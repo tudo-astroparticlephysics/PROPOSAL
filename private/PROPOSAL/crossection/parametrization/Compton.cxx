@@ -70,6 +70,11 @@ Parametrization::IntegralLimits Compton::GetIntegralLimits(double energy)
 
     limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
 
+    if (limits.vUp < limits.vMin)
+    {
+        limits.vUp = limits.vMin;
+    }
+
     return limits;
 }
 

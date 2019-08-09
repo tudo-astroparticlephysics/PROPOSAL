@@ -1442,6 +1442,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         log_debug("No given weak_multiplier option given. Use default (%f)", sec_def_global.utility_def.weak_def.multiplier);
     }
 
+    if (json_global.find("compton_multiplier") != json_global.end())
+    {
+        if (json_global["compton_multiplier"].is_number())
+        {
+            sec_def_global.utility_def.compton_def.multiplier = json_global["compton_multiplier"].get<double>();
+        }
+        else
+        {
+            log_fatal("The given compton_multiplier option is not a double.");
+        }
+    }
+    else
+    {
+        log_debug("No given compton_multiplier option given. Use default (%f)", sec_def_global.utility_def.compton_def.multiplier);
+    }
+
     if (json_global.find("lpm") != json_global.end())
     {
         if (json_global["lpm"].is_boolean())
@@ -1682,6 +1698,24 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     {
         log_debug("The weak option is not set. Use default %s",
                   WeakInteractionFactory::Get().GetStringFromEnum(sec_def_global.utility_def.weak_def.parametrization).c_str());
+    }
+
+    if (json_global.find("compton") != json_global.end())
+    {
+        if (json_global["compton"].is_string())
+        {
+            std::string compton = json_global["compton"].get<std::string>();
+            sec_def_global.utility_def.compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(compton);
+        }
+        else
+        {
+            log_fatal("The given compton option is not a string.");
+        }
+    }
+    else
+    {
+        log_debug("The compton option is not set. Use default %s",
+                  ComptonFactory::Get().GetStringFromEnum(sec_def_global.utility_def.compton_def.parametrization).c_str());
     }
 
     if (json_global.find("photo_shadow") != json_global.end())

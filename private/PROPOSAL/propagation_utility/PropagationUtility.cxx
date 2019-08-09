@@ -107,6 +107,7 @@ Utility::Utility(const ParticleDef& particle_def,
     if(utility_def.compton_def.parametrization!=ComptonFactory::Enum::None) {
         crosssections_.push_back(ComptonFactory::Get().CreateCompton(
                 particle_def_, *medium_, cut_settings_, utility_def.compton_def));
+        log_debug("Compton enabled");
     }
 
 }
@@ -161,6 +162,7 @@ Utility::Utility(const ParticleDef& particle_def,
     if(utility_def.compton_def.parametrization!=ComptonFactory::Enum::None) {
         crosssections_.push_back(ComptonFactory::Get().CreateCompton(
                 particle_def_, *medium_, cut_settings_, utility_def.compton_def, interpolation_def));
+        log_debug("Compton enabled");
     }
 }
 
