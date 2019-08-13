@@ -75,6 +75,7 @@ def create_tables(dir_name, interpolate=False, **kwargs):
                                 medium,
                                 cut,
                                 multiplier,
+                                True,
                                 interpoldef)
 
                             xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
@@ -83,7 +84,8 @@ def create_tables(dir_name, interpolate=False, **kwargs):
                                 particle,
                                 medium,
                                 cut,
-                                multiplier
+                                multiplier,
+                                True
                                 )
 
                             xsection = pp.crosssection.MupairIntegral(param_current)
@@ -138,6 +140,7 @@ def create_table_dNdx(dir_name, interpolate=False):
                                     medium,
                                     cut,
                                     multiplier,
+                                    True,
                                     interpoldef)
 
                                 xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
@@ -146,7 +149,8 @@ def create_table_dNdx(dir_name, interpolate=False):
                                     particle,
                                     medium,
                                     cut,
-                                    multiplier)
+                                    multiplier,
+                                    True)
 
                                 xsection = pp.crosssection.MupairIntegral(param_current)
 
@@ -188,6 +192,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
                                     medium,
                                     cut,
                                     multiplier,
+                                    True,
                                     interpoldef)
 
                                 xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
@@ -196,7 +201,8 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
                                     particle,
                                     medium,
                                     cut,
-                                    multiplier)
+                                    multiplier,
+                                    True)
 
                                 xsection = pp.crosssection.MupairIntegral(param_current)
 
@@ -240,6 +246,7 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
                                     medium,
                                     cut,
                                     multiplier,
+                                    True,
                                     interpoldef)
 
                                 xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
@@ -248,7 +255,8 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
                                     particle,
                                     medium,
                                     cut,
-                                    multiplier)
+                                    multiplier,
+                                    True)
 
                                 xsection = pp.crosssection.MupairIntegral(param_current)
 
@@ -294,26 +302,26 @@ def create_table_rho(dir_name, interpolate=False):
                                     medium,
                                     cut,
                                     multiplier,
+                                    True,
                                     interpoldef)
 
-                                xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
                             else:
                                 param_current = param(
                                     particle,
                                     medium,
                                     cut,
-                                    multiplier)
-
-                                xsection = pp.crosssection.MupairIntegral(param_current)
+                                    multiplier,
+                                    True)
 
                             buf = [""]
 
                             for energy in energies:
                                 rnd1 = pp.RandomGenerator.get().random_double()
                                 rnd2 = pp.RandomGenerator.get().random_double()
-                                particles = xsection.calculate_produced_particles(energy, v*energy, rnd1, rnd2)
-                                E1 = particles[0].energy
-                                E2 = particles[1].energy
+
+                                rho = param_current.Calculaterho(energy, v, rnd1, rnd2)
+                                E1 = 0.5 * v * energy * (1 + rho)
+                                E2 = 0.5 * v * energy * (1 - rho)
 
                                 buf.append(particle.name)
                                 buf.append(medium.name)

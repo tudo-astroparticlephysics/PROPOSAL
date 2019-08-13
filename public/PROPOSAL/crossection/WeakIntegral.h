@@ -52,7 +52,10 @@ namespace PROPOSAL {
         double CalculatedEdx(double energy){ (void)energy; return 0; }
         double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }
         double CalculatedE2dx(double energy){ (void)energy; return 0; }
-        
+        std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(double energy, double energy_loss){
+            // interaction is fatal
+            (void)energy; (void)energy_loss; return std::make_pair(std::vector<Particle*>(), true);
+        }
     };
 
 } // namespace PROPOSAL

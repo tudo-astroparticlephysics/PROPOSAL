@@ -9,21 +9,22 @@
 #include "PROPOSAL/Constants.h"
 
 
-#define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                                                               \
-    Mupair##param::Mupair##param(const ParticleDef& particle_def,                                                        \
+#define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                                                              \
+    Mupair##param::Mupair##param(const ParticleDef& particle_def,                                                      \
                                const Medium& medium,                                                                   \
                                const EnergyCutSettings& cuts,                                                          \
-                               double multiplier)                                                                               \
-        : MupairProductionRhoIntegral(particle_def, medium, cuts, multiplier)                                      \
+                               double multiplier,                                                                      \
+                               bool particle_output)                                                                   \
+        : MupairProductionRhoIntegral(particle_def, medium, cuts, multiplier, particle_output)                         \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    Mupair##param::Mupair##param(const Mupair##param& photo)                                                              \
-        : MupairProductionRhoIntegral(photo)                                                                            \
+    Mupair##param::Mupair##param(const Mupair##param& photo)                                                           \
+        : MupairProductionRhoIntegral(photo)                                                                           \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    Mupair##param::~Mupair##param() {}                                                                                   \
+    Mupair##param::~Mupair##param() {}                                                                                 \
                                                                                                                        \
     const std::string Mupair##param::name_ = "Mupair" #param;
 
@@ -40,13 +41,14 @@ using namespace PROPOSAL;
 MupairProduction::MupairProduction(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  const EnergyCutSettings& cuts,
-                                 double multiplier)
-    : Parametrization(particle_def, medium, cuts, multiplier), drho_integral_(IROMB, IMAXS, IPREC)
+                                 double multiplier,
+                                 bool particle_output)
+    : Parametrization(particle_def, medium, cuts, multiplier), drho_integral_(IROMB, IMAXS, IPREC), particle_output_(particle_output)
 {
 }
 
 MupairProduction::MupairProduction(const MupairProduction& mupair)
-    : Parametrization(mupair), drho_integral_(IROMB, IMAXS, IPREC)
+    : Parametrization(mupair), drho_integral_(IROMB, IMAXS, IPREC), particle_output_(mupair.particle_output_)
 {
 }
 
@@ -54,9 +56,12 @@ MupairProduction::~MupairProduction() {}
 
 bool MupairProduction::compare(const Parametrization& parametrization) const
 {
-    //const MupairProduction* pairproduction = static_cast<const MupairProduction*>(&parametrization);
+    const MupairProduction* mupair = static_cast<const MupairProduction*>(&parametrization);
 
-    return Parametrization::compare(parametrization);
+    if (particle_output_ != mupair->particle_output_)
+        return false;
+    else
+        return Parametrization::compare(parametrization);
 }
 
 // ------------------------------------------------------------------------- //
@@ -120,8 +125,9 @@ double MupairProduction::Calculaterho(double energy, double v, double rnd1, doub
 MupairProductionRhoIntegral::MupairProductionRhoIntegral(const ParticleDef& particle_def,
                                                        const Medium& medium,
                                                        const EnergyCutSettings& cuts,
-                                                       double multiplier)
-    : MupairProduction(particle_def, medium, cuts, multiplier)
+                                                       double multiplier,
+                                                       bool particle_output)
+    : MupairProduction(particle_def, medium, cuts, multiplier, particle_output)
     , integral_(IROMB, IMAXS, IPREC)
 {
 }

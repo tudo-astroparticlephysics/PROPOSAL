@@ -90,23 +90,25 @@ using namespace PROPOSAL;
              py::arg("lpm_effect"),                                                                                    \
              py::arg("interpolation_def"));
 
-#define MUPAIR_DEF(module, cls)                                                                                         \
-    py::class_<Mupair##cls, std::shared_ptr<Mupair##cls>, MupairProductionRhoIntegral>(module, #cls)                      \
-        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),                    \
+#define MUPAIR_DEF(module, cls)                                                                                        \
+    py::class_<Mupair##cls, std::shared_ptr<Mupair##cls>, MupairProductionRhoIntegral>(module, #cls)                   \
+        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(),                    \
              py::arg("particle_def"),                                                                                  \
              py::arg("medium"),                                                                                        \
              py::arg("energy_cuts"),                                                                                   \
-             py::arg("multiplier"));
+             py::arg("multiplier"),                                                                                    \
+             py::arg("particle_output"));
 
-#define MUPAIR_INTERPOL_DEF(module, cls)                                                                                \
-    py::class_<MupairProductionRhoInterpolant<Mupair##cls>,                                                              \
-               std::shared_ptr<MupairProductionRhoInterpolant<Mupair##cls> >,                                            \
-               Mupair##cls>(module, #cls "Interpolant")                                                                 \
-        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, InterpolationDef>(),  \
+#define MUPAIR_INTERPOL_DEF(module, cls)                                                                               \
+    py::class_<MupairProductionRhoInterpolant<Mupair##cls>,                                                            \
+               std::shared_ptr<MupairProductionRhoInterpolant<Mupair##cls> >,                                          \
+               Mupair##cls>(module, #cls "Interpolant")                                                                \
+        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool, InterpolationDef>(),  \
              py::arg("particle_def"),                                                                                  \
              py::arg("medium"),                                                                                        \
              py::arg("energy_cuts"),                                                                                   \
-             py::arg("multiplier"),                                                                                      \
+             py::arg("multiplier"),                                                                                    \
+             py::arg("particle_output"),                                                                               \
              py::arg("interpolation_def"));
 
 // ------------------------------------------------------------------------- //
@@ -1392,7 +1394,8 @@ void init_parametrization(py::module& m)
                 particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
                 medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
                 energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
-                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies   
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
+                particle_output (bool): If enabled, produced muons are sampled and returned as particles. Otherwise, only a DymamicData object is returned
                 interpolation_def (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
                                                                                           
             Since the differential cross section is given in :math:`\rho` as well, an intergration over this parameter is needed.
@@ -1410,7 +1413,7 @@ void init_parametrization(py::module& m)
                 >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
                 >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
                 >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
-                >>> param = pyPROPOSAL.parametrization.mupairproduction.KelnerKokoulinPetrukhin(mu, medium, cuts, 1.0)
+                >>> param = pyPROPOSAL.parametrization.mupairproduction.KelnerKokoulinPetrukhin(mu, medium, cuts, 1.0, True)
                 )pbdoc")
             .def("Calculaterho", &MupairProduction::Calculaterho,
             py::arg("energy"),
@@ -1936,21 +1939,17 @@ void init_crosssection(py::module& m)
         .def("calculate_produced_particles", &CrossSection::CalculateProducedParticles,
             py::arg("energy"),
             py::arg("energy_loss"),
-            py::arg("rnd1"),
-            py::arg("rnd2"),
                 R"pbdoc( 
 
-            Available for the muon pairproduction. Samples the two muons that are produces in pairproduction by sampling the asymmetry parameter :math:`\rho` which describes
-            the distribution of the energy loss between the two created muons.
+            If particles are produced in the interaction of this CrossSection, the methods samples those particles corresponding to the energy of the initial particle as
+            well as the energy loss of the initial particle. Available for muon pairproduction.
 
             Args:                                                                                                  
                 energy (float): primary particle energy in MeV
                 energy_loss (float): energy loss of the primary particle in MeV
-                rnd1 (float): random number between 0 and 1 to calculate the asymmetry between the two produced particles
-                rnd2 (float): random number between 0 and 1 to calculate the sign of the asymmetry between the two produces particles
 
             Returns:
-                list of created particles with corresponding energies
+                List of created particles as well as a boolean with the information whether the initial particle has been destroyed in the interaction
                      
                 )pbdoc")
         .def_property_readonly("id", &CrossSection::GetTypeId,
@@ -2524,7 +2523,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                     distance (float): Distance to propagate in cm.
 
                 Returns:
-                    float: if the value is positive, the energy after the propagated distance. If negativ the propagated distance is return with a minus sign.
+                    float: if the value is positive, the energy after the propagated distance. If negative the propagated distance is return with a minus sign.
 			)pbdoc"
 		)
         .def(
@@ -2543,7 +2542,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 		)
         .def(
 			"MakeStochasticLoss", 
-			&Sector::MakeStochasticLoss, 
+			&Sector::MakeStochasticLoss,
 			py::arg("particle_energy"),
 			R"pbdoc(
                 Samples the stochastic loss.
@@ -2553,7 +2552,13 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                         particle.
 
                 Returns:
-                    tuple: (energy loss, interaction type)
+                    Tuple of three elements describing the sampled stoachastic loss:
+
+                    * Absolute energy loss of stochastic loss
+
+                    * Type of stochastic loss as :meth:`particle.DynamicData` object
+
+                    * Pair of a list of created secondary particles as well as a boolean describing whether the initial particle was destroyed in this interaction
 			)pbdoc"
 		)
         .def_property_readonly(

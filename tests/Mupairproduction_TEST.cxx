@@ -38,11 +38,11 @@ EnergyCutSettings ecuts;
 double multiplier   = 1.;
 
 MupairProductionRhoIntegral* MupairInt_A =
-        new MupairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier);
-Parametrization* MupairInt_B = new MupairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier);
+        new MupairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier, true);
+Parametrization* MupairInt_B = new MupairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier, true);
 EXPECT_TRUE(*MupairInt_A == *MupairInt_B);
 
-MupairKelnerKokoulinPetrukhin param_int(particle_def, medium, ecuts, multiplier);
+MupairKelnerKokoulinPetrukhin param_int(particle_def, medium, ecuts, multiplier, true);
 EXPECT_TRUE(param_int == *MupairInt_A);
 
 MupairIntegral* Int_A        = new MupairIntegral(param_int);
@@ -51,12 +51,12 @@ EXPECT_TRUE(*Int_A == *Int_B);
 
 InterpolationDef InterpolDef;
 MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>* MupairInterpol_A =
-        new MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, InterpolDef);
+        new MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, true, InterpolDef);
 Parametrization* MupairInterpol_B =
-        new MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, InterpolDef);
+        new MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, true, InterpolDef);
 EXPECT_TRUE(*MupairInterpol_A == *MupairInterpol_B);
 
-MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> param_interpol(particle_def, medium, ecuts, multiplier, InterpolDef);
+MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> param_interpol(particle_def, medium, ecuts, multiplier, true, InterpolDef);
 EXPECT_TRUE(param_interpol == *MupairInterpol_A);
 
 MupairInterpolant* Interpol_A        = new MupairInterpolant(param_interpol, InterpolDef);
@@ -84,30 +84,34 @@ EnergyCutSettings ecuts_2(-1, 0.05);
 double multiplier_1 = 1.;
 double multiplier_2 = 2.;
 
-MupairKelnerKokoulinPetrukhin MupairInt_A(mu_def, medium_1, ecuts_1, multiplier_1);
-MupairKelnerKokoulinPetrukhin MupairInt_B(tau_def, medium_1, ecuts_1, multiplier_1);
-MupairKelnerKokoulinPetrukhin MupairInt_C(mu_def, medium_2, ecuts_1, multiplier_1);
-MupairKelnerKokoulinPetrukhin MupairInt_D(mu_def, medium_1, ecuts_2, multiplier_1);
-MupairKelnerKokoulinPetrukhin MupairInt_E(mu_def, medium_1, ecuts_1, multiplier_2);
+MupairKelnerKokoulinPetrukhin MupairInt_A(mu_def, medium_1, ecuts_1, multiplier_1, true);
+MupairKelnerKokoulinPetrukhin MupairInt_B(tau_def, medium_1, ecuts_1, multiplier_1, true);
+MupairKelnerKokoulinPetrukhin MupairInt_C(mu_def, medium_2, ecuts_1, multiplier_1, true);
+MupairKelnerKokoulinPetrukhin MupairInt_D(mu_def, medium_1, ecuts_2, multiplier_1, true);
+MupairKelnerKokoulinPetrukhin MupairInt_E(mu_def, medium_1, ecuts_1, multiplier_2, true);
+MupairKelnerKokoulinPetrukhin MupairInt_F(mu_def, medium_1, ecuts_1, multiplier_1, false);
 EXPECT_TRUE(MupairInt_A != MupairInt_B);
 EXPECT_TRUE(MupairInt_A != MupairInt_C);
 EXPECT_TRUE(MupairInt_A != MupairInt_D);
 EXPECT_TRUE(MupairInt_A != MupairInt_E);
+EXPECT_TRUE(MupairInt_A != MupairInt_F);
 
 MupairIntegral Int_A(MupairInt_A);
 MupairIntegral Int_B(MupairInt_B);
 EXPECT_TRUE(Int_A != Int_B);
 
 InterpolationDef InterpolDef;
-MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(mu_def, medium_1, ecuts_1, multiplier_1, InterpolDef);
-MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_B(tau_def, medium_1, ecuts_1, multiplier_1, InterpolDef);
-MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_C(mu_def, medium_2, ecuts_1, multiplier_1, InterpolDef);
-MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_D(mu_def, medium_1, ecuts_2, multiplier_1, InterpolDef);
-MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_E(mu_def, medium_1, ecuts_1, multiplier_2, InterpolDef);
+MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(mu_def, medium_1, ecuts_1, multiplier_1, true, InterpolDef);
+MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_B(tau_def, medium_1, ecuts_1, multiplier_1, true, InterpolDef);
+MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_C(mu_def, medium_2, ecuts_1, multiplier_1, true, InterpolDef);
+MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_D(mu_def, medium_1, ecuts_2, multiplier_1, true, InterpolDef);
+MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_E(mu_def, medium_1, ecuts_1, multiplier_2, true, InterpolDef);
+MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_F(mu_def, medium_1, ecuts_1, multiplier_1, false, InterpolDef);
 EXPECT_TRUE(MupairInterpol_A != MupairInterpol_B);
 EXPECT_TRUE(MupairInterpol_A != MupairInterpol_C);
 EXPECT_TRUE(MupairInterpol_A != MupairInterpol_D);
 EXPECT_TRUE(MupairInterpol_A != MupairInterpol_E);
+EXPECT_TRUE(MupairInterpol_A != MupairInterpol_F);
 
 MupairInterpolant Interpol_A(MupairInterpol_A, InterpolDef);
 MupairInterpolant Interpol_B(MupairInterpol_B, InterpolDef);
@@ -121,7 +125,7 @@ Water medium;
 EnergyCutSettings ecuts;
 double multiplier = 1.;
 
-MupairKelnerKokoulinPetrukhin MupairInt_A(particle_def, medium, ecuts, multiplier);
+MupairKelnerKokoulinPetrukhin MupairInt_A(particle_def, medium, ecuts, true, multiplier);
 MupairKelnerKokoulinPetrukhin MupairInt_B = MupairInt_A;
 EXPECT_TRUE(MupairInt_A == MupairInt_B);
 
@@ -130,7 +134,7 @@ MupairIntegral Int_B = Int_A;
 EXPECT_TRUE(Int_A == Int_B);
 
 InterpolationDef InterpolDef;
-MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(particle_def, medium, ecuts, multiplier, InterpolDef);
+MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(particle_def, medium, ecuts, multiplier, true, InterpolDef);
 MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_B = MupairInterpol_A;
 EXPECT_TRUE(MupairInterpol_A == MupairInterpol_B);
 
@@ -146,7 +150,7 @@ Water medium;
 EnergyCutSettings ecuts;
 double multiplier = 1.;
 
-MupairKelnerKokoulinPetrukhin MupairInt_A(particle_def, medium, ecuts, multiplier);
+MupairKelnerKokoulinPetrukhin MupairInt_A(particle_def, medium, ecuts, true, multiplier);
 MupairKelnerKokoulinPetrukhin MupairInt_B(MupairInt_A);
 EXPECT_TRUE(MupairInt_A == MupairInt_B);
 
@@ -155,7 +159,7 @@ MupairIntegral Int_B(Int_A);
 EXPECT_TRUE(Int_A == Int_B);
 
 InterpolationDef InterpolDef;
-MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(particle_def, medium, ecuts, multiplier, InterpolDef);
+MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(particle_def, medium, ecuts, multiplier, true, InterpolDef);
 MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_B(MupairInterpol_A);
 EXPECT_TRUE(MupairInterpol_A == MupairInterpol_B);
 
@@ -389,6 +393,8 @@ double E2_stored;
 double E1_new;
 double E2_new;
 
+double rho;
+
 std::vector<Particle*> particles;
 
 
@@ -411,10 +417,10 @@ mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(pa
 
 CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
 
-particles = mupair->CalculateProducedParticles(energy, v*energy, rnd1, rnd2);
+rho = mupair->GetParametrization().Calculaterho(energy, v, rnd1, rnd2);
+E1_new = 0.5 * v * energy * (1 + rho);
+E2_new = 0.5 * v * energy * (1 - rho);
 
-E1_new = particles[0]->GetEnergy();
-E2_new = particles[1]->GetEnergy();
 ASSERT_NEAR(E1_new, E1_stored, 1E-6 * E1_stored);
 ASSERT_NEAR(E2_new, E2_stored, 1E-6 * E2_stored);
 

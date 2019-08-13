@@ -64,8 +64,14 @@ public:
     virtual double CalculatedNdx(double energy)                                     = 0;
     virtual double CalculatedNdx(double energy, double rnd)                         = 0;
     virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2) = 0;
-    virtual std::vector<Particle*> CalculateProducedParticles(double energy, double energy_loss, double rnd1, double rnd2){
-        (void)energy; (void)energy_loss; (void)rnd1; (void)rnd2; return std::vector<Particle*>();}
+
+    // CalculateProducedParticles Return values:
+    // First Parameter: List of produced particles by stochastic interaction (default: no particles, e.g. empty list)
+    // Second parameter: Is the interaction a fatal interaction (e.g. will the initial particle vanish after interaction?)
+    virtual std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(
+            double energy, double energy_loss){
+        (void)energy; (void)energy_loss; return std::make_pair(std::vector<Particle*>(), false);
+    }
 
     // ----------------------------------------------------------------- //
     // Getter

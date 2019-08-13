@@ -11,6 +11,9 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
 
+#include "PROPOSAL/math/RandomGenerator.h"
+
+
 using namespace PROPOSAL;
 
 MupairInterpolant::MupairInterpolant(const MupairProduction& param, InterpolationDef def)
@@ -93,18 +96,26 @@ double MupairInterpolant::CalculatedEdx(double energy)
     return parametrization_->GetMultiplier() * std::max(dedx_interpolant_->Interpolate(energy), 0.0);
 }
 
-std::vector<Particle*> MupairInterpolant::CalculateProducedParticles(double energy, double energy_loss, double rnd1, double rnd2){
+std::pair<std::vector<Particle*>, bool> MupairInterpolant::CalculateProducedParticles(double energy, double energy_loss){
+    std::vector<Particle*> mupair;
+
+    if(parametrization_->IsParticleOutputEnabled() == false){
+        return std::make_pair(mupair, false);
+    }
 
     //Create MuPair particles
-    std::vector<Particle*> mupair;
     mupair.push_back(new Particle(MuMinusDef::Get()));
     mupair.push_back(new Particle(MuPlusDef::Get()));
+
+    //Sample random numbers
+    double rnd1 = RandomGenerator::Get().RandomDouble();
+    double rnd2 = RandomGenerator::Get().RandomDouble();
 
     //Sample and assign energies
     double rho = parametrization_->Calculaterho(energy, energy_loss/energy, rnd1, rnd2);
 
     mupair[0]->SetEnergy(0.5*energy_loss*(1 + rho));
     mupair[1]->SetEnergy(0.5*energy_loss*(1 - rho));
-    return mupair;
+    return std::make_pair(mupair, false);
 
 }

@@ -85,7 +85,6 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, ParticleDef const& def)
        << "\t\t" << def.charge << '\n';
     os << "HardComponentTables:" << '\n';
 
-    std::cout << def.hard_component_table.size() << std::endl;
     for (unsigned int i = 0; i < def.hard_component_table.size(); ++i)
     {
         for (unsigned int j = 0; j < def.hard_component_table[i].size(); ++j)

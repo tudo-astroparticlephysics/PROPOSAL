@@ -206,7 +206,7 @@ TEST(Sector, Propagate)
             particle.SetDirection(Vector3D(1, 0, 0));
 
             energyTillStochastic_calc = sector.CalculateEnergyTillStochastic(energy_init).first;
-            stochasticLoss_calc = sector.MakeStochasticLoss(energy_init).first;
+            stochasticLoss_calc = std::get<0>(sector.MakeStochasticLoss(energy_init));
             energy_final_calc = sector.Propagate(distance);
 
             ASSERT_NEAR(energyTillStochastic_calc, energyTillStochastic_stored, std::abs(1e-3 * energyTillStochastic_calc));
