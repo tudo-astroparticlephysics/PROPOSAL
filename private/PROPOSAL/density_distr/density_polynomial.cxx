@@ -72,8 +72,14 @@ double Density_polynomial::Correct(Vector3D xi,
     // direction * fAxis_
 
     try {
-        res = NewtonRaphson(F, dF, 0, distance_to_border, 1e-6);
+        res = NewtonRaphson(F, dF, 0, distance_to_border, distance_to_border/2);
+        std::cout << "res: "
+                  << res
+                  << std::endl;
     } catch (MathException& e) {
+        std::cout << "Distance to border: " 
+                  << distance_to_border 
+                  << std::endl;
         return distance_to_border;
     }
 

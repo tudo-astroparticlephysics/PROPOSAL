@@ -347,6 +347,7 @@ double Sector::Propagate(double distance)
 
     while (flag)
     {
+
         energy_till_stochastic_ = CalculateEnergyTillStochastic(initial_energy);
 
         if (energy_till_stochastic_.first > energy_till_stochastic_.second)
@@ -364,6 +365,10 @@ double Sector::Propagate(double distance)
                                                            distance - propagated_distance, 
                                                            particle_.GetPosition(), 
                                                            particle_.GetDirection());
+
+        std::cout << "distance_to_border: " 
+                  << distance - propagated_distance 
+                  << std::endl;
 
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
