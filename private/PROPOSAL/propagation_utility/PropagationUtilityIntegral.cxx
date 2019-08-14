@@ -87,11 +87,11 @@ double UtilityIntegralDisplacement::Calculate(double ei, double ef, double rnd)
         ei, ef, std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, this, std::placeholders::_1), 4, -rnd);
 }
     
-double UtilityIntegralDisplacement::Calculate(double ei, double ef, double rnd, Vector3D xi, Vector3D direction)
+double UtilityIntegralDisplacement::Calculate(double ei, double ef, double distance_to_border, Vector3D xi, Vector3D direction)
 {
     double aux = integral_.IntegrateWithRandomRatio(
-        ei, ef, std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, this, std::placeholders::_1), 4, -rnd);
-    return utility_.GetDensityDistribution().Correct(xi, direction, aux);
+        ei, ef, std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, this, std::placeholders::_1), 4, -distance_to_border);
+    return utility_.GetDensityDistribution().Correct(xi, direction, aux, distance_to_border);
 }
 
 /******************************************************************************

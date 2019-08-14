@@ -10,7 +10,7 @@
 namespace PROPOSAL {
 
     double NewtonRaphson(std::function<double(double)> func, std::function<double(double)> dfunc, double x1, double x2,
-                         double xacc) {
+            double xinit, int MAX_STEPS, double xacc) {
 
         /*
          * Method adapted from rtsafe method from:
@@ -20,7 +20,6 @@ namespace PROPOSAL {
 
         double df, dx, dxold, f, fh, fl;
         double temp, xh, xl, rts;
-        const int MAXIT = 100;
 
         fl = func(x1);
         fh = func(x2);
@@ -47,14 +46,14 @@ namespace PROPOSAL {
             xl = x2;
         }
 
-        rts = 0.5 * (x1 + x2); //initial guess for root
+        rts = xinit; //initial guess for root
         dxold = fabs(x2 - x1);
         dx = dxold;
 
         f = func(rts);
         df = dfunc(rts);
 
-        for (int j = 1; j < MAXIT; j++) {
+        for (int j = 1; j < MAX_STEPS; j++) {
             if ((((rts - xh) * df - f) * ((rts - xl) * df - f) > 0.0) || (fabs(2.0 * f) > fabs(dxold * df)))
             {
                 //use bisection if Newton method produces an x that is out of range

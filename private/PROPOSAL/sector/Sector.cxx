@@ -347,6 +347,7 @@ double Sector::Propagate(double distance)
 
     while (flag)
     {
+
         energy_till_stochastic_ = CalculateEnergyTillStochastic(initial_energy);
 
         if (energy_till_stochastic_.first > energy_till_stochastic_.second)
@@ -360,10 +361,14 @@ double Sector::Propagate(double distance)
         }
 
         displacement = displacement_calculator_->Calculate(initial_energy, 
-                                               final_energy, 
-                                               distance-propagated_distance, 
-                                               particle_.GetPosition(), 
-                                               particle_.GetDirection());
+                                                           final_energy, 
+                                                           distance - propagated_distance, 
+                                                           particle_.GetPosition(), 
+                                                           particle_.GetDirection());
+
+        std::cout << "distance_to_border: " 
+                  << distance - propagated_distance 
+                  << std::endl;
 
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
@@ -371,14 +376,14 @@ double Sector::Propagate(double distance)
         {
             displacement = distance - propagated_distance;
 
-            double aux = utility_.GetDensityDistribution().Calculate(
-                    particle_.GetPosition(), 
-                    particle_.GetDirection(), 
-                    displacement);
+            /* double aux = utility_.GetDensityDistribution().Calculate( */
+            /*         particle_.GetPosition(), */ 
+            /*         particle_.GetDirection(), */ 
+            /*         displacement); */
 
             final_energy = displacement_calculator_->GetUpperLimit(
                 initial_energy, 
-                aux);
+                displacement);
         }
 
         if(sector_def_.do_continuous_energy_loss_output)

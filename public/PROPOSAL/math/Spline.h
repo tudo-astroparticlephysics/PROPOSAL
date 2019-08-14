@@ -18,7 +18,7 @@ class Spline
 
         Spline(const Spline&);
 
-        virtual Spline* clone() const = 0;
+        virtual Spline* clone() const = 0; 
 
         virtual double evaluate(double x);
 

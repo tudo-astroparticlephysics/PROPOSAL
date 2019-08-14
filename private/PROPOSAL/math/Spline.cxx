@@ -189,7 +189,9 @@ void Cubic_Spline::calculate_splines(std::vector<double> x, std::vector<double> 
         std::vector<double> coeff;
         for(int i = 0; i<n; i++){
             coeff = {a[i], b[i], c[i], d[i]};
-            splines_.push_back(Polynom(coeff));
+            auto p = Polynom(coeff);
+            p.shift(-x[i]);
+            splines_.push_back(p);
             subintervall_.push_back(x[i]);
         }
         n_subintervalls_ = n;

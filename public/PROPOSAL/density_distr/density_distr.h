@@ -73,7 +73,7 @@ class Density_distr
 
         virtual Density_distr* clone() const = 0;
 
-        virtual double Correct(Vector3D xi, Vector3D direction, double res) const = 0;
+        virtual double Correct(Vector3D xi, Vector3D direction, double res, double distance_to_border) const = 0;
         virtual double Integrate(Vector3D xi, Vector3D direction, double l) const = 0;
         virtual double Calculate(Vector3D xi, Vector3D direction, double distance) const = 0;
         virtual double GetCorrection(Vector3D xi) const = 0;

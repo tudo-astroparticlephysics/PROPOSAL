@@ -1,6 +1,6 @@
 #include "PROPOSAL/density_distr/density_polynomial.h" 
 #include "PROPOSAL/math/MathMethods.h" 
-#include "PROPOSAL/math/Function.h" 
+#include "PROPOSAL/math/Function.h"
 #include <functional>
 #include <algorithm>
 #include <iostream>
@@ -52,7 +52,8 @@ double Density_polynomial::helper_function(Vector3D xi,
 
 double Density_polynomial::Correct(Vector3D xi, 
                                    Vector3D direction,
-                                   double res) const 
+                                   double res,
+                                   double distance_to_border) const 
 {
     std::function<double(double)> F = std::bind(&Density_polynomial::Helper_function, 
                                                 this, 
@@ -72,13 +73,15 @@ double Density_polynomial::Correct(Vector3D xi,
     // direction * fAxis_
 
     try {
-        res = NewtonRaphson(F, dF, 0, 1e7, 1.e-6);
+        res = NewtonRaphson(F, dF, 0, distance_to_border, distance_to_border/2);
+        std::cout << "res: "
+                  << res
+                  << std::endl;
     } catch (MathException& e) {
-        double depth = GetCorrection(xi + res * direction);
-        if ( depth < 0 ) 
-            DensityException("Densities smaller than zero are non-physical. Check coefficients from polynom.");
-        else
-            throw e;
+        std::cout << "Distance to border: " 
+                  << distance_to_border 
+                  << std::endl;
+        return distance_to_border;
     }
 
     return res;
