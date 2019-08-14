@@ -51,7 +51,8 @@ double Density_polynomial::helper_function(Vector3D xi,
 
 double Density_polynomial::Correct(Vector3D xi, 
                                    Vector3D direction,
-                                   double res) const 
+                                   double res,
+                                   double distance_to_border) const 
 {
     std::function<double(double)> F = std::bind(&Density_polynomial::Helper_function, 
                                                 this, 
@@ -71,13 +72,9 @@ double Density_polynomial::Correct(Vector3D xi,
     // direction * fAxis_
 
     try {
-        res = NewtonRaphson(F, dF, 0, 1e7, 5e3);
+        res = NewtonRaphson(F, dF, 0, distance_to_border, 1e-6);
     } catch (MathException& e) {
-        double depth = GetCorrection(xi + res * direction);
-        if ( depth < 0 ) 
-            DensityException("Densities smaller than zero are non-physical. Check coefficients from polynom.");
-        else
-            throw e;
+        return distance_to_border;
     }
 
     return res;

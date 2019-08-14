@@ -48,7 +48,7 @@ class Density_polynomial : public Density_distr
 
         Density_polynomial* clone() const { return new Density_polynomial(*this); };
 
-        double Correct(Vector3D xi, Vector3D direction, double res) const override;
+        double Correct(Vector3D xi, Vector3D direction, double res, double distance_to_border) const override;
         double Integrate(Vector3D xi, Vector3D direction, double l) const override;
         double Calculate(Vector3D xi, Vector3D direction, double distance) const override;
         double GetCorrection(Vector3D xi) const override;

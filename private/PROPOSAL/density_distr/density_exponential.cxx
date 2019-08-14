@@ -20,7 +20,8 @@ double Density_exponential::GetEffectiveDistance(Vector3D xi, Vector3D direction
 
 double Density_exponential::Correct(Vector3D xi, 
                                     Vector3D direction, 
-                                    double res) const 
+                                    double res,
+                                    double distance_to_border) const 
 {
     double phi = GetDepth(xi);
     double delta = GetEffectiveDistance(xi, direction);

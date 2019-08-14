@@ -14,7 +14,8 @@ Density_homogeneous::Density_homogeneous(const Density_homogeneous& dens_distr):
 
 double Density_homogeneous::Correct(Vector3D xi, 
                                     Vector3D direction, 
-                                    double res) const
+                                    double res,
+                                    double distance_to_border) const
 {
     (void) xi;
     (void) direction;

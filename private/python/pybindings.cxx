@@ -2,6 +2,7 @@
 #include <pybind11/functional.h>
 #include <pybind11/stl_bind.h>
 #include <pybind11/stl.h>
+#include <pybind11/numpy.h>
 
 #include "PROPOSAL/PROPOSAL.h"
 
@@ -305,6 +306,7 @@ void init_medium(py::module& m)
         .def_property_readonly("refraction_index", &Medium::GetR)
         .def_property_readonly("density_correction", &Medium::GetDensityCorrection)
         .def_property_readonly("radiation_length", &Medium::GetRadiationLength)
+        .def_property_readonly("mass_density", &Medium::GetMassDensity)
         .def_property_readonly("mol_density", &Medium::GetMolDensity)
         .def_property_readonly("average_nucleon_weigth", &Medium::GetMM)
         .def_property_readonly("sum_nucleons", &Medium::GetSumNucleons)
@@ -312,35 +314,59 @@ void init_medium(py::module& m)
         .def_property_readonly("components", &Medium::GetComponents)
         .def_property_readonly("name", &Medium::GetName);
 
-    /* MEDIUM_DEF(m_sub, Water) */
-    /* MEDIUM_DEF(m_sub, Ice) */
-    /* MEDIUM_DEF(m_sub, Salt) */
-    /* MEDIUM_DEF(m_sub, CalciumCarbonate) */
-    /* MEDIUM_DEF(m_sub, StandardRock) */
-    /* MEDIUM_DEF(m_sub, FrejusRock) */
-    /* MEDIUM_DEF(m_sub, Iron) */
-    /* MEDIUM_DEF(m_sub, Hydrogen) */
-    /* MEDIUM_DEF(m_sub, Lead) */
-    /* MEDIUM_DEF(m_sub, Copper) */
-    /* MEDIUM_DEF(m_sub, Uranium) */
-    /* MEDIUM_DEF(m_sub, Air) */
-    /* MEDIUM_DEF(m_sub, Paraffin) */
-    /* MEDIUM_DEF(m_sub, AntaresWater) */
+    MEDIUM_DEF(m_sub, Water)
+    MEDIUM_DEF(m_sub, Ice)
+    MEDIUM_DEF(m_sub, Salt)
+    MEDIUM_DEF(m_sub, CalciumCarbonate)
+    MEDIUM_DEF(m_sub, StandardRock)
+    MEDIUM_DEF(m_sub, FrejusRock)
+    MEDIUM_DEF(m_sub, Iron)
+    MEDIUM_DEF(m_sub, Hydrogen)
+    MEDIUM_DEF(m_sub, Lead)
+    MEDIUM_DEF(m_sub, Copper)
+    MEDIUM_DEF(m_sub, Uranium)
+    MEDIUM_DEF(m_sub, Air)
+    MEDIUM_DEF(m_sub, Paraffin)
+    MEDIUM_DEF(m_sub, AntaresWater)
 
-    py::class_<Density_distr, std::shared_ptr<Density_distr>>(m_sub, "Density_distribution");
-    /*     .def_property_readonly("Axis", &Density_distr::GetAxis); */
+    py::class_<Density_distr, std::shared_ptr<Density_distr>>(m_sub, "density_distribution");
     
-    py::class_<Density_exponential, Density_distr, std::shared_ptr<Density_exponential>>(m_sub, "Density_exponential")
-        .def(py::init<const Axis&, double>(), py::arg("density_axis"), py::arg("sigma"));
-    
-    py::class_<Density_homogeneous, Density_distr, std::shared_ptr<Density_homogeneous>>(m_sub, "Density_homogeneous")
+    py::class_< Density_homogeneous, 
+                Density_distr, 
+                std::shared_ptr<Density_homogeneous>
+               >(m_sub, "density_homogeneous")
         .def(py::init<>());
-
-    /* py::class_<cls, Density_distr, std::shared_ptr<cls> >(module, #cls)                                                \ */
-    /*     .def(py::init<const Axis&>(), py::arg("density_axis")); */
     
-    /* DENSITY_DEF(m_sub, Density_exponential); */
-    /* DENSITY_DEF(m_sub, Density_homogeneous); */
+    py::class_< Density_exponential, 
+                Density_distr, 
+                std::shared_ptr<Density_exponential>
+              >(m_sub, "density_exponential")
+        .def(
+                py::init<const Axis&, double>(), 
+                py::arg("density_axis"), 
+                py::arg("sigma")
+            );
+
+    py::class_< Density_polynomial, 
+                Density_distr, 
+                std::shared_ptr<Density_polynomial>
+              >(m_sub, "density_polynomial")
+        .def(
+                py::init<const Axis&, const Polynom&>(),
+                py::arg("density_axis"), 
+                py::arg("polynom_coeff")
+            );
+    
+    py::class_< Density_splines, 
+                Density_distr, 
+                std::shared_ptr<Density_splines>
+              >(m_sub, "density_splines")
+        .def(
+                py::init<const Axis&, const Spline&>(),
+                py::arg("density_axis"), 
+                py::arg("splines")
+            );
+        
 
     py::class_<Axis, std::shared_ptr<Axis>>(m_sub, "Density_axis")
         .def_property_readonly("fAxis", &Axis::GetAxis)
@@ -1977,7 +2003,7 @@ void init_math(py::module& m)
     py::module m_sub = m.def_submodule("math");
 
     py::class_<Polynom, std::shared_ptr<Polynom> >(m_sub, "Polynom")
-        .def("__call__", &Polynom::evaluate, py::arg("argument"))
+        .def("__call__", py::vectorize(&Polynom::evaluate), py::arg("argument"))
         .def("__str__", &py_print<Polynom>)
         .def(py::init<std::vector<double>>())
         .def("derivate", &Polynom::GetDerivative)
@@ -1985,8 +2011,25 @@ void init_math(py::module& m)
         .def_property_readonly("coeff", &Polynom::GetCoefficient);
     
     py::class_<Spline, std::shared_ptr<Spline> >(m_sub, "Spline")
-        .def(py::init<std::vector<double>, std::vector<double>>());
-        /* .def("__call__", &Polynom::evaluate, py::arg("argument")) */
+        .def("__call__", py::vectorize(&Spline::evaluate), py::arg("argument"))
+        .def("derivate", &Spline::Derivative)
+        .def("antiderivative", &Spline::Antiderivative, py::arg("constant"));
+
+    py::class_< Cubic_Spline, 
+                std::shared_ptr<Cubic_Spline>, 
+                Spline
+              >(m_sub, "Cubic_spline")
+        .def(
+                py::init<std::vector<double>, std::vector<double>>(),
+                py::arg("x"), 
+                py::arg("y")
+            )
+        .def(
+                py::init<std::vector<Polynom>, std::vector<double>>(),
+                py::arg("Polynom"),
+                py::arg("definition_area")
+            );
+
 }
 
 PYBIND11_MODULE(pyPROPOSAL, m)
@@ -2673,7 +2716,6 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 
 #undef COMPONENT_DEF
 #undef MEDIUM_DEF
-/* #undef DENSITY_DEF */ 
 #undef AXIS_DEF
 #undef PARTICLE_DEF
 #undef BREMS_DEF

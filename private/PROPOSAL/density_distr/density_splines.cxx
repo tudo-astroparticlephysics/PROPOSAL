@@ -43,7 +43,8 @@ double Density_splines::helper_function(Vector3D xi,
 
 double Density_splines::Correct(Vector3D xi, 
                                 Vector3D direction,
-                                double res) const 
+                                double res,
+                                double distance_to_border) const 
 {
     std::function<double(double)> F = std::bind(&Density_splines::Helper_function, 
                                                 this, 
@@ -59,7 +60,11 @@ double Density_splines::Correct(Vector3D xi,
                                                 res,
                                                 std::placeholders::_1);
 
-    res = NewtonRaphson(F, dF, 0, 1e7, 1.e-6);
+    try {
+        res = NewtonRaphson(F, dF, 0, distance_to_border, 1.e-6);
+    } catch (MathException& e) {
+        return distance_to_border;
+    }
 
     return res;
 }
