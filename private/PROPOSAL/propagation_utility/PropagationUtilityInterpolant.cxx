@@ -188,8 +188,9 @@ double UtilityInterpolantDisplacement::Calculate(double ei, double ef, double di
         stored_result_ = interpolant_->Interpolate(ei);
         aux            = stored_result_ - interpolant_->Interpolate(ef);
 
+        std::cout << "orginal displacement: " << aux << std::endl;
         displacement = utility_.GetDensityDistribution().Correct(xi, direction, aux, distance_to_border);
-        std::cout << "displacement: " << displacement << std::endl;
+        std::cout << "corrected displacement: " << displacement << std::endl;
 
         if (std::abs(aux) > std::abs(stored_result_) * HALF_PRECISION)
         {

@@ -26,7 +26,13 @@ double Density_exponential::Correct(Vector3D xi,
     double phi = GetDepth(xi);
     double delta = GetEffectiveDistance(xi, direction);
 
-    return 1. / delta * std::log( 1 + std::exp(-phi) * res * delta );
+    std::cout << "phi: " 
+              << phi 
+              << "\ndelta: "
+              << delta 
+              << std::endl;
+
+    return 1. / delta * std::log( 1 + std::exp(-phi) * res * std::abs(delta) );
 }
 
 double Density_exponential::Integrate(Vector3D xi, 

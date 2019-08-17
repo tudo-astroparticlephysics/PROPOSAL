@@ -31,12 +31,6 @@ double Density_polynomial::Helper_function(Vector3D xi,
                                            double res, 
                                            double l) const 
 {
-    // std::cout << "Helper function(" 
-    //           << l
-    //           << "): "
-    //           << Integrate(xi, direction, 0) - Integrate(xi, direction, l) + res
-    //           << std::endl;
-
     return Integrate(xi, direction, l) - Integrate(xi, direction, 0) + res;
 }
 
@@ -45,9 +39,7 @@ double Density_polynomial::helper_function(Vector3D xi,
                                            double res, 
                                            double l) const 
 {
-    double delta = axis_->GetEffectiveDistance(xi, direction);
-
-    return density_distribution(axis_->GetDepth(xi) + l * delta);
+    return Evaluate(xi, direction, l) - Evaluate(xi, direction, 0);
 }
 
 double Density_polynomial::Correct(Vector3D xi, 
@@ -94,6 +86,15 @@ double Density_polynomial::Integrate(Vector3D xi,
     double delta = axis_->GetEffectiveDistance(xi, direction);
 
     return antiderived_density_distribution(axis_->GetDepth(xi) + l * delta);
+}
+
+double Density_polynomial::Evaluate(Vector3D xi, 
+                                    Vector3D direction, 
+                                    double l) const
+{
+    double delta = axis_->GetEffectiveDistance(xi, direction);
+
+    return density_distribution(axis_->GetDepth(xi) + l * delta);
 }
 
 double Density_polynomial::Calculate(Vector3D xi, 

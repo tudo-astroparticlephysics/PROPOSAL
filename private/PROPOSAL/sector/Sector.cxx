@@ -376,14 +376,14 @@ double Sector::Propagate(double distance)
         {
             displacement = distance - propagated_distance;
 
-            /* double aux = utility_.GetDensityDistribution().Calculate( */
-            /*         particle_.GetPosition(), */ 
-            /*         particle_.GetDirection(), */ 
-            /*         displacement); */
+            double displacement_aequivaltent = utility_.GetDensityDistribution().Calculate(
+                    particle_.GetPosition(), 
+                    particle_.GetDirection(), 
+                    displacement);
 
             final_energy = displacement_calculator_->GetUpperLimit(
                 initial_energy, 
-                displacement);
+                displacement_aequivaltent);
         }
 
         if(sector_def_.do_continuous_energy_loss_output)
