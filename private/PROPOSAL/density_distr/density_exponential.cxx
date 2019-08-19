@@ -2,7 +2,6 @@
 #include <cmath>
 #include <iostream>
 
-
 Density_exponential::Density_exponential(const Axis& axis, double sigma):
     Density_distr(axis),
     sigma_(sigma)
@@ -32,7 +31,12 @@ double Density_exponential::Correct(Vector3D xi,
               << delta 
               << std::endl;
 
-    return 1. / delta * std::log( 1 + std::exp(-phi) * res * std::abs(delta) );
+    double aux = 1. / delta * std::log( 1 + std::exp(-phi) * res * delta);
+
+    if( std::isnan(aux) )
+        throw DensityException("Next interaction point lies in infinite.");
+
+    return aux;
 }
 
 double Density_exponential::Integrate(Vector3D xi, 
@@ -43,7 +47,6 @@ double Density_exponential::Integrate(Vector3D xi,
 
     return std::exp( GetDepth(xi) + l * delta ) / delta;
 }
-
 
 
 double Density_exponential::Calculate(Vector3D xi, 

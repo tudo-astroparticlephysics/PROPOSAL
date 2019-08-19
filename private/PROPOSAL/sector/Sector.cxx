@@ -360,11 +360,24 @@ double Sector::Propagate(double distance)
             final_energy         = energy_till_stochastic_.second;
         }
 
-        displacement = displacement_calculator_->Calculate(initial_energy, 
-                                                           final_energy, 
-                                                           distance - propagated_distance, 
-                                                           particle_.GetPosition(), 
-                                                           particle_.GetDirection());
+        try {
+            displacement = displacement_calculator_->Calculate(initial_energy, 
+                                                               final_energy, 
+                                                               distance - propagated_distance, 
+                                                               particle_.GetPosition(), 
+                                                               particle_.GetDirection());
+        } catch (DensityException& e) {
+            displacement = distance - propagated_distance;
+
+            double displacement_aequivaltent = utility_.GetDensityDistribution().Calculate(
+                    particle_.GetPosition(), 
+                    particle_.GetDirection(), 
+                    displacement);
+
+            final_energy = displacement_calculator_->GetUpperLimit(
+                initial_energy, 
+                displacement_aequivaltent);
+        }
 
         std::cout << "distance_to_border: " 
                   << distance - propagated_distance 
