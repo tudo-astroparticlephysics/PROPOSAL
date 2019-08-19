@@ -1741,6 +1741,8 @@ void init_parametrization(py::module& m)
         .def_readwrite("parametrization", &IonizationFactory::Definition::parametrization)
         .def_readwrite("multiplier", &IonizationFactory::Definition::multiplier);
 
+    // Photon interactions
+
     // --------------------------------------------------------------------- //
     // Compton Scattering
     // --------------------------------------------------------------------- //
@@ -1796,6 +1798,59 @@ void init_parametrization(py::module& m)
             .def(py::init<>())
             .def_readwrite("parametrization", &ComptonFactory::Definition::parametrization)
             .def_readwrite("multiplier", &ComptonFactory::Definition::multiplier);
+
+    // --------------------------------------------------------------------- //
+    // PhotoPairProduction
+    // --------------------------------------------------------------------- //
+
+    py::module m_sub_photopair = m_sub.def_submodule("photopair");
+
+    py::class_<PhotoPairProduction, std::shared_ptr<PhotoPairProduction>, Parametrization>(m_sub_photopair, "PhotoPair",
+                                                                   R"pbdoc(
+
+            Virtual class for the PhotoPairProduction parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
+
+            The following parametrizations are currently implemented:
+
+            * Tsai
+
+            Example:
+                To create a photopair parametrization
+
+                >>> gamma = pyPROPOSAL.particle.GammaDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> param = pyPROPOSAL.parametrization.PhotoPair.Tsai(gamma, medium, multiplier)
+                )pbdoc");
+
+    py::class_<PhotoPairTsai, std::shared_ptr<PhotoPairTsai>, PhotoPairProduction>(m_sub_photopair, "Tsai")
+            .def(py::init<const ParticleDef&, const Medium&, double>(),
+                 py::arg("particle_def"),
+                 py::arg("medium"),
+                 py::arg("multiplier"));
+
+    py::enum_<PhotoPairFactory::Enum>(m_sub_photopair, "PhotoPairParametrization")
+            .value("Tsai", PhotoPairFactory::Tsai)
+            .value("None", PhotoPairFactory::None);
+
+    py::class_<PhotoPairFactory, std::unique_ptr<PhotoPairFactory, py::nodelete>>(m_sub_photopair, "PhotoPairFactory")
+            .def("get_enum_from_str", &PhotoPairFactory::GetEnumFromString, py::arg("parametrization_str"))
+            .def("create_photopair",
+                 (CrossSection* (PhotoPairFactory::*)(const ParticleDef&, const Medium&, const PhotoPairFactory::Definition&)const)&PhotoPairFactory::CreatePhotoPair,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("photopair_def"))
+            .def("create_photopair_interpol",
+                 (CrossSection* (PhotoPairFactory::*)(const ParticleDef&, const Medium&, const PhotoPairFactory::Definition&, InterpolationDef)const)&PhotoPairFactory::CreatePhotoPair,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("photopair_def"), py::arg("interpolation_def"))
+            .def_static("get", &PhotoPairFactory::Get, py::return_value_policy::reference);
+
+    py::class_<PhotoPairFactory::Definition, std::shared_ptr<PhotoPairFactory::Definition> >(m_sub_photopair, "PhotoPairDefinition")
+            .def(py::init<>())
+            .def_readwrite("parametrization", &PhotoPairFactory::Definition::parametrization)
+            .def_readwrite("multiplier", &PhotoPairFactory::Definition::multiplier);
 }
 
 void init_crosssection(py::module& m)
@@ -1816,7 +1871,9 @@ void init_crosssection(py::module& m)
             Since the usage of interpolation tables can improve the speed of the propagation by several orders of magnitude (with neglible decline in accuracy) it is highly recommended
             to use the interpolation methods.
                                                             
-            There are specific crosssection classes for every interaction that can be used. 
+            There are specific crosssection classes for every interaction that can be used.
+
+            For propagation of massive leptons, there are the following crosssections
 
             * BremsIntegral / BremsInterpolant
 
@@ -1830,7 +1887,11 @@ void init_crosssection(py::module& m)
 
             * WeakIntegral / WeakInterpolant
 
+            For propagation of photons, there are the following crosssections
+
             * ComptonIntegral / ComptonInterpolant
+
+            * PhotoPairIntegral / PhotoPairInterpolant
 
             Example:
                 To create a bremsstrahlung CrossSection
@@ -1982,6 +2043,8 @@ void init_crosssection(py::module& m)
             .def(py::init<const WeakInteraction&>(), py::arg("parametrization"));
     py::class_<ComptonIntegral, std::shared_ptr<ComptonIntegral>, CrossSectionIntegral>(m_sub, "ComptonIntegral")
             .def(py::init<const Compton&>(), py::arg("parametrization"));
+    py::class_<PhotoPairIntegral, std::shared_ptr<PhotoPairIntegral>, CrossSectionIntegral>(m_sub, "PhotoPairIntegral")
+            .def(py::init<const PhotoPairProduction&>(), py::arg("parametrization"));
 
     py::class_<BremsInterpolant, std::shared_ptr<BremsInterpolant>, CrossSectionInterpolant>(
         m_sub, "BremsInterpolant")
@@ -2004,6 +2067,9 @@ void init_crosssection(py::module& m)
     py::class_<ComptonInterpolant, std::shared_ptr<ComptonInterpolant>, CrossSectionInterpolant>(
         m_sub, "ComptonInterpolant")
         .def(py::init<const Compton&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
+    py::class_<PhotoPairInterpolant, std::shared_ptr<PhotoPairInterpolant>, CrossSectionInterpolant>(
+            m_sub, "PhotoPairInterpolant")
+            .def(py::init<const PhotoPairProduction&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
 }
 
 void init_scattering(py::module& m)
@@ -2262,7 +2328,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("ioniz_def", &Utility::Definition::ioniz_def)
         .def_readwrite("mupair_def", &Utility::Definition::mupair_def)
         .def_readwrite("weak_def", &Utility::Definition::weak_def)
-        .def_readwrite("compton_def", &Utility::Definition::compton_def);
+        .def_readwrite("compton_def", &Utility::Definition::compton_def)
+        .def_readwrite("photopair_def", &Utility::Definition::photopair_def);
 
 
     // --------------------------------------------------------------------- //

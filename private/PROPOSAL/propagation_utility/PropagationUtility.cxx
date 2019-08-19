@@ -1,4 +1,5 @@
 
+#include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/medium/Medium.h"
 
@@ -23,6 +24,7 @@ Utility::Definition::Definition()
     , ioniz_def()
     , mupair_def()
     , weak_def()
+    , photopair_def()
 {
 }
 
@@ -41,6 +43,8 @@ bool Utility::Definition::operator==(const Utility::Definition& utility_def) con
     else if (mupair_def != utility_def.mupair_def)
         return false;
     else if (weak_def != utility_def.weak_def)
+        return false;
+    else if (photopair_def != utility_def.photopair_def)
         return false;
 
     return true;
@@ -110,6 +114,12 @@ Utility::Utility(const ParticleDef& particle_def,
         log_debug("Compton enabled");
     }
 
+    if(utility_def.photopair_def.parametrization!=PhotoPairFactory::Enum::None) {
+        crosssections_.push_back(PhotoPairFactory::Get().CreatePhotoPair(
+                particle_def_, *medium_, utility_def.photopair_def));
+        log_debug("PhotoPairProduction enabled");
+    }
+
 }
 
 Utility::Utility(const ParticleDef& particle_def,
@@ -163,6 +173,12 @@ Utility::Utility(const ParticleDef& particle_def,
         crosssections_.push_back(ComptonFactory::Get().CreateCompton(
                 particle_def_, *medium_, cut_settings_, utility_def.compton_def, interpolation_def));
         log_debug("Compton enabled");
+    }
+
+    if(utility_def.photopair_def.parametrization!=PhotoPairFactory::Enum::None) {
+        crosssections_.push_back(PhotoPairFactory::Get().CreatePhotoPair(
+                particle_def_, *medium_, utility_def.photopair_def, interpolation_def));
+        log_debug("PhotoPairProduction enabled");
     }
 }
 

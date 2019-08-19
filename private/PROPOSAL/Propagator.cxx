@@ -8,6 +8,7 @@
 // #include <cmath>
 
 #include <fstream>
+#include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -1458,6 +1459,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         log_debug("No given compton_multiplier option given. Use default (%f)", sec_def_global.utility_def.compton_def.multiplier);
     }
 
+    if (json_global.find("photopair_multiplier") != json_global.end())
+    {
+        if (json_global["photopair_multiplier"].is_number())
+        {
+            sec_def_global.utility_def.photopair_def.multiplier = json_global["photopair_multiplier"].get<double>();
+        }
+        else
+        {
+            log_fatal("The given photopair_multiplier option is not a double.");
+        }
+    }
+    else
+    {
+        log_debug("No given photopair_multiplier option given. Use default (%f)", sec_def_global.utility_def.photopair_def.multiplier);
+    }
+
     if (json_global.find("lpm") != json_global.end())
     {
         if (json_global["lpm"].is_boolean())
@@ -1716,6 +1733,24 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     {
         log_debug("The compton option is not set. Use default %s",
                   ComptonFactory::Get().GetStringFromEnum(sec_def_global.utility_def.compton_def.parametrization).c_str());
+    }
+
+    if (json_global.find("photopair") != json_global.end())
+    {
+        if (json_global["photopair"].is_string())
+        {
+            std::string photopair = json_global["photopair"].get<std::string>();
+            sec_def_global.utility_def.photopair_def.parametrization = PhotoPairFactory::Get().GetEnumFromString(photopair);
+        }
+        else
+        {
+            log_fatal("The given photopair option is not a string.");
+        }
+    }
+    else
+    {
+        log_debug("The photopair option is not set. Use default %s",
+                  PhotoPairFactory::Get().GetStringFromEnum(sec_def_global.utility_def.photopair_def.parametrization).c_str());
     }
 
     if (json_global.find("photo_shadow") != json_global.end())
