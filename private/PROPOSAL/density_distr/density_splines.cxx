@@ -26,9 +26,7 @@ double Density_splines::Helper_function(Vector3D xi,
                                         double res, 
                                         double l) const 
 {
-    double aux = Integrate(xi, direction, l) - Integrate(xi, direction, 0) + res;
-    
-    return aux;
+    return Integrate(xi, direction, 0) - Integrate(xi, direction, l) + res;
 }
 
 double Density_splines::helper_function(Vector3D xi, 
@@ -36,9 +34,8 @@ double Density_splines::helper_function(Vector3D xi,
                                         double res, 
                                         double l) const 
 {
-    double delta = axis_->GetEffectiveDistance(xi, direction);
 
-    return spline_->evaluate(axis_->GetDepth(xi) + l * delta);
+    return Evaluate(xi, direction, 0) - Evaluate(xi, direction, l);
 }
 
 double Density_splines::Correct(Vector3D xi, 
@@ -63,7 +60,7 @@ double Density_splines::Correct(Vector3D xi,
     try {
         res = NewtonRaphson(F, dF, 0, distance_to_border, 1.e-6);
     } catch (MathException& e) {
-        return distance_to_border;
+        throw DensityException("Next interaction point lies in infinite.");
     }
 
     return res;
@@ -75,7 +72,16 @@ double Density_splines::Integrate(Vector3D xi,
 {
     double delta = axis_->GetEffectiveDistance(xi, direction);
 
-    return integrated_spline_->evaluate(axis_->GetDepth(xi) + l * delta);
+    return 1 / (delta * delta) * integrated_spline_->evaluate(axis_->GetDepth(xi) + l * delta);
+}
+
+double Density_splines::Evaluate(Vector3D xi, 
+                                  Vector3D direction, 
+                                  double l) const
+{
+    double delta = axis_->GetEffectiveDistance(xi, direction);
+
+    return spline_->evaluate(axis_->GetDepth(xi) + l * delta);
 }
 
 double Density_splines::Calculate(Vector3D xi, 

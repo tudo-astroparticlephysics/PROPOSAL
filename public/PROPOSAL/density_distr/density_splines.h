@@ -22,6 +22,7 @@ class Density_splines : public Density_distr
 
         double Correct(Vector3D xi, Vector3D direction, double res, double distance_to_border) const override;
         double Integrate(Vector3D xi, Vector3D direction, double l) const override;
+        double Evaluate(Vector3D xi, Vector3D direction, double l) const;
         double Calculate(Vector3D xi, Vector3D direction, double distance) const override;
         double GetCorrection(Vector3D xi) const override;
         
