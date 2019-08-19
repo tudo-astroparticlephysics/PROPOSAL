@@ -31,7 +31,7 @@ double Density_polynomial::Helper_function(Vector3D xi,
                                            double res, 
                                            double l) const 
 {
-    return Integrate(xi, direction, l) - Integrate(xi, direction, 0) + res;
+    return Integrate(xi, direction, 0) - Integrate(xi, direction, l) + res;
 }
 
 double Density_polynomial::helper_function(Vector3D xi, 
@@ -39,7 +39,7 @@ double Density_polynomial::helper_function(Vector3D xi,
                                            double res, 
                                            double l) const 
 {
-    return Evaluate(xi, direction, l) - Evaluate(xi, direction, 0);
+    return Evaluate(xi, direction, 0) - Evaluate(xi, direction, l);
 }
 
 double Density_polynomial::Correct(Vector3D xi, 
@@ -66,14 +66,8 @@ double Density_polynomial::Correct(Vector3D xi,
 
     try {
         res = NewtonRaphson(F, dF, 0, distance_to_border, distance_to_border/2);
-        std::cout << "res: "
-                  << res
-                  << std::endl;
     } catch (MathException& e) {
-        std::cout << "Distance to border: " 
-                  << distance_to_border 
-                  << std::endl;
-        return distance_to_border;
+        throw DensityException("Next interaction point lies in infinite.");
     }
 
     return res;
@@ -85,7 +79,7 @@ double Density_polynomial::Integrate(Vector3D xi,
 {
     double delta = axis_->GetEffectiveDistance(xi, direction);
 
-    return antiderived_density_distribution(axis_->GetDepth(xi) + l * delta);
+    return 1 / (delta * delta) * antiderived_density_distribution(axis_->GetDepth(xi) + l * delta);
 }
 
 double Density_polynomial::Evaluate(Vector3D xi, 
