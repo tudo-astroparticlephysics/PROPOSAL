@@ -329,7 +329,46 @@ void init_medium(py::module& m)
     MEDIUM_DEF(m_sub, Paraffin)
     MEDIUM_DEF(m_sub, AntaresWater)
 
-    py::class_<Density_distr, std::shared_ptr<Density_distr>>(m_sub, "density_distribution");
+    py::class_< Density_distr, 
+                std::shared_ptr<Density_distr>
+              >(m_sub, "density_distribution")
+         .def(
+            "correct",
+            &Density_distr::Correct,
+            py::arg("xi"),
+            py::arg("direction"),
+            py::arg("displacement"),
+            py::arg("distance_to_border"),
+            R"pbdoc(
+            )pbdoc"
+            )
+         .def(
+            "integrate",
+            &Density_distr::Integrate,
+            py::arg("xi"),
+            py::arg("direction"),
+            py::arg("displacement"),
+            R"pbdoc(
+            )pbdoc"
+            )
+         .def(
+            "evaluate",
+            &Density_distr::Evaluate,
+            py::arg("xi"),
+            py::arg("direction"),
+            py::arg("displacement"),
+            R"pbdoc(
+            )pbdoc"
+            )
+         .def(
+            "calculate",
+            &Density_distr::Calculate,
+            py::arg("xi"),
+            py::arg("direction"),
+            py::arg("displacement"),
+            R"pbdoc(
+            )pbdoc"
+            );
     
     py::class_< Density_homogeneous, 
                 Density_distr, 

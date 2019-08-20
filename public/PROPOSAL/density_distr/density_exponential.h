@@ -1,29 +1,37 @@
 #pragma once
- 
+
 #include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/math/Vector3D.h"
- 
- 
-class Density_exponential: public Density_distr
-{
-public:
+
+class Density_exponential : public Density_distr {
+   public:
     Density_exponential(const Axis& axis, double sigma);
- 
-    ~Density_exponential() {};
 
-    Density_exponential* clone() const {return new Density_exponential(*this);};
+    ~Density_exponential(){};
 
-    double Integrate(Vector3D xi, Vector3D direction, double res) const override;
-    double Correct(Vector3D xi, Vector3D direction, double res, double distance_to_border) const override;
+    Density_exponential* clone() const {
+        return new Density_exponential(*this);
+    };
 
-    double Calculate(Vector3D xi, Vector3D direction, double distance) const override;
-    double GetCorrection(Vector3D x) const override;
-        
+    double Integrate(Vector3D xi,
+                     Vector3D direction,
+                     double res) const override;
+    double Correct(Vector3D xi,
+                   Vector3D direction,
+                   double res,
+                   double distance_to_border) const override;
+
+    double Calculate(Vector3D xi,
+                     Vector3D direction,
+                     double distance) const override;
+    double Evaluate(Vector3D xi,
+                    Vector3D direction,
+                    double distance) const override;
+
     double GetDepth(Vector3D xi) const;
     double GetEffectiveDistance(Vector3D xi, Vector3D direction) const;
 
-private:
+   private:
     double sigma_;
 };
-
 
