@@ -1,81 +1,86 @@
 #pragma once
 
-#include <vector>
-#include <string>
 #include <fstream>
+#include <string>
+#include <utility>
+#include <vector>
 #include "PROPOSAL/math/Function.h"
 
 namespace PROPOSAL {
 
-class Spline 
-{
-    public:
+class Spline {
+   public:
+    Spline(std::vector<double>, std::vector<double>);
+    Spline(std::vector<Polynom>, std::vector<double>);
 
-        Spline(std::vector<double>, std::vector<double>);
-        Spline(std::vector<Polynom>, std::vector<double>);
+    Spline(std::string spline_path);
 
-        Spline(std::string spline_path);
+    Spline(const Spline&);
 
-        Spline(const Spline&);
+    virtual Spline* clone() const = 0;
 
-        virtual Spline* clone() const = 0; 
+    virtual double evaluate(double x);
 
-        virtual double evaluate(double x);
+    virtual void Derivative();
+    virtual void Antiderivative(double c);
 
-        virtual void Derivative();
-        virtual void Antiderivative(double c);
+    virtual bool save(std::string, bool) = 0;
 
-        virtual bool save(std::string, bool) = 0;
+    std::pair<double, double> GetDomain();
 
-    protected:
-        virtual void calculate_splines(std::vector<double> x, std::vector<double> y) = 0;
+   protected:
+    virtual void calculate_splines(std::vector<double> x,
+                                   std::vector<double> y) = 0;
 
-        std::vector<Polynom> splines_;
-        std::vector<double> subintervall_;
-        unsigned int n_subintervalls_;
-        std::vector<double> x_;
-        std::vector<double> y_;
+    std::vector<Polynom> splines_;
+    unsigned int n_subintervalls_;
+    std::vector<double> subintervall_;
+    std::vector<double> x_;
+    std::vector<double> y_;
 };
 
 struct spline_container {
     double a_0;
     double h_i;
 
-    friend std::fstream& operator <<(std::fstream& stream, spline_container& s) {
+    friend std::fstream& operator<<(std::fstream& stream, spline_container& s) {
         stream << s.h_i << " " << s.a_0 << std::endl;
         return stream;
     }
 
-    friend std::fstream& operator >>(std::fstream& stream, spline_container& s) {
+    friend std::fstream& operator>>(std::fstream& stream, spline_container& s) {
         stream >> s.h_i >> s.a_0;
         return stream;
     }
 };
 
-} // namespace PROPOSAL
+}  // namespace PROPOSAL
 
 ////----------------------------------------------------------------------------//
-////------------------------------- Linear Spline ------------------------------//
+////------------------------------- Linear Spline
+///------------------------------//
 ////----------------------------------------------------------------------------//
 
-//namespace PROPOSAL {
+// namespace PROPOSAL {
 
-//struct linear_spline_container: spline_container
+// struct linear_spline_container: spline_container
 //{
 //    double a_1;
-    
-//    friend std::fstream& operator <<(std::fstream& stream, linear_spline_container& s) {
+
+//    friend std::fstream& operator <<(std::fstream& stream,
+//    linear_spline_container& s) {
 //        stream << s.h_i << " " << s.a_0 << " " << s.a_1 << std::endl;
 //        return stream;
 //    }
 
-//    friend std::fstream& operator >>(std::fstream& stream, linear_spline_container& s) {
+//    friend std::fstream& operator >>(std::fstream& stream,
+//    linear_spline_container& s) {
 //        stream >> s.h_i >> s.a_0 >> s.a_1;
 //        return stream;
 //    }
 //};
 
-//class Linear_Spline : Spline
+// class Linear_Spline : Spline
 //{
 //    public:
 
@@ -85,12 +90,12 @@ struct spline_container {
 //        Linear_Spline(std::string spline_path);
 
 //        Linear_Spline(const Linear_Spline&);
-   
+
 //        bool save(std::string, bool);
 
 //    private:
-//        void calculate_splines(std::vector<double> x, std::vector<double> y) override;
-//        std::vector<linear_spline_container> GetSplineContainer();
+//        void calculate_splines(std::vector<double> x, std::vector<double> y)
+//        override; std::vector<linear_spline_container> GetSplineContainer();
 
 //};
 
@@ -102,46 +107,47 @@ struct spline_container {
 
 namespace PROPOSAL {
 
-struct cubic_spline_container // : linear_spline_container
+struct cubic_spline_container  // : linear_spline_container
 {
     double h_i;
     double a_0;
     double a_1;
     double a_2;
     double a_3;
-    
-    friend std::fstream& operator <<(std::fstream& stream, cubic_spline_container& s) {
-        stream << s.h_i << " " << s.a_0 << " " << s.a_1 << " " << s.a_2 << " " << s.a_3;
+
+    friend std::fstream& operator<<(std::fstream& stream,
+                                    cubic_spline_container& s) {
+        stream << s.h_i << " " << s.a_0 << " " << s.a_1 << " " << s.a_2 << " "
+               << s.a_3;
 
         return stream;
     }
 
-    friend std::fstream& operator >>(std::fstream& stream, cubic_spline_container& s) {
+    friend std::fstream& operator>>(std::fstream& stream,
+                                    cubic_spline_container& s) {
         stream >> s.h_i >> s.a_0 >> s.a_1 >> s.a_2 >> s.a_3;
         return stream;
     }
 };
 
-class Cubic_Spline : public Spline
-{
-    public:
+class Cubic_Spline : public Spline {
+   public:
+    Cubic_Spline(std::vector<double>, std::vector<double>);
+    Cubic_Spline(std::vector<Polynom>, std::vector<double>);
 
-        Cubic_Spline(std::vector<double>, std::vector<double>);
-        Cubic_Spline(std::vector<Polynom>, std::vector<double>);
+    Cubic_Spline(std::string spline_path, bool binary);
 
-        Cubic_Spline(std::string spline_path, bool binary);
+    Cubic_Spline(const Cubic_Spline&);
 
-        Cubic_Spline(const Cubic_Spline&);
-        
-        Cubic_Spline* clone() const { return new Cubic_Spline(*this); };
-        
-        bool save(std::string, bool);
-    
-        std::vector<cubic_spline_container> GetSplineContainer();
+    Cubic_Spline* clone() const { return new Cubic_Spline(*this); };
 
-    private:
+    bool save(std::string, bool);
 
-        void calculate_splines(std::vector<double> x, std::vector<double> y) override;
+    std::vector<cubic_spline_container> GetSplineContainer();
+
+   private:
+    void calculate_splines(std::vector<double> x,
+                           std::vector<double> y) override;
 };
 
-} // namespace PROPOSAL
+}  // namespace PROPOSAL
