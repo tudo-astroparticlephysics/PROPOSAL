@@ -57,7 +57,7 @@ namespace PROPOSAL {
         double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
     protected:
         virtual bool compare(const CrossSection&) const;
-        void InitdNdxInerpolation(const InterpolationDef& def);
+        void InitdNdxInterpolation(const InterpolationDef& def);
     private:
         double rndc_;
     };

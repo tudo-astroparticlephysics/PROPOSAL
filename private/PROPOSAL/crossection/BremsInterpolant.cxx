@@ -17,7 +17,7 @@ BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef
     : CrossSectionInterpolant(DynamicData::Brems, param)
 {
     // Use parent CrossSecition dNdx interpolation
-    InitdNdxInerpolation(def);
+    InitdNdxInterpolation(def);
 
     // --------------------------------------------------------------------- //
     // Builder for DEdx

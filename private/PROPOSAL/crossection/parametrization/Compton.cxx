@@ -99,11 +99,6 @@ size_t Compton::GetHash() const
 // Define the specific parametrizations
 // ------------------------------------------------------------------------- //
 
-// ------------------------------------------------------------------------- //
-// EGS4 parametrization for electrons and positrons
-// CompleteScreening for above 50 MeV, emperical corrections below 50 MeV
-// ------------------------------------------------------------------------- //
-
 ComptonKleinNishina::ComptonKleinNishina(const ParticleDef& particle_def,
                                                const Medium& medium,
                                                const EnergyCutSettings& cuts,
@@ -130,17 +125,14 @@ const std::string ComptonKleinNishina::name_ = "ComptonKleinNishina";
 
 double ComptonKleinNishina::DifferentialCrossSection(double energy, double v)
 {
+    // Adapted from "THE EGS5 CODE SYSTEM" by Hideo Harayama and Yoshihito Namito
+    // SLAC Report number SLAC-R-730, KEK Report number 2005-8
+    // Equation (2.170) adapted for PROPOSAL
+    // Based on O. Klein and Y. Nishina "Über die Streuung von Strahlung durch freie
+    // Electronen nach der Neuen Relativistischen Quantum Dynamic von Dirac", Zeitschrift für Physik, 52, 853-868.
 
     double aux    = 0;
 
-    double costheta = 1 - ME / energy * (v / (1-v));
-    double Ep = (1 - v) * energy;
-
-    aux = 2. * std::pow( Ep / energy, 2 ) * ( Ep / energy + energy / Ep + std::pow(costheta, 2) - 1 );
-
-    aux *= ME / (energy * std::pow(1-v, 2));
-
-    /* This is EGS5 code
     double C1, C2, C3, epsilon;
     double kp = energy / ME;
 
@@ -152,7 +144,6 @@ double ComptonKleinNishina::DifferentialCrossSection(double energy, double v)
     aux = ( C1 / epsilon + C2 ) / epsilon + C3 + epsilon;
 
     aux = aux / energy; // we loose a factor E due to variable transformation from k' to v
-     */
 
     aux *= PI * std::pow(RE, 2.) * ME;
     return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * components_[component_index_]->GetNucCharge() * aux;

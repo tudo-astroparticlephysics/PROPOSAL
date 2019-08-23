@@ -2024,6 +2024,24 @@ void init_crosssection(py::module& m)
 
             Pointer to the current parametrization object
                                                             
+                )pbdoc")
+        .def("CalculateCumulativeCrossSection", &CrossSection::CalculateCumulativeCrossSection,
+             py::arg("energy"),
+             py::arg("component"),
+             py::arg("v"),
+             R"pbdoc(
+
+            Return the cumulative cross section, e.g.
+
+                .. math:: \int_{v_{cut}}^{v} \frac{d\sigma}{dv} dv
+
+            Args:
+                energy (float): energy in MeV
+                component (int): number of the component to evaluate the crosssection. Use component = 0 for media with only one component
+                v (float): limit in v to evaluate the differential cross section
+
+            Returns:
+                cumulative crosssection, e.g. the probability for a stochastic loss where v is smaller than the given parameter (and bigger than the defined v_cut)
                 )pbdoc");
 
     py::class_<CrossSectionIntegral, std::shared_ptr<CrossSectionIntegral>, CrossSection>(m_sub, "CrossSectionIntegral");

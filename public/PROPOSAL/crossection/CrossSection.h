@@ -73,6 +73,8 @@ public:
         (void)energy; (void)energy_loss; return std::make_pair(std::vector<Particle*>(), false);
     }
 
+    virtual double CalculateCumulativeCrossSection(double energy, int component, double v) = 0;
+
     // ----------------------------------------------------------------- //
     // Getter
     // ----------------------------------------------------------------- //

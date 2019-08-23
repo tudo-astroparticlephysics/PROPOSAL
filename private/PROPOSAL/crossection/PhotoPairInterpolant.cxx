@@ -18,7 +18,7 @@ using namespace PROPOSAL;
 PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairProduction& param, InterpolationDef def)
         : CrossSectionInterpolant(DynamicData::Epair, param) {
     // Use own initialization
-    PhotoPairInterpolant::InitdNdxInerpolation(def);
+    PhotoPairInterpolant::InitdNdxInterpolation(def);
 }
 
 PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairInterpolant& param)
@@ -111,7 +111,7 @@ std::pair<std::vector<Particle*>, bool> PhotoPairInterpolant::CalculateProducedP
 }
 
 // ------------------------------------------------------------------------- //
-void PhotoPairInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
+void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
 {
     // --------------------------------------------------------------------- //
     // Builder for dNdx with no logarithmic energy

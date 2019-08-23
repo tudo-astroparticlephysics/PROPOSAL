@@ -50,6 +50,13 @@ namespace PROPOSAL {
 
         double CalculatedEdx(double energy);
         double CalculatedEdxWithoutMultiplier(double energy);
+        virtual double CalculatedE2dxWithoutMultiplier(double energy);
+        virtual double CalculatedNdx(double energy);
+        virtual double CalculatedNdx(double energy, double rnd);
+
+        double CalculateCumulativeCrossSection(double energy, int i, double v);
+    private:
+        double CalculateStochasticLoss(double energy, double rnd1);
 
     };
 

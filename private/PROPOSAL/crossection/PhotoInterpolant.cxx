@@ -17,7 +17,7 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef d
     : CrossSectionInterpolant(DynamicData::NuclInt, param)
 {
     // Use parent CrossSecition dNdx interpolation
-    InitdNdxInerpolation(def);
+    InitdNdxInterpolation(def);
 
     // --------------------------------------------------------------------- //
     // Builder for DEdx

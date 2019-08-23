@@ -17,7 +17,7 @@ EpairInterpolant::EpairInterpolant(const EpairProduction& param, InterpolationDe
     : CrossSectionInterpolant(DynamicData::Epair, param)
 {
     // Use parent CrossSecition dNdx interpolation
-    InitdNdxInerpolation(def);
+    InitdNdxInterpolation(def);
 
     // --------------------------------------------------------------------- //
     // Builder for DEdx

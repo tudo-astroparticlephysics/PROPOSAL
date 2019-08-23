@@ -152,6 +152,19 @@ double CrossSectionIntegral::CalculateStochasticLoss(double energy, double rnd1,
     return CalculateStochasticLoss(energy, rnd2);
 }
 
+double CrossSectionIntegral::CalculateCumulativeCrossSection(double energy, int i, double v)
+{
+    parametrization_->SetCurrentComponent(i);
+    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+
+    return dndx_integral_.at(i).Integrate(
+            limits.vUp,
+            v,
+            std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
+            4);
+
+}
+
 // ------------------------------------------------------------------------- //
 // Private methods
 // ------------------------------------------------------------------------- //

@@ -24,7 +24,7 @@ set (PROPOSAL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/WeakIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/WeakInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/PhotoPairIntegral.cxx
-    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/PhotoInterpolant.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/PhotoPairInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/IonizIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/IonizInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/PhotoIntegral.cxx

@@ -58,7 +58,7 @@ public:
 
 private:
     virtual double CalculateStochasticLoss(double energy, double rnd1);
-    virtual void InitdNdxInerpolation(const InterpolationDef& def);
+    virtual void InitdNdxInterpolation(const InterpolationDef& def);
 };
 
 } // namespace PROPOSAL

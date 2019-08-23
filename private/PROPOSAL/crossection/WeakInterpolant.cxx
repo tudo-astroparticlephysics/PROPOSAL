@@ -16,7 +16,7 @@ using namespace PROPOSAL;
 WeakInterpolant::WeakInterpolant(const WeakInteraction& param, InterpolationDef def)
         : CrossSectionInterpolant(DynamicData::WeakInt, param) {
     // Use parent CrossSecition dNdx interpolation
-    InitdNdxInerpolation(def);
+    InitdNdxInterpolation(def);
 }
 
 WeakInterpolant::WeakInterpolant(const WeakInterpolant& param)

@@ -1,5 +1,6 @@
 
 #include <functional>
+#include <cmath>
 
 #include "PROPOSAL/crossection/ComptonIntegral.h"
 #include "PROPOSAL/crossection/ComptonInterpolant.h"
@@ -10,14 +11,15 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 
 ComptonInterpolant::ComptonInterpolant(const Compton& param, InterpolationDef def)
         : CrossSectionInterpolant(DynamicData::Compton, param)
 {
-    // Use parent CrossSecition dNdx interpolation
-    InitdNdxInerpolation(def);
+    // Use own CrossSecition dNdx interpolation
+    ComptonInterpolant::InitdNdxInterpolation(def);
 
     // --------------------------------------------------------------------- //
     // Builder for DEdx
@@ -91,4 +93,173 @@ double ComptonInterpolant::CalculatedEdx(double energy)
     }
 
     return parametrization_->GetMultiplier() * std::max(dedx_interpolant_->Interpolate(energy), 0.0);
+}
+
+//----------------------------------------------------------------------------//
+double ComptonInterpolant::FunctionToBuildDNdxInterpolant2D(double energy,
+                                                                 double v,
+                                                                 Integral& integral,
+                                                                 int component)
+{
+    parametrization_->SetCurrentComponent(component);
+    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+
+    if (limits.vUp == limits.vMax)
+    {
+        return 0;
+    }
+
+    v = limits.vUp + (limits.vMax - limits.vUp) * v;
+
+    // Integrate with the substitution t = ln(1-v) to avoid numerical problems
+    auto integrand_substitution = [&](double energy, double t){
+        return std::exp(t) * parametrization_->FunctionToDNdxIntegral(energy, 1 - std::exp(t));
+    };
+
+    double t_min = std::log(1. - v);
+    double t_max = std::log(1. - limits.vUp);
+
+
+    return integral.Integrate(
+            t_min,
+            t_max,
+            std::bind(integrand_substitution, energy, std::placeholders::_1),
+            2);
+}
+
+double ComptonInterpolant::CalculateCumulativeCrossSection(double energy, int component, double v)
+{
+    parametrization_->SetCurrentComponent(component);
+    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+
+    v = (v - limits.vUp) / (limits.vMax - limits.vUp);
+
+    return dndx_interpolant_2d_.at(component)->Interpolate(energy, v);
+}
+
+// ------------------------------------------------------------------------- //
+// Private methods
+// ------------------------------------------------------------------------- //
+
+// ------------------------------------------------------------------------- //
+double ComptonInterpolant::CalculateStochasticLoss(double energy, double rnd1)
+{
+
+    double rnd;
+    double rsum;
+
+    rnd  = rnd1 * sum_of_rates_;
+    rsum = 0;
+
+    for (size_t i = 0; i < components_.size(); ++i)
+    {
+        rsum += prob_for_component_[i];
+
+        if (rsum > rnd)
+        {
+            parametrization_->SetCurrentComponent(i);
+            Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+
+            if (limits.vUp == limits.vMax)
+            {
+                return energy * limits.vUp;
+            }
+
+            // Linear interpolation in v
+            return energy * ( limits.vUp + (limits.vMax - limits.vMin) * dndx_interpolant_2d_.at(i)->FindLimit(energy, rnd_ * prob_for_component_[i]) );
+        }
+    }
+
+    // sometime everything is fine, just the probability for interaction is zero
+    bool prob_for_all_comp_is_zero = true;
+    for (size_t i = 0; i < components_.size(); ++i)
+    {
+        parametrization_->SetCurrentComponent(i);
+        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+
+        if (limits.vUp != limits.vMax)
+            prob_for_all_comp_is_zero = false;
+    }
+
+    if (prob_for_all_comp_is_zero)
+        return 0;
+
+    log_fatal("sum was not initialized correctly");
+    return 0; // just to prevent warnings
+}
+
+// ------------------------------------------------------------------------- //
+void ComptonInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
+{
+    // --------------------------------------------------------------------- //
+    // Builder for dNdx
+    // --------------------------------------------------------------------- //
+
+    std::vector<Interpolant1DBuilder> builder1d(components_.size());
+    std::vector<Interpolant2DBuilder> builder2d(components_.size());
+
+    Helper::InterpolantBuilderContainer builder_container1d(components_.size());
+    Helper::InterpolantBuilderContainer builder_container2d(components_.size());
+    Helper::InterpolantBuilderContainer builder_return;
+
+    Integral integral(IROMB, IMAXS, IPREC);
+
+    for (unsigned int i = 0; i < components_.size(); ++i)
+    {
+        // !!! IMPORTANT !!!
+        // Order of builder matter because the functions needed for 1d interpolation
+        // needs the already intitialized 2d interpolants.
+        builder2d[i]
+                .SetMax1(def.nodes_cross_section)
+                .SetX1Min(parametrization_->GetParticleDef().mass)
+                .SetX1Max(def.max_node_energy)
+                .SetMax2(def.nodes_cross_section)
+                .SetX2Min(1. / (2. * (1. - def.nodes_cross_section)))
+                .SetX2Max((1. - 2. * def.nodes_cross_section) / (2. * (1. - def.nodes_cross_section)))
+                .SetRomberg1(def.order_of_interpolation)
+                .SetRational1(false)
+                .SetRelative1(false)
+                .SetIsLog1(true)
+                .SetRomberg2(def.order_of_interpolation)
+                .SetRational2(true)
+                .SetRelative2(false)
+                .SetIsLog2(false)
+                .SetRombergY(def.order_of_interpolation)
+                .SetRationalY(true)
+                .SetRelativeY(false)
+                .SetLogSubst(false)
+                .SetFunction2D(std::bind(
+                        &CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D,
+                        this,
+                        std::placeholders::_1,
+                        std::placeholders::_2,
+                        std::ref(integral),
+                        i));
+
+        builder_container2d[i].first  = &builder2d[i];
+        builder_container2d[i].second = &dndx_interpolant_2d_[i];
+
+        builder1d[i]
+                .SetMax(def.nodes_cross_section)
+                .SetXMin(parametrization_->GetParticleDef().mass)
+                .SetXMax(def.max_node_energy)
+                .SetRomberg(def.order_of_interpolation)
+                .SetRational(false)
+                .SetRelative(false)
+                .SetIsLog(true)
+                .SetRombergY(def.order_of_interpolation)
+                .SetRationalY(true)
+                .SetRelativeY(false)
+                .SetLogSubst(false)
+                .SetFunction1D(std::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, std::placeholders::_1, i));
+
+        builder_container1d[i].first  = &builder1d[i];
+        builder_container1d[i].second = &dndx_interpolant_1d_[i];
+    }
+
+    builder_return.insert(builder_return.end(), builder_container2d.begin(), builder_container2d.end());
+    builder_return.insert(builder_return.end(), builder_container1d.begin(), builder_container1d.end());
+    // builder2d.insert(builder2d.end(), builder1d.begin(), builder1d.end());
+
+    Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), def);
 }

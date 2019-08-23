@@ -20,7 +20,7 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, Interpolatio
     : CrossSectionInterpolant(DynamicData::MuPair, param)
 {
     // Use parent CrossSecition dNdx interpolation
-    InitdNdxInerpolation(def);
+    InitdNdxInterpolation(def);
 
     // --------------------------------------------------------------------- //
     // Builder for DEdx

@@ -53,6 +53,7 @@ public:
     virtual double CalculatedNdx(double energy);
     virtual double CalculatedNdx(double energy, double rnd);
     virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
+    virtual double CalculateCumulativeCrossSection(double energy, int component, double v);
 
 protected:
     virtual bool compare(const CrossSection&) const;

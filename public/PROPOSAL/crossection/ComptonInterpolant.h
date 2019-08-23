@@ -49,6 +49,13 @@ namespace PROPOSAL {
         // ----------------------------------------------------------------- //
 
         double CalculatedEdx(double energy);
+        virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, Integral&, int component);
+        virtual double CalculateCumulativeCrossSection(double energy, int component, double v);
+
+    private:
+        virtual double CalculateStochasticLoss(double energy, double rnd1);
+        virtual void InitdNdxInterpolation(const InterpolationDef& def);
+
     };
 
 } // namespace PROPOSAL
