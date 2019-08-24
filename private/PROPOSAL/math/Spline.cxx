@@ -7,6 +7,7 @@
 
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/math/Function.h"
+#include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/Spline.h"
 #include "PROPOSAL/math/TableWriter.h"
 
@@ -37,8 +38,6 @@ double Spline::evaluate(double x) {
             return splines_[i].evaluate(x);
     }
 
-    std::cout << "Warn extrapolation." << std::endl;
-
     if (x > subintervall_.back())
         return splines_[n_subintervalls_ - 1].evaluate(x);
     else
@@ -52,8 +51,13 @@ void Spline::Derivative() {
 }
 
 void Spline::Antiderivative(double c) {
+    double aux1 = c;
+    double aux2 = 0;
     for (unsigned int i = 0; i < n_subintervalls_; ++i) {
-        splines_[i] = splines_[i].GetAntiderivative(c);
+        aux2 = splines_[i].GetAntiderivative(0).evaluate(subintervall_[i]);
+        splines_[i] = splines_[i].GetAntiderivative(aux1 - aux2);
+        aux1 += splines_[i].evaluate(subintervall_[i + 1]) -
+                splines_[i].evaluate(subintervall_[i]);
     }
 }
 

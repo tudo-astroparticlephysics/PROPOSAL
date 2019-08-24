@@ -83,9 +83,5 @@ double Density_polynomial::Evaluate(Vector3D xi,
 double Density_polynomial::Calculate(Vector3D xi,
                                      Vector3D direction,
                                      double distance) const {
-    // return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
-    double aux =
-        Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
-    std::cout << "Calculate(" << distance << "): " << aux << std::endl;
-    return aux;
+    return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
