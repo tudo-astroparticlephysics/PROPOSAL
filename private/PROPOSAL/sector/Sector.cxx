@@ -225,27 +225,27 @@ Sector::Sector(Particle& particle, const Sector& sector)
     }
 }
 
-Sector::Sector(const Sector& collection)
-    : sector_def_(collection.sector_def_)
-    , particle_(collection.particle_)
-    , geometry_(collection.geometry_->clone())
-    , utility_(collection.utility_)
-    , displacement_calculator_(collection.displacement_calculator_->clone(utility_))
-    , interaction_calculator_(collection.interaction_calculator_->clone(utility_))
-    , decay_calculator_(collection.decay_calculator_->clone(utility_))
+Sector::Sector(const Sector& sector)
+    : sector_def_(sector.sector_def_)
+    , particle_(sector.particle_)
+    , geometry_(sector.geometry_->clone())
+    , utility_(sector.utility_)
+    , displacement_calculator_(sector.displacement_calculator_->clone(utility_))
+    , interaction_calculator_(sector.interaction_calculator_->clone(utility_))
+    , decay_calculator_(sector.decay_calculator_->clone(utility_))
     , exact_time_calculator_(NULL)
     , cont_rand_(NULL)
-    , scattering_(collection.scattering_->clone())
+    , scattering_(sector.scattering_->clone())
 {
     // These are optional, therfore check NULL
-    if (collection.exact_time_calculator_ != NULL)
+    if (sector.exact_time_calculator_ != NULL)
     {
-        exact_time_calculator_ = collection.exact_time_calculator_->clone(utility_);
+        exact_time_calculator_ = sector.exact_time_calculator_->clone(utility_);
     }
 
-    if (collection.cont_rand_ != NULL)
+    if (sector.cont_rand_ != NULL)
     {
-        cont_rand_ = new ContinuousRandomizer(utility_, *collection.cont_rand_);
+        cont_rand_ = new ContinuousRandomizer(utility_, *sector.cont_rand_);
     }
 }
 
@@ -454,6 +454,7 @@ double Sector::Propagate(double distance)
                             for(unsigned int i=0; i<decay_products.size(); i++){
                                 // set additional properties for muon pair particles
                                 decay_products[i]->SetPosition(particle_.GetPosition());
+                                decay_products[i]->SetDirection(particle_.GetDirection());
                                 decay_products[i]->SetTime(particle_.GetTime());
                                 decay_products[i]->SetParentParticleEnergy(particle_.GetEnergy());
                             }

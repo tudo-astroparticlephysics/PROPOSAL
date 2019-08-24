@@ -565,7 +565,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
         particle_position  = particle_.GetPosition();
         particle_direction = particle_.GetDirection();
 
-        ChooseCurrentCollection(particle_position, particle_direction);
+        ChooseCurrentSector(particle_position, particle_direction);
 
         if (current_sector_ == NULL)
         {
@@ -573,8 +573,8 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             break;
         }
 
-        // Check if have to propagate the particle_ through the whole collection
-        // or only to the collection border
+        // Check if have to propagate the particle_ through the whole sector
+        // or only to the sector border
         distance = CalculateEffectiveDistance(particle_position, particle_direction);
 
         if (already_reached_closest_approach == false)
@@ -671,10 +671,10 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 }
 
 // ------------------------------------------------------------------------- //
-void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, const Vector3D& particle_direction)
+void Propagator::ChooseCurrentSector(const Vector3D& particle_position, const Vector3D& particle_direction)
 {
-    std::vector<int> crossed_collections;
-    crossed_collections.resize(0);
+    std::vector<int> crossed_sector;
+    crossed_sector.resize(0);
 
     for (unsigned int i = 0; i < sectors_.size(); i++)
     {
@@ -688,7 +688,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
                 if (sectors_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
                     current_sector_ = sectors_[i];
-                    crossed_collections.push_back(i);
+                    crossed_sector.push_back(i);
                 } else
                 {
                 }
@@ -705,7 +705,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
                 if (sectors_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
                     current_sector_ = sectors_[i];
-                    crossed_collections.push_back(i);
+                    crossed_sector.push_back(i);
                 } else
                 {
                 }
@@ -723,9 +723,9 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
                 if (sectors_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
                     current_sector_ = sectors_[i];
-                    crossed_collections.push_back(i);
+                    crossed_sector.push_back(i);
                 }
-                // The particle reached the border of all specified collections
+                // The particle reached the border of all specified sectors
                 else
                 {
                 }
@@ -733,21 +733,22 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
         }
     }
 
-    // No process collection was found
-    if (crossed_collections.size() == 0)
+    // No sector was found
+    if (crossed_sector.size() == 0)
     {
         current_sector_ = NULL;
-        log_fatal("No Cross Section was found!!!");
+        log_fatal("There is no sector defined at position [%f, %f, %f] !!!",
+                  particle_position.GetX(), particle_position.GetY(), particle_position.GetZ());
     }
 
-    // Choose current collection when multiple collections are crossed!
+    // Choose current sector when multiple sectors are crossed!
     //
     // Choose by hierarchy of Geometry
-    // If same hierarchys are available the denser one is choosen
+    // If same hierarchys are available the denser one is chosen
     // If hierarchy and density are the same then the first found is taken.
     //
 
-    for (std::vector<int>::iterator iter = crossed_collections.begin(); iter != crossed_collections.end(); ++iter)
+    for (std::vector<int>::iterator iter = crossed_sector.begin(); iter != crossed_sector.end(); ++iter)
     {
         // Current Hierachy is bigger -> Nothing to do!
         //
@@ -767,7 +768,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
                 continue;
             }
 
-            // Current Density is smaller -> Set the new collection!
+            // Current Density is smaller -> Set the new sector!
             //
             else
             {
@@ -776,7 +777,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
 
         }
 
-        // Current Hierachy is smaller -> Set the new collection!
+        // Current Hierachy is smaller -> Set the new sector!
         //
         else
         {
@@ -788,10 +789,10 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
 // ------------------------------------------------------------------------- //
 double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position, const Vector3D& particle_direction)
 {
-    double distance_to_collection_border = 0;
-    double distance_to_detector          = 0;
+    double distance_to_sector_border = 0;
+    double distance_to_detector = 0;
 
-    distance_to_collection_border =
+    distance_to_sector_border =
         current_sector_->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
     double tmp_distance_to_border;
 
@@ -809,7 +810,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
                         (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                     if (tmp_distance_to_border <= 0)
                         continue;
-                    distance_to_collection_border = std::min(tmp_distance_to_border, distance_to_collection_border);
+                    distance_to_sector_border = std::min(tmp_distance_to_border, distance_to_sector_border);
                 }
             }
         }
@@ -824,7 +825,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
                     (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                 if (tmp_distance_to_border <= 0)
                     continue;
-                distance_to_collection_border = std::min(tmp_distance_to_border, distance_to_collection_border);
+                distance_to_sector_border = std::min(tmp_distance_to_border, distance_to_sector_border);
             }
 
         }
@@ -841,9 +842,9 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
                         (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                     if (tmp_distance_to_border <= 0)
                         continue;
-                    distance_to_collection_border = std::min(tmp_distance_to_border, distance_to_collection_border);
+                    distance_to_sector_border = std::min(tmp_distance_to_border, distance_to_sector_border);
                 }
-                // The particle_ reached the border of all specified collections
+                // The particle_ reached the border of all specified sectors
                 else
                 {
                 }
@@ -855,10 +856,10 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 
     if (distance_to_detector > 0)
     {
-        return std::min(distance_to_detector, distance_to_collection_border);
+        return std::min(distance_to_detector, distance_to_sector_border);
     } else
     {
-        return distance_to_collection_border;
+        return distance_to_sector_border;
     }
 }
 
