@@ -12,6 +12,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 
 using namespace PROPOSAL;
 
@@ -32,7 +33,7 @@ ComptonInterpolant::ComptonInterpolant(const Compton& param, InterpolationDef de
     ComptonIntegral compton(param);
 
     builder1d.SetMax(def.nodes_cross_section)
-            .SetXMin(param.GetParticleDef().mass)
+            .SetXMin(param.GetParticleDef().low)
             .SetXMax(def.max_node_energy)
             .SetRomberg(def.order_of_interpolation)
             .SetRational(true)
@@ -54,7 +55,7 @@ ComptonInterpolant::ComptonInterpolant(const Compton& param, InterpolationDef de
     Helper::InterpolantBuilderContainer builder_container_de2dx;
 
     builder_de2dx.SetMax(def.nodes_continous_randomization)
-            .SetXMin(param.GetParticleDef().mass)
+            .SetXMin(param.GetParticleDef().low)
             .SetXMax(def.max_node_energy)
             .SetRomberg(def.order_of_interpolation)
             .SetRational(false)
@@ -137,6 +138,40 @@ double ComptonInterpolant::CalculateCumulativeCrossSection(double energy, int co
     return dndx_interpolant_2d_.at(component)->Interpolate(energy, v);
 }
 
+void ComptonInterpolant::StochasticDeflection(Particle *particle, double energy, double energy_loss) {
+
+    Vector3D direction;
+    Vector3D old_direction = particle->GetDirection();
+    old_direction.CalculateSphericalCoordinates();
+
+    double theta_deflect = RandomGenerator::Get().RandomDouble() * 2 * PI; // random azimuth
+    double sinphi_deflect = std::sqrt(1. - std::pow( 1. - (ME * (1. / (energy - energy_loss) - 1. / energy)), 2. ));
+
+    double tx = sinphi_deflect * std::cos(theta_deflect);
+    double ty = sinphi_deflect * std::sin(theta_deflect);
+    double tz = std::sqrt(1. - tx * tx - ty * ty);
+    if(ME * (1. / (energy - energy_loss) - 1. / energy ) > 1 ){
+        // Backward deflection
+        tz = -tz;
+    }
+
+    long double sinth, costh, sinph, cosph;
+    sinth = (long double)std::sin(old_direction.GetTheta());
+    costh = (long double)std::cos(old_direction.GetTheta());
+    sinph = (long double)std::sin(old_direction.GetPhi());
+    cosph = (long double)std::cos(old_direction.GetPhi());
+
+    const Vector3D rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
+    const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
+
+    // Rotation towards all tree axes
+    direction = tz * old_direction;
+    direction = direction + tx * rotate_vector_x;
+    direction = direction + ty * rotate_vector_y;
+
+    particle->SetDirection(direction);
+}
+
 // ------------------------------------------------------------------------- //
 // Private methods
 // ------------------------------------------------------------------------- //
@@ -211,7 +246,7 @@ void ComptonInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
         // needs the already intitialized 2d interpolants.
         builder2d[i]
                 .SetMax1(def.nodes_cross_section)
-                .SetX1Min(parametrization_->GetParticleDef().mass)
+                .SetX1Min(parametrization_->GetParticleDef().low)
                 .SetX1Max(def.max_node_energy)
                 .SetMax2(def.nodes_cross_section)
                 .SetX2Min(1. / (2. * (1. - def.nodes_cross_section)))
@@ -241,7 +276,7 @@ void ComptonInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
 
         builder1d[i]
                 .SetMax(def.nodes_cross_section)
-                .SetXMin(parametrization_->GetParticleDef().mass)
+                .SetXMin(parametrization_->GetParticleDef().low)
                 .SetXMax(def.max_node_energy)
                 .SetRomberg(def.order_of_interpolation)
                 .SetRational(false)

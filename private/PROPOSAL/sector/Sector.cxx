@@ -677,6 +677,9 @@ std::tuple<double, DynamicData::Type, std::pair<std::vector<Particle*>, bool> > 
             energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_energy, rnd2, rnd3);
             energy_loss.second = cross_sections[i]->GetTypeId();
 
+            // Deflect the particle if necessary
+            cross_sections[i]->StochasticDeflection(&particle_, particle_energy, energy_loss.first);
+
             // calculate produced particles, get an empty list if no particles are produced in interaction
             products           = cross_sections[i]->CalculateProducedParticles(particle_energy, energy_loss.first);
 

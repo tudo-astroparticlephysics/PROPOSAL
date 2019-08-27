@@ -373,6 +373,26 @@ TauPlusDef::TauPlusDef()
 TauPlusDef::~TauPlusDef() {}
 
 // ------------------------------------------------------------------------- //
+// Photon definition:
+// e_low is set to twice the electron mass, since photons with a lower energy
+// can not produce any leptons and are therefore irrelevant for us...
+// ------------------------------------------------------------------------- //
+
+GammaDef::GammaDef()
+        : ParticleDef(
+        "Gamma",
+        0.,
+        2*ME,
+        STABLE_PARTICLE,
+        0.0,
+        HardComponentTables::EmptyTable,
+        DecayTable().addChannel(1.1, StableChannel()))
+{
+}
+
+GammaDef::~GammaDef() {}
+
+// ------------------------------------------------------------------------- //
 // Signature for following macro definitions:
 //
 // class name, mass, lifetime, charge
@@ -406,7 +426,6 @@ PARTICLE_IMP(NuTau, 0.0, STABLE_PARTICLE, 0.0)
 PARTICLE_IMP(NuTauBar, 0.0, STABLE_PARTICLE, 0.0)
 
 PARTICLE_IMP(Monopole, MMON, STABLE_PARTICLE, CMON)
-PARTICLE_IMP(Gamma, 0.0, STABLE_PARTICLE, 0.0)
 
 PARTICLE_IMP(SMPMinus, MSMP, STABLE_PARTICLE, -1.0)
 PARTICLE_IMP(SMPPlus, MSMP, STABLE_PARTICLE, 1.0)

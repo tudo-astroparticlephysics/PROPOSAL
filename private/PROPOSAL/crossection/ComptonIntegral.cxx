@@ -6,6 +6,8 @@
 #include "PROPOSAL/crossection/parametrization/Compton.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 
 using namespace PROPOSAL;
 
@@ -182,6 +184,40 @@ double ComptonIntegral::CalculateCumulativeCrossSection(double energy, int i, do
             t_max,
             std::bind(integrand_substitution, energy, std::placeholders::_1),
             2);
+}
+
+void ComptonIntegral::StochasticDeflection(Particle *particle, double energy, double energy_loss) {
+
+    Vector3D direction;
+    Vector3D old_direction = particle->GetDirection();
+    old_direction.CalculateSphericalCoordinates();
+
+    double theta_deflect = RandomGenerator::Get().RandomDouble() * 2 * PI; // random azimuth
+    double sinphi_deflect = std::sqrt(1. - std::pow( 1. - (ME * (1. / (energy - energy_loss) - 1. / energy)), 2. ));
+
+    double tx = sinphi_deflect * std::cos(theta_deflect);
+    double ty = sinphi_deflect * std::sin(theta_deflect);
+    double tz = std::sqrt(1. - tx * tx - ty * ty);
+    if(ME * (1. / (energy - energy_loss) - 1. / energy ) > 1 ){
+        // Backward deflection
+        tz = -tz;
+    }
+
+    long double sinth, costh, sinph, cosph;
+    sinth = (long double)std::sin(old_direction.GetTheta());
+    costh = (long double)std::cos(old_direction.GetTheta());
+    sinph = (long double)std::sin(old_direction.GetPhi());
+    cosph = (long double)std::cos(old_direction.GetPhi());
+
+    const Vector3D rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
+    const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
+
+    // Rotation towards all tree axes
+    direction = tz * old_direction;
+    direction = direction + tx * rotate_vector_x;
+    direction = direction + ty * rotate_vector_y;
+
+    particle->SetDirection(direction);
 }
 
 // ------------------------------------------------------------------------- //

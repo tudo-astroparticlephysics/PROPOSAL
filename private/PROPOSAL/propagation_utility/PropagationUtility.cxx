@@ -90,8 +90,9 @@ Utility::Utility(const ParticleDef& particle_def,
                 particle_def_, *medium_, cut_settings_, utility_def.ioniz_def));
     }
     else{
-        log_warn("No Ionization cross section chosen. Initialization may fail because no cross section for small energies"
-                 "are available. You may have to enable Ionization or set a higher e_low parameter for the particle.");
+        log_debug("No Ionization cross section chosen. For lepton propagation,Initialization may fail because no cross"
+                  "section for small energies are available. You may have to enable Ionization or set a higher e_low"
+                  "parameter for the particle.");
     }
 
     if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
@@ -151,8 +152,9 @@ Utility::Utility(const ParticleDef& particle_def,
         crosssections_.push_back(IonizationFactory::Get().CreateIonization(
                 particle_def_, *medium_, cut_settings_, utility_def.ioniz_def, interpolation_def));
     }else{
-        log_warn("No Ionization cross section chosen. Initialization may fail because no cross section for small energies"
-                 "are available. You may have to enable Ionization or set a higher e_low parameter for the particle.");
+        log_debug("No Ionization cross section chosen. For lepton propagation,Initialization may fail because no cross"
+                  "section for small energies are available. You may have to enable Ionization or set a higher e_low"
+                  "parameter for the particle.");
     }
 
     if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
