@@ -6,7 +6,7 @@
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/decay/DecayChannel.h"
 
-#include "PROPOSAL/density_distr/density_homogeneous.h"
+#include "PROPOSAL/medium/density_distr/density_distr.h"
 
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/geometry/Sphere.h"
@@ -39,8 +39,7 @@ Sector::Definition::Definition()
       utility_def(),
       cut_settings(),
       medium_(new Ice()),
-      geometry_(new Sphere(Vector3D(), 1.0e20, 0.0)),
-      density_distribution_(new Density_homogeneous()) {}
+      geometry_(new Sphere(Vector3D(), 1.0e20, 0.0)) {}
 
 Sector::Definition::Definition(const Definition& def)
     : do_stochastic_loss_weighting(def.do_stochastic_loss_weighting),
@@ -55,8 +54,7 @@ Sector::Definition::Definition(const Definition& def)
       utility_def(def.utility_def),
       cut_settings(def.cut_settings),
       medium_(def.medium_->clone()),
-      geometry_(def.geometry_->clone()),
-      density_distribution_(def.density_distribution_->clone()) {}
+      geometry_(def.geometry_->clone()) {}
 
 bool Sector::Definition::operator==(const Definition& sector_def) const {
     if (do_stochastic_loss_weighting != sector_def.do_stochastic_loss_weighting)
@@ -106,7 +104,6 @@ void Sector::Definition::swap(Definition& definition) {
     swap(scattering_model, definition.scattering_model);
     swap(location, definition.location);
     swap(utility_def, definition.utility_def);
-    // density_distribution_->swap(*definition.density_distribution_);
     medium_->swap(*definition.medium_);
     geometry_->swap(*definition.geometry_);
 }
@@ -122,12 +119,6 @@ Sector::Definition& Sector::Definition::operator=(
 Sector::Definition::~Definition() {
     delete medium_;
     delete geometry_;
-}
-
-void Sector::Definition::SetDensityDistribution(
-    const Density_distr& density_distribution) {
-    delete density_distribution_;
-    density_distribution_ = density_distribution.clone();
 }
 
 void Sector::Definition::SetMedium(const Medium& medium) {
@@ -151,7 +142,6 @@ Sector::Sector(Particle& particle, const Definition& sector_def)
       utility_(particle_.GetParticleDef(),
                sector_def.GetMedium(),
                sector_def.cut_settings,
-               sector_def.GetDensityDistribution(),
                sector_def.utility_def),
       displacement_calculator_(new UtilityIntegralDisplacement(utility_)),
       interaction_calculator_(new UtilityIntegralInteraction(utility_)),
@@ -181,7 +171,6 @@ Sector::Sector(Particle& particle,
       utility_(particle_.GetParticleDef(),
                sector_def.GetMedium(),
                sector_def.cut_settings,
-               sector_def.GetDensityDistribution(),
                sector_def.utility_def,
                interpolation_def),
       displacement_calculator_(
@@ -354,7 +343,7 @@ double Sector::Propagate(double distance) {
             displacement = distance - propagated_distance;
 
             double displacement_aequivaltent =
-                utility_.GetDensityDistribution().Calculate(
+                utility_.GetMedium().GetDensityDistribution().Calculate(
                     particle_.GetPosition(), particle_.GetDirection(),
                     displacement);
 
@@ -369,7 +358,7 @@ double Sector::Propagate(double distance) {
             displacement = distance - propagated_distance;
 
             double displacement_aequivaltent =
-                utility_.GetDensityDistribution().Calculate(
+                utility_.GetMedium().GetDensityDistribution().Calculate(
                     particle_.GetPosition(), particle_.GetDirection(),
                     displacement);
 
@@ -659,7 +648,8 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(
     } else {
         rnddMin = decay_calculator_->Calculate(
                       initial_energy, particle_.GetParticleDef().low, rndd) /
-                  utility_.GetMedium().GetDensityCorrection();
+                  utility_.GetMedium().GetDensityDistribution().Evaluate(
+                      particle_.GetPosition(), particle_.GetDirection(), 0);
     }
 
     rndiMin = interaction_calculator_->Calculate(
@@ -670,7 +660,9 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(
         final.second = particle_.GetLow();
     } else {
         final.second = decay_calculator_->GetUpperLimit(
-            initial_energy, rndd * utility_.GetMedium().GetDensityCorrection());
+            initial_energy,
+            rndd * utility_.GetMedium().GetDensityDistribution().Evaluate(
+                       particle_.GetPosition(), particle_.GetDirection(), 0));
     }
 
     if (rndi >= rndiMin || rndiMin <= 0) {
@@ -686,8 +678,6 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(
 void Sector::AdvanceParticle(double dr, double ei, double ef) {
     double dist = particle_.GetPropagatedDistance();
     double time = particle_.GetTime();
-    Vector3D position = particle_.GetPosition();
-    Vector3D direction = particle_.GetDirection();
 
     dist += dr;
 
@@ -695,9 +685,8 @@ void Sector::AdvanceParticle(double dr, double ei, double ef) {
         // DensityDistribution Approximation: Use the DensityDistribution at the
         // position of initial energy
         time += exact_time_calculator_->Calculate(ei, ef, 0.0) /
-                (utility_.GetMedium().GetDensityCorrection() *
-                 utility_.GetDensityDistribution().Evaluate(position, direction,
-                                                            0));
+                utility_.GetMedium().GetDensityDistribution().Evaluate(
+                    particle_.GetPosition(), particle_.GetDirection(), 0);
     } else {
         time += dr / SPEED;
     }

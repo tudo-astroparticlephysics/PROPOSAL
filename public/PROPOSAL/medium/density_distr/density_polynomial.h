@@ -2,9 +2,9 @@
 #include <functional>
 #include <iostream>
 #include <vector>
-#include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/math/Function.h"
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/medium/density_distr/density_distr.h"
 
 class Density_polynomial : public Density_distr {
    public:

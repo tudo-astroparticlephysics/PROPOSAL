@@ -26,7 +26,6 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 // #include <string>
@@ -48,29 +47,21 @@ class Geometry;
 /*! \class ProcessSector ProcessSector.h "CrossSections.h"
     \brief initializes all cross sections and keeps references to them
  */
-class Sector
-{
-public:
-    struct ParticleLocation
-    {
-        enum Enum
-        {
-            InfrontDetector = 0,
-            InsideDetector,
-            BehindDetector
-        };
+class Sector {
+   public:
+    struct ParticleLocation {
+        enum Enum { InfrontDetector = 0, InsideDetector, BehindDetector };
     };
 
-    class Definition
-    {
-    public:
+    class Definition {
+       public:
         Definition();
         Definition(const Definition&);
         ~Definition();
 
         bool operator==(const Definition&) const;
         bool operator!=(const Definition&) const;
-        Definition& operator= (const Definition&);
+        Definition& operator=(const Definition&);
         void swap(Definition&);
 
         void SetMedium(const Medium&);
@@ -78,13 +69,14 @@ public:
 
         void SetGeometry(const Geometry&);
         const Geometry& GetGeometry() const { return *geometry_; }
-        
-        void SetDensityDistribution(const Density_distr&);
-        const Density_distr& GetDensityDistribution() const { return *density_distribution_; }
 
-        bool do_stochastic_loss_weighting; //!< Do weigthing of stochastic losses. Set to false in constructor.
-        double stochastic_loss_weighting;  //!< weigth of stochastic losses. Set to 0 in constructor
-        bool stopping_decay; //!< Let particle decay if elow is reached but no decay was sampled
+        bool do_stochastic_loss_weighting;  //!< Do weigthing of stochastic
+                                            //!< losses. Set to false in
+                                            //!< constructor.
+        double stochastic_loss_weighting;  //!< weigth of stochastic losses. Set
+                                           //!< to 0 in constructor
+        bool stopping_decay;  //!< Let particle decay if elow is reached but no
+                              //!< decay was sampled
 
         bool do_continuous_randomization;
         bool do_continuous_energy_loss_output;
@@ -99,20 +91,18 @@ public:
 
         EnergyCutSettings cut_settings;
 
-
-    private:
+       private:
         Medium* medium_;
         Geometry* geometry_;
-        Density_distr* density_distribution_;
     };
 
-public:
+   public:
     // Sector(Particle&);
     Sector(Particle&, const Definition&);
     Sector(Particle&, const Definition&, const InterpolationDef&);
     Sector(Particle&, const Sector&);
-    // Sector(Particle&, const Geometry&, const Utility&, const Scattering&, bool do_interpolation, const Definition&
-    // def = Definition());
+    // Sector(Particle&, const Geometry&, const Utility&, const Scattering&,
+    // bool do_interpolation, const Definition& def = Definition());
     Sector(const Sector&);
     ~Sector();
 
@@ -120,7 +110,8 @@ public:
     bool operator!=(const Sector&) const;
 
     // Sector& operator=(const Sector& collection);
-    // friend std::ostream& operator<<(std::ostream& os, Sector const& collection);
+    // friend std::ostream& operator<<(std::ostream& os, Sector const&
+    // collection);
 
     // --------------------------------------------------------------------- //
     // Member functions
@@ -143,14 +134,15 @@ public:
      * Calculates the contiuous loss till the first stochastic loss happend
      * and subtract it from initial energy
      * Also caluclate the energy at which the particle decay
-     * These to energys can be compared to decide if a decay or particle interaction
-     * happens
+     * These to energys can be compared to decide if a decay or particle
+     * interaction happens
      *
      *  \param  initial_energy   initial energy
-     *  \return pair.first final energy befor first interaction pair.second decay energy at which the
-     *          particle decay
+     *  \return pair.first final energy befor first interaction pair.second
+     * decay energy at which the particle decay
      */
-    std::pair<double, double> CalculateEnergyTillStochastic(double initial_energy);
+    std::pair<double, double> CalculateEnergyTillStochastic(
+        double initial_energy);
 
     /*!
      * advances the particle by the given distance
@@ -168,13 +160,16 @@ public:
      *
      *  \return pair of energy loss [MeV] and kind of interaction
      */
-    std::pair<double, DynamicData::Type> MakeStochasticLoss(double particle_energy);
+    std::pair<double, DynamicData::Type> MakeStochasticLoss(
+        double particle_energy);
 
     // --------------------------------------------------------------------- //
     // Enable options & Setter
     // --------------------------------------------------------------------- //
 
-    void SetLocation(ParticleLocation::Enum location) { sector_def_.location = location; }
+    void SetLocation(ParticleLocation::Enum location) {
+        sector_def_.location = location;
+    }
 
     // --------------------------------------------------------------------- //
     // Getter
@@ -189,8 +184,8 @@ public:
     const Medium* GetMedium() const { return &utility_.GetMedium(); }
     const Definition& GetSectorDef() const { return sector_def_; }
 
-protected:
-    Sector& operator=(const Sector&); // Undefined & not allowed
+   protected:
+    Sector& operator=(const Sector&);  // Undefined & not allowed
 
     // --------------------------------------------------------------------- //
     // Protected members
@@ -210,4 +205,4 @@ protected:
     ContinuousRandomizer* cont_rand_;
     Scattering* scattering_;
 };
-} // namespace PROPOSAL
+}  // namespace PROPOSAL

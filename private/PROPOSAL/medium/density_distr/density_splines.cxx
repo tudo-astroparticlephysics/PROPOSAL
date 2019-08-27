@@ -1,4 +1,4 @@
-#include "PROPOSAL/density_distr/density_splines.h"
+#include "PROPOSAL/medium/density_distr/density_splines.h"
 #include <algorithm>
 #include <functional>
 #include <iostream>

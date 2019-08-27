@@ -1,4 +1,4 @@
-#include "PROPOSAL/density_distr/density_polynomial.h"
+#include "PROPOSAL/medium/density_distr/density_polynomial.h"
 #include <algorithm>
 #include <cmath>
 #include <functional>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/medium/density_distr/density_distr.h"
 
 class Density_exponential : public Density_distr {
    public:

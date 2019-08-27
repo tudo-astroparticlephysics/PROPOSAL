@@ -26,28 +26,27 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/medium/density_distr/density_distr.h"
+#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
 
-#define MEDIUM_DEF(cls)                                                                                                \
-    class cls : public Medium                                                                                          \
-    {                                                                                                                  \
-    public:                                                                                                            \
-        cls(double rho = 1.0);                                                                                         \
-        cls(const Medium& medium)                                                                                      \
-            : Medium(medium)                                                                                           \
-        {                                                                                                              \
-        }                                                                                                              \
-        virtual ~cls() {}                                                                                              \
-                                                                                                                       \
-        virtual Medium* clone() const { return new cls(*this); }                                                       \
-        static Medium* create(double density_correction = 1.0) { return new cls(density_correction); }                 \
+#define MEDIUM_DEF(cls)                                          \
+    class cls : public Medium {                                  \
+       public:                                                   \
+        cls(double rho = 1.0);                                   \
+        cls(const Medium& medium) : Medium(medium) {}            \
+        virtual ~cls() {}                                        \
+                                                                 \
+        virtual Medium* clone() const { return new cls(*this); } \
+        static Medium* create(double density_correction = 1.0) { \
+            return new cls(density_correction);                  \
+        }                                                        \
     };
 
 namespace PROPOSAL {
@@ -56,12 +55,11 @@ namespace PROPOSAL {
  *                                   Medium                                    *
  ******************************************************************************/
 
-class Medium
-{
-public:
+class Medium {
+   public:
     // class Builder;
 
-public:
+   public:
     Medium() {}
     Medium(std::string name,
            double rho,
@@ -94,7 +92,9 @@ public:
 
     // Getter
     int GetNumComponents() const { return numComponents_; }
-    const std::vector<Components::Component*>& GetComponents() const { return components_; }
+    const std::vector<Components::Component*>& GetComponents() const {
+        return components_;
+    }
     double GetSumCharge() const { return sumCharge_; }
     double GetZA() const { return ZA_; }
     double GetI() const { return I_; }
@@ -112,6 +112,7 @@ public:
     std::string GetName() const { return name_; }
     double GetMM() const { return MM_; }
     double GetSumNucleons() const { return sumNucleons_; }
+    const Density_distr& GetDensityDistribution() const { return *dens_distr_; }
 
     // Setter
     void SetNumComponents(int numComponents);
@@ -125,15 +126,17 @@ public:
     void SetX1(double X1);
     void SetD0(double d0);
     void SetR(double r);
-    void SetRho(double rho);
+    void SetDensityCorrection(double rho);
     void SetMassDensity(double massDensity);
     void SetMolDensity(double molDensity);
     void SetAverageNucleonWeight(std::vector<double> M);
-    void SetComponents(std::vector<std::shared_ptr<Components::Component>> components);
+    void SetComponents(
+        std::vector<std::shared_ptr<Components::Component>> components);
     void SetMM(double MM);
     void SetSumNucleons(double sumNucleons);
+    void SetDensityDistribution(Density_distr& dens_distr);
 
-protected:
+   protected:
     // Methods
     void init();
     double X0_inv(unsigned int Z, double M);
@@ -141,29 +144,31 @@ protected:
     // Protected member
     std::string name_;
 
-    int numComponents_;                              ///< number of components
-    std::vector<Components::Component*> components_; ///< Components of Medium
+    int numComponents_;                               ///< number of components
+    std::vector<Components::Component*> components_;  ///< Components of Medium
 
-    double sumCharge_; ///< sum of charges of all nuclei
+    double sumCharge_;  ///< sum of charges of all nuclei
 
-    double ZA_;               ///< <Z/A>
-    double I_;                ///< ionization potential [eV]
-    double C_, a_;            ///< ionization formula constants
-    double m_, X0_, X1_, d0_; ///< ionization formula constants (continued)
-    double r_;                ///< refraction index
+    double ZA_;                ///< <Z/A>
+    double I_;                 ///< ionization potential [eV]
+    double C_, a_;             ///< ionization formula constants
+    double m_, X0_, X1_, d0_;  ///< ionization formula constants (continued)
+    double r_;                 ///< refraction index
 
-    double rho_;             ///< multiplicative density correction factor
-    double massDensity_;     ///< mass density [g/cm3]
-    double molDensity_;      ///< molecule density [number/cm3]
-    double radiationLength_; ///< radiation length [cm]
+    double rho_;              ///< multiplicative density correction factor
+    double massDensity_;      ///< mass density [g/cm3]
+    double molDensity_;       ///< molecule density [number/cm3]
+    double radiationLength_;  ///< radiation length [cm]
 
-    double ecut_; ///< cutoff energy [MeV]
-    double vcut_; ///< relative cutoff energy
-    double vCut_; ///< relative cutoff energy - call setCut(E) to set this
+    double ecut_;  ///< cutoff energy [MeV]
+    double vcut_;  ///< relative cutoff energy
+    double vCut_;  ///< relative cutoff energy - call setCut(E) to set this
 
-    double MM_;          ///< average all-component nucleon weight
-    double sumNucleons_; ///< sum of nucleons of all nuclei
-};
+    double MM_;           ///< average all-component nucleon weight
+    double sumNucleons_;  ///< sum of nucleons of all nuclei
+
+    Density_distr* dens_distr_;
+};  // namespace PROPOSAL
 
 MEDIUM_DEF(Water)
 MEDIUM_DEF(Ice)
@@ -178,24 +183,22 @@ MEDIUM_DEF(Copper)
 MEDIUM_DEF(Uranium)
 MEDIUM_DEF(Paraffin)
 
-class Air : public Medium
-{
-public:
+class Air : public Medium {
+   public:
     static const double fraction_N;
     static const double fraction_O;
     static const double fraction_Ar;
     static const double fraction_sum;
 
-public:
+   public:
     Air(double rho = 1.0);
-    Air(const Medium& medium)
-        : Medium(medium)
-    {
-    }
+    Air(const Medium& medium) : Medium(medium) {}
     virtual ~Air() {}
 
     virtual Medium* clone() const { return new Air(*this); }
-    static Medium* create(double density_correction = 1.0) { return new Air(density_correction); }
+    static Medium* create(double density_correction = 1.0) {
+        return new Air(density_correction);
+    }
 };
 
 // #<{(|
@@ -213,6 +216,6 @@ public:
 // |)}>#
 MEDIUM_DEF(AntaresWater)
 
-} // namespace PROPOSAL
+}  // namespace PROPOSAL
 
 #undef MEDIUM_DEF
