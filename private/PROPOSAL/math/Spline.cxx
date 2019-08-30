@@ -38,6 +38,7 @@ double Spline::evaluate(double x) {
             return splines_[i].evaluate(x);
     }
 
+    // logger warining
     if (x > subintervall_.back())
         return splines_[n_subintervalls_ - 1].evaluate(x);
     else
@@ -45,9 +46,11 @@ double Spline::evaluate(double x) {
 }
 
 void Spline::Derivative() {
-    for (unsigned int i = 0; i < n_subintervalls_; ++i) {
-        splines_[i] = splines_[i].GetDerivative();
-    }
+    // for (unsigned int i = 0; i < n_subintervalls_; ++i) {
+    //     splines_[i] = splines_[i].GetDerivative();
+    // }
+    for (auto spline : splines_)
+        spline = spline.GetDerivative();
 }
 
 void Spline::Antiderivative(double c) {
@@ -63,63 +66,61 @@ void Spline::Antiderivative(double c) {
 
 std::pair<double, double> Spline::GetDomain() {
     std::pair<double, double> domain(subintervall_.front(),
-                                     subintervall_.back());  // value init
-
+                                     subintervall_.back());
     return domain;
 }
-////----------------------------------------------------------------------------//
-////------------------------------- Linear Spline
-///------------------------------//
-////----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//------------------------------- Linear Spline ------------------------------//
+//----------------------------------------------------------------------------//
 
-// Linear_Spline::Linear_Spline(std::vector<double> x, std::vector<double>
-// y) :
-//    Spline(x, y)
-//{
-//    calculate_splines(x_, y_);
-//}
+Linear_Spline::Linear_Spline(std::vector<double> x, std::vector<double> y)
+    : Spline(x, y) {
+    calculate_splines(x_, y_);
+}
 
-// Linear_Spline::Linear_Spline(std::vector<Polynom> splines,
-// std::vector<double> subintervall) :
-//    Spline(splines, subintervall)
-//{
+Linear_Spline::Linear_Spline(std::vector<Polynom> splines,
+                             std::vector<double> subintervall)
+    : Spline(splines, subintervall) {}
 
-//}
+// Linear_Spline::Linear_Spline(std::string path) : Spline(path) {}
 
-// Linear_Spline::Linear_Spline(std::string path) :
-//    Spline(path)
-//{
-//}
+Linear_Spline::Linear_Spline(const Linear_Spline& spline) : Spline(spline) {}
 
-// Linear_Spline::Linear_Spline(const Linear_Spline& spline) :
-//    Spline( spline )
-//{
-//}
+void Linear_Spline::calculate_splines(std::vector<double> x,
+                                      std::vector<double> y) {
+    unsigned int n = x.size() - 1;
+    double a_1;
+    double a_0;
 
-// void Linear_Spline::calculate_splines(std::vector<double> x,
-// std::vector<double> y)
-//{
-//}
+    for (unsigned int i = 0; i < n; ++i) {
+        a_1 = (y[i + 1] - y[i]) / (x[i + 1] - x[i]);
+        a_0 = y[i] - a_1 * x[i];
+        Polynom p = Polynom({a_0, a_1});
 
-// std::vector<linear_spline_container> Linear_Spline::GetSplineContainer()
-//{
-//    std::vector<linear_spline_container> container;
+        splines_.push_back(p);
+    }
 
-//    linear_spline_container lin_container;
-//    for (unsigned int i = 0; i < splines_.size() ; ++i) {
-//        std::vector<double> coeff = splines_[i].GetCoefficient();
-//        lin_container.h_i = subintervall_[i];
-//        lin_container.a_0 = coeff[0];
-//        lin_container.a_1 = coeff[1];
-//        container.push_back(lin_container);
-//    }
+    n_subintervalls_ = n;
+    subintervall_ = x;
+}
 
-//    return container;
-//}
+// std::vector<linear_spline_container> Linear_Spline::GetSplineContainer() {
+//     std::vector<linear_spline_container> container;
+
+//     linear_spline_container lin_container;
+//     for (unsigned int i = 0; i < splines_.size(); ++i) {
+//         std::vector<double> coeff = splines_[i].GetCoefficient();
+//         lin_container.h_i = subintervall_[i];
+//         lin_container.a_0 = coeff[0];
+//         lin_container.a_1 = coeff[1];
+//         container.push_back(lin_container);
+//     }
+
+//     return container;
+// }
 
 //----------------------------------------------------------------------------//
-//-------------------------------- Cubic Spline
-//------------------------------//
+//-------------------------------- Cubic Spline ------------------------------//
 //----------------------------------------------------------------------------//
 
 Cubic_Spline::Cubic_Spline(std::vector<double> x, std::vector<double> y)
@@ -199,22 +200,34 @@ void Cubic_Spline::calculate_splines(std::vector<double> x,
     n_subintervalls_ = n;
 }
 
-std::vector<cubic_spline_container> Cubic_Spline::GetSplineContainer() {
-    std::vector<cubic_spline_container> container;
+// std::vector<spline_container> Cubic_Spline::GetSplineContainer() {
+//     std::vector<spline_container> sp_container;
 
-    cubic_spline_container cub_container;
-    for (unsigned int i = 0; i < splines_.size(); ++i) {
-        std::vector<double> coeff = splines_[i].GetCoefficient();
-        cub_container.h_i = subintervall_[i];
-        cub_container.a_0 = coeff[0];
-        cub_container.a_1 = coeff[1];
-        cub_container.a_2 = coeff[2];
-        cub_container.a_3 = coeff[3];
-        container.push_back(cub_container);
-    }
+//     for (unsigned int i = 0; i < n_subintervalls_; ++i) {
+//         sp_container[i].coeff = splines_[i].GetCoefficient();
+//         sp_container[i].h_i = subintervall_[i];
+//         sp_container[i].degree = splines_[i].GetCoefficient().size();
+//     }
 
-    return container;
-}
+//     return container;
+// }
+
+// std::vector<cubic_spline_container> Cubic_Spline::GetSplineContainer() {
+//     std::vector<cubic_spline_container> container;
+
+//     cubic_spline_container cub_container;
+//     for (unsigned int i = 0; i < splines_.size(); ++i) {
+//         std::vector<double> coeff = splines_[i].GetCoefficient();
+//         cub_container.h_i = subintervall_[i];
+//         cub_container.a_0 = coeff[0];
+//         cub_container.a_1 = coeff[1];
+//         cub_container.a_2 = coeff[2];
+//         cub_container.a_3 = coeff[3];
+//         container.push_back(cub_container);
+//     }
+
+//     return container;
+// }
 
 //----------------------------------------------------------------------------//
 //--------------------------------Save and
@@ -238,41 +251,41 @@ std::vector<cubic_spline_container> Cubic_Spline::GetSplineContainer() {
 //         return 1;
 // }
 
-Cubic_Spline::Cubic_Spline(std::string path, bool binary) : Spline(path) {
-    Table_read reader(path, binary);
+// Cubic_Spline::Cubic_Spline(std::string path, bool binary) : Spline(path) {
+//     Table_read reader(path, binary);
 
-    reader.read(n_subintervalls_);
+//     reader.read(n_subintervalls_);
 
-    std::vector<cubic_spline_container> spline_container;
-    cubic_spline_container container;
+//     std::vector<cubic_spline_container> spline_container;
+//     cubic_spline_container container;
 
-    for (unsigned int i = 0; i < n_subintervalls_; ++i) {
-        reader.read(container);
-        spline_container.push_back(container);
-    }
-    reader.close();
+//     for (unsigned int i = 0; i < n_subintervalls_; ++i) {
+//         reader.read(container);
+//         spline_container.push_back(container);
+//     }
+//     reader.close();
 
-    for (auto i : spline_container) {
-        subintervall_.push_back(i.h_i);
+//     for (auto i : spline_container) {
+//         subintervall_.push_back(i.h_i);
 
-        std::vector<double> coeff = {i.a_0, i.a_1, i.a_2, i.a_3};
-        Polynom p(coeff);
-        splines_.push_back(p);
-    }
-    n_subintervalls_ = subintervall_.size();
-}
+//         std::vector<double> coeff = {i.a_0, i.a_1, i.a_2, i.a_3};
+//         Polynom p(coeff);
+//         splines_.push_back(p);
+//     }
+//     n_subintervalls_ = subintervall_.size();
+// }
 
-bool Cubic_Spline::save(std::string path, bool binary) {
-    Table_write writer(path, binary);
+// bool Cubic_Spline::save(std::string path, bool binary) {
+//     Table_write writer(path, binary);
 
-    writer.write(n_subintervalls_);
+//     writer.write(n_subintervalls_);
 
-    std::vector<cubic_spline_container> spline_container = GetSplineContainer();
-    for (auto i : spline_container) {
-        writer.write(i);
-    }
-    writer.close();
+//     std::vector<cubic_spline_container> spline_container =
+//     GetSplineContainer(); for (auto i : spline_container) {
+//         writer.write(i);
+//     }
+//     writer.close();
 
-    return 1;
-}
+//     return 1;
+// }
 

@@ -273,8 +273,6 @@ void init_medium(py::module& m) {
         .def_property_readonly("num_components", &Medium::GetNumComponents)
         .def_property_readonly("components", &Medium::GetComponents)
         .def_property_readonly("name", &Medium::GetName)
-        .def_property("density_correction", &Medium::GetDensityCorrection,
-                      &Medium::SetDensityCorrection)
         .def_property("density_distribution", &Medium::GetDensityDistribution,
                       &Medium::SetDensityDistribution,
                       R"pbdoc(
@@ -1864,6 +1862,13 @@ void init_math(py::module& m) {
         .def("__call__", py::vectorize(&Spline::evaluate), py::arg("argument"))
         .def("derivate", &Spline::Derivative)
         .def("antiderivative", &Spline::Antiderivative, py::arg("constant"));
+
+    py::class_<Linear_Spline, std::shared_ptr<Linear_Spline>, Spline>(
+        m_sub, "Linear_spline")
+        .def(py::init<std::vector<double>, std::vector<double>>(), py::arg("x"),
+             py::arg("y"))
+        .def(py::init<std::vector<Polynom>, std::vector<double>>(),
+             py::arg("Polynom"), py::arg("definition_area"));
 
     py::class_<Cubic_Spline, std::shared_ptr<Cubic_Spline>, Spline>(
         m_sub, "Cubic_spline")
