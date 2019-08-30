@@ -3,7 +3,8 @@
 #include <cmath>
 #include <iostream>
 
-Density_homogeneous::Density_homogeneous() : Density_distr() {}
+Density_homogeneous::Density_homogeneous()
+    : Density_distr(), correction_factor_(1.0) {}
 
 Density_homogeneous::Density_homogeneous(double correction_factor)
     : Density_distr(), correction_factor_(correction_factor) {}
@@ -20,7 +21,7 @@ double Density_homogeneous::Correct(Vector3D xi,
     (void)xi;
     (void)direction;
 
-    return res;
+    return res / correction_factor_;
 }
 
 double Density_homogeneous::Integrate(Vector3D xi,
@@ -29,7 +30,7 @@ double Density_homogeneous::Integrate(Vector3D xi,
     (void)xi;
     (void)direction;
 
-    return distance;
+    return correction_factor_ * distance;
 }
 
 double Density_homogeneous::Calculate(Vector3D xi,
@@ -38,7 +39,7 @@ double Density_homogeneous::Calculate(Vector3D xi,
     (void)xi;
     (void)direction;
 
-    return distance;
+    return correction_factor_ * distance;
 }
 
 double Density_homogeneous::Evaluate(Vector3D xi,
@@ -48,5 +49,5 @@ double Density_homogeneous::Evaluate(Vector3D xi,
     (void)direction;
     (void)l;
 
-    return 1;
+    return correction_factor_;
 }

@@ -42,8 +42,6 @@ std::ostream& operator<<(std::ostream& os, Medium const& medium) {
     os << "refraction index:\t\t\t\t" << medium.r_ << std::endl;
     os << "average all-component nucleon weight [MeV]:\t" << medium.MM_
        << std::endl;
-    os << "multiplicative density correction factor:\t" << medium.rho_
-       << std::endl;
     os << "sum of charges of all nuclei:\t\t\t" << medium.sumCharge_
        << std::endl;
     os << "radiation Length:\t\t" << medium.radiationLength_ << std::endl;
@@ -95,13 +93,7 @@ Medium::Medium(std::string name,
       vCut_(0),
       MM_(0),
       sumNucleons_(0),
-      dens_distr_(new Density_homogeneous(rho_)) {
-    if (rho > 0) {
-        rho_ = rho;
-    } else {
-        rho_ = 1;
-    }
-
+      dens_distr_(new Density_homogeneous(rho)) {
     // components_.reserve(numComponents_);
     // for (int i = 0; i < numComponents_; ++i)
     for (auto component : components) {
@@ -124,7 +116,6 @@ Medium::Medium(const Medium& medium)
       X1_(medium.X1_),
       d0_(medium.d0_),
       r_(medium.r_),
-      rho_(medium.rho_),
       massDensity_(medium.massDensity_),
       molDensity_(medium.molDensity_),
       radiationLength_(medium.radiationLength_),
@@ -172,7 +163,6 @@ void Medium::swap(Medium& medium) {
     swap(X1_, medium.X1_);
     swap(d0_, medium.d0_);
     swap(r_, medium.r_);
-    swap(rho_, medium.rho_);
     swap(massDensity_, medium.massDensity_);
     swap(molDensity_, medium.molDensity_);
     swap(radiationLength_, medium.radiationLength_);
@@ -199,7 +189,6 @@ Medium& Medium::operator=(const Medium& medium) {
         X0_ = medium.X0_;
         X1_ = medium.X1_;
         d0_ = medium.d0_;
-        rho_ = medium.rho_;
         massDensity_ = medium.massDensity_;
         molDensity_ = medium.molDensity_;
         radiationLength_ = medium.radiationLength_;
@@ -246,8 +235,6 @@ bool Medium::operator==(const Medium& medium) const {
     else if (d0_ != medium.d0_)
         return false;
     else if (r_ != medium.r_)
-        return false;
-    else if (rho_ != medium.rho_)
         return false;
     else if (massDensity_ != medium.massDensity_)
         return false;
@@ -386,10 +373,6 @@ void Medium::SetD0(double d0) {
 
 void Medium::SetR(double r) {
     r_ = r;
-}
-
-void Medium::SetRho(double rho) {
-    rho_ = rho;
 }
 
 void Medium::SetMassDensity(double massDensity) {

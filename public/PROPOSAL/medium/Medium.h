@@ -105,7 +105,6 @@ class Medium {
     double GetX1() const { return X1_; }
     double GetD0() const { return d0_; }
     double GetR() const { return r_; }
-    double GetDensityCorrection() const { return rho_; }
     double GetMassDensity() const { return massDensity_; }
     double GetRadiationLength() const { return radiationLength_; }
     double GetMolDensity() const { return molDensity_; }
@@ -126,7 +125,6 @@ class Medium {
     void SetX1(double X1);
     void SetD0(double d0);
     void SetR(double r);
-    void SetDensityCorrection(double rho);
     void SetMassDensity(double massDensity);
     void SetMolDensity(double molDensity);
     void SetAverageNucleonWeight(std::vector<double> M);
@@ -155,7 +153,6 @@ class Medium {
     double m_, X0_, X1_, d0_;  ///< ionization formula constants (continued)
     double r_;                 ///< refraction index
 
-    double rho_;              ///< multiplicative density correction factor
     double massDensity_;      ///< mass density [g/cm3]
     double molDensity_;       ///< molecule density [number/cm3]
     double radiationLength_;  ///< radiation length [cm]
