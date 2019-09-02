@@ -81,7 +81,7 @@ public:
 private:
      double InelCorrection(double energy, double v);
      double CrossSectionWithoutInelasticCorrection(double energy, double v);
-
+     double Delta(double beta, double gamma);
      static const std::string name_;
 };
 
