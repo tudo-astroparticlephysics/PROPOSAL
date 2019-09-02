@@ -80,7 +80,7 @@ Polynom Polynom::GetAntiderivative(double constant) {
     return Polynom(derivative_coeff);
 }
 
-std::vector<double> Polynom::GetCoefficient() {
+std::vector<double> Polynom::GetCoefficient() const {
     std::vector<double> v(coeff, coeff + N);
     return v;
 }

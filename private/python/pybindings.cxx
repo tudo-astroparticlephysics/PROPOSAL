@@ -1860,8 +1860,10 @@ void init_math(py::module& m) {
 
     py::class_<Spline, std::shared_ptr<Spline>>(m_sub, "Spline")
         .def("__call__", py::vectorize(&Spline::evaluate), py::arg("argument"))
+        .def("__str__", &py_print<Spline>)
         .def("derivate", &Spline::Derivative)
-        .def("antiderivative", &Spline::Antiderivative, py::arg("constant"));
+        .def("antiderivative", &Spline::Antiderivative, py::arg("constant"))
+        .def("save", &Spline::save, py::arg("path"), py::arg("binary"));
 
     py::class_<Linear_Spline, std::shared_ptr<Linear_Spline>, Spline>(
         m_sub, "Linear_spline")
@@ -1875,7 +1877,9 @@ void init_math(py::module& m) {
         .def(py::init<std::vector<double>, std::vector<double>>(), py::arg("x"),
              py::arg("y"))
         .def(py::init<std::vector<Polynom>, std::vector<double>>(),
-             py::arg("Polynom"), py::arg("definition_area"));
+             py::arg("Polynom"), py::arg("definition_area"))
+        .def(py::init<std::string, bool>(), py::arg("Filename"),
+             py::arg("binary"));
 }
 
 PYBIND11_MODULE(pyPROPOSAL, m) {

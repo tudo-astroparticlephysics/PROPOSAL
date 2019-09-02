@@ -22,7 +22,7 @@ class Polynom {
 
     Polynom GetDerivative();
     Polynom GetAntiderivative(double constant);
-    std::vector<double> GetCoefficient();
+    std::vector<double> GetCoefficient() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Polynom& p);
 
