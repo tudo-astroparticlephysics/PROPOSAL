@@ -35,27 +35,6 @@ Spline::Spline(std::string path, bool binary) {
     reader.jump(2);
 
     reader.read(*this);
-
-    // std::vector<spline_container> spline_containers;
-    // spline_container container;
-
-    // reader.read(n_subintervalls_);
-    // for (unsigned int i = 0; i < n_subintervalls_ - 1; ++i) {
-    //     reader.read(container);
-    //     spline_containers.push_back(container);
-    // }
-    // reader.close();
-
-    // for (auto i : spline_containers) {
-    //     subintervall_.push_back(i.domain.first);
-
-    //     std::vector<double> coeff = i.coeff;
-    //     Polynom p(coeff);
-    //     splines_.push_back(p);
-    // }
-    // subintervall_.push_back(
-    //     spline_containers[n_subintervalls_ - 1].domain.second);
-    // n_subintervalls_ = subintervall_.size();
 }
 
 double Spline::evaluate(double x) {

@@ -31,12 +31,12 @@
 #include <string>
 #include "PROPOSAL/math/Vector3D.h"
 
-using namespace PROPOSAL;
-
+namespace PROPOSAL {
 class Axis {
    public:
     Axis();
     Axis(Vector3D fp0, Vector3D fAxis);
+    virtual ~Axis(){};
 
     virtual Axis* clone() const = 0;
 
@@ -51,29 +51,37 @@ class Axis {
     Vector3D fAxis_;
     Vector3D fp0_;
 };
+}  // namespace PROPOSAL
 
+namespace PROPOSAL {
 class RadialAxis : public Axis {
    public:
     RadialAxis();
     RadialAxis(Vector3D fAxis, Vector3D fp0);
 
-    RadialAxis* clone() const { return new RadialAxis(*this); };
+    Axis* clone() const override { return new RadialAxis(*this); };
+    ~RadialAxis(){};
 
     double GetDepth(Vector3D xi) const override;
     double GetEffectiveDistance(Vector3D xi, Vector3D direction) const override;
 };
+}  // namespace PROPOSAL
 
+namespace PROPOSAL {
 class CartesianAxis : public Axis {
    public:
     CartesianAxis();
     CartesianAxis(Vector3D fAxis, Vector3D fp0);
+    ~CartesianAxis(){};
 
-    CartesianAxis* clone() const { return new CartesianAxis(*this); };
+    Axis* clone() const override { return new CartesianAxis(*this); };
 
     double GetDepth(Vector3D xi) const override;
     double GetEffectiveDistance(Vector3D xi, Vector3D direction) const override;
 };
+}  // namespace PROPOSAL
 
+namespace PROPOSAL {
 class DensityException : public std::exception {
    public:
     DensityException(const char* m) : message_(m){};
@@ -82,14 +90,16 @@ class DensityException : public std::exception {
    private:
     std::string message_;
 };
+}  // namespace PROPOSAL
 
+namespace PROPOSAL {
 class Density_distr {
    public:
     Density_distr();
     Density_distr(const Axis& axis);
     Density_distr(const Density_distr&);
 
-    virtual ~Density_distr(){};
+    virtual ~Density_distr() { delete axis_; };
 
     virtual Density_distr* clone() const = 0;
 
@@ -110,4 +120,5 @@ class Density_distr {
    protected:
     Axis* axis_;
 };
+}  // namespace PROPOSAL
 

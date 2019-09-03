@@ -6,19 +6,22 @@
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/medium/density_distr/density_distr.h"
 
+namespace PROPOSAL {
 class Density_polynomial : public Density_distr {
    public:
     Density_polynomial(const Axis&, const Polynom&);
     Density_polynomial(const Density_polynomial&);
 
-    Density_polynomial* clone() const { return new Density_polynomial(*this); };
+    Density_distr* clone() const override {
+        return new Density_polynomial(*this);
+    };
 
     double Correct(Vector3D xi,
                    Vector3D direction,
                    double res,
                    double distance_to_border) const override;
     double Integrate(Vector3D xi, Vector3D direction, double l) const override;
-    double Evaluate(Vector3D xi, Vector3D direction, double l) const;
+    double Evaluate(Vector3D xi, Vector3D direction, double l) const override;
     double Calculate(Vector3D xi,
                      Vector3D direction,
                      double distance) const override;
@@ -39,4 +42,4 @@ class Density_polynomial : public Density_distr {
     std::function<double(double)> density_distribution;
     std::function<double(double)> antiderived_density_distribution;
 };
-
+}  // namespace PROPOSAL

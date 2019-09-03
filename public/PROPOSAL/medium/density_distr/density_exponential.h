@@ -3,13 +3,14 @@
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/medium/density_distr/density_distr.h"
 
+namespace PROPOSAL {
 class Density_exponential : public Density_distr {
    public:
     Density_exponential(const Axis& axis, double sigma);
 
     ~Density_exponential(){};
 
-    Density_exponential* clone() const {
+    Density_distr* clone() const override {
         return new Density_exponential(*this);
     };
 
@@ -34,4 +35,4 @@ class Density_exponential : public Density_distr {
    private:
     double sigma_;
 };
-
+}  // namespace PROPOSAL

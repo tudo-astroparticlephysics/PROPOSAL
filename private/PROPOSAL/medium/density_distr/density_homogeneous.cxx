@@ -3,6 +3,8 @@
 #include <cmath>
 #include <iostream>
 
+using namespace PROPOSAL;
+
 Density_homogeneous::Density_homogeneous()
     : Density_distr(), correction_factor_(1.0) {}
 

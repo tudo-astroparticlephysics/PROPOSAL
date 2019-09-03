@@ -2,6 +2,8 @@
 #include <cmath>
 #include <iostream>
 
+using namespace PROPOSAL;
+
 Density_exponential::Density_exponential(const Axis& axis, double sigma)
     : Density_distr(axis), sigma_(sigma) {}
 

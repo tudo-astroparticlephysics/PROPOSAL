@@ -124,7 +124,7 @@ Medium::Medium(const Medium& medium)
       vCut_(medium.vCut_),
       MM_(medium.MM_),
       sumNucleons_(medium.sumNucleons_),
-      dens_distr_(medium.dens_distr_) {
+      dens_distr_(medium.dens_distr_->clone()) {
     // Deep copy of components
     components_.resize(numComponents_);
     for (unsigned int i = 0; i < components_.size(); ++i) {
@@ -140,6 +140,7 @@ Medium::~Medium() {
         delete (*iter);
     }
 
+    delete dens_distr_;
     components_.clear();
 }
 

@@ -10,20 +10,22 @@
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%% Polynomial-Density %%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+namespace PROPOSAL {
 class Density_splines : public Density_distr {
    public:
     Density_splines(const Axis&, const Spline&);
     Density_splines(const Density_splines&);
 
-    Density_splines* clone() const { return new Density_splines(*this); };
+    Density_distr* clone() const override {
+        return new Density_splines(*this);
+    };
 
     double Correct(Vector3D xi,
                    Vector3D direction,
                    double res,
                    double distance_to_border) const override;
     double Integrate(Vector3D xi, Vector3D direction, double l) const override;
-    double Evaluate(Vector3D xi, Vector3D direction, double l) const;
+    double Evaluate(Vector3D xi, Vector3D direction, double l) const override;
     double Calculate(Vector3D xi,
                      Vector3D direction,
                      double distance) const override;
@@ -45,4 +47,4 @@ class Density_splines : public Density_distr {
     std::function<double(double)> density_distribution;
     std::function<double(double)> antiderived_density_distribution;
 };
-
+}  // namespace PROPOSAL

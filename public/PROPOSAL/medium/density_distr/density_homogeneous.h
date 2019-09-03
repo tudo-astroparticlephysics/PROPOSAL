@@ -38,7 +38,7 @@ class Density_homogeneous : public Density_distr {
 
     ~Density_homogeneous(){};
 
-    Density_homogeneous* clone() const {
+    Density_distr* clone() const override {
         return new Density_homogeneous(*this);
     };
 

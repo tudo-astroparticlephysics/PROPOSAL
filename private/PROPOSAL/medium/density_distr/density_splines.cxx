@@ -5,6 +5,8 @@
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/Spline.h"
 
+using namespace PROPOSAL;
+
 Density_splines::Density_splines(const Axis& axis, const Spline& splines)
     : Density_distr(axis),
       spline_(splines.clone()),

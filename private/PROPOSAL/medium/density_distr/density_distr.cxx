@@ -3,10 +3,12 @@
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/math/Vector3D.h"
 
+using namespace PROPOSAL;
+
 Density_distr::Density_distr() : axis_(CartesianAxis().clone()) {}
 
 Density_distr::Density_distr(const Density_distr& density_distr)
-    : axis_(density_distr.axis_) {}
+    : axis_(density_distr.axis_->clone()) {}
 
 Density_distr::Density_distr(const Axis& axis) : axis_(axis.clone()) {}
 
