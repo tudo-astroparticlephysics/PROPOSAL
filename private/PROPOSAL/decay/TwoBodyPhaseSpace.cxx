@@ -49,7 +49,9 @@ DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(const Particle& particle)
     products[0]->SetDirection(direction);
     products[0]->SetMomentum(momentum);
 
-    products[1]->SetDirection(-direction);
+    Vector3D opposite_direction = -direction;
+    opposite_direction.CalculateSphericalCoordinates();
+    products[1]->SetDirection(opposite_direction);
     products[1]->SetMomentum(momentum);
 
     Boost(products, particle.GetDirection(), particle.GetEnergy() / particle.GetMass(), particle.GetMomentum() / particle.GetMass());
