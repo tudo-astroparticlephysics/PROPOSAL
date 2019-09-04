@@ -218,6 +218,19 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSAL::Particle* 
     double tf = particle->GetExitTime() * I3Units::second;
     double Ef = particle->GetExitEnergy() * I3Units::MeV / I3Units::GeV;
 
+    if (Ef == particle->GetMass())
+    {
+        // If a particle decays, it gets its mass as the final energy
+        // (in the new version of PROPOSAL).
+        // However, in the old version (or in MMC),
+        // it gets the negative length to the border of the detector in cm.
+        // As this is not intuitive, this was changed in the core library.
+        // But to make make the MMCTrack consistent with the old one,
+        // this is changed here in the interface.
+        PROPOSAL::Geometry& tmp_detector = proposal_service_.GetPropagatorToParticleDef(particle->GetParticleDef())->GetDetector();
+        Ef = -tmp_detector.DistanceToBorder(particle->GetExitPoint(), particle->GetDirection()).first;
+    }
+
     double xc = particle->GetClosestApproachPoint().GetX() * I3Units::cm / I3Units::m;
     double yc = particle->GetClosestApproachPoint().GetY() * I3Units::cm / I3Units::m;
     double zc = particle->GetClosestApproachPoint().GetZ() * I3Units::cm / I3Units::m;

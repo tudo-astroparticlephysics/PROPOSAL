@@ -132,19 +132,19 @@ private:
     Geometry* ParseGeometryConifg(const std::string& json_object_str);
 
     // ----------------------------------------------------------------------------
-    /// @brief Choose the current collection the particle is in.
+    /// @brief Choose the current sector the particle is in.
     ///
     /// @param particle_position
     /// @param particle_direction
     // ----------------------------------------------------------------------------
-    void ChooseCurrentCollection(const Vector3D& particle_position, const Vector3D& particle_direction);
+    void ChooseCurrentSector(const Vector3D& particle_position, const Vector3D& particle_direction);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the distance to propagate
     ///
     /// Calculate the distance to propagate and
     /// choose if the particle has to propagate through the whole sector
-    /// or only to the collection border
+    /// or only to the sector border
     ///
     /// @param particle_position
     /// @param particle_direction
@@ -161,31 +161,31 @@ private:
         global_seed_; //!< Seed for the internal random number generator
     static const double
         global_ecut_inside_; //!< ecut for inside the detector (it's used when not specified explicit for a sector in
-    //! congiguration file)
+    //! configuration file)
     static const double
         global_ecut_infront_; //!< ecut for infront of the detector (it's used when not specified explicit for a
-    //! sector in congiguration file)
+    //! sector in configuration file)
     static const double
         global_ecut_behind_; //!< ecut for behind the detector (it's used when not specified explicit for a sector in
-    //! congiguration file)
+    //! configuration file)
     static const double
         global_vcut_inside_; //!< vcut for inside the detector (it's used when not specified explicit for a sector in
-    //! congiguration file)
+    //! configuration file)
     static const double
         global_vcut_infront_; //!< ecut for infront of the detector (it's used when not specified explicit for a
-    //! sector in congiguration file)
+    //! sector in configuration file)
     static const double
         global_vcut_behind_; //!< ecut for behind the detector (it's used when not specified explicit for a sector in
-    //! congiguration file)
+    //! configuration file)
     static const double
         global_cont_inside_; //!< continuous randominzation flag for inside the detector (it's used when not
-    //! specified explicit for a sector in congiguration file)
+    //! specified explicit for a sector in configuration file)
     static const double
         global_cont_infront_; //!< continuous randominzation flag for infront of the detector (it's used when not
-    //! specified explicit for a sector in congiguration file)
+    //! specified explicit for a sector in configuration file)
     static const double
         global_cont_behind_;        //!< continuous randominzation flag for behind the detector (it's used when not
-                                    //! specified explicit for a sector in congiguration file)
+                                    //! specified explicit for a sector in configuration file)
     static const bool do_interpolation_; //!< Enable interpolation
     static const bool uniform_; //!< Enable uniform sampling of phase space points for decays
 

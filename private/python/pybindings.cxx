@@ -1151,6 +1151,33 @@ void init_parametrization(py::module& m) {
         .value("SandrockSoedingreksoRhode",
                BremsstrahlungFactory::SandrockSoedingreksoRhode);
 
+    py::class_<BremsstrahlungFactory,
+               std::unique_ptr<BremsstrahlungFactory, py::nodelete>>(
+        m_sub_brems, "BremsFactory")
+        .def("get_enum_from_str", &BremsstrahlungFactory::GetEnumFromString,
+             py::arg("parametrization_str"))
+        .def("create_bremsstrahlung",
+             (CrossSection *
+              (BremsstrahlungFactory::*)(const ParticleDef&, const Medium&,
+                                         const EnergyCutSettings&,
+                                         const BremsstrahlungFactory::
+                                             Definition&)const) &
+                 BremsstrahlungFactory::CreateBremsstrahlung,
+             py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"),
+             py::arg("brems_def"))
+        .def("create_bremsstrahlung_interpol",
+             (CrossSection *
+              (BremsstrahlungFactory::*)(const ParticleDef&, const Medium&,
+                                         const EnergyCutSettings&,
+                                         const BremsstrahlungFactory::
+                                             Definition&,
+                                         InterpolationDef) const) &
+                 BremsstrahlungFactory::CreateBremsstrahlung,
+             py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"),
+             py::arg("brems_def"), py::arg("interpolation_def"))
+        .def_static("get", &BremsstrahlungFactory::Get,
+                    py::return_value_policy::reference);
+
     py::class_<BremsstrahlungFactory::Definition,
                std::shared_ptr<BremsstrahlungFactory::Definition>>(
         m_sub_brems, "BremsDefinition")
@@ -1220,6 +1247,33 @@ void init_parametrization(py::module& m) {
                EpairProductionFactory::KelnerKokoulinPetrukhin)
         .value("SandrockSoedingreksoRhode",
                EpairProductionFactory::SandrockSoedingreksoRhode);
+
+    py::class_<EpairProductionFactory,
+               std::unique_ptr<EpairProductionFactory, py::nodelete>>(
+        m_sub_epair, "EpairFactory")
+        .def("get_enum_from_str", &EpairProductionFactory::GetEnumFromString,
+             py::arg("parametrization_str"))
+        .def("create_pairproduction",
+             (CrossSection *
+              (EpairProductionFactory::*)(const ParticleDef&, const Medium&,
+                                          const EnergyCutSettings&,
+                                          const EpairProductionFactory::
+                                              Definition&)const) &
+                 EpairProductionFactory::CreateEpairProduction,
+             py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"),
+             py::arg("brems_def"))
+        .def("create_pairproduction_interpol",
+             (CrossSection *
+              (EpairProductionFactory::*)(const ParticleDef&, const Medium&,
+                                          const EnergyCutSettings&,
+                                          const EpairProductionFactory::
+                                              Definition&,
+                                          InterpolationDef) const) &
+                 EpairProductionFactory::CreateEpairProduction,
+             py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"),
+             py::arg("brems_def"), py::arg("interpolation_def"))
+        .def_static("get", &EpairProductionFactory::Get,
+                    py::return_value_policy::reference);
 
     py::class_<EpairProductionFactory::Definition,
                std::shared_ptr<EpairProductionFactory::Definition>>(
@@ -1546,9 +1600,36 @@ void init_parametrization(py::module& m) {
         .value("ButkevichMikhailov",
                PhotonuclearFactory::ShadowButkevichMikhailov);
 
+    py::class_<PhotonuclearFactory,
+               std::unique_ptr<PhotonuclearFactory, py::nodelete>>(
+        m_sub_photo, "PhotoFactory")
+        .def("get_enum_from_str", &PhotonuclearFactory::GetEnumFromString,
+             py::arg("parametrization_str"))
+        .def("create_photonuclear",
+             (CrossSection *
+              (PhotonuclearFactory::*)(const ParticleDef&, const Medium&,
+                                       const EnergyCutSettings&,
+                                       const PhotonuclearFactory::Definition&)
+                  const) &
+                 PhotonuclearFactory::CreatePhotonuclear,
+             py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"),
+             py::arg("photo_def"))
+        .def("create_photonuclear_interpol",
+             (CrossSection *
+              (PhotonuclearFactory::*)(const ParticleDef&, const Medium&,
+                                       const EnergyCutSettings&,
+                                       const PhotonuclearFactory::Definition&,
+                                       InterpolationDef) const) &
+                 PhotonuclearFactory::CreatePhotonuclear,
+             py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"),
+             py::arg("photo_def"), py::arg("interpolation_def"))
+        .def_static("get", &PhotonuclearFactory::Get,
+                    py::return_value_policy::reference);
+
     py::class_<PhotonuclearFactory::Definition,
                std::shared_ptr<PhotonuclearFactory::Definition>>(
         m_sub_photo, "PhotoDefinition")
+>>>>>>> 7b2946fc9e7758c4337da99a256348531edc167b
         .def(py::init<>())
         .def_readwrite("parametrization",
                        &PhotonuclearFactory::Definition::parametrization)
@@ -2360,10 +2441,10 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
                     Function Docstring.
 
                     Args:
-                        particle_def (pyPROPOSAL.particle.ParticleDef): sldkfjas lsdkjfa 
-                        sector_defs (List[pyPROPOSAL.SectorDefinition]): slkd sldkf ksjdlfa
-                        detector (pyPROPOSAL.geometry.Geometry): kfsdljflaskdj
-                        interpolation_def (pyPROPOSAL.InterpolationDef):  sdfa  sldkf sdfa
+                        particle_def (pyPROPOSAL.particle.ParticleDef): definition of the particle to propagate describing the basic properties.
+                        sector_defs (List[pyPROPOSAL.SectorDefinition]): list of the sectors describing the environment around the detector.
+                        detector (pyPROPOSAL.geometry.Geometry): geometry of the detector.
+                        interpolation_def (pyPROPOSAL.InterpolationDef): definition of the Interpolation tables like path to store them, etc.
                 )pbdoc")
         .def(
             py::init<const ParticleDef&, const std::vector<Sector::Definition>&,
@@ -2376,6 +2457,29 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
              py::arg("max_distance_cm") = 1e20,
              py::return_value_policy::reference,
              R"pbdoc(
+=======
+                py::init<const ParticleDef&, 
+                const std::vector<Sector::Definition>&, const Geometry&>(),
+                py::arg("particle_def"), 
+                py::arg("sector_defs"), 
+                py::arg("detector")
+            )
+        .def(
+                py::init<const ParticleDef&, const std::string&>(), 
+                py::arg("particle_def"), 
+                py::arg("config_file")
+            )
+        .def(
+                py::init<const Propagator&>(),
+                py::arg("Propagator")
+            )
+        .def(
+                "propagate", 
+                &Propagator::Propagate, 
+                py::arg("max_distance_cm") = 1e20, 
+                py::return_value_policy::reference,
+                R"pbdoc(
+>>>>>>> 7b2946fc9e7758c4337da99a256348531edc167b
                     Propagate a particle through sectors and produce stochastic
                     losses, untill propagated distance is reached.
 
@@ -2431,19 +2535,27 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
                     Get the internal created particle to modify its properties.
 
                     Returns:
-                        ParticleDef: definition of the propagated particle.
+                        Particle: the propagated particle.
+                )pbdoc")
+        .def_property_readonly("sector", &Propagator::GetCurrentSector,
+                               R"pbdoc(
+                    "Get the current sector"
+
+                    Returns:
+                        Sector: the current sector, where the particle is at the moment.
                 )pbdoc")
         .def_property_readonly("detector", &Propagator::GetDetector,
                                R"pbdoc(
                     Get the detector geometry.
 
                     Returns:
-                        SectorDefinition: definition of the sector.
+                        Geometry: the geometry of the detector.
                 )pbdoc");
 
-    // --------------------------------------------------------------------- //
-    // PropagatorService
-    // --------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------
+    // // PropagatorService
+    // ---------------------------------------------------------------------
+    // //
 
     py::class_<PropagatorService, std::shared_ptr<PropagatorService>>(
         m, "PropagatorService")
