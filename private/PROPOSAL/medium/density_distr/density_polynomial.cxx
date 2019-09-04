@@ -69,8 +69,8 @@ double Density_polynomial::Integrate(Vector3D xi,
                                      double l) const {
     double delta = axis_->GetEffectiveDistance(xi, direction);
 
-    return 1 / (delta * delta) *
-           antiderived_density_distribution(axis_->GetDepth(xi) + l * delta);
+    return antiderived_density_distribution(axis_->GetDepth(xi) + l * delta) /
+           (delta * delta);
 }
 
 double Density_polynomial::Evaluate(Vector3D xi,

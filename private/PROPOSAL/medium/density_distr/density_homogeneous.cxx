@@ -12,9 +12,8 @@ Density_homogeneous::Density_homogeneous(double correction_factor)
     : Density_distr(), correction_factor_(correction_factor) {}
 
 Density_homogeneous::Density_homogeneous(const Density_homogeneous& dens_distr)
-    : Density_distr() {
-    (void)dens_distr;
-}
+    : Density_distr(dens_distr),
+      correction_factor_(dens_distr.correction_factor_) {}
 
 double Density_homogeneous::Correct(Vector3D xi,
                                     Vector3D direction,
@@ -28,20 +27,14 @@ double Density_homogeneous::Correct(Vector3D xi,
 
 double Density_homogeneous::Integrate(Vector3D xi,
                                       Vector3D direction,
-                                      double distance) const {
-    (void)xi;
-    (void)direction;
-
-    return correction_factor_ * distance;
+                                      double l) const {
+    return correction_factor_ * l;
 }
 
 double Density_homogeneous::Calculate(Vector3D xi,
                                       Vector3D direction,
                                       double distance) const {
-    (void)xi;
-    (void)direction;
-
-    return correction_factor_ * distance;
+    return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
 
 double Density_homogeneous::Evaluate(Vector3D xi,
