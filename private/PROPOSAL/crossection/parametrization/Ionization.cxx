@@ -33,12 +33,34 @@ Ionization::Ionization(const Ionization& ioniz)
 Ionization::~Ionization() {}
 
 // ------------------------------------------------------------------------- //
-Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
+double Ionization::Delta(double beta, double gamma) {
+    const Medium& medium = this->GetMedium();
+    double X;
+
+    X = std::log(beta * gamma) / std::log(10);
+
+    if (X < medium.GetX0())
+    {
+        return medium.GetD0() * std::pow(10, 2 * (X - medium.GetX0()));
+    } else if (X < medium.GetX1())
+    {
+        return 2 * LOG10 * X + medium.GetC() + medium.GetA() * std::pow(medium.GetX1() - X, medium.GetM());
+    } else
+    {
+        return 2 * LOG10 * X + medium.GetC();
+    }
+}
+
+// ------------------------------------------------------------------------- //
+// Specific Parametrization
+// ------------------------------------------------------------------------- //
+// ------------------------------------------------------------------------- //
+Parametrization::IntegralLimits IonizBetheBlochRossi::GetIntegralLimits(double energy)
 {
     IntegralLimits limits;
 
     double mass_ration = ME / particle_def_.mass;
-    ;
+
     double gamma = energy / particle_def_.mass;
 
     limits.vMin = (1.e-6 * medium_->GetI()) / energy;
@@ -64,10 +86,6 @@ Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
 
     return limits;
 }
-
-// ------------------------------------------------------------------------- //
-// Specific Parametrization
-// ------------------------------------------------------------------------- //
 
 IonizBetheBlochRossi::IonizBetheBlochRossi(const ParticleDef& particle_def,
                                            const Medium& medium,
@@ -161,25 +179,6 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
 }
 
 // ------------------------------------------------------------------------- //
-double IonizBetheBlochRossi::Delta(double beta, double gamma) {
-    const Medium& medium = this->GetMedium();
-    double X;
-
-    X = std::log(beta * gamma) / std::log(10);
-
-    if (X < medium.GetX0())
-    {
-        return medium.GetD0() * std::pow(10, 2 * (X - medium.GetX0()));
-    } else if (X < medium.GetX1())
-    {
-        return 2 * LOG10 * X + medium.GetC() + medium.GetA() * std::pow(medium.GetX1() - X, medium.GetM());
-    } else
-    {
-        return 2 * LOG10 * X + medium.GetC();
-    }
-}
-
-// ------------------------------------------------------------------------- //
 // Bremststrahlung when scattering at atomic electrons
 // and the atomic electrons emit the Bremsstrahlung photon
 // because of the v^{-2} dependency, it is treated together with Ionization
@@ -240,3 +239,248 @@ double IonizBetheBlochRossi::CrossSectionWithoutInelasticCorrection(double energ
 
 
 const std::string IonizBetheBlochRossi::name_ = "IonizBetheBlochRossi";
+
+// ------------------------------------------------------------------------- //
+// Ionization formula for positrons
+// BetheBloch can't be used due to the ambiguity of the final state
+// For high energy transfers, Moller or Bhabha Scattering is used (different for electron and positron)
+// For low energies, we need to take a sum over the excitation probabilities of the atom (first order independent!)
+// ------------------------------------------------------------------------- //
+
+IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(const ParticleDef& particle_def,
+                                           const Medium& medium,
+                                           const EnergyCutSettings& cuts,
+                                           double multiplier)
+        : Ionization(particle_def, medium, cuts, multiplier)
+{
+}
+
+IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(const IonizBergerSeltzerBhabha& ioniz)
+        : Ionization(ioniz)
+{
+}
+
+IonizBergerSeltzerBhabha::~IonizBergerSeltzerBhabha() {}
+
+// ------------------------------------------------------------------------- //
+Parametrization::IntegralLimits IonizBergerSeltzerBhabha::GetIntegralLimits(double energy)
+{
+    IntegralLimits limits;
+
+    limits.vMin = 0.;
+
+    limits.vMax = 1. - ME / energy;
+
+    if (limits.vMax < 0) {
+        limits.vMax = 0;
+    }
+
+    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
+
+    if (limits.vUp < limits.vMin)
+    {
+        limits.vUp = limits.vMin;
+    }
+
+    return limits;
+}
+
+double IonizBergerSeltzerBhabha::DifferentialCrossSection(double energy, double v)
+{
+    /*
+     * Bhabha-Crosssection, taken from : "The EGS5 Code System",
+     * Hirayama, Hideo and Namito, Yoshihito and Bielajew, Alex and Wilderman, Scott and R. Nelson, Walter,
+     * DOI: 10.2172/877459
+     *
+     * For high energy transfers, corresponding to high v and therefore stoachastic losses, the electrons of the
+     * shell can be treated as free and we can use the Bhabha Scattering crosssection. Furthermore, we use the Bhabha
+     * crosssection to estimate the dE2dx integral
+     */
+
+    double aux    = 0;
+
+    double gamma = energy/ME;
+    double epsilon = (v * energy)/(energy - ME);
+    double betasquared = 1. - 1. / (gamma * gamma);
+    double y = 1. / (gamma + 1.);
+    double B1 = 2. - y * y;
+    double B2 = (1. - 2. * y) * (3. + y * y);
+    double B4 = std::pow(1. - 2. * y, 3.);
+    double B3 = std::pow(1. - 2. * y, 2.) + B4;
+
+    aux = 1. / (betasquared * epsilon * epsilon) - B1 / epsilon + B2 - B3 * epsilon + B4 * epsilon * epsilon;
+
+    aux *= 1. / (gamma - 1.);
+    aux *= 1. / (1. - 1. / gamma); // conversion from epsilon to v
+    aux *= 2. * PI  * std::pow(RE, 2.) * medium_->GetMassDensity() * NA * medium_->GetZA() ;
+
+    return std::max(aux, 0.);
+}
+
+// ------------------------------------------------------------------------- //
+double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(double energy, double variable)
+{
+    /* Berger Seltzer Formula, taken from:
+     * The EGS5 Code System,
+     * Hirayama, Hideo and Namito, Yoshihito and Bielajew, Alex and Wilderman, Scott and R. Nelson, Walter,
+     * DOI: 10.2172/877459
+     *
+     * In general, especially for small energy transfers, one has to consider the excitation probabilities of the
+     * atom. The Berger-Seltzer formula used here takes these information into account for small energy transfers
+     * and uses the Bhabha-formula for high energy transfers, see:
+     * "Positron-Electron Differences in Energy Loss and Multiple Scattering", F. Rohrlich and B.C. Carlson (1954)
+     */
+
+    (void)variable; // integral is calculated analytically here
+
+    double result, aux;
+
+    Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
+    ParticleDef particle_def = this->GetParticleDef();
+    const Medium& medium     = this->GetMedium();
+
+    double fplus; // (2.269)
+    double bigDelta     = std::min(limits.vMax * energy / ME, limits.vUp * energy / ME); // (2.265)
+    double gamma        = energy / ME; // (2.258)
+    double betasquared  = 1. - 1. / (gamma * gamma); // (2.260)
+    double tau          = gamma - 1.; // (2.262)
+    double y            = 1. / (gamma + 1.); // (2.263)
+
+    aux = tau + 2 * bigDelta - (3. * bigDelta * bigDelta * y / 2.) - (bigDelta - std::pow(bigDelta, 3.) / 3.) * y * y
+            - (bigDelta * bigDelta / 2. - tau * std::pow(bigDelta, 3.) / 3. + std::pow(bigDelta, 4.) / 4.) * std::pow(y, 3.);
+
+    aux *= betasquared / tau;
+    fplus = std::log(tau * bigDelta) - aux;
+
+    result = std::log( 2. * (tau + 2.) / (std::pow(1e-6 * medium.GetI(), 2. ) / ME) );
+    result += fplus;
+    result -= Delta(std::sqrt(betasquared), gamma);
+
+    result *= 2. * PI * RE * RE * ME / betasquared;
+
+    result *= NA * medium.GetZA() * medium_->GetMassDensity();
+
+    return std::max(result, 0.);
+}
+
+const std::string IonizBergerSeltzerBhabha::name_ = "IonizBergerSeltzerBhabha";
+
+// ------------------------------------------------------------------------- //
+// Ionization formula for electrons
+// BetheBloch can't be used due to the ambiguity of the final state
+// For high energy transfers, Moller or Bhabha Scattering is used (different for electron and positron)
+// For low energies, we need to take a sum over the excitation probabilities of the atom (first order independent!)
+// ------------------------------------------------------------------------- //
+
+IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(const ParticleDef& particle_def,
+                                                   const Medium& medium,
+                                                   const EnergyCutSettings& cuts,
+                                                   double multiplier)
+        : Ionization(particle_def, medium, cuts, multiplier)
+{
+}
+
+IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(const IonizBergerSeltzerMoller& ioniz)
+        : Ionization(ioniz)
+{
+}
+
+IonizBergerSeltzerMoller::~IonizBergerSeltzerMoller() {}
+
+// ------------------------------------------------------------------------- //
+Parametrization::IntegralLimits IonizBergerSeltzerMoller::GetIntegralLimits(double energy)
+{
+    IntegralLimits limits;
+
+    limits.vMin = 0.;
+
+    limits.vMax = 0.5 * (1. - ME / energy);
+
+    if (limits.vMax < 0) {
+        limits.vMax = 0;
+    }
+
+    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
+
+    if (limits.vUp < limits.vMin)
+    {
+        limits.vUp = limits.vMin;
+    }
+
+    return limits;
+}
+
+double IonizBergerSeltzerMoller::DifferentialCrossSection(double energy, double v)
+{
+
+    /*
+     * Moller-Crosssection, taken from : "The EGS5 Code System",
+     * Hirayama, Hideo and Namito, Yoshihito and Bielajew, Alex and Wilderman, Scott and R. Nelson, Walter,
+     * DOI: 10.2172/877459
+     * For high energy transfers, corresponding to high v and therefore stoachastic losses, the electrons of the
+     * shell can be treated as free and we can use the Moller Scattering crosssection. Furthermore, we use the Moller
+     * crosssection to estimate the dE2dx integral
+     */
+
+    double aux    = 0;
+
+    double gamma = energy/ME;
+    double epsilon = (v * energy)/(energy - ME);
+    double betasquared = 1. - 1. / (gamma * gamma);
+
+    aux = std::pow(gamma - 1., 2.) / (gamma * gamma) + 1. / epsilon * (1. / epsilon - (2. * gamma - 1.) / (gamma * gamma))
+            + 1. / (1. - epsilon) * (1. / (1. - epsilon) - (2. * gamma - 1.) / (gamma * gamma));
+    aux = aux / betasquared;
+
+    aux *= 1. / (gamma - 1.);
+    aux *= 1. / (1. - 1. / gamma); // conversion from epsilon to v
+    aux *= 2. * PI  * std::pow(RE, 2.) * medium_->GetMassDensity() * NA * medium_->GetZA() ;
+
+    return std::max(aux, 0.);
+}
+
+// ------------------------------------------------------------------------- //
+double IonizBergerSeltzerMoller::FunctionToDEdxIntegral(double energy, double variable)
+{
+    /* Berger Seltzer Formula, taken from:
+     * The EGS5 Code System,
+     * Hirayama, Hideo and Namito, Yoshihito and Bielajew, Alex and Wilderman, Scott and R. Nelson, Walter,
+     * DOI: 10.2172/877459
+     *
+     * In general, especially for small energy transfers, one has to consider the excitation probabilities of the
+     * atom. The Berger-Seltzer formula used here takes these information into account for small energy transfers
+     * and uses the Moller-formula for high energy transfers, see:
+     * "Positron-Electron Differences in Energy Loss and Multiple Scattering", F. Rohrlich and B.C. Carlson (1954)
+     */
+
+    (void)variable; // integral is calculated analytically here
+
+    double result, aux;
+
+    Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
+    ParticleDef particle_def = this->GetParticleDef();
+    const Medium& medium     = this->GetMedium();
+
+    double fminus; // (2.268)
+    double bigDelta     = std::min(limits.vMax * energy / ME, limits.vUp * energy / ME); // (2.265)
+    double gamma        = energy / ME; // (2.258)
+    double betasquared  = 1. - 1. / (gamma * gamma); // (2.260)
+    double tau          = gamma - 1.; // (2.262)
+
+    aux = bigDelta * bigDelta / 2. + (2. * tau + 1.) * std::log(1. - bigDelta / tau);
+    aux = aux / (gamma * gamma);
+
+    fminus = aux - 1. - betasquared + std::log((tau - bigDelta) * bigDelta) + tau / (tau - bigDelta);
+
+    result = std::log( 2. * (tau + 2.) / (std::pow(1e-6 * medium.GetI(), 2. ) / ME) );
+    result += fminus;
+    result -= Delta(std::sqrt(betasquared), gamma);
+
+    result *= 2. * PI * RE * RE * ME / betasquared;
+
+    result *= NA * medium.GetZA() * medium_->GetMassDensity();
+
+    return std::max(result, 0.);
+}
+
+const std::string IonizBergerSeltzerMoller::name_ = "IonizBergerSeltzerMoller";

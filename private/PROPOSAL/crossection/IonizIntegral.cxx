@@ -33,11 +33,17 @@ double IonizIntegral::CalculatedEdxWithoutMultiplier(double energy)
 {
     Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
 
-    return energy * dedx_integral_.Integrate(
-                        limits.vMin,
-                        limits.vUp,
-                        std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
-                        4);
+    if(parametrization_->GetName() != "IonizBergerSeltzerBhabha" && parametrization_->GetName() != "IonizBergerSeltzerMoller"){
+        return energy * dedx_integral_.Integrate(
+                limits.vMin,
+                limits.vUp,
+                std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
+                4);
+    }
+    else{
+        return parametrization_->FunctionToDEdxIntegral(energy, 0);
+    }
+
 }
 
 double IonizIntegral::CalculatedEdx(double energy)

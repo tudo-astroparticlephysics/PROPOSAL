@@ -53,6 +53,8 @@ public:
         Fail = 0,
         None,
         BetheBlochRossi,
+        IonizBergerSeltzerBhabha,
+        IonizBergerSeltzerMoller,
     };
 
     struct Definition

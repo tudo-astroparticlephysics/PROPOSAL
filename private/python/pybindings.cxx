@@ -1706,6 +1706,10 @@ void init_parametrization(py::module& m)
 
             * BetheBlochRossi
 
+            * IonizBergerSeltzerBhabha (for positron propagation)
+
+            * IonizBergerSeltzerMoller (for electron propagation)
+
             Example:
                 To create a ionization parametrization
 
@@ -1722,8 +1726,24 @@ void init_parametrization(py::module& m)
              py::arg("energy_cuts"),
              py::arg("multiplier"));
 
+    py::class_<IonizBergerSeltzerBhabha, std::shared_ptr<IonizBergerSeltzerBhabha>, Ionization>(m_sub_ioniz, "BergerSeltzerBhabha")
+            .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+             py::arg("particle_def"),
+             py::arg("medium"),
+             py::arg("energy_cuts"),
+             py::arg("multiplier"));
+
+    py::class_<IonizBergerSeltzerMoller, std::shared_ptr<IonizBergerSeltzerMoller>, Ionization>(m_sub_ioniz, "BergerSeltzerMoller")
+            .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+                 py::arg("particle_def"),
+                 py::arg("medium"),
+                 py::arg("energy_cuts"),
+                 py::arg("multiplier"));
+
     py::enum_<IonizationFactory::Enum>(m_sub_ioniz, "IonizParametrization")
             .value("BetheBlochRossi", IonizationFactory::BetheBlochRossi)
+            .value("IonizBergerSeltzerBhabha", IonizationFactory::IonizBergerSeltzerBhabha)
+            .value("IonizBergerSeltzerMoller", IonizationFactory::IonizBergerSeltzerMoller)
             .value("None", IonizationFactory::None);
 
     py::class_<IonizationFactory, std::unique_ptr<IonizationFactory, py::nodelete>>(m_sub_ioniz, "IonizFactory")
