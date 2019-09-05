@@ -171,6 +171,9 @@ public:
 
     void SetElost(const double elost) { elost_ = elost; }
 
+    // Deflect the direction of a particle by cosphi_deflect with an azimuth of theta_deflect
+    void DeflectDirection(double cosphi_deflect, double theta_deflect);
+
     // Getter
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const DecayTable& GetDecayTable() const { return particle_def_.decay_table; }

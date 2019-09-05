@@ -256,6 +256,37 @@ void Particle::SetMomentum(double momentum)
     energy_   = std::sqrt(momentum_ * momentum_ + particle_def_.mass * particle_def_.mass);
 }
 
+void Particle::DeflectDirection(double cosphi_deflect, double theta_deflect) {
+
+    Vector3D old_direction = GetDirection();
+
+    old_direction.CalculateSphericalCoordinates();
+    double sinphi_deflect = std::sqrt(1. - cosphi_deflect * cosphi_deflect);
+
+    double tx = sinphi_deflect * std::cos(theta_deflect);
+    double ty = sinphi_deflect * std::sin(theta_deflect);
+    double tz = std::sqrt(1. - tx * tx - ty * ty);
+    if(cosphi_deflect < 0. ){
+        // Backward deflection
+        tz = -tz;
+    }
+
+    long double sinth, costh, sinph, cosph;
+    sinth = (long double)std::sin(old_direction.GetTheta());
+    costh = (long double)std::cos(old_direction.GetTheta());
+    sinph = (long double)std::sin(old_direction.GetPhi());
+    cosph = (long double)std::cos(old_direction.GetPhi());
+
+    const Vector3D rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
+    const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
+
+    // Rotation towards all tree axes
+    Vector3D new_direction( tz * old_direction + tx * rotate_vector_x + ty * rotate_vector_y );
+
+    SetDirection(new_direction);
+
+}
+
 // ------------------------------------------------------------------------- //
 // Print
 // ------------------------------------------------------------------------- //

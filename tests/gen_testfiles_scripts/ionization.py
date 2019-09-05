@@ -3,6 +3,8 @@ import numpy as np
 
 parametrizations = [
     pp.parametrization.ionization.BetheBlochRossi,
+    pp.parametrization.ionization.BergerSeltzerMoller,
+    pp.parametrization.ionization.BergerSeltzerBhabha,
 ]
 
 particle_defs = [
