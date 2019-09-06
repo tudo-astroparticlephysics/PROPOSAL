@@ -217,10 +217,9 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
         .def_readwrite("mupair_def", &Utility::Definition::mupair_def)
         .def_readwrite("weak_def", &Utility::Definition::weak_def);
 
-    // ---------------------------------------------------------------------
-    // // ContinousRandomization
-    // ---------------------------------------------------------------------
-    // //
+    // --------------------------------------------------------------------- //
+    // ContinousRandomization
+    // --------------------------------------------------------------------- //
 
     py::class_<ContinuousRandomizer, std::shared_ptr<ContinuousRandomizer>>(
         m, "ContinuousRandomizer",
@@ -487,10 +486,9 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
         .def_static("get", &RandomGenerator::Get,
                     py::return_value_policy::reference);
 
-    // ---------------------------------------------------------------------
-    // // Propagator
-    // ---------------------------------------------------------------------
-    // //
+    // --------------------------------------------------------------------- //
+    // Propagator
+    // --------------------------------------------------------------------- //
 
     py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
         .def(
