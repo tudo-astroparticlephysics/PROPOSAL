@@ -1368,10 +1368,10 @@ void init_parametrization(py::module& m)
         .def("get_enum_from_str", &EpairProductionFactory::GetEnumFromString, py::arg("parametrization_str"))
         .def("create_pairproduction",
             (CrossSection* (EpairProductionFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const EpairProductionFactory::Definition&)const)&EpairProductionFactory::CreateEpairProduction,
-            py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("brems_def"))
+            py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("epair_def"))
         .def("create_pairproduction_interpol",
             (CrossSection* (EpairProductionFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const EpairProductionFactory::Definition&, InterpolationDef)const)&EpairProductionFactory::CreateEpairProduction,
-            py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("brems_def"), py::arg("interpolation_def"))
+            py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("epair_def"), py::arg("interpolation_def"))
         .def_static("get", &EpairProductionFactory::Get, py::return_value_policy::reference);
 
     py::class_<EpairProductionFactory::Definition, std::shared_ptr<EpairProductionFactory::Definition> >(m_sub_epair, "EpairDefinition")
@@ -1453,6 +1453,17 @@ void init_parametrization(py::module& m)
         .value("KelnerKokoulinPetrukhin", MupairProductionFactory::KelnerKokoulinPetrukhin)
         .value("None", MupairProductionFactory::None);
 
+    py::class_<MupairProductionFactory, std::unique_ptr<MupairProductionFactory, py::nodelete>>(m_sub_mupair, "MuPairFactory")
+            .def("get_enum_from_str", &MupairProductionFactory::GetEnumFromString, py::arg("parametrization_str"))
+            .def("create_mupairproduction",
+                 (CrossSection* (MupairProductionFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const MupairProductionFactory::Definition&)const)&MupairProductionFactory::CreateMupairProduction,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("mupair_def"))
+            .def("create_mupairproduction_interpol",
+                 (CrossSection* (MupairProductionFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const MupairProductionFactory::Definition&, InterpolationDef)const)&MupairProductionFactory::CreateMupairProduction,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("mupair_def"), py::arg("interpolation_def"))
+            .def_static("get", &MupairProductionFactory::Get, py::return_value_policy::reference);
+
+
     py::class_<MupairProductionFactory::Definition, std::shared_ptr<MupairProductionFactory::Definition> >(m_sub_mupair, "MupairDefinition")
         .def(py::init<>())
         .def_readwrite("parametrization", &MupairProductionFactory::Definition::parametrization)
@@ -1497,6 +1508,17 @@ void init_parametrization(py::module& m)
     py::enum_<WeakInteractionFactory::Enum>(m_sub_weak, "WeakParametrization")
             .value("CooperSarkarMertsch", WeakInteractionFactory::CooperSarkarMertsch)
             .value("None", WeakInteractionFactory::None);
+
+    py::class_<WeakInteractionFactory, std::unique_ptr<WeakInteractionFactory, py::nodelete>>(m_sub_weak, "WeakFactory")
+            .def("get_enum_from_str", &WeakInteractionFactory::GetEnumFromString, py::arg("parametrization_str"))
+            .def("create_weak",
+                 (CrossSection* (WeakInteractionFactory::*)(const ParticleDef&, const Medium&, const WeakInteractionFactory::Definition&)const)&WeakInteractionFactory::CreateWeakInteraction,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("weak_def"))
+            .def("create_weak_interpol",
+                 (CrossSection* (WeakInteractionFactory::*)(const ParticleDef&, const Medium&, const WeakInteractionFactory::Definition&, InterpolationDef)const)&WeakInteractionFactory::CreateWeakInteraction,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("weak_def"), py::arg("interpolation_def"))
+            .def_static("get", &WeakInteractionFactory::Get, py::return_value_policy::reference);
+
 
     py::class_<WeakInteractionFactory::Definition, std::shared_ptr<WeakInteractionFactory::Definition> >(m_sub_weak, "WeakDefinition")
             .def(py::init<>())
