@@ -96,7 +96,7 @@ double MupairInterpolant::CalculatedEdx(double energy)
     return parametrization_->GetMultiplier() * std::max(dedx_interpolant_->Interpolate(energy), 0.0);
 }
 
-std::pair<std::vector<Particle*>, bool> MupairInterpolant::CalculateProducedParticles(double energy, double energy_loss){
+std::pair<std::vector<Particle*>, bool> MupairInterpolant::CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction){
     std::vector<Particle*> mupair;
 
     if(parametrization_->IsParticleOutputEnabled() == false){
@@ -116,6 +116,8 @@ std::pair<std::vector<Particle*>, bool> MupairInterpolant::CalculateProducedPart
 
     mupair[0]->SetEnergy(0.5*energy_loss*(1 + rho));
     mupair[1]->SetEnergy(0.5*energy_loss*(1 - rho));
+    mupair[0]->SetDirection(initial_direction);
+    mupair[1]->SetDirection(initial_direction);
     return std::make_pair(mupair, false);
 
 }

@@ -49,7 +49,7 @@ public:
     // ----------------------------------------------------------------- //
 
     double CalculatedEdx(double energy);
-    std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(double energy, double energy_loss);
+    std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction);
 
 };
 

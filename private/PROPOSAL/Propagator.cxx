@@ -1753,6 +1753,24 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
                   PhotoPairFactory::Get().GetStringFromEnum(sec_def_global.utility_def.photopair_def.parametrization).c_str());
     }
 
+    if (json_global.find("photoangle") != json_global.end())
+    {
+        if (json_global["photoangle"].is_string())
+        {
+            std::string photoangle = json_global["photoangle"].get<std::string>();
+            sec_def_global.utility_def.photopair_def.photoangle = PhotoPairFactory::Get().GetPhotoAngleEnumFromString(photoangle);
+        }
+        else
+        {
+            log_fatal("The given photoangle option is not a string.");
+        }
+    }
+    else
+    {
+        log_debug("The photoangle option is not set. Use default %s",
+                  PhotoPairFactory::Get().GetStringFromPhotoAngleEnum(sec_def_global.utility_def.photopair_def.photoangle).c_str());
+    }
+
     if (json_global.find("photo_shadow") != json_global.end())
     {
         if (json_global["photo_shadow"].is_string())

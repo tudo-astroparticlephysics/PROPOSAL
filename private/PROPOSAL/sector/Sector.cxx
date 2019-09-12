@@ -681,7 +681,7 @@ std::tuple<double, DynamicData::Type, std::pair<std::vector<Particle*>, bool> > 
             cross_sections[i]->StochasticDeflection(&particle_, particle_energy, energy_loss.first);
 
             // calculate produced particles, get an empty list if no particles are produced in interaction
-            products           = cross_sections[i]->CalculateProducedParticles(particle_energy, energy_loss.first);
+            products           = cross_sections[i]->CalculateProducedParticles(particle_energy, energy_loss.first, particle_.GetDirection());
 
             break;
         }

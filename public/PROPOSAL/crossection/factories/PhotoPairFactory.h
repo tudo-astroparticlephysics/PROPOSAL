@@ -44,6 +44,7 @@ namespace PROPOSAL {
     struct ParticleDef;
     class EnergyCutSettings;
     class Medium;
+    class PhotoAngleDistribution;
 
     class PhotoPairFactory
     {
@@ -59,10 +60,18 @@ namespace PROPOSAL {
             Tsai
         };
 
+        enum PhotoAngle
+        {
+            PhotoAngleTsaiIntegral,
+            PhotoAngleNoDeflection,
+            PhotoAngleEGS
+        };
+
         struct Definition
         {
             Definition()
                     : parametrization(None)
+                    , photoangle(PhotoAngleNoDeflection)
                     , multiplier(1.0)
             {
             }
@@ -72,6 +81,8 @@ namespace PROPOSAL {
                 if (parametrization != def.parametrization)
                     return false;
                 else if (multiplier != def.multiplier)
+                    return false;
+                else if (photoangle != def.photoangle)
                     return false;
 
                 return true;
@@ -83,6 +94,7 @@ namespace PROPOSAL {
             }
 
             Enum parametrization;
+            PhotoAngle photoangle;
             double multiplier;
         };
 
@@ -97,6 +109,12 @@ namespace PROPOSAL {
         typedef std::map<std::string, RegisterFunction> PhotoPairMapString;
         typedef std::map<Enum, RegisterFunction> PhotoPairMapEnum;
         typedef boost::bimap<std::string, Enum> BimapStringEnum;
+
+        typedef std::function<PhotoAngleDistribution*(const ParticleDef&, const Medium&)> RegisterPhotoAngleFunction;
+
+        typedef std::map<std::string, RegisterPhotoAngleFunction> PhotoAngleMapString;
+        typedef std::map<PhotoAngle, RegisterPhotoAngleFunction> PhotoAngleMapEnum;
+        typedef boost::bimap<std::string, PhotoAngle> BimapStringPhotoAngleEnum;
 
         // --------------------------------------------------------------------- //
         // Most general creation
@@ -131,6 +149,16 @@ namespace PROPOSAL {
             return instance;
         }
 
+        // --------------------------------------------------------------------- //
+        // PhotoAngle
+        // --------------------------------------------------------------------- //
+
+        PhotoAngleDistribution* CreatePhotoAngleDistribution(const std::string&, const ParticleDef&, const Medium& medium);
+        PhotoAngleDistribution* CreatePhotoAngleDistribution(const PhotoAngle&, const ParticleDef&, const Medium& medium);
+
+        PhotoAngle GetPhotoAngleEnumFromString(const std::string&);
+        std::string GetStringFromPhotoAngleEnum(const PhotoAngle&);
+
     private:
         PhotoPairFactory();
         ~PhotoPairFactory();
@@ -147,6 +175,14 @@ namespace PROPOSAL {
         PhotoPairMapString photopair_map_str_;
         PhotoPairMapEnum photopair_map_enum_;
         BimapStringEnum string_enum_;
+
+        // PhotoAngle
+
+        void RegisterPhotoAngle(const std::string& name, const PhotoAngle&, RegisterPhotoAngleFunction);
+
+        PhotoAngleMapString photo_angle_map_str_;
+        PhotoAngleMapEnum photo_angle_map_enum_;
+        BimapStringPhotoAngleEnum string_photo_angle_enum_;
     };
 
 } // namespace PROPOSAL

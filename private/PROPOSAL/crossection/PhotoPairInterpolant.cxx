@@ -15,15 +15,18 @@
 
 using namespace PROPOSAL;
 
-PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairProduction& param, InterpolationDef def)
-        : CrossSectionInterpolant(DynamicData::Epair, param) {
+PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairProduction& param, const PhotoAngleDistribution& photoangle, InterpolationDef def)
+        : CrossSectionInterpolant(DynamicData::Epair, param)
+        , photoangle_(photoangle.clone()){
     // Use own initialization
     PhotoPairInterpolant::InitdNdxInterpolation(def);
 }
 
+
 PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairInterpolant& param)
         : CrossSectionInterpolant(param)
 {
+    delete photoangle_;
 }
 
 PhotoPairInterpolant::~PhotoPairInterpolant() {}
@@ -49,8 +52,26 @@ bool PhotoPairInterpolant::compare(const CrossSection& cross_section) const
         if (*dndx_interpolant_2d_[i] != *cross_section_interpolant->dndx_interpolant_2d_[i])
             return false;
     }
+    if(*photoangle_!=*cross_section_interpolant->photoangle_)
+        return false;
 
     return true;
+}
+
+// ------------------------------------------------------------------------- //
+double PhotoPairInterpolant::CalculatedNdx(double energy) {
+    if(energy < 2. * ME){
+        return 0;
+    } else
+        return CrossSectionInterpolant::CalculatedNdx(energy);
+}
+
+// ------------------------------------------------------------------------- //
+double PhotoPairInterpolant::CalculatedNdx(double energy, double rnd) {
+    if(energy < 2. * ME){
+        return 0;
+    } else
+        return CrossSectionInterpolant::CalculatedNdx(energy, rnd);
 }
 
 // ------------------------------------------------------------------------- //
@@ -66,7 +87,7 @@ double PhotoPairInterpolant::CalculateStochasticLoss(double energy, double rnd1,
 
 
 // ------------------------------------------------------------------------- //
-std::pair<std::vector<Particle*>, bool> PhotoPairInterpolant::CalculateProducedParticles(double energy, double energy_loss){
+std::pair<std::vector<Particle*>, bool> PhotoPairInterpolant::CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction){
     (void)energy_loss;
     double rnd;
     double rsum;
@@ -101,10 +122,16 @@ std::pair<std::vector<Particle*>, bool> PhotoPairInterpolant::CalculateProducedP
             particle_list[0]->SetEnergy(energy * (1-rho));
             particle_list[1]->SetEnergy(energy * rho);
 
+            PhotoAngleDistribution::DeflectionAngles angles;
+            angles = photoangle_->SampleAngles(energy, rho, i);
+            particle_list[0]->SetDirection(initial_direction);
+            particle_list[1]->SetDirection(initial_direction);
+            particle_list[0]->DeflectDirection(angles.cosphi0, angles.theta0);
+            particle_list[1]->DeflectDirection(angles.cosphi1, angles.theta1);
+
             return std::make_pair(particle_list, true);
         }
     }
-
 
     log_fatal("could not sample ProducedParticles for PhotoPairProduction!");
     return std::make_pair(particle_list, true);
@@ -133,7 +160,7 @@ void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
         // needs the already intitialized 2d interpolants.
         builder2d[i]
                 .SetMax1(def.nodes_cross_section)
-                .SetX1Min(2 * ME)
+                .SetX1Min(2. * ME)
                 .SetX1Max(def.max_node_energy)
                 .SetMax2(def.nodes_cross_section)
                 .SetX2Min(0.0)

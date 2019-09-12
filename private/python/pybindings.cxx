@@ -1892,7 +1892,74 @@ void init_parametrization(py::module& m)
     py::class_<PhotoPairFactory::Definition, std::shared_ptr<PhotoPairFactory::Definition> >(m_sub_photopair, "PhotoPairDefinition")
             .def(py::init<>())
             .def_readwrite("parametrization", &PhotoPairFactory::Definition::parametrization)
+            .def_readwrite("photoangle", &PhotoPairFactory::Definition::photoangle)
             .def_readwrite("multiplier", &PhotoPairFactory::Definition::multiplier);
+
+    // PhotoAngleDistribution
+
+    py::class_<PhotoAngleDistribution, std::shared_ptr<PhotoAngleDistribution>>(m_sub_photopair, "PhotoAngleDistribution",
+            R"pbdoc(
+
+            Virtual class for the PhotoAngleDistribution parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+
+            The following parametrizations are currently implemented:
+
+            * PhotoPairNoDeflection
+
+            * PhotoPairTsaiIntegral
+
+            * PhotoPairEGS
+
+            Example:
+                To create a PhotoAngleDistribution parametrization
+
+                >>> gamma = pyPROPOSAL.particle.GammaDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> param = pyPROPOSAL.parametrization.PhotoAngleDistribution.TsaiIntegral(gamma, medium)
+                )pbdoc")
+            .def("SetCurrentComponent", &PhotoAngleDistribution::SetCurrentComponent,
+                 py::arg("component_index"))
+            .def("SampleAngles", &PhotoAngleDistribution::SampleAngles,
+                 py::arg("energy"),
+                 py::arg("rho"),
+                 py::arg("component_index"));
+
+    py::class_<PhotoAngleTsaiIntegral, std::shared_ptr<PhotoAngleTsaiIntegral>, PhotoAngleDistribution>(m_sub_photopair, "PhotoAngleTsaiIntegral")
+            .def(py::init<const ParticleDef&, const Medium&>(),
+                 py::arg("particle_def"),
+                 py::arg("medium"))
+            .def("FunctionToIntegral", &PhotoAngleTsaiIntegral::FunctionToIntegral,
+                                                py::arg("energy"),
+                                                py::arg("x"),
+                                                py::arg("theta"));
+
+    py::class_<PhotoAngleNoDeflection, std::shared_ptr<PhotoAngleNoDeflection>, PhotoAngleDistribution>(m_sub_photopair, "PhotoAngleNoDeflection")
+            .def(py::init<const ParticleDef&, const Medium&>(),
+                 py::arg("particle_def"),
+                 py::arg("medium"))
+;
+
+    py::class_<PhotoAngleEGS, std::shared_ptr<PhotoAngleEGS>, PhotoAngleDistribution>(m_sub_photopair, "PhotoAngleEGS")
+            .def(py::init<const ParticleDef&, const Medium&>(),
+                 py::arg("particle_def"),
+                 py::arg("medium"));
+
+    py::class_<PhotoAngleDistribution::DeflectionAngles, std::shared_ptr<PhotoAngleDistribution::DeflectionAngles > >(m_sub_photopair, "DeflectionAngles")
+            .def(py::init<>())
+            .def_readwrite("cosphi0", &PhotoAngleDistribution::DeflectionAngles::cosphi0)
+            .def_readwrite("theta0", &PhotoAngleDistribution::DeflectionAngles::theta0)
+            .def_readwrite("cosphi1", &PhotoAngleDistribution::DeflectionAngles::cosphi1)
+            .def_readwrite("theta1", &PhotoAngleDistribution::DeflectionAngles::theta1);
+
+    py::enum_<PhotoPairFactory::PhotoAngle >(m_sub_photopair, "PhotoAngle")
+            .value("PhotoAngleTsaiIntegral", PhotoPairFactory::PhotoAngleTsaiIntegral)
+            .value("PhotoAngleEGS", PhotoPairFactory::PhotoAngleEGS)
+            .value("PhotoAngleNoDeflection", PhotoPairFactory::PhotoAngleNoDeflection);
+
 }
 
 void init_crosssection(py::module& m)
@@ -2042,14 +2109,16 @@ void init_crosssection(py::module& m)
         .def("calculate_produced_particles", &CrossSection::CalculateProducedParticles,
             py::arg("energy"),
             py::arg("energy_loss"),
-                R"pbdoc( 
+             py::arg("intial_directgion"),
+             R"pbdoc(
 
             If particles are produced in the interaction of this CrossSection, the methods samples those particles corresponding to the energy of the initial particle as
-            well as the energy loss of the initial particle. Available for muon pairproduction.
+            well as the energy loss of the initial particle
 
             Args:                                                                                                  
                 energy (float): primary particle energy in MeV
                 energy_loss (float): energy loss of the primary particle in MeV
+                initial_direction (Vector3D): direction of the parent particle
 
             Returns:
                 List of created particles as well as a boolean with the information whether the initial particle has been destroyed in the interaction
@@ -2100,11 +2169,11 @@ void init_crosssection(py::module& m)
     py::class_<MupairIntegral, std::shared_ptr<MupairIntegral>, CrossSectionIntegral>(m_sub, "MupairIntegral")
         .def(py::init<const MupairProduction&>(), py::arg("parametrization"));
     py::class_<WeakIntegral, std::shared_ptr<WeakIntegral>, CrossSectionIntegral>(m_sub, "WeakIntegral")
-            .def(py::init<const WeakInteraction&>(), py::arg("parametrization"));
+         .def(py::init<const WeakInteraction&>(), py::arg("parametrization"));
     py::class_<ComptonIntegral, std::shared_ptr<ComptonIntegral>, CrossSectionIntegral>(m_sub, "ComptonIntegral")
-            .def(py::init<const Compton&>(), py::arg("parametrization"));
+         .def(py::init<const Compton&>(), py::arg("parametrization"));
     py::class_<PhotoPairIntegral, std::shared_ptr<PhotoPairIntegral>, CrossSectionIntegral>(m_sub, "PhotoPairIntegral")
-            .def(py::init<const PhotoPairProduction&>(), py::arg("parametrization"));
+         .def(py::init<const PhotoPairProduction&, const PhotoAngleDistribution&>(), py::arg("parametrization"), py::arg("photoangle_distribution"));
 
     py::class_<BremsInterpolant, std::shared_ptr<BremsInterpolant>, CrossSectionInterpolant>(
         m_sub, "BremsInterpolant")
@@ -2128,8 +2197,8 @@ void init_crosssection(py::module& m)
         m_sub, "ComptonInterpolant")
         .def(py::init<const Compton&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
     py::class_<PhotoPairInterpolant, std::shared_ptr<PhotoPairInterpolant>, CrossSectionInterpolant>(
-            m_sub, "PhotoPairInterpolant")
-            .def(py::init<const PhotoPairProduction&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
+        m_sub, "PhotoPairInterpolant")
+        .def(py::init<const PhotoPairProduction&, const PhotoAngleDistribution&, InterpolationDef>(), py::arg("parametrization"), py::arg("photoangle_distribution"), py::arg("interpolation_def"));
 }
 
 void init_scattering(py::module& m)

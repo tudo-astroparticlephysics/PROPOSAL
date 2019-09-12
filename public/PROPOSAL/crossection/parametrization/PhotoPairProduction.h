@@ -100,4 +100,142 @@ namespace PROPOSAL {
 
     };
 
+    class PhotoAngleDistribution
+    {
+    public:
+        PhotoAngleDistribution(const ParticleDef&, const Medium&);
+        PhotoAngleDistribution(const PhotoAngleDistribution&);
+        virtual ~PhotoAngleDistribution();
+
+        virtual PhotoAngleDistribution* clone() const = 0;
+
+        bool operator==(const PhotoAngleDistribution&) const;
+        bool operator!=(const PhotoAngleDistribution&) const;
+
+        struct DeflectionAngles
+        {
+            double cosphi0, theta0, cosphi1, theta1;
+        };
+
+        virtual DeflectionAngles SampleAngles(double energy, double rho, int component_index) = 0;
+
+        // Getter
+        const ParticleDef& GetParticleDef() const { return particle_def_; }
+        const Medium& GetMedium() const { return *medium_; }
+
+        virtual const std::string& GetName() const = 0;
+        virtual size_t GetHash() const = 0;
+
+        // Setter
+        void SetCurrentComponent(int index) { component_index_ = index; }
+
+    protected:
+        virtual bool compare(const PhotoAngleDistribution&) const;
+
+        typedef std::vector<Components::Component*> ComponentVec;
+        const ParticleDef particle_def_;
+        const Medium* medium_;
+        const ComponentVec& components_;
+        int component_index_;
+    };
+
+    class PhotoAngleTsaiIntegral : public PhotoAngleDistribution
+    {
+    public:
+        PhotoAngleTsaiIntegral(const ParticleDef& particle_def, const Medium& medium)
+        : PhotoAngleDistribution(particle_def, medium)
+        , integral_(IROMB, IMAXS, IPREC)
+
+        {
+        }
+        PhotoAngleTsaiIntegral(const PhotoAngleTsaiIntegral& photoangle)
+        : PhotoAngleDistribution(photoangle)
+        , integral_(photoangle.integral_)
+        {
+        }
+        virtual ~PhotoAngleTsaiIntegral() {}
+
+        PhotoAngleDistribution* clone() const {return new PhotoAngleTsaiIntegral(*this); }
+        static PhotoAngleDistribution* create(const ParticleDef& particle_def, const Medium& medium) {
+            return new PhotoAngleTsaiIntegral(particle_def, medium);
+        }
+
+        virtual DeflectionAngles SampleAngles(double energy, double rho, int component_index) ;
+        double FunctionToIntegral(double energy, double x, double theta);
+
+        // Getter
+
+        virtual const std::string& GetName() const { return name_; }
+        virtual size_t GetHash() const;
+
+    protected:
+        Integral integral_;
+
+    private:
+        static const std::string name_;
+
+    };
+
+    class PhotoAngleNoDeflection : public PhotoAngleDistribution
+    {
+    public:
+        PhotoAngleNoDeflection(const ParticleDef& particle_def, const Medium& medium)
+        : PhotoAngleDistribution(particle_def, medium)
+        {
+        }
+        PhotoAngleNoDeflection(const PhotoAngleNoDeflection& photoangle)
+        : PhotoAngleDistribution(photoangle)
+        {
+        }
+        virtual ~PhotoAngleNoDeflection() {}
+
+        PhotoAngleDistribution* clone() const {return new PhotoAngleNoDeflection(*this); }
+
+        static PhotoAngleDistribution* create(const ParticleDef& particle_def, const Medium& medium) {
+            return new PhotoAngleNoDeflection(particle_def, medium);
+        }
+
+        virtual DeflectionAngles SampleAngles(double energy, double rho, int component_index);
+
+        // Getter
+
+        virtual const std::string& GetName() const { return name_; }
+        virtual size_t GetHash() const;
+
+    private:
+        static const std::string name_;
+
+    };
+
+    class PhotoAngleEGS : public PhotoAngleDistribution
+    {
+    public:
+        PhotoAngleEGS(const ParticleDef& particle_def, const Medium& medium)
+                : PhotoAngleDistribution(particle_def, medium)
+        {
+        }
+        PhotoAngleEGS(const PhotoAngleNoDeflection& photoangle)
+                : PhotoAngleDistribution(photoangle)
+        {
+        }
+        virtual ~PhotoAngleEGS() {}
+
+        PhotoAngleDistribution* clone() const {return new PhotoAngleEGS(*this); }
+
+        static PhotoAngleDistribution* create(const ParticleDef& particle_def, const Medium& medium) {
+            return new PhotoAngleEGS(particle_def, medium);
+        }
+
+        virtual DeflectionAngles SampleAngles(double energy, double rho, int component_index);
+
+        // Getter
+
+        virtual const std::string& GetName() const { return name_; }
+        virtual size_t GetHash() const;
+
+    private:
+        static const std::string name_;
+
+    };
+
 } // namespace PROPOSAL

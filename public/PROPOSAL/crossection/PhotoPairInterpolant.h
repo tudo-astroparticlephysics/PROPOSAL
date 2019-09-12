@@ -38,7 +38,7 @@ namespace PROPOSAL {
     class PhotoPairInterpolant : public CrossSectionInterpolant
     {
     public:
-        PhotoPairInterpolant(const PhotoPairProduction&, InterpolationDef);
+        PhotoPairInterpolant(const PhotoPairProduction&, const PhotoAngleDistribution&, InterpolationDef);
         PhotoPairInterpolant(const PhotoPairInterpolant&);
         virtual ~PhotoPairInterpolant();
 
@@ -48,16 +48,24 @@ namespace PROPOSAL {
         // Public methods
         // ----------------------------------------------------------------- //
 
+        double CalculatedNdx(double energy);
+        double CalculatedNdx(double energy, double rnd);
+
         //these methods return zero because the photopairproduction contribution is stochastic only
         double CalculatedEdx(double energy){ (void)energy; return 0; }
         double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }
         double CalculatedE2dx(double energy){ (void)energy; return 0; }
 
-        std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(double energy, double energy_loss);
+        std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D);
         double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
+
+        PhotoAngleDistribution& GetPhotoAngleDistribution() const { return *photoangle_; }
+
     protected:
         virtual bool compare(const CrossSection&) const;
         void InitdNdxInterpolation(const InterpolationDef& def);
+
+        PhotoAngleDistribution* photoangle_;
     private:
         double rndc_;
     };

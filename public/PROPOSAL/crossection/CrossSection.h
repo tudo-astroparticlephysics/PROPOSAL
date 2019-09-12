@@ -69,8 +69,8 @@ public:
     // First Parameter: List of produced particles by stochastic interaction (default: no particles, e.g. empty list)
     // Second parameter: Is the interaction a fatal interaction (e.g. will the initial particle vanish after interaction?)
     virtual std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(
-            double energy, double energy_loss){
-        (void)energy; (void)energy_loss; return std::make_pair(std::vector<Particle*>(), false);
+            double energy, double energy_loss, const Vector3D initial_direction){
+        (void)energy; (void)energy_loss; (void)initial_direction; return std::make_pair(std::vector<Particle*>(), false);
     }
 
     virtual void StochasticDeflection(Particle* particle, double energy, double energy_loss){
