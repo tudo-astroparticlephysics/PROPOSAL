@@ -45,10 +45,6 @@ double Density_exponential::Calculate(Vector3D xi,
     return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
 
-double Density_exponential::Evaluate(Vector3D xi,
-                                     Vector3D direction,
-                                     double l) const {
-    double delta = GetEffectiveDistance(xi, direction);
-
-    return std::exp(GetDepth(xi) + l * delta);
+double Density_exponential::Evaluate(Vector3D xi) const {
+    return std::exp(GetDepth(xi));
 }

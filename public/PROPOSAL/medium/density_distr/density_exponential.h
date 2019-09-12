@@ -25,9 +25,7 @@ class Density_exponential : public Density_distr {
     double Calculate(Vector3D xi,
                      Vector3D direction,
                      double distance) const override;
-    double Evaluate(Vector3D xi,
-                    Vector3D direction,
-                    double distance) const override;
+    double Evaluate(Vector3D xi) const override;
 
     double GetDepth(Vector3D xi) const;
     double GetEffectiveDistance(Vector3D xi, Vector3D direction) const;

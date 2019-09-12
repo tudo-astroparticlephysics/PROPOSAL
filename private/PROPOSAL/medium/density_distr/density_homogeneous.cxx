@@ -37,12 +37,8 @@ double Density_homogeneous::Calculate(Vector3D xi,
     return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
 
-double Density_homogeneous::Evaluate(Vector3D xi,
-                                     Vector3D direction,
-                                     double l) const {
+double Density_homogeneous::Evaluate(Vector3D xi) const {
     (void)xi;
-    (void)direction;
-    (void)l;
 
     return correction_factor_;
 }

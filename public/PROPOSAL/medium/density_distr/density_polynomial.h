@@ -21,7 +21,7 @@ class Density_polynomial : public Density_distr {
                    double res,
                    double distance_to_border) const override;
     double Integrate(Vector3D xi, Vector3D direction, double l) const override;
-    double Evaluate(Vector3D xi, Vector3D direction, double l) const override;
+    double Evaluate(Vector3D xi) const override;
     double Calculate(Vector3D xi,
                      Vector3D direction,
                      double distance) const override;

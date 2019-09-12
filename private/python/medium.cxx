@@ -77,7 +77,8 @@ void init_medium(py::module& m) {
         .def_property_readonly("refraction_index", &Medium::GetR,
                                R"pbdoc(Refraction index of the medium.)pbdoc")
         .def_property_readonly(
-            "radiation_length", &Medium::GetRadiationLength,
+            "radiation_length",
+            (double (Medium::*)() const) & Medium::GetRadiationLength,
             R"pbdoc(Radiation length of the medium in [].)pbdoc")
         .def_property_readonly(
             "mass_density", &Medium::GetMassDensity,
@@ -167,7 +168,6 @@ void init_medium(py::module& m) {
 				float: displacement equivalent
             )pbdoc")
         .def("evaluate", &Density_distr::Evaluate, py::arg("xi"),
-             py::arg("direction"), py::arg("displacement"),
              R"pbdoc(
 			Evaluate the density correction at given point.
 
@@ -176,8 +176,6 @@ void init_medium(py::module& m) {
 
 			Parameters:
 				xi (Vector3D): particle position
-				direction (Vector3D): particle direction
-				displacement (float): distance since last stochastical loss
 
 			Return:
 				float: density

@@ -32,6 +32,7 @@
 #include <string>
 #include <vector>
 
+#include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/density_distr/density_distr.h"
 #include "PROPOSAL/medium/density_distr/density_homogeneous.h"
@@ -107,6 +108,7 @@ class Medium {
     double GetR() const { return r_; }
     double GetMassDensity() const { return massDensity_; }
     double GetRadiationLength() const { return radiationLength_; }
+    double GetRadiationLength(Vector3D position) const;
     double GetMolDensity() const { return molDensity_; }
     std::string GetName() const { return name_; }
     double GetMM() const { return MM_; }

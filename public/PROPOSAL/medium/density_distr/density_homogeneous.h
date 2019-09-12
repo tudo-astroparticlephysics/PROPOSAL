@@ -52,9 +52,7 @@ class Density_homogeneous : public Density_distr {
     double Calculate(Vector3D xi,
                      Vector3D direction,
                      double distance) const override;
-    double Evaluate(Vector3D xi,
-                    Vector3D direction,
-                    double distance) const override;
+    double Evaluate(Vector3D xi) const override;
 
    private:
     double correction_factor_;

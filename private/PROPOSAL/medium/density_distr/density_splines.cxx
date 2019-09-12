@@ -30,7 +30,7 @@ double Density_splines::helper_function(Vector3D xi,
                                         Vector3D direction,
                                         double res,
                                         double l) const {
-    return Evaluate(xi, direction, 0) - Evaluate(xi, direction, l);
+    return Evaluate(xi) - Evaluate(xi + l * direction);
 }
 
 double Density_splines::Correct(Vector3D xi,
@@ -64,17 +64,12 @@ double Density_splines::Integrate(Vector3D xi,
            integrated_spline_->evaluate(axis_->GetDepth(xi) + l * delta);
 }
 
-double Density_splines::Evaluate(Vector3D xi,
-                                 Vector3D direction,
-                                 double l) const {
-    double delta = axis_->GetEffectiveDistance(xi, direction);
-
-    return spline_->evaluate(axis_->GetDepth(xi) + l * delta);
-}
-
 double Density_splines::Calculate(Vector3D xi,
                                   Vector3D direction,
                                   double distance) const {
     return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
 
+double Density_splines::Evaluate(Vector3D xi) const {
+    return spline_->evaluate(axis_->GetDepth(xi));
+}

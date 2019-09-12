@@ -43,13 +43,13 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
     }
 
     // Calculate Chi_c^2
-    chiCSq_ = ((4. * PI * NA * ALPHA * ALPHA * HBAR * HBAR * SPEED * SPEED) *
-               (medium_->GetMassDensity() *
-                medium_->GetDensityDistribution().Evaluate(
-                    particle_.GetPosition(), particle_.GetDirection(), 0) *
-                dr) /
-               (momentum * momentum * beta_Sq)) *
-              ZSq_A_average_;
+    chiCSq_ =
+        ((4. * PI * NA * ALPHA * ALPHA * HBAR * HBAR * SPEED * SPEED) *
+         (medium_->GetMassDensity() *
+          medium_->GetDensityDistribution().Evaluate(particle_.GetPosition()) *
+          dr) /
+         (momentum * momentum * beta_Sq)) *
+        ZSq_A_average_;
 
     // Calculate B
     Scattering::RandomAngles random_angles;

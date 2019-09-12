@@ -113,9 +113,7 @@ class Density_distr {
     virtual double Calculate(Vector3D xi,
                              Vector3D direction,
                              double distance) const = 0;
-    virtual double Evaluate(Vector3D xi,
-                            Vector3D direction,
-                            double distance) const = 0;
+    virtual double Evaluate(Vector3D xi) const = 0;
 
    protected:
     Axis* axis_;

@@ -649,7 +649,7 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(
         rnddMin = decay_calculator_->Calculate(
                       initial_energy, particle_.GetParticleDef().low, rndd) /
                   utility_.GetMedium().GetDensityDistribution().Evaluate(
-                      particle_.GetPosition(), particle_.GetDirection(), 0);
+                      particle_.GetPosition());
     }
 
     rndiMin = interaction_calculator_->Calculate(
@@ -662,7 +662,7 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(
         final.second = decay_calculator_->GetUpperLimit(
             initial_energy,
             rndd * utility_.GetMedium().GetDensityDistribution().Evaluate(
-                       particle_.GetPosition(), particle_.GetDirection(), 0));
+                       particle_.GetPosition()));
     }
 
     if (rndi >= rndiMin || rndiMin <= 0) {
@@ -686,7 +686,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef) {
         // position of initial energy
         time += exact_time_calculator_->Calculate(ei, ef, 0.0) /
                 utility_.GetMedium().GetDensityDistribution().Evaluate(
-                    particle_.GetPosition(), particle_.GetDirection(), 0);
+                    particle_.GetPosition());
     } else {
         time += dr / SPEED;
     }
