@@ -49,7 +49,7 @@ double multiplier   = 1.;
 
 WeakInteraction* Weak_A = new WeakCooperSarkarMertsch(particle_def, medium, multiplier);
 Parametrization* Weak_B = new WeakCooperSarkarMertsch(particle_def, medium, multiplier);
-EXPECT_TRUE(*Weak_B == *Weak_B);
+EXPECT_TRUE(*Weak_A == *Weak_B);
 
 WeakCooperSarkarMertsch param_int(particle_def, medium, multiplier);
 EXPECT_TRUE(param_int == *Weak_A);

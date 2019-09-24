@@ -59,7 +59,7 @@ std::pair<std::vector<Particle*>, bool> PhotoPairIntegral::CalculateProducedPart
     if(rndc_<0){
         //CalculateStochasticLoss has never been called before, return empty list
         //TODO: find a better way of checking the random numbers
-        log_debug("CalculateProducedParticles has been called with no call of CalculateStochasticLoss for PhotoPairProduction");
+        log_warn("CalculateProducedParticles has been called with no call of CalculateStochasticLoss for PhotoPairProduction");
         return std::make_pair(particle_list, true);
     }
 

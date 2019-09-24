@@ -25,6 +25,7 @@ Utility::Definition::Definition()
     , mupair_def()
     , weak_def()
     , photopair_def()
+    , annihilation_def()
 {
 }
 
@@ -45,6 +46,8 @@ bool Utility::Definition::operator==(const Utility::Definition& utility_def) con
     else if (weak_def != utility_def.weak_def)
         return false;
     else if (photopair_def != utility_def.photopair_def)
+        return false;
+    else if (annihilation_def != utility_def.annihilation_def)
         return false;
 
     return true;
@@ -93,6 +96,12 @@ Utility::Utility(const ParticleDef& particle_def,
         log_debug("No Ionization cross section chosen. For lepton propagation,Initialization may fail because no cross"
                   "section for small energies are available. You may have to enable Ionization or set a higher e_low"
                   "parameter for the particle.");
+    }
+
+    if(utility_def.annihilation_def.parametrization!=AnnihilationFactory::Enum::None) {
+        crosssections_.push_back(AnnihilationFactory::Get().CreateAnnihilation(
+                particle_def_, *medium_, utility_def.annihilation_def));
+        log_debug("Annihilation enabled");
     }
 
     if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
@@ -155,6 +164,12 @@ Utility::Utility(const ParticleDef& particle_def,
         log_debug("No Ionization cross section chosen. For lepton propagation,Initialization may fail because no cross"
                   "section for small energies are available. You may have to enable Ionization or set a higher e_low"
                   "parameter for the particle.");
+    }
+
+    if(utility_def.annihilation_def.parametrization!=AnnihilationFactory::Enum::None) {
+        crosssections_.push_back(AnnihilationFactory::Get().CreateAnnihilation(
+                particle_def_, *medium_, utility_def.annihilation_def, interpolation_def));
+        log_debug("Annihilation enabled");
     }
 
     if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {

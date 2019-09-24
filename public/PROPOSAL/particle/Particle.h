@@ -52,6 +52,7 @@ public:
         ContinuousEnergyLoss,
         WeakInt,
         Compton,
+        Annihilation,
     };
 
 public:

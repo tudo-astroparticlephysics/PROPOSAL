@@ -17,19 +17,20 @@ using namespace PROPOSAL;
 
 PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairProduction& param, const PhotoAngleDistribution& photoangle, InterpolationDef def)
         : CrossSectionInterpolant(DynamicData::Epair, param)
-        , photoangle_(photoangle.clone()){
+        , photoangle_(photoangle.clone()), rndc_(-1.){
     // Use own initialization
     PhotoPairInterpolant::InitdNdxInterpolation(def);
 }
 
 
 PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairInterpolant& param)
-        : CrossSectionInterpolant(param)
+        : CrossSectionInterpolant(param), photoangle_(param.GetPhotoAngleDistribution().clone()), rndc_(param.rndc_)
 {
-    delete photoangle_;
 }
 
-PhotoPairInterpolant::~PhotoPairInterpolant() {}
+PhotoPairInterpolant::~PhotoPairInterpolant() {
+        delete photoangle_;
+}
 
 bool PhotoPairInterpolant::compare(const CrossSection& cross_section) const
 {
@@ -98,7 +99,7 @@ std::pair<std::vector<Particle*>, bool> PhotoPairInterpolant::CalculateProducedP
     if(rndc_<0){
         //CalculateStochasticLoss has never been called before, return empty list
         //TODO: find a better way of checking the random numbers
-        log_debug("CalculateProducedParticles has been called with no call of CalculateStochasticLoss for PhotoPairProduction");
+        log_warn("CalculateProducedParticles has been called with no call of CalculateStochasticLoss for PhotoPairProduction");
         return std::make_pair(particle_list, true);
     }
 

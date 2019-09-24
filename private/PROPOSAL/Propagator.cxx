@@ -1411,6 +1411,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         log_debug("No given epair_multiplier option given. Use default (%f)", sec_def_global.utility_def.epair_def.multiplier);
     }
 
+    if (json_global.find("annihilation_multiplier") != json_global.end())
+    {
+        if (json_global["annihilation_multiplier"].is_number())
+        {
+            sec_def_global.utility_def.annihilation_def.multiplier = json_global["annihilation_multiplier"].get<double>();
+        }
+        else
+        {
+            log_fatal("The given annihilation_multiplier option is not a double.");
+        }
+    }
+    else
+    {
+        log_debug("No given annihilation_multiplier option given. Use default (%f)", sec_def_global.utility_def.annihilation_def.multiplier);
+    }
+
     if (json_global.find("mupair_multiplier") != json_global.end())
     {
         if (json_global["mupair_multiplier"].is_number())
@@ -1679,6 +1695,24 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     {
         log_debug("The photo option is not set. Use default %s",
                   PhotonuclearFactory::Get().GetStringFromEnum(sec_def_global.utility_def.photo_def.parametrization).c_str());
+    }
+
+    if (json_global.find("annihilation") != json_global.end())
+    {
+        if (json_global["annihilation"].is_string())
+        {
+            std::string annihilation = json_global["annihilation"].get<std::string>();
+            sec_def_global.utility_def.annihilation_def.parametrization = AnnihilationFactory::Get().GetEnumFromString(annihilation);
+        }
+        else
+        {
+            log_fatal("The given annihilation option is not a string.");
+        }
+    }
+    else
+    {
+        log_debug("The annihilation option is not set. Use default %s",
+                  AnnihilationFactory::Get().GetStringFromEnum(sec_def_global.utility_def.annihilation_def.parametrization).c_str());
     }
 
     if (json_global.find("mupair") != json_global.end())

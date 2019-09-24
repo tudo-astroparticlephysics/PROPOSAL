@@ -1381,6 +1381,62 @@ void init_parametrization(py::module& m)
         .def_readwrite("multiplier", &EpairProductionFactory::Definition::multiplier);
 
     // --------------------------------------------------------------------- //
+    // Annihilation
+    // --------------------------------------------------------------------- //
+
+    py::module m_sub_annihilation = m_sub.def_submodule("annihilation");
+    py::class_<Annihilation, std::shared_ptr<Annihilation>, Parametrization>(m_sub_annihilation, "Annihilation",
+                                                                                   R"pbdoc(
+
+            Virtual class for the annihilation parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
+
+            The following parametrizations are currently implemented:
+
+            * AnnihilationHeitler
+
+            Example:
+                To create a annihilation parametrization
+
+                >>> positron = pyPROPOSAL.particle.EPlusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> param = pyPROPOSAL.parametrization.annihilation.Heitler(positron, medium, 1.0)
+                )pbdoc");
+
+
+    py::class_<AnnihilationHeitler, std::shared_ptr<AnnihilationHeitler>, Annihilation>(m_sub_annihilation, "Heitler")
+        .def(py::init<const ParticleDef&, const Medium&, double>(),
+             py::arg("particle_def"),
+             py::arg("medium"),
+             py::arg("multiplier"));
+
+
+    py::enum_<AnnihilationFactory::Enum>(m_sub_annihilation, "AnnihilationParametrization")
+            .value("Heitler", AnnihilationFactory::Heitler)
+            .value("None", AnnihilationFactory::None);
+
+    py::class_<AnnihilationFactory, std::unique_ptr<AnnihilationFactory, py::nodelete>>(m_sub_annihilation, "AnnihilationFactory")
+            .def("get_enum_from_str", &AnnihilationFactory::GetEnumFromString, py::arg("parametrization_str"))
+            .def("create_annihilation",
+                 (CrossSection* (AnnihilationFactory::*)(const ParticleDef&, const Medium&, const AnnihilationFactory::Definition&)const)&AnnihilationFactory::CreateAnnihilation,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("annihilation_def"))
+            .def("create_annihilation_interpol",
+                 (CrossSection* (AnnihilationFactory::*)(const ParticleDef&, const Medium&, const AnnihilationFactory::Definition&, InterpolationDef)const)&AnnihilationFactory::CreateAnnihilation,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("annihilation_def"), py::arg("interpolation_def"))
+            .def_static("get", &AnnihilationFactory::Get, py::return_value_policy::reference);
+
+
+    py::class_<AnnihilationFactory::Definition, std::shared_ptr<AnnihilationFactory::Definition> >(m_sub_annihilation, "AnnihilationDefinition")
+            .def(py::init<>())
+            .def_readwrite("parametrization", &AnnihilationFactory::Definition::parametrization)
+            .def_readwrite("multiplier", &AnnihilationFactory::Definition::multiplier);
+
+
+    // --------------------------------------------------------------------- //
     // Mupair
     // --------------------------------------------------------------------- //
 
@@ -2109,7 +2165,7 @@ void init_crosssection(py::module& m)
         .def("calculate_produced_particles", &CrossSection::CalculateProducedParticles,
             py::arg("energy"),
             py::arg("energy_loss"),
-             py::arg("intial_directgion"),
+            py::arg("intial_direction"),
              R"pbdoc(
 
             If particles are produced in the interaction of this CrossSection, the methods samples those particles corresponding to the energy of the initial particle as
@@ -2136,7 +2192,7 @@ void init_crosssection(py::module& m)
             Pointer to the current parametrization object
                                                             
                 )pbdoc")
-        .def("CalculateCumulativeCrossSection", &CrossSection::CalculateCumulativeCrossSection,
+        .def("calculate_cumulative_crosssection", &CrossSection::CalculateCumulativeCrossSection,
              py::arg("energy"),
              py::arg("component"),
              py::arg("v"),
@@ -2166,6 +2222,8 @@ void init_crosssection(py::module& m)
         .def(py::init<const Photonuclear&>(), py::arg("parametrization"));
     py::class_<IonizIntegral, std::shared_ptr<IonizIntegral>, CrossSectionIntegral>(m_sub, "IonizIntegral")
         .def(py::init<const Ionization&>(), py::arg("parametrization"));
+    py::class_<AnnihilationIntegral, std::shared_ptr<AnnihilationIntegral>, CrossSectionIntegral>(m_sub, "AnnihilationIntegral")
+        .def(py::init<const Annihilation&>(), py::arg("parametrization"));
     py::class_<MupairIntegral, std::shared_ptr<MupairIntegral>, CrossSectionIntegral>(m_sub, "MupairIntegral")
         .def(py::init<const MupairProduction&>(), py::arg("parametrization"));
     py::class_<WeakIntegral, std::shared_ptr<WeakIntegral>, CrossSectionIntegral>(m_sub, "WeakIntegral")
@@ -2187,6 +2245,9 @@ void init_crosssection(py::module& m)
     py::class_<IonizInterpolant, std::shared_ptr<IonizInterpolant>, CrossSectionInterpolant>(
         m_sub, "IonizInterpolant")
         .def(py::init<const Ionization&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
+    py::class_<AnnihilationInterpolant, std::shared_ptr<AnnihilationInterpolant>, CrossSectionInterpolant>(
+        m_sub, "AnnihilationInterpolant")
+        .def(py::init<const Annihilation&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
     py::class_<MupairInterpolant, std::shared_ptr<MupairInterpolant>, CrossSectionInterpolant>(
         m_sub, "MupairInterpolant")
         .def(py::init<const MupairProduction&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
@@ -2455,6 +2516,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("photo_def", &Utility::Definition::photo_def)
         .def_readwrite("epair_def", &Utility::Definition::epair_def)
         .def_readwrite("ioniz_def", &Utility::Definition::ioniz_def)
+        .def_readwrite("annihilation_def", &Utility::Definition::annihilation_def)
         .def_readwrite("mupair_def", &Utility::Definition::mupair_def)
         .def_readwrite("weak_def", &Utility::Definition::weak_def)
         .def_readwrite("compton_def", &Utility::Definition::compton_def)

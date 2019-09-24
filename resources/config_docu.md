@@ -94,8 +94,10 @@ The cross section multiplier, available for each cross section, scales this cros
 
 Choosing '"None"' as the option for a parametrizations disables this interaction (default option for weak interaction and muon pair production)
 
-For **Ionization**, there is just one parametrization:
+For **Ionization**, there are crosssections electrons, positrons or heavier particles:
   - `"IonizBetheBlochRossi"`
+  - '"IonizBergerSeltzerBhabha"'
+  - '"IonizBergerSeltzerMoller"'
 
 The **electron pair production** parametrizations are:
   - `"EpairKelnerKokoulinPetrukhin"` (Proc. 12th ICCR (1971), 2436) with corrections for the interaction with atomic electrons (Phys. Atom. Nucl. 61 (1998), 448)
@@ -133,30 +135,35 @@ For these parametrizations the parametrization of the shadowing factor can be ch
 
 The **LPM effect** (Landau-Pomeranschuk-Migdal), suppressing the bremsstrahlung and the pair production at high energies and the Ter-Mikaelian effect, suppress low bremsstrahlung energy losses, can also be incorporated.
 
+**Annihilation** of positrons with electrons is per default disabled and can be enabled using the parametrization:
+  - `"AnnihilationHeitler"` 
+
 The **muon pair production** (which is an optional process and per default disabled) parametrizations are:
   - `"MupairKelnerKokoulinPetrukhin"` (Phys. Atom. Nucl. Vol. 63, No.9 (2000),  pp. 1603-1611, DOI: 10.1134/1.1312894)
   
 The **weak interaction** (charged current interaction of a charged lepton, per default disabled) parametrizations are:
   - `"CooperSarkarMertsch"` by Cooper-Sarkar, Mertsch, Sarkar [arXiv:1106.3723 ](https://arxiv.org/abs/1106.3723v1)
 
-| Keyword                 | Type   | Default    | Description |
-| ----------------------  | ------ | ---------- | ----------- |
-| `brems_multiplier`      | Double | `1.0`        | scales the bremsstrahlung |
-| `epair_multiplier`      | Double | `1.0`        | scales the electron pair production |
-| `ioniz_multiplier`      | Double | `1.0`        | scales the ionization |
-| `photo_multiplier`      | Double | `1.0`        | scales the nuclear interaction |
-| `mupair_multiplier`     | Double | `1.0`        | scales the muon pair production |
-| `weak_multiplier`       | Double | `1.0`        | scales the weak interaction |
-| `ioniz`                 | String | `"IonizBetheBlochRossi"` | ionization parametrization |
-| `epair`                 | String | `"EpairKelnerKokoulinPetrukhin"` | electron pair production parametrization |
-| `mupair`                | String | `"None"` | muon pair production parametrization |
-| `brems`                 | String | `"BremsKelnerKokoulinPetrukhin"` | Bremsstrahlung parametrization |
-| `photo`                 | String | `"PhotoAbramowiczLevinLevyMaor97"` | nuclear interaction parametrization |
-| `photo_hard_component`  | Bool   | `True`     | including the hard components |
-| `photo_shadow`          | String | `"ShadowButkevichMikhailov"` | shadowing parametrization |
-| `weak`                  | String | `"None"` | weak interaction parametrization |
-| `lpm`                   | Bool   | `True`     | Incorporate the LPM-effect and TM-effect |
-| `mupair_particle_output`| Bool   | `True`     | Produced muon pairs are treated as Particles with corresponding energies in the Output of Secondaries (and not as DynamicData objects) |
+| Keyword                  | Type   | Default    | Description |
+| -----------------------  | ------ | ---------- | ----------- |
+| `brems_multiplier`       | Double | `1.0`        | scales the bremsstrahlung |
+| `epair_multiplier`       | Double | `1.0`        | scales the electron pair production |
+| `ioniz_multiplier`       | Double | `1.0`        | scales the ionization |
+| `photo_multiplier`       | Double | `1.0`        | scales the nuclear interaction |
+| `annihilation_multiplier`| Double | `1.0`        | scales the annihilation |
+| `mupair_multiplier`      | Double | `1.0`        | scales the muon pair production |
+| `weak_multiplier`        | Double | `1.0`        | scales the weak interaction |
+| `ioniz`                  | String | `"IonizBetheBlochRossi"` | ionization parametrization |
+| `epair`                  | String | `"EpairKelnerKokoulinPetrukhin"` | electron pair production parametrization |
+| `brems`                  | String | `"BremsKelnerKokoulinPetrukhin"` | Bremsstrahlung parametrization |
+| `photo`                  | String | `"PhotoAbramowiczLevinLevyMaor97"` | nuclear interaction parametrization |
+| `photo_hard_component`   | Bool   | `True`     | including the hard components |
+| `photo_shadow`           | String | `"ShadowButkevichMikhailov"` | shadowing parametrization |
+| `weak`                   | String | `"None"` | weak interaction parametrization |
+| `lpm`                    | Bool   | `True`     | Incorporate the LPM-effect and TM-effect |
+| `annihilation`           | String | `"None"` | annihilation parametrization |
+| `mupair`                 | String | `"None"` | muon pair production parametrization |
+| `mupair_particle_output` | Bool   | `True`     | Produced muon pairs are treated as Particles with corresponding energies in the Output of Secondaries (and not as DynamicData objects) |
 
 
 ### Energy-cut parameters ###
