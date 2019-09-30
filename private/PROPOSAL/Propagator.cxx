@@ -191,7 +191,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     RandomGenerator::Get().SetSeed(global_seed);
     log_info("Seed of the default random generator set to %i", global_seed);
 
-    // Read in global cut and continous randomization options
+    // Read in global cut and continuous randomization options
     std::string cut_object_str;
     nlohmann::json cuts_infront_object;
     cut_object_str = ParseCutSettings(json_global_str,
@@ -244,7 +244,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
             }
             else
             {
-                log_info("Integration instead of interpolation is chosen. The propagation is now extreamly slow.");
+                log_info("Integration instead of interpolation is chosen. The propagation is now extremely slow.");
             }
         }
         else
@@ -389,7 +389,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         }
         geometry->SetHierarchy(hierarchy);
 
-        // Use global options in case they will not be overriden
+        // Use global options in case they will not be overridden
         Sector::Definition sec_def_infront = sec_def_global;
         sec_def_infront.location           = Sector::ParticleLocation::InfrontDetector;
         sec_def_infront.SetMedium(*med);
@@ -750,13 +750,13 @@ void Propagator::ChooseCurrentSector(const Vector3D& particle_position, const Ve
 
     for (std::vector<int>::iterator iter = crossed_sector.begin(); iter != crossed_sector.end(); ++iter)
     {
-        // Current Hierachy is bigger -> Nothing to do!
+        // Current Hierarchy is bigger -> Nothing to do!
         //
         if (current_sector_->GetGeometry()->GetHierarchy() > sectors_[*iter]->GetGeometry()->GetHierarchy())
         {
             continue;
         }
-        // Current Hierachy is equal -> Look at the density!
+        // Current Hierarchy is equal -> Look at the density!
         //
         else if (current_sector_->GetGeometry()->GetHierarchy() == sectors_[*iter]->GetGeometry()->GetHierarchy())
         {
@@ -777,7 +777,7 @@ void Propagator::ChooseCurrentSector(const Vector3D& particle_position, const Ve
 
         }
 
-        // Current Hierachy is smaller -> Set the new sector!
+        // Current Hierarchy is smaller -> Set the new sector!
         //
         else
         {
