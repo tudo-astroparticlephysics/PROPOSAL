@@ -39,6 +39,11 @@ namespace PROPOSAL {
 class Geometry
 {
 public:
+    struct ParticleLocation {
+        enum Enum { InfrontGeometry= 0, InsideGeometry, BehindGeometry };
+    };
+
+public:
     Geometry(const std::string);
     Geometry(const std::string, const Vector3D position);
     Geometry(const Geometry&);
@@ -63,6 +68,8 @@ public:
     bool IsInfront(const Vector3D& position, const Vector3D& direction);
 
     bool IsBehind(const Vector3D& position, const Vector3D& direction);
+
+
 
     /*!
      * This function calculates the distance of the particle position
@@ -90,6 +97,8 @@ public:
     // ----------------------------------------------------------------- //
     // Getter & Setter
     // ----------------------------------------------------------------- //
+
+    ParticleLocation::Enum GetLocation(const Vector3D& position, const Vector3D& direction);
 
     Vector3D GetPosition() const { return position_; }
 

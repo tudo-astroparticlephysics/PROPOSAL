@@ -107,6 +107,7 @@ class Medium {
     double GetD0() const { return d0_; }
     double GetR() const { return r_; }
     double GetMassDensity() const { return massDensity_; }
+    double GetCorrectedMassDensity(Vector3D xi) const { return massDensity_ * dens_distr_->Evaluate(xi); }
     double GetRadiationLength() const { return radiationLength_; }
     double GetRadiationLength(Vector3D position) const;
     double GetMolDensity() const { return molDensity_; }

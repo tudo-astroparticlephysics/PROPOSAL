@@ -676,62 +676,17 @@ void Propagator::ChooseCurrentSector(const Vector3D& particle_position, const Ve
     std::vector<int> crossed_sector;
     crossed_sector.resize(0);
 
-    for (unsigned int i = 0; i < sectors_.size(); i++)
+    Geometry::ParticleLocation::Enum detector_location = detector_->GetLocation(particle_position, particle_direction);
+
+    for (unsigned int i = 0; i <sectors_.size(); ++i)
     {
-        if (detector_->IsInfront(particle_position, particle_direction))
+        if ( static_cast<int>(sectors_[i]->GetLocation()) == static_cast<int>(detector_location) )
         {
-            if (sectors_[i]->GetLocation() != Sector::ParticleLocation::InfrontDetector)
-            {
-                continue;
-            } else
-            {
-                if (sectors_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
-                {
                     current_sector_ = sectors_[i];
                     crossed_sector.push_back(i);
-                } else
-                {
-                }
-            }
-        }
-
-        else if (detector_->IsInside(particle_position, particle_direction))
-        {
-            if (sectors_[i]->GetLocation() != Sector::ParticleLocation::InsideDetector)
-            {
-                continue;
-            } else
-            {
-                if (sectors_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
-                {
-                    current_sector_ = sectors_[i];
-                    crossed_sector.push_back(i);
-                } else
-                {
-                }
-            }
-
-        }
-
-        else if (detector_->IsBehind(particle_position, particle_direction))
-        {
-            if (sectors_[i]->GetLocation() != Sector::ParticleLocation::BehindDetector)
-            {
-                continue;
-            } else
-            {
-                if (sectors_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
-                {
-                    current_sector_ = sectors_[i];
-                    crossed_sector.push_back(i);
-                }
-                // The particle reached the border of all specified sectors
-                else
-                {
-                }
-            }
         }
     }
+
 
     // No sector was found
     if (crossed_sector.size() == 0)
@@ -763,7 +718,7 @@ void Propagator::ChooseCurrentSector(const Vector3D& particle_position, const Ve
             // Current Density is bigger or same -> Nothing to do!
             //
 
-            if (current_sector_->GetMedium()->GetMassDensity() >= sectors_[*iter]->GetMedium()->GetMassDensity())
+            if (current_sector_->GetMedium()->GetCorrectedMassDensity(particle_position) >= sectors_[*iter]->GetMedium()->GetCorrectedMassDensity(particle_position))
             {
                 continue;
             }
@@ -796,58 +751,20 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
         current_sector_->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
     double tmp_distance_to_border;
 
+    Geometry::ParticleLocation::Enum detector_location = detector_->GetLocation(particle_position, particle_direction);
+
     for (std::vector<Sector*>::iterator iter = sectors_.begin(); iter != sectors_.end(); ++iter)
     {
-        if (detector_->IsInfront(particle_position, particle_direction))
-        {
-            if ((*iter)->GetLocation() != Sector::ParticleLocation::InfrontDetector)
-                continue;
-            else
-            {
-                if ((*iter)->GetGeometry()->GetHierarchy() >= current_sector_->GetGeometry()->GetHierarchy())
-                {
-                    tmp_distance_to_border =
-                        (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
-                    if (tmp_distance_to_border <= 0)
-                        continue;
-                    distance_to_sector_border = std::min(tmp_distance_to_border, distance_to_sector_border);
-                }
-            }
-        }
 
-        else if (detector_->IsInside(particle_position, particle_direction))
+        if ( static_cast<int>((*iter)->GetLocation()) == static_cast<int>(detector_location) )
         {
-            if ((*iter)->GetLocation() != Sector::ParticleLocation::InsideDetector)
-                continue;
-            else
+            if ((*iter)->GetGeometry()->GetHierarchy() >= current_sector_->GetGeometry()->GetHierarchy())
             {
                 tmp_distance_to_border =
                     (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                 if (tmp_distance_to_border <= 0)
                     continue;
                 distance_to_sector_border = std::min(tmp_distance_to_border, distance_to_sector_border);
-            }
-
-        }
-
-        else if (detector_->IsBehind(particle_position, particle_direction))
-        {
-            if ((*iter)->GetLocation() != Sector::ParticleLocation::BehindDetector)
-                continue;
-            else
-            {
-                if ((*iter)->GetGeometry()->GetHierarchy() >= current_sector_->GetGeometry()->GetHierarchy())
-                {
-                    tmp_distance_to_border =
-                        (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
-                    if (tmp_distance_to_border <= 0)
-                        continue;
-                    distance_to_sector_border = std::min(tmp_distance_to_border, distance_to_sector_border);
-                }
-                // The particle_ reached the border of all specified sectors
-                else
-                {
-                }
             }
         }
     }
