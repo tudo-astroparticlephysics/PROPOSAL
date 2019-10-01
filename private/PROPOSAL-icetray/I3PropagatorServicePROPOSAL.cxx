@@ -218,7 +218,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSAL::Particle* 
     double tf = particle->GetExitTime() * I3Units::second;
     double Ef = particle->GetExitEnergy() * I3Units::MeV / I3Units::GeV;
 
-    if (Ef == particle->GetMass())
+    if (Ef == particle->GetMass() * I3Units::MeV / I3Units::GeV)
     {
         // If a particle decays, it gets its mass as the final energy
         // (in the new version of PROPOSAL).

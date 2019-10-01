@@ -99,7 +99,7 @@ Propagator* PropagatorService::GetPropagatorToParticleDef(const ParticleDef& par
     }
     else
     {
-        log_warn("Propagator for particle %s not found! Default Propagator will be returned!",
+        log_warn("Propagator for particle %s not found! Default nullptr will be returned!",
                  particle_def.name.c_str());
         Propagator* default_propagator = nullptr;
         return default_propagator;
