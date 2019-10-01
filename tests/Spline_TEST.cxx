@@ -20,11 +20,12 @@ double linear(double x) {
     return x + 1;
 }
 
-std::vector<double> x(10);
-std::vector<double> f_x(10);
-std::iota(std::begin(x), std::end(x), 0);
 
 TEST(Linear_Spline, Comparison_equal) {
+    std::vector<double> x(10);
+    std::vector<double> f_x(10);
+    std::iota(std::begin(x), std::end(x), 0);
+
     for (int i = 0; i < x.size(); ++i) {
         f_x[i] = linear(x[i]);
     }
@@ -35,6 +36,10 @@ TEST(Linear_Spline, Comparison_equal) {
 }
 
 TEST(Cubic_Spline, Comparison_equal) {
+    std::vector<double> x(10);
+    std::vector<double> f_x(10);
+    std::iota(std::begin(x), std::end(x), 0);
+
     for (int i = 0; i < x.size(); ++i) {
         f_x[i] = qubic(x[i]);
     }
