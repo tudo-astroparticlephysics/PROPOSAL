@@ -202,17 +202,16 @@ Sector::Sector(Particle& particle, const Sector& sector)
       particle_(particle),
       geometry_(sector.geometry_->clone()),
       utility_(sector.utility_),
-      displacement_calculator_(
-          sector.displacement_calculator_->clone(utility_)),
+      displacement_calculator_(sector.displacement_calculator_->clone(utility_)),
       interaction_calculator_(sector.interaction_calculator_->clone(utility_)),
       decay_calculator_(sector.decay_calculator_->clone(utility_)),
       exact_time_calculator_(NULL),
       cont_rand_(NULL),
-      scattering_(sector.scattering_->clone(particle_, utility_)) {
-    if (particle.GetParticleDef() != sector.GetParticle().GetParticleDef()) {
-        log_fatal(
-            "Particle definition should be equal to the sector paricle "
-            "definition!");
+      scattering_(sector.scattering_->clone(particle_, utility_))
+{
+    if (particle.GetParticleDef() != sector.GetParticle().GetParticleDef())
+    {
+        log_fatal("Particle definition should be equal to the sector particle definition!");
     }
 
     // These are optional, therfore check NULL
@@ -307,7 +306,7 @@ double Sector::Propagate(double distance) {
     // TODO(mario): check Fri 2017/08/25
     // int secondary_id    =   0;
 
-    // first: final energy befor first interaction second: energy at which the
+    // first: final energy before first interaction second: energy at which the
     // particle decay
     // first and second are compared to decide if interaction happens or decay
     std::pair<double, double> energy_till_stochastic_;
@@ -418,7 +417,7 @@ double Sector::Propagate(double distance) {
         }
 
         // Set the particle energy to the current energy before making
-        // stochatic losses or decay
+        // stochastic losses or decay
         particle_.SetEnergy(final_energy);
 
         if (particle_interaction) {
@@ -587,7 +586,7 @@ double Sector::Propagate(double distance) {
             break;
         }
 
-        // Next round: update the inital energy
+        // Next round: update the initial energy
         initial_energy = final_energy;
     }
 
@@ -601,9 +600,9 @@ double Sector::Propagate(double distance) {
         particle_time -= particle_.GetLifetime() *
                          std::log(RandomGenerator::Get().RandomDouble());
         particle_.SetTime(particle_time);
+
         // TODO: one should also advance hte particle according to the sampeled
         // time and set the new position as the endpoint.
-
         particle_.SetEnergy(particle_.GetMass());
         decay_products =
             particle_.GetDecayTable().SelectChannel().Decay(particle_);
