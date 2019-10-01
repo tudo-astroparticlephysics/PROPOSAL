@@ -210,7 +210,7 @@ Sector::Sector(Particle& particle, const Sector& sector)
 {
     if (particle.GetParticleDef() != sector.GetParticle().GetParticleDef())
     {
-        log_fatal("Particle definition should be equal to the sector paricle definition!");
+        log_fatal("Particle definition should be equal to the sector particle definition!");
     }
 
     // These are optional, therfore check NULL
@@ -225,27 +225,27 @@ Sector::Sector(Particle& particle, const Sector& sector)
     }
 }
 
-Sector::Sector(const Sector& collection)
-    : sector_def_(collection.sector_def_)
-    , particle_(collection.particle_)
-    , geometry_(collection.geometry_->clone())
-    , utility_(collection.utility_)
-    , displacement_calculator_(collection.displacement_calculator_->clone(utility_))
-    , interaction_calculator_(collection.interaction_calculator_->clone(utility_))
-    , decay_calculator_(collection.decay_calculator_->clone(utility_))
+Sector::Sector(const Sector& sector)
+    : sector_def_(sector.sector_def_)
+    , particle_(sector.particle_)
+    , geometry_(sector.geometry_->clone())
+    , utility_(sector.utility_)
+    , displacement_calculator_(sector.displacement_calculator_->clone(utility_))
+    , interaction_calculator_(sector.interaction_calculator_->clone(utility_))
+    , decay_calculator_(sector.decay_calculator_->clone(utility_))
     , exact_time_calculator_(NULL)
     , cont_rand_(NULL)
-    , scattering_(collection.scattering_->clone())
+    , scattering_(sector.scattering_->clone())
 {
     // These are optional, therfore check NULL
-    if (collection.exact_time_calculator_ != NULL)
+    if (sector.exact_time_calculator_ != NULL)
     {
-        exact_time_calculator_ = collection.exact_time_calculator_->clone(utility_);
+        exact_time_calculator_ = sector.exact_time_calculator_->clone(utility_);
     }
 
-    if (collection.cont_rand_ != NULL)
+    if (sector.cont_rand_ != NULL)
     {
-        cont_rand_ = new ContinuousRandomizer(utility_, *collection.cont_rand_);
+        cont_rand_ = new ContinuousRandomizer(utility_, *sector.cont_rand_);
     }
 }
 
@@ -315,7 +315,7 @@ double Sector::Propagate(double distance)
     // TODO(mario): check Fri 2017/08/25
     // int secondary_id    =   0;
 
-    // first: final energy befor first interaction second: energy at which the
+    // first: final energy before first interaction second: energy at which the
     // particle decay
     // first and second are compared to decide if interaction happens or decay
     std::pair<double, double> energy_till_stochastic_;
@@ -374,7 +374,7 @@ double Sector::Propagate(double distance)
         }
 
         // Advance the Particle according to the displacement
-        // Initial energy and final energy are needed if Molier Scattering is enabled
+        // Initial energy and final energy are needed if Moliere Scattering is enabled
         AdvanceParticle(displacement, initial_energy, final_energy);
 
         propagated_distance += displacement;
@@ -396,8 +396,8 @@ double Sector::Propagate(double distance)
         if(sector_def_.do_continuous_energy_loss_output)
         {
             continuous_loss->SetEnergy(initial_energy - final_energy);
-            continuous_loss->SetDirection((particle_.GetPosition() - continuous_loss->GetPosition()));
-            continuous_loss->SetTime(particle_.GetTime() - continuous_loss->GetTime());
+            continuous_loss->SetDirection(particle_.GetDirection());
+            continuous_loss->SetPropagatedDistance(particle_.GetPropagatedDistance() - continuous_loss->GetPropagatedDistance());
             if (sector_def_.only_loss_inside_detector)
             {
                 if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
@@ -419,7 +419,7 @@ double Sector::Propagate(double distance)
         }
 
         // Set the particle energy to the current energy before making
-        // stochatic losses or decay
+        // stochastic losses or decay
         particle_.SetEnergy(final_energy);
 
         if (particle_interaction)
@@ -454,6 +454,7 @@ double Sector::Propagate(double distance)
                             for(unsigned int i=0; i<decay_products.size(); i++){
                                 // set additional properties for muon pair particles
                                 decay_products[i]->SetPosition(particle_.GetPosition());
+                                decay_products[i]->SetDirection(particle_.GetDirection());
                                 decay_products[i]->SetTime(particle_.GetTime());
                                 decay_products[i]->SetParentParticleEnergy(particle_.GetEnergy());
                             }
@@ -588,7 +589,7 @@ double Sector::Propagate(double distance)
             break;
         }
 
-        // Next round: update the inital energy
+        // Next round: update the initial energy
         initial_energy = final_energy;
     }
 
@@ -601,7 +602,7 @@ double Sector::Propagate(double distance)
         double particle_time = particle_.GetTime();
         particle_time -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
         particle_.SetTime(particle_time);
-        // TODO: one should also advance hte particle according to the sampeled time
+        // TODO: one should also advance the particle according to the sampled time
         // and set the new position as the endpoint.
 
         particle_.SetEnergy(particle_.GetMass());
