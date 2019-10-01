@@ -1,7 +1,5 @@
 #pragma once
 
-#include <boost/bimap.hpp>
-
 #include "PROPOSAL/PROPOSAL.h"
 #include "dataclasses/physics/I3Particle.h"
 
