@@ -676,15 +676,13 @@ void Propagator::ChooseCurrentSector(const Vector3D& particle_position, const Ve
     std::vector<int> crossed_sector;
     crossed_sector.resize(0);
 
+    // Get Location of the detector (Inside/Infront/Behind)
     Geometry::ParticleLocation::Enum detector_location = detector_->GetLocation(particle_position, particle_direction);
 
     for (unsigned int i = 0; i <sectors_.size(); ++i)
     {
         if ( static_cast<int>(sectors_[i]->GetLocation()) == static_cast<int>(detector_location) )
-        {
-                    current_sector_ = sectors_[i];
-                    crossed_sector.push_back(i);
-        }
+            crossed_sector.push_back(i);
     }
 
 
@@ -694,6 +692,9 @@ void Propagator::ChooseCurrentSector(const Vector3D& particle_position, const Ve
         current_sector_ = NULL;
         log_fatal("There is no sector defined at position [%f, %f, %f] !!!",
                   particle_position.GetX(), particle_position.GetY(), particle_position.GetZ());
+    } else
+    {
+        current_sector_ = sectors_[crossed_sector.back()];
     }
 
     // Choose current sector when multiple sectors are crossed!
@@ -705,39 +706,23 @@ void Propagator::ChooseCurrentSector(const Vector3D& particle_position, const Ve
 
     for (std::vector<int>::iterator iter = crossed_sector.begin(); iter != crossed_sector.end(); ++iter)
     {
-        // Current Hierachy is bigger -> Nothing to do!
-        //
-        if (current_sector_->GetGeometry()->GetHierarchy() > sectors_[*iter]->GetGeometry()->GetHierarchy())
-        {
-            continue;
-        }
+
         // Current Hierachy is equal -> Look at the density!
         //
-        else if (current_sector_->GetGeometry()->GetHierarchy() == sectors_[*iter]->GetGeometry()->GetHierarchy())
+        if (current_sector_->GetGeometry()->GetHierarchy() == sectors_[*iter]->GetGeometry()->GetHierarchy())
         {
-            // Current Density is bigger or same -> Nothing to do!
-            //
-
-            if (current_sector_->GetMedium()->GetCorrectedMassDensity(particle_position) >= sectors_[*iter]->GetMedium()->GetCorrectedMassDensity(particle_position))
-            {
-                continue;
-            }
-
             // Current Density is smaller -> Set the new sector!
             //
-            else
-            {
+            if (current_sector_->GetMedium()->GetCorrectedMassDensity(particle_position) < sectors_[*iter]->GetMedium()->GetCorrectedMassDensity(particle_position))
                 current_sector_ = sectors_[*iter];
-            }
 
         }
 
         // Current Hierachy is smaller -> Set the new sector!
         //
-        else
-        {
+        if (current_sector_->GetGeometry()->GetHierarchy() < sectors_[*iter]->GetGeometry()->GetHierarchy())
             current_sector_ = sectors_[*iter];
-        }
+
     }
 }
 
