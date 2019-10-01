@@ -21,6 +21,7 @@ double Density_homogeneous::Correct(Vector3D xi,
                                     double distance_to_border) const {
     (void)xi;
     (void)direction;
+    (void)distance_to_border;
 
     return res / correction_factor_;
 }
@@ -28,6 +29,9 @@ double Density_homogeneous::Correct(Vector3D xi,
 double Density_homogeneous::Integrate(Vector3D xi,
                                       Vector3D direction,
                                       double l) const {
+    (void)xi;
+    (void)direction;
+
     return correction_factor_ * l;
 }
 

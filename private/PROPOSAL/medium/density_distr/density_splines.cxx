@@ -30,6 +30,7 @@ double Density_splines::helper_function(Vector3D xi,
                                         Vector3D direction,
                                         double res,
                                         double l) const {
+    (void)res;
     return Evaluate(xi) - Evaluate(xi + l * direction);
 }
 
