@@ -267,6 +267,7 @@ IF(ADD_TESTS)
   ADD_EXECUTABLE(UnitTest_Sector tests/Sector_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_MathMethods tests/MathMethods_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Spline tests/Spline_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Density tests/Density_distribution_TEST.cxx)
 
   TARGET_LINK_LIBRARIES(UnitTest_Utility PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Scattering PROPOSAL ${gtest_LIBRARIES})
@@ -291,6 +292,7 @@ IF(ADD_TESTS)
   TARGET_LINK_LIBRARIES(UnitTest_Sector PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_MathMethods PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Spline PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Density PROPOSAL ${gtest_LIBRARIES})
 
   ADD_TEST(UnitTest_Utility bin/UnitTest_Utility)
   ADD_TEST(UnitTest_Scattering bin/UnitTest_Scattering)
@@ -315,6 +317,7 @@ IF(ADD_TESTS)
   ADD_TEST(UnitTest_Sector bin/UnitTest_Sector)
   ADD_TEST(UnitTest_MathMethods bin/UnitTest_MathMethods)
   ADD_TEST(UnitTest_Spline bin/UnitTest_Spline)
+  ADD_TEST(UnitTest_Density bin/UnitTest_Density)
 
 ENDIF()
 
