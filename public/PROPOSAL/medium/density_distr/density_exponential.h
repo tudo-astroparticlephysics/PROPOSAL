@@ -10,6 +10,8 @@ class Density_exponential : public Density_distr {
 
     ~Density_exponential(){};
 
+    bool compare(const Density_distr& dens_distr) const override;
+
     Density_distr* clone() const override {
         return new Density_exponential(*this);
     };

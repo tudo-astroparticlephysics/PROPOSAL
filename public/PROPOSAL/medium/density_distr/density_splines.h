@@ -15,6 +15,13 @@ class Density_splines : public Density_distr {
    public:
     Density_splines(const Axis&, const Spline&);
     Density_splines(const Density_splines&);
+    Density_splines() {
+        delete axis_;
+        delete spline_;
+        delete integrated_spline_;
+    }
+
+    bool compare(const Density_distr& dens_distr) const override;
 
     Density_distr* clone() const override {
         return new Density_splines(*this);

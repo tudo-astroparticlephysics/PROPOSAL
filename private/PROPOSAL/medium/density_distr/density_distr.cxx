@@ -12,6 +12,20 @@ Density_distr::Density_distr(const Density_distr& density_distr)
 
 Density_distr::Density_distr(const Axis& axis) : axis_(axis.clone()) {}
 
+bool Density_distr::operator==(const Density_distr& dens_distr) const
+{
+    if (*axis_ != *dens_distr.axis_)
+        return false;
+    if (!this->compare(dens_distr) )
+        return false;
+    return true;
+}
+
+
+bool Density_distr::operator!=(const Density_distr& dens_distr) const {
+    return !(*this == dens_distr);
+}
+
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%        Axis        %%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -19,6 +33,20 @@ Density_distr::Density_distr(const Axis& axis) : axis_(axis.clone()) {}
 Axis::Axis() {}
 
 Axis::Axis(Vector3D fAxis, Vector3D fp0) : fAxis_(fAxis), fp0_(fp0) {}
+
+Axis::Axis(const Axis& axis) : fAxis_(axis.fAxis_), fp0_(axis.fp0_) {}
+
+bool Axis::operator==(const Axis& axis) const {
+    if(fAxis_ != axis.fAxis_)
+        return false;
+    if(fp0_ != axis.fp0_)
+        return false;
+    return true;
+}
+
+bool Axis::operator!=(const Axis& axis) const {
+    return !(*this == axis);
+}
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%       Radial       %%%%%%%%%%%%%%%%%%%%

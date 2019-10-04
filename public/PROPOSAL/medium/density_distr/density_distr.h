@@ -36,7 +36,12 @@ class Axis {
    public:
     Axis();
     Axis(Vector3D fp0, Vector3D fAxis);
-    virtual ~Axis(){};
+    Axis(const Axis&);
+
+    virtual ~Axis() {};
+
+    bool operator==(const Axis& axis) const;
+    bool operator!=(const Axis& axis) const;
 
     virtual Axis* clone() const = 0;
 
@@ -60,7 +65,7 @@ class RadialAxis : public Axis {
     RadialAxis(Vector3D fAxis, Vector3D fp0);
 
     Axis* clone() const override { return new RadialAxis(*this); };
-    ~RadialAxis(){};
+    ~RadialAxis() {};
 
     double GetDepth(Vector3D xi) const override;
     double GetEffectiveDistance(Vector3D xi, Vector3D direction) const override;
@@ -72,7 +77,7 @@ class CartesianAxis : public Axis {
    public:
     CartesianAxis();
     CartesianAxis(Vector3D fAxis, Vector3D fp0);
-    ~CartesianAxis(){};
+    ~CartesianAxis() {};
 
     Axis* clone() const override { return new CartesianAxis(*this); };
 
@@ -101,6 +106,11 @@ class Density_distr {
 
     virtual ~Density_distr() { delete axis_; };
 
+    virtual bool operator==(const Density_distr& dens_distr) const;
+    virtual bool operator!=(const Density_distr& dens_distr) const;
+    virtual bool compare(const Density_distr& dens_distr) const = 0;
+
+
     virtual Density_distr* clone() const = 0;
 
     virtual double Correct(Vector3D xi,
@@ -119,4 +129,3 @@ class Density_distr {
     Axis* axis_;
 };
 }  // namespace PROPOSAL
-

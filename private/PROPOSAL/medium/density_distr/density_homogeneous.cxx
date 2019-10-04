@@ -15,6 +15,14 @@ Density_homogeneous::Density_homogeneous(const Density_homogeneous& dens_distr)
     : Density_distr(dens_distr),
       correction_factor_(dens_distr.correction_factor_) {}
 
+
+bool Density_homogeneous::compare(const Density_distr& dens_distr) const {
+    const Density_homogeneous* dens_homogen = dynamic_cast<const Density_homogeneous*>(&dens_distr);
+    if(correction_factor_ != dens_homogen->correction_factor_ )
+        return false;
+    return true;
+}
+
 double Density_homogeneous::Correct(Vector3D xi,
                                     Vector3D direction,
                                     double res,

@@ -19,6 +19,15 @@ Density_splines::Density_splines(const Density_splines& dens_splines)
       spline_(dens_splines.spline_),
       integrated_spline_(dens_splines.integrated_spline_) {}
 
+bool Density_splines::compare(const Density_distr& dens_distr) const {
+    const Density_splines* dens_poly = dynamic_cast<const Density_splines*>(&dens_distr);
+    if( spline_!= dens_poly->spline_)
+        return false;
+    if( integrated_spline_!= dens_poly->integrated_spline_)
+        return false;
+    return true;
+}
+
 double Density_splines::Helper_function(Vector3D xi,
                                         Vector3D direction,
                                         double res,

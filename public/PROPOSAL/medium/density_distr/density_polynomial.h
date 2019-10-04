@@ -11,6 +11,9 @@ class Density_polynomial : public Density_distr {
    public:
     Density_polynomial(const Axis&, const Polynom&);
     Density_polynomial(const Density_polynomial&);
+    ~Density_polynomial();
+
+    bool compare(const Density_distr& dens_distr) const override;
 
     Density_distr* clone() const override {
         return new Density_polynomial(*this);

@@ -11,6 +11,13 @@ double Density_exponential::GetDepth(Vector3D xi) const {
     return axis_->GetDepth(xi) / sigma_;
 }
 
+bool Density_exponential::compare(const Density_distr& dens_distr) const {
+    const Density_exponential* dens_exp = dynamic_cast<const Density_exponential*>(&dens_distr);
+    if(sigma_ != dens_exp->sigma_ )
+        return false;
+    return true;
+}
+
 double Density_exponential::GetEffectiveDistance(Vector3D xi,
                                                  Vector3D direction) const {
     return axis_->GetEffectiveDistance(xi, direction) / sigma_;

@@ -36,7 +36,9 @@ class Density_homogeneous : public Density_distr {
     Density_homogeneous(const Density_homogeneous&);
     Density_homogeneous(double correction_factor);
 
-    ~Density_homogeneous(){};
+    // ~Density_homogeneous(){};
+
+    bool compare(const Density_distr& dens_distr) const override;
 
     Density_distr* clone() const override {
         return new Density_homogeneous(*this);
@@ -58,4 +60,3 @@ class Density_homogeneous : public Density_distr {
     double correction_factor_;
 };
 }  // namespace PROPOSAL
-
