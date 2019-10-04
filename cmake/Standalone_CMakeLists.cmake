@@ -314,6 +314,7 @@ IF(ADD_TESTS)
   ADD_TEST(UnitTest_Propagation bin/UnitTest_Propagation)
   ADD_TEST(UnitTest_Sector bin/UnitTest_Sector)
   ADD_TEST(UnitTest_MathMethods bin/UnitTest_MathMethods)
+  ADD_TEST(UnitTest_Spline bin/UnitTest_Spline)
 
 ENDIF()
 
@@ -340,4 +341,3 @@ CONFIGURE_FILE(
 
 ADD_CUSTOM_TARGET(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-
