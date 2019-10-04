@@ -198,7 +198,7 @@ Medium& Medium::operator=(const Medium& medium) {
         vCut_ = medium.vCut_;
         MM_ = medium.MM_;
         sumNucleons_ = medium.sumNucleons_;
-        dens_distr_ = medium.dens_distr_;
+        dens_distr_ = medium.dens_distr_->clone();
 
         components_.clear();
         components_.resize(numComponents_);
