@@ -19,7 +19,6 @@ Polynom::Polynom(std::vector<double> coefficients) : N_(coefficients.size()) {
 
 Polynom::Polynom(const Polynom& poly) : N_(poly.N_), coeff_(poly.coeff_) {}
 
-
 bool Polynom::operator==(const Polynom& polynom) const {
     if (N_ != polynom.N_)
         return false;

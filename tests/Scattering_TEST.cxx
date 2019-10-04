@@ -170,6 +170,7 @@ TEST(Scattering, Scatter) {
 
         Scattering* scattering = NULL;
 
+        std::cout << "before if param==High" << std::endl;
         if (parametrization == "HighlandIntegral") {
             Utility utility(particle_def, *medium, ecuts, Utility::Definition(),
                             InterpolationDef());
@@ -182,6 +183,7 @@ TEST(Scattering, Scatter) {
                 parametrization, particle, utility, InterpolationDef());
         }
 
+        std::cout << "before energy check" << std::endl;
         while (energy_previous < energy_init) {
             energy_previous = energy_init;
 

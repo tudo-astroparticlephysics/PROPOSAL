@@ -101,9 +101,9 @@ long double ScatteringHighlandIntegral::CalculateTheta0(double dr,
         scatter_->GetUtility().GetMedium().GetDensityDistribution().Evaluate(
             particle_.GetPosition());
     double cutoff = 1;
-    double radiation_lenght =
-        scatter_->GetUtility().GetMedium().GetRadiationLength(
-            particle_.GetPosition());
+    double radiation_lenght = 1;
+        /* scatter_->GetUtility().GetMedium().GetRadiationLength( */
+        /*     particle_.GetPosition()); */
 
     aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_lenght) *
           std::abs(particle_.GetCharge());
@@ -114,10 +114,9 @@ long double ScatteringHighlandIntegral::CalculateTheta0(double dr,
 
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringHighlandIntegral::CalculateRandomAngle(
-    double dr,
-    double ei,
-    double ef) {
+Scattering::RandomAngles ScatteringHighlandIntegral::CalculateRandomAngle(double dr,
+                                                                          double ei,
+                                                                          double ef) {
     double Theta0, rnd1, rnd2;
     Scattering::RandomAngles random_angles;
 

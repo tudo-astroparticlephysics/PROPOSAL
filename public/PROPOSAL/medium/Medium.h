@@ -42,7 +42,6 @@
        public:                                                   \
         cls(double rho = 1.0);                                   \
         cls(const Medium& medium) : Medium(medium) {}            \
-        virtual ~cls() {}                                        \
                                                                  \
         virtual Medium* clone() const { return new cls(*this); } \
         static Medium* create(double density_correction = 1.0) { \

@@ -27,6 +27,7 @@ class Spline {
     Spline(std::vector<Polynom>, std::vector<double>);
     Spline(std::string spline_path, bool binary);
     Spline(const Spline&);
+    virtual ~Spline() {};
 
     bool operator==(const Spline& spline) const;
     bool operator!=(const Spline& spline) const;

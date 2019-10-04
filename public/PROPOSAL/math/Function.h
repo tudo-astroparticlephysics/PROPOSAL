@@ -13,6 +13,7 @@ class Polynom {
     Polynom(std::vector<double> coefficients);
     Polynom(const Polynom&);
 
+    ~Polynom() {};
     // Polynom& operator=(const Polynom& poly);
 
     Polynom* clone() const { return new Polynom(*this); };
