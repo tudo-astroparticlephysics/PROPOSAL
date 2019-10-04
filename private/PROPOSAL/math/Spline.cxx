@@ -37,6 +37,20 @@ Spline::Spline(std::string path, bool binary) {
     reader.read(*this);
 }
 
+bool Spline::operator==(const Spline& spline) const {
+    if(splines_ != spline.splines_)
+        return false;
+    if( n_subintervalls_ != spline.n_subintervalls_ )
+        return false;
+    if( subintervall_ != spline.subintervall_ )
+        return false;
+    return true;
+}
+
+bool Spline::operator!=(const Spline& spline) const {
+    return !(*this == spline);
+}
+
 double Spline::evaluate(double x) {
     for (unsigned int i = 0; i < n_subintervalls_; ++i) {
         if (subintervall_[i] <= x && x <= subintervall_[i + 1])
@@ -258,4 +272,3 @@ void Cubic_Spline::calculate_splines(std::vector<double> x,
     subintervall_.push_back(x.back());
     n_subintervalls_ = n;
 }
-

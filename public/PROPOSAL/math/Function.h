@@ -17,6 +17,9 @@ class Polynom {
 
     Polynom* clone() const { return new Polynom(*this); };
 
+    bool operator==(const Polynom& polynom) const;
+    bool operator!=(const Polynom& polynom) const;
+
     double evaluate(double x);
     void shift(double x);
 
@@ -29,8 +32,8 @@ class Polynom {
     std::function<double(double)> GetFunction();
 
    protected:
-    int N;
-    double* coeff;
+    int N_;
+    double* coeff_;
 };
 
 }  // namespace PROPOSAL

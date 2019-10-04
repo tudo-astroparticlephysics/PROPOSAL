@@ -253,7 +253,7 @@ bool Medium::operator==(const Medium& medium) const {
         return false;
     else if (sumNucleons_ != medium.sumNucleons_)
         return false;
-    else if (dens_distr_ != medium.dens_distr_)
+    else if (*dens_distr_ != *medium.dens_distr_)
         return false;
     else {
         bool Return = true;
@@ -267,16 +267,14 @@ bool Medium::operator==(const Medium& medium) const {
     }
 }
 
-// ------------------------------------------------------------------------- //
 bool Medium::operator!=(const Medium& medium) const {
     return !(*this == medium);
 }
 
 // ------------------------------------------------------------------------- //
-// Methods
+//                                   Methods
 // ------------------------------------------------------------------------- //
 
-// ------------------------------------------------------------------------- //
 void Medium::init() {
     // Init Radiation length and further members
     double aux1 = 0;
@@ -405,7 +403,7 @@ void Medium::SetDensityDistribution(Density_distr& density_distr) {
 }
 
 /******************************************************************************
- *                              Different Media                                *
+ *                              Different Media                               *
  ******************************************************************************/
 
 Water::Water(double rho)

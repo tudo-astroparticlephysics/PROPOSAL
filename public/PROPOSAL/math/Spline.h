@@ -28,6 +28,9 @@ class Spline {
     Spline(std::string spline_path, bool binary);
     Spline(const Spline&);
 
+    bool operator==(const Spline& spline) const;
+    bool operator!=(const Spline& spline) const;
+
     virtual Spline* clone() const = 0;
 
     virtual bool save(std::string, bool);
