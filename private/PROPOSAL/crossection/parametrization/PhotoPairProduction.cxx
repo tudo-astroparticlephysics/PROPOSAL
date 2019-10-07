@@ -53,7 +53,7 @@ Parametrization::IntegralLimits PhotoPairProduction::GetIntegralLimits(double en
     else {
         limits.vMin = ME / energy;
         limits.vUp = limits.vMin; //treat interaction as fully stochastic
-        limits.vMax = 1 - ME / energy;
+        limits.vMax = 1. - ME / energy;
     }
 
     return limits;
@@ -125,10 +125,10 @@ double PhotoPairTsai::DifferentialCrossSection(double energy, double x)
         Phi2 = 4./3. * logZ + 4. * std::log(1. / (2. * eta * ALPHA)) + 11./3. - 2. * std::log(1 + std::pow(C, 2.))
                 + 25. * std::pow(C, 2.) * (1. - C * std::atan(1./C)) - 14. * std::pow(C, 2.) * std::log(1 + std::pow(C, -2.)); // (3.26)
         Psi1 = 8./3. * logZ + 4. * std::log(1. / (2. * eta * ALPHA)) + 23./3. - 2. * std::log(1 + std::pow(C, 2.))
-                - 17.5 * C * std::atan(1./C) + 8 * std::pow(C, 2.) * std::log(1 + std::pow(C, -2.)) - 1./6. / (1 + std::pow(C, -2.)); // (3.27)
+                - 17.5 * C * std::atan(1./C) + 8. * std::pow(C, 2.) * std::log(1 + std::pow(C, -2.)) - 1./6. / (1 + std::pow(C, -2.)); // (3.27)
         Psi2 = 8./3. * logZ + 4. * std::log(1. / (2. * eta * ALPHA)) + 21./3. - 2. * std::log(1 + std::pow(C, 2.))
-                - 105. * std::pow(C, 2.) * (1. - C * std::atan(1./C)) + 50 * std::pow(C, 2.) * std::log(1 + std::pow(C, -2.))
-                - 24. * std::pow(C, 2.) * ( -std::log(std::pow(C, 2.)) * std::log(1 + std::pow(C, -2.)) + dilog(1 + std::pow(C, -2.)) - dilog(1) ); // (3.28)
+                - 105. * std::pow(C, 2.) * (1. - C * std::atan(1./C)) + 50. * std::pow(C, 2.) * std::log(1. + std::pow(C, -2.))
+                - 24. * std::pow(C, 2.) * ( -std::log(std::pow(C, 2.)) * std::log(1 + std::pow(C, -2.)) + dilog(1. + std::pow(C, -2.)) - dilog(1) ); // (3.28)
     }else if (Z<=4.5){
         // Lithium or Berylium
         double a, b, ap, bp;
@@ -161,7 +161,7 @@ double PhotoPairTsai::DifferentialCrossSection(double energy, double x)
         Phi2 = Phi1 - 2./3. * 1. / (1. + 6.5 * gamma + 6. * std::pow(gamma, 2.)); // (3.39)
         Psi1 = 28.340 - 2. * std::log(1. + std::pow(3.621 * epsilon, 2.))
                 - 4. * (1. - 0.7 * std::exp(-8. * epsilon) - 0.3 * std::exp(-29.2 * epsilon)); // (3.40)
-        Psi2 = Psi1 - 2./3. * 1. / (1. + 40. * epsilon + 400 * std::pow(epsilon, 2.)); // (3.41)
+        Psi2 = Psi1 - 2./3. * 1. / (1. + 40. * epsilon + 400. * std::pow(epsilon, 2.)); // (3.41)
     }
 
     double z = std::pow(Z / 137., 2.);
@@ -176,7 +176,7 @@ double PhotoPairTsai::DifferentialCrossSection(double energy, double x)
     double p = std::sqrt( std::pow(x * k, 2.) - std::pow(ME, 2.) ); // electron momentum
     aux *= x * std::pow(k, 2.) / p; // conversion from differential cross section in electron momentum to x
 
-    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * aux; //TODO what are the real factors here, those are just guesses
+    return std::max(medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * aux, 0.); //TODO what are the real factors here, those are just guesses
 }
 
 

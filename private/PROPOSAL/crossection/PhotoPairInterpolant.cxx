@@ -161,7 +161,7 @@ void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
         // needs the already intitialized 2d interpolants.
         builder2d[i]
                 .SetMax1(def.nodes_cross_section)
-                .SetX1Min(2. * ME)
+                .SetX1Min(ME)
                 .SetX1Max(def.max_node_energy)
                 .SetMax2(def.nodes_cross_section)
                 .SetX2Min(0.0)
@@ -191,7 +191,7 @@ void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
 
         builder1d[i]
                 .SetMax(def.nodes_cross_section)
-                .SetXMin(2 * ME)
+                .SetXMin(ME)
                 .SetXMax(def.max_node_energy)
                 .SetRomberg(def.order_of_interpolation)
                 .SetRational(false)

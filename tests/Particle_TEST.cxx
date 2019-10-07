@@ -1,8 +1,10 @@
 
 #include "gtest/gtest.h"
+#include <cmath>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/math/Vector3D.h"
 
 using namespace PROPOSAL;
 
@@ -75,6 +77,41 @@ TEST(Assignment, Copyconstructor2)
     Particle B(A);
 
     EXPECT_TRUE(A == B);
+}
+
+TEST(Deflection, Deflection)
+{
+    Vector3D direction_A(1., 0., 0.);
+    Vector3D direction_B(0., -1./SQRT2, 1./SQRT2);
+    Vector3D direction_C(1./3., 2./3., -2./3.);
+    Vector3D direction_tmp(1., 0., 0.);
+    Particle particle(MuMinusDef::Get());
+    double cosangle;
+
+    std::vector<double> cos_phi_list{-1, -0.8, -0.2, 0., 0.2, 0.8, 1.};
+    std::vector<double> theta_list{0, PI/4., PI/2., PI, 3./2. * PI, 2. * PI};
+
+    for(auto const& cos_phi: cos_phi_list){
+        for(auto const& theta: theta_list){
+            particle.SetDirection(direction_A);
+            particle.DeflectDirection(cos_phi, theta);
+            direction_tmp = particle.GetDirection();
+            cosangle = scalar_product(direction_A, direction_tmp);
+            ASSERT_NEAR(cos_phi, cosangle, 1e-8);
+
+            particle.SetDirection(direction_B);
+            particle.DeflectDirection(cos_phi, theta);
+            direction_tmp = particle.GetDirection();
+            cosangle = scalar_product(direction_B, direction_tmp);
+            ASSERT_NEAR(cos_phi, cosangle, 1e-8);
+
+            particle.SetDirection(direction_C);
+            particle.DeflectDirection(cos_phi, theta);
+            direction_tmp = particle.GetDirection();
+            cosangle = scalar_product(direction_C, direction_tmp);
+            ASSERT_NEAR(cos_phi, cosangle, 1e-8);
+        }
+    }
 }
 
 int main(int argc, char** argv)

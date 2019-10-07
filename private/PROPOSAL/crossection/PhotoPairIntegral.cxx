@@ -17,7 +17,7 @@ PhotoPairIntegral::PhotoPairIntegral(const PhotoPairProduction& param, const Pho
 }
 
 PhotoPairIntegral::PhotoPairIntegral(const PhotoPairIntegral& photo)
-        : CrossSectionIntegral(photo), rndc_(photo.rndc_)
+        : CrossSectionIntegral(photo), photoangle_(photo.GetPhotoAngleDistribution().clone()), rndc_(photo.rndc_)
 {
 }
 
