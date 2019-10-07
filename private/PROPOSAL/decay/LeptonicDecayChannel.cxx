@@ -141,7 +141,9 @@ DecayChannel::DecayProducts LeptonicDecayChannelApprox::Decay(const Particle& pa
     products[1]->SetDirection(direction);
     products[1]->SetMomentum(momentum_neutrinos);
 
-    products[2]->SetDirection(-direction);
+    Vector3D opposite_direction = -direction;
+    opposite_direction.CalculateSphericalCoordinates();
+    products[2]->SetDirection(opposite_direction);
     products[2]->SetMomentum(momentum_neutrinos);
 
     // Boost neutrinos to lepton frame

@@ -89,3 +89,19 @@ std::vector<DynamicData*> PropagatorService::Propagate(Particle& particle, doubl
         return std::vector<DynamicData*>();
     }
 }
+
+Propagator* PropagatorService::GetPropagatorToParticleDef(const ParticleDef& particle_def)
+{
+    PropagatorMap::iterator it = propagator_map_.find(particle_def);
+    if (it != propagator_map_.end())
+    {
+        return it->second;
+    }
+    else
+    {
+        log_warn("Propagator for particle %s not found! Default nullptr will be returned!",
+                 particle_def.name.c_str());
+        Propagator* default_propagator = nullptr;
+        return default_propagator;
+    }
+}

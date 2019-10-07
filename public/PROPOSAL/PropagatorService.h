@@ -76,6 +76,18 @@ public:
     // ----------------------------------------------------------------------------
     std::vector<DynamicData*> Propagate(Particle&, double distance = 1e20);
 
+    // ----------------------------------------------------------------------------
+    /// @brief Get Propagator for a given particle
+    ///
+    /// The Propagator to a given particle hold the information of the propagation
+    /// parameters, which is useful to get access to.
+    ///
+    /// @param Particle
+    ///
+    /// @return Propagator
+    // ----------------------------------------------------------------------------
+    Propagator* GetPropagatorToParticleDef(const ParticleDef&);
+
 private:
     PropagatorMap propagator_map_;
 };

@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include <boost/bimap.hpp>
 #include <functional>
 
 #include <map>
@@ -147,8 +146,8 @@ public:
     typedef std::map<std::string, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> > PhotoQ2MapString;
     typedef std::map<Enum, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> > PhotoQ2MapEnum;
 
-    typedef boost::bimap<std::string, Enum> BimapStringEnum;
-    typedef boost::bimap<std::string, Shadow> BimapStringShadowEnum;
+    typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
+    typedef Helper::Bimap<std::string, Shadow> BimapStringShadowEnum;
 
     // --------------------------------------------------------------------- //
     // Shadow effect
