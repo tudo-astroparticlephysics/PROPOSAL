@@ -29,10 +29,11 @@
 
 #pragma once
 
-#include <boost/bimap.hpp>
 #include <functional>
 
 #include <map>
+
+#include "PROPOSAL/methods.h"
 
 namespace PROPOSAL {
 
@@ -74,7 +75,7 @@ public:
     typedef std::function<Medium*(double)> RegisterFunction;
     typedef std::map<std::string, RegisterFunction> MediumMapString;
     typedef std::map<Enum, RegisterFunction> MediumMapEnum;
-    typedef boost::bimap<std::string, Enum> BimapStringEnum;
+    typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
     void Register(const std::string& name, const Enum&, RegisterFunction);
     // void Register(const Enum&, RegisterFunction);

@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include <boost/bimap.hpp>
 #include <functional>
 
 #include "PROPOSAL/methods.h"
@@ -107,7 +106,7 @@ public:
     typedef std::map<std::string, std::pair<RegisterFunction, RegisterFunctionInterpolant> > EpairMapString;
     typedef std::map<Enum, std::pair<RegisterFunction, RegisterFunctionInterpolant> > EpairMapEnum;
 
-    typedef boost::bimap<std::string, Enum> BimapStringEnum;
+    typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
     // --------------------------------------------------------------------- //
     // Most general creation

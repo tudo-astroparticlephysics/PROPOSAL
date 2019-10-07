@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include <boost/bimap.hpp>
 #include <functional>
 
 #include <map>
@@ -105,7 +104,7 @@ public:
 
     typedef std::map<std::string, RegisterFunction> BremsstrahlungMapString;
     typedef std::map<Enum, RegisterFunction> BremsstrahlungMapEnum;
-    typedef boost::bimap<std::string, Enum> BimapStringEnum;
+    typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
     // --------------------------------------------------------------------- //
     // Most general creation
