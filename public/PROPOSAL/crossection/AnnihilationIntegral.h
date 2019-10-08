@@ -57,7 +57,7 @@ namespace PROPOSAL {
 
     private:
         double rndc_;
-
+        ParticleDef const* gamma_def_;
     };
 
 } // namespace PROPOSAL

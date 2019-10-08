@@ -89,6 +89,8 @@ std::string DynamicData::GetNameFromType(Type type)
             return "ContinuousEnergyLoss";
         case WeakInt:
             return "WeakInt";
+        case Compton:
+            return "Compton";
         default:
             return "Type not found";
     }

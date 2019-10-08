@@ -12,12 +12,15 @@
 using namespace PROPOSAL;
 
 PhotoPairIntegral::PhotoPairIntegral(const PhotoPairProduction& param, const PhotoAngleDistribution& photoangle)
-        : CrossSectionIntegral(DynamicData::Epair, param), photoangle_(photoangle.clone()), rndc_(-1)
+        : CrossSectionIntegral(DynamicData::Particle, param), photoangle_(photoangle.clone()), rndc_(-1)
 {
+    eminus_def_ = &EMinusDef::Get();
+    eplus_def_ = &EPlusDef::Get();
 }
 
 PhotoPairIntegral::PhotoPairIntegral(const PhotoPairIntegral& photo)
         : CrossSectionIntegral(photo), photoangle_(photo.GetPhotoAngleDistribution().clone()), rndc_(photo.rndc_)
+        , eminus_def_(photo.eminus_def_), eplus_def_(photo.eplus_def_)
 {
 }
 
@@ -63,8 +66,8 @@ std::pair<std::vector<Particle*>, bool> PhotoPairIntegral::CalculateProducedPart
         return std::make_pair(particle_list, true);
     }
 
-    particle_list.push_back(new Particle(EPlusDef::Get()));
-    particle_list.push_back(new Particle(EMinusDef::Get()));
+    particle_list.push_back(new Particle(*eplus_def_));
+    particle_list.push_back(new Particle(*eminus_def_));
 
     rnd  = rndc_ * sum_of_rates_;
     rsum = 0;

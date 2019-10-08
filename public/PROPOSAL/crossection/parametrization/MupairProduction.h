@@ -95,7 +95,7 @@ public:
 
     virtual IntegralLimits GetIntegralLimits(double energy);
 
-    virtual bool IsParticleOutputEnabled(){return particle_output_;};
+    virtual bool IsParticleOutputEnabled() const {return particle_output_;};
 
 protected:
     bool compare(const Parametrization&) const;

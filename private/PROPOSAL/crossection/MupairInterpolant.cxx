@@ -17,7 +17,7 @@
 using namespace PROPOSAL;
 
 MupairInterpolant::MupairInterpolant(const MupairProduction& param, InterpolationDef def)
-    : CrossSectionInterpolant(DynamicData::MuPair, param)
+    : CrossSectionInterpolant(GetType(param), param)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInterpolation(def);
@@ -72,10 +72,13 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, Interpolatio
     Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
     Helper::InitializeInterpolation(
         "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
+
+    muminus_def_ = &MuMinusDef::Get();
+    muplus_def = &MuPlusDef::Get();
 }
 
 MupairInterpolant::MupairInterpolant(const MupairInterpolant& mupair)
-    : CrossSectionInterpolant(mupair)
+    : CrossSectionInterpolant(mupair), muminus_def_(mupair.muminus_def_), muplus_def(mupair.muplus_def)
 {
 }
 
@@ -104,8 +107,8 @@ std::pair<std::vector<Particle*>, bool> MupairInterpolant::CalculateProducedPart
     }
 
     //Create MuPair particles
-    mupair.push_back(new Particle(MuMinusDef::Get()));
-    mupair.push_back(new Particle(MuPlusDef::Get()));
+    mupair.push_back(new Particle(*muminus_def_));
+    mupair.push_back(new Particle(*muplus_def));
 
     //Sample random numbers
     double rnd1 = RandomGenerator::Get().RandomDouble();
@@ -120,4 +123,13 @@ std::pair<std::vector<Particle*>, bool> MupairInterpolant::CalculateProducedPart
     mupair[1]->SetDirection(initial_direction);
     return std::make_pair(mupair, false);
 
+}
+
+DynamicData::Type MupairInterpolant::GetType(const MupairProduction& param){
+    if(param.IsParticleOutputEnabled()){
+        return DynamicData::Particle;
+    }
+    else{
+        return DynamicData::MuPair;
+    }
 }

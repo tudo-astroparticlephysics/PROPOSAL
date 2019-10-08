@@ -211,7 +211,7 @@ TEST(IntegralValue, IntegrateWithLogSubstitution)
 
 TEST(QUADPACK, RombergIntegrationFailure)
 {
-    double precision = 1e-5;
+    double precision = 1e-4;
     IonizIntegral Ioniz_Int(IonizBetheBlochRossi(MuMinusDef::Get(), Ice(), EnergyCutSettings(), 1.0));
 
     // --------------------------------------------------------------------- //

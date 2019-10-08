@@ -458,7 +458,9 @@ double Sector::Propagate(double distance)
                     Output::getInstance().FillSecondaryVector(products);
                 }
             }
-            else{
+
+            if(energy_loss.second != DynamicData::Particle){
+                // DynamicData::Particle means no DynamicData object will be added to SecondaryVector
                 // add energy loss with DynamicData to SecondaryVector
                 if (sector_def_.only_loss_inside_detector)
                 {

@@ -68,6 +68,8 @@ namespace PROPOSAL {
         PhotoAngleDistribution* photoangle_;
     private:
         double rndc_;
+        ParticleDef const* eminus_def_;
+        ParticleDef const* eplus_def_;
     };
 
 } // namespace PROPOSAL

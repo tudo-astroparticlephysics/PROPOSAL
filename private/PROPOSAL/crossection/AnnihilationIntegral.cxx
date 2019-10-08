@@ -12,12 +12,13 @@
 using namespace PROPOSAL;
 
 AnnihilationIntegral::AnnihilationIntegral(const Annihilation& param)
-        : CrossSectionIntegral(DynamicData::Annihilation, param), rndc_(-1.)
+        : CrossSectionIntegral(DynamicData::Particle, param), rndc_(-1.)
 {
+    gamma_def_ = &GammaDef::Get();
 }
 
 AnnihilationIntegral::AnnihilationIntegral(const AnnihilationIntegral& annihilation)
-        : CrossSectionIntegral(annihilation), rndc_(annihilation.rndc_)
+        : CrossSectionIntegral(annihilation), rndc_(annihilation.rndc_), gamma_def_(annihilation.gamma_def_)
 {
 }
 
@@ -38,8 +39,8 @@ std::pair<std::vector<Particle*>, bool> AnnihilationIntegral::CalculateProducedP
         return std::make_pair(particle_list, true);
     }
 
-    particle_list.push_back(new Particle(GammaDef::Get()));
-    particle_list.push_back(new Particle(GammaDef::Get()));
+    particle_list.push_back(new Particle(*gamma_def_));
+    particle_list.push_back(new Particle(*gamma_def_));
 
     rnd  = rndc_ * sum_of_rates_;
     rsum = 0;

@@ -12,12 +12,14 @@
 using namespace PROPOSAL;
 
 MupairIntegral::MupairIntegral(const MupairProduction& param)
-    : CrossSectionIntegral(DynamicData::MuPair, param)
+    : CrossSectionIntegral(GetType(param), param)
 {
+    muminus_def_ = &MuMinusDef::Get();
+    muplus_def = &MuPlusDef::Get();
 }
 
 MupairIntegral::MupairIntegral(const MupairIntegral& mupair)
-    : CrossSectionIntegral(mupair)
+    : CrossSectionIntegral(mupair), muminus_def_(mupair.muminus_def_), muplus_def(mupair.muplus_def)
 {
 }
 
@@ -64,8 +66,8 @@ std::pair<std::vector<Particle*>, bool> MupairIntegral::CalculateProducedParticl
     }
 
     //Create MuPair particles
-    mupair.push_back(new Particle(MuMinusDef::Get()));
-    mupair.push_back(new Particle(MuPlusDef::Get()));
+    mupair.push_back(new Particle(*muminus_def_));
+    mupair.push_back(new Particle(*muplus_def));
 
     //Sample random numbers
     double rnd1 = RandomGenerator::Get().RandomDouble();
@@ -82,3 +84,11 @@ std::pair<std::vector<Particle*>, bool> MupairIntegral::CalculateProducedParticl
 
 }
 
+DynamicData::Type MupairIntegral::GetType(const MupairProduction& param){
+    if(param.IsParticleOutputEnabled()){
+        return DynamicData::Particle;
+    }
+    else{
+        return DynamicData::MuPair;
+    }
+}

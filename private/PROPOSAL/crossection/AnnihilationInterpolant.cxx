@@ -17,13 +17,14 @@
 using namespace PROPOSAL;
 
 AnnihilationInterpolant::AnnihilationInterpolant(const Annihilation& param, InterpolationDef def)
-        : CrossSectionInterpolant(DynamicData::Annihilation, param), rndc_(-1.) {
+        : CrossSectionInterpolant(DynamicData::Particle, param), rndc_(-1.) {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInterpolation(def);
+    gamma_def_ = &GammaDef::Get();
 }
 
-AnnihilationInterpolant::AnnihilationInterpolant(const AnnihilationInterpolant& param)
-        : CrossSectionInterpolant(param), rndc_(param.rndc_)
+AnnihilationInterpolant::AnnihilationInterpolant(const AnnihilationInterpolant& annihilation)
+        : CrossSectionInterpolant(annihilation), rndc_(annihilation.rndc_), gamma_def_(annihilation.gamma_def_)
 {
 }
 
@@ -76,8 +77,8 @@ std::pair<std::vector<Particle*>, bool> AnnihilationInterpolant::CalculateProduc
         return std::make_pair(particle_list, true);
     }
 
-    particle_list.push_back(new Particle(GammaDef::Get()));
-    particle_list.push_back(new Particle(GammaDef::Get()));
+    particle_list.push_back(new Particle(*gamma_def_));
+    particle_list.push_back(new Particle(*gamma_def_));
 
     rnd  = rndc_ * sum_of_rates_;
     rsum = 0;

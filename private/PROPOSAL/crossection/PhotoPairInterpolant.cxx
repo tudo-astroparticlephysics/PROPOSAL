@@ -16,15 +16,18 @@
 using namespace PROPOSAL;
 
 PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairProduction& param, const PhotoAngleDistribution& photoangle, InterpolationDef def)
-        : CrossSectionInterpolant(DynamicData::Epair, param)
+        : CrossSectionInterpolant(DynamicData::Particle, param)
         , photoangle_(photoangle.clone()), rndc_(-1.){
     // Use own initialization
     PhotoPairInterpolant::InitdNdxInterpolation(def);
+    eminus_def_ = &EMinusDef::Get();
+    eplus_def_ = &EPlusDef::Get();
 }
 
 
 PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairInterpolant& param)
         : CrossSectionInterpolant(param), photoangle_(param.GetPhotoAngleDistribution().clone()), rndc_(param.rndc_)
+        , eminus_def_(param.eminus_def_), eplus_def_(param.eplus_def_)
 {
 }
 
@@ -103,8 +106,8 @@ std::pair<std::vector<Particle*>, bool> PhotoPairInterpolant::CalculateProducedP
         return std::make_pair(particle_list, true);
     }
 
-    particle_list.push_back(new Particle(EPlusDef::Get()));
-    particle_list.push_back(new Particle(EMinusDef::Get()));
+    particle_list.push_back(new Particle(*eplus_def_));
+    particle_list.push_back(new Particle(*eminus_def_));
 
     rnd  = rndc_ * sum_of_rates_;
     rsum = 0;
