@@ -34,6 +34,7 @@
 
 #include "PROPOSAL/decay/DecayTable.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Logging.h"
 
 #define PARTICLE_DEF(cls)                                                                                              \
     class cls##Def : public ParticleDef                                                                                \
@@ -111,10 +112,29 @@ struct ParticleDef
                 const HardComponentTables::VecType& table,
                 const DecayTable&);
 
+    ParticleDef(std::string name,
+                double mass,
+                double low,
+                double lifetime,
+                double charge,
+                const HardComponentTables::VecType& table,
+                const DecayTable&,
+                const ParticleDef&);
+
     ParticleDef(const ParticleDef&);
     virtual ~ParticleDef();
 
     ParticleDef* clone() const { return new ParticleDef(*this); }
+
+    const ParticleDef* GetWeakPartner() const {
+        if(weak_partner == nullptr){
+            log_fatal("WeakPartner not defined for particle %s.", name.c_str());
+            return nullptr;
+        }
+        else{
+            return weak_partner;
+        }
+    }
 
     bool operator==(const ParticleDef&) const;
     bool operator!=(const ParticleDef&) const;
@@ -123,6 +143,7 @@ struct ParticleDef
 
 private:
     ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
+    const ParticleDef* weak_partner; //TODO: This will cause a deadlock if two particles have each other as weak partners
 };
 
 
@@ -172,6 +193,11 @@ public:
         decay_table = var;
         return *this;
     }
+    Builder& SetWeakPartner(const ParticleDef& partner)
+    {
+        weak_partner = &partner;
+        return *this;
+    }
     Builder& SetParticleDef(const ParticleDef& var)
     {
         name                 = var.name;
@@ -181,6 +207,7 @@ public:
         charge               = var.charge;
         hard_component_table = &var.hard_component_table;
         decay_table          = var.decay_table;
+        weak_partner         = var.weak_partner;
         return *this;
     }
 
@@ -192,7 +219,7 @@ public:
             low = mass;
         }
 
-        return ParticleDef(name, mass, low, lifetime, charge, *hard_component_table, decay_table);
+        return ParticleDef(name, mass, low, lifetime, charge, *hard_component_table, decay_table, *weak_partner);
     }
 
 private:
@@ -203,6 +230,7 @@ private:
     double charge;
     const HardComponentTables::VecType* hard_component_table;
     DecayTable decay_table;
+    const ParticleDef* weak_partner;
 };
 
 // ------------------------------------------------------------------------- //

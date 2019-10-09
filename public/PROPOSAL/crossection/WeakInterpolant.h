@@ -55,8 +55,6 @@ namespace PROPOSAL {
         std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction);
     protected:
         virtual bool compare(const CrossSection&) const;
-    private:
-        ParticleDef const* converted_particle_; //the particle the charged lepton may be converted to
     };
 
 } // namespace PROPOSAL

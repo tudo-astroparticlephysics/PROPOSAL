@@ -106,6 +106,7 @@ ParticleDef::ParticleDef()
     , charge(0.0)
     , hard_component_table(HardComponentTables::EmptyTable)
     , decay_table()
+    , weak_partner(nullptr)
 {
 }
 
@@ -123,9 +124,28 @@ ParticleDef::ParticleDef(std::string name,
     , charge(charge)
     , hard_component_table(table)
     , decay_table(decay_table)
+    , weak_partner(nullptr)
 {
 }
 
+ParticleDef::ParticleDef(std::string name,
+                         double mass,
+                         double low,
+                         double lifetime,
+                         double charge,
+                         const HardComponentTables::VecType& table,
+                         const DecayTable& decay_table,
+                         const ParticleDef& partner)
+        : name(name)
+        , mass(mass)
+        , low(low)
+        , lifetime(lifetime)
+        , charge(charge)
+        , hard_component_table(table)
+        , decay_table(decay_table)
+        , weak_partner(&partner)
+{
+}
 ParticleDef::~ParticleDef() {}
 
 ParticleDef::ParticleDef(const ParticleDef& def)
@@ -136,6 +156,7 @@ ParticleDef::ParticleDef(const ParticleDef& def)
     , charge(def.charge)
     , hard_component_table(def.hard_component_table)
     , decay_table(def.decay_table)
+    , weak_partner(def.weak_partner)
 {
 }
 
@@ -185,6 +206,9 @@ bool ParticleDef::operator==(const ParticleDef& def) const
     } else if (decay_table != def.decay_table)
     {
         return false;
+    } else if (weak_partner != def.weak_partner)
+    {
+        return false;
     } else
     {
         return true;
@@ -208,6 +232,7 @@ ParticleDef::Builder::Builder()
     , charge(-1)
     , hard_component_table(&HardComponentTables::EmptyTable)
     , decay_table()
+    , weak_partner(nullptr)
 {
 }
 
@@ -215,15 +240,46 @@ ParticleDef::Builder::Builder()
 // Special Particle definitions
 // ------------------------------------------------------------------------- //
 
+EMinusDef::EMinusDef()
+        : ParticleDef(
+            "EMinus",
+            ME,
+            ME,
+            STABLE_PARTICLE,
+            -1.0,
+            HardComponentTables::EmptyTable,
+            DecayTable().addChannel(1.1, StableChannel()),
+            NuEDef::Get())
+{
+}
+
+EMinusDef::~EMinusDef() {}
+
+EPlusDef::EPlusDef()
+        : ParticleDef(
+            "EPlus",
+            ME,
+            ME,
+            STABLE_PARTICLE,
+            1.0,
+            HardComponentTables::EmptyTable,
+            DecayTable().addChannel(1.1, StableChannel()),
+            NuEBarDef::Get())
+{
+}
+
+EPlusDef::~EPlusDef() {}
+
 MuMinusDef::MuMinusDef()
     : ParticleDef(
-          "MuMinus",
-          MMU,
-          MMU,
-          LMU,
-          -1.0,
-          HardComponentTables::MuonTable,
-          DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get())))
+            "MuMinus",
+            MMU,
+            MMU,
+            LMU,
+            -1.0,
+            HardComponentTables::MuonTable,
+            DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get())),
+            NuMuDef::Get())
 {
 }
 
@@ -236,7 +292,8 @@ MuPlusDef::MuPlusDef()
                   LMU,
                   1.0,
                   HardComponentTables::MuonTable,
-                  DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())))
+                  DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())),
+                  NuMuBarDef::Get())
 {
 }
 
@@ -301,7 +358,8 @@ TauMinusDef::TauMinusDef()
                                       .addDaughter(PiPlusDef::Get())
                                       .addDaughter(PiMinusDef::Get())
                                       .addDaughter(NuTauDef::Get())
-                                      .build()))
+                                      .build()),
+                  NuTauDef::Get())
 {
 }
 
@@ -366,7 +424,8 @@ TauPlusDef::TauPlusDef()
                                       .addDaughter(PiPlusDef::Get())
                                       .addDaughter(PiMinusDef::Get())
                                       .addDaughter(NuTauBarDef::Get())
-                                      .build()))
+                                      .build()),
+                  NuTauBarDef::Get())
 {
 }
 
@@ -399,8 +458,6 @@ GammaDef::~GammaDef() {}
 //
 // ------------------------------------------------------------------------- //
 
-PARTICLE_IMP(EMinus, ME, STABLE_PARTICLE, -1.0)
-PARTICLE_IMP(EPlus, ME, STABLE_PARTICLE, 1.0)
 
 PARTICLE_IMP(StauMinus, MSTAU, STABLE_PARTICLE, -1.0)
 PARTICLE_IMP(StauPlus, MSTAU, STABLE_PARTICLE, 1.0)

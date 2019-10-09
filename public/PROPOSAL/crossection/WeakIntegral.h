@@ -53,8 +53,6 @@ namespace PROPOSAL {
         double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }
         double CalculatedE2dx(double energy){ (void)energy; return 0; }
         std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction);
-    private:
-        ParticleDef const* converted_particle_; //the particle the charged lepton may be converted to
     };
 
 } // namespace PROPOSAL
