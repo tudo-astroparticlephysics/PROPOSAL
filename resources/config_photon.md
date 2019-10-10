@@ -25,7 +25,7 @@ Photo pair production describes the production of an electron-positron pair by a
 Photo pair production interactions are always stochastic and always catastrophic: 
 After an interaction, the initial photon is destroyed and the energy is divided between the electron and the positron.
 
-To sample the angles of these photons different models can be used. Those parametrizations are available and can be set via the `hotoangle` parameter:
+To sample the angles of the created particles different models can be used. Those parametrizations are available and can be set via the `hotoangle` parameter:
   - `"PhotoAngleNoDeflection"` Both particles inherit the direction of the initial photon
   - `"PhotoAngleEGS"` The created particles are deflected by an angle of 1/energy with random azimuth
   - `"PhotoAngleTsaiIntegral"` The deflection angle is sampled for each interaction (Review of Modern Physics, Vol. 46, No. 4, October 1974)
@@ -34,4 +34,4 @@ To sample the angles of these photons different models can be used. Those parame
 | -----------------------  | ------ | ------------------------- | ----------- |
 | `photopair_multiplier`   | Double | `1.0`                     | Scales the photopairproduction parametrization |
 | `photopair`              | String | `None`                    | Photopairproduction parametrization |
-| `photoangle`             | String | `PhotoAngleNoDeflection`  | Photopairproduction parametrization |
+| `photoangle`             | String | `PhotoAngleNoDeflection`  | Parametrization of the deflection angle|
