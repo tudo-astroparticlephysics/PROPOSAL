@@ -19,6 +19,7 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Logging.h"
 
 #define PARTICLE_IMP(cls, MASS, LIFETIME, CHARGE)                                                                      \
     cls##Def::cls##Def()                                                                                               \
@@ -158,6 +159,16 @@ ParticleDef::ParticleDef(const ParticleDef& def)
     , decay_table(def.decay_table)
     , weak_partner(def.weak_partner)
 {
+}
+
+const ParticleDef* ParticleDef::GetWeakPartner() const {
+    if(weak_partner == nullptr){
+        log_fatal("WeakPartner not defined for particle %s.", name.c_str());
+        return nullptr;
+    }
+    else{
+        return weak_partner;
+    }
 }
 
 // ParticleDef& ParticleDef::operator=(const ParticleDef& def)

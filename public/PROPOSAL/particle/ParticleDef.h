@@ -34,7 +34,6 @@
 
 #include "PROPOSAL/decay/DecayTable.h"
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/Logging.h"
 
 #define PARTICLE_DEF(cls)                                                                                              \
     class cls##Def : public ParticleDef                                                                                \
@@ -126,15 +125,7 @@ struct ParticleDef
 
     ParticleDef* clone() const { return new ParticleDef(*this); }
 
-    const ParticleDef* GetWeakPartner() const {
-        if(weak_partner == nullptr){
-            log_fatal("WeakPartner not defined for particle %s.", name.c_str());
-            return nullptr;
-        }
-        else{
-            return weak_partner;
-        }
-    }
+    const ParticleDef* GetWeakPartner() const;
 
     bool operator==(const ParticleDef&) const;
     bool operator!=(const ParticleDef&) const;
