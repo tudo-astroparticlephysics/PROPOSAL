@@ -191,6 +191,7 @@ TEST(DecaySpectrum, MuMinus_Rest){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -244,6 +245,7 @@ TEST(DecaySpectrum, MuMinus_Rest){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -298,6 +300,7 @@ TEST(DecaySpectrum, MuMinus_Rest){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -392,6 +395,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -445,6 +449,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -499,6 +504,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -593,6 +599,7 @@ TEST(DecaySpectrum, TauMinus_Rest){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -646,6 +653,7 @@ TEST(DecaySpectrum, TauMinus_Rest){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -700,6 +708,7 @@ TEST(DecaySpectrum, TauMinus_Rest){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -795,6 +804,7 @@ TEST(DecaySpectrum, TauMinus_energy){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -848,6 +858,7 @@ TEST(DecaySpectrum, TauMinus_energy){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -902,6 +913,7 @@ TEST(DecaySpectrum, TauMinus_energy){
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
+            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
