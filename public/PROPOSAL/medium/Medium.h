@@ -213,6 +213,25 @@ public:
 // |)}>#
 MEDIUM_DEF(AntaresWater)
 
+/// @brief Cascadia Basin seawater
+///
+/// Cascadia Basin is located in the Northeast Pacific Ocean at a depth of
+/// 2.66 km close to the coast of Victoria, Canada. Infrastructure for deep-sea
+/// experiments is provided by Ocean Networks Canada (ONC). Therefore, it is an
+/// interesting site for future neutrino telescopes.
+///
+/// The chemical composition of the Cacadia Basin seawater is based on the six
+/// most important (by reference salinity) materials dissolved in Standard
+/// Seawater, according to F. J. Millero et al., Deep Sea Research Part I:
+/// Oceanographic Research Papers 55.1 (2008), pp. 50-72. These materials are
+/// sodium, magnesium, calcium, potassium, chlorine, and sulfate ions.
+///
+/// The project https://kkrings.github.io/seawater/ is used to calculate the
+/// chemical composition of the Cascadia Basin seawater. The practical salinity
+/// of 34.6288 psu and the mass density of 1.0400322 g/cm3 are obtained from
+/// ONC measurements.
+MEDIUM_DEF(CascadiaBasinWater)
+
 } // namespace PROPOSAL
 
 #undef MEDIUM_DEF

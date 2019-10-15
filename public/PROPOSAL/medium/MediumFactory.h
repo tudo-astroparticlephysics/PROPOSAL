@@ -57,7 +57,8 @@ public:
         Uranium,
         Air,
         Paraffin,
-        AntaresWater
+        AntaresWater,
+        CascadiaBasinWater
     };
 
     struct Definition
