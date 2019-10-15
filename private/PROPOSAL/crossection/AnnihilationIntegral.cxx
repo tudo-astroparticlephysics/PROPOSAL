@@ -45,8 +45,6 @@ std::pair<std::vector<Particle*>, bool> AnnihilationIntegral::CalculateProducedP
     rnd  = rndc_ * sum_of_rates_;
     rsum = 0;
 
-    double gamma = energy / parametrization_->GetParticleDef().mass;
-
     for (size_t i = 0; i < components_.size(); ++i)
     {
         rsum += prob_for_component_[i];
@@ -63,11 +61,10 @@ std::pair<std::vector<Particle*>, bool> AnnihilationIntegral::CalculateProducedP
             particle_list[0]->SetDirection(initial_direction);
             particle_list[1]->SetDirection(initial_direction);
 
-            double cosphi0 = (rho * (gamma + 1.) - 1.) / (rho * std::sqrt(gamma * gamma - 1.));
-            double cosphi1 = std::sqrt( 1. - ( (1. - cosphi0 * cosphi0) * std::pow(particle_list[0]->GetEnergy(), 2.) ) / std::pow(particle_list[1]->GetEnergy(), 2.) ); //energy-momentum conversation
+            double cosphi0 = ((energy + ME) * (1. - rho) - ME)/( (1. - rho) * std::sqrt( (energy + ME) * (energy - ME) ) );
+            double cosphi1 = ((energy + ME) * rho - ME)/( rho * std::sqrt((energy + ME) * (energy - ME)));
 
             double rndtheta = RandomGenerator::Get().RandomDouble();
-
 
             particle_list[0]->DeflectDirection(cosphi0, rndtheta * 2. * PI);
             particle_list[1]->DeflectDirection(cosphi1, std::fmod(rndtheta * 2. * PI + PI, 2. * PI));
