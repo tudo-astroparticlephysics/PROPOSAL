@@ -166,7 +166,7 @@ double UtilityInterpolantDisplacement::Calculate(double ei, double ef, double rn
         stored_result_ = interpolant_->Interpolate(ei);
         aux            = stored_result_ - interpolant_->Interpolate(ef);
 
-        if (std::abs(aux) > std::abs(stored_result_) * HALF_PRECISION)
+        if (std::abs(aux) > std::abs(stored_result_) * HALF_PRECISION && aux >= 0)
         {
             return std::max(aux, 0.0);
         }
