@@ -726,14 +726,14 @@ CascadiaBasinWater::CascadiaBasinWater(double rho)
         0.,        // d0
         1.0400322, // massDensity
         {
-            std::shared_ptr<Components::Component>(new Components::Hydrogen(2.0)),
-            std::shared_ptr<Components::Component>(new Components::Oxygen(1.0021)),
-            std::shared_ptr<Components::Component>(new Components::Sodium(8.7174e-3)),
-            std::shared_ptr<Components::Component>(new Components::Magnesium(9.8180e-4)),
-            std::shared_ptr<Components::Component>(new Components::Calcium(1.9113e-4)),
-            std::shared_ptr<Components::Component>(new Components::Potassium(1.8975e-4)),
-            std::shared_ptr<Components::Component>(new Components::Chlorine(1.0147e-2)),
-            std::shared_ptr<Components::Component>(new Components::Sulfur(5.2487e-4))
+            std::make_shared<Components::Component>(Components::Hydrogen(2.0)),
+            std::make_shared<Components::Component>(Components::Oxygen(1.0021)),
+            std::make_shared<Components::Component>(Components::Sodium(8.7174e-3)),
+            std::make_shared<Components::Component>(Components::Magnesium(9.8180e-4)),
+            std::make_shared<Components::Component>(Components::Calcium(1.9113e-4)),
+            std::make_shared<Components::Component>(Components::Potassium(1.8975e-4)),
+            std::make_shared<Components::Component>(Components::Chlorine(1.0147e-2)),
+            std::make_shared<Components::Component>(Components::Sulfur(5.2487e-4))
         })
 {}
 
