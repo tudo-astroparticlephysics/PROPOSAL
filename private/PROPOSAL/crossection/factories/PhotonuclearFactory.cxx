@@ -72,7 +72,7 @@ void PhotonuclearFactory::RegisterShadowEffect(const std::string& name,
 {
     photo_shadow_map_str_[name]    = create;
     photo_shadow_map_enum_[shadow] = create;
-    string_shadow_enum_.insert(BimapStringShadowEnum::value_type(name, shadow));
+    string_shadow_enum_.insert(name, shadow);
 }
 
 // ------------------------------------------------------------------------- //
@@ -80,7 +80,7 @@ void PhotonuclearFactory::RegisterRealPhoton(const std::string& name, Enum enum_
 {
     photo_real_map_str_[name]    = create;
     photo_real_map_enum_[enum_t] = create;
-    string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
+    string_enum_.insert(name, enum_t);
 }
 
 // ------------------------------------------------------------------------- //
@@ -90,7 +90,7 @@ void PhotonuclearFactory::RegisterQ2(const std::string& name,
 {
     photo_q2_map_str_[name]    = create;
     photo_q2_map_enum_[enum_t] = create;
-    string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
+    string_enum_.insert(name, enum_t);
 }
 
 // ------------------------------------------------------------------------- //
@@ -189,8 +189,9 @@ PhotonuclearFactory::Enum PhotonuclearFactory::GetEnumFromString(const std::stri
     std::string name_lower = name;
     std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
 
-    BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
-    if (it != string_enum_.left.end())
+    auto& left = string_enum_.GetLeft();
+    auto it = left.find(name_lower);
+    if (it != left.end())
     {
         return it->second;
     } else
@@ -203,8 +204,9 @@ PhotonuclearFactory::Enum PhotonuclearFactory::GetEnumFromString(const std::stri
 // ------------------------------------------------------------------------- //
 std::string PhotonuclearFactory::GetStringFromEnum(const PhotonuclearFactory::Enum& enum_t)
 {
-    BimapStringEnum::right_const_iterator it = string_enum_.right.find(enum_t);
-    if (it != string_enum_.right.end())
+    auto& right = string_enum_.GetRight();
+    auto it = right.find(enum_t);
+    if (it != right.end())
     {
         return it->second;
     } else
@@ -220,8 +222,9 @@ PhotonuclearFactory::Shadow PhotonuclearFactory::GetShadowEnumFromString(const s
     std::string name_lower = name;
     std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
 
-    BimapStringShadowEnum::left_const_iterator it = string_shadow_enum_.left.find(name_lower);
-    if (it != string_shadow_enum_.left.end())
+    auto& left = string_shadow_enum_.GetLeft();
+    auto it = left.find(name_lower);
+    if (it != left.end())
     {
         return it->second;
     } else
@@ -234,9 +237,9 @@ PhotonuclearFactory::Shadow PhotonuclearFactory::GetShadowEnumFromString(const s
 // ------------------------------------------------------------------------- //
 std::string PhotonuclearFactory::GetStringFromShadowEnum(const Shadow& shadow)
 {
-
-    BimapStringShadowEnum::right_const_iterator it = string_shadow_enum_.right.find(shadow);
-    if (it != string_shadow_enum_.right.end())
+    auto& right = string_shadow_enum_.GetRight();
+    auto it = right.find(shadow);
+    if (it != right.end())
     {
         return it->second;
     } else

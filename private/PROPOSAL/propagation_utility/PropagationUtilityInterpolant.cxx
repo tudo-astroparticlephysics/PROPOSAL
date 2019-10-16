@@ -1,4 +1,5 @@
 
+#include <cmath>
 #include <functional>
 
 #include "PROPOSAL/math/Interpolant.h"
