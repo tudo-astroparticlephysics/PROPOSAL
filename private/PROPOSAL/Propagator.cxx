@@ -1155,7 +1155,7 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
     {
         if (json_object["nodes_propagate"].is_number())
         {
-            interpolation_def.nodes_cross_section = json_object["nodes_propagate"];
+            interpolation_def.nodes_propagate = json_object["nodes_propagate"];
         }
         else
         {
@@ -1171,7 +1171,7 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
     {
         if (json_object["nodes_continous_randomization"].is_number())
         {
-            interpolation_def.nodes_cross_section = json_object["nodes_continous_randomization"];
+            interpolation_def.nodes_continous_randomization = json_object["nodes_continous_randomization"];
         }
         else
         {
