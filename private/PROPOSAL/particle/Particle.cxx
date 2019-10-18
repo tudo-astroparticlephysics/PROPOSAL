@@ -263,7 +263,7 @@ void Particle::DeflectDirection(double cosphi_deflect, double theta_deflect) {
     Vector3D old_direction = GetDirection();
 
     old_direction.CalculateSphericalCoordinates();
-    double sinphi_deflect = std::sqrt( (1. - cosphi_deflect) * (1. + cosphi_deflect) );
+    double sinphi_deflect = std::sqrt( std::max(0., (1. - cosphi_deflect) * (1. + cosphi_deflect) ));
     double tx = sinphi_deflect * std::cos(theta_deflect);
     double ty = sinphi_deflect * std::sin(theta_deflect);
     double tz = std::sqrt(std::max(1. - tx * tx - ty * ty, 0.));
