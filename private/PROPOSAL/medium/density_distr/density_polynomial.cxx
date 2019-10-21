@@ -25,9 +25,7 @@ Density_polynomial::Density_polynomial(const Density_polynomial& dens)
       density_distribution(polynom_.GetFunction()),
       antiderived_density_distribution(Polynom_.GetFunction()) {}
 
-Density_polynomial::~Density_polynomial() {
-    delete axis_;
-}
+Density_polynomial::~Density_polynomial() {}
 
 bool Density_polynomial::compare(const Density_distr& dens_distr) const {
     const Density_polynomial* dens_poly = dynamic_cast<const Density_polynomial*>(&dens_distr);
