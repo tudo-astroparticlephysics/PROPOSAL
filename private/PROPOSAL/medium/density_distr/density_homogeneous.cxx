@@ -23,8 +23,8 @@ bool Density_homogeneous::compare(const Density_distr& dens_distr) const {
     return true;
 }
 
-double Density_homogeneous::Correct(Vector3D xi,
-                                    Vector3D direction,
+double Density_homogeneous::Correct(const Vector3D& xi,
+                                    const Vector3D& direction,
                                     double res,
                                     double distance_to_border) const {
     (void)xi;
@@ -34,8 +34,8 @@ double Density_homogeneous::Correct(Vector3D xi,
     return res / correction_factor_;
 }
 
-double Density_homogeneous::Integrate(Vector3D xi,
-                                      Vector3D direction,
+double Density_homogeneous::Integrate(const Vector3D& xi,
+                                      const Vector3D& direction,
                                       double l) const {
     (void)xi;
     (void)direction;
@@ -43,13 +43,13 @@ double Density_homogeneous::Integrate(Vector3D xi,
     return correction_factor_ * l;
 }
 
-double Density_homogeneous::Calculate(Vector3D xi,
-                                      Vector3D direction,
+double Density_homogeneous::Calculate(const Vector3D& xi,
+                                      const Vector3D& direction,
                                       double distance) const {
     return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
 
-double Density_homogeneous::Evaluate(Vector3D xi) const {
+double Density_homogeneous::Evaluate(const Vector3D& xi) const {
     (void)xi;
 
     return correction_factor_;

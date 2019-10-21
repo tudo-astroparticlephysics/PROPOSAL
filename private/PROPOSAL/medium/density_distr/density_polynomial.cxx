@@ -36,15 +36,15 @@ bool Density_polynomial::compare(const Density_distr& dens_distr) const {
     return true;
 }
 
-double Density_polynomial::Helper_function(Vector3D xi,
-                                           Vector3D direction,
+double Density_polynomial::Helper_function(const Vector3D& xi,
+                                           const Vector3D& direction,
                                            double res,
                                            double l) const {
     return Integrate(xi, direction, 0) - Integrate(xi, direction, l) + res;
 }
 
-double Density_polynomial::helper_function(Vector3D xi,
-                                           Vector3D direction,
+double Density_polynomial::helper_function(const Vector3D& xi,
+                                           const Vector3D& direction,
                                            double res,
                                            double l) const {
     (void)res;
@@ -52,8 +52,8 @@ double Density_polynomial::helper_function(Vector3D xi,
     return Evaluate(xi) - Evaluate(xi + l * direction);
 }
 
-double Density_polynomial::Correct(Vector3D xi,
-                                   Vector3D direction,
+double Density_polynomial::Correct(const Vector3D& xi,
+                                   const Vector3D& direction,
                                    double res,
                                    double distance_to_border) const {
     std::function<double(double)> F =
@@ -77,8 +77,8 @@ double Density_polynomial::Correct(Vector3D xi,
     return res;
 }
 
-double Density_polynomial::Integrate(Vector3D xi,
-                                     Vector3D direction,
+double Density_polynomial::Integrate(const Vector3D& xi,
+                                     const Vector3D& direction,
                                      double l) const {
     double delta = axis_->GetEffectiveDistance(xi, direction);
 
@@ -86,12 +86,12 @@ double Density_polynomial::Integrate(Vector3D xi,
            (delta * delta);
 }
 
-double Density_polynomial::Calculate(Vector3D xi,
-                                     Vector3D direction,
+double Density_polynomial::Calculate(const Vector3D& xi,
+                                     const Vector3D& direction,
                                      double distance) const {
     return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
 
-double Density_polynomial::Evaluate(Vector3D xi) const {
+double Density_polynomial::Evaluate(const Vector3D& xi) const {
     return density_distribution(axis_->GetDepth(xi));
 }

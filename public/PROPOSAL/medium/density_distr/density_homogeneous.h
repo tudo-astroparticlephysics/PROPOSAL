@@ -44,17 +44,19 @@ class Density_homogeneous : public Density_distr {
         return new Density_homogeneous(*this);
     };
 
-    double Correct(Vector3D xi,
-                   Vector3D direction,
+    double Correct(const Vector3D& xi,
+                   const Vector3D& direction,
                    double res,
                    double distance_to_border) const override;
-    double Integrate(Vector3D xi,
-                     Vector3D direction,
+    double Integrate(const Vector3D& xi,
+                     const Vector3D& direction,
                      double res) const override;
-    double Calculate(Vector3D xi,
-                     Vector3D direction,
+    double Calculate(const Vector3D& xi,
+                     const Vector3D& direction,
                      double distance) const override;
-    double Evaluate(Vector3D xi) const override;
+    double Evaluate(const Vector3D& xi) const override;
+
+    double GetCorrectionfactor() const { return correction_factor_; }
 
    private:
     double correction_factor_;

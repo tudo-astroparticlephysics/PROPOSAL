@@ -16,21 +16,21 @@ class Density_exponential : public Density_distr {
         return new Density_exponential(*this);
     };
 
-    double Integrate(Vector3D xi,
-                     Vector3D direction,
+    double Integrate(const Vector3D& xi,
+                     const Vector3D& direction,
                      double res) const override;
-    double Correct(Vector3D xi,
-                   Vector3D direction,
+    double Correct(const Vector3D& xi,
+                   const Vector3D& direction,
                    double res,
                    double distance_to_border) const override;
 
-    double Calculate(Vector3D xi,
-                     Vector3D direction,
+    double Calculate(const Vector3D& xi,
+                     const Vector3D& direction,
                      double distance) const override;
-    double Evaluate(Vector3D xi) const override;
+    double Evaluate(const Vector3D& xi) const override;
 
-    double GetDepth(Vector3D xi) const;
-    double GetEffectiveDistance(Vector3D xi, Vector3D direction) const;
+    double GetDepth(const Vector3D& xi) const;
+    double GetEffectiveDistance(const Vector3D& xi, const Vector3D& direction) const;
 
    private:
     double sigma_;

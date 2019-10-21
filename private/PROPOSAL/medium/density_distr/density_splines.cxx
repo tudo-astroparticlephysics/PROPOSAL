@@ -28,23 +28,23 @@ bool Density_splines::compare(const Density_distr& dens_distr) const {
     return true;
 }
 
-double Density_splines::Helper_function(Vector3D xi,
-                                        Vector3D direction,
+double Density_splines::Helper_function(const Vector3D& xi,
+                                        const Vector3D& direction,
                                         double res,
                                         double l) const {
     return Integrate(xi, direction, 0) - Integrate(xi, direction, l) + res;
 }
 
-double Density_splines::helper_function(Vector3D xi,
-                                        Vector3D direction,
+double Density_splines::helper_function(const Vector3D& xi,
+                                        const Vector3D& direction,
                                         double res,
                                         double l) const {
     (void)res;
     return Evaluate(xi) - Evaluate(xi + l * direction);
 }
 
-double Density_splines::Correct(Vector3D xi,
-                                Vector3D direction,
+double Density_splines::Correct(const Vector3D& xi,
+                                const Vector3D& direction,
                                 double res,
                                 double distance_to_border) const {
     std::function<double(double)> F =
@@ -65,8 +65,8 @@ double Density_splines::Correct(Vector3D xi,
     return res;
 }
 
-double Density_splines::Integrate(Vector3D xi,
-                                  Vector3D direction,
+double Density_splines::Integrate(const Vector3D& xi,
+                                  const Vector3D& direction,
                                   double l) const {
     double delta = axis_->GetEffectiveDistance(xi, direction);
 
@@ -74,12 +74,12 @@ double Density_splines::Integrate(Vector3D xi,
            integrated_spline_->evaluate(axis_->GetDepth(xi) + l * delta);
 }
 
-double Density_splines::Calculate(Vector3D xi,
-                                  Vector3D direction,
+double Density_splines::Calculate(const Vector3D& xi,
+                                  const Vector3D& direction,
                                   double distance) const {
     return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
 
-double Density_splines::Evaluate(Vector3D xi) const {
+double Density_splines::Evaluate(const Vector3D& xi) const {
     return spline_->evaluate(axis_->GetDepth(xi));
 }

@@ -7,7 +7,7 @@ using namespace PROPOSAL;
 Density_exponential::Density_exponential(const Axis& axis, double sigma)
     : Density_distr(axis), sigma_(sigma) {}
 
-double Density_exponential::GetDepth(Vector3D xi) const {
+double Density_exponential::GetDepth(const Vector3D& xi) const {
     return axis_->GetDepth(xi) / sigma_;
 }
 
@@ -18,13 +18,13 @@ bool Density_exponential::compare(const Density_distr& dens_distr) const {
     return true;
 }
 
-double Density_exponential::GetEffectiveDistance(Vector3D xi,
-                                                 Vector3D direction) const {
+double Density_exponential::GetEffectiveDistance(const Vector3D& xi,
+                                                 const Vector3D& direction) const {
     return axis_->GetEffectiveDistance(xi, direction) / sigma_;
 }
 
-double Density_exponential::Correct(Vector3D xi,
-                                    Vector3D direction,
+double Density_exponential::Correct(const Vector3D& xi,
+                                    const Vector3D& direction,
                                     double res,
                                     double distance_to_border) const {
     (void)distance_to_border;
@@ -40,20 +40,20 @@ double Density_exponential::Correct(Vector3D xi,
     return aux;
 }
 
-double Density_exponential::Integrate(Vector3D xi,
-                                      Vector3D direction,
+double Density_exponential::Integrate(const Vector3D& xi,
+                                      const Vector3D& direction,
                                       double l) const {
     double delta = GetEffectiveDistance(xi, direction);
 
     return std::exp(GetDepth(xi) + l * delta) / delta;
 }
 
-double Density_exponential::Calculate(Vector3D xi,
-                                      Vector3D direction,
+double Density_exponential::Calculate(const Vector3D& xi,
+                                      const Vector3D& direction,
                                       double distance) const {
     return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
 
-double Density_exponential::Evaluate(Vector3D xi) const {
+double Density_exponential::Evaluate(const Vector3D& xi) const {
     return std::exp(GetDepth(xi));
 }

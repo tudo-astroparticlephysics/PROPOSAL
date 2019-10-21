@@ -35,7 +35,7 @@ namespace PROPOSAL {
 class Axis {
    public:
     Axis();
-    Axis(Vector3D fp0, Vector3D fAxis);
+    Axis(const Vector3D& fp0, const Vector3D& fAxis);
     Axis(const Axis&);
 
     virtual ~Axis() {};
@@ -45,12 +45,12 @@ class Axis {
 
     virtual Axis* clone() const = 0;
 
-    virtual double GetDepth(Vector3D xi) const = 0;
-    virtual double GetEffectiveDistance(Vector3D xi,
-                                        Vector3D direction) const = 0;
+    virtual double GetDepth(const Vector3D& xi) const = 0;
+    virtual double GetEffectiveDistance(const Vector3D& xi,
+                                        const Vector3D& direction) const = 0;
 
-    Vector3D GetAxis() { return fAxis_; };
-    Vector3D GetFp0() { return fp0_; };
+    Vector3D GetAxis() const { return fAxis_; };
+    Vector3D GetFp0() const { return fp0_; };
 
    protected:
     Vector3D fAxis_;
@@ -62,13 +62,13 @@ namespace PROPOSAL {
 class RadialAxis : public Axis {
    public:
     RadialAxis();
-    RadialAxis(Vector3D fAxis, Vector3D fp0);
+    RadialAxis(const Vector3D& fAxis, const Vector3D& fp0);
 
     Axis* clone() const override { return new RadialAxis(*this); };
     ~RadialAxis() {};
 
-    double GetDepth(Vector3D xi) const override;
-    double GetEffectiveDistance(Vector3D xi, Vector3D direction) const override;
+    double GetDepth(const Vector3D& xi) const override;
+    double GetEffectiveDistance(const Vector3D& xi, const Vector3D& direction) const override;
 };
 }  // namespace PROPOSAL
 
@@ -76,13 +76,13 @@ namespace PROPOSAL {
 class CartesianAxis : public Axis {
    public:
     CartesianAxis();
-    CartesianAxis(Vector3D fAxis, Vector3D fp0);
+    CartesianAxis(const Vector3D& fAxis, const Vector3D& fp0);
     ~CartesianAxis() {};
 
     Axis* clone() const override { return new CartesianAxis(*this); };
 
-    double GetDepth(Vector3D xi) const override;
-    double GetEffectiveDistance(Vector3D xi, Vector3D direction) const override;
+    double GetDepth(const Vector3D& xi) const override;
+    double GetEffectiveDistance(const Vector3D& xi, const Vector3D& direction) const override;
 };
 }  // namespace PROPOSAL
 
@@ -113,17 +113,19 @@ class Density_distr {
 
     virtual Density_distr* clone() const = 0;
 
-    virtual double Correct(Vector3D xi,
-                           Vector3D direction,
+    virtual double Correct(const Vector3D& xi,
+                           const Vector3D& direction,
                            double res,
                            double distance_to_border) const = 0;
-    virtual double Integrate(Vector3D xi,
-                             Vector3D direction,
+    virtual double Integrate(const Vector3D& xi,
+                             const Vector3D& direction,
                              double l) const = 0;
-    virtual double Calculate(Vector3D xi,
-                             Vector3D direction,
+    virtual double Calculate(const Vector3D& xi,
+                             const Vector3D& direction,
                              double distance) const = 0;
-    virtual double Evaluate(Vector3D xi) const = 0;
+    virtual double Evaluate(const Vector3D& xi) const = 0;
+
+    const Axis& GetAxis() const { return *axis_; }
 
    protected:
     Axis* axis_;

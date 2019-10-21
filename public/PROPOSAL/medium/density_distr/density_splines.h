@@ -27,22 +27,22 @@ class Density_splines : public Density_distr {
         return new Density_splines(*this);
     };
 
-    double Correct(Vector3D xi,
-                   Vector3D direction,
+    double Correct(const Vector3D& xi,
+                   const Vector3D& direction,
                    double res,
                    double distance_to_border) const override;
-    double Integrate(Vector3D xi, Vector3D direction, double l) const override;
-    double Evaluate(Vector3D xi) const override;
-    double Calculate(Vector3D xi,
-                     Vector3D direction,
+    double Integrate(const Vector3D& xi, const Vector3D& direction, double l) const override;
+    double Evaluate(const Vector3D& xi) const override;
+    double Calculate(const Vector3D& xi,
+                     const Vector3D& direction,
                      double distance) const override;
 
-    double Helper_function(Vector3D xi,
-                           Vector3D direction,
+    double Helper_function(const Vector3D& xi,
+                           const Vector3D& direction,
                            double res,
                            double l) const;
-    double helper_function(Vector3D xi,
-                           Vector3D direction,
+    double helper_function(const Vector3D& xi,
+                           const Vector3D& direction,
                            double res,
                            double l) const;
 
