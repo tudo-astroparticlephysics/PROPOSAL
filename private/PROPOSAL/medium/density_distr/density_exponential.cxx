@@ -13,6 +13,8 @@ double Density_exponential::GetDepth(const Vector3D& xi) const {
 
 bool Density_exponential::compare(const Density_distr& dens_distr) const {
     const Density_exponential* dens_exp = dynamic_cast<const Density_exponential*>(&dens_distr);
+    if(!dens_exp)
+        return false;
     if(sigma_ != dens_exp->sigma_ )
         return false;
     return true;

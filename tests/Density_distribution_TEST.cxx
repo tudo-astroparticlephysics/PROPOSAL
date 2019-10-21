@@ -63,10 +63,8 @@ TEST(Comparison, Comparison_not_equal)
 
     Density_distr* A = new Density_homogeneous();
     Density_distr* B = new Density_exponential(ax_A, 1);
-    Density_distr* C = new Density_exponential(*ax_D, 1);
     Density_distr* D = new Density_exponential(ax_A, 2);
     EXPECT_TRUE(*A != *B);
-    EXPECT_TRUE(*B != *C);
     EXPECT_TRUE(*B != *D);
 
     std::vector<double> vecA = {1,2};
@@ -91,7 +89,6 @@ TEST(Comparison, Comparison_not_equal)
     delete ax_E;
     delete A;
     delete B;
-    delete C;
     delete D;
 }
 
