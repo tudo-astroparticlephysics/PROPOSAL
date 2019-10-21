@@ -214,10 +214,10 @@ bool Utility::operator!=(const Utility& utility) const {
  ******************************************************************************/
 
 UtilityDecorator::UtilityDecorator(const Utility& utility)
-    : utility_(utility) {}
+    : utility_(*utility.clone()) {}
 
 UtilityDecorator::UtilityDecorator(const UtilityDecorator& decorator)
-    : utility_(decorator.utility_) {}
+    : utility_(*decorator.utility_.clone()) {}
 
 UtilityDecorator::~UtilityDecorator() {}
 

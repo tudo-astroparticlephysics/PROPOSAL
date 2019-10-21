@@ -80,6 +80,8 @@ class Utility {
     Utility(const Utility&);
     virtual ~Utility();
 
+    const Utility* clone() const {return new Utility(*this);}
+
     bool operator==(const Utility& utility) const;
     bool operator!=(const Utility& utility) const;
 
