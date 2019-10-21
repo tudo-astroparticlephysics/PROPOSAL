@@ -1,4 +1,6 @@
 
+#include <cmath>
+
 #include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"

@@ -81,7 +81,7 @@ void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr ra
 // ------------------------------------------------------------------------- //
 void I3PropagatorServicePROPOSAL::RegisterParticleType(I3Particle::ParticleType ptype)
 {
-    ParticleDef particle_def = I3PROPOSALParticleConverter::GeneratePROPOSALType(ptype);
+    ParticleDef particle_def = particle_converter_.GeneratePROPOSALType(ptype);
     std::cout << particle_def << std::endl;
 
     // If ptype is not known an empty particle definition is returned (e.g. empty name)
@@ -143,7 +143,7 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
 // ------------------------------------------------------------------------- //
 I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, std::vector<I3Particle>& daughters)
 {
-    Particle particle = I3PROPOSALParticleConverter::GeneratePROPOSALParticle(p);
+    Particle particle = particle_converter_.GeneratePROPOSALParticle(p);
 
     std::vector<DynamicData*> secondaries = proposal_service_.Propagate(particle, distance_to_propagate_);
 
@@ -167,15 +167,14 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, std::vector<
     {
         // this should be a stochastic
 
-        ParticleDef particle_def = I3PROPOSALParticleConverter::GeneratePROPOSALType(p.GetType());
-        if (particle_def == EMinusDef::Get() || particle_def == EPlusDef::Get())
+        if (p.GetType() == I3Particle::EMinus || p.GetType() == I3Particle::EPlus)
         // || particle_def == ParticleType::Hadrons) //TODO(mario):  Wed 2017/10/25
         {
             if (p.GetShape() != I3Particle::TopShower)
             {
                 log_fatal("The particle '%s' has no TopShower shape, but 'e-', 'e+' and 'Hadrons' need that. I don't "
                           "know why?",
-                          particle_def.name.c_str());
+                          p.GetTypeString().c_str());
             }
         }
 
@@ -184,12 +183,12 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, std::vector<
 
         // this is not the particle you're looking for
         // move along...and add it to the daughter list
-        daughters.push_back(I3PROPOSALParticleConverter::GenerateI3Particle(*secondaries.at(i)));
+        daughters.push_back(particle_converter_.GenerateI3Particle(*secondaries.at(i)));
     }
 
     if (final_stochastic_loss_ != I3Particle::unknown)
     {
-        I3Particle i3_particle = I3PROPOSALParticleConverter::GenerateI3Particle(particle);
+        I3Particle i3_particle = particle_converter_.GenerateI3Particle(particle);
         i3_particle.SetType(final_stochastic_loss_);
         i3_particle.SetEnergy(particle.GetEnergy() - particle.GetParticleDef().mass);
 

@@ -16,6 +16,7 @@
 #include "simclasses/I3MMCTrack.h"
 
 #include "PROPOSAL/PROPOSAL.h"
+#include "PROPOSAL-icetray/Converter.h"
 
 class I3Particle;
 
@@ -64,6 +65,7 @@ private:
     I3RandomServicePtr rng_;
     std::string config_file_;
     PropagatorService proposal_service_;
+    I3PROPOSALParticleConverter particle_converter_;
 
     I3Particle::ParticleType final_stochastic_loss_;
     double distance_to_propagate_;
@@ -80,6 +82,7 @@ private:
     boost::shared_ptr<I3MMCTrack> GenerateMMCTrack(PROPOSAL::Particle* particle);
 
     boost::shared_ptr<I3MMCTrack> propagate(I3Particle& p, std::vector<I3Particle>& daughters);
+    PROPOSAL::ParticleDef GeneratePROPOSALType(const I3Particle::ParticleType& ptype_I3) const;
 };
 
 I3_POINTER_TYPEDEFS(I3PropagatorServicePROPOSAL);

@@ -29,13 +29,12 @@
 
 #pragma once
 
-#include <boost/bimap.hpp>
-
 #include <map>
 #include <string>
 #include <vector>
 
 #include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/methods.h"
 
 namespace PROPOSAL {
 
@@ -55,7 +54,7 @@ public:
         NoScattering
     };
 
-    typedef boost::bimap<std::string, Enum> BimapStringEnum;
+    typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
     Scattering* CreateScattering(const std::string&, Particle&, const Utility&, const InterpolationDef&);
     Scattering* CreateScattering(const Enum, Particle&, const Utility&, const InterpolationDef&);
