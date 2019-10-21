@@ -46,6 +46,10 @@ bool Scattering::operator!=(const Scattering& scattering) const
 
 void Scattering::Scatter(double dr, double ei, double ef)
 {
+    if(dr<=0){
+	return;
+	}
+
     double sz, tz;
 
     RandomAngles random_angles = CalculateRandomAngle(dr, ei, ef);
