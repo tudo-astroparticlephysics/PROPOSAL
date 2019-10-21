@@ -29,6 +29,8 @@ Density_polynomial::~Density_polynomial() {}
 
 bool Density_polynomial::compare(const Density_distr& dens_distr) const {
     const Density_polynomial* dens_poly = dynamic_cast<const Density_polynomial*>(&dens_distr);
+    if(!dens_poly)
+        return false;
     if( polynom_ != dens_poly->polynom_ )
         return false;
     return true;

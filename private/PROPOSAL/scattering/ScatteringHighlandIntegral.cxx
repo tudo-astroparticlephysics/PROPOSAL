@@ -1,9 +1,9 @@
 
 
-#include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -21,60 +21,60 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+ScatteringHighlandIntegral::ScatteringHighlandIntegral(Particle& particle, const Utility& utility)
+    : Scattering(particle)
+    , scatter_(new UtilityIntegralScattering(utility))
+{
+    if (particle.GetParticleDef() != utility.GetParticleDef())
+    {
+        log_fatal("Particle definition should be equal to the utility paricle definition!");
+    }
+}
+
 ScatteringHighlandIntegral::ScatteringHighlandIntegral(Particle& particle,
-                                                       const Utility& utility)
-    : Scattering(particle), scatter_(new UtilityIntegralScattering(utility)) {
-    if (particle.GetParticleDef() != utility.GetParticleDef()) {
-        log_fatal(
-            "Particle definition should be equal to the utility paricle "
-            "definition!");
+                                                       const Utility& utility,
+                                                       const InterpolationDef& interpolation_def)
+    : Scattering(particle)
+    , scatter_(new UtilityInterpolantScattering(utility, interpolation_def))
+{
+    if (particle.GetParticleDef() != utility.GetParticleDef())
+    {
+        log_fatal("Particle definition should be equal to the utility paricle definition!");
     }
 }
 
-ScatteringHighlandIntegral::ScatteringHighlandIntegral(
-    Particle& particle,
-    const Utility& utility,
-    const InterpolationDef& interpolation_def)
-    : Scattering(particle),
-      scatter_(new UtilityInterpolantScattering(utility, interpolation_def)) {
-    if (particle.GetParticleDef() != utility.GetParticleDef()) {
-        log_fatal(
-            "Particle definition should be equal to the utility paricle "
-            "definition!");
+ScatteringHighlandIntegral::ScatteringHighlandIntegral(const ScatteringHighlandIntegral& scattering)
+    : Scattering(scattering)
+    , scatter_(scattering.scatter_->clone(scattering.scatter_->GetUtility()))
+{
+}
+
+ScatteringHighlandIntegral::ScatteringHighlandIntegral(Particle& particle,
+                                                       const Utility& utility,
+                                                       const ScatteringHighlandIntegral& scattering)
+    : Scattering(particle)
+    , scatter_(scattering.scatter_->clone(utility))
+{
+    if (particle.GetParticleDef() != scattering.GetParticle().GetParticleDef())
+    {
+        log_fatal("Particle definition should be equal to the scattering paricle definition!");
+    }
+    if (utility != scattering.scatter_->GetUtility())
+    {
+        log_fatal("Utilities of the ScatteringHighlandIntegral should have same values!");
     }
 }
 
-ScatteringHighlandIntegral::ScatteringHighlandIntegral(
-    const ScatteringHighlandIntegral& scattering)
-    : Scattering(scattering),
-      scatter_(scattering.scatter_->clone(scattering.scatter_->GetUtility())) {}
-
-ScatteringHighlandIntegral::ScatteringHighlandIntegral(
-    Particle& particle,
-    const Utility& utility,
-    const ScatteringHighlandIntegral& scattering)
-    : Scattering(particle), scatter_(scattering.scatter_->clone(utility)) {
-    if (particle.GetParticleDef() !=
-        scattering.GetParticle().GetParticleDef()) {
-        log_fatal(
-            "Particle definition should be equal to the scattering paricle "
-            "definition!");
-    }
-    if (utility != scattering.scatter_->GetUtility()) {
-        log_fatal(
-            "Utilities of the ScatteringHighlandIntegral should have same "
-            "values!");
-    }
-}
-
-ScatteringHighlandIntegral::~ScatteringHighlandIntegral() {
+ScatteringHighlandIntegral::~ScatteringHighlandIntegral()
+{
     delete scatter_;
 }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-bool ScatteringHighlandIntegral::compare(const Scattering& scattering) const {
+bool ScatteringHighlandIntegral::compare(const Scattering& scattering) const
+{
     const ScatteringHighlandIntegral* scatteringHighlandIntegral =
         dynamic_cast<const ScatteringHighlandIntegral*>(&scattering);
 
@@ -93,19 +93,13 @@ bool ScatteringHighlandIntegral::compare(const Scattering& scattering) const {
 //----------------------------------------------------------------------------//
 
 //----------------------------------------------------------------------------//
-long double ScatteringHighlandIntegral::CalculateTheta0(double dr,
-                                                        double ei,
-                                                        double ef) {
-    double aux =
-        scatter_->Calculate(ei, ef, 0.0) *
-        scatter_->GetUtility().GetMedium().GetDensityDistribution().Evaluate(
-            particle_.GetPosition());
-    double cutoff = 1;
-    double radiation_lenght = scatter_->GetUtility().GetMedium().GetRadiationLength(
-            particle_.GetPosition());
+long double ScatteringHighlandIntegral::CalculateTheta0(double dr, double ei, double ef)
+{
+    double aux              = scatter_->Calculate(ei, ef, 0.0) / scatter_->GetUtility().GetMedium().GetDensityDistribution().Evaluate(particle_.GetPosition());
+    double cutoff           = 1;
+    double radiation_lenght = scatter_->GetUtility().GetMedium().GetRadiationLength(particle_.GetPosition());
 
-    aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_lenght) *
-          std::abs(particle_.GetCharge());
+    aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_lenght) * std::abs(particle_.GetCharge());
     aux *= std::max(1 + 0.038 * std::log(dr / radiation_lenght), 0.0);
 
     return std::min(aux, cutoff);
@@ -113,9 +107,8 @@ long double ScatteringHighlandIntegral::CalculateTheta0(double dr,
 
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringHighlandIntegral::CalculateRandomAngle(double dr,
-                                                                          double ei,
-                                                                          double ef) {
+Scattering::RandomAngles ScatteringHighlandIntegral::CalculateRandomAngle(double dr, double ei, double ef)
+{
     double Theta0, rnd1, rnd2;
     Scattering::RandomAngles random_angles;
 

@@ -18,6 +18,8 @@ Density_homogeneous::Density_homogeneous(const Density_homogeneous& dens_distr)
 
 bool Density_homogeneous::compare(const Density_distr& dens_distr) const {
     const Density_homogeneous* dens_homogen = dynamic_cast<const Density_homogeneous*>(&dens_distr);
+    if(!dens_homogen)
+        return false;
     if(correction_factor_ != dens_homogen->correction_factor_ )
         return false;
     return true;
