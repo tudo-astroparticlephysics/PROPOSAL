@@ -316,7 +316,7 @@ void Medium::init() {
     }
 
     radiationLength_ = aux2 / aux1;
-    // radiationLength_ /= massDensity_;
+    radiationLength_ /= massDensity_;
 }
 
 // ------------------------------------------------------------------------- //

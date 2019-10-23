@@ -18,17 +18,22 @@
 
 using namespace PROPOSAL;
 
-ParticleDef getParticleDef(const std::string& name) {
-    if (name == "MuMinus") {
+ParticleDef getParticleDef(const std::string& name)
+{
+    if (name == "MuMinus")
+    {
         return MuMinusDef::Get();
-    } else if (name == "TauMinus") {
+    } else if (name == "TauMinus")
+    {
         return TauMinusDef::Get();
-    } else {
+    } else
+    {
         return EMinusDef::Get();
     }
 }
 
-TEST(Comparison, Comparison_equal) {
+TEST(Comparison, Comparison_equal)
+{
     Particle mu = Particle(MuMinusDef::Get());
     Water water(1.0);
 
@@ -57,8 +62,9 @@ TEST(Comparison, Comparison_equal) {
     EXPECT_TRUE(*highInt1 == highInt2);
 }
 
-TEST(Comparison, Comparison_not_equal) {
-    Particle mu = Particle(MuMinusDef::Get());
+TEST(Comparison, Comparison_not_equal)
+{
+    Particle mu  = Particle(MuMinusDef::Get());
     Particle tau = Particle(TauMinusDef::Get());
     Water water(1.0);
     Ice ice;
@@ -102,7 +108,8 @@ TEST(Comparison, Comparison_not_equal) {
     EXPECT_TRUE(highInt1 != highInt4);
 }
 
-TEST(Assignment, Copyconstructor) {
+TEST(Assignment, Copyconstructor)
+{
     Particle mu = Particle(MuMinusDef::Get());
     Water water(1.0);
 
@@ -111,7 +118,8 @@ TEST(Assignment, Copyconstructor) {
     EXPECT_TRUE(moliere1 == moliere2);
 }
 
-TEST(Assignment, Copyconstructor2) {
+TEST(Assignment, Copyconstructor2)
+{
     Particle mu = Particle(MuMinusDef::Get());
     Water water(1.0);
 
@@ -120,13 +128,15 @@ TEST(Assignment, Copyconstructor2) {
     EXPECT_TRUE(moliere1 == moliere2);
 }
 
-TEST(Scattering, Scatter) {
+TEST(Scattering, Scatter)
+{
     std::ifstream in;
     std::string filename = "bin/TestFiles/Scattering_scatter.txt";
 
     in.open(filename.c_str());
 
-    if (!in.good()) {
+    if (!in.good())
+    {
         std::cerr << "File \"" << filename << "\" not found" << std::endl;
     }
 
@@ -137,7 +147,7 @@ TEST(Scattering, Scatter) {
     double energy_init, energy_final, distance;
     double energy_previous = -1;
     double ecut, vcut;
-    Vector3D position_init = Vector3D(0, 0, 0);
+    Vector3D position_init  = Vector3D(0, 0, 0);
     Vector3D direction_init = Vector3D(1, 0, 0);
     direction_init.CalculateSphericalCoordinates();
     double x_f, y_f, z_f;
@@ -145,14 +155,15 @@ TEST(Scattering, Scatter) {
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
-    double error = 1e-3;
+    double error    = 1e-3;
     bool first_line = true;
 
-    while (in.good()) {
-        if (first_line) {
-            in >> particleName >> mediumName >> parametrization >> ecut >>
-                vcut >> energy_init >> energy_final >> distance >> x_f >> y_f >>
-                z_f >> radius_f >> phi_f >> theta_f;
+    while (in.good())
+    {
+        if (first_line)
+        {
+            in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >>
+                distance >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
 
             first_line = false;
         }
@@ -160,7 +171,7 @@ TEST(Scattering, Scatter) {
         energy_previous = -1;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Particle particle = Particle(particle_def);
+        Particle particle        = Particle(particle_def);
         particle.SetEnergy(energy_init);
         particle.SetPosition(position_init);
         particle.SetDirection(direction_init);
@@ -170,21 +181,19 @@ TEST(Scattering, Scatter) {
 
         Scattering* scattering = NULL;
 
-        std::cout << "before if param==High" << std::endl;
-        if (parametrization == "HighlandIntegral") {
-            Utility utility(particle_def, *medium, ecuts, Utility::Definition(),
-                            InterpolationDef());
-            scattering = ScatteringFactory::Get().CreateScattering(
-                parametrization, particle, utility, InterpolationDef());
-        } else {
-            Utility utility(particle_def, *medium, ecuts,
-                            Utility::Definition());
-            scattering = ScatteringFactory::Get().CreateScattering(
-                parametrization, particle, utility, InterpolationDef());
+        if (parametrization == "HighlandIntegral")
+        {
+            Utility utility(particle_def, *medium, ecuts, Utility::Definition(), InterpolationDef());
+            scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle, utility, InterpolationDef());
+        }
+        else
+        {
+            Utility utility(particle_def, *medium, ecuts, Utility::Definition());
+            scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle, utility, InterpolationDef());
         }
 
-        std::cout << "before energy check" << std::endl;
-        while (energy_previous < energy_init) {
+        while (energy_previous < energy_init)
+        {
             energy_previous = energy_init;
 
             particle.SetEnergy(energy_init);
@@ -193,23 +202,16 @@ TEST(Scattering, Scatter) {
 
             scattering->Scatter(distance, energy_init, energy_final);
 
-            ASSERT_NEAR(particle.GetPosition().GetX(), x_f,
-                        std::abs(error * x_f));
-            ASSERT_NEAR(particle.GetPosition().GetY(), y_f,
-                        std::abs(error * y_f));
-            ASSERT_NEAR(particle.GetPosition().GetZ(), z_f,
-                        std::abs(error * z_f));
+            ASSERT_NEAR(particle.GetPosition().GetX(), x_f, std::abs(error * x_f));
+            ASSERT_NEAR(particle.GetPosition().GetY(), y_f, std::abs(error * y_f));
+            ASSERT_NEAR(particle.GetPosition().GetZ(), z_f, std::abs(error * z_f));
 
-            ASSERT_NEAR(particle.GetDirection().GetRadius(), radius_f,
-                        std::abs(error * radius_f));
-            ASSERT_NEAR(particle.GetDirection().GetPhi(), phi_f,
-                        std::abs(error * phi_f));
-            ASSERT_NEAR(particle.GetDirection().GetTheta(), theta_f,
-                        std::abs(error * theta_f));
+            ASSERT_NEAR(particle.GetDirection().GetRadius(), radius_f, std::abs(error * radius_f));
+            ASSERT_NEAR(particle.GetDirection().GetPhi(), phi_f, std::abs(error * phi_f));
+            ASSERT_NEAR(particle.GetDirection().GetTheta(), theta_f, std::abs(error * theta_f));
 
-            in >> particleName >> mediumName >> parametrization >> ecut >>
-                vcut >> energy_init >> energy_final >> distance >> x_f >> y_f >>
-                z_f >> radius_f >> phi_f >> theta_f;
+            in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >>
+                distance >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
         }
 
         delete medium;
@@ -217,7 +219,8 @@ TEST(Scattering, Scatter) {
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
