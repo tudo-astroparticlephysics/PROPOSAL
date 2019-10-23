@@ -404,7 +404,13 @@ double Sector::Propagate(double distance) {
                     Sector::ParticleLocation::InsideDetector) {
                     Output::getInstance().FillSecondaryVector(continuous_loss);
                 }
-            } else {
+                else
+                {
+                    delete continuous_loss;
+                }
+            }
+            else
+            {
                 Output::getInstance().FillSecondaryVector(continuous_loss);
             }
         }
