@@ -42,12 +42,15 @@ public:
      * @param[in] config_file path to the configuration file where all the
                               energy cuts, interpolation settings, cross
                               section parametrizations, etc are set
+     * @param[in] slice_tracks Emit slices of track between stochastic losses,
+                               and set the parent track shape to Dark.
      * @param[in] final_loss  The rest energy after propagation of a given
                               distance is stored in this particel, if given
     * @param[in] distance     Maximum distance to propagate, default: 1e20cm
     **/
     I3PropagatorServicePROPOSAL(
         std::string configfile = "",
+        bool slice_tracks = true,
         I3Particle::ParticleType final_loss = I3Particle::unknown,
         double distance = 1e20
     );
@@ -68,6 +71,7 @@ private:
     I3PROPOSALParticleConverter particle_converter_;
 
     I3Particle::ParticleType final_stochastic_loss_;
+    bool slice_tracks_;
     double distance_to_propagate_;
 
     // default, assignment, and copy constructor declared private

@@ -17,11 +17,13 @@ I3_PYTHON_MODULE(PROPOSAL)
            bases<I3PropagatorService>,
            boost::noncopyable>(
             "I3PropagatorServicePROPOSAL",
-            init<std::string, I3Particle::ParticleType, double>(
+            init<std::string, bool, I3Particle::ParticleType, double>(
                 (arg("config_file")           = PROPOSAL::I3PropagatorServicePROPOSAL::GetDefaultConfigFile(),
+                 arg("slice_tracks") = true,
                  arg("final_stochastic_loss") = I3Particle::unknown,
                  arg("distance_to_propagate") = 1e20),
                 ":param config_file: Path to the configuration file\n"
+                ":param slice_tracks: Emit slices of track between stochastic losses, and set the parent track shape to Dark.\n"
                 ":param final_stochastic_loss: Finalize the propagation with a stochastic loss of the given type. Use a "
                 "ParticleType different from unknown to enable this feature. The data are stored in a particle of that given type.\n"
                 ":param distance_to_propagate: Stop the propagation if this propagation length is reached\n")

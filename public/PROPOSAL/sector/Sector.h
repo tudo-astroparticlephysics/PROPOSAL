@@ -183,6 +183,7 @@ public:
     const Utility& GetUtility() const { return utility_; }
     const Medium* GetMedium() const { return &utility_.GetMedium(); }
     const Definition& GetSectorDef() const { return sector_def_; }
+    Definition& GetSectorDef() { return sector_def_; }
 
 protected:
     Sector& operator=(const Sector&); // Undefined & not allowed

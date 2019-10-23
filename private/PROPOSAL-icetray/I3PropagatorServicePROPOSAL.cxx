@@ -24,11 +24,15 @@ using namespace PROPOSAL;
 
 
 // ------------------------------------------------------------------------- //
-I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string configfile, I3Particle::ParticleType final_loss, double distance)
+I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string configfile,
+    bool slice_tracks,
+    I3Particle::ParticleType final_loss,
+    double distance)
     : I3PropagatorService()
     , config_file_(PROPOSAL::Helper::ResolvePath(configfile))
     , proposal_service_()
     , final_stochastic_loss_(final_loss)
+    , slice_tracks_(slice_tracks)
     , distance_to_propagate_(distance)
 {
     if (config_file_.empty())
@@ -37,13 +41,9 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string configfile,
     }
 
     log_info("Using configuration file: \"%s\"", config_file_.c_str());
-
-    proposal_service_.RegisterPropagator(Propagator(MuMinusDef::Get(), config_file_));
-    proposal_service_.RegisterPropagator(Propagator(MuPlusDef::Get(), config_file_));
-    proposal_service_.RegisterPropagator(Propagator(TauMinusDef::Get(), config_file_));
-    proposal_service_.RegisterPropagator(Propagator(TauPlusDef::Get(), config_file_));
-
-    log_info("Propagator created for muons and taus");
+    for (auto ptype : {I3Particle::MuMinus, I3Particle::MuPlus, I3Particle::TauMinus, I3Particle::TauPlus}) {
+        RegisterParticleType(ptype);
+    }
 }
 
 // ------------------------------------------------------------------------- //
@@ -82,14 +82,21 @@ void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr ra
 void I3PropagatorServicePROPOSAL::RegisterParticleType(I3Particle::ParticleType ptype)
 {
     ParticleDef particle_def = particle_converter_.GeneratePROPOSALType(ptype);
-    std::cout << particle_def << std::endl;
+    log_debug_stream(particle_def);
 
     // If ptype is not known an empty particle definition is returned (e.g. empty name)
     // Do not register unkown particles
     if (!particle_def.name.empty())
     {
-        proposal_service_.RegisterPropagator(Propagator(particle_def, config_file_));
-        std::cout << "particle registered" << std::endl;
+        auto propagator = Propagator(particle_def, config_file_);
+        // ensure that secondary output modes match settings
+        for(auto sector : propagator.GetSectors()) {
+            i3_assert(sector);
+            sector->GetSectorDef().do_continuous_energy_loss_output = slice_tracks_;
+            sector->GetSectorDef().only_loss_inside_detector = true;
+        }
+        proposal_service_.RegisterPropagator(propagator);
+        log_debug_stream("particle registered");
     }
 }
 
@@ -102,13 +109,9 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
     std::vector<I3Particle> daughters;
 
     log_trace("location type = %d", p.GetLocationType());
-    if (p.GetLocationType() != I3Particle::InIce)
-        return std::vector<I3Particle>();
-
-    if ((p.GetType() == I3Particle::NuE) || (p.GetType() == I3Particle::NuEBar) || (p.GetType() == I3Particle::NuMu) ||
-        (p.GetType() == I3Particle::NuMuBar) || (p.GetType() == I3Particle::NuTau) ||
-        (p.GetType() == I3Particle::NuTauBar))
-        return std::vector<I3Particle>();
+    if (p.GetLocationType() != I3Particle::InIce || 
+        !proposal_service_.IsRegistered(particle_converter_.GeneratePROPOSALType(p.GetType())))
+        return daughters;
 
     log_trace("particle to propagate:\n"
               "type/energy[GeV]/posx[m]/posy[m]/posz[m]/theta[deg]/phi[deg]/length[m]\n"
@@ -163,6 +166,9 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, std::vector<
     if (mmcTrack)
         mmcTrack->SetParticle(p);
 
+    double currentEnergy = (mmcTrack && mmcTrack->GetEi() > 0) ?
+        mmcTrack->GetEi() : p.GetEnergy();
+
     for (int i = 0; i < nParticles; i++)
     {
         // this should be a stochastic
@@ -184,6 +190,34 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, std::vector<
         // this is not the particle you're looking for
         // move along...and add it to the daughter list
         daughters.push_back(particle_converter_.GenerateI3Particle(*secondaries.at(i)));
+        I3Particle &segment = daughters.back();
+
+        // I3PropagatorModule and related clients will not return secondaries
+        // to the originating propagator by default. To force muon secondaries
+        // (e.g. from pair production) to themselves be propagated, we unset
+        // their length.
+        if (secondaries.at(i)->GetTypeId() == PROPOSAL::DynamicData::Particle
+            && proposal_service_.IsRegistered(static_cast<const PROPOSAL::Particle*>(secondaries.at(i))->GetParticleDef())
+            && segment.GetLength() == 0)
+        {
+            segment.SetLength(NAN);
+        }
+
+        // Emit track segments with the current energy for use with
+        // parameterizations such as https://arxiv.org/abs/1206.5530
+        if (slice_tracks_) {
+            double energyLoss = segment.GetEnergy();
+            if (segment.GetType() == I3Particle::ContinuousEnergyLoss) {
+                segment.SetType(p.GetType());
+                segment.SetEnergy(currentEnergy);
+            }
+            currentEnergy -= std::min(energyLoss, currentEnergy);
+        }
+    }
+    // Mark the parent track as Dark; its light yield is already accounted for
+    // by the track segments.
+    if (slice_tracks_) {
+        p.SetShape(I3Particle::Dark);
     }
 
     if (final_stochastic_loss_ != I3Particle::unknown)
