@@ -710,6 +710,33 @@ AntaresWater::AntaresWater(double rho)
 
 }
 
+// chemical composition is normalized with respect to hydrogen: calculate a
+// total atomic weight that yields two hydrogen atoms; use this weight to
+// calculate the numbers of atoms for all other elements
+CascadiaBasinWater::CascadiaBasinWater(double rho)
+    : Medium(
+        "cascadiabasinwater",
+        rho,
+        75.,       // I
+        -3.5017,   // C
+        0.09116,   // a
+        3.4773,    // m
+        0.2400,    // X0
+        2.8004,    // X1
+        0.,        // d0
+        1.0400322, // massDensity
+        {
+            std::make_shared<Components::Component>(Components::Hydrogen(2.0)),
+            std::make_shared<Components::Component>(Components::Oxygen(1.0021)),
+            std::make_shared<Components::Component>(Components::Sodium(8.7174e-3)),
+            std::make_shared<Components::Component>(Components::Magnesium(9.8180e-4)),
+            std::make_shared<Components::Component>(Components::Calcium(1.9113e-4)),
+            std::make_shared<Components::Component>(Components::Potassium(1.8975e-4)),
+            std::make_shared<Components::Component>(Components::Chlorine(1.0147e-2)),
+            std::make_shared<Components::Component>(Components::Sulfur(5.2487e-4))
+        })
+{}
+
 /******************************************************************************
  *                        private Helper Funcitons                             *
  ******************************************************************************/

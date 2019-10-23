@@ -27,6 +27,7 @@ MediumFactory::MediumFactory()
     Register("air", Air, &Air::create);
     Register("paraffin", Paraffin, &Paraffin::create);
     Register("antareswater", AntaresWater, &AntaresWater::create);
+    Register("cascadiabasinwater", CascadiaBasinWater, &CascadiaBasinWater::create);
 }
 
 MediumFactory::~MediumFactory()
