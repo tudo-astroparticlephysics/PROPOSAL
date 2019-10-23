@@ -404,6 +404,10 @@ double Sector::Propagate(double distance)
                 {
                     Output::getInstance().FillSecondaryVector(continuous_loss);
                 }
+                else
+                {
+                    delete continuous_loss;
+                }
             }
             else
             {
