@@ -99,7 +99,7 @@ long double ScatteringHighlandIntegral::CalculateTheta0(double dr, double ei, do
                               scatter_->GetUtility().GetMedium().GetDensityDistribution().Evaluate(
                                       particle_.GetPosition());
     double cutoff           = 1;
-    double radiation_lenght = scatter_->GetUtility().GetMedium().GetRadiationLength(
+    double radiation_length = scatter_->GetUtility().GetMedium().GetRadiationLength(
                                       particle_.GetPosition());
 
     aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_length) * std::abs(particle_.GetCharge());
