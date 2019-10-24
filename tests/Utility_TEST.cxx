@@ -6,8 +6,7 @@
 
 using namespace PROPOSAL;
 
-TEST(Comparison, Comparison_equal)
-{
+TEST(Comparison, Comparison_equal) {
     Water water(1.0);
     EnergyCutSettings ecuts;
     ParticleDef pDef(MuMinusDef::Get());
@@ -19,8 +18,7 @@ TEST(Comparison, Comparison_equal)
     EXPECT_TRUE(utils1 == utils2);
 }
 
-TEST(Comparison, Comparison_not_equal)
-{
+TEST(Comparison, Comparison_not_equal) {
     Water water1(1.0);
     Water water2(0.9);
 
@@ -42,34 +40,35 @@ TEST(Comparison, Comparison_not_equal)
     EXPECT_TRUE(utils1 != utils4);
 }
 
-TEST(Copyconstructor, Copyconstructor)
-{
-    Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition());
+TEST(Copyconstructor, Copyconstructor) {
+    Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(),
+              Utility::Definition());
     Utility B(A);
 
     EXPECT_TRUE(A == B);
 
-    Utility C(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
+    Utility C(MuMinusDef::Get(), Ice(), EnergyCutSettings(),
+              Utility::Definition(), InterpolationDef());
     Utility D(C);
 
     EXPECT_TRUE(C == D);
 }
 
-TEST(Copyconstructor, Copyconstructor2)
-{
-    Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition());
+TEST(Copyconstructor, Copyconstructor2) {
+    Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(),
+              Utility::Definition());
     Utility B = A;
 
     EXPECT_TRUE(A == B);
 
-    Utility C(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
+    Utility C(MuMinusDef::Get(), Ice(), EnergyCutSettings(),
+              Utility::Definition(), InterpolationDef());
     Utility D = C;
 
     EXPECT_TRUE(C == D);
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

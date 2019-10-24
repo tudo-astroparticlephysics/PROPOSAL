@@ -125,7 +125,7 @@ private:
     // ----------------------------------------------------------------------------
     /// @brief Create geometry from json config file
     ///
-    /// @param pt boost property tree
+    /// @param std::string containing the json config for the geometry
     ///
     /// @return new Geometry
     // ----------------------------------------------------------------------------

@@ -104,7 +104,6 @@ and if you want to cite the latest improvements
 
 ## Requirements ##
 
-- Boost Library 1.48 or higher
 - [log4cplus](https://github.com/log4cplus/log4cplus) 2.0.2
 - CMake 2.8 or higher
 

@@ -16,6 +16,7 @@
 #include "simclasses/I3MMCTrack.h"
 
 #include "PROPOSAL/PROPOSAL.h"
+#include "PROPOSAL-icetray/Converter.h"
 
 class I3Particle;
 
@@ -41,12 +42,15 @@ public:
      * @param[in] config_file path to the configuration file where all the
                               energy cuts, interpolation settings, cross
                               section parametrizations, etc are set
+     * @param[in] slice_tracks Emit slices of track between stochastic losses,
+                               and set the parent track shape to Dark.
      * @param[in] final_loss  The rest energy after propagation of a given
                               distance is stored in this particel, if given
     * @param[in] distance     Maximum distance to propagate, default: 1e20cm
     **/
     I3PropagatorServicePROPOSAL(
         std::string configfile = "",
+        bool slice_tracks = true,
         I3Particle::ParticleType final_loss = I3Particle::unknown,
         double distance = 1e20
     );
@@ -64,8 +68,10 @@ private:
     I3RandomServicePtr rng_;
     std::string config_file_;
     PropagatorService proposal_service_;
+    I3PROPOSALParticleConverter particle_converter_;
 
     I3Particle::ParticleType final_stochastic_loss_;
+    bool slice_tracks_;
     double distance_to_propagate_;
 
     // default, assignment, and copy constructor declared private
@@ -80,6 +86,7 @@ private:
     boost::shared_ptr<I3MMCTrack> GenerateMMCTrack(PROPOSAL::Particle* particle);
 
     boost::shared_ptr<I3MMCTrack> propagate(I3Particle& p, std::vector<I3Particle>& daughters);
+    PROPOSAL::ParticleDef GeneratePROPOSALType(const I3Particle::ParticleType& ptype_I3) const;
 };
 
 I3_POINTER_TYPEDEFS(I3PropagatorServicePROPOSAL);

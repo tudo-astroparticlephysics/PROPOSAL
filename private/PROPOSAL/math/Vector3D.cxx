@@ -210,10 +210,11 @@ double Vector3D::magnitude() const
 
 void Vector3D::normalise()
 {
-    double length = std::sqrt(x_ * x_ + y_ * y_ + z_ * z_);
-    x_            = x_ / length;
-    y_            = y_ / length;
-    z_            = z_ / length;
+    double length   = std::sqrt(x_ * x_ + y_ * y_ + z_ * z_);
+    x_              = x_ / length;
+    y_              = y_ / length;
+    z_              = z_ / length;
+    spheric_radius_ = 1;
 }
 
 //----------------------------------------------------------------------//

@@ -26,7 +26,6 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include <vector>
@@ -35,13 +34,15 @@
 #include "PROPOSAL/crossection/factories/ComptonFactory.h"
 #include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"
-#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
 #include "PROPOSAL/crossection/factories/MupairProductionFactory.h"
+#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
 #include "PROPOSAL/crossection/factories/WeakInteractionFactory.h"
 #include "PROPOSAL/crossection/factories/PhotoPairFactory.h"
 #include "PROPOSAL/crossection/factories/AnnihilationFactory.h"
 
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
 namespace PROPOSAL {
@@ -51,11 +52,9 @@ class Medium;
 
 struct InterpolationDef;
 
-class Utility
-{
-public:
-    struct Definition
-    {
+class Utility {
+   public:
+    struct Definition {
         BremsstrahlungFactory::Definition brems_def;
         ComptonFactory::Definition compton_def;
         PhotonuclearFactory::Definition photo_def;
@@ -66,7 +65,6 @@ public:
         PhotoPairFactory::Definition photopair_def;
         AnnihilationFactory::Definition annihilation_def;
 
-
         bool operator==(const Utility::Definition& utility_def) const;
         bool operator!=(const Utility::Definition& utility_def) const;
 
@@ -74,22 +72,33 @@ public:
         ~Definition();
     };
 
-public:
-    Utility(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition);
-    Utility(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition, const InterpolationDef&);
+   public:
+    Utility(const ParticleDef&,
+            const Medium&,
+            const EnergyCutSettings&,
+            Definition);
+    Utility(const ParticleDef&,
+            const Medium&,
+            const EnergyCutSettings&,
+            Definition,
+            const InterpolationDef&);
     Utility(const std::vector<CrossSection*>&);
     Utility(const Utility&);
     virtual ~Utility();
+
+    const Utility* clone() const {return new Utility(*this);}
 
     bool operator==(const Utility& utility) const;
     bool operator!=(const Utility& utility) const;
 
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const Medium& GetMedium() const { return *medium_; }
-    const std::vector<CrossSection*>& GetCrosssections() const { return crosssections_; }
+    const std::vector<CrossSection*>& GetCrosssections() const {
+        return crosssections_;
+    }
 
-protected:
-    Utility& operator=(const Utility&); // Undefined & not allowed
+   protected:
+    Utility& operator=(const Utility&);  // Undefined & not allowed
 
     // --------------------------------------------------------------------- //
     // Protected members
@@ -102,9 +111,8 @@ protected:
     std::vector<CrossSection*> crosssections_;
 };
 
-class UtilityDecorator
-{
-public:
+class UtilityDecorator {
+   public:
     UtilityDecorator(const Utility&);
 
     // Copy constructors
@@ -119,12 +127,14 @@ public:
     // Methods
     virtual double FunctionToIntegral(double energy);
     virtual double Calculate(double ei, double ef, double rnd) = 0;
-    virtual double GetUpperLimit(double ei, double rnd)        = 0;
+    virtual double Calculate(double, double, double, Vector3D, Vector3D);
+    virtual double GetUpperLimit(double ei, double rnd) = 0;
 
     const Utility& GetUtility() const { return utility_; }
 
-protected:
-    UtilityDecorator& operator=(const UtilityDecorator&); // Undefined & not allowed
+   protected:
+    UtilityDecorator& operator=(
+        const UtilityDecorator&);  // Undefined & not allowed
 
     // Implemented in child classes to be able to use equality operator
     virtual bool compare(const UtilityDecorator&) const = 0;
@@ -132,4 +142,4 @@ protected:
     const Utility& utility_;
 };
 
-} // namespace PROPOSAL
+}  // namespace PROPOSAL

@@ -184,6 +184,7 @@ TEST(Normalise, Operator)
     EXPECT_TRUE(A != C);
     EXPECT_TRUE(B != C);
     A.normalise();
+    C.SetSphericalCoordinates(1,0,0);
     EXPECT_TRUE(A == C);
     B.normalise();
     EXPECT_TRUE(B != C);

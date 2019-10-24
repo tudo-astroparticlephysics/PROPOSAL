@@ -5,6 +5,8 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 
+#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
+
 using namespace PROPOSAL;
 
 TEST(Comparison, Comparison_equal)
@@ -160,6 +162,24 @@ TEST(Assignment, Swap)
 
     Copper Z(0.3);
     EXPECT_TRUE(*X == Z);
+}
+
+TEST(Density_distr, Evaluate)
+{
+    Water A;
+    Water B;
+
+    double corr_faktor = 1.0;
+    Density_homogeneous dens_hom(corr_faktor);
+    A.SetDensityDistribution(dens_hom);
+    B.SetDensityDistribution(dens_hom); 
+
+    Vector3D test_point (2,1,0);
+
+    double DensA = A.GetDensityDistribution().Evaluate(test_point);
+    double DensB = B.GetDensityDistribution().Evaluate(test_point);
+
+    EXPECT_TRUE(DensA == DensB);
 }
 
 int main(int argc, char** argv)

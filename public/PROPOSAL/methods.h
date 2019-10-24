@@ -69,8 +69,7 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
 // ----------------------------------------------------------------------------
 /// @brief Implementation of inverse error function
 ///
-/// It is done for performance test with valgrind --tool=callgrind.
-/// This tool has problems with boost::math::erf_inv.
+/// THis is the implementation of the inverse errot function.
 ///
 /// @param x
 ///

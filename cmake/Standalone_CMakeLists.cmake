@@ -50,6 +50,7 @@ OPTION(ADD_PYTHON "Choose to compile the python wrapper library" ON)
 OPTION(ADD_ROOT "Choose to compile ROOT examples." OFF)
 OPTION(ADD_PERFORMANCE_TEST "Choose to compile the performace test source." OFF)
 OPTION(ADD_TESTS "Build all unittests." OFF)
+OPTION(ADD_CPPEXAMPLE "Choose to compile Cpp example." ON)
 
 #################################################################
 #################           python      #########################
@@ -153,7 +154,7 @@ endif (ADD_TESTS)
 
 SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${CMAKE_THREAD_LIBS_INIT})
 
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/public" "${PROJECT_SOURCE_DIR}" ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/public" "${PROJECT_SOURCE_DIR}" ${LOG4CPLUS_INCLUDE_DIR} )
 
 # FILE(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*.cxx)
 FILE(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*)
@@ -166,8 +167,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 # The following warnings are silenced, because they arise in the dependencies:
 # -Wno-c++11-long-long : "long long" only occurs in ROOT 5
-# -Wno-variadic-macros : only in output.h; has something todo with BOOST
-# -Wno-gnu-zero-variadic-macro-arguments : this is also a warning comming from BOOST occuring e.g. in log_fatal()
 
 TARGET_LINK_LIBRARIES(PROPOSAL ${LIBRARYS_TO_LINK})
 
@@ -199,17 +198,19 @@ ADD_EXECUTABLE(WriteSectorsFromDomList
 )
 TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
 
-ADD_EXECUTABLE(example
-        private/test/example.cxx
-)
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+IF(ADD_CPPEXAMPLE)
+    ADD_EXECUTABLE(example
+            private/test/example.cxx
+    )
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
 endif()
 
 TARGET_LINK_LIBRARIES(example PROPOSAL)
+ENDIF(ADD_CPPEXAMPLE)
+
 
 IF(ADD_PERFORMANCE_TEST)
 	ADD_EXECUTABLE(performance_test
@@ -250,7 +251,7 @@ IF(ADD_TESTS)
   ADD_EXECUTABLE(UnitTest_Medium tests/Medium_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Particle tests/Particle_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_ParticleDef tests/ParticleDef_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_DecayChannel tests/DecayChannel_TEST.cxx)
+  # ADD_EXECUTABLE(UnitTest_DecayChannel tests/DecayChannel_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_DecayTable tests/DecayTable_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_EnergyCutSettings tests/EnergyCutSettings_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_ContinuousRandomization tests/ContinuousRandomization_TEST.cxx)
@@ -258,6 +259,9 @@ IF(ADD_TESTS)
   ADD_EXECUTABLE(UnitTest_Vector3D tests/Vector3D_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Propagation tests/Propagation_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Sector tests/Sector_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_MathMethods tests/MathMethods_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Spline tests/Spline_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Density tests/Density_distribution_TEST.cxx)
 
   TARGET_LINK_LIBRARIES(UnitTest_Utility PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Scattering PROPOSAL ${gtest_LIBRARIES})
@@ -275,7 +279,7 @@ IF(ADD_TESTS)
   TARGET_LINK_LIBRARIES(UnitTest_Medium PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Particle PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_ParticleDef PROPOSAL ${gtest_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_DecayChannel PROPOSAL ${gtest_LIBRARIES})
+  # TARGET_LINK_LIBRARIES(UnitTest_DecayChannel PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_DecayTable PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_EnergyCutSettings PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_ContinuousRandomization PROPOSAL ${gtest_LIBRARIES})
@@ -283,6 +287,9 @@ IF(ADD_TESTS)
   TARGET_LINK_LIBRARIES(UnitTest_Vector3D PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Propagation PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Sector PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_MathMethods PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Spline PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Density PROPOSAL ${gtest_LIBRARIES})
 
   ADD_TEST(UnitTest_Utility bin/UnitTest_Utility)
   ADD_TEST(UnitTest_Scattering bin/UnitTest_Scattering)
@@ -291,7 +298,7 @@ IF(ADD_TESTS)
   ADD_TEST(UnitTest_Medium bin/UnitTest_Medium)
   ADD_TEST(UnitTest_Particle bin/UnitTest_Particle)
   ADD_TEST(UnitTest_ParticleDef bin/UnitTest_ParticleDef)
-  ADD_TEST(UnitTest_DecayChannel bin/UnitTest_DecayChannel)
+  # ADD_TEST(UnitTest_DecayChannel bin/UnitTest_DecayChannel)
   ADD_TEST(UnitTest_DecayTable bin/UnitTest_DecayTable)
   ADD_TEST(UnitTest_EnergyCutSettings bin/UnitTest_EnergyCutSettings)
   ADD_TEST(UnitTest_Interpolant bin/UnitTest_Interpolant)
@@ -308,6 +315,9 @@ IF(ADD_TESTS)
   ADD_TEST(UnitTest_Vector3D bin/UnitTest_Vector3D)
   ADD_TEST(UnitTest_Propagation bin/UnitTest_Propagation)
   ADD_TEST(UnitTest_Sector bin/UnitTest_Sector)
+  ADD_TEST(UnitTest_MathMethods bin/UnitTest_MathMethods)
+  ADD_TEST(UnitTest_Spline bin/UnitTest_Spline)
+  ADD_TEST(UnitTest_Density bin/UnitTest_Density)
 
 ENDIF()
 
@@ -316,9 +326,12 @@ ADD_SUBDIRECTORY( doc )
 
 IF(ADD_PYTHON)
 	IF(PYTHONLIBS_FOUND AND pybind11_FOUND)
-		PYBIND11_ADD_MODULE(pyPROPOSAL SHARED private/python/pybindings.cxx)
+        FILE(GLOB_RECURSE PYTHON_SRC_FILES ${PROJECT_SOURCE_DIR}/private/python/*)
+        INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/public/python )
+		PYBIND11_ADD_MODULE(pyPROPOSAL SHARED ${PYTHON_SRC_FILES})
 		TARGET_LINK_LIBRARIES(pyPROPOSAL PRIVATE PROPOSAL)
-		SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" SUFFIX ".so" COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
+		SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" SUFFIX ".so"
+            COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
 		INSTALL(TARGETS pyPROPOSAL DESTINATION lib)
 	ENDIF(PYTHONLIBS_FOUND AND pybind11_FOUND)
 ENDIF(ADD_PYTHON)
@@ -331,4 +344,3 @@ CONFIGURE_FILE(
 
 ADD_CUSTOM_TARGET(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-

@@ -15,6 +15,7 @@
 #include "phys-services/I3RandomService.h"
 
 #include "PROPOSAL/PROPOSAL.h"
+#include "PROPOSAL-icetray/Converter.h"
 
 /**
  * @brief A simple muon energy-loss calculator
@@ -76,6 +77,7 @@ public:
 
 private:
     PROPOSAL::Propagator* propagator_;
+    I3PROPOSALParticleConverter particle_converter_;
     I3Particle::ParticleType final_stochastic_loss_;
 };
 } // namespace PROPOSAL
