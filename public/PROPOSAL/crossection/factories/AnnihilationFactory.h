@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include <boost/bimap.hpp>
+#include <map>
 #include <functional>
 
 #include "PROPOSAL/methods.h"
@@ -93,7 +93,7 @@ namespace PROPOSAL {
         typedef std::map<std::string, RegisterFunction > AnnihilationMapString;
         typedef std::map<Enum, RegisterFunction > AnnihilationMapEnum;
 
-        typedef boost::bimap<std::string, Enum> BimapStringEnum;
+        typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
         // --------------------------------------------------------------------- //
         // Most general creation

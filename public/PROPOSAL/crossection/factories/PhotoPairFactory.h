@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include <boost/bimap.hpp>
 #include <functional>
 
 #include <map>
@@ -108,13 +107,13 @@ namespace PROPOSAL {
 
         typedef std::map<std::string, RegisterFunction> PhotoPairMapString;
         typedef std::map<Enum, RegisterFunction> PhotoPairMapEnum;
-        typedef boost::bimap<std::string, Enum> BimapStringEnum;
+        typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
         typedef std::function<PhotoAngleDistribution*(const ParticleDef&, const Medium&)> RegisterPhotoAngleFunction;
 
         typedef std::map<std::string, RegisterPhotoAngleFunction> PhotoAngleMapString;
         typedef std::map<PhotoAngle, RegisterPhotoAngleFunction> PhotoAngleMapEnum;
-        typedef boost::bimap<std::string, PhotoAngle> BimapStringPhotoAngleEnum;
+        typedef Helper::Bimap<std::string, PhotoAngle> BimapStringPhotoAngleEnum;
 
         // --------------------------------------------------------------------- //
         // Most general creation

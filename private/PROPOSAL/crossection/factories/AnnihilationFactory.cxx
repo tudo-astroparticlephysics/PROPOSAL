@@ -82,7 +82,7 @@ void AnnihilationFactory::Register(const std::string& name,
 {
     annihilation_map_str_[name]    = create;
     annihilation_map_enum_[enum_t] = create;
-    string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
+    string_enum_.insert(name, enum_t);
 }
 
 // ------------------------------------------------------------------------- //
@@ -91,22 +91,25 @@ AnnihilationFactory::Enum AnnihilationFactory::GetEnumFromString(const std::stri
     std::string name_lower = name;
     std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
 
-    BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
-    if (it != string_enum_.left.end())
+    auto& left = string_enum_.GetLeft();
+    auto it = left.find(name_lower);
+    if (it != left.end())
     {
         return it->second;
     } else
     {
         log_fatal("Annihilation %s not registered!", name.c_str());
-        return Fail; // Just to prevent warnings
+        return AnnihilationFactory::Fail; // Just to prevent warnings
+
     }
 }
 
 // ------------------------------------------------------------------------- //
 std::string AnnihilationFactory::GetStringFromEnum(const AnnihilationFactory::Enum& enum_t)
 {
-    BimapStringEnum::right_const_iterator it = string_enum_.right.find(enum_t);
-    if (it != string_enum_.right.end())
+    auto& right = string_enum_.GetRight();
+    auto it = right.find(enum_t);
+    if (it != right.end())
     {
         return it->second;
     } else

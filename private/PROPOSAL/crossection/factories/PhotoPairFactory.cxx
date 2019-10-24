@@ -48,7 +48,7 @@ void PhotoPairFactory::Register(const std::string& name, Enum enum_t, RegisterFu
 {
     photopair_map_str_[name]    = create;
     photopair_map_enum_[enum_t] = create;
-    string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
+    string_enum_.insert(name, enum_t);
 }
 
 // --------------------------------------------------------------------- //
@@ -112,14 +112,15 @@ PhotoPairFactory::Enum PhotoPairFactory::GetEnumFromString(const std::string& na
     std::string name_lower = name;
     std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
 
-    BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
-    if (it != string_enum_.left.end())
+    auto& left = string_enum_.GetLeft();
+    auto it = left.find(name_lower);
+    if (it != left.end())
     {
         return it->second;
     } else
     {
         log_fatal("PhotoPair %s not registered!", name.c_str());
-        return PhotoPairFactory::Fail; // Just to prevent warinngs
+        return PhotoPairFactory::Fail; // Just to prevent warnings
 
     }
 }
@@ -127,8 +128,9 @@ PhotoPairFactory::Enum PhotoPairFactory::GetEnumFromString(const std::string& na
 // ------------------------------------------------------------------------- //
 std::string PhotoPairFactory::GetStringFromEnum(const PhotoPairFactory::Enum& enum_t)
 {
-    BimapStringEnum::right_const_iterator it = string_enum_.right.find(enum_t);
-    if (it != string_enum_.right.end())
+    auto& right = string_enum_.GetRight();
+    auto it = right.find(enum_t);
+    if (it != right.end())
     {
         return it->second;
     } else
@@ -147,8 +149,7 @@ void PhotoPairFactory::RegisterPhotoAngle(const std::string& name, const PhotoAn
 {
     photo_angle_map_str_[name]    = create;
     photo_angle_map_enum_[photoangle_t] = create;
-    string_photo_angle_enum_.insert(BimapStringPhotoAngleEnum::value_type(name, photoangle_t));
-}
+    string_photo_angle_enum_.insert(name, photoangle_t);}
 
 // ------------------------------------------------------------------------- //
 PhotoAngleDistribution* PhotoPairFactory::CreatePhotoAngleDistribution(
@@ -194,23 +195,25 @@ PhotoPairFactory::PhotoAngle PhotoPairFactory::GetPhotoAngleEnumFromString(const
     std::string name_lower = name;
     std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
 
-    BimapStringPhotoAngleEnum::left_const_iterator it = string_photo_angle_enum_.left.find(name_lower);
-    if (it != string_photo_angle_enum_.left.end())
+    auto& left = string_photo_angle_enum_.GetLeft();
+    auto it = left.find(name_lower);
+    if (it != left.end())
     {
         return it->second;
     } else
     {
         log_fatal("PhotoAngle %s not registered!", name.c_str());
         return PhotoPairFactory::PhotoAngleNoDeflection; // Just to prevent warnings
+
     }
 }
 
 // ------------------------------------------------------------------------- //
 std::string PhotoPairFactory::GetStringFromPhotoAngleEnum(const PhotoAngle& photoangle)
 {
-
-    BimapStringPhotoAngleEnum::right_const_iterator it = string_photo_angle_enum_.right.find(photoangle);
-    if (it != string_photo_angle_enum_.right.end())
+    auto& right = string_photo_angle_enum_.GetRight();
+    auto it = right.find(photoangle);
+    if (it != right.end())
     {
         return it->second;
     } else
