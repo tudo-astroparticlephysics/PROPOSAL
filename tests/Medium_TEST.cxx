@@ -166,25 +166,20 @@ TEST(Assignment, Swap)
 
 TEST(Density_distr, Evaluate)
 {
-    /* Water A; */
-    /* Water B; */
+    Water A;
+    Water B;
 
-    /* double corr_faktor = 1.0; */
-    /* Density_homogeneous dens_hom(corr_faktor); */
-    /* A.SetDensityDistribution(dens_hom); */
-    /* B.SetDensityDistribution(dens_hom); */
+    double corr_faktor = 1.0;
+    Density_homogeneous dens_hom(corr_faktor);
+    A.SetDensityDistribution(dens_hom);
+    B.SetDensityDistribution(dens_hom); 
 
-    /* Vector3D test_point (2,1,0); */
+    Vector3D test_point (2,1,0);
 
-    /* double DensA = A.GetDensityDistribution().Evaluate(test_point); */
-    /* double DensB = B.GetDensityDistribution().Evaluate(test_point); */
+    double DensA = A.GetDensityDistribution().Evaluate(test_point);
+    double DensB = B.GetDensityDistribution().Evaluate(test_point);
 
-    /* EXPECT_TRUE(DensA == DensB); */
-    EXPECT_TRUE(1 == 1);
-
-    /* Vector3D fp0(0,0,0); */
-    /* Vector3D fp1(1,0,0); */
-    /* Vector3D direction(1,0,0); */
+    EXPECT_TRUE(DensA == DensB);
 }
 
 int main(int argc, char** argv)
