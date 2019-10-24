@@ -71,7 +71,7 @@ protected:
 
     std::pair<double, double> function_and_derivative(double x, double parent_mass, double E_max, double right_side);
 
-    double FindRootBoost(double min, double parent_mass, double E_max, double right_side);
+    double FindRoot(double min, double parent_mass, double E_max, double right_side);
 };
 
 class LeptonicDecayChannel : public LeptonicDecayChannelApprox

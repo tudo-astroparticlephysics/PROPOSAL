@@ -87,7 +87,7 @@ std::pair<double, double> LeptonicDecayChannelApprox::function_and_derivative(do
 }
 
 // ------------------------------------------------------------------------- //
-double LeptonicDecayChannelApprox::FindRootBoost(double min, double parent_mass, double E_max, double right_side)
+double LeptonicDecayChannelApprox::FindRoot(double min, double parent_mass, double E_max, double right_side)
 {
     double max        = 1;
     double x_start    = 0.5;
@@ -119,7 +119,7 @@ DecayChannel::DecayProducts LeptonicDecayChannelApprox::Decay(const Particle& pa
     double f_max      = DecayRate(1.0, parent_mass, emax, 0.0);
     double right_side = f_min + (f_max - f_min) * RandomGenerator::Get().RandomDouble();
 
-    double find_root = FindRootBoost(x_min, parent_mass, emax, right_side);
+    double find_root = FindRoot(x_min, parent_mass, emax, right_side);
 
     double lepton_energy   = std::max(find_root * emax, massive_lepton_.mass);
     double lepton_momentum = std::sqrt((lepton_energy - massive_lepton_.mass) * (lepton_energy + massive_lepton_.mass));

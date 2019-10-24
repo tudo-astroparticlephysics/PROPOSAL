@@ -154,7 +154,7 @@ endif (ADD_TESTS)
 
 SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${CMAKE_THREAD_LIBS_INIT})
 
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/public" "${PROJECT_SOURCE_DIR}" ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/public" "${PROJECT_SOURCE_DIR}" ${LOG4CPLUS_INCLUDE_DIR} )
 
 # FILE(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*.cxx)
 FILE(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*)
@@ -167,8 +167,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 # The following warnings are silenced, because they arise in the dependencies:
 # -Wno-c++11-long-long : "long long" only occurs in ROOT 5
-# -Wno-variadic-macros : only in output.h; has something todo with BOOST
-# -Wno-gnu-zero-variadic-macro-arguments : this is also a warning comming from BOOST occuring e.g. in log_fatal()
 
 TARGET_LINK_LIBRARIES(PROPOSAL ${LIBRARYS_TO_LINK})
 

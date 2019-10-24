@@ -11,22 +11,19 @@ dependencies on your system.
 	apt install cmake \
 		doxygen \
 		liblog4cplus-dev
-		libboost-dev \
 
 ### Arch Linux ###
 
 	pacman -S cmake \
 		doxygen \
 		log4cplus \
-		gtest \
-		boost-libs
+		gtest
 
 ### Mac OS X ###
 
 	brew install cmake \
 		doxygen \
-		log4cplus \
-		boost \
+		log4cplus
 
 ## Install PROPOSAL ##
 

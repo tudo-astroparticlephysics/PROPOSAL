@@ -8,7 +8,7 @@ An example for Ubuntu 16.04 is given below.
 
 .. code-block:: shell
 
-   apt install cmake doxygen liblog4cplus-dev libboost-dev
+   apt install cmake doxygen liblog4cplus-dev
 
 Package names may vary depending on OS.
 Then you can install PROPOSAL at your preferred location.
