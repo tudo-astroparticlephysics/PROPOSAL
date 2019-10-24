@@ -56,7 +56,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.8
-            - libboost-dev
       env:
          - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
 
@@ -68,7 +67,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-            - libboost-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
@@ -82,7 +80,6 @@ matrix:
           packages:
             - clang-3.6
             - g++-4.9
-            - libboost-dev
       env:
         - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
@@ -96,7 +93,6 @@ matrix:
           packages:
             - clang-5.0
             - g++-7
-            - libboost-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
@@ -114,7 +110,6 @@ install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         brew upgrade;
         brew install cmake;
-        brew install boost;
       fi
     - ./install_log4cplus.sh
 
