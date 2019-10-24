@@ -1,7 +1,7 @@
 
-#include <sstream>
-#include <cmath>
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include <cmath>
+#include <sstream>
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 
@@ -15,45 +15,39 @@ Parametrization::Parametrization(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  const EnergyCutSettings& cuts,
                                  double multiplier)
-    : particle_def_(particle_def)
-    , medium_(medium.clone())
-    , cut_settings_(cuts)
-    , components_(medium_->GetComponents())
-    , component_index_(0)
-    , multiplier_(multiplier)
-{
-}
+    : particle_def_(particle_def),
+      medium_(medium.clone()),
+      cut_settings_(cuts),
+      components_(medium_->GetComponents()),
+      component_index_(0),
+      multiplier_(multiplier) {}
 
 Parametrization::Parametrization(const Parametrization& param)
-    : particle_def_(param.particle_def_)
-    , medium_(param.medium_->clone())
-    , cut_settings_(param.cut_settings_)
-    , components_(medium_->GetComponents())
-    , component_index_(param.component_index_) // //TODO(mario): Check better way Mon 2017/09/04
-    , multiplier_(param.multiplier_)
-{
-}
+    : particle_def_(param.particle_def_),
+      medium_(param.medium_->clone()),
+      cut_settings_(param.cut_settings_),
+      components_(medium_->GetComponents()),
+      component_index_(param.component_index_)  // //TODO(mario): Check better
+                                                // way Mon 2017/09/04
+      ,
+      multiplier_(param.multiplier_) {}
 
-Parametrization::~Parametrization()
-{
+Parametrization::~Parametrization() {
     delete medium_;
 }
 
-bool Parametrization::operator==(const Parametrization& parametrization) const
-{
+bool Parametrization::operator==(const Parametrization& parametrization) const {
     if (typeid(*this) != typeid(parametrization))
         return false;
     else
         return this->compare(parametrization);
 }
 
-bool Parametrization::operator!=(const Parametrization& parametrization) const
-{
+bool Parametrization::operator!=(const Parametrization& parametrization) const {
     return !(*this == parametrization);
 }
 
-bool Parametrization::compare(const Parametrization& parametrization) const
-{
+bool Parametrization::compare(const Parametrization& parametrization) const {
     if (particle_def_ != parametrization.particle_def_)
         return false;
     if (*medium_ != *parametrization.medium_)
@@ -68,8 +62,8 @@ bool Parametrization::compare(const Parametrization& parametrization) const
         return true;
 }
 
-std::ostream& PROPOSAL::operator<<(std::ostream& os, Parametrization const& param)
-{
+std::ostream& PROPOSAL::operator<<(std::ostream& os,
+                                   Parametrization const& param) {
     std::stringstream ss;
     ss << " Parametrization (" << &param << ") ";
     os << Helper::Centered(80, ss.str()) << '\n';
@@ -92,20 +86,18 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, Parametrization const& para
 // ------------------------------------------------------------------------- //
 
 //----------------------------------------------------------------------------//
-double Parametrization::FunctionToDNdxIntegral(double energy, double variable)
-{
+double Parametrization::FunctionToDNdxIntegral(double energy, double variable) {
     return DifferentialCrossSection(energy, variable);
 }
 
 // ------------------------------------------------------------------------- //
-double Parametrization::FunctionToDEdxIntegral(double energy, double variable)
-{
+double Parametrization::FunctionToDEdxIntegral(double energy, double variable) {
     return variable * DifferentialCrossSection(energy, variable);
 }
 
 // ------------------------------------------------------------------------- //
-double Parametrization::FunctionToDE2dxIntegral(double energy, double variable)
-{
+double Parametrization::FunctionToDE2dxIntegral(double energy,
+                                                double variable) {
     return variable * variable * DifferentialCrossSection(energy, variable);
 }
 
@@ -113,17 +105,11 @@ double Parametrization::FunctionToDE2dxIntegral(double energy, double variable)
 // Getter
 // ------------------------------------------------------------------------- //
 
-size_t Parametrization::GetHash() const
-{
+size_t Parametrization::GetHash() const {
     std::size_t seed = 0;
-    hash_combine(seed,
-                 GetName(),
-                 std::abs(particle_def_.charge),
-                 particle_def_.mass,
-                 medium_->GetName(),
-                 medium_->GetDensityCorrection(),
-                 cut_settings_.GetEcut(),
-                 cut_settings_.GetVcut());
+    hash_combine(seed, GetName(), std::abs(particle_def_.charge),
+                 particle_def_.mass, medium_->GetName(),
+                 cut_settings_.GetEcut(), cut_settings_.GetVcut());
 
     return seed;
 }

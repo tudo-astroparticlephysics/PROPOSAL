@@ -95,12 +95,15 @@ bool ScatteringHighlandIntegral::compare(const Scattering& scattering) const
 //----------------------------------------------------------------------------//
 long double ScatteringHighlandIntegral::CalculateTheta0(double dr, double ei, double ef)
 {
-    double aux              = scatter_->Calculate(ei, ef, 0.0);
+    double aux              = scatter_->Calculate(ei, ef, 0.0) *
+                              scatter_->GetUtility().GetMedium().GetDensityDistribution().Evaluate(
+                                      particle_.GetPosition());
     double cutoff           = 1;
-    double radiation_lenght = scatter_->GetUtility().GetMedium().GetRadiationLength();
+    double radiation_length = scatter_->GetUtility().GetMedium().GetRadiationLength(
+                                      particle_.GetPosition());
 
-    aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_lenght) * std::abs(particle_.GetCharge());
-    aux *= std::max(1 + 0.038 * std::log(dr / radiation_lenght), 0.0);
+    aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_length) * std::abs(particle_.GetCharge());
+    aux *= std::max(1 + 0.038 * std::log(dr / radiation_length), 0.0);
 
     return std::min(aux, cutoff);
 }

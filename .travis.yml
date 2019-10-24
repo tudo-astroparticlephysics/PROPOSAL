@@ -121,7 +121,7 @@ install:
 before_script:
     - mkdir build
     - cd build
-    - cmake .. -DADD_TESTS=ON
+    - cmake .. -DADD_TESTS=ON -DADD_PYTHON=OFF
     - make VERBOSE=1
 
 script:
@@ -129,4 +129,3 @@ script:
 
 notifications:
     email: false
-

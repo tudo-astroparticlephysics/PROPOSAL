@@ -26,7 +26,6 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/medium/Components.h"
@@ -41,20 +40,20 @@
 #include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
 #include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"
-#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
 #include "PROPOSAL/crossection/factories/MupairProductionFactory.h"
+#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
 #include "PROPOSAL/crossection/factories/WeakInteractionFactory.h"
 
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/crossection/parametrization/MupairProduction.h"
-#include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
-#include "PROPOSAL/crossection/parametrization/WeakTable.h"
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
+#include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
+#include "PROPOSAL/crossection/parametrization/WeakTable.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
@@ -66,10 +65,10 @@
 #include "PROPOSAL/crossection/EpairInterpolant.h"
 #include "PROPOSAL/crossection/IonizIntegral.h"
 #include "PROPOSAL/crossection/IonizInterpolant.h"
-#include "PROPOSAL/crossection/PhotoIntegral.h"
-#include "PROPOSAL/crossection/PhotoInterpolant.h"
 #include "PROPOSAL/crossection/MupairIntegral.h"
 #include "PROPOSAL/crossection/MupairInterpolant.h"
+#include "PROPOSAL/crossection/PhotoIntegral.h"
+#include "PROPOSAL/crossection/PhotoInterpolant.h"
 #include "PROPOSAL/crossection/WeakIntegral.h"
 #include "PROPOSAL/crossection/WeakInterpolant.h"
 
@@ -80,10 +79,20 @@
 #include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 
+#include "PROPOSAL/medium/density_distr/density_distr.h"
+#include "PROPOSAL/medium/density_distr/density_exponential.h"
+#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
+#include "PROPOSAL/medium/density_distr/density_polynomial.h"
+#include "PROPOSAL/medium/density_distr/density_splines.h"
+
+#include "PROPOSAL/math/Function.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
+#include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
+#include "PROPOSAL/math/Spline.h"
+#include "PROPOSAL/math/TableWriter.h"
 #include "PROPOSAL/math/Vector3D.h"
 
 #include "PROPOSAL/particle/Particle.h"

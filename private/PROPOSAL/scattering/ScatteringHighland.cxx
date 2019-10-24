@@ -25,31 +25,22 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 ScatteringHighland::ScatteringHighland(Particle& particle, const Medium& medium)
-    : Scattering(particle)
-    , medium_(medium.clone())
-{
-}
+    : Scattering(particle), medium_(medium.clone()) {}
 
 ScatteringHighland::ScatteringHighland(const ScatteringHighland& scattering)
-    : Scattering(scattering)
-    , medium_(scattering.medium_->clone())
-{
-}
+    : Scattering(scattering), medium_(scattering.medium_->clone()) {}
 
-ScatteringHighland::ScatteringHighland(Particle& particle, const ScatteringHighland& scattering)
-    : Scattering(particle)
-    , medium_(scattering.medium_->clone())
-{
-}
+ScatteringHighland::ScatteringHighland(Particle& particle,
+                                       const ScatteringHighland& scattering)
+    : Scattering(particle), medium_(scattering.medium_->clone()) {}
 
-ScatteringHighland::~ScatteringHighland()
-{
+ScatteringHighland::~ScatteringHighland() {
     delete medium_;
 }
 
-bool ScatteringHighland::compare(const Scattering& scattering) const
-{
-    const ScatteringHighland* scatteringHighland = dynamic_cast<const ScatteringHighland*>(&scattering);
+bool ScatteringHighland::compare(const Scattering& scattering) const {
+    const ScatteringHighland* scatteringHighland =
+        dynamic_cast<const ScatteringHighland*>(&scattering);
 
     if (!scatteringHighland)
         return false;
@@ -63,20 +54,23 @@ bool ScatteringHighland::compare(const Scattering& scattering) const
 // Private methods
 // ------------------------------------------------------------------------- //
 
-double ScatteringHighland::CalculateTheta0(double dr)
-{
+double ScatteringHighland::CalculateTheta0(double dr) {
     // eq 6 of Lynch, Dahl
     // Nuclear Instruments and Methods in Physics Research Section B 58 (1991)
-    double y = dr / medium_->GetRadiationLength();
-    double beta = 1. / sqrt(1 + particle_.GetMass() * particle_.GetMass() / (particle_.GetMomentum() * particle_.GetMomentum()));
-    y = 13.6 * std::abs(particle_.GetCharge()) / (particle_.GetMomentum() * beta) * sqrt(y) * (1. + 0.088 * log10(y));
+    double y = dr / medium_->GetRadiationLength(particle_.GetPosition());
+    double beta =
+        1. / sqrt(1 + particle_.GetMass() * particle_.GetMass() /
+                          (particle_.GetMomentum() * particle_.GetMomentum()));
+    y = 13.6 * std::abs(particle_.GetCharge()) /
+        (particle_.GetMomentum() * beta) * sqrt(y) * (1. + 0.088 * log10(y));
     return y;
 }
 
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringHighland::CalculateRandomAngle(double dr, double ei, double ef)
-{
+Scattering::RandomAngles ScatteringHighland::CalculateRandomAngle(double dr,
+                                                                  double ei,
+                                                                  double ef) {
     (void)ei;
     (void)ef;
 
