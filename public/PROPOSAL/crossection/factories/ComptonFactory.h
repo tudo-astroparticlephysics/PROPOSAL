@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include <boost/bimap.hpp>
 #include <functional>
 
 #include <map>
@@ -96,7 +95,7 @@ namespace PROPOSAL {
 
         typedef std::map<std::string, RegisterFunction> ComptonMapString;
         typedef std::map<Enum, RegisterFunction> ComptonMapEnum;
-        typedef boost::bimap<std::string, Enum> BimapStringEnum;
+        typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
         // --------------------------------------------------------------------- //
         // Most general creation

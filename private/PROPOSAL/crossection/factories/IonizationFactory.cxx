@@ -32,7 +32,7 @@ void IonizationFactory::Register(const std::string& name, Enum enum_t, RegisterF
 {
     ioniz_map_str_[name]    = create;
     ioniz_map_enum_[enum_t] = create;
-    string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
+    string_enum_.insert(name, enum_t);
 }
 
 // ------------------------------------------------------------------------- //
@@ -92,8 +92,9 @@ IonizationFactory::Enum IonizationFactory::GetEnumFromString(const std::string& 
     std::string name_lower = name;
     std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
 
-    BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
-    if (it != string_enum_.left.end())
+    auto& left = string_enum_.GetLeft();
+    auto it = left.find(name_lower);
+    if (it != left.end())
     {
         return it->second;
     } else
@@ -107,8 +108,9 @@ IonizationFactory::Enum IonizationFactory::GetEnumFromString(const std::string& 
 // ------------------------------------------------------------------------- //
 std::string IonizationFactory::GetStringFromEnum(const IonizationFactory::Enum& enum_t)
 {
-    BimapStringEnum::right_const_iterator it = string_enum_.right.find(enum_t);
-    if (it != string_enum_.right.end())
+    auto& right = string_enum_.GetRight();
+    auto it = right.find(enum_t);
+    if (it != right.end())
     {
         return it->second;
     } else
