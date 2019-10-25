@@ -650,7 +650,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             propagationstep_till_closest_approach = false;
         }
 
-        if (result <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance())
+        if (result <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance() || particle_.GetEnergy() <= particle_.GetLow())
             break;
     }
     if (detector_->IsInside(particle_.GetPosition(), particle_.GetDirection()))
