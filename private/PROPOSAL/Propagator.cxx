@@ -681,8 +681,11 @@ void Propagator::ChooseCurrentSector(const Vector3D& particle_position, const Ve
 
     for (unsigned int i = 0; i <sectors_.size(); ++i)
     {
-        if ( static_cast<int>(sectors_[i]->GetLocation()) == static_cast<int>(detector_location) )
-            crossed_sector.push_back(i);
+        if (sectors_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
+        {
+            if ( static_cast<int>(sectors_[i]->GetLocation()) == static_cast<int>(detector_location) )
+                crossed_sector.push_back(i);
+        }
     }
 
 
