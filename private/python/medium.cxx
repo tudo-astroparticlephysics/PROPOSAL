@@ -22,13 +22,13 @@ void init_medium(py::module& m) {
             modified once there are initalized, with the exception of their 
             density distribution. There are several preimplemented media. 
 
-            +------------+------+----------+------------------+--------------+
-            | Water      | Ice  | Salt     | CalciumCarbonate | StandardRock |
-            +------------+------+----------+------------------+--------------+
-            | FrejusRock | Iron | Hydrogen | Lead             | Copper       | 
-            +------------+------+----------+------------------+--------------+
-            | Uranium    | Air  | Paraffin | AntaresWater     |              |
-            +------------+------+----------+------------------+--------------+
+            +------------+------+----------+------------------+--------------------+
+            | Water      | Ice  | Salt     | CalciumCarbonate | StandardRock       |
+            +------------+------+----------+------------------+--------------------+
+            | FrejusRock | Iron | Hydrogen | Lead             | Copper             |
+            +------------+------+----------+------------------+--------------------+
+            | Uranium    | Air  | Paraffin | AntaresWater     | CascadiaBasinWater |
+            +------------+------+----------+------------------+--------------------+
 
             By default a media will be assumed as homogen distributed. There
             is the possibility to create inhomogen densities as listed below.
@@ -119,6 +119,7 @@ void init_medium(py::module& m) {
     MEDIUM_DEF(m_sub, Air)
     MEDIUM_DEF(m_sub, Paraffin)
     MEDIUM_DEF(m_sub, AntaresWater)
+    MEDIUM_DEF(m_sub, CascadiaBasinWater)
 
     py::class_<Density_distr, std::shared_ptr<Density_distr>>(
         m_sub, "density_distribution", R"pbdoc(
