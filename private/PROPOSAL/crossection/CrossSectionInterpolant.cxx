@@ -57,7 +57,7 @@ bool CrossSectionInterpolant::compare(const CrossSection& cross_section) const
 }
 
 // ------------------------------------------------------------------------- //
-void CrossSectionInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
+void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
 {
     // --------------------------------------------------------------------- //
     // Builder for dNdx
@@ -313,6 +313,16 @@ double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rn
 double CrossSectionInterpolant::FunctionToBuildDNdxInterpolant(double energy, int component)
 {
     return dndx_interpolant_2d_[component]->Interpolate(energy, 1.);
+}
+
+double CrossSectionInterpolant::CalculateCumulativeCrossSection(double energy, int component, double v)
+{
+    parametrization_->SetCurrentComponent(component);
+    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+
+    v = std::log(v / limits.vUp) / std::log(limits.vMax / limits.vUp);
+
+    return dndx_interpolant_2d_.at(component)->Interpolate(energy, v);
 }
 
 //----------------------------------------------------------------------------//

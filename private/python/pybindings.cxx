@@ -210,12 +210,15 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
     py::class_<Utility::Definition, std::shared_ptr<Utility::Definition>>(
         m, "UtilityDefinition")
         .def(py::init<>())
+        .def_readwrite("annihilation_def", &Utility::Definition::annihilation_def)
         .def_readwrite("brems_def", &Utility::Definition::brems_def)
         .def_readwrite("photo_def", &Utility::Definition::photo_def)
         .def_readwrite("epair_def", &Utility::Definition::epair_def)
         .def_readwrite("ioniz_def", &Utility::Definition::ioniz_def)
         .def_readwrite("mupair_def", &Utility::Definition::mupair_def)
-        .def_readwrite("weak_def", &Utility::Definition::weak_def);
+        .def_readwrite("weak_def", &Utility::Definition::weak_def)
+        .def_readwrite("compton_def", &Utility::Definition::compton_def)
+        .def_readwrite("photopair_def", &Utility::Definition::photopair_def);
 
     // --------------------------------------------------------------------- //
     // ContinousRandomization
@@ -462,7 +465,13 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
                         particle.
 
                 Returns:
-                    tuple: (energy loss, interaction type)
+                    Tuple of three elements describing the sampled stoachastic loss:
+
+                    * Absolute energy loss of stochastic loss
+
+                    * Type of stochastic loss as :meth:`particle.DynamicData` object
+
+                    * Pair of a list of created secondary particles as well as a boolean describing whether the initial particle was destroyed in this interaction
 			)pbdoc")
         .def_property_readonly("particle", &Sector::GetParticle,
                                R"pbdoc(

@@ -88,6 +88,7 @@ public:
     const Medium& GetMedium() const { return *medium_; }
     const EnergyCutSettings& GetEnergyCuts() const { return cut_settings_; }
     double GetMultiplier() const { return multiplier_; }
+    virtual bool IsParticleOutputEnabled() const {return false;} // no particle production per default
 
     virtual size_t GetHash() const;
 

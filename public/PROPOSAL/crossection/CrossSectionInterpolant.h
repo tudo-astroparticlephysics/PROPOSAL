@@ -55,6 +55,7 @@ public:
     // Needed to initialize interpolation
     virtual double FunctionToBuildDNdxInterpolant(double energy, int component);
     virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, Integral&, int component);
+    virtual double CalculateCumulativeCrossSection(double energy, int component, double v);
 
 protected:
     virtual bool compare(const CrossSection&) const;
@@ -62,7 +63,7 @@ protected:
     typedef std::vector<Interpolant*> InterpolantVec;
 
     virtual double CalculateStochasticLoss(double energy, double rnd1);
-    virtual void InitdNdxInerpolation(const InterpolationDef& def);
+    virtual void InitdNdxInterpolation(const InterpolationDef& def);
 
     Interpolant* dedx_interpolant_;
     Interpolant* de2dx_interpolant_;

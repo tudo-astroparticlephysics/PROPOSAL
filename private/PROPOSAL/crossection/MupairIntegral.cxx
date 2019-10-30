@@ -6,15 +6,20 @@
 #include "PROPOSAL/crossection/parametrization/MupairProduction.h"
 #include "PROPOSAL/medium/Medium.h"
 
+#include "PROPOSAL/math/RandomGenerator.h"
+
+
 using namespace PROPOSAL;
 
 MupairIntegral::MupairIntegral(const MupairProduction& param)
-    : CrossSectionIntegral(DynamicData::MuPair, param)
+    : CrossSectionIntegral(GetType(param), param)
 {
+    muminus_def_ = &MuMinusDef::Get();
+    muplus_def = &MuPlusDef::Get();
 }
 
 MupairIntegral::MupairIntegral(const MupairIntegral& mupair)
-    : CrossSectionIntegral(mupair)
+    : CrossSectionIntegral(mupair), muminus_def_(mupair.muminus_def_), muplus_def(mupair.muplus_def)
 {
 }
 
@@ -53,19 +58,37 @@ double MupairIntegral::CalculatedEdxWithoutMultiplier(double energy)
     return energy * sum;
 }
 
-std::vector<Particle*> MupairIntegral::CalculateProducedParticles(double energy, double energy_loss, double rnd1, double rnd2){
+std::pair<std::vector<Particle*>, bool> MupairIntegral::CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction){
+    std::vector<Particle*> mupair;
+
+    if(parametrization_->IsParticleOutputEnabled() == false){
+        return std::make_pair(mupair, false);
+    }
 
     //Create MuPair particles
-    std::vector<Particle*> mupair;
-    mupair.push_back(new Particle(MuMinusDef::Get()));
-    mupair.push_back(new Particle(MuPlusDef::Get()));
+    mupair.push_back(new Particle(*muminus_def_));
+    mupair.push_back(new Particle(*muplus_def));
+
+    //Sample random numbers
+    double rnd1 = RandomGenerator::Get().RandomDouble();
+    double rnd2 = RandomGenerator::Get().RandomDouble();
 
     //Sample and assign energies
     double rho = parametrization_->Calculaterho(energy, energy_loss/energy, rnd1, rnd2);
 
     mupair[0]->SetEnergy(0.5*energy_loss*(1 + rho));
     mupair[1]->SetEnergy(0.5*energy_loss*(1 - rho));
-    return mupair;
+    mupair[0]->SetDirection(initial_direction);
+    mupair[1]->SetDirection(initial_direction);
+    return std::make_pair(mupair, false);
 
 }
 
+DynamicData::Type MupairIntegral::GetType(const MupairProduction& param){
+    if(param.IsParticleOutputEnabled()){
+        return DynamicData::Particle;
+    }
+    else{
+        return DynamicData::MuPair;
+    }
+}

@@ -29,11 +29,17 @@
 
 #pragma once
 
+#include <functional>
+
+#include <map>
+#include <string>
+
 #include "PROPOSAL/methods.h"
 
 namespace PROPOSAL {
 
 class CrossSection;
+class Ionization;
 struct ParticleDef;
 class Medium;
 class EnergyCutSettings;
@@ -41,16 +47,30 @@ class EnergyCutSettings;
 class IonizationFactory
 {
 public:
+    enum Enum
+    {
+        Fail = 0,
+        None,
+        BetheBlochRossi,
+        IonizBergerSeltzerBhabha,
+        IonizBergerSeltzerMoller,
+    };
+
     struct Definition
     {
         Definition()
-            : multiplier(1.0)
+            : parametrization(BetheBlochRossi)
+            , multiplier(1.0)
         {
         }
 
         bool operator==(const IonizationFactory::Definition& def) const
         {
-            return multiplier == def.multiplier;
+            if(parametrization != def.parametrization)
+                return false;
+            else if(multiplier != def.multiplier)
+                return false;
+            return true;
         }
 
         bool operator!=(const IonizationFactory::Definition& def) const
@@ -58,8 +78,21 @@ public:
             return !(*this == def);
         }
 
+        Enum parametrization;
         double multiplier;
     };
+
+    // --------------------------------------------------------------------- //
+    // Typedefs for readablitiy
+    // --------------------------------------------------------------------- //
+
+    typedef std::function<
+            Ionization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier)>
+            RegisterFunction;
+
+    typedef std::map<std::string, RegisterFunction> IonizMapString;
+    typedef std::map<Enum, RegisterFunction> IonizMapEnum;
+        typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
     // --------------------------------------------------------------------- //
     // Most general creation
@@ -76,6 +109,16 @@ public:
                                    const Definition&,
                                    InterpolationDef) const;
 
+    // ----------------------------------------------------------------------------
+    /// @brief string to enum conversation for ioniz parametrizations
+    // ----------------------------------------------------------------------------
+    Enum GetEnumFromString(const std::string&);
+
+    // ----------------------------------------------------------------------------
+    /// @brief enum to string conversation for ioniz parametrizations
+    // ----------------------------------------------------------------------------
+    std::string GetStringFromEnum(const Enum&);
+
     // --------------------------------------------------------------------- //
     // Singleton pattern
     // --------------------------------------------------------------------- //
@@ -89,6 +132,19 @@ public:
 private:
     IonizationFactory();
     ~IonizationFactory();
+
+    // ----------------------------------------------------------------------------
+    /// @brief Register Ionization parametrizations
+    ///
+    /// @param name
+    /// @param Enum
+    /// @param RegisterFunction
+    // ----------------------------------------------------------------------------
+    void Register(const std::string& name, Enum, RegisterFunction);
+
+    IonizMapString ioniz_map_str_;
+    IonizMapEnum ioniz_map_enum_;
+    BimapStringEnum string_enum_;
 };
 
 } // namespace PROPOSAL

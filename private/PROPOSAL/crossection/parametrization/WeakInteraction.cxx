@@ -8,7 +8,7 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
-#include "PROPOSAL/crossection/parametrization/WeakTable.h"
+#include "PROPOSAL/crossection/parametrization/ParamTables.h"
 
 
 using namespace PROPOSAL;
@@ -73,17 +73,18 @@ WeakCooperSarkarMertsch::WeakCooperSarkarMertsch(const ParticleDef& particle_def
         , interpolant_(2, NULL)
 {
 
-    if(particle_def==EMinusDef::Get()||particle_def==MuMinusDef::Get()||particle_def==TauMinusDef::Get()){
+    if(particle_def.charge < 0.)
+    {
         // Initialize interpolant for particles (remember crossing symmetry rules)
         interpolant_[0] = new Interpolant(energies, y_nubar_p, sigma_nubar_p, IROMB, false, false, IROMB, false, false);
         interpolant_[1] = new Interpolant(energies, y_nubar_n, sigma_nubar_n, IROMB, false, false, IROMB, false, false);
     }
-    else if(particle_def==EPlusDef::Get()||particle_def==MuPlusDef::Get()||particle_def==TauPlusDef::Get()){
+    else if(particle_def.charge > 0.){
         // Initialize interpolant for antiparticles (remember crossing symmetry rules)
         interpolant_[0] = new Interpolant(energies, y_nu_p, sigma_nu_p, IROMB, false, false, IROMB, false, false);
         interpolant_[1] = new Interpolant(energies, y_nu_n, sigma_nu_n, IROMB, false, false, IROMB, false, false);
     }else{
-        log_fatal("Weak interaction: Particle to propagate is not a SM charged lepton");
+        log_fatal("Weak interaction: Particle to propagate is not a charged lepton");
     }
 
 }

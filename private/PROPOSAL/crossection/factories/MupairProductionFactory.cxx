@@ -16,6 +16,7 @@ MupairProductionFactory::MupairProductionFactory()
     , string_enum_()
 {
     Register("mupairkelnerkokoulinpetrukhin", KelnerKokoulinPetrukhin, std::make_pair(&MupairKelnerKokoulinPetrukhin::create, &MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>::create));
+    Register("none", None, std::make_pair(nullptr, nullptr));
 }
 
 MupairProductionFactory::~MupairProductionFactory()
@@ -35,15 +36,20 @@ CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef&
                                                             const EnergyCutSettings& cuts,
                                                             const Definition& def) const
 {
+    if(def.parametrization == MupairProductionFactory::Enum::None){
+        log_fatal("Can't return MuPairproduction Crosssection if parametrization is None");
+        return NULL;
+    }
+
     MupairMapEnum::const_iterator it = mupair_map_enum_.find(def.parametrization);
 
     if (it != mupair_map_enum_.end())
     {
-        return new MupairIntegral(*it->second.first(particle_def, medium, cuts, def.multiplier));
+        return new MupairIntegral(*it->second.first(particle_def, medium, cuts, def.multiplier, def.particle_output));
     } else
     {
         log_fatal("MupairProduction %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warinngs
+        return NULL; // Just to prevent warnings
     }
 }
 
@@ -54,15 +60,20 @@ CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef&
                                                             const Definition& def,
                                                             InterpolationDef interpolation_def) const
 {
+    if(def.parametrization == MupairProductionFactory::Enum::None){
+        log_fatal("Can't return MuPairproduction Crosssection if parametrization is None");
+        return NULL;
+    }
+
     MupairMapEnum::const_iterator it = mupair_map_enum_.find(def.parametrization);
 
     if (it != mupair_map_enum_.end())
     {
-        return new MupairInterpolant(*it->second.second(particle_def, medium, cuts, def.multiplier, interpolation_def), interpolation_def);
+        return new MupairInterpolant(*it->second.second(particle_def, medium, cuts, def.multiplier, def.particle_output, interpolation_def), interpolation_def);
     } else
     {
-        log_fatal("MupairProduction %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warinngs
+        log_fatal("MupairProduction %s not registered!", typeid(def.parametrization).name());
+        return NULL; // Just to prevent warnings
     }
 }
 
@@ -90,7 +101,7 @@ MupairProductionFactory::Enum MupairProductionFactory::GetEnumFromString(const s
     } else
     {
         log_fatal("MupairProduction %s not registerd!", name.c_str());
-        return None; // Just to prevent warinngs
+        return Fail; // Just to prevent warnings
     }
 }
 
@@ -105,6 +116,6 @@ std::string MupairProductionFactory::GetStringFromEnum(const MupairProductionFac
     } else
     {
         log_fatal("MupairProduction %s not registerd!", typeid(enum_t).name());
-        return ""; // Just to prevent warinngs
+        return ""; // Just to prevent warnings
     }
 }

@@ -10,6 +10,8 @@ set (PROPOSAL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/Output.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/Propagator.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/PropagatorService.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/ComptonIntegral.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/ComptonInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/BremsIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/BremsInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/CrossSection.cxx
@@ -21,21 +23,27 @@ set (PROPOSAL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/MupairInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/WeakIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/WeakInterpolant.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/PhotoPairIntegral.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/PhotoPairInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/IonizIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/IonizInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/PhotoIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/PhotoInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/BremsstrahlungFactory.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/ComptonFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/EpairProductionFactory.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/PhotoPairFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/MupairProductionFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/IonizationFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/PhotonuclearFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/WeakInteractionFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/Bremsstrahlung.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/Compton.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/EpairProduction.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/MupairProduction.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/WeakInteraction.cxx
-    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/WeakTable.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/ParamTables.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/Ionization.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/Parametrization.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/PhotoQ2Integration.cxx

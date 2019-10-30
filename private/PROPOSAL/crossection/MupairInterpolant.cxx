@@ -11,13 +11,16 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
 
+#include "PROPOSAL/math/RandomGenerator.h"
+
+
 using namespace PROPOSAL;
 
 MupairInterpolant::MupairInterpolant(const MupairProduction& param, InterpolationDef def)
-    : CrossSectionInterpolant(DynamicData::MuPair, param)
+    : CrossSectionInterpolant(GetType(param), param)
 {
     // Use parent CrossSecition dNdx interpolation
-    InitdNdxInerpolation(def);
+    InitdNdxInterpolation(def);
 
     // --------------------------------------------------------------------- //
     // Builder for DEdx
@@ -69,10 +72,13 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, Interpolatio
     Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
     Helper::InitializeInterpolation(
         "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
+
+    muminus_def_ = &MuMinusDef::Get();
+    muplus_def = &MuPlusDef::Get();
 }
 
 MupairInterpolant::MupairInterpolant(const MupairInterpolant& mupair)
-    : CrossSectionInterpolant(mupair)
+    : CrossSectionInterpolant(mupair), muminus_def_(mupair.muminus_def_), muplus_def(mupair.muplus_def)
 {
 }
 
@@ -93,18 +99,37 @@ double MupairInterpolant::CalculatedEdx(double energy)
     return parametrization_->GetMultiplier() * std::max(dedx_interpolant_->Interpolate(energy), 0.0);
 }
 
-std::vector<Particle*> MupairInterpolant::CalculateProducedParticles(double energy, double energy_loss, double rnd1, double rnd2){
+std::pair<std::vector<Particle*>, bool> MupairInterpolant::CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction){
+    std::vector<Particle*> mupair;
+
+    if(parametrization_->IsParticleOutputEnabled() == false){
+        return std::make_pair(mupair, false);
+    }
 
     //Create MuPair particles
-    std::vector<Particle*> mupair;
-    mupair.push_back(new Particle(MuMinusDef::Get()));
-    mupair.push_back(new Particle(MuPlusDef::Get()));
+    mupair.push_back(new Particle(*muminus_def_));
+    mupair.push_back(new Particle(*muplus_def));
+
+    //Sample random numbers
+    double rnd1 = RandomGenerator::Get().RandomDouble();
+    double rnd2 = RandomGenerator::Get().RandomDouble();
 
     //Sample and assign energies
     double rho = parametrization_->Calculaterho(energy, energy_loss/energy, rnd1, rnd2);
 
     mupair[0]->SetEnergy(0.5*energy_loss*(1 + rho));
     mupair[1]->SetEnergy(0.5*energy_loss*(1 - rho));
-    return mupair;
+    mupair[0]->SetDirection(initial_direction);
+    mupair[1]->SetDirection(initial_direction);
+    return std::make_pair(mupair, false);
 
+}
+
+DynamicData::Type MupairInterpolant::GetType(const MupairProduction& param){
+    if(param.IsParticleOutputEnabled()){
+        return DynamicData::Particle;
+    }
+    else{
+        return DynamicData::MuPair;
+    }
 }

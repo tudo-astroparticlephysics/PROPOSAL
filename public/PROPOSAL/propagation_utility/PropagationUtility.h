@@ -31,11 +31,14 @@
 #include <vector>
 
 #include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crossection/factories/ComptonFactory.h"
 #include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"
 #include "PROPOSAL/crossection/factories/MupairProductionFactory.h"
 #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
 #include "PROPOSAL/crossection/factories/WeakInteractionFactory.h"
+#include "PROPOSAL/crossection/factories/PhotoPairFactory.h"
+#include "PROPOSAL/crossection/factories/AnnihilationFactory.h"
 
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/math/Vector3D.h"
@@ -53,11 +56,14 @@ class Utility {
    public:
     struct Definition {
         BremsstrahlungFactory::Definition brems_def;
+        ComptonFactory::Definition compton_def;
         PhotonuclearFactory::Definition photo_def;
         EpairProductionFactory::Definition epair_def;
         IonizationFactory::Definition ioniz_def;
         MupairProductionFactory::Definition mupair_def;
         WeakInteractionFactory::Definition weak_def;
+        PhotoPairFactory::Definition photopair_def;
+        AnnihilationFactory::Definition annihilation_def;
 
         bool operator==(const Utility::Definition& utility_def) const;
         bool operator!=(const Utility::Definition& utility_def) const;

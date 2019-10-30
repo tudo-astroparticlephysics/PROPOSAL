@@ -31,40 +31,19 @@ IonizIntegral::~IonizIntegral() {}
 
 double IonizIntegral::CalculatedEdxWithoutMultiplier(double energy)
 {
-    double result, aux;
-
     Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
-    ParticleDef particle_def = parametrization_->GetParticleDef();
-    const Medium& medium     = parametrization_->GetMedium();
 
-    // TODO(mario): Better way? Sat 2017/09/02
-
-    // PDG eq. 33.10
-    // with Spin 1/2 correction by Rossi
-    double square_momentum   = (energy - particle_def.mass) * (energy + particle_def.mass);
-    double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
-    double beta              = particle_momentum / energy;
-    double gamma             = energy / particle_def.mass;
-
-    aux    = beta * gamma / (1.e-6 * medium.GetI());
-    result = std::log(limits.vUp * (2 * ME * energy)) + 2 * std::log(aux);
-    aux    = limits.vUp / (2 * (1 + 1 / gamma));
-    result += aux * aux;
-    aux = beta * beta;
-    result -= aux * (1 + limits.vUp / limits.vMax) + Delta(beta, gamma);
-
-    if (result > 0)
-    {
-        result *= IONK * particle_def.charge * particle_def.charge * medium.GetZA() / (2 * aux);
-    } else
-    {
-        result = 0;
+    if(parametrization_->GetName() != "IonizBergerSeltzerBhabha" && parametrization_->GetName() != "IonizBergerSeltzerMoller"){
+        return energy * dedx_integral_.Integrate(
+                limits.vMin,
+                limits.vUp,
+                std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
+                4);
     }
-    return  medium.GetMassDensity() * result + energy * dedx_integral_.Integrate(
-                        limits.vMin,
-                        limits.vUp,
-                        std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
-                        4);
+    else{
+        return parametrization_->FunctionToDEdxIntegral(energy, 0);
+    }
+
 }
 
 double IonizIntegral::CalculatedEdx(double energy)
@@ -164,24 +143,4 @@ double IonizIntegral::CalculateStochasticLoss(double energy, double rnd1)
     log_fatal("SumCharge of medium was not initialized correctly");
 
     return 0;
-}
-
-// ------------------------------------------------------------------------- //
-double IonizIntegral::Delta(double beta, double gamma)
-{
-    const Medium& medium = parametrization_->GetMedium();
-    double X;
-
-    X = std::log(beta * gamma) / std::log(10);
-
-    if (X < medium.GetX0())
-    {
-        return medium.GetD0() * std::pow(10, 2 * (X - medium.GetX0()));
-    } else if (X < medium.GetX1())
-    {
-        return 2 * LOG10 * X + medium.GetC() + medium.GetA() * std::pow(medium.GetX1() - X, medium.GetM());
-    } else
-    {
-        return 2 * LOG10 * X + medium.GetC();
-    }
 }

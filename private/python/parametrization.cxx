@@ -60,23 +60,24 @@
              py::arg("energy_cuts"), py::arg("multiplier"),                \
              py::arg("lpm_effect"), py::arg("interpolation_def"));
 
-#define MUPAIR_DEF(module, cls)                            \
-    py::class_<Mupair##cls, std::shared_ptr<Mupair##cls>,  \
-               MupairProductionRhoIntegral>(module, #cls)  \
-        .def(py::init<const ParticleDef&, const Medium&,   \
-                      const EnergyCutSettings&, double>(), \
-             py::arg("particle_def"), py::arg("medium"),   \
-             py::arg("energy_cuts"), py::arg("multiplier"));
+#define MUPAIR_DEF(module, cls)                                  \
+    py::class_<Mupair##cls, std::shared_ptr<Mupair##cls>,        \
+               MupairProductionRhoIntegral>(module, #cls)        \
+        .def(py::init<const ParticleDef&, const Medium&,         \
+                      const EnergyCutSettings&, double, bool>(), \
+             py::arg("particle_def"), py::arg("medium"),         \
+             py::arg("energy_cuts"), py::arg("multiplier"),      \
+             py::arg("particle_output"));
 
-#define MUPAIR_INTERPOL_DEF(module, cls)                                     \
-    py::class_<MupairProductionRhoInterpolant<Mupair##cls>,                  \
-               std::shared_ptr<MupairProductionRhoInterpolant<Mupair##cls>>, \
-               Mupair##cls>(module, #cls "Interpolant")                      \
-        .def(py::init<const ParticleDef&, const Medium&,                     \
-                      const EnergyCutSettings&, double, InterpolationDef>(), \
-             py::arg("particle_def"), py::arg("medium"),                     \
-             py::arg("energy_cuts"), py::arg("multiplier"),                  \
-             py::arg("interpolation_def"));
+#define MUPAIR_INTERPOL_DEF(module, cls)                                           \
+    py::class_<MupairProductionRhoInterpolant<Mupair##cls>,                        \
+               std::shared_ptr<MupairProductionRhoInterpolant<Mupair##cls>>,       \
+               Mupair##cls>(module, #cls "Interpolant")                            \
+        .def(py::init<const ParticleDef&, const Medium&,                           \
+                      const EnergyCutSettings&, double, bool, InterpolationDef>(), \
+             py::arg("particle_def"), py::arg("medium"),                           \
+             py::arg("energy_cuts"), py::arg("multiplier"),                        \
+             py::arg("particle_output"), py::arg("interpolation_def"));
 
 namespace py = pybind11;
 using namespace PROPOSAL;
@@ -291,6 +292,7 @@ void init_parametrization(py::module& m) {
     BREMS_DEF(m_sub_brems, CompleteScreening)
     BREMS_DEF(m_sub_brems, AndreevBezrukovBugaev)
     BREMS_DEF(m_sub_brems, SandrockSoedingreksoRhode)
+    BREMS_DEF(m_sub_brems, ElectronScreening)
 
     py::enum_<BremsstrahlungFactory::Enum>(m_sub_brems, "BremsParametrization")
         .value("PetrukhinShestakov", BremsstrahlungFactory::PetrukhinShestakov)
@@ -300,7 +302,11 @@ void init_parametrization(py::module& m) {
         .value("AndreevBezrukovBugaev",
                BremsstrahlungFactory::AndreevBezrukovBugaev)
         .value("SandrockSoedingreksoRhode",
-               BremsstrahlungFactory::SandrockSoedingreksoRhode);
+               BremsstrahlungFactory::SandrockSoedingreksoRhode)
+        .value("ElectronScreening",
+               BremsstrahlungFactory::ElectronScreening)
+        .value("None",
+               BremsstrahlungFactory::None);
 
     py::class_<BremsstrahlungFactory,
                std::unique_ptr<BremsstrahlungFactory, py::nodelete>>(
@@ -398,7 +404,9 @@ void init_parametrization(py::module& m) {
         .value("KelnerKokoulinPetrukhin",
                EpairProductionFactory::KelnerKokoulinPetrukhin)
         .value("SandrockSoedingreksoRhode",
-               EpairProductionFactory::SandrockSoedingreksoRhode);
+               EpairProductionFactory::SandrockSoedingreksoRhode)
+        .value("None",
+               EpairProductionFactory::None);
 
     py::class_<EpairProductionFactory,
                std::unique_ptr<EpairProductionFactory, py::nodelete>>(
@@ -413,7 +421,7 @@ void init_parametrization(py::module& m) {
                                               Definition&)const) &
                  EpairProductionFactory::CreateEpairProduction,
              py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"),
-             py::arg("brems_def"))
+             py::arg("epair_def"))
         .def("create_pairproduction_interpol",
              (CrossSection *
               (EpairProductionFactory::*)(const ParticleDef&, const Medium&,
@@ -423,7 +431,7 @@ void init_parametrization(py::module& m) {
                                           InterpolationDef) const) &
                  EpairProductionFactory::CreateEpairProduction,
              py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"),
-             py::arg("brems_def"), py::arg("interpolation_def"))
+             py::arg("epair_def"), py::arg("interpolation_def"))
         .def_static("get", &EpairProductionFactory::Get,
                     py::return_value_policy::reference);
 
@@ -437,6 +445,62 @@ void init_parametrization(py::module& m) {
                        &EpairProductionFactory::Definition::lpm_effect)
         .def_readwrite("multiplier",
                        &EpairProductionFactory::Definition::multiplier);
+
+    // --------------------------------------------------------------------- //
+    // Annihilation
+    // --------------------------------------------------------------------- //
+
+    py::module m_sub_annihilation = m_sub.def_submodule("annihilation");
+    py::class_<Annihilation, std::shared_ptr<Annihilation>, Parametrization>(m_sub_annihilation, "Annihilation",
+                                                                                   R"pbdoc(
+
+            Virtual class for the annihilation parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
+
+            The following parametrizations are currently implemented:
+
+            * AnnihilationHeitler
+
+            Example:
+                To create a annihilation parametrization
+
+                >>> positron = pyPROPOSAL.particle.EPlusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> param = pyPROPOSAL.parametrization.annihilation.Heitler(positron, medium, 1.0)
+                )pbdoc");
+
+
+    py::class_<AnnihilationHeitler, std::shared_ptr<AnnihilationHeitler>, Annihilation>(m_sub_annihilation, "Heitler")
+        .def(py::init<const ParticleDef&, const Medium&, double>(),
+             py::arg("particle_def"),
+             py::arg("medium"),
+             py::arg("multiplier"));
+
+
+    py::enum_<AnnihilationFactory::Enum>(m_sub_annihilation, "AnnihilationParametrization")
+            .value("Heitler", AnnihilationFactory::Heitler)
+            .value("None", AnnihilationFactory::None);
+
+    py::class_<AnnihilationFactory, std::unique_ptr<AnnihilationFactory, py::nodelete>>(m_sub_annihilation, "AnnihilationFactory")
+            .def("get_enum_from_str", &AnnihilationFactory::GetEnumFromString, py::arg("parametrization_str"))
+            .def("create_annihilation",
+                 (CrossSection* (AnnihilationFactory::*)(const ParticleDef&, const Medium&, const AnnihilationFactory::Definition&)const)&AnnihilationFactory::CreateAnnihilation,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("annihilation_def"))
+            .def("create_annihilation_interpol",
+                 (CrossSection* (AnnihilationFactory::*)(const ParticleDef&, const Medium&, const AnnihilationFactory::Definition&, InterpolationDef)const)&AnnihilationFactory::CreateAnnihilation,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("annihilation_def"), py::arg("interpolation_def"))
+            .def_static("get", &AnnihilationFactory::Get, py::return_value_policy::reference);
+
+
+    py::class_<AnnihilationFactory::Definition, std::shared_ptr<AnnihilationFactory::Definition> >(m_sub_annihilation, "AnnihilationDefinition")
+            .def(py::init<>())
+            .def_readwrite("parametrization", &AnnihilationFactory::Definition::parametrization)
+            .def_readwrite("multiplier", &AnnihilationFactory::Definition::multiplier);
+
 
     // ---------------------------------------------------------------------
     // // Mupair
@@ -456,7 +520,8 @@ void init_parametrization(py::module& m) {
                 energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies   
                 interpolation_def (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
-                                                                                          
+                particle_output (bool): If enabled, produced muons are sampled and returned as particles. Otherwise, only a DymamicData object is returned
+
             Since the differential cross section is given in :math:`\rho` as well, an intergration over this parameter is needed.
             When using the interpolation_def parameter, this integration is saved in interpolation tables (improving the performance of the calculation with neglible decline in accuracy).                                                         
 
@@ -472,7 +537,7 @@ void init_parametrization(py::module& m) {
                 >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
                 >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
                 >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
-                >>> param = pyPROPOSAL.parametrization.mupairproduction.KelnerKokoulinPetrukhin(mu, medium, cuts, 1.0)
+                >>> param = pyPROPOSAL.parametrization.mupairproduction.KelnerKokoulinPetrukhin(mu, medium, cuts, 1.0, True)
                 )pbdoc")
         .def("Calculaterho", &MupairProduction::Calculaterho, py::arg("energy"),
              py::arg("v"), py::arg("rnd1"), py::arg("rnd2"),
@@ -511,7 +576,20 @@ void init_parametrization(py::module& m) {
     py::enum_<MupairProductionFactory::Enum>(m_sub_mupair,
                                              "MupairParametrization")
         .value("KelnerKokoulinPetrukhin",
-               MupairProductionFactory::KelnerKokoulinPetrukhin);
+               MupairProductionFactory::KelnerKokoulinPetrukhin)
+        .value("None",
+               MupairProductionFactory::None);
+
+    py::class_<MupairProductionFactory, std::unique_ptr<MupairProductionFactory, py::nodelete>>(m_sub_mupair, "MuPairFactory")
+        .def("get_enum_from_str", &MupairProductionFactory::GetEnumFromString, py::arg("parametrization_str"))
+        .def("create_mupairproduction",
+            (CrossSection* (MupairProductionFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const MupairProductionFactory::Definition&)const)&MupairProductionFactory::CreateMupairProduction,
+            py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("mupair_def"))
+        .def("create_mupairproduction_interpol",
+            (CrossSection* (MupairProductionFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const MupairProductionFactory::Definition&, InterpolationDef)const)&MupairProductionFactory::CreateMupairProduction,
+            py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("mupair_def"), py::arg("interpolation_def"))
+        .def_static("get", &MupairProductionFactory::Get, py::return_value_policy::reference);
+
 
     py::class_<MupairProductionFactory::Definition,
                std::shared_ptr<MupairProductionFactory::Definition>>(
@@ -519,8 +597,6 @@ void init_parametrization(py::module& m) {
         .def(py::init<>())
         .def_readwrite("parametrization",
                        &MupairProductionFactory::Definition::parametrization)
-        .def_readwrite("mupair_enable",
-                       &MupairProductionFactory::Definition::mupair_enable)
         .def_readwrite("multiplier",
                        &MupairProductionFactory::Definition::multiplier)
         .def_readwrite("particle_output",
@@ -563,7 +639,20 @@ void init_parametrization(py::module& m) {
 
     py::enum_<WeakInteractionFactory::Enum>(m_sub_weak, "WeakParametrization")
         .value("CooperSarkarMertsch",
-               WeakInteractionFactory::CooperSarkarMertsch);
+               WeakInteractionFactory::CooperSarkarMertsch)
+        .value("None",
+               WeakInteractionFactory::None);
+
+    py::class_<WeakInteractionFactory, std::unique_ptr<WeakInteractionFactory, py::nodelete>>(m_sub_weak, "WeakFactory")
+        .def("get_enum_from_str", &WeakInteractionFactory::GetEnumFromString, py::arg("parametrization_str"))
+        .def("create_weak",
+            (CrossSection* (WeakInteractionFactory::*)(const ParticleDef&, const Medium&, const WeakInteractionFactory::Definition&)const)&WeakInteractionFactory::CreateWeakInteraction,
+            py::arg("particle_def"), py::arg("medium"), py::arg("weak_def"))
+        .def("create_weak_interpol",
+            (CrossSection* (WeakInteractionFactory::*)(const ParticleDef&, const Medium&, const WeakInteractionFactory::Definition&, InterpolationDef)const)&WeakInteractionFactory::CreateWeakInteraction,
+            py::arg("particle_def"), py::arg("medium"), py::arg("weak_def"), py::arg("interpolation_def"))
+        .def_static("get", &WeakInteractionFactory::Get, py::return_value_policy::reference);
+
 
     py::class_<WeakInteractionFactory::Definition,
                std::shared_ptr<WeakInteractionFactory::Definition>>(
@@ -571,8 +660,6 @@ void init_parametrization(py::module& m) {
         .def(py::init<>())
         .def_readwrite("parametrization",
                        &WeakInteractionFactory::Definition::parametrization)
-        .def_readwrite("weak_enable",
-                       &WeakInteractionFactory::Definition::weak_enable)
         .def_readwrite("multiplier",
                        &WeakInteractionFactory::Definition::multiplier);
 
@@ -747,7 +834,8 @@ void init_parametrization(py::module& m) {
         .value("AbramowiczLevinLevyMaor97",
                PhotonuclearFactory::AbramowiczLevinLevyMaor97)
         .value("ButkevichMikhailov", PhotonuclearFactory::ButkevichMikhailov)
-        .value("RenoSarcevicSu", PhotonuclearFactory::RenoSarcevicSu);
+        .value("RenoSarcevicSu", PhotonuclearFactory::RenoSarcevicSu)
+        .value("None", PhotonuclearFactory::None);
 
     py::enum_<PhotonuclearFactory::Shadow>(m_sub_photo, "PhotoShadow")
         .value("DuttaRenoSarcevicSeckel",
@@ -793,22 +881,16 @@ void init_parametrization(py::module& m) {
         .def_readwrite("multiplier",
                        &PhotonuclearFactory::Definition::multiplier);
 
-    // ---------------------------------------------------------------------
-    // // Ionization
-    // ---------------------------------------------------------------------
-    // //
+    // --------------------------------------------------------------------- //
+    // Ionization
+    // --------------------------------------------------------------------- //
 
     py::module m_sub_ioniz = m_sub.def_submodule("ionization");
 
-    py::class_<Ionization, std::shared_ptr<Ionization>, Parametrization>(
-        m_sub_ioniz, "Ionization")
-        .def(py::init<const ParticleDef&, const Medium&,
-                      const EnergyCutSettings&, double>(),
-             py::arg("particle_def"), py::arg("medium"), py::arg("energy_cuts"),
-             py::arg("multiplier"),
-             R"pbdoc( 
+    py::class_<Ionization, std::shared_ptr<Ionization>, Parametrization>(m_sub_ioniz, "Ionization",
+            R"pbdoc(
 
-            Ionization parametrization. It can be initialized with the following parameters
+            Virtual class for the Ionization parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:                                                                                                  
                 particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
@@ -816,19 +898,237 @@ void init_parametrization(py::module& m) {
                 energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization                                                                                           
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
 
+            The following parametrizations are currently implemented:
+
+            * BetheBlochRossi
+
+            * IonizBergerSeltzerBhabha (for positron propagation)
+
+            * IonizBergerSeltzerMoller (for electron propagation)
+
             Example:
                 To create a ionization parametrization
 
-                >>> mu = pp.particle.MuMinusDef.get()
-                >>> medium = pp.medium.StandardRock(1.0)
-                >>> cuts = pp.EnergyCutSettings(-1, -1)
-                >>> param = pyPROPOSAL.parametrization.ionization.Ionization(mu, medium, cuts, multiplier)
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> param = pyPROPOSAL.parametrization.ionization.BetheBlochRossi(mu, medium, cuts, multiplier)
                 )pbdoc");
 
-    py::class_<IonizationFactory::Definition,
-               std::shared_ptr<IonizationFactory::Definition>>(
-        m_sub_ioniz, "IonizationDefinition")
+    py::class_<IonizBetheBlochRossi, std::shared_ptr<IonizBetheBlochRossi>, Ionization>(m_sub_ioniz, "BetheBlochRossi")
+        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+             py::arg("particle_def"),
+             py::arg("medium"),
+             py::arg("energy_cuts"),
+             py::arg("multiplier"));
+
+    py::class_<IonizBergerSeltzerBhabha, std::shared_ptr<IonizBergerSeltzerBhabha>, Ionization>(m_sub_ioniz, "BergerSeltzerBhabha")
+            .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+             py::arg("particle_def"),
+             py::arg("medium"),
+             py::arg("energy_cuts"),
+             py::arg("multiplier"));
+
+    py::class_<IonizBergerSeltzerMoller, std::shared_ptr<IonizBergerSeltzerMoller>, Ionization>(m_sub_ioniz, "BergerSeltzerMoller")
+            .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+                 py::arg("particle_def"),
+                 py::arg("medium"),
+                 py::arg("energy_cuts"),
+                 py::arg("multiplier"));
+
+    py::enum_<IonizationFactory::Enum>(m_sub_ioniz, "IonizParametrization")
+            .value("BetheBlochRossi", IonizationFactory::BetheBlochRossi)
+            .value("IonizBergerSeltzerBhabha", IonizationFactory::IonizBergerSeltzerBhabha)
+            .value("IonizBergerSeltzerMoller", IonizationFactory::IonizBergerSeltzerMoller)
+            .value("None", IonizationFactory::None);
+
+    py::class_<IonizationFactory, std::unique_ptr<IonizationFactory, py::nodelete>>(m_sub_ioniz, "IonizFactory")
+            .def("get_enum_from_str", &IonizationFactory::GetEnumFromString, py::arg("parametrization_str"))
+            .def("create_ionization",
+                 (CrossSection* (IonizationFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const IonizationFactory::Definition&)const)&IonizationFactory::CreateIonization,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("ioniz_def"))
+            .def("create_ionization_interpol",
+                 (CrossSection* (IonizationFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const IonizationFactory::Definition&, InterpolationDef)const)&IonizationFactory::CreateIonization,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("ioniz_def"), py::arg("interpolation_def"))
+            .def_static("get", &IonizationFactory::Get, py::return_value_policy::reference);
+
+    py::class_<IonizationFactory::Definition, std::shared_ptr<IonizationFactory::Definition> >(m_sub_ioniz, "IonizationDefinition")
         .def(py::init<>())
-        .def_readwrite("multiplier",
-                       &IonizationFactory::Definition::multiplier);
+        .def_readwrite("parametrization", &IonizationFactory::Definition::parametrization)
+        .def_readwrite("multiplier", &IonizationFactory::Definition::multiplier);
+
+    // Photon interactions
+
+    // --------------------------------------------------------------------- //
+    // Compton Scattering
+    // --------------------------------------------------------------------- //
+
+    py::module m_sub_compton = m_sub.def_submodule("compton");
+
+    py::class_<Compton, std::shared_ptr<Compton>, Parametrization>(m_sub_compton, "Compton",
+                                                                         R"pbdoc(
+
+            Virtual class for the Compton scattering parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
+
+            The following parametrizations are currently implemented:
+
+            * KleinNishina
+
+            Example:
+                To create a compton scattering parametrization
+
+                >>> gamma = pyPROPOSAL.particle.GammaDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> param = pyPROPOSAL.parametrization.compton.KleinNishina(gamma, medium, cuts, multiplier)
+                )pbdoc");
+
+    py::class_<ComptonKleinNishina, std::shared_ptr<ComptonKleinNishina>, Compton>(m_sub_compton, "KleinNishina")
+            .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+                 py::arg("particle_def"),
+                 py::arg("medium"),
+                 py::arg("energy_cuts"),
+                 py::arg("multiplier"));
+
+    py::enum_<ComptonFactory::Enum>(m_sub_compton, "ComptonParametrization")
+            .value("KleinNishina", ComptonFactory::KleinNishina)
+            .value("None", ComptonFactory::None);
+
+    py::class_<ComptonFactory, std::unique_ptr<ComptonFactory, py::nodelete>>(m_sub_compton, "ComptonFactory")
+            .def("get_enum_from_str", &ComptonFactory::GetEnumFromString, py::arg("parametrization_str"))
+            .def("create_compton",
+                 (CrossSection* (ComptonFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ComptonFactory::Definition&)const)&ComptonFactory::CreateCompton,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("compton_def"))
+            .def("create_compton_interpol",
+                 (CrossSection* (ComptonFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ComptonFactory::Definition&, InterpolationDef)const)&ComptonFactory::CreateCompton,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("compton_def"), py::arg("interpolation_def"))
+            .def_static("get", &ComptonFactory::Get, py::return_value_policy::reference);
+
+    py::class_<ComptonFactory::Definition, std::shared_ptr<ComptonFactory::Definition> >(m_sub_compton, "ComptonDefinition")
+            .def(py::init<>())
+            .def_readwrite("parametrization", &ComptonFactory::Definition::parametrization)
+            .def_readwrite("multiplier", &ComptonFactory::Definition::multiplier);
+
+    // --------------------------------------------------------------------- //
+    // PhotoPairProduction
+    // --------------------------------------------------------------------- //
+
+    py::module m_sub_photopair = m_sub.def_submodule("photopair");
+
+    py::class_<PhotoPairProduction, std::shared_ptr<PhotoPairProduction>, Parametrization>(m_sub_photopair, "PhotoPair",
+                                                                   R"pbdoc(
+
+            Virtual class for the PhotoPairProduction parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
+
+            The following parametrizations are currently implemented:
+
+            * Tsai
+
+            Example:
+                To create a photopair parametrization
+
+                >>> gamma = pyPROPOSAL.particle.GammaDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> param = pyPROPOSAL.parametrization.PhotoPair.Tsai(gamma, medium, multiplier)
+                )pbdoc");
+
+    py::class_<PhotoPairTsai, std::shared_ptr<PhotoPairTsai>, PhotoPairProduction>(m_sub_photopair, "Tsai")
+            .def(py::init<const ParticleDef&, const Medium&, double>(),
+                 py::arg("particle_def"), py::arg("medium"), py::arg("multiplier"));
+
+    py::enum_<PhotoPairFactory::Enum>(m_sub_photopair, "PhotoPairParametrization")
+            .value("Tsai", PhotoPairFactory::Tsai)
+            .value("None", PhotoPairFactory::None);
+
+    py::class_<PhotoPairFactory, std::unique_ptr<PhotoPairFactory, py::nodelete>>(m_sub_photopair, "PhotoPairFactory")
+            .def("get_enum_from_str", &PhotoPairFactory::GetEnumFromString, py::arg("parametrization_str"))
+            .def("create_photopair",
+                 (CrossSection* (PhotoPairFactory::*)(const ParticleDef&, const Medium&, const PhotoPairFactory::Definition&)const)&PhotoPairFactory::CreatePhotoPair,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("photopair_def"))
+            .def("create_photopair_interpol",
+                 (CrossSection* (PhotoPairFactory::*)(const ParticleDef&, const Medium&, const PhotoPairFactory::Definition&, InterpolationDef)const)&PhotoPairFactory::CreatePhotoPair,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("photopair_def"), py::arg("interpolation_def"))
+            .def_static("get", &PhotoPairFactory::Get, py::return_value_policy::reference);
+
+    py::class_<PhotoPairFactory::Definition, std::shared_ptr<PhotoPairFactory::Definition> >(m_sub_photopair, "PhotoPairDefinition")
+            .def(py::init<>())
+            .def_readwrite("parametrization", &PhotoPairFactory::Definition::parametrization)
+            .def_readwrite("photoangle", &PhotoPairFactory::Definition::photoangle)
+            .def_readwrite("multiplier", &PhotoPairFactory::Definition::multiplier);
+
+    // PhotoAngleDistribution
+
+    py::class_<PhotoAngleDistribution, std::shared_ptr<PhotoAngleDistribution>>(m_sub_photopair, "PhotoAngleDistribution",
+            R"pbdoc(
+
+            Virtual class for the PhotoAngleDistribution parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+
+            The following parametrizations are currently implemented:
+
+            * PhotoPairNoDeflection
+
+            * PhotoPairTsaiIntegral
+
+            * PhotoPairEGS
+
+            Example:
+                To create a PhotoAngleDistribution parametrization
+
+                >>> gamma = pyPROPOSAL.particle.GammaDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> param = pyPROPOSAL.parametrization.PhotoAngleDistribution.TsaiIntegral(gamma, medium)
+                )pbdoc")
+            .def("SetCurrentComponent", &PhotoAngleDistribution::SetCurrentComponent,
+                 py::arg("component_index"))
+            .def("SampleAngles", &PhotoAngleDistribution::SampleAngles,
+                 py::arg("energy"),
+                 py::arg("rho"),
+                 py::arg("component_index"));
+
+    py::class_<PhotoAngleTsaiIntegral, std::shared_ptr<PhotoAngleTsaiIntegral>, PhotoAngleDistribution>(m_sub_photopair, "PhotoAngleTsaiIntegral")
+            .def(py::init<const ParticleDef&, const Medium&>(),
+                 py::arg("particle_def"),
+                 py::arg("medium"))
+            .def("FunctionToIntegral", &PhotoAngleTsaiIntegral::FunctionToIntegral,
+                 py::arg("energy"),
+                 py::arg("x"),
+                 py::arg("theta"));
+
+    py::class_<PhotoAngleNoDeflection, std::shared_ptr<PhotoAngleNoDeflection>, PhotoAngleDistribution>(m_sub_photopair, "PhotoAngleNoDeflection")
+            .def(py::init<const ParticleDef&, const Medium&>(),
+                 py::arg("particle_def"),
+                 py::arg("medium"));
+
+    py::class_<PhotoAngleEGS, std::shared_ptr<PhotoAngleEGS>, PhotoAngleDistribution>(m_sub_photopair, "PhotoAngleEGS")
+            .def(py::init<const ParticleDef&, const Medium&>(),
+                 py::arg("particle_def"),
+                 py::arg("medium"));
+
+    py::class_<PhotoAngleDistribution::DeflectionAngles, std::shared_ptr<PhotoAngleDistribution::DeflectionAngles > >(m_sub_photopair, "DeflectionAngles")
+            .def(py::init<>())
+            .def_readwrite("cosphi0", &PhotoAngleDistribution::DeflectionAngles::cosphi0)
+            .def_readwrite("theta0", &PhotoAngleDistribution::DeflectionAngles::theta0)
+            .def_readwrite("cosphi1", &PhotoAngleDistribution::DeflectionAngles::cosphi1)
+            .def_readwrite("theta1", &PhotoAngleDistribution::DeflectionAngles::theta1);
+
+    py::enum_<PhotoPairFactory::PhotoAngle >(m_sub_photopair, "PhotoAngle")
+            .value("PhotoAngleTsaiIntegral", PhotoPairFactory::PhotoAngleTsaiIntegral)
+            .value("PhotoAngleEGS", PhotoPairFactory::PhotoAngleEGS)
+            .value("PhotoAngleNoDeflection", PhotoPairFactory::PhotoAngleNoDeflection);
+
 }

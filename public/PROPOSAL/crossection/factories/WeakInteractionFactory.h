@@ -47,15 +47,15 @@ namespace PROPOSAL {
     public:
         enum Enum
         {
-            None = 0,
-            CooperSarkarMertsch
+            Fail = 0,
+            None,
+            CooperSarkarMertsch,
         };
 
         struct Definition
         {
             Definition()
-                    : parametrization(CooperSarkarMertsch)
-                    , weak_enable(false)
+                    : parametrization(None)
                     , multiplier(1.0)
             {
             }
@@ -63,8 +63,6 @@ namespace PROPOSAL {
             bool operator==(const WeakInteractionFactory::Definition& def) const
             {
                 if (parametrization != def.parametrization)
-                    return false;
-                else if (weak_enable != def.weak_enable)
                     return false;
                 else if (multiplier != def.multiplier)
                     return false;
@@ -78,7 +76,6 @@ namespace PROPOSAL {
             }
 
             Enum parametrization;
-            bool weak_enable;
             double multiplier;
         };
 

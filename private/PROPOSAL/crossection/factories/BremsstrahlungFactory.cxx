@@ -22,6 +22,8 @@ BremsstrahlungFactory::BremsstrahlungFactory()
     Register("bremscompletescreening", CompleteScreening, &BremsCompleteScreening::create);
     Register("bremsandreevbezrukovbugaev", AndreevBezrukovBugaev, &BremsAndreevBezrukovBugaev::create);
     Register("bremssandrocksoedingreksorhode", SandrockSoedingreksoRhode, &BremsSandrockSoedingreksoRhode::create);
+    Register("bremselectronscreening", ElectronScreening, &BremsElectronScreening::create);
+    Register("none", None, nullptr); //empty parametrization
 }
 
 // ------------------------------------------------------------------------- //
@@ -50,6 +52,11 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
                                                           const EnergyCutSettings& cuts,
                                                           const Definition& def) const
 {
+    if(def.parametrization == BremsstrahlungFactory::Enum::None){
+        log_fatal("Can't return Bremsstrahlung Crosssection if parametrization is None");
+        return NULL;
+    }
+
     BremsstrahlungMapEnum::const_iterator it = bremsstrahlung_map_enum_.find(def.parametrization);
 
     if (it != bremsstrahlung_map_enum_.end())
@@ -57,8 +64,8 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
         return new BremsIntegral(*it->second(particle_def, medium, cuts, def.multiplier, def.lpm_effect));
     } else
     {
-        log_fatal("Bremsstrahlung %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warinngs
+        log_fatal("Bremsstrahlung %s not registered!", typeid(def.parametrization).name());
+        return NULL; // Just to prevent warnings
     }
 }
 
@@ -69,6 +76,11 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
                                                           const Definition& def,
                                                           InterpolationDef interpolation_def) const
 {
+    if(def.parametrization == BremsstrahlungFactory::Enum::None){
+        log_fatal("Can't return Bremsstrahlung Crosssection if parametrization is None");
+        return NULL;
+    }
+
     BremsstrahlungMapEnum::const_iterator it = bremsstrahlung_map_enum_.find(def.parametrization);
 
     if (it != bremsstrahlung_map_enum_.end())
@@ -77,8 +89,8 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
                                     interpolation_def);
     } else
     {
-        log_fatal("Bremsstrahlung %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warinngs
+        log_fatal("Bremsstrahlung %s not registered!", typeid(def.parametrization).name());
+        return NULL; // Just to prevent warnings
     }
 }
 
@@ -95,8 +107,8 @@ BremsstrahlungFactory::Enum BremsstrahlungFactory::GetEnumFromString(const std::
         return it->second;
     } else
     {
-        log_fatal("Bremsstrahlung %s not registerd!", name.c_str());
-        return BremsstrahlungFactory::None; // Just to prevent warinngs
+        log_fatal("Bremsstrahlung %s not registered!", name.c_str());
+        return BremsstrahlungFactory::Fail; // Just to prevent warinngs
 
     }
 }
@@ -111,7 +123,7 @@ std::string BremsstrahlungFactory::GetStringFromEnum(const BremsstrahlungFactory
         return it->second;
     } else
     {
-        log_fatal("Bremsstrahlung %s not registerd!", typeid(enum_t).name());
-        return ""; // Just to prevent warinngs
+        log_fatal("Bremsstrahlung %s not registered!", typeid(enum_t).name());
+        return ""; // Just to prevent warnings
     }
 }

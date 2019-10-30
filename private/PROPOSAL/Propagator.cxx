@@ -8,6 +8,7 @@
 // #include <cmath>
 
 #include <fstream>
+#include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -165,11 +166,11 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     // set global settings
     if (json_config.find("global") == json_config.end())
     {
-        log_fatal("No given global settings. Use default");
+        log_fatal("The 'globals' option is not set. Use default options.");
     }
     if (!json_config["global"].is_object())
     {
-        log_fatal("The given global option is not an object.");
+        log_fatal("Invalid input for option 'nodes_propagate'. Expected a json object.");
     }
     nlohmann::json json_global = json_config["global"];
     std::string json_global_str = json_global.dump();
@@ -184,7 +185,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         }
         else
         {
-            log_fatal("The given seed option is not a number.");
+            log_fatal("Invalid input for option 'seed'. Expected a number.");
         }
     }
 
@@ -230,12 +231,12 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
                 }
                 else
                 {
-                    log_fatal("The given do_interpolation option is not a bool.");
+                    log_fatal("Invalid input for option 'do_interpolation'. Expected a bool.");
                 }
             }
             else
             {
-                log_debug("The do_interpolation option is not set. Default is true");
+                log_debug("The 'do_interpolation' option is not set. Use default (true)");
             }
             if (do_interpolation)
             {
@@ -249,12 +250,12 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         }
         else
         {
-            log_fatal("The given global interpolation option is not a json object.");
+            log_fatal("Invalid input for global option 'interpolation'. Expected a json object.");
         }
     }
     else
     {
-        log_debug("No Interpolation-Option set. Use default InterpolationDef");
+        log_debug("The 'interpolation' option is not set. Use default interpolation settings.");
     }
 
     // Read in global sector definition
@@ -269,12 +270,12 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         }
         else
         {
-            log_fatal("The given uniform phasespace sampling option for decays is not a bool.");
+            log_fatal("Invalid input for option 'uniform' (uniform phasespace sampling for decays). Expected a bool.");
         }
     }
     else
     {
-        log_debug("No uniform phasespace sampling option for decays set. Use default (true)");
+        log_debug("The 'uniform' option (uniform phasespace sampling for decays) is not set. Use default (true)");
     }
     particle_.GetDecayTable().SetUniformSampling(uniform);
 
@@ -304,12 +305,12 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         }
         else
         {
-            log_fatal("The given sectors option is not an array of json objects.");
+            log_fatal("Invalid input for option 'sectors'. Expected an array of json objects.");
         }
     }
     else
     {
-        log_fatal("No given sectors option.");
+        log_fatal("The 'sectors' option is not set.");
     }
 
 
@@ -318,7 +319,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         json_sectors = json_config["sectors"][idx];
         if (!json_sectors.is_object())
         {
-            log_fatal("This given sector is not a json object.");
+            log_fatal("Invalid input for an object in 'sectors'. Each sector must be a json object.");
         }
         std::string json_sector_str = json_sectors.dump();
 
@@ -332,12 +333,12 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
             }
             else
             {
-                log_fatal("The given density correction option is not a number.");
+                log_fatal("Invalid input for option 'density_correction'. Expected a number.");
             }
         }
         else
         {
-            log_debug("No given density correction. Use default 1.0");
+            log_debug("The 'density_correction' option is not set. Use default (1.0)");
         }
 
         std::string medium_name = MediumFactory::Get().GetStringFromEnum(medium_def.type);
@@ -349,12 +350,12 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
             }
             else
             {
-                log_fatal("The given medium option is not a string.");
+                log_fatal("Invalid input for option 'medium'. Expected a string.");
             }
         }
         else
         {
-            log_debug("No given medium. Use default (Water)");
+            log_debug("The 'medium' option is not set. Use default (Water)");
         }
         Medium* med = MediumFactory::Get().CreateMedium(medium_name, medium_def.density_correction);
 
@@ -380,12 +381,12 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
             }
             else
             {
-                log_fatal("The given hierarchy option is not a number.");
+                log_fatal("Invalid input for option 'hierarchy'. Expected a number.");
             }
         }
         else
         {
-            log_debug("No given hierarchy. Use default (0)");
+            log_debug("The 'hierarchy' option is not set. Use default (0)");
         }
         geometry->SetHierarchy(hierarchy);
 
@@ -649,7 +650,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             propagationstep_till_closest_approach = false;
         }
 
-        if (result <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance())
+        if (result <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance() || particle_.GetEnergy() <= particle_.GetLow())
             break;
     }
     if (detector_->IsInside(particle_.GetPosition(), particle_.GetDirection()))
@@ -710,7 +711,7 @@ void Propagator::ChooseCurrentSector(const Vector3D& particle_position, const Ve
     for (std::vector<int>::iterator iter = crossed_sector.begin(); iter != crossed_sector.end(); ++iter)
     {
 
-        // Current Hierachy is equal -> Look at the density!
+        // Current Hierarchy is equal -> Look at the density!
         //
         if (current_sector_->GetGeometry()->GetHierarchy() == sectors_[*iter]->GetGeometry()->GetHierarchy())
         {
@@ -807,7 +808,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal("The given shape option is not a string.");
+            log_fatal("Invalid input for option 'shape'. Expected a string.");
         }
     }
     else
@@ -853,18 +854,18 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
                     }
                     else
                     {
-                        log_fatal("The given origin option needs doubles in the array.");
+                        log_fatal("Invalid input for option 'origin'. Expected an array consisting of three numbers, but the objects in the array are no numbers.");
                     }
                 }
             }
             else
             {
-                log_fatal("The given origin option is not an array of len 3.");
+                log_fatal("Invalid input for option 'origin'. Expected an array consisting of three numbers, but the array has not the length three.");
             }
         }
         else
         {
-            log_fatal("The given origin option is not an array of 3 doubles.");
+            log_fatal("Invalid input for option 'origin'. Expected an array consisting of three numbers, but the input is not an array.");
         }
     }
     else
@@ -891,7 +892,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
             }
             else
             {
-                log_fatal("The given outer_radius option is not a number.");
+                log_fatal("Invalid input for option 'outer_radius'. Expected a number.");
             }
         }
         else
@@ -907,7 +908,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
             }
             else
             {
-                log_fatal("The given inner_radius option is not a number.");
+                log_fatal("Invalid input for option 'inner_radius'. Expected a number.");
             }
         }
         else
@@ -935,7 +936,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
             }
             else
             {
-                log_fatal("The given length option is not a number.");
+                log_fatal("Invalid input for option 'length'. Expected a number.");
             }
         }
         else
@@ -951,7 +952,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
             }
             else
             {
-                log_fatal("The given width option is not a number.");
+                log_fatal("Invalid input for option 'width'. Expected a number.");
             }
         }
         else
@@ -967,7 +968,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
             }
             else
             {
-                log_fatal("The given height option is not a number.");
+                log_fatal("Invalid input for option 'height'. Expected a number.");
             }
         }
         else
@@ -996,7 +997,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
             }
             else
             {
-                log_fatal("The given outer_radius option is not a number.");
+                log_fatal("Invalid input for option 'outer_radius'. Expected a number.");
             }
         }
         else
@@ -1012,7 +1013,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
             }
             else
             {
-                log_fatal("The given inner_radius option is not a number.");
+                log_fatal("Invalid input for option 'inner_radius'. Expected a number.");
             }
         }
         else
@@ -1028,7 +1029,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
             }
             else
             {
-                log_fatal("The given height option is not a number.");
+                log_fatal("Invalid input for option 'height'. Expected a number.");
             }
         }
         else
@@ -1064,12 +1065,12 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         }
         else
         {
-            log_fatal("The given nodes_propagate option is not a number.");
+            log_fatal("Invalid input for option 'nodes_propagate'. Expected a number.");
         }
     }
     else
     {
-        log_debug("The nodes_propagate option is not set. Use default (1000)");
+        log_debug("The 'nodes_propagate option' is not set. Use default (1000)");
     }
     
     if (json_object.find("nodes_continous_randomization") != json_object.end())
@@ -1080,12 +1081,12 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         }
         else
         {
-            log_fatal("The given nodes_continous_randomization option is not a number.");
+            log_fatal("Invalid input for option 'nodes_continous_randomization'. Expected a number.");
         }
     }
     else
     {
-        log_debug("The nodes_continous_randomization option is not set. Use default (300)");
+        log_debug("The 'nodes_continous_randomization' option is not set. Use default (300)");
     }
     
     if (json_object.find("nodes_cross_section") != json_object.end())
@@ -1096,12 +1097,12 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         }
         else
         {
-            log_fatal("The given nodes_cross_section option is not a number.");
+            log_fatal("Invalid input for option 'nodes_cross_section'. Expected a number.");
         }
     }
     else
     {
-        log_debug("The nodes_cross_section option is not set. Use default (100)");
+        log_debug("The 'nodes_cross_section' option is not set. Use default (100)");
     }
     
     if (json_object.find("max_node_energy") != json_object.end())
@@ -1112,12 +1113,12 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         }
         else
         {
-            log_fatal("The given max_node_energy option is not a number.");
+            log_fatal("Invalid input for option 'max_node_energy'. Expected a number.");
         }
     }
     else
     {
-        log_debug("The max_node_energy option is not set. Use default (1e14 MeV)");
+        log_debug("The 'max_node_energy' option is not set. Use default (1e14 MeV)");
     }
 
 
@@ -1129,12 +1130,12 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         }
         else
         {
-            log_fatal("The given do_binary_tables option is not a bool.");
+            log_fatal("Invalid input for option 'do_binary_tables'. Expected a bool.");
         }
     }
     else
     {
-        log_debug("The do_binary_tables option is not set. Use default (true)");
+        log_debug("The 'do_binary_tables' option is not set. Use default (true)");
     }
 
     if (json_object.find("just_use_readonly_path") != json_object.end())
@@ -1145,12 +1146,12 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         }
         else
         {
-            log_fatal("The given just_use_readonly_path option is not a bool.");
+            log_fatal("Invalid input for option 'just_use_readonly_path'. Expected a bool.");
         }
     }
     else
     {
-        log_debug("The just_use_readonly_path option is not set. Use default (false)");
+        log_debug("The 'just_use_readonly_path' option is not set. Use default (false)");
     }
 
     // Parse to find path to interpolation tables
@@ -1174,13 +1175,13 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
                 }
                 else
                 {
-                    log_fatal("The given path_to_tables option does not consist of strings.");
+                    log_fatal("Invalid input for option 'path_to_tables'. Expected a string or a list of strings.");
                 }
             }
         }
         else
         {
-            log_fatal("The given path_to_tables option must be a string or a list of strings.");
+            log_fatal("Invalid input for option 'path_to_tables'. Expected a string or a list of strings.");
         }
 
         if (table_path_str != "")
@@ -1219,13 +1220,13 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
                 }
                 else
                 {
-                    log_fatal("The given path_to_tables_readonly option does not consist of strings.");
+                    log_fatal("Invalid input for option 'path_to_tables_readonly'. Expected a string or a list of strings.");
                 }
             }
         }
         else
         {
-            log_fatal("The given path_to_tables_readonly option must be a string or a list of strings.");
+            log_fatal("Invalid input for option 'path_to_tables_readonly'. Expected a string or a list of strings.");
         }
 
         if (table_path_str != "")
@@ -1240,7 +1241,7 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
     }
     else
     {
-        log_debug("No path to readonly tables set. Use default and look at writable path to tables.");
+        log_debug("No 'path_to_tables_readonly' option set. Use default and look at writable path to tables.");
     }
 
     return interpolation_def;
@@ -1259,12 +1260,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given brems_multiplier option is not a double.");
+            log_fatal("Invalid input for option 'brems_multiplier'. Expected a number.");
         }
     }
     else
     {
-        log_debug("No given brems_multiplier option given. Use default (%f)", sec_def_global.utility_def.brems_def.multiplier);
+        log_debug("The 'brems_multiplier' option is not set. Use default (%f)", sec_def_global.utility_def.brems_def.multiplier);
     }
 
     if (json_global.find("photo_multiplier") != json_global.end())
@@ -1275,13 +1276,13 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given photo_multiplier option is not a double.");    
+            log_fatal("Invalid input for option 'photo_multiplier'. Expected a number.");
         }
         
     }
     else
     {
-        log_debug("No given photo_multiplier option given. Use default (%f)", sec_def_global.utility_def.photo_def.multiplier);
+        log_debug("The 'photo_multiplier' option is not set. Use default (%f)", sec_def_global.utility_def.photo_def.multiplier);
     }
 
     if (json_global.find("ioniz_multiplier") != json_global.end())
@@ -1292,12 +1293,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given ioniz_multiplier option is not a double.");
+            log_fatal("Invalid input for option 'ioniz_multiplier'. Expected a number.");
         }
     }
     else
     {
-        log_debug("No given ioniz_multiplier option given. Use default (%f)", sec_def_global.utility_def.ioniz_def.multiplier);
+        log_debug("The 'ioniz_multiplier' option is not set. Use default (%f)", sec_def_global.utility_def.ioniz_def.multiplier);
     }
 
     if (json_global.find("epair_multiplier") != json_global.end())
@@ -1308,12 +1309,28 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given epair_multiplier option is not a double.");
+            log_fatal("Invalid input for option 'epair_multiplier'. Expected a number.");
         }
     }
     else
     {
-        log_debug("No given epair_multiplier option given. Use default (%f)", sec_def_global.utility_def.epair_def.multiplier);
+        log_debug("The 'epair_multiplier' option is not set. Use default (%f)", sec_def_global.utility_def.epair_def.multiplier);
+    }
+
+    if (json_global.find("annihilation_multiplier") != json_global.end())
+    {
+        if (json_global["annihilation_multiplier"].is_number())
+        {
+            sec_def_global.utility_def.annihilation_def.multiplier = json_global["annihilation_multiplier"].get<double>();
+        }
+        else
+        {
+            log_fatal("Invalid input for option 'annihilation_multiplier'. Expected a number.");
+        }
+    }
+    else
+    {
+        log_debug("The 'annihilation_multiplier' option is not set. Use default (%f)", sec_def_global.utility_def.annihilation_def.multiplier);
     }
 
     if (json_global.find("mupair_multiplier") != json_global.end())
@@ -1324,12 +1341,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given mupair_multiplier option is not a double.");
+            log_fatal("Invalid input for option 'mupair_multiplier'. Expected a number.");
         }
     }
     else
     {
-        log_debug("No given mupair_multiplier option given. Use default (%f)", sec_def_global.utility_def.mupair_def.multiplier);
+        log_debug("The 'mupair_multiplier' option is not set. Use default (%f)", sec_def_global.utility_def.mupair_def.multiplier);
     }
 
     if (json_global.find("weak_multiplier") != json_global.end())
@@ -1340,12 +1357,44 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given weak_multiplier option is not a double.");
+            log_fatal("Invalid input for option 'weak_multiplier'. Expected a number.");
         }
     }
     else
     {
-        log_debug("No given weak_multiplier option given. Use default (%f)", sec_def_global.utility_def.weak_def.multiplier);
+        log_debug("The 'weak_multiplier' option is not set. Use default (%f)", sec_def_global.utility_def.weak_def.multiplier);
+    }
+
+    if (json_global.find("compton_multiplier") != json_global.end())
+    {
+        if (json_global["compton_multiplier"].is_number())
+        {
+            sec_def_global.utility_def.compton_def.multiplier = json_global["compton_multiplier"].get<double>();
+        }
+        else
+        {
+            log_fatal("Invalid input for option 'compton_multiplier'. Expected a number.");
+        }
+    }
+    else
+    {
+        log_debug("The 'compton_multiplier' option is not set. Use default (%f)", sec_def_global.utility_def.compton_def.multiplier);
+    }
+
+    if (json_global.find("photopair_multiplier") != json_global.end())
+    {
+        if (json_global["photopair_multiplier"].is_number())
+        {
+            sec_def_global.utility_def.photopair_def.multiplier = json_global["photopair_multiplier"].get<double>();
+        }
+        else
+        {
+            log_fatal("Invalid input for option 'photopair_multiplier'. Expected a number.");
+        }
+    }
+    else
+    {
+        log_debug("The 'photopair_multiplier' option is not set. Use default (%f)", sec_def_global.utility_def.photopair_def.multiplier);
     }
 
     if (json_global.find("lpm") != json_global.end())
@@ -1357,29 +1406,14 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given lpm option is not a bool.");
+            log_fatal("Invalid input for option 'lpm'. Expected a bool.");
         }
     }
     else
     {
-        log_debug("No given lpm option given. Use default (true)");
+        log_debug("The 'lpm' option is not set. Use default (true)");
     }
 
-    if (json_global.find("mupair_enable") != json_global.end())
-    {
-        if (json_global["mupair_enable"].is_boolean())
-        {
-            sec_def_global.utility_def.mupair_def.mupair_enable = json_global["mupair_enable"].get<bool>();
-        }
-        else
-        {
-            log_fatal("The given mupair_enable option is not a bool.");
-        }
-    }
-    else
-    {
-        log_debug("No given mupair_enable option given. Use default (false)");
-    }
 
     if (json_global.find("mupair_particle_output") != json_global.end())
     {
@@ -1389,28 +1423,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given mupair_particle_output option is not a bool.");
+            log_fatal("Invalid input for option 'mupair_particle_output'. Expected a bool.");
         }
     }
     else
     {
-        log_debug("No given mupair_particle_output option given. Use default (true)");
-    }
-
-    if (json_global.find("weak_enable") != json_global.end())
-    {
-        if (json_global["weak_enable"].is_boolean())
-        {
-            sec_def_global.utility_def.weak_def.weak_enable = json_global["weak_enable"].get<bool>();
-        }
-        else
-        {
-            log_fatal("The given weak_enable option is not a bool.");
-        }
-    }
-    else
-    {
-        log_debug("No given weak_enable option given. Use default (false)");
+        log_debug("The 'mupair_particle_output' option is not set. Use default (true)");
     }
 
     if (json_global.find("exact_time") != json_global.end())
@@ -1421,12 +1439,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given exact_time option is not a bool.");
+            log_fatal("Invalid input for option 'exact_time'. Expected a bool.");
         }
     }
     else
     {
-        log_debug("No given exact_time option given. Use default (true)");
+        log_debug("The 'exact_time' option is not set. Use default (true)");
     }
 
     if (json_global.find("continous_loss_output") != json_global.end())
@@ -1437,12 +1455,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given continous_loss_output option is not a bool.");
+            log_fatal("Invalid input for option 'do_continuous_energy_loss_output'. Expected a bool.");
         }
     }
     else
     {
-        log_debug("No given continous_loss_output option given. Use default true");
+        log_debug("The 'do_continuous_energy_loss_output' option is not set. Use default (true)");
     }
 
     if (json_global.find("stopping_decay") != json_global.end())
@@ -1453,12 +1471,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given stopping_decay option is not a bool.");
+            log_fatal("Invalid input for option 'stopping_decay'. Expected a bool.");
         }
     }
     else
     {
-        log_debug("No given stopping_decay option given. Use default true");
+        log_debug("The 'stopping_decay' option is not set. Use default (true)");
     }
 
     if (json_global.find("only_loss_inside_detector") != json_global.end())
@@ -1469,12 +1487,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given only_loss_inside_detector option is not a bool.");
+            log_fatal("Invalid input for option 'only_loss_inside_detector'. Expected a bool.");
         }
     }
     else
     {
-        log_debug("No given only_loss_inside_detector option given. Use default false");
+        log_debug("The 'only_loss_inside_detector' option is not set. Use default (false)");
     }
 
     if (json_global.find("stochastic_loss_weighting") != json_global.end())
@@ -1486,12 +1504,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given stochastic_loss_weighting option is not a number.");
+            log_fatal("Invalid input for option 'stochastic_loss_weighting'. Expected a number.");
         }
     }
     else
     {
-        log_debug("The stochastic_loss_weighting option is not set. Use default (%f)", sec_def_global.stochastic_loss_weighting);
+        log_debug("The 'stochastic_loss_weighting option' is not set. Use default (%f)", sec_def_global.stochastic_loss_weighting);
     }
 
 
@@ -1504,12 +1522,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given scattering option is not a string.");
+            log_fatal("Invalid input for option 'scattering'. Expected a string.");
         }
     }
     else
     {
-        log_debug("The scattering option is not set. Use default (%s)",
+        log_debug("The 'scattering' option is not set. Use default (%s)",
                   ScatteringFactory::Get().GetStringFromEnum(sec_def_global.scattering_model).c_str());
     }
 
@@ -1522,13 +1540,31 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given brems option is not a string.");
+            log_fatal("Invalid input for option 'brems'. Expected a string.");
         }
     }
     else
     {
-        log_debug("The brems option is not set. Use default %s",
+        log_debug("The 'brems' option is not set. Use default %s",
                   BremsstrahlungFactory::Get().GetStringFromEnum(sec_def_global.utility_def.brems_def.parametrization).c_str());
+    }
+
+    if (json_global.find("ioniz") != json_global.end())
+    {
+        if (json_global["ioniz"].is_string())
+        {
+            std::string ioniz = json_global["ioniz"].get<std::string>();
+            sec_def_global.utility_def.ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(ioniz);
+        }
+        else
+        {
+            log_fatal("Invalid input for option 'ioniz'. Expected a string.");
+        }
+    }
+    else
+    {
+        log_debug("The 'ioniz' option is not set. Use default %s",
+                  IonizationFactory::Get().GetStringFromEnum(sec_def_global.utility_def.ioniz_def.parametrization).c_str());
     }
 
     if (json_global.find("epair") != json_global.end())
@@ -1540,12 +1576,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given epair option is not a string.");
+            log_fatal("Invalid input for option 'epair'. Expected a string.");
         }
     }
     else
     {
-        log_debug("The epair option is not set. Use default %s",
+        log_debug("The 'epair' option is not set. Use default %s",
                   EpairProductionFactory::Get().GetStringFromEnum(sec_def_global.utility_def.epair_def.parametrization).c_str());
     }
     
@@ -1558,13 +1594,31 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given photo option is not a string.");
+            log_fatal("Invalid input for option 'photo'. Expected a string.");
         }
     }
     else
     {
-        log_debug("The photo option is not set. Use default %s",
+        log_debug("The 'photo' option is not set. Use default %s",
                   PhotonuclearFactory::Get().GetStringFromEnum(sec_def_global.utility_def.photo_def.parametrization).c_str());
+    }
+
+    if (json_global.find("annihilation") != json_global.end())
+    {
+        if (json_global["annihilation"].is_string())
+        {
+            std::string annihilation = json_global["annihilation"].get<std::string>();
+            sec_def_global.utility_def.annihilation_def.parametrization = AnnihilationFactory::Get().GetEnumFromString(annihilation);
+        }
+        else
+        {
+            log_fatal("Invalid input for option 'annihilation'. Expected a string.");
+        }
+    }
+    else
+    {
+        log_debug("The 'annihilation' option is not set. Use default %s",
+                  AnnihilationFactory::Get().GetStringFromEnum(sec_def_global.utility_def.annihilation_def.parametrization).c_str());
     }
 
     if (json_global.find("mupair") != json_global.end())
@@ -1576,12 +1630,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given mupair option is not a string.");
+            log_fatal("Invalid input for option 'mupair'. Expected a string.");
         }
     }
     else
     {
-        log_debug("The mupair option is not set. Use default %s",
+        log_debug("The 'mupair' option is not set. Use default %s",
                   MupairProductionFactory::Get().GetStringFromEnum(sec_def_global.utility_def.mupair_def.parametrization).c_str());
     }
 
@@ -1594,13 +1648,67 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given weak option is not a string.");
+            log_fatal("Invalid input for option 'weak'. Expected a string.");
         }
     }
     else
     {
-        log_debug("The weak option is not set. Use default %s",
+        log_debug("The 'weak' option is not set. Use default %s",
                   WeakInteractionFactory::Get().GetStringFromEnum(sec_def_global.utility_def.weak_def.parametrization).c_str());
+    }
+
+    if (json_global.find("compton") != json_global.end())
+    {
+        if (json_global["compton"].is_string())
+        {
+            std::string compton = json_global["compton"].get<std::string>();
+            sec_def_global.utility_def.compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(compton);
+        }
+        else
+        {
+            log_fatal("Invalid input for option 'compton'. Expected a string.");
+        }
+    }
+    else
+    {
+        log_debug("The 'compton' option is not set. Use default %s",
+                  ComptonFactory::Get().GetStringFromEnum(sec_def_global.utility_def.compton_def.parametrization).c_str());
+    }
+
+    if (json_global.find("photopair") != json_global.end())
+    {
+        if (json_global["photopair"].is_string())
+        {
+            std::string photopair = json_global["photopair"].get<std::string>();
+            sec_def_global.utility_def.photopair_def.parametrization = PhotoPairFactory::Get().GetEnumFromString(photopair);
+        }
+        else
+        {
+            log_fatal("Invalid input for option 'photopair'. Expected a string.");
+        }
+    }
+    else
+    {
+        log_debug("The 'photopair' option is not set. Use default %s",
+                  PhotoPairFactory::Get().GetStringFromEnum(sec_def_global.utility_def.photopair_def.parametrization).c_str());
+    }
+
+    if (json_global.find("photoangle") != json_global.end())
+    {
+        if (json_global["photoangle"].is_string())
+        {
+            std::string photoangle = json_global["photoangle"].get<std::string>();
+            sec_def_global.utility_def.photopair_def.photoangle = PhotoPairFactory::Get().GetPhotoAngleEnumFromString(photoangle);
+        }
+        else
+        {
+            log_fatal("Invalid input for option 'photoangle'. Expected a string.");
+        }
+    }
+    else
+    {
+        log_debug("The 'photoangle' option is not set. Use default %s",
+                  PhotoPairFactory::Get().GetStringFromPhotoAngleEnum(sec_def_global.utility_def.photopair_def.photoangle).c_str());
     }
 
     if (json_global.find("photo_shadow") != json_global.end())
@@ -1612,12 +1720,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given photo_shadow option is not a string.");
+            log_fatal("Invalid input for option 'photo_shadow'. Expected a string.");
         }
     }
     else
     {
-        log_debug("The photo_shadow option is not set. Use default %s",
+        log_debug("The 'photo_shadow' option is not set. Use default %s",
                   PhotonuclearFactory::Get().GetStringFromShadowEnum(sec_def_global.utility_def.photo_def.shadow).c_str());
     }
 
@@ -1629,12 +1737,12 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         }
         else
         {
-            log_fatal("The given photo_hard_component option is not a bool.");
+            log_fatal("Invalid input for option 'photo_hard_component'. Expected a bool.");
         }
     }
     else
     {
-        log_debug("The photo_hard_component option is not set. Use default %s",
+        log_debug("The 'photo_hard_component' option is not set. Use default %s",
                   sec_def_global.utility_def.photo_def.hard_component ? "true" : "false");
     }
 
@@ -1670,7 +1778,7 @@ std::string Propagator::ParseCutSettings(const std::string& json_object_str,
     }
     else
     {
-        log_debug("No given %s . Use default", json_key.c_str());
+        log_debug("The '%s' option is not set. Use default", json_key.c_str());
     }
 
     // get ecut
@@ -1682,12 +1790,12 @@ std::string Propagator::ParseCutSettings(const std::string& json_object_str,
         }
         else
         {
-            log_fatal("The given %s option is not a number.", ecut_str.c_str());
+            log_fatal("Invalid input for option '%s'. Expected a number.", ecut_str.c_str());
         }
     }
     else
     {
-        log_debug("No given %s . Use default %f", ecut_str.c_str(), default_ecut);
+        log_debug("The '%s' option is not set. Use default %f.", ecut_str.c_str(), default_ecut);
     }
 
     // get vcut
@@ -1699,12 +1807,12 @@ std::string Propagator::ParseCutSettings(const std::string& json_object_str,
         }
         else
         {
-            log_fatal("The given %s option is not a number.", vcut_str.c_str());
+            log_fatal("Invalid input for option '%s'. Expected a number.", vcut_str.c_str());
         }
     }
     else
     {
-        log_debug("No given %s . Use default %f", vcut_str.c_str(), default_vcut);
+        log_debug("The '%s' option is not set. Use default %f.", vcut_str.c_str(), default_vcut);
     }
 
     // get continuous randomization
@@ -1716,12 +1824,12 @@ std::string Propagator::ParseCutSettings(const std::string& json_object_str,
         }
         else
         {
-            log_fatal("The given %s option is not a number.", cont_str.c_str());
+            log_fatal("Invalid input for option '%s'. Expected a number.", cont_str.c_str());
         }
     }
     else
     {
-        log_debug("No given %s . Use default %s", cont_str.c_str(), default_contrand ? "true" : "false");
+        log_debug("The '%s' option is not set. Use default %s.", cont_str.c_str(), default_contrand ? "true" : "false");
     }
 
     std::string output_object_str = output_object.dump();

@@ -53,12 +53,14 @@ public:
 
     enum Enum
     {
-        None = 0,
+        Fail = 0,
+        None,
         PetrukhinShestakov,
         KelnerKokoulinPetrukhin,
         CompleteScreening,
         AndreevBezrukovBugaev,
-        SandrockSoedingreksoRhode
+        SandrockSoedingreksoRhode,
+        ElectronScreening,
     };
 
     struct Definition

@@ -191,6 +191,7 @@ void init_particle(py::module& m) {
         .value("MuPair", DynamicData::MuPair)
         .value("Hadrons", DynamicData::Hadrons)
         .value("ContinuousEnergyLoss", DynamicData::ContinuousEnergyLoss)
+        .value("Compton", DynamicData::Compton)
         .value("WeakInt", DynamicData::WeakInt);
 
     py::class_<DynamicData, std::shared_ptr<DynamicData>>(m_sub, "DynamicData",

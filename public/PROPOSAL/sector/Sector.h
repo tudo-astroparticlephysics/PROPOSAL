@@ -158,10 +158,9 @@ class Sector {
     /**
      *  Makes Stochastic Energyloss
      *
-     *  \return pair of energy loss [MeV] and kind of interaction
+     *  \return tuple of energy loss [MeV], kind of interaction and list of produced particles
      */
-    std::pair<double, DynamicData::Type> MakeStochasticLoss(
-        double particle_energy);
+    std::tuple<double, DynamicData::Type, std::pair<std::vector<Particle*>, bool> > MakeStochasticLoss(double particle_energy);
 
     // --------------------------------------------------------------------- //
     // Enable options & Setter

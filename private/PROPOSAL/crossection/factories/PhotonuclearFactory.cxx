@@ -33,6 +33,7 @@ PhotonuclearFactory::PhotonuclearFactory()
     RegisterRealPhoton("photobezrukovbugaev", BezrukovBugaev, &PhotoBezrukovBugaev::create);
     RegisterRealPhoton("photorhode", Rhode, &PhotoRhode::create);
     RegisterRealPhoton("photokokoulin", Kokoulin, &PhotoKokoulin::create);
+    RegisterRealPhoton("none", None, nullptr);
 
     RegisterQ2("photoabramowiczlevinlevymaor91",
                AbramowiczLevinLevyMaor91,
@@ -106,8 +107,8 @@ ShadowEffect* PhotonuclearFactory::CreateShadowEffect(const std::string& name)
         return it->second();
     } else
     {
-        log_fatal("Photonuclear %s not registerd!", name.c_str());
-        return NULL; // Just to prevent warinngs
+        log_fatal("Photonuclear %s not registered!", name.c_str());
+        return NULL; // Just to prevent warnings
     }
 }
 
@@ -121,8 +122,8 @@ ShadowEffect* PhotonuclearFactory::CreateShadowEffect(const Shadow& shadow)
         return it->second();
     } else
     {
-        log_fatal("Photonuclear %s not registerd!", typeid(shadow).name());
-        return NULL; // Just to prevent warinngs
+        log_fatal("Photonuclear %s not registered!", typeid(shadow).name());
+        return NULL; // Just to prevent warnings
     }
 }
 
@@ -132,6 +133,11 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
                                                       const EnergyCutSettings& cuts,
                                                       const Definition& def) const
 {
+    if(def.parametrization == PhotonuclearFactory::Enum::None){
+        log_fatal("Can't return Photonuclear Crosssection if parametrization is None");
+        return NULL;
+    }
+
     PhotoQ2MapEnum::const_iterator it_q2            = photo_q2_map_enum_.find(def.parametrization);
     PhotoRealPhotonMapEnum::const_iterator it_photo = photo_real_map_enum_.find(def.parametrization);
 
@@ -148,8 +154,8 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
         return new PhotoIntegral(*it_photo->second(particle_def, medium, cuts, def.multiplier, def.hard_component));
     } else
     {
-        log_fatal("Photonuclear %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warinngs
+        log_fatal("Photonuclear %s not registered!", typeid(def.parametrization).name());
+        return NULL; // Just to prevent warnings
     }
 }
 
@@ -160,6 +166,11 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
                                                       const Definition& def,
                                                       InterpolationDef interpolation_def) const
 {
+    if(def.parametrization == PhotonuclearFactory::Enum::None){
+        log_fatal("Can't return Photonuclear Crosssection if parametrization is None");
+        return NULL;
+    }
+
     PhotoQ2MapEnum::const_iterator it_q2            = photo_q2_map_enum_.find(def.parametrization);
     PhotoRealPhotonMapEnum::const_iterator it_photo = photo_real_map_enum_.find(def.parametrization);
 
@@ -178,8 +189,8 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
                                     interpolation_def);
     } else
     {
-        log_fatal("Photonuclear %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warinngs
+        log_fatal("Photonuclear %s not registered!", typeid(def.parametrization).name());
+        return NULL; // Just to prevent warnings
     }
 }
 
@@ -196,8 +207,8 @@ PhotonuclearFactory::Enum PhotonuclearFactory::GetEnumFromString(const std::stri
         return it->second;
     } else
     {
-        log_fatal("Photonuclear %s not registerd!", name.c_str());
-        return PhotonuclearFactory::None; // Just to prevent warinngs
+        log_fatal("Photonuclear %s not registered!", name.c_str());
+        return PhotonuclearFactory::Fail; // Just to prevent warnings
     }
 }
 
@@ -211,8 +222,8 @@ std::string PhotonuclearFactory::GetStringFromEnum(const PhotonuclearFactory::En
         return it->second;
     } else
     {
-        log_fatal("Photonuclear %s not registerd!", typeid(enum_t).name());
-        return ""; // Just to prevent warinngs
+        log_fatal("Photonuclear %s not registered!", typeid(enum_t).name());
+        return ""; // Just to prevent warnings
     }
 }
 
@@ -229,8 +240,8 @@ PhotonuclearFactory::Shadow PhotonuclearFactory::GetShadowEnumFromString(const s
         return it->second;
     } else
     {
-        log_fatal("Photonuclear %s not registerd!", name.c_str());
-        return PhotonuclearFactory::ShadowNone; // Just to prevent warinngs
+        log_fatal("Photonuclear %s not registered!", name.c_str());
+        return PhotonuclearFactory::ShadowNone; // Just to prevent warnings
     }
 }
 
@@ -244,7 +255,7 @@ std::string PhotonuclearFactory::GetStringFromShadowEnum(const Shadow& shadow)
         return it->second;
     } else
     {
-        log_fatal("Photonuclear %s not registerd!", typeid(shadow).name());
-        return ""; // Just to prevent warinngs
+        log_fatal("Photonuclear %s not registered!", typeid(shadow).name());
+        return ""; // Just to prevent warnings
     }
 }

@@ -104,7 +104,7 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
     for (unsigned int i = 0; i < number_of_interpolants; ++i) {
         builder_vec[i]
             .SetMax(number_of_sampling_points)
-            .SetXMin(particle_def.mass)
+            .SetXMin(particle_def.low)
             .SetXMax(interpolation_def_.max_node_energy)
             .SetRomberg(interpolation_def_.order_of_interpolation)
             .SetRational(false)
@@ -165,7 +165,7 @@ double UtilityInterpolantDisplacement::Calculate(double ei,
         stored_result_ = interpolant_->Interpolate(ei);
         aux = stored_result_ - interpolant_->Interpolate(ef);
 
-        if (std::abs(aux) > std::abs(stored_result_) * HALF_PRECISION) {
+        if (std::abs(aux) > std::abs(stored_result_) * HALF_PRECISION && aux >= 0) {
             return std::max(aux, 0.0);
         }
     }
@@ -221,7 +221,7 @@ double UtilityInterpolantDisplacement::BuildInterpolant(
     double energy,
     UtilityIntegral& utility,
     Integral& integral) {
-    return integral.Integrate(energy, utility_.GetParticleDef().mass,
+    return integral.Integrate(energy, utility_.GetParticleDef().low,
                               std::bind(&UtilityIntegral::FunctionToIntegral,
                                         &utility, std::placeholders::_1),
                               4);
@@ -314,7 +314,7 @@ double UtilityInterpolantInteraction::BuildInterpolant(double energy,
                                                        Integral& integral) {
     if (up_) {
         return integral.Integrate(
-            energy, utility_.GetParticleDef().mass,
+            energy, utility_.GetParticleDef().low,
             std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
                       std::placeholders::_1),
             4);

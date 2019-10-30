@@ -1,4 +1,5 @@
 
+#include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/medium/Medium.h"
 
@@ -16,16 +17,24 @@ using namespace PROPOSAL;
 Utility::Definition::Definition()
     // : do_interpolation(true)
     // , interpolation_def()
-    : brems_def(),
-      photo_def(),
-      epair_def(),
-      ioniz_def(),
-      mupair_def(),
-      weak_def() {}
+    : brems_def()
+    , compton_def()
+    , photo_def()
+    , epair_def()
+    , ioniz_def()
+    , mupair_def()
+    , weak_def()
+    , photopair_def()
+    , annihilation_def()
+{
+}
+
 
 bool Utility::Definition::operator==(
     const Utility::Definition& utility_def) const {
     if (brems_def != utility_def.brems_def)
+        return false;
+    else if (compton_def != utility_def.compton_def)
         return false;
     else if (photo_def != utility_def.photo_def)
         return false;
@@ -36,6 +45,10 @@ bool Utility::Definition::operator==(
     else if (mupair_def != utility_def.mupair_def)
         return false;
     else if (weak_def != utility_def.weak_def)
+        return false;
+    else if (photopair_def != utility_def.photopair_def)
+        return false;
+    else if (annihilation_def != utility_def.annihilation_def)
         return false;
 
     return true;
@@ -56,40 +69,66 @@ Utility::Utility(const ParticleDef& particle_def,
                  const Medium& medium,
                  const EnergyCutSettings& cut_settings,
                  Definition utility_def)
-    : particle_def_(particle_def),
-      medium_(medium.clone()),
-      cut_settings_(cut_settings),
-      crosssections_() {
-    crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
-        particle_def_, *medium_, cut_settings_, utility_def.brems_def));
-
-    crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(
-        particle_def_, *medium_, cut_settings_, utility_def.photo_def));
-
-    crosssections_.push_back(
-        EpairProductionFactory::Get().CreateEpairProduction(
-            particle_def_, *medium_, cut_settings_, utility_def.epair_def));
-
-    crosssections_.push_back(IonizationFactory::Get().CreateIonization(
-        particle_def_, *medium_, cut_settings_, utility_def.ioniz_def));
-
-    if (utility_def.mupair_def.mupair_enable == true) {
-        crosssections_.push_back(
-            MupairProductionFactory::Get().CreateMupairProduction(
-                particle_def_, *medium_, cut_settings_,
-                utility_def.mupair_def));
-        log_debug("Mupair Production enabled");
-    } else {
-        log_debug("Mupair Production disabled");
+    : particle_def_(particle_def)
+    , medium_(medium.clone())
+    , cut_settings_(cut_settings)
+    , crosssections_()
+{
+    if(utility_def.brems_def.parametrization!=BremsstrahlungFactory::Enum::None) {
+        crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
+                particle_def_, *medium_, cut_settings_, utility_def.brems_def));
     }
 
-    if (utility_def.weak_def.weak_enable == true) {
-        crosssections_.push_back(
-            WeakInteractionFactory::Get().CreateWeakInteraction(
-                particle_def_, *medium_, utility_def.weak_def));
+    if(utility_def.photo_def.parametrization!=PhotonuclearFactory::Enum::None) {
+        crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(
+                particle_def_, *medium_, cut_settings_,utility_def.photo_def));
+    }
+
+    if(utility_def.epair_def.parametrization!=EpairProductionFactory::Enum::None) {
+        crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(
+                particle_def_, *medium_, cut_settings_, utility_def.epair_def));
+    }
+
+    if(utility_def.ioniz_def.parametrization!=IonizationFactory::Enum::None) {
+        crosssections_.push_back(IonizationFactory::Get().CreateIonization(
+                particle_def_, *medium_, cut_settings_, utility_def.ioniz_def));
+    }
+    else{
+        log_debug("No Ionization cross section chosen. For lepton propagation,Initialization may fail because no cross"
+                  "section for small energies are available. You may have to enable Ionization or set a higher e_low"
+                  "parameter for the particle.");
+    }
+
+    if(utility_def.annihilation_def.parametrization!=AnnihilationFactory::Enum::None) {
+        crosssections_.push_back(AnnihilationFactory::Get().CreateAnnihilation(
+                particle_def_, *medium_, utility_def.annihilation_def));
+        log_debug("Annihilation enabled");
+    }
+
+    if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
+        crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
+            particle_def_, *medium_, cut_settings_, utility_def.mupair_def));
+        log_debug("Mupair Production enabled");
+    }
+
+    if(utility_def.weak_def.parametrization!=WeakInteractionFactory::Enum::None) {
+        crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
+                    particle_def_, *medium_, utility_def.weak_def));
         log_debug("Weak Interaction enabled");
-    } else {
-        log_debug("Weak Interaction disabled");
+    }
+
+    // Photon interactions
+
+    if(utility_def.compton_def.parametrization!=ComptonFactory::Enum::None) {
+        crosssections_.push_back(ComptonFactory::Get().CreateCompton(
+                particle_def_, *medium_, cut_settings_, utility_def.compton_def));
+        log_debug("Compton enabled");
+    }
+
+    if(utility_def.photopair_def.parametrization!=PhotoPairFactory::Enum::None) {
+        crosssections_.push_back(PhotoPairFactory::Get().CreatePhotoPair(
+                particle_def_, *medium_, utility_def.photopair_def));
+        log_debug("PhotoPairProduction enabled");
     }
 }
 
@@ -98,45 +137,65 @@ Utility::Utility(const ParticleDef& particle_def,
                  const EnergyCutSettings& cut_settings,
                  Definition utility_def,
                  const InterpolationDef& interpolation_def)
-    : particle_def_(particle_def),
-      medium_(medium.clone()),
-      cut_settings_(cut_settings),
-      crosssections_() {
-    crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
-        particle_def_, *medium_, cut_settings_, utility_def.brems_def,
-        interpolation_def));
-
-    crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(
-        particle_def_, *medium_, cut_settings_, utility_def.photo_def,
-        interpolation_def));
-
-    crosssections_.push_back(
-        EpairProductionFactory::Get().CreateEpairProduction(
-            particle_def_, *medium_, cut_settings_, utility_def.epair_def,
-            interpolation_def));
-
-    crosssections_.push_back(IonizationFactory::Get().CreateIonization(
-        particle_def_, *medium_, cut_settings_, utility_def.ioniz_def,
-        interpolation_def));
-
-    if (utility_def.mupair_def.mupair_enable == true) {
-        crosssections_.push_back(
-            MupairProductionFactory::Get().CreateMupairProduction(
-                particle_def_, *medium_, cut_settings_, utility_def.mupair_def,
-                interpolation_def));
-        log_debug("Mupair Production enabled");
-    } else {
-        log_debug("Mupair Production disabled");
+    : particle_def_(particle_def)
+    , medium_(medium.clone())
+    , cut_settings_(cut_settings)
+    , crosssections_()
+{
+    if(utility_def.brems_def.parametrization!=BremsstrahlungFactory::Enum::None) {
+        crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
+                particle_def_, *medium_, cut_settings_, utility_def.brems_def, interpolation_def));
     }
 
-    if (utility_def.weak_def.weak_enable == true) {
-        crosssections_.push_back(
-            WeakInteractionFactory::Get().CreateWeakInteraction(
-                particle_def_, *medium_, utility_def.weak_def,
-                interpolation_def));
+    if(utility_def.photo_def.parametrization!=PhotonuclearFactory::Enum::None) {
+        crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(
+                particle_def_, *medium_, cut_settings_, utility_def.photo_def, interpolation_def));
+    }
+
+    if(utility_def.epair_def.parametrization!=EpairProductionFactory::Enum::None) {
+        crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(
+                particle_def_, *medium_, cut_settings_, utility_def.epair_def, interpolation_def));
+    }
+
+    if(utility_def.ioniz_def.parametrization!=IonizationFactory::Enum::None) {
+        crosssections_.push_back(IonizationFactory::Get().CreateIonization(
+                particle_def_, *medium_, cut_settings_, utility_def.ioniz_def, interpolation_def));
+    }else{
+        log_debug("No Ionization cross section chosen. For lepton propagation,Initialization may fail because no cross"
+                  "section for small energies are available. You may have to enable Ionization or set a higher e_low"
+                  "parameter for the particle.");
+    }
+
+    if(utility_def.annihilation_def.parametrization!=AnnihilationFactory::Enum::None) {
+        crosssections_.push_back(AnnihilationFactory::Get().CreateAnnihilation(
+                particle_def_, *medium_, utility_def.annihilation_def, interpolation_def));
+        log_debug("Annihilation enabled");
+    }
+
+    if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
+        crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
+                    particle_def_, *medium_, cut_settings_, utility_def.mupair_def, interpolation_def));
+        log_debug("Mupair Production enabled");
+    }
+
+    if(utility_def.weak_def.parametrization!=WeakInteractionFactory::Enum::None) {
+        crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
+                    particle_def_, *medium_, utility_def.weak_def, interpolation_def));
         log_debug("Weak Interaction enabled");
-    } else {
-        log_debug("WeakInteraction disabled");
+    }
+
+    // Photon interactions
+
+    if(utility_def.compton_def.parametrization!=ComptonFactory::Enum::None) {
+        crosssections_.push_back(ComptonFactory::Get().CreateCompton(
+                particle_def_, *medium_, cut_settings_, utility_def.compton_def, interpolation_def));
+        log_debug("Compton enabled");
+    }
+
+    if(utility_def.photopair_def.parametrization!=PhotoPairFactory::Enum::None) {
+        crosssections_.push_back(PhotoPairFactory::Get().CreatePhotoPair(
+                particle_def_, *medium_, utility_def.photopair_def, interpolation_def));
+        log_debug("PhotoPairProduction enabled");
     }
 }
 

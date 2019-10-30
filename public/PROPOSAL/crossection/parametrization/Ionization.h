@@ -39,29 +39,99 @@ public:
     Ionization(const Ionization&);
     virtual ~Ionization();
 
-    virtual Parametrization* clone() const { return new Ionization(*this); }
+    virtual Parametrization* clone() const = 0;
 
     // ----------------------------------------------------------------- //
     // Public methods
     // ----------------------------------------------------------------- //
+    double Delta(double beta, double gamma);
+    double DifferentialCrossSection(double energy, double v) = 0;
+private:
 
-    double DifferentialCrossSection(double energy, double v);
+};
 
-    double FunctionToDEdxIntegral(double energy, double v);
+// ----------------------------------------------------------------- //
+// Spefific Parametrization
+// ----------------------------------------------------------------- //
+
+class IonizBetheBlochRossi : public Ionization
+{
+public:
+    IonizBetheBlochRossi(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    IonizBetheBlochRossi(const IonizBetheBlochRossi&);
+    ~IonizBetheBlochRossi();
+
+    Parametrization* clone() const { return new IonizBetheBlochRossi(*this); }
+    static Ionization* create(const ParticleDef& particle_def,
+                                      const Medium& medium,
+                                      const EnergyCutSettings& cuts,
+                                      double multiplier)
+        {
+            return new IonizBetheBlochRossi(particle_def, medium, cuts, multiplier);
+        }
+
+     IntegralLimits GetIntegralLimits(double energy);
+     double DifferentialCrossSection(double energy, double v);
+     double FunctionToDEdxIntegral(double energy, double v);
+
+     const std::string& GetName() const { return name_; }
+
+private:
+     double InelCorrection(double energy, double v);
+     double CrossSectionWithoutInelasticCorrection(double energy, double v);
+     static const std::string name_;
+};
+
+class IonizBergerSeltzerBhabha : public Ionization
+{
+public:
+    IonizBergerSeltzerBhabha(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    IonizBergerSeltzerBhabha(const IonizBergerSeltzerBhabha&);
+    ~IonizBergerSeltzerBhabha();
+
+    Parametrization* clone() const { return new IonizBergerSeltzerBhabha(*this); }
+    static Ionization* create(const ParticleDef& particle_def,
+                                    const Medium& medium,
+                                    const EnergyCutSettings& cuts,
+                                    double multiplier)
+        {
+            return new IonizBergerSeltzerBhabha(particle_def, medium, cuts, multiplier);
+        }
 
     IntegralLimits GetIntegralLimits(double energy);
-
-    // --------------------------------------------------------------------- //
-    // Getter
-    // --------------------------------------------------------------------- //
+    double DifferentialCrossSection(double energy, double v);
+    double FunctionToDEdxIntegral(double energy, double v);
 
     const std::string& GetName() const { return name_; }
 
 private:
     static const std::string name_;
-
-    double InelCorrection(double energy, double v);
-    double CrossSectionWithoutInelasticCorrection(double energy, double v);
 };
+
+class IonizBergerSeltzerMoller : public Ionization
+    {
+    public:
+    IonizBergerSeltzerMoller(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    IonizBergerSeltzerMoller(const IonizBergerSeltzerMoller&);
+    ~IonizBergerSeltzerMoller();
+
+    Parametrization* clone() const { return new IonizBergerSeltzerMoller(*this); }
+        static Ionization* create(const ParticleDef& particle_def,
+                                  const Medium& medium,
+                                  const EnergyCutSettings& cuts,
+                                  double multiplier)
+        {
+            return new IonizBergerSeltzerMoller(particle_def, medium, cuts, multiplier);
+        }
+
+        IntegralLimits GetIntegralLimits(double energy);
+        double DifferentialCrossSection(double energy, double v);
+        double FunctionToDEdxIntegral(double energy, double v);
+
+        const std::string& GetName() const { return name_; }
+
+    private:
+        static const std::string name_;
+    };
 
 } // namespace PROPOSAL

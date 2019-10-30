@@ -19,6 +19,7 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Logging.h"
 
 #define PARTICLE_IMP(cls, MASS, LIFETIME, CHARGE)                                                                      \
     cls##Def::cls##Def()                                                                                               \
@@ -85,7 +86,6 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, ParticleDef const& def)
        << "\t\t" << def.charge << '\n';
     os << "HardComponentTables:" << '\n';
 
-    std::cout << def.hard_component_table.size() << std::endl;
     for (unsigned int i = 0; i < def.hard_component_table.size(); ++i)
     {
         for (unsigned int j = 0; j < def.hard_component_table[i].size(); ++j)
@@ -107,6 +107,7 @@ ParticleDef::ParticleDef()
     , charge(0.0)
     , hard_component_table(HardComponentTables::EmptyTable)
     , decay_table()
+    , weak_partner(nullptr)
 {
 }
 
@@ -124,9 +125,28 @@ ParticleDef::ParticleDef(std::string name,
     , charge(charge)
     , hard_component_table(table)
     , decay_table(decay_table)
+    , weak_partner(nullptr)
 {
 }
 
+ParticleDef::ParticleDef(std::string name,
+                         double mass,
+                         double low,
+                         double lifetime,
+                         double charge,
+                         const HardComponentTables::VecType& table,
+                         const DecayTable& decay_table,
+                         const ParticleDef& partner)
+        : name(name)
+        , mass(mass)
+        , low(low)
+        , lifetime(lifetime)
+        , charge(charge)
+        , hard_component_table(table)
+        , decay_table(decay_table)
+        , weak_partner(&partner)
+{
+}
 ParticleDef::~ParticleDef() {}
 
 ParticleDef::ParticleDef(const ParticleDef& def)
@@ -137,7 +157,18 @@ ParticleDef::ParticleDef(const ParticleDef& def)
     , charge(def.charge)
     , hard_component_table(def.hard_component_table)
     , decay_table(def.decay_table)
+    , weak_partner(def.weak_partner)
 {
+}
+
+const ParticleDef* ParticleDef::GetWeakPartner() const {
+    if(weak_partner == nullptr){
+        log_fatal("WeakPartner not defined for particle %s.", name.c_str());
+        return nullptr;
+    }
+    else{
+        return weak_partner;
+    }
 }
 
 // ParticleDef& ParticleDef::operator=(const ParticleDef& def)
@@ -186,6 +217,9 @@ bool ParticleDef::operator==(const ParticleDef& def) const
     } else if (decay_table != def.decay_table)
     {
         return false;
+    } else if (weak_partner != def.weak_partner)
+    {
+        return false;
     } else
     {
         return true;
@@ -209,6 +243,7 @@ ParticleDef::Builder::Builder()
     , charge(-1)
     , hard_component_table(&HardComponentTables::EmptyTable)
     , decay_table()
+    , weak_partner(nullptr)
 {
 }
 
@@ -216,15 +251,46 @@ ParticleDef::Builder::Builder()
 // Special Particle definitions
 // ------------------------------------------------------------------------- //
 
+EMinusDef::EMinusDef()
+        : ParticleDef(
+            "EMinus",
+            ME,
+            ME,
+            STABLE_PARTICLE,
+            -1.0,
+            HardComponentTables::EmptyTable,
+            DecayTable().addChannel(1.1, StableChannel()),
+            NuEDef::Get())
+{
+}
+
+EMinusDef::~EMinusDef() {}
+
+EPlusDef::EPlusDef()
+        : ParticleDef(
+            "EPlus",
+            ME,
+            ME,
+            STABLE_PARTICLE,
+            1.0,
+            HardComponentTables::EmptyTable,
+            DecayTable().addChannel(1.1, StableChannel()),
+            NuEBarDef::Get())
+{
+}
+
+EPlusDef::~EPlusDef() {}
+
 MuMinusDef::MuMinusDef()
     : ParticleDef(
-          "MuMinus",
-          MMU,
-          MMU,
-          LMU,
-          -1.0,
-          HardComponentTables::MuonTable,
-          DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get())))
+            "MuMinus",
+            MMU,
+            MMU,
+            LMU,
+            -1.0,
+            HardComponentTables::MuonTable,
+            DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get())),
+            NuMuDef::Get())
 {
 }
 
@@ -237,7 +303,8 @@ MuPlusDef::MuPlusDef()
                   LMU,
                   1.0,
                   HardComponentTables::MuonTable,
-                  DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())))
+                  DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())),
+                  NuMuBarDef::Get())
 {
 }
 
@@ -302,7 +369,8 @@ TauMinusDef::TauMinusDef()
                                       .addDaughter(PiPlusDef::Get())
                                       .addDaughter(PiMinusDef::Get())
                                       .addDaughter(NuTauDef::Get())
-                                      .build()))
+                                      .build()),
+                  NuTauDef::Get())
 {
 }
 
@@ -367,11 +435,32 @@ TauPlusDef::TauPlusDef()
                                       .addDaughter(PiPlusDef::Get())
                                       .addDaughter(PiMinusDef::Get())
                                       .addDaughter(NuTauBarDef::Get())
-                                      .build()))
+                                      .build()),
+                  NuTauBarDef::Get())
 {
 }
 
 TauPlusDef::~TauPlusDef() {}
+
+// ------------------------------------------------------------------------- //
+// Photon definition:
+// e_low is set to twice the electron mass, since photons with a lower energy
+// can not produce any leptons and are therefore irrelevant for us...
+// ------------------------------------------------------------------------- //
+
+GammaDef::GammaDef()
+        : ParticleDef(
+        "Gamma",
+        0.,
+        2*ME,
+        STABLE_PARTICLE,
+        0.0,
+        HardComponentTables::EmptyTable,
+        DecayTable().addChannel(1.1, StableChannel()))
+{
+}
+
+GammaDef::~GammaDef() {}
 
 // ------------------------------------------------------------------------- //
 // Signature for following macro definitions:
@@ -380,8 +469,6 @@ TauPlusDef::~TauPlusDef() {}
 //
 // ------------------------------------------------------------------------- //
 
-PARTICLE_IMP(EMinus, ME, STABLE_PARTICLE, -1.0)
-PARTICLE_IMP(EPlus, ME, STABLE_PARTICLE, 1.0)
 
 PARTICLE_IMP(StauMinus, MSTAU, STABLE_PARTICLE, -1.0)
 PARTICLE_IMP(StauPlus, MSTAU, STABLE_PARTICLE, 1.0)
@@ -407,7 +494,6 @@ PARTICLE_IMP(NuTau, 0.0, STABLE_PARTICLE, 0.0)
 PARTICLE_IMP(NuTauBar, 0.0, STABLE_PARTICLE, 0.0)
 
 PARTICLE_IMP(Monopole, MMON, STABLE_PARTICLE, CMON)
-PARTICLE_IMP(Gamma, 0.0, STABLE_PARTICLE, 0.0)
 
 PARTICLE_IMP(SMPMinus, MSMP, STABLE_PARTICLE, -1.0)
 PARTICLE_IMP(SMPPlus, MSMP, STABLE_PARTICLE, 1.0)

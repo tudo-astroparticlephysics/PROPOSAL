@@ -57,7 +57,6 @@ public:
 
 private:
     virtual double CalculateStochasticLoss(double energy, double rnd1);
-    double Delta(double beta, double gamma);
 };
 
 } // namespace PROPOSAL

@@ -22,7 +22,7 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def
     : CrossSectionInterpolant(DynamicData::DeltaE, param)
 {
     // Use overwritten dNdx interpolation
-    InitdNdxInerpolation(def);
+    InitdNdxInterpolation(def);
 
     // --------------------------------------------------------------------- //
     // Builder for DEdx
@@ -83,7 +83,7 @@ IonizInterpolant::IonizInterpolant(const IonizInterpolant& ioniz)
 IonizInterpolant::~IonizInterpolant() {}
 
 // ------------------------------------------------------------------------- //
-void IonizInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
+void IonizInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
 {
     // --------------------------------------------------------------------- //
     // Builder for dNdx

@@ -131,7 +131,7 @@ c++ project by including the header files. The following snippet uses the
 [configuration](resources/config.json) to propagate muons and
 store the muon ranges for further proceeds.
 The parameters of the configuration file are described
-[here](resources/config_docu.md).
+**[here](resources/config_docu.md)**.
 
 ```c++
 #include "PROPOSAL/PROPOSAL.h"

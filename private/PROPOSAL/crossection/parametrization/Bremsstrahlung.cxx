@@ -5,9 +5,11 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/crossection/parametrization/ParamTables.h"
 
 #define BREMSSTRAHLUNG_IMPL(param)                                                                                     \
     Brems##param::Brems##param(const ParticleDef& particle_def,                                                        \
@@ -568,6 +570,151 @@ double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, d
     }
 
     return std::max(((2.0 - 2.0 * v + v * v) * phi1 - 2.0/3.0 * (1. - v) * phi2) + 1./Z * s_atomic + 0.25*ALPHA * phi1 * s_rad, 0.);
+}
+
+// ------------------------------------------------------------------------- //
+// EGS4 parametrization for electrons and positrons
+// CompleteScreening for above 50 MeV, emperical corrections below 50 MeV
+// ------------------------------------------------------------------------- //
+
+BremsElectronScreening::BremsElectronScreening(const ParticleDef& particle_def,
+                               const Medium& medium,
+                               const EnergyCutSettings& cuts,
+                               double multiplier,
+                               bool lpm)
+        : Bremsstrahlung(particle_def, medium, cuts, multiplier, lpm), interpolant_(NULL)
+    {
+        interpolant_ = new Interpolant(A_logZ, A_energies, A_correction, 2, false, false, 2, false, false);
+    }
+
+BremsElectronScreening::BremsElectronScreening(const BremsElectronScreening& brems)
+        : Bremsstrahlung(brems), interpolant_(new Interpolant(*brems.interpolant_))
+    {
+    }
+
+BremsElectronScreening::~BremsElectronScreening() {
+    delete interpolant_;
+}
+
+bool BremsElectronScreening::compare(const Parametrization& parametrization) const
+{
+    const BremsElectronScreening* bremsstrahlung = static_cast<const BremsElectronScreening*>(&parametrization);
+
+    if (interpolant_ != bremsstrahlung->interpolant_)
+        return false;
+    else
+        return Bremsstrahlung::compare(parametrization);
+}
+
+const std::string BremsElectronScreening::name_ = "BremsElectronScreening";
+
+double BremsElectronScreening::DifferentialCrossSection(double energy, double v)
+{
+
+    double aux    = 0;
+    double result = 0;
+
+    result = CalculateParametrization(energy, v);
+
+    aux = particle_def_.charge * particle_def_.charge * (ME / particle_def_.mass) * RE;
+    aux *= aux * (ALPHA / v) * result;
+
+    if (lpm_)
+    {
+        aux *= lpm(energy, v);
+    }
+
+    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * aux;
+}
+
+double BremsElectronScreening::CalculateParametrization(double energy, double v)
+{
+
+    double aux    = 0;
+    double result = 0;
+
+    double Z3 = std::pow(components_[component_index_]->GetNucCharge(), -1. / 3);
+    double logZ = std::log(components_[component_index_]->GetNucCharge());
+
+    double delta = particle_def_.mass * particle_def_.mass * v / (2 * energy * (1 - v));
+    double x = 136 * Z3 * 2 * delta / ME;
+
+    //structure functions
+
+    double phi1, phi2;
+
+    if(x <= 1.0){
+        aux = x*x;
+        phi1 = 20.867 - 3.242 * x + 0.625 * aux;
+        phi2 = 20.029 - 1.930 * x - 0.086 * aux;
+    }
+    else{
+        phi1 = 21.12 - 4.184 * std::log(x + 0.952);
+        phi2 = phi1;
+    }
+
+    // Coulomb correction function and empirical correction factor
+
+    double f_c;
+    double A_fac = interpolant_->InterpolateArray(logZ, energy);
+
+
+    aux = ALPHA * components_[component_index_]->GetNucCharge();
+    aux *= aux;
+    f_c = aux * (1 / (1 + aux) + 0.20206 + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
+
+    // bremsstrahlung contribution with atomic electrons as target particles
+    double Lr, Lp, xi;
+
+    switch ((int)(components_[component_index_]->GetNucCharge() + 0.5))
+    {
+        case 1:
+        {
+            Lr = 5.31;
+            Lp = 6.144;
+            break;
+        }
+        case 2:
+        {
+            Lr = 4.79;
+            Lp = 5.621;
+            break;
+        }
+
+        case 3:
+        {
+            Lr = 4.74;
+            Lp = 5.805;
+            break;
+        }
+
+        case 4:
+        {
+            Lr = 4.71;
+            Lp = 5.924;
+            break;
+        }
+
+        default:
+        {
+            Lr = std::log(184.15 * Z3);
+            Lp = std::log(1194 * Z3 * Z3);
+            break;
+        }
+    }
+
+    xi = Lp / (Lr - f_c);
+
+    if(energy < 50.) {
+        f_c = 0;
+    }
+
+    result = A_fac * components_[component_index_]->GetNucCharge() * (components_[component_index_]->GetNucCharge() + xi);
+
+    aux = (2. - 2. * v + v*v) * (phi1 - 4./3 * logZ - 4 * f_c) - 2./3 * (1. - v) * (phi2 - 4./3 * logZ - 4 * f_c);
+    result *=aux;
+
+    return result;
 }
 
 #undef BREMSSTRAHLUNG_IMPL
