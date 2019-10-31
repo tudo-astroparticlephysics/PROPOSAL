@@ -193,7 +193,7 @@ double UtilityInterpolantDisplacement::Calculate(double ei,
         displacement = utility_.GetMedium().GetDensityDistribution().Correct(
             xi, direction, aux, distance_to_border);
 
-        if (std::abs(aux) > std::abs(stored_result_) * HALF_PRECISION) {
+        if (std::abs(aux) > std::abs(stored_result_) * HALF_PRECISION && aux >= 0) {
             return std::max(displacement, 0.0);
         }
     }
