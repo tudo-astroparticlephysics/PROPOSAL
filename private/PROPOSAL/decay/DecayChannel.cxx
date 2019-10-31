@@ -96,7 +96,7 @@ Vector3D DecayChannel::GenerateRandomDirection()
     double phi       = 2.0 * PI * RandomGenerator::Get().RandomDouble();
     double cos_theta = 2.0 * RandomGenerator::Get().RandomDouble() - 1.0;
     double sin_theta = std::sqrt((1.0 - cos_theta) * (1.0 + cos_theta));
-    Vector3D direction = Vector3D(sin_theta * std::sin(phi), sin_theta * std::cos(phi), cos_theta);
+    Vector3D direction = Vector3D(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta);
     direction.CalculateSphericalCoordinates();
     // direction.SetSphericalCoordinates(1.0, phi, std::acos(cos_theta));
     return direction;
