@@ -149,8 +149,8 @@ DecayChannel::DecayProducts LeptonicDecayChannelApprox::Decay(const Particle& pa
     Boost(*products[1], products[0]->GetDirection(), gamma, betagamma);
     Boost(*products[2], products[0]->GetDirection(), gamma, betagamma);
 
-    // Boost all particle in parent frame
-    Boost(products, particle.GetDirection(), particle.GetEnergy()/particle.GetMass(), particle.GetMomentum()/particle.GetMass());
+    // Boost all products in Lab frame (the reason, why the boosting goes in the negative direction of the particle)
+    Boost(products, -particle.GetDirection(), particle.GetEnergy()/particle.GetMass(), particle.GetMomentum()/particle.GetMass());
 
     CopyParticleProperties(products, particle);
 

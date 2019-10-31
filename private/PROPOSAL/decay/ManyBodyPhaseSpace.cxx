@@ -149,8 +149,8 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(const Particle& particle)
         GenerateEvent(products, params, particle);
     }
 
-    // Boost all daughters to parent frame
-    Boost(products, particle.GetDirection(), particle.GetEnergy()/particle.GetMass(), particle.GetMomentum() / particle.GetMass());
+    // Boost all products in Lab frame (the reason, why the boosting goes in the negative direction of the particle)
+    Boost(products, -particle.GetDirection(), particle.GetEnergy()/particle.GetMass(), particle.GetMomentum() / particle.GetMass());
 
     CopyParticleProperties(products, particle);
 
