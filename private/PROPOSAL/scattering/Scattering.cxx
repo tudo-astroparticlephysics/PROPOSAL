@@ -46,6 +46,11 @@ bool Scattering::operator!=(const Scattering& scattering) const
 
 void Scattering::Scatter(double dr, double ei, double ef)
 {
+    if(dr<=0)
+    {
+        return;
+    }
+
     double sz, tz;
 
     RandomAngles random_angles = CalculateRandomAngle(dr, ei, ef);
@@ -62,14 +67,6 @@ void Scattering::Scatter(double dr, double ei, double ef)
     costh = (long double)std::cos(old_direction.GetTheta());
     sinph = (long double)std::sin(old_direction.GetPhi());
     cosph = (long double)std::cos(old_direction.GetPhi());
-
-    if(dr<=0){
-        /*TODO: This statement should be at the beginning of the method to avoid unnecessary sampling of random numbers,
-         * but this lets the current Sector.Propagate test fail in travis. Therefore, this statement should be but at
-         * the "right place" when when revisiting the TestFiles or UnitTest_Sector
-         * */
-        return;
-    }
 
     const Vector3D rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
     const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
