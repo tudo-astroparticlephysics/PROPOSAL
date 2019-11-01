@@ -75,10 +75,10 @@ struct InterpolationDef
         : order_of_interpolation(5)
         , path_to_tables(std::string())
         , path_to_tables_readonly(std::string())
-        , max_node_energy(1e14)
-        , nodes_cross_section(100)
-        , nodes_continous_randomization(200)
-        , nodes_propagate(1000)
+        , max_node_energy(1e14) // upper energy bound for Interpolation (MeV)
+        , nodes_cross_section(100) // number of interpolation in cross section
+        , nodes_continous_randomization(200) // number of interpolation in continuous randomization
+        , nodes_propagate(1000) // number of interpolation in propagate
         , do_binary_tables(true)
         , just_use_readonly_path(false)
     {

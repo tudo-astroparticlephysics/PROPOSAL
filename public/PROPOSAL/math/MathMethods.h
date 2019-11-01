@@ -35,8 +35,6 @@
 #include <exception>
 #include <string>
 
-#include "PROPOSAL/Constants.h"
-
 class MathException: public std::exception {
     public:
         MathException(char const* message) : message_(message) {};

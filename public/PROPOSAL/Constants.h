@@ -44,13 +44,6 @@ extern const int IMAXS;     // max number of int. steps
 extern const double IPREC;  // integration precision
 extern const double IPREC2; // integration precision
 
-// interpolation parameters
-extern const int NUM1; // number of interpolation in cross section
-extern const int NUM2; // number of interpolation in continuous randomization
-extern const int NUM3; // number of interpolation in propagate
-
-extern const double BIGENERGY; // upper energy bound for Interpolation (MeV)
-
 // precision parameters
 extern const double COMPUTER_PRECISION;
 extern const double HALF_PRECISION; // std::sqrt(computerPrecision);

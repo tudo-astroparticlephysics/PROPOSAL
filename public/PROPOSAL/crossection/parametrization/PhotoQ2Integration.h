@@ -36,7 +36,6 @@
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
 
 #define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                                                             \

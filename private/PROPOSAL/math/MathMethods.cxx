@@ -3,8 +3,9 @@
 #include <fstream>
 #include <iostream>
 #include "PROPOSAL/math/MathMethods.h"
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/methods.h"
 #include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {

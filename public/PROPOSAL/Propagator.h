@@ -48,7 +48,6 @@
 // #include <deque>
 #include <vector>
 
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/Sector.h"
 
 namespace PROPOSAL {

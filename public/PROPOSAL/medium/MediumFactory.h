@@ -30,7 +30,6 @@
 #pragma once
 
 #include <functional>
-
 #include <map>
 
 #include "PROPOSAL/methods.h"
