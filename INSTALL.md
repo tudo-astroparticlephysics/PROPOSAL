@@ -10,20 +10,23 @@ dependencies on your system.
 
 	apt install cmake \
 		doxygen \
-		liblog4cplus-dev
+		liblog4cplus-dev \
+		git-lfs
 
 ### Arch Linux ###
 
 	pacman -S cmake \
 		doxygen \
 		log4cplus \
-		gtest
+		gtest \
+		git-lfs
 
 ### Mac OS X ###
 
 	brew install cmake \
 		doxygen \
-		log4cplus
+		log4cplus \
+		git-lfs
 
 ## Install PROPOSAL ##
 
@@ -45,6 +48,10 @@ dependencies on your system.
 	or
 
 		git clone https://github.com/tudo-astroparticlephysics/PROPOSAL.git PROPOSAL/src
+
+	In case you want to perform the unit tests, you need to install `git-lfs` first and do an extra pull to get the TestFiles.
+
+		git lfs pull
 
 4.	Move to the build directory and generate the Makefile with cmake:
 

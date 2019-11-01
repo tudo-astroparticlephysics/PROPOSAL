@@ -58,7 +58,6 @@ If you use PROPOSAL, please cite the PROPOSAL paper
   number    = {9},
   pages     = {2070--2090},
   year      = {2013},
-  publisher = {Elsevier},
   doi       = {10.1016/j.cpc.2013.04.001}
 }
 ```
@@ -84,7 +83,7 @@ and our zenodo entry of the version you use
 ```
 and if you want to cite the latest improvements
 ```bibtex
-@online{dunsch_2018_proposal_improvements,
+@article{dunsch_2018_proposal_improvements,
   title       = {Recent Improvements for the Lepton Propagator PROPOSAL},
   author      = {Dunsch, Mario and
                  Soedingrekso, Jan and
@@ -92,11 +91,13 @@ and if you want to cite the latest improvements
                  Meier, Max and
                  Menne, Thorben and
                  Rhode, Wolfgang},
-  year        = {2018},
-  eprint      = {1809.07740},
-  eprinttype  = {arxiv},
-  eprintclass = {hep-ph},
   journal     = {Computer Physics Communications},
+  volume      = {242},
+  pages       = {132--144},
+  year        = {2019},
+  eprint      = {1809.07740},
+  eprinttype  = {arXiv},
+  eprintclass = {hep-ph},
   doi         = {10.1016/j.cpc.2019.03.021}
 }
 ```
