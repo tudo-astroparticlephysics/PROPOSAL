@@ -13,7 +13,7 @@
 
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/sector/Sector.h"
+#include "PROPOSAL/Sector.h"
 
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"

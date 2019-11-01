@@ -2,7 +2,7 @@
 
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/math/RandomGenerator.h"
-#include "PROPOSAL/methods.h"
+#include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 
 #include "PROPOSAL/Constants.h"

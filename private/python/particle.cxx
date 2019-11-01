@@ -1,4 +1,5 @@
-#include "PROPOSAL/PROPOSAL.h"
+
+#include "PROPOSAL/particle/Particle.h"
 #include "pyBindings.h"
 
 #define PARTICLE_DEF(module, cls)                                           \

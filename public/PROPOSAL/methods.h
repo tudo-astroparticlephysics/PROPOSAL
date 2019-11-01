@@ -67,32 +67,6 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
 }
 
 // ----------------------------------------------------------------------------
-/// @brief Implementation of inverse error function
-///
-/// THis is the implementation of the inverse errot function.
-///
-/// @param x
-///
-/// @return inverse error function of at x
-// ----------------------------------------------------------------------------
-double inverseErrorFunction(double x);
-
-// ----------------------------------------------------------------------------
-/// @brief Calculate the dilogarithm
-///
-/// @param x real argument
-///
-/// Originally translated by R.Brun from CERNLIB DILOG function C332
-///
-/// Implemented as a truncated series expansion in terms of Chebyshev
-/// polynomials, see [Yudell L. Luke: Mathematical functions and their
-/// approximations, Academic Press Inc., New York 1975, p.67].
-///
-/// @return dilog(x)
-// ----------------------------------------------------------------------------
-double dilog(double x);
-
-// ----------------------------------------------------------------------------
 /// @brief Definition needed to initialize interpolation
 // ----------------------------------------------------------------------------
 struct InterpolationDef

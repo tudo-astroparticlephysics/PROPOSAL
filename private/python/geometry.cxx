@@ -1,4 +1,8 @@
-#include "PROPOSAL/PROPOSAL.h"
+
+#include "PROPOSAL/geometry/GeometryFactory.h"
+#include "PROPOSAL/geometry/Box.h"
+#include "PROPOSAL/geometry/Cylinder.h"
+#include "PROPOSAL/geometry/Sphere.h"
 #include "pyBindings.h"
 
 namespace py = pybind11;

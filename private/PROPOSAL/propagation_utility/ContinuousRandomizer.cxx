@@ -7,6 +7,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
+#include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
 

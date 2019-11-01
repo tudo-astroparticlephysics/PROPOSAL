@@ -49,7 +49,7 @@
 #include <vector>
 
 #include "PROPOSAL/Output.h"
-#include "PROPOSAL/sector/Sector.h"
+#include "PROPOSAL/Sector.h"
 
 namespace PROPOSAL {
 

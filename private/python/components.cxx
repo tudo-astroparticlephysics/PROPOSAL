@@ -1,4 +1,5 @@
-#include "PROPOSAL/PROPOSAL.h"
+
+#include "PROPOSAL/medium/Components.h"
 #include "pyBindings.h"
 
 #define COMPONENT_DEF(module, cls)                             \

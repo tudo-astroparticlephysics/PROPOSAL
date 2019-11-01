@@ -1,4 +1,6 @@
-#include "PROPOSAL/PROPOSAL.h"
+
+#include "PROPOSAL/math/Function.h"
+#include "PROPOSAL/math/Spline.h"
 #include "pyBindings.h"
 
 namespace py = pybind11;

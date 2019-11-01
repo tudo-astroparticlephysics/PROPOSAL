@@ -4,7 +4,7 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/methods.h"
+#include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/scattering/Coefficients.h"
 

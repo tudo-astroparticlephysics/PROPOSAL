@@ -123,11 +123,10 @@
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
 #include "PROPOSAL/scattering/ScatteringNoScattering.h"
 
-#include "PROPOSAL/sector/Sector.h"
-
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/PropagatorService.h"
+#include "PROPOSAL/Sector.h"
 #include "PROPOSAL/methods.h"

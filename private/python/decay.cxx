@@ -1,4 +1,9 @@
-#include "PROPOSAL/PROPOSAL.h"
+
+#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/decay/LeptonicDecayChannel.h"
+#include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
+#include "PROPOSAL/decay/StableChannel.h"
+#include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "pyBindings.h"
 
 namespace py = pybind11;

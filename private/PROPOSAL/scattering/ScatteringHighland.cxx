@@ -15,7 +15,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/methods.h"
+#include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;

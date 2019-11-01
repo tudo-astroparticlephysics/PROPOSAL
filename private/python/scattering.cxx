@@ -1,4 +1,12 @@
-#include "PROPOSAL/PROPOSAL.h"
+
+#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/scattering/ScatteringFactory.h"
+#include "PROPOSAL/scattering/ScatteringHighland.h"
+#include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
+#include "PROPOSAL/scattering/ScatteringMoliere.h"
+#include "PROPOSAL/scattering/ScatteringNoScattering.h"
 #include "pyBindings.h"
 
 namespace py = pybind11;

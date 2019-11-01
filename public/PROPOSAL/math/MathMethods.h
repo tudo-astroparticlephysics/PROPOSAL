@@ -31,10 +31,11 @@
 
 #include <functional>
 #include <iostream>
-#include "PROPOSAL/Logging.h"
 #include <vector>
 #include <exception>
 #include <string>
+
+#include "PROPOSAL/Constants.h"
 
 class MathException: public std::exception {
     public:
@@ -49,6 +50,33 @@ class MathException: public std::exception {
 
 namespace PROPOSAL {
 
+
+// ----------------------------------------------------------------------------
+/// @brief Implementation of inverse error function
+///
+/// This is the implementation of the inverse errot function.
+/// Taken from https://web.archive.org/web/20150320023257/http://home.online.no/~pjacklam/notes/invnorm/
+///
+/// @param x
+///
+/// @return inverse error function of at x
+// ----------------------------------------------------------------------------
+double inverseErrorFunction(double x);
+
+// ----------------------------------------------------------------------------
+/// @brief Calculate the dilogarithm
+///
+/// @param x real argument
+///
+/// Originally translated by R.Brun from CERNLIB DILOG function C332
+///
+/// Implemented as a truncated series expansion in terms of Chebyshev
+/// polynomials, see [Yudell L. Luke: Mathematical functions and their
+/// approximations, Academic Press Inc., New York 1975, p.67].
+///
+/// @return dilog(x)
+// ----------------------------------------------------------------------------
+double dilog(double x);
 
 
 /// @brief Netwon-Raphson method and bisection to find the root of the function f
