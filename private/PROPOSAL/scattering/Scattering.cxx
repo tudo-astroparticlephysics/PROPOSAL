@@ -64,11 +64,11 @@ std::shared_ptr<std::pair<Vector3D, Vector3D>> Scattering::Scatter(double dr, do
 
     const Vector3D old_direction = particle_.GetDirection();
 
-    long double sinth, costh, sinph, cosph;
-    sinth = (long double)std::sin(old_direction.GetTheta());
-    costh = (long double)std::cos(old_direction.GetTheta());
-    sinph = (long double)std::sin(old_direction.GetPhi());
-    cosph = (long double)std::cos(old_direction.GetPhi());
+    double sinth, costh, sinph, cosph;
+    sinth = std::sin(old_direction.GetTheta());
+    costh = std::cos(old_direction.GetTheta());
+    sinph = std::sin(old_direction.GetPhi());
+    cosph = std::cos(old_direction.GetPhi());
 
     const Vector3D rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
     const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
