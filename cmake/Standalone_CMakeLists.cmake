@@ -92,6 +92,8 @@ add_subdirectory(extern/log4cplus)
 FILE(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*)
 add_library(PROPOSAL SHARED ${SRC_FILES})
 target_include_directories(PROPOSAL PUBLIC ${PROJECT_SOURCE_DIR}/public)
+target_compile_features(PROPOSAL PUBLIC cxx_std_11)
+set_target_properties(PROPOSAL PROPERTIES CXX_EXTENSIONS OFF)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-format-security")
