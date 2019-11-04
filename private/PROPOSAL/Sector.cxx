@@ -630,10 +630,6 @@ void Sector::AdvanceParticle(double dr, double ei, double ef) {
     if( sector_def_.scattering_model == ScatteringFactory::Enum::NoScattering ){
         directions.first = particle_.GetDirection();
         directions.second = particle_.GetDirection();
-        double rnd1 = RandomGenerator::Get().RandomDouble();
-        double rnd2 = RandomGenerator::Get().RandomDouble();
-        double rnd3 = RandomGenerator::Get().RandomDouble();
-        double rnd4 = RandomGenerator::Get().RandomDouble();
     } else {
         directions = scattering_->Scatter(dr, ei, ef);
     }
