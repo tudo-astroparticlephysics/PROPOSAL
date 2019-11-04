@@ -8,6 +8,7 @@
  **/
 
 #include <cmath>
+#include <memory>
 
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/Particle.h"
@@ -44,13 +45,14 @@ bool Scattering::operator!=(const Scattering& scattering) const
     return !(*this == scattering);
 }
 
-std::pair<Vector3D, Vector3D> Scattering::Scatter(double dr, double ei, double ef)
+std::shared_ptr<std::pair<Vector3D, Vector3D>> Scattering::Scatter(double dr, double ei, double ef)
 {
-    std::pair<Vector3D, Vector3D> new_direction(Vector3D(0,0,0), particle_.GetDirection());
+    Vector3D u(0,0,0); // averaged continous propagation direction
+    Vector3D n_i(particle_.GetDirection()); // direction after continous propagation
 
     if(dr<=0)
     {
-        return new_direction;
+        return std::make_shared<std::pair<Vector3D, Vector3D>>(std::make_pair(u, n_i));
     }
 
     double sz, tz;
@@ -72,15 +74,15 @@ std::pair<Vector3D, Vector3D> Scattering::Scatter(double dr, double ei, double e
     const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
 
     // Rotation towards all tree axes
-    new_direction.first = sz * old_direction;
-    new_direction.first = new_direction.first + random_angles.sx * rotate_vector_x;
-    new_direction.first = new_direction.first + random_angles.sy * rotate_vector_y;
+    u = sz * old_direction;
+    u = u + random_angles.sx * rotate_vector_x;
+    u = u + random_angles.sy * rotate_vector_y;
 
     // Rotation towards all tree axes
-    new_direction.second = tz * old_direction;
-    new_direction.second = new_direction.second + random_angles.tx * rotate_vector_x;
-    new_direction.second = new_direction.second + random_angles.ty * rotate_vector_y;
-    new_direction.second.CalculateSphericalCoordinates();
+    n_i = tz * old_direction;
+    n_i = n_i + random_angles.tx * rotate_vector_x;
+    n_i = n_i + random_angles.ty * rotate_vector_y;
+    n_i.CalculateSphericalCoordinates();
 
-    return new_direction;
+    return std::make_shared<std::pair<Vector3D, Vector3D>>(std::make_pair(u, n_i));
 }

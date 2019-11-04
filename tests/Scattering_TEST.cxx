@@ -200,9 +200,9 @@ TEST(Scattering, Scatter)
             particle.SetPosition(position_init);
             particle.SetDirection(direction_init);
 
-            std::pair<Vector3D, Vector3D> directions = scattering->Scatter(distance, energy_init, energy_final);
-            particle.SetPosition(particle.GetPosition() + distance * directions.first);
-            particle.SetDirection(directions.second);
+            std::shared_ptr<std::pair<Vector3D, Vector3D>> directions = scattering->Scatter(distance, energy_init, energy_final);
+            particle.SetPosition(particle.GetPosition() + distance * directions->first);
+            particle.SetDirection(directions->second);
 
             ASSERT_NEAR(particle.GetPosition().GetX(), x_f, std::abs(error * x_f));
             ASSERT_NEAR(particle.GetPosition().GetY(), y_f, std::abs(error * y_f));

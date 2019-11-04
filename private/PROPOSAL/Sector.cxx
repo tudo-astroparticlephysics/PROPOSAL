@@ -625,17 +625,18 @@ void Sector::AdvanceParticle(double dr, double ei, double ef) {
         time += dr / SPEED;
     }
 
-    std::pair<Vector3D, Vector3D> directions; // u, n_f
 
-    if( sector_def_.scattering_model == ScatteringFactory::Enum::NoScattering ){
-        directions.first = particle_.GetDirection();
-        directions.second = particle_.GetDirection();
-    } else {
-        directions = scattering_->Scatter(dr, ei, ef);
+    Vector3D u(particle_.GetDirection());
+    Vector3D n_i(particle_.GetDirection());
+
+    if( sector_def_.scattering_model != ScatteringFactory::Enum::NoScattering ){
+        std::shared_ptr<std::pair<Vector3D, Vector3D>> directions = scattering_->Scatter(dr, ei, ef);
+        u = directions->first;
+        n_i = directions->second;
     }
 
-    particle_.SetPosition(particle_.GetPosition() + dr * directions.first);
-    particle_.SetDirection(directions.second);
+    particle_.SetPosition(particle_.GetPosition() + dr * u);
+    particle_.SetDirection(n_i);
 
     particle_.SetPropagatedDistance(dist);
     particle_.SetTime(time);
