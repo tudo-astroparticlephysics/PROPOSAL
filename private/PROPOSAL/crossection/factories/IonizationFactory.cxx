@@ -1,4 +1,4 @@
-
+#include <algorithm>
 #include "PROPOSAL/crossection/IonizIntegral.h"
 #include "PROPOSAL/crossection/IonizInterpolant.h"
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"

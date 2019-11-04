@@ -1,6 +1,10 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 
-project( PROPOSAL)
+project(
+	PROPOSAL
+	VERSION 5.3.0
+	LANGUAGES CXX
+)
 
 
 IF(I3_PROJECTS)

@@ -10,4 +10,3 @@ cmake_uninstall.cmake
 *.png
 *.pdf
 *.swp
-pybind11/
