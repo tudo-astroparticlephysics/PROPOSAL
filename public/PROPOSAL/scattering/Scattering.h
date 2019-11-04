@@ -28,11 +28,13 @@
 
 
 #pragma once
+#include <utility>
 
 namespace PROPOSAL {
 
 class Particle;
 class Utility;
+class Vector3D;
 
 class Scattering
 {
@@ -47,7 +49,7 @@ public:
     virtual Scattering* clone() const                          = 0; // virtual constructor idiom (used for deep copies)
     virtual Scattering* clone(Particle&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies)
 
-    void Scatter(double dr, double ei, double ef);
+    std::pair<Vector3D, Vector3D> Scatter(double dr, double ei, double ef);
 
     const Particle& GetParticle() const { return particle_; }
 

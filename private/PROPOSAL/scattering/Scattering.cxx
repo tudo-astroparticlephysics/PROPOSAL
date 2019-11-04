@@ -44,11 +44,13 @@ bool Scattering::operator!=(const Scattering& scattering) const
     return !(*this == scattering);
 }
 
-void Scattering::Scatter(double dr, double ei, double ef)
+std::pair<Vector3D, Vector3D> Scattering::Scatter(double dr, double ei, double ef)
 {
+    std::pair<Vector3D, Vector3D> new_direction(Vector3D(0,0,0), particle_.GetDirection());
+
     if(dr<=0)
     {
-        return;
+        return new_direction;
     }
 
     double sz, tz;
@@ -58,8 +60,6 @@ void Scattering::Scatter(double dr, double ei, double ef)
     sz = std::sqrt(std::max(1. - (random_angles.sx * random_angles.sx + random_angles.sy * random_angles.sy), 0.));
     tz = std::sqrt(std::max(1. - (random_angles.tx * random_angles.tx + random_angles.ty * random_angles.ty), 0.));
 
-    Vector3D position;
-    Vector3D direction;
     const Vector3D old_direction = particle_.GetDirection();
 
     long double sinth, costh, sinph, cosph;
@@ -71,22 +71,16 @@ void Scattering::Scatter(double dr, double ei, double ef)
     const Vector3D rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
     const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
 
-    position = particle_.GetPosition();
+    // Rotation towards all tree axes
+    new_direction.first = sz * old_direction;
+    new_direction.first = new_direction.first + random_angles.sx * rotate_vector_x;
+    new_direction.first = new_direction.first + random_angles.sy * rotate_vector_y;
 
     // Rotation towards all tree axes
-    direction = sz * old_direction;
-    direction = direction + random_angles.sx * rotate_vector_x;
-    direction = direction + random_angles.sy * rotate_vector_y;
+    new_direction.second = tz * old_direction;
+    new_direction.second = new_direction.second + random_angles.tx * rotate_vector_x;
+    new_direction.second = new_direction.second + random_angles.ty * rotate_vector_y;
+    new_direction.second.CalculateSphericalCoordinates();
 
-    position = position + dr * direction;
-
-    // Rotation towards all tree axes
-    direction = tz * old_direction;
-    direction = direction + random_angles.tx * rotate_vector_x;
-    direction = direction + random_angles.ty * rotate_vector_y;
-
-    direction.CalculateSphericalCoordinates();
-
-    particle_.SetPosition(position);
-    particle_.SetDirection(direction);
+    return new_direction;
 }
