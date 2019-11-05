@@ -18,7 +18,11 @@ using namespace PROPOSAL;
 
 Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
                                                                  double ei,
-                                                                 double ef) {
+                                                                 double ef,
+                                                                 double rnd1,
+                                                                 double rnd2,
+                                                                 double rnd3,
+                                                                 double rnd4) {
     (void)ei;
     (void)ef;
 
@@ -80,16 +84,14 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
 
     double pre_factor = std::sqrt(chiCSq_ * B_[max_weight_index_]);
 
-    double rnd1, rnd2;
-
-    rnd1 = GetRandom(pre_factor);
-    rnd2 = GetRandom(pre_factor);
+    rnd1 = GetRandom(pre_factor, rnd1);
+    rnd2 = GetRandom(pre_factor, rnd2);
 
     random_angles.sx = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.tx = rnd2;
 
-    rnd1 = GetRandom(pre_factor);
-    rnd2 = GetRandom(pre_factor);
+    rnd1 = GetRandom(pre_factor, rnd3);
+    rnd2 = GetRandom(pre_factor, rnd4);
 
     random_angles.sy = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.ty = rnd2;
@@ -376,13 +378,11 @@ double ScatteringMoliere::F(double theta) {
 //-------------------------generate random angle------------------------------//
 //----------------------------------------------------------------------------//
 
-double ScatteringMoliere::GetRandom(double pre_factor) {
+double ScatteringMoliere::GetRandom(double pre_factor, double rnd) {
     //  Generate random angles following Moliere's distribution by comparing a
     //  uniformly distributed random number with the integral of the
     //  distribution. Therefore, determine the angle where the integral is equal
     //  to the random number.
-
-    double rnd = RandomGenerator::Get().RandomDouble();
 
     // Newton-Raphson method:
     double theta_n;

@@ -13,6 +13,7 @@
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 
 using namespace PROPOSAL;
 
@@ -47,6 +48,16 @@ bool Scattering::operator!=(const Scattering& scattering) const
 
 std::shared_ptr<std::pair<Vector3D, Vector3D>> Scattering::Scatter(double dr, double ei, double ef)
 {
+    double rnd1 = RandomGenerator::Get().RandomDouble();
+    double rnd2 = RandomGenerator::Get().RandomDouble();
+    double rnd3 = RandomGenerator::Get().RandomDouble();
+    double rnd4 = RandomGenerator::Get().RandomDouble();
+
+    return Scattering::Scatter(dr, ei, ef, rnd1, rnd2, rnd3, rnd4);
+}
+
+std::shared_ptr<std::pair<Vector3D, Vector3D>> Scattering::Scatter(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4)
+{
     Vector3D u(0,0,0); // averaged continous propagation direction
     Vector3D n_i(particle_.GetDirection()); // direction after continous propagation
 
@@ -57,7 +68,7 @@ std::shared_ptr<std::pair<Vector3D, Vector3D>> Scattering::Scatter(double dr, do
 
     double sz, tz;
 
-    RandomAngles random_angles = CalculateRandomAngle(dr, ei, ef);
+    RandomAngles random_angles = CalculateRandomAngle(dr, ei, ef, rnd1, rnd2, rnd3, rnd4);
 
     sz = std::sqrt(std::max(1. - (random_angles.sx * random_angles.sx + random_angles.sy * random_angles.sy), 0.));
     tz = std::sqrt(std::max(1. - (random_angles.tx * random_angles.tx + random_angles.ty * random_angles.ty), 0.));
@@ -85,4 +96,14 @@ std::shared_ptr<std::pair<Vector3D, Vector3D>> Scattering::Scatter(double dr, do
     n_i.CalculateSphericalCoordinates();
 
     return std::make_shared<std::pair<Vector3D, Vector3D>>(std::make_pair(u, n_i));
+}
+
+Scattering::RandomAngles Scattering::CalculateRandomAngle(double dr, double ei, double ef)
+{
+    double rnd1 = RandomGenerator::Get().RandomDouble();
+    double rnd2 = RandomGenerator::Get().RandomDouble();
+    double rnd3 = RandomGenerator::Get().RandomDouble();
+    double rnd4 = RandomGenerator::Get().RandomDouble();
+
+    return this->CalculateRandomAngle(dr, ei, ef, rnd1, rnd2, rnd3, rnd4);
 }

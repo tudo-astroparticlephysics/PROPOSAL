@@ -53,11 +53,15 @@ bool ScatteringNoScattering::compare(const Scattering& scattering) const
 }
 
 //----------------------------------------------------------------------------//
-Scattering::RandomAngles ScatteringNoScattering::CalculateRandomAngle(double dr, double ei, double ef)
+Scattering::RandomAngles ScatteringNoScattering::CalculateRandomAngle(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4)
 {
     (void)ei;
     (void)ef;
     (void)dr;
+    (void)rnd1;
+    (void)rnd2;
+    (void)rnd3;
+    (void)rnd4;
 
     Scattering::RandomAngles random_angles;
 

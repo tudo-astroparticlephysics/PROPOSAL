@@ -58,7 +58,7 @@ private:
 
     bool compare(const Scattering&) const;
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4);
 
     const Medium* medium_;
 
@@ -89,6 +89,6 @@ private:
     //----------------------------------------------------------------------------//
     //----------------------------------------------------------------------------//
 
-    double GetRandom(double pre_factor);
+    double GetRandom(double pre_factor, double rnd);
 };
 } // namespace PROPOSAL

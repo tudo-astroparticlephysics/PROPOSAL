@@ -51,6 +51,7 @@ public:
     virtual Scattering* clone(Particle&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies)
 
     std::shared_ptr<std::pair<Vector3D, Vector3D>> Scatter(double dr, double ei, double ef);
+    std::shared_ptr<std::pair<Vector3D, Vector3D>> Scatter(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4);
 
     const Particle& GetParticle() const { return particle_; }
 
@@ -65,7 +66,8 @@ protected:
         double sx, sy, tx, ty;
     };
 
-    virtual RandomAngles CalculateRandomAngle(double dr, double ei, double ef) = 0;
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
+    virtual RandomAngles CalculateRandomAngle(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4) = 0;
 
     Particle& particle_;
 };
