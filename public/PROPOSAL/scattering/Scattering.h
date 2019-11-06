@@ -30,12 +30,20 @@
 #pragma once
 #include <utility>
 #include <memory>
+#include "PROPOSAL/math/Vector3D.h"
 
 namespace PROPOSAL {
 
 class Particle;
 class Utility;
-class Vector3D;
+
+struct Directions : std::enable_shared_from_this<Directions>
+{
+    Directions(Vector3D u, Vector3D n_i) : u_(u), n_i_(n_i) {};
+
+    Vector3D u_;
+    Vector3D n_i_;
+};
 
 class Scattering
 {
@@ -50,8 +58,9 @@ public:
     virtual Scattering* clone() const                          = 0; // virtual constructor idiom (used for deep copies)
     virtual Scattering* clone(Particle&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies)
 
-    std::shared_ptr<std::pair<Vector3D, Vector3D>> Scatter(double dr, double ei, double ef);
-    std::shared_ptr<std::pair<Vector3D, Vector3D>> Scatter(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4);
+
+    std::shared_ptr<Directions> Scatter(double dr, double ei, double ef);
+    std::shared_ptr<Directions> Scatter(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4);
 
     const Particle& GetParticle() const { return particle_; }
 
@@ -70,6 +79,7 @@ protected:
     virtual RandomAngles CalculateRandomAngle(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4) = 0;
 
     Particle& particle_;
+    Directions directions_;
 };
 
 } // namespace PROPOSAL

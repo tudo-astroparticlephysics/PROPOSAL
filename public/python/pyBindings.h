@@ -14,3 +14,6 @@ std::string py_print(const T& t) {
     ss << t;
     return ss.str();
 }
+
+template <typename... Args>
+using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;

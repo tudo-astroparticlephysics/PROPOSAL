@@ -22,12 +22,14 @@ using namespace PROPOSAL;
  ******************************************************************************/
 
 Scattering::Scattering(Particle& particle)
-    : particle_(particle)
+    : particle_(particle),
+      directions_(Vector3D(), Vector3D())
 {
 }
 
 Scattering::Scattering(const Scattering& scattering)
-    : particle_(scattering.particle_)
+    : particle_(scattering.particle_),
+      directions_(scattering.directions_)
 {
 }
 
@@ -46,7 +48,7 @@ bool Scattering::operator!=(const Scattering& scattering) const
     return !(*this == scattering);
 }
 
-std::shared_ptr<std::pair<Vector3D, Vector3D>> Scattering::Scatter(double dr, double ei, double ef)
+std::shared_ptr<Directions> Scattering::Scatter(double dr, double ei, double ef)
 {
     double rnd1 = RandomGenerator::Get().RandomDouble();
     double rnd2 = RandomGenerator::Get().RandomDouble();
@@ -56,14 +58,16 @@ std::shared_ptr<std::pair<Vector3D, Vector3D>> Scattering::Scatter(double dr, do
     return Scattering::Scatter(dr, ei, ef, rnd1, rnd2, rnd3, rnd4);
 }
 
-std::shared_ptr<std::pair<Vector3D, Vector3D>> Scattering::Scatter(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4)
+std::shared_ptr<Directions> Scattering::Scatter(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4)
 {
-    Vector3D u(0,0,0); // averaged continous propagation direction
-    Vector3D n_i(particle_.GetDirection()); // direction after continous propagation
+    // u averaged continous propagation direction
+    // n_i direction after continous propagation
+    directions_.u_ = Vector3D(0, 0, 0);
+    directions_.n_i_ = Vector3D(particle_.GetDirection());
 
     if(dr<=0)
     {
-        return std::make_shared<std::pair<Vector3D, Vector3D>>(std::make_pair(u, n_i));
+        return std::make_shared<Directions>(directions_);
     }
 
     double sz, tz;
@@ -85,17 +89,17 @@ std::shared_ptr<std::pair<Vector3D, Vector3D>> Scattering::Scatter(double dr, do
     const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
 
     // Rotation towards all tree axes
-    u = sz * old_direction;
-    u = u + random_angles.sx * rotate_vector_x;
-    u = u + random_angles.sy * rotate_vector_y;
+    directions_.u_ = sz * old_direction;
+    directions_.u_ = directions_.u_ + random_angles.sx * rotate_vector_x;
+    directions_.u_ = directions_.u_ + random_angles.sy * rotate_vector_y;
 
     // Rotation towards all tree axes
-    n_i = tz * old_direction;
-    n_i = n_i + random_angles.tx * rotate_vector_x;
-    n_i = n_i + random_angles.ty * rotate_vector_y;
-    n_i.CalculateSphericalCoordinates();
+    directions_.n_i_ = tz * old_direction;
+    directions_.n_i_ = directions_.n_i_ + random_angles.tx * rotate_vector_x;
+    directions_.n_i_ = directions_.n_i_ + random_angles.ty * rotate_vector_y;
+    directions_.n_i_.CalculateSphericalCoordinates();
 
-    return std::make_shared<std::pair<Vector3D, Vector3D>>(std::make_pair(u, n_i));
+    return std::make_shared<Directions>(directions_);
 }
 
 Scattering::RandomAngles Scattering::CalculateRandomAngle(double dr, double ei, double ef)
