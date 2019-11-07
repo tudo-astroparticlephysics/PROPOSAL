@@ -76,7 +76,7 @@ public:
     ///
     /// @return vector of secondary data
     // ----------------------------------------------------------------------------
-    std::shared_ptr<Secondaries> Propagate(Particle&, double distance = 1e20);
+    Secondaries Propagate(Particle&, double distance = 1e20);
 
     // ----------------------------------------------------------------------------
     /// @brief Get Propagator for a given particle

@@ -45,7 +45,7 @@ bool PropagatorService::IsRegistered(const ParticleDef& particle_def)
 }
 
 // ------------------------------------------------------------------------- //
-std::shared_ptr<Secondaries> PropagatorService::Propagate(Particle& particle, double distance)
+Secondaries PropagatorService::Propagate(Particle& particle, double distance)
 {
     ParticleDef particle_def = particle.GetParticleDef();
 
@@ -64,7 +64,7 @@ std::shared_ptr<Secondaries> PropagatorService::Propagate(Particle& particle, do
         prop_particle.SetTime(particle.GetTime());
         prop_particle.SetElost(particle.GetElost());
 
-        std::shared_ptr<Secondaries> secondaries = propagator->Propagate(distance);
+        Secondaries secondaries = propagator->Propagate(distance);
 
         particle.SetEnergy(prop_particle.GetEnergy());
         particle.SetParentParticleEnergy(prop_particle.GetParentParticleEnergy());
@@ -89,7 +89,7 @@ std::shared_ptr<Secondaries> PropagatorService::Propagate(Particle& particle, do
     {
         log_warn("Propagator for particle %s not found! Empty secondary vector will be returned!",
                  particle_def.name.c_str());
-        return std::shared_ptr<Secondaries>();
+        return Secondaries();
     }
 }
 

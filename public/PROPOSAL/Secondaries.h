@@ -46,6 +46,7 @@ public:
     void push_back(const Particle& particle, const DynamicData::Type& secondary,
         double energyloss);
 
+    void clear() { secondarys_.clear(); };
     std::vector<std::shared_ptr<DynamicData>> GetSecondaries() { return secondarys_; };
     int GetNumberOfParticles() { return secondarys_.size(); };
 

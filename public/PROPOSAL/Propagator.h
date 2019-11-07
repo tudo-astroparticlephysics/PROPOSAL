@@ -75,7 +75,7 @@ public:
     ///
     /// @return Secondary data
     // ----------------------------------------------------------------------------
-    std::shared_ptr<Secondaries> Propagate(double MaxDistance_cm = 1e20);
+    Secondaries Propagate(double MaxDistance_cm = 1e20);
 
     // --------------------------------------------------------------------- //
     // Getter

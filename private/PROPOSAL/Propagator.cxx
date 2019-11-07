@@ -513,7 +513,7 @@ bool Propagator::operator!=(const Propagator& propagator) const
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-std::shared_ptr<Secondaries> Propagator::Propagate(double MaxDistance_cm)
+Secondaries Propagator::Propagate(double MaxDistance_cm)
 {
     double distance = 0;
     double distance_to_closest_approach  = 0;
@@ -548,6 +548,8 @@ std::shared_ptr<Secondaries> Propagator::Propagate(double MaxDistance_cm)
     bool was_in_detector    = false;
     bool propagationstep_till_closest_approach = false;
     bool already_reached_closest_approach = false;
+
+    secondaries_.clear();
 
     while (1)
     {
@@ -654,7 +656,7 @@ std::shared_ptr<Secondaries> Propagator::Propagate(double MaxDistance_cm)
 
     particle_.SetElost(particle_.GetEntryEnergy() - particle_.GetExitEnergy());
 
-    return std::make_shared<Secondaries>(secondaries_);
+    return secondaries_;
 }
 
 // ------------------------------------------------------------------------- //

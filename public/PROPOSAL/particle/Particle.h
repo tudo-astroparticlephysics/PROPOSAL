@@ -75,7 +75,7 @@ public:
     void SetPropagatedDistance(double prop_dist) { propagated_distance_ = prop_dist; }
 
     // Getter
-    Type GetTypeId() const { return type_id_; }
+    Type GetTypeId() { return type_id_; }
     static std::string GetNameFromType(Type);
 
     Vector3D GetPosition() const { return position_; }
