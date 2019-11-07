@@ -1,5 +1,6 @@
 
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/Secondaries.h"
 #include "pyBindings.h"
 
 #define PARTICLE_DEF(module, cls)                                           \
@@ -31,18 +32,18 @@ void init_particle(py::module& m) {
         |SMPMinus  |SMPPlus   |          |          |          |          |
         +----------+----------+----------+----------+----------+----------+
 
-        Particle are static objects, so that the properties can not be 
+        Particle are static objects, so that the properties can not be
         changed once it is initalized.  Own particle can be created if you
         initalize a complete new with the :meth:`ParticleDef` class or
         modifie a copy of a existing one with the :meth:`ParticleDefBuilder`.
-        
+
         A predefined particle can be initialize for example with
 
         >>> muon = pyPROPOSAL.particle.MuMinusDef.get()
 
-        The :meth:`Particle` class is a container for partilce related data. 
-        There can be for example initial energy set and losses read out. 
-        The :meth:`particle.Data` class is a container for interaction a 
+        The :meth:`Particle` class is a container for partilce related data.
+        There can be for example initial energy set and losses read out.
+        The :meth:`particle.Data` class is a container for interaction a
         particle does.
     )pbdoc";
 
@@ -94,9 +95,9 @@ void init_particle(py::module& m) {
                 collected before a new static particle is build.
 
                 Example:
-                    A usecase for the ParticleDefBuilder might be if your 
-                    particle will be propagated stochastically until a 
-                    certain lower limit which is higher than the particle 
+                    A usecase for the ParticleDefBuilder might be if your
+                    particle will be propagated stochastically until a
+                    certain lower limit which is higher than the particle
                     mass is reached.
 
                     >>> builder = pp.particle.ParticleDefBuilder()
@@ -104,13 +105,13 @@ void init_particle(py::module& m) {
                     >>> builder.SetLow(1e6)  # 1 Tev
                     >>> mu_def = mu_def_builder.build()
 
-                    Therby muons which energy is lower than one TeV will be 
+                    Therby muons which energy is lower than one TeV will be
                     handled continously.
             )pbdoc")
         .def(py::init<>(),
              R"pbdoc(
-                Before you can create or modify a particle a definition builder has 
-                to be initalized. It collect the properties of the new or changed 
+                Before you can create or modify a particle a definition builder has
+                to be initalized. It collect the properties of the new or changed
                 particle.
             )pbdoc")
         .def("SetName", &ParticleDef::Builder::SetName,
@@ -146,12 +147,12 @@ void init_particle(py::module& m) {
         .def("SetParticleDef", &ParticleDef::Builder::SetParticleDef,
              R"pbdoc(
                 Args:
-                    arg1 (ParticleDef): a pre defined particle which values should 
+                    arg1 (ParticleDef): a pre defined particle which values should
                         be take over.
             )pbdoc")
         .def("build", &ParticleDef::Builder::build,
              R"pbdoc(
-                Return: 
+                Return:
                     ParticleDef: generate a static particle with in ParticleDefBuilder properties
             )pbdoc");
 
@@ -197,8 +198,8 @@ void init_particle(py::module& m) {
 
     py::class_<DynamicData, std::shared_ptr<DynamicData>>(m_sub, "DynamicData",
                                                           R"pbdoc(
-                Interaction will be stored in form of Dynamic Data. 
-                It is used as an array with all important values for 
+                Interaction will be stored in form of Dynamic Data.
+                It is used as an array with all important values for
                 secondary particles. Secondary particles are not propagated.
             )pbdoc")
         .def(py::init<DynamicData::Type>())
@@ -206,9 +207,9 @@ void init_particle(py::module& m) {
         .def("__str__", &py_print<DynamicData>)
         .def_property_readonly("id", &DynamicData::GetTypeId,
                                R"pbdoc(
-                Type of Interaction. Interaction id of a particle can be convertet 
+                Type of Interaction. Interaction id of a particle can be convertet
                 in an str with:
-                
+
                 >>> if p.id == pyPROPOSAL.particle.Data.Particle:
                 >>>     print(p.particle_def.name)
                 >>> else:
@@ -253,7 +254,7 @@ void init_particle(py::module& m) {
                 while propagation process. There every information about
                 the primary particle will be stored.
 
-                Information about secondary particles will be found in 
+                Information about secondary particles will be found in
                 :meth:`particle.DynamicData`
             )pbdoc")
         .def(py::init<>())
@@ -309,20 +310,20 @@ void init_particle(py::module& m) {
                       &Particle::GetClosestApproachPoint,
                       &Particle::SetClosestApproachPoint,
                       R"pbdoc(
-                In a first order the point where distance between particle 
+                In a first order the point where distance between particle
                 and detector center is minimal.
             )pbdoc")
         .def_property("closet_approach_time", &Particle::GetClosestApproachTime,
                       &Particle::SetClosestApproachTime,
                       R"pbdoc(
-                In a first order the time where distance between particle 
+                In a first order the time where distance between particle
                 and detector center is minimal.
             )pbdoc")
         .def_property("closet_approach_energy",
                       &Particle::GetClosestApproachEnergy,
                       &Particle::SetClosestApproachEnergy,
                       R"pbdoc(
-                In a first order the energy where distance between particle 
+                In a first order the energy where distance between particle
                 and detector center is minimal.
             )pbdoc")
         .def_property("e_lost", &Particle::GetElost, &Particle::SetElost,
@@ -330,4 +331,12 @@ void init_particle(py::module& m) {
                 Energy primary particle lost in detector.
                 Energy primary particle lost in detector...
             )pbdoc");
+
+    py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries",
+            R"pbdoc( List of secondaries)pbdoc")
+        .def_property_readonly("particles", &Secondaries::GetSecondaries)
+        .def_property_readonly("number_of_particles", &Secondaries::GetNumberOfParticles);
+
 }
+
+#undef PARTICLE_DEF

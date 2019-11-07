@@ -49,6 +49,7 @@
 #include <vector>
 
 #include "PROPOSAL/Sector.h"
+#include "PROPOSAL/Secondaries.h"
 
 namespace PROPOSAL {
 
@@ -74,7 +75,7 @@ public:
     ///
     /// @return Secondary data
     // ----------------------------------------------------------------------------
-    std::vector<DynamicData*> Propagate(double MaxDistance_cm = 1e20);
+    std::shared_ptr<Secondaries> Propagate(double MaxDistance_cm = 1e20);
 
     // --------------------------------------------------------------------- //
     // Getter
@@ -197,7 +198,7 @@ private:
 
     Particle particle_;
     Geometry* detector_;
+    Secondaries secondaries_;
 };
 
 } // namespace PROPOSAL
-

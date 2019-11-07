@@ -69,24 +69,24 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
         m, "EnergyCutSettings",
         R"pbdoc(
 			Settings for the lower integration limit.
-			Losses below the cut will be handeled continously and the 
+			Losses below the cut will be handeled continously and the
 			other stochasticaly.
 
-			.. math:: 
+			.. math::
 
 				\text{cut} = \begin{cases} e_\text{cut} & E * v_\text{cut} \geq e_\text{cut} \\ v_\text{cut} & \, \text{else} \end{cases}
 		)pbdoc")
         .def(py::init<>(),
              R"pbdoc(
-                    Initialize some standard settings. 
+                    Initialize some standard settings.
                     The default e_cut = 500 Mev and v_cut = 0.05 will be set.
                 )pbdoc")
         .def(py::init<double, double>(), py::arg("ecut"), py::arg("vcut"),
              R"pbdoc(
-                    Set the cut values manualy. 
-            
-                    Args: 
-                        ecut (float): static energy cut. 
+                    Set the cut values manualy.
+
+                    Args:
+                        ecut (float): static energy cut.
                         vcut (float): relativ energy cut.
                 )pbdoc")
         .def(py::init<const EnergyCutSettings&>())
@@ -119,14 +119,14 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
         m, "InterpolationDef",
         R"pbdoc(
 				The set standard values have been optimized for performance
-				and accuracy. They should not be changed any further 
+				and accuracy. They should not be changed any further
 				without a good reason.
 
 				Example:
-					For speed savings it makes sense to specify a path to 
+					For speed savings it makes sense to specify a path to
 					the tables, to reuse build tables if possible.
 
-					Sometimes it is usefull to look in the tables for a check. 
+					Sometimes it is usefull to look in the tables for a check.
 					To do this binary tables can be diabled.
 
 					>>> interpolDef = pp.InterpolationDef()
@@ -142,30 +142,30 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
 			)pbdoc")
         .def_readwrite("path_to_tables", &InterpolationDef::path_to_tables,
                        R"pbdoc(
-				Path where tables can be written from memory to disk to 
+				Path where tables can be written from memory to disk to
 				reuse it if possible.
 			)pbdoc")
         .def_readwrite("path_to_tables_readonly",
                        &InterpolationDef::path_to_tables_readonly,
                        R"pbdoc(
-				Path where tables can be read from disk to avoid to rebuild 
+				Path where tables can be read from disk to avoid to rebuild
 				it.
 			)pbdoc")
         .def_readwrite("max_node_energy", &InterpolationDef::max_node_energy,
                        R"pbdoc(
-				maximum energy that will be interpolated. Energies greater 
+				maximum energy that will be interpolated. Energies greater
 				than the value are extrapolated. Default: 1e14 MeV
 			)pbdoc")
         .def_readwrite("nodes_cross_section",
                        &InterpolationDef::nodes_cross_section,
                        R"pbdoc(
-				number of nodes used by evaluation of cross section 
+				number of nodes used by evaluation of cross section
 				integrals. Default: xxx
 			)pbdoc")
         .def_readwrite("nodes_continous_randomization",
                        &InterpolationDef::nodes_continous_randomization,
                        R"pbdoc(
-				number of nodes used by evaluation of continous 
+				number of nodes used by evaluation of continous
 				randomization integrals. Default: xxx
 			)pbdoc")
         .def_readwrite("nodes_propagate", &InterpolationDef::nodes_propagate,
@@ -175,8 +175,8 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
 			)pbdoc")
         .def_readwrite("do_binary_tables", &InterpolationDef::do_binary_tables,
                        R"pbdoc(
-				Should binary tables be used to store the data. 
-				This will increase performance, but are not readable for a 
+				Should binary tables be used to store the data.
+				This will increase performance, but are not readable for a
 				crosscheck by human. Default: xxx
 			)pbdoc")
         .def_readwrite("just_use_readonly_path",
@@ -227,48 +227,48 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
     py::class_<ContinuousRandomizer, std::shared_ptr<ContinuousRandomizer>>(
         m, "ContinuousRandomizer",
         R"pbdoc(
-        If :math:`v_\text{cut}` is large, the spectrum is not continously any 
-        more. Particles which has no stochastic loss crossing the medium has 
-        all the same energy :math:`E_\text{peak}` after propagating through 
+        If :math:`v_\text{cut}` is large, the spectrum is not continously any
+        more. Particles which has no stochastic loss crossing the medium has
+        all the same energy :math:`E_\text{peak}` after propagating through
         the medium.  This produce a gap of size of minimal stochastic loss.
         This effect can be reduced using continous randomization.
-        
+
         .. figure:: figures/mu_continuous.png
             :scale: 50%
             :align: center
 
             Propagate a muon with 100 TeV through 300 m Rock.
 
-        The average energy loss from continous energy losses, is 
-        estimated by the energy-integral. 
+        The average energy loss from continous energy losses, is
+        estimated by the energy-integral.
 
         .. math::
-        
+
             \int^{E_f}_{E_i} \frac{\sigma(E)}{-f(E)} d\text{E} = -\text{log}(\xi)
 
-        Since probability of a energy loss :math:`e_{lost} < e_{cut}` 
-        at distance is finite, it produce fluctuations in average 
+        Since probability of a energy loss :math:`e_{lost} < e_{cut}`
+        at distance is finite, it produce fluctuations in average
         energy losses.
 
-        This small losses can be added in form of a perturbation from 
+        This small losses can be added in form of a perturbation from
         average energy loss.
 
     )pbdoc")
         .def(py::init<const Utility&, const InterpolationDef>(),
              py::arg("utility"), py::arg("interpolation_def"),
              R"pbdoc(
-                    Initalize a continous randomization calculator. 
-                    This may take some minutes because for all parametrization 
-                    the continous randomization interpolation tables have to be 
+                    Initalize a continous randomization calculator.
+                    This may take some minutes because for all parametrization
+                    the continous randomization interpolation tables have to be
                     build.
 
                     Note:
                         .. math::
-                            
-                            \langle ( \Delta ( \Delta E ) )^2 \rangle = 
-                                \int^{e_\text{cut}}_{e_0} \frac{d\text{E}}{-f(E)} 
+
+                            \langle ( \Delta ( \Delta E ) )^2 \rangle =
+                                \int^{e_\text{cut}}_{e_0} \frac{d\text{E}}{-f(E)}
                                 \left( \int_0^{e_{cut}} e^2 p(e;E) d\text{e} \right)
-                    
+
                     Args:
                         interpolation_def (interpolation_def): specify the number of interpolation points for cont-integral
                         utility (utility): specify the parametrization and energy cuts
@@ -277,32 +277,32 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
              py::arg("initial_energy"), py::arg("final_energy"),
              py::arg("rand"),
              R"pbdoc(
-                    Calculates the stochastical smering of the distribution based on 
-                    the second momentum of the parametrizations, the final and intial 
+                    Calculates the stochastical smering of the distribution based on
+                    the second momentum of the parametrizations, the final and intial
                     energy.
-                    
+
                     Note:
-                        A normal distribution with uppere defined variance will be 
+                        A normal distribution with uppere defined variance will be
                         asumed. The cumulative distibution function has the form:
-                        
+
                         .. math::
-                            
+
                             \text{cdf}(E) = \frac{1}{2} \left(1 + \text{erf} \left(
                                 \frac{E}{ \sqrt{ 2 \sigma^2 } } \right) \right)
-                        
+
                         There will be sampled a deviation form mean energy :math:`a`
-                        between :math:`\text{cdf}(E_\text{i} - E_\text{f})` and 
-                        :math:`\text{cdf}(E_\text{mass} - E_\text{f})` and finaly the 
+                        between :math:`\text{cdf}(E_\text{i} - E_\text{f})` and
+                        :math:`\text{cdf}(E_\text{mass} - E_\text{f})` and finaly the
                         energy updated.
 
                         .. math::
 
                             E_\text{f} = \sigma \cdot a + E_\text{f}
-                    
-                    Args: 
-                        initial_energy (float): energy befor stochastical loss 
-                        final_energy (float): energy after stochastical loss 
-                        rand (float): random number between 0 and 1 
+
+                    Args:
+                        initial_energy (float): energy befor stochastical loss
+                        final_energy (float): energy after stochastical loss
+                        rand (float): random number between 0 and 1
 
                     Returns:
                         float: randomized final energy
@@ -323,20 +323,20 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
     py::class_<Sector::Definition, std::shared_ptr<Sector::Definition>>(
         m, "SectorDefinition",
         R"pbdoc(
-                Sector definition is a container that collects all important 
-                settings for propagation through a sector. There could for 
-                example specify the used cross sections or the energy cut 
+                Sector definition is a container that collects all important
+                settings for propagation through a sector. There could for
+                example specify the used cross sections or the energy cut
                 settings.
 
-                An example for multiple SectorDefinitions is the standard 
+                An example for multiple SectorDefinitions is the standard
                 implementation of propagation. Three sectors are generated,
-                which differ in the energy cut settings, to reduce computing 
-                power without a measurable loss of accuracy. Infront of the 
+                which differ in the energy cut settings, to reduce computing
+                power without a measurable loss of accuracy. Infront of the
                 detector energy cut will be like :math:`v_\text{cut} = 0.05`.
-                Inside the detector the energy cut :math:`e_\text{cut} = 500 
-                \text{MeV}` is chosen so that particles below the detector 
+                Inside the detector the energy cut :math:`e_\text{cut} = 500
+                \text{MeV}` is chosen so that particles below the detector
                 resolution are statistically sampled. Outside of the detector no
-                cuts are made to find a decay point of the particle in first 
+                cuts are made to find a decay point of the particle in first
                 approximation.
             )pbdoc")
         .def(py::init<>())
@@ -357,46 +357,46 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
         .def_readwrite("do_stochastic_loss_weighting",
                        &Sector::Definition::do_stochastic_loss_weighting,
                        R"pbdoc(
-                    Boolean value whether the probability of producing a 
-                    stochastic loss should be adjusted with a factor, 
+                    Boolean value whether the probability of producing a
+                    stochastic loss should be adjusted with a factor,
                     defaults to False.
                 )pbdoc")
         .def_readwrite("stochastic_loss_weighting",
                        &Sector::Definition::stochastic_loss_weighting,
                        R"pbdoc(
-                    Factor used to scale the probability of producing a 
+                    Factor used to scale the probability of producing a
                     stochastic loss, defaults to 1.0.
                 )pbdoc")
         .def_readwrite("stopping_decay", &Sector::Definition::stopping_decay,
                        R"pbdoc(
-                    
+
                 )pbdoc")
         .def_readwrite("do_continuous_randomization",
                        &Sector::Definition::do_continuous_randomization,
                        R"pbdoc(
-                    Boolean if continous randomization should be done if 
+                    Boolean if continous randomization should be done if
                     interpolation if is used, defaults to true.
                 )pbdoc")
         .def_readwrite("do_continuous_energy_loss_output",
                        &Sector::Definition::do_continuous_energy_loss_output,
                        R"pbdoc(
-                    
+
                 )pbdoc")
         .def_readwrite("do_exact_time_calculation",
                        &Sector::Definition::do_exact_time_calculation,
                        R"pbdoc(
-                    Boolean if particle speed could be approach by the speed 
-                    of light or should be calculated by solving the track 
+                    Boolean if particle speed could be approach by the speed
+                    of light or should be calculated by solving the track
                     integral, defaults to false.
 
-                    If the energy is in the order of the rest energy of the 
-                    particle, the assumption that the particle moves at the 
-                    speed of light becomes increasingly worse. Than it make 
+                    If the energy is in the order of the rest energy of the
+                    particle, the assumption that the particle moves at the
+                    speed of light becomes increasingly worse. Than it make
                     sense to calculate the time integral.
 
                     .. math::
-                            
-                            t_\text{f} = t_\text{i} + \int_{x_\text{i}}^{x_\text{f}} 
+
+                            t_\text{f} = t_\text{i} + \int_{x_\text{i}}^{x_\text{f}}
                                 \frac{ \text{dx} }{ v(x) }
                 )pbdoc")
         .def_readwrite("scattering_model",
@@ -413,7 +413,7 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
                 )pbdoc")
         .def_readwrite("particle_location", &Sector::Definition::location,
                        R"pbdoc(
-                    Definition of the relationship of the sectors to each 
+                    Definition of the relationship of the sectors to each
                     other of type :meth:`ParticleLocation`.
                 )pbdoc")
         .def_readwrite("crosssection_defs", &Sector::Definition::utility_def,
@@ -427,7 +427,7 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
     // //
 
     py::class_<Sector, std::shared_ptr<Sector>>(m, "Sector", R"pbdoc(
-            A sector is characterized by its homogeneous attitudes. 
+            A sector is characterized by its homogeneous attitudes.
             Within a sector there are no boundaries to consider.
 		)pbdoc")
         .def(py::init<Particle&, const Sector::Definition&>(),
@@ -438,7 +438,7 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
              py::arg("interpolation_def"))
         .def("propagate", &Sector::Propagate, py::arg("distance"),
              R"pbdoc(
-                Args: 
+                Args:
                     distance (float): Distance to propagate in cm.
 
                 Returns:
@@ -447,21 +447,21 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
         .def("CalculateEnergyTillStochastic",
              &Sector::CalculateEnergyTillStochastic, py::arg("initial_energy"),
              R"pbdoc(
-                Samples the energy up to the next stochastic loss. 
+                Samples the energy up to the next stochastic loss.
 
                 Args:
                     initial_energy (float): Energy in MeV.
 
                 Returns:
-                    tuple: (next stochastic energy, decay energy) 
+                    tuple: (next stochastic energy, decay energy)
 			)pbdoc")
         .def("MakeStochasticLoss", &Sector::MakeStochasticLoss,
              py::arg("particle_energy"),
              R"pbdoc(
                 Samples the stochastic loss.
-			
+
                 Args:
-                    particle_energy (float): Energy of the propagated 
+                    particle_energy (float): Energy of the propagated
                         particle.
 
                 Returns:
@@ -476,7 +476,7 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
         .def_property_readonly("particle", &Sector::GetParticle,
                                R"pbdoc(
 				Get the internal created particle to modify its properties
-				
+
 				Return:
 					Particle: propagated Particle
 			)pbdoc");
@@ -539,9 +539,9 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
                     Returns:
                         list(DynamicData): list of stochastic losses parameters
                         list(list): list of stochastic losses parameters
-                    
+
                     Example:
-                        Propagate 1000 particle with an inital energy of 100 
+                        Propagate 1000 particle with an inital energy of 100
                         Tev and save the losses in daughters.
 
                         >>> for i in range(int(1e3)):
@@ -551,32 +551,32 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
                         >>>   mu.direction = pp.Vector3D(0, 0, -1)
                         >>>   daughters = prop.propagate()
 
-                    Further basic condition are set at the next point of 
+                    Further basic condition are set at the next point of
                     interaction during generation.
                     The aim is to introduce forced stochastic losses
-                    so that the particle can be propagated through homogeneous 
+                    so that the particle can be propagated through homogeneous
                     sectors.
                     A more percise description of propagation through a
                     homoegenous sector can be found in ???.
-                    
+
                     .. figure:: figures/sector.png
                         :height: 200px
                         :align: center
 
-                        If the next interaction point is outside the actuell 
+                        If the next interaction point is outside the actuell
                         sector, the particle is forced to an interaction at the
-                        sector boundary. Thus it can be assumed that the 
+                        sector boundary. Thus it can be assumed that the
                         particle is porpagated by a homogeneous medium.
 
-                    The propagated particle will be forced to interact in the 
-                    closest point to the dector center. 
-                    This will be stored in the closest_approach variable of 
+                    The propagated particle will be forced to interact in the
+                    closest point to the dector center.
+                    This will be stored in the closest_approach variable of
                     the propagated particle.
 
-                    The propagation terminate if the maximal distance is 
+                    The propagation terminate if the maximal distance is
                     reached.
-                    The energy loss of the particle (e_lost) in the detector 
-                    will be calculated and the produced secondary particles 
+                    The energy loss of the particle (e_lost) in the detector
+                    will be calculated and the produced secondary particles
                     returned.
                 )pbdoc")
         .def_property_readonly("particle", &Propagator::GetParticle,
@@ -618,7 +618,6 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
 // #undef COMPONENT_DEF
 // #undef MEDIUM_DEF
 // #undef AXIS_DEF
-// #undef PARTICLE_DEF
 // #undef BREMS_DEF
 // #undef PHOTO_REAL_DEF
 // #undef PHOTO_Q2_DEF
