@@ -130,3 +130,4 @@
 #include "PROPOSAL/PropagatorService.h"
 #include "PROPOSAL/Sector.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Secondaries.h"

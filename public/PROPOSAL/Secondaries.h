@@ -1,4 +1,3 @@
-
 /******************************************************************************
  *                                                                            *
  * This file is part of the simulation tool PROPOSAL.                         *
@@ -29,69 +28,29 @@
 
 #pragma once
 
-#include <unordered_map>
-#include <memory>
 
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/Secondaries.h"
+#include <memory>
+#include <vector>
 
 namespace PROPOSAL {
 
-class Propagator;
-
-class PropagatorService
-{
-public:
-    typedef std::unordered_map<ParticleDef, Propagator*> PropagatorMap;
+class Secondaries {
 
 public:
-    PropagatorService();
-    virtual ~PropagatorService();
+    Secondaries() {};
 
-    // ----------------------------------------------------------------------------
-    /// @brief Register the propagator to use
-    ///
-    /// The Propagators will be stored in an look up table and later called
-    /// within Propagate() with the given definition of the particle
-    ///
-    /// @param Propagator
-    // ----------------------------------------------------------------------------
-    void RegisterPropagator(const Propagator&);
+    void push_back(const Particle& particle);
+    void push_back(DynamicData continuous_loss);
+    void push_back(std::shared_ptr<DynamicData> continuous_loss);
+    void push_back(const Particle& particle, const DynamicData::Type& secondary,
+        double energyloss);
 
-    // ----------------------------------------------------------------------------
-    /// @brief Check if a propagator is registered for the given particle definition
-    ///
-    /// @param ParticleDef
-    ///
-    /// @return bool
-    // ----------------------------------------------------------------------------
-    bool IsRegistered(const ParticleDef&);
-
-    // ----------------------------------------------------------------------------
-    /// @brief Propagate the given particle
-    ///
-    /// The given particle will hold the information after propagation.
-    ///
-    /// @param Particle
-    ///
-    /// @return vector of secondary data
-    // ----------------------------------------------------------------------------
-    std::shared_ptr<Secondaries> Propagate(Particle&, double distance = 1e20);
-
-    // ----------------------------------------------------------------------------
-    /// @brief Get Propagator for a given particle
-    ///
-    /// The Propagator to a given particle hold the information of the propagation
-    /// parameters, which is useful to get access to.
-    ///
-    /// @param Particle
-    ///
-    /// @return Propagator
-    // ----------------------------------------------------------------------------
-    Propagator* GetPropagatorToParticleDef(const ParticleDef&);
+    std::vector<std::shared_ptr<DynamicData>> GetSecondaries() { return secondarys_; };
+    int GetNumberOfParticles() { return secondarys_.size(); };
 
 private:
-    PropagatorMap propagator_map_;
+    std::vector<std::shared_ptr<DynamicData>> secondarys_;
 };
 
 } // namespace PROPOSAL

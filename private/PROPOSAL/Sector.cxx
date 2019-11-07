@@ -2,6 +2,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Secondaries.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/decay/DecayChannel.h"
@@ -20,6 +21,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
+#include <memory>
 using namespace PROPOSAL;
 
 /******************************************************************************
@@ -285,7 +287,7 @@ Sector::~Sector() {
 }
 
 // ------------------------------------------------------------------------- //
-double Sector::Propagate(double distance) {
+std::pair<double, std::shared_ptr<Secondaries>> Sector::Propagate(double distance) {
     bool flag;
     double displacement;
 
@@ -296,6 +298,8 @@ double Sector::Propagate(double distance) {
 
     bool is_decayed = false;
     bool particle_interaction = false;
+
+    Secondaries secondaries;
 
     std::vector<Particle*> products;
 
@@ -402,7 +406,7 @@ double Sector::Propagate(double distance) {
             if (sector_def_.only_loss_inside_detector) {
                 if (sector_def_.location ==
                     Sector::ParticleLocation::InsideDetector) {
-                    Output::getInstance().FillSecondaryVector(continuous_loss);
+                    secondaries.push_back(*continuous_loss);
                 }
                 else
                 {
@@ -411,7 +415,7 @@ double Sector::Propagate(double distance) {
             }
             else
             {
-                Output::getInstance().FillSecondaryVector(continuous_loss);
+                secondaries.push_back(*continuous_loss);
             }
         }
 
@@ -452,31 +456,22 @@ double Sector::Propagate(double distance) {
                     products[i]->SetParentParticleEnergy(particle_.GetEnergy());
                 }
 
-                if (sector_def_.only_loss_inside_detector)
+
+                if (not (sector_def_.only_loss_inside_detector && sector_def_.location != Sector::ParticleLocation::InsideDetector) )
                 {
-                    if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
-                    {
-                        Output::getInstance().FillSecondaryVector(products);
+                    for (auto p : products) {
+                        secondaries.push_back(*p);
                     }
-                }
-                else
-                {
-                    Output::getInstance().FillSecondaryVector(products);
                 }
             }
 
             if(energy_loss.second != DynamicData::Particle){
                 // DynamicData::Particle means no DynamicData object will be added to SecondaryVector
                 // add energy loss with DynamicData to SecondaryVector
-                if (sector_def_.only_loss_inside_detector)
+
+                if (not (sector_def_.only_loss_inside_detector && sector_def_.location != Sector::ParticleLocation::InsideDetector))
                 {
-                    if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
-                    {
-                        Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
-                    }
-                } else {
-                    Output::getInstance().FillSecondaryVector(
-                        particle_, energy_loss.second, energy_loss.first);
+                        secondaries.push_back(particle_, energy_loss.second, energy_loss.first);
                 }
             }
 
@@ -492,16 +487,11 @@ double Sector::Propagate(double distance) {
         }else
         {
             products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
-            if (sector_def_.only_loss_inside_detector)
+            if (not (sector_def_.only_loss_inside_detector && sector_def_.location == Sector::ParticleLocation::InsideDetector))
             {
-                if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
-                {
-                    Output::getInstance().FillSecondaryVector(products);
-                }
-            }
-            else
-            {
-                Output::getInstance().FillSecondaryVector(products);
+                    for (auto p : products) {
+                        secondaries.push_back(*p);
+                    }
             }
 
             is_decayed = true;
@@ -537,17 +527,12 @@ double Sector::Propagate(double distance) {
         particle_.SetEnergy(particle_.GetMass());
 
         products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
-        if (sector_def_.only_loss_inside_detector)
-        {
-            if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
-            {
-                Output::getInstance().FillSecondaryVector(products);
-            }
-        }
-        else
-        {
-            Output::getInstance().FillSecondaryVector(products);
 
+        if (not (sector_def_.only_loss_inside_detector && sector_def_.location != Sector::ParticleLocation::InsideDetector))
+        {
+            for (auto p : products) {
+                secondaries.push_back(*p);
+            }
         }
 
         final_energy = particle_.GetMass();
@@ -557,12 +542,12 @@ double Sector::Propagate(double distance) {
 
     // Particle reached the border, final energy is returned
     if (propagated_distance == distance) {
-        return final_energy;
+        return std::make_pair(final_energy, std::make_shared<Secondaries>(secondaries));
     }
     // The particle stopped/decayed, the propagated distance is return with a
     // minus sign
     else {
-        return -propagated_distance;
+        return std::make_pair(-propagated_distance, std::make_shared<Secondaries>(secondaries));
     }
 }
 

@@ -30,7 +30,9 @@
 
 // #include <string>
 // #include <vector>
+#include <memory>
 
+#include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 
@@ -128,7 +130,7 @@ class Sector {
      *  \return energy at distance OR -(track length)
      */
 
-    double Propagate(double distance);
+    std::pair<double, std::shared_ptr<Secondaries>> Propagate(double distance);
 
     /**
      * Calculates the contiuous loss till the first stochastic loss happend

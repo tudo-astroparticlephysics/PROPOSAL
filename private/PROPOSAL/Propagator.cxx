@@ -513,22 +513,10 @@ bool Propagator::operator!=(const Propagator& propagator) const
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
+std::shared_ptr<Secondaries> Propagator::Propagate(double MaxDistance_cm)
 {
-    Output::getInstance().ClearSecondaryVector();
-
-    Output::getInstance().GetSecondarys().reserve(1000);
-
-#if ROOT_SUPPORT
-    Output::getInstance().StorePrimaryInTree(&particle_);
-#endif
-
-    if (Output::store_in_ASCII_file_)
-        Output::getInstance().StorePrimaryInASCII(&particle_);
-
     double distance = 0;
     double distance_to_closest_approach  = 0;
-    double result   = 0;
 
     // These two variables are needed to calculate the energy loss inside the detector
     // energy_at_entry_point is initialized with the current energy because this is a
@@ -639,7 +627,11 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             distance = MaxDistance_cm - particle_.GetPropagatedDistance();
         }
 
-        result = current_sector_->Propagate(distance);
+        std::pair<double,std::shared_ptr<Secondaries>> sector_result = current_sector_->Propagate(distance);
+
+        for (auto p : sector_result.second->GetSecondaries()) {
+            secondaries_.push_back(p);
+        }
 
         if (propagationstep_till_closest_approach)
         {
@@ -650,7 +642,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             propagationstep_till_closest_approach = false;
         }
 
-        if (result <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance() || particle_.GetEnergy() <= particle_.GetLow())
+        if (sector_result.first <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance() || particle_.GetEnergy() <= particle_.GetLow())
             break;
     }
     if (detector_->IsInside(particle_.GetPosition(), particle_.GetDirection()))
@@ -662,13 +654,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 
     particle_.SetElost(particle_.GetEntryEnergy() - particle_.GetExitEnergy());
 
-#if ROOT_SUPPORT
-    Output::getInstance().StorePropagatedPrimaryInTree(&particle_);
-#endif
-    if (Output::store_in_ASCII_file_)
-        Output::getInstance().StorePropagatedPrimaryInASCII(&particle_);
-
-    return Output::getInstance().GetSecondarys();
+    return std::make_shared<Secondaries>(secondaries_);
 }
 
 // ------------------------------------------------------------------------- //
