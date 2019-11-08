@@ -629,11 +629,11 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
             distance = MaxDistance_cm - particle_.GetPropagatedDistance();
         }
 
-        std::pair<double,std::shared_ptr<Secondaries>> sector_result = current_sector_->Propagate(distance);
+        std::pair<double,Secondaries> sector_result = current_sector_->Propagate(distance);
 
-        for (auto p : sector_result.second->GetSecondaries()) {
-            secondaries_.push_back(p);
-        }
+        secondaries_.append(sector_result.second);
+        /* for (auto p : sector_result.second->GetSecondaries()) { */
+        /* } */
 
         if (propagationstep_till_closest_approach)
         {

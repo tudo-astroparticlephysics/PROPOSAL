@@ -39,6 +39,7 @@ class Secondaries {
 
 public:
     Secondaries() {};
+    Secondaries(std::shared_ptr<DynamicData> inital_particle ) {secondaries_.push_back(inital_particle); };
 
     void push_back(const Particle& particle);
     void push_back(DynamicData continuous_loss);
@@ -46,12 +47,14 @@ public:
     void push_back(const Particle& particle, const DynamicData::Type& secondary,
         double energyloss);
 
-    void clear() { secondarys_.clear(); };
-    std::vector<std::shared_ptr<DynamicData>> GetSecondaries() { return secondarys_; };
-    int GetNumberOfParticles() { return secondarys_.size(); };
+    void append(const Secondaries& secondaries);
+
+    void clear() { secondaries_.clear(); };
+    std::vector<std::shared_ptr<DynamicData>> GetSecondaries() { return secondaries_; };
+    int GetNumberOfParticles() { return secondaries_.size(); };
 
 private:
-    std::vector<std::shared_ptr<DynamicData>> secondarys_;
+    std::vector<std::shared_ptr<DynamicData>> secondaries_;
 };
 
 } // namespace PROPOSAL

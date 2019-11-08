@@ -7,16 +7,17 @@ using namespace PROPOSAL;
 void Secondaries::push_back(const Particle& particle)
 {
     Particle data(particle);
-    secondarys_.push_back(std::make_shared<DynamicData>(data));
+    secondaries_.push_back(std::make_shared<DynamicData>(data));
 }
 
 void Secondaries::push_back(DynamicData continuous_loss)
 {
-    secondarys_.push_back(std::make_shared<DynamicData>(continuous_loss));
+    secondaries_.push_back(std::make_shared<DynamicData>(continuous_loss));
 }
 
-void Secondaries::push_back(std::shared_ptr<DynamicData> continuous_loss){
-    secondarys_.push_back(continuous_loss);
+void Secondaries::push_back(std::shared_ptr<DynamicData> continuous_loss)
+{
+    secondaries_.push_back(continuous_loss);
 }
 
 void Secondaries::push_back(const Particle& particle, const DynamicData::Type& interaction_type, double energy_loss)
@@ -30,5 +31,10 @@ void Secondaries::push_back(const Particle& particle, const DynamicData::Type& i
     data.SetParentParticleEnergy(particle.GetEnergy());
     data.SetPropagatedDistance(particle.GetPropagatedDistance());
 
-    secondarys_.push_back(std::make_shared<DynamicData>(data));
+    secondaries_.push_back(std::make_shared<DynamicData>(data));
+}
+
+void Secondaries::append(const Secondaries& secondaries)
+{
+    secondaries_.insert(secondaries_.end(), secondaries.secondaries_.begin(), secondaries.secondaries_.end());
 }

@@ -130,7 +130,7 @@ class Sector {
      *  \return energy at distance OR -(track length)
      */
 
-    std::pair<double, std::shared_ptr<Secondaries>> Propagate(double distance);
+    std::pair<double, Secondaries> Propagate(double distance);
 
     /**
      * Calculates the contiuous loss till the first stochastic loss happend

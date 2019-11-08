@@ -287,7 +287,7 @@ Sector::~Sector() {
 }
 
 // ------------------------------------------------------------------------- //
-std::pair<double, std::shared_ptr<Secondaries>> Sector::Propagate(double distance) {
+std::pair<double, Secondaries> Sector::Propagate(double distance) {
     bool flag;
     double displacement;
 
@@ -542,12 +542,12 @@ std::pair<double, std::shared_ptr<Secondaries>> Sector::Propagate(double distanc
 
     // Particle reached the border, final energy is returned
     if (propagated_distance == distance) {
-        return std::make_pair(final_energy, std::make_shared<Secondaries>(secondaries));
+        return std::make_pair(final_energy, secondaries);
     }
     // The particle stopped/decayed, the propagated distance is return with a
     // minus sign
     else {
-        return std::make_pair(-propagated_distance, std::make_shared<Secondaries>(secondaries));
+        return std::make_pair(-propagated_distance, secondaries);
     }
 }
 
