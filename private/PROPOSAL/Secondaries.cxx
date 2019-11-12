@@ -6,11 +6,10 @@ using namespace PROPOSAL;
 
 void Secondaries::push_back(const Particle& particle)
 {
-    Particle data(particle);
-    secondaries_.push_back(std::make_shared<DynamicData>(data));
+    secondaries_.push_back(std::make_shared<DynamicData>(particle));
 }
 
-void Secondaries::push_back(DynamicData continuous_loss)
+void Secondaries::push_back(const DynamicData& continuous_loss)
 {
     secondaries_.push_back(std::make_shared<DynamicData>(continuous_loss));
 }

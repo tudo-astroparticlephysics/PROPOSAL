@@ -39,10 +39,10 @@ class Secondaries {
 
 public:
     Secondaries() {};
-    Secondaries(std::shared_ptr<DynamicData> inital_particle ) {secondaries_.push_back(inital_particle); };
+    Secondaries(std::shared_ptr<DynamicData> inital_particle ) { secondaries_.push_back(inital_particle); };
 
     void push_back(const Particle& particle);
-    void push_back(DynamicData continuous_loss);
+    void push_back(const DynamicData& continuous_loss);
     void push_back(std::shared_ptr<DynamicData> continuous_loss);
     void push_back(const Particle& particle, const DynamicData::Type& secondary,
         double energyloss);
