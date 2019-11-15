@@ -53,6 +53,17 @@ Vector3D::Vector3D(const Vector3D& vector_3d)
 {
 }
 
+Vector3D::Vector3D(Vector3D&& other)
+    : x_(std::move(other.x_))
+    , y_(std::move(other.y_))
+    , z_(std::move(other.z_))
+    , spheric_radius_(std::move(other.spheric_radius_))
+    , spheric_azimuth_(std::move(other.spheric_azimuth_))
+    , spheric_zenith_(std::move(other.spheric_zenith_))
+{
+}
+
+
 // destructor
 Vector3D::~Vector3D() {}
 

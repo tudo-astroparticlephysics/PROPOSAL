@@ -40,6 +40,7 @@ public:
     Vector3D();
     Vector3D(const double x, const double y, const double z);
     Vector3D(const Vector3D& vector_3d);
+    Vector3D(Vector3D&& other);
     ~Vector3D();
 
     //-------------------------------------//

@@ -57,6 +57,7 @@ public:
 public:
     DynamicData(DynamicData::Type);
     DynamicData(const DynamicData&);
+    DynamicData(DynamicData&&);
     virtual ~DynamicData();
 
     friend std::ostream& operator<<(std::ostream&, DynamicData const&);

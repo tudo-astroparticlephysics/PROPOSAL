@@ -39,6 +39,17 @@ DynamicData::DynamicData(const DynamicData& data)
 {
 }
 
+DynamicData::DynamicData(DynamicData&& other)
+    : type_id_(std::move(other.type_id_))
+    , position_(std::move(other.position_))
+    , direction_(std::move(other.direction_))
+    , energy_(std::move(other.energy_))
+    , parent_particle_energy_(std::move(other.parent_particle_energy_))
+    , time_(std::move(other.time_))
+    , propagated_distance_(std::move(other.propagated_distance_))
+{
+}
+
 DynamicData::~DynamicData() {}
 
 // ------------------------------------------------------------------------- //
