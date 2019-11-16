@@ -162,7 +162,7 @@ class Sector {
      *
      *  \return tuple of energy loss [MeV], kind of interaction and list of produced particles
      */
-    std::tuple<double, DynamicData::Type, std::pair<std::vector<Particle*>, bool> > MakeStochasticLoss(double particle_energy);
+    std::pair<double, DynamicData::Type> MakeStochasticLoss(double particle_energy);
 
     // --------------------------------------------------------------------- //
     // Enable options & Setter
@@ -206,5 +206,8 @@ class Sector {
 
     ContinuousRandomizer* cont_rand_;
     Scattering* scattering_;
+
+    int averaged_produced_particle_ {100};
+    int n_th_call_ {1} ;
 };
 }  // namespace PROPOSAL

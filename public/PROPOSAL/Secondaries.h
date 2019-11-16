@@ -30,6 +30,7 @@
 
 
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/math/Vector3D.h"
 #include <memory>
 #include <vector>
 
@@ -38,23 +39,24 @@ namespace PROPOSAL {
 class Secondaries {
 
 public:
-    Secondaries() {};
-    Secondaries(std::shared_ptr<DynamicData> inital_particle ) { secondaries_.push_back(inital_particle); };
+    Secondaries();
+    Secondaries(size_t number_secondaries);
 
-    void push_back(const Particle& particle);
+    /* void push_back(const Particle& particle); */
     void push_back(const DynamicData& continuous_loss);
-    void push_back(std::shared_ptr<DynamicData> continuous_loss);
-    void push_back(const Particle& particle, const DynamicData::Type& secondary,
-        double energyloss);
+    void push_back(const Particle& particle, const DynamicData::Type& secondary, const double& energyloss);
+    void emplace_back(const DynamicData::Type& type, const Vector3D& position,
+        const Vector3D& direction, const double& energy, const double& parent_particle_energy,
+        const double& time, const double& distance);
 
-    void append(const Secondaries& secondaries);
+    void append(Secondaries secondaries);
 
     void clear() { secondaries_.clear(); };
-    std::vector<std::shared_ptr<DynamicData>> GetSecondaries() { return secondaries_; };
-    int GetNumberOfParticles() { return secondaries_.size(); };
+    std::vector<DynamicData> GetSecondaries() { secondaries_.shrink_to_fit(); return secondaries_; };
+    unsigned int GetNumberOfParticles() { return secondaries_.size(); };
 
 private:
-    std::vector<std::shared_ptr<DynamicData>> secondaries_;
+    std::vector<DynamicData> secondaries_;
 };
 
 } // namespace PROPOSAL

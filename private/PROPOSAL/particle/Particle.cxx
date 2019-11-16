@@ -17,6 +17,11 @@ using namespace PROPOSAL;
  *                              Dynamic Particle                              *
  ******************************************************************************/
 
+DynamicData::DynamicData()
+    : type_id_(DynamicData::Type::None)
+{
+}
+
 DynamicData::DynamicData(DynamicData::Type type)
     : type_id_(type)
     , position_(Vector3D())
@@ -25,6 +30,17 @@ DynamicData::DynamicData(DynamicData::Type type)
     , parent_particle_energy_(0)
     , time_(0)
     , propagated_distance_(0)
+{
+}
+
+DynamicData::DynamicData(const DynamicData::Type& type, const Vector3D& position, const Vector3D& direction, const double& energy, const double& parent_particle_energy, const double& time, const double& distance)
+    : type_id_(type)
+    , position_(position)
+    , direction_(direction)
+    , energy_(energy)
+    , parent_particle_energy_(parent_particle_energy)
+    , time_(time)
+    , propagated_distance_(distance)
 {
 }
 
@@ -39,18 +55,25 @@ DynamicData::DynamicData(const DynamicData& data)
 {
 }
 
-DynamicData::DynamicData(DynamicData&& other)
-    : type_id_(std::move(other.type_id_))
-    , position_(std::move(other.position_))
-    , direction_(std::move(other.direction_))
-    , energy_(std::move(other.energy_))
-    , parent_particle_energy_(std::move(other.parent_particle_energy_))
-    , time_(std::move(other.time_))
-    , propagated_distance_(std::move(other.propagated_distance_))
-{
-}
+
+
+/* DynamicData::DynamicData(DynamicData&& other) */
+/*     : type_id_(std::move(other.type_id_)) */
+/*     , position_(std::move(other.position_)) */
+/*     , direction_(std::move(other.direction_)) */
+/*     , energy_(std::move(other.energy_)) */
+/*     , parent_particle_energy_(std::move(other.parent_particle_energy_)) */
+/*     , time_(std::move(other.time_)) */
+/*     , propagated_distance_(std::move(other.propagated_distance_)) */
+/* { */
+/* } */
 
 DynamicData::~DynamicData() {}
+
+DynamicData& DynamicData::operator=(const DynamicData&)
+{
+    return *this;
+}
 
 // ------------------------------------------------------------------------- //
 std::ostream& PROPOSAL::operator<<(std::ostream& os, DynamicData const& data)
