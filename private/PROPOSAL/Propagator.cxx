@@ -8,7 +8,6 @@
 // #include <cmath>
 
 #include <fstream>
-#include <random>
 #include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 
 #include "PROPOSAL/Propagator.h"
@@ -21,6 +20,7 @@
 
 #include "PROPOSAL/medium/MediumFactory.h"
 
+#include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
@@ -550,14 +550,7 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
     bool propagationstep_till_closest_approach = false;
     bool already_reached_closest_approach = false;
 
-    std::cout << "mu: " << mu_produced_particle_ << std::endl;
-    std::cout << "sigma: " << sigma_produced_particle_ << std::endl;
-    std::student_t_distribution<double> distribution(n_th_call_);
-    double aux = 1 - 0.05 / 2;
-    double t = distribution(aux);
-    confidence_intervall = mu_produced_particle_ + t * std::sqrt(sigma_produced_particle_ / n_th_call_);
-    std::cout << "confidence intervall: " << confidence_intervall << std::endl;
-    Secondaries secondaries_(confidence_intervall);
+    Secondaries secondaries_(static_cast<size_t>(produced_particle_moments_.first + 2 * std::sqrt(produced_particle_moments_.second)));
 
     while (1)
     {
@@ -664,12 +657,9 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
 
     particle_.SetElost(particle_.GetEntryEnergy() - particle_.GetExitEnergy());
 
-    int produced_particle {static_cast<int>(secondaries_.GetNumberOfParticles())};
-    mu_produced_particle_ += ( produced_particle- mu_produced_particle_ ) / n_th_call_;
-    sigma_produced_particle_ += 1 / (n_th_call_ - 1) * (mu_produced_particle_ - produced_particle)
-        * (mu_produced_particle_ - produced_particle);
-
-    n_th_call_ += 1;
+    n_th_call_ += 1.;
+    double produced_particles_ = static_cast<double>(secondaries_.GetNumberOfParticles());
+    produced_particle_moments_ = welfords_online_algorithm(produced_particles_, n_th_call_, produced_particle_moments_.first, produced_particle_moments_.second);
 
     return secondaries_;
 }

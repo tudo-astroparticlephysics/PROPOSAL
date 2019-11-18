@@ -207,7 +207,7 @@ class Sector {
     ContinuousRandomizer* cont_rand_;
     Scattering* scattering_;
 
-    int averaged_produced_particle_ {100};
-    int n_th_call_ {1} ;
+    std::pair<double,double> produced_particle_moments_ {100., 10000.};
+    unsigned int n_th_call_ {1};
 };
 }  // namespace PROPOSAL

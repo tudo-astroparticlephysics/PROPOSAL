@@ -1,5 +1,6 @@
 
 #include <cmath>
+#include <utility>
 #include <fstream>
 #include <iostream>
 #include "PROPOSAL/math/MathMethods.h"
@@ -366,6 +367,13 @@ std::pair<std::vector<double>, std::vector<double>> ParseSplineCoordinates(
     return_val.first = x_vec;
     return_val.second = y_vec;
     return return_val;
+}
+
+std::pair<double, double> welfords_online_algorithm(double& new_Value, unsigned int& iter, double& mean, double& cov) {
+    double new_mean = mean + (new_Value - mean) / static_cast<double>(iter);
+    double new_cov = cov + ((new_Value - mean) * (new_Value - new_mean) - cov) / static_cast<double>(iter);
+
+    return std::make_pair (new_mean, new_cov);
 }
 
 }  // namespace PROPOSAL

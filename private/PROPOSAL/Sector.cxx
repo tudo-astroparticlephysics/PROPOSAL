@@ -13,6 +13,7 @@
 #include "PROPOSAL/geometry/Sphere.h"
 
 #include "PROPOSAL/math/RandomGenerator.h"
+#include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/Sector.h"
 
@@ -299,7 +300,7 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
     bool is_decayed = false;
     bool particle_interaction = false;
 
-    Secondaries secondaries(averaged_produced_particle_ * 1.5);
+    Secondaries secondaries(static_cast<size_t>(produced_particle_moments_.first + 2 * std::sqrt(produced_particle_moments_.second)));
 
     /* std::vector<Particle*> products; */
 
@@ -526,8 +527,9 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
 
     particle_.SetEnergy(final_energy);
 
-    averaged_produced_particle_ += (static_cast<int>(secondaries.GetNumberOfParticles())- averaged_produced_particle_ ) / n_th_call_;
-    n_th_call_ += 1;
+    n_th_call_ += 1.;
+    double produced_particles_ = static_cast<double>(secondaries.GetNumberOfParticles());
+    produced_particle_moments_ = welfords_online_algorithm(produced_particles_, n_th_call_, produced_particle_moments_.first, produced_particle_moments_.second);
 
     // Particle reached the border, final energy is returned
     if (propagated_distance == distance) {
