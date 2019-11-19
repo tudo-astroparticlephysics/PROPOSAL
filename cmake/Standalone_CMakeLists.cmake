@@ -191,11 +191,6 @@ endforeach()
 #################           Executables        ##################
 #################################################################
 
-ADD_EXECUTABLE(WriteSectorsFromDomList
-    private/test/WriteSectorsFromDomList.cxx
-)
-TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
-
 IF(ADD_CPPEXAMPLE)
     ADD_EXECUTABLE(example
             private/test/example.cxx

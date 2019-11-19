@@ -1,7 +1,6 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/Secondaries.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"

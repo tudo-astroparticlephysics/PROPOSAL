@@ -23,7 +23,6 @@
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/json.hpp"
 

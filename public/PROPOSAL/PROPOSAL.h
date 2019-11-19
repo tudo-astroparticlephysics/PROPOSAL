@@ -91,6 +91,8 @@
 #include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 
+#include "PROPOSAL/interfaces/root.h"
+
 #include "PROPOSAL/medium/density_distr/density_distr.h"
 #include "PROPOSAL/medium/density_distr/density_exponential.h"
 #include "PROPOSAL/medium/density_distr/density_homogeneous.h"
@@ -125,7 +127,6 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/PropagatorService.h"
 #include "PROPOSAL/Sector.h"
