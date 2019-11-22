@@ -91,8 +91,6 @@
 #include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 
-#include "PROPOSAL/interfaces/root.h"
-
 #include "PROPOSAL/medium/density_distr/density_distr.h"
 #include "PROPOSAL/medium/density_distr/density_exponential.h"
 #include "PROPOSAL/medium/density_distr/density_homogeneous.h"
@@ -132,3 +130,7 @@
 #include "PROPOSAL/Sector.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Secondaries.h"
+
+#if ROOT_SUPPORT
+    #include "PROPOSAL/interfaces/root.h"
+#endif
