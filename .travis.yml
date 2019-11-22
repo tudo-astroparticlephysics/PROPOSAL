@@ -117,7 +117,7 @@ before_script:
     - mkdir build
     - cd build
     - cmake .. -DADD_TESTS=ON -DADD_PYTHON=OFF
-    - make VERBOSE=1
+    - make VERBOSE=1 -j2
 
 script:
     - travis_wait 60 ctest -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
