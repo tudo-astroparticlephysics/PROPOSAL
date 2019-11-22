@@ -419,7 +419,7 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
             energy_loss = MakeStochasticLoss(final_energy);
 
             secondaries.emplace_back(energy_loss.second, particle_.GetPosition(),
-                    particle_.GetDirection(), energy_loss.second, particle_.GetEnergy(),
+                    particle_.GetDirection(), energy_loss.first, particle_.GetEnergy(),
                     particle_.GetTime(), particle_.GetPropagatedDistance());
 
             /* if (energy_loss.second == DynamicData::None) { */
