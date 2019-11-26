@@ -303,9 +303,9 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
 
     /* std::vector<Particle*> products; */
 
-    std::pair<double, DynamicData::Type> energy_loss;
+    std::pair<double, InteractionType> energy_loss;
 
-    DynamicData continuous_loss {DynamicData::Type::None};
+    DynamicData continuous_loss {InteractionType::None};
 
     // TODO(mario): check Fri 2017/08/25
     // int secondary_id    =   0;
@@ -606,7 +606,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef) {
     particle_.SetTime(time);
 }
 
-std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss(double particle_energy)
+std::pair<double, InteractionType> Sector::MakeStochasticLoss(double particle_energy)
 {
     double rnd1 = RandomGenerator::Get().RandomDouble();
     double rnd2 = RandomGenerator::Get().RandomDouble();
@@ -619,9 +619,9 @@ std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss(double particle_
     std::vector<CrossSection*> cross_sections = utility_.GetCrosssections();
 
     // return 0 and unknown, if there is no interaction
-    std::pair<double, DynamicData::Type> energy_loss;
+    std::pair<double, InteractionType> energy_loss;
     energy_loss.first = 0.;
-    energy_loss.second = DynamicData::None;
+    energy_loss.second = InteractionType::None;
 
     /* std::pair<std::vector<Particle*>, bool> products; */
 
@@ -672,5 +672,5 @@ std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss(double particle_
     }
 
 
-    return std::pair<double, DynamicData::Type>(energy_loss.first, energy_loss.second);
+    return std::pair<double, InteractionType>(energy_loss.first, energy_loss.second);
 }

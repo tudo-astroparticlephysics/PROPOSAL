@@ -14,7 +14,7 @@
 using namespace PROPOSAL;
 
 BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef def)
-    : CrossSectionInterpolant(DynamicData::Brems, param)
+    : CrossSectionInterpolant(InteractionType::Brems, param)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInterpolation(def);

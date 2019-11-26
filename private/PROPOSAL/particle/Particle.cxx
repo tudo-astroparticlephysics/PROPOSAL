@@ -18,11 +18,11 @@ using namespace PROPOSAL;
  ******************************************************************************/
 
 DynamicData::DynamicData()
-    : type_id_(DynamicData::Type::None)
+    : type_id_(InteractionType::None)
 {
 }
 
-DynamicData::DynamicData(DynamicData::Type type)
+DynamicData::DynamicData(InteractionType type)
     : type_id_(type)
     , position_(Vector3D())
     , direction_(Vector3D())
@@ -33,7 +33,7 @@ DynamicData::DynamicData(DynamicData::Type type)
 {
 }
 
-DynamicData::DynamicData(const DynamicData::Type& type, const Vector3D& position, const Vector3D& direction, const double& energy, const double& parent_particle_energy, const double& time, const double& distance)
+DynamicData::DynamicData(const InteractionType& type, const Vector3D& position, const Vector3D& direction, const double& energy, const double& parent_particle_energy, const double& time, const double& distance)
     : type_id_(type)
     , position_(position)
     , direction_(direction)
@@ -99,31 +99,31 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DynamicData const& data)
 }
 
 // ------------------------------------------------------------------------- //
-std::string DynamicData::GetNameFromType(Type type)
+std::string DynamicData::GetNameFromType(InteractionType type)
 {
     switch (type)
     {
-        case None:
+        case InteractionType::None:
             return "None";
-        case Particle:
+        case InteractionType::Particle:
             return "Particle";
-        case Brems:
+        case InteractionType::Brems:
             return "Brems";
-        case DeltaE:
+        case InteractionType::DeltaE:
             return "DeltaE";
-        case Epair:
+        case InteractionType::Epair:
             return "Epair";
-        case NuclInt:
+        case InteractionType::NuclInt:
             return "NuclInt";
-        case MuPair:
+        case InteractionType::MuPair:
             return "MuPair";
-        case Hadrons:
+        case InteractionType::Hadrons:
             return "Hadrons";
-        case ContinuousEnergyLoss:
+        case InteractionType::ContinuousEnergyLoss:
             return "ContinuousEnergyLoss";
-        case WeakInt:
+        case InteractionType::WeakInt:
             return "WeakInt";
-        case Compton:
+        case InteractionType::Compton:
             return "Compton";
         default:
             return "Type not found";
@@ -135,7 +135,7 @@ std::string DynamicData::GetNameFromType(Type type)
  ******************************************************************************/
 
 Particle::Particle()
-    : DynamicData(DynamicData::Particle)
+    : DynamicData(InteractionType::Particle)
     , particle_def_(MuMinusDef::Get())
     , momentum_(0)
     , parent_particle_id_(0)
@@ -174,7 +174,7 @@ Particle::Particle(const Particle& particle)
 }
 
 Particle::Particle(const ParticleDef& particleDef)
-    : DynamicData(DynamicData::Particle)
+    : DynamicData(InteractionType::Particle)
     , particle_def_(particleDef)
     , momentum_(0)
     , parent_particle_id_(0)

@@ -162,7 +162,7 @@ class Sector {
      *
      *  \return tuple of energy loss [MeV], kind of interaction and list of produced particles
      */
-    std::pair<double, DynamicData::Type> MakeStochasticLoss(double particle_energy);
+    std::pair<double, InteractionType> MakeStochasticLoss(double particle_energy);
 
     // --------------------------------------------------------------------- //
     // Enable options & Setter

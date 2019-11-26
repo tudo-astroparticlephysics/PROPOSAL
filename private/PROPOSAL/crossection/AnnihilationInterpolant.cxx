@@ -17,7 +17,7 @@
 using namespace PROPOSAL;
 
 AnnihilationInterpolant::AnnihilationInterpolant(const Annihilation& param, InterpolationDef def)
-        : CrossSectionInterpolant(DynamicData::Particle, param), rndc_(-1.) {
+        : CrossSectionInterpolant(InteractionType::Particle, param), rndc_(-1.) {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInterpolation(def);
     gamma_def_ = &GammaDef::Get();

@@ -16,7 +16,7 @@
 using namespace PROPOSAL;
 
 PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairProduction& param, const PhotoAngleDistribution& photoangle, InterpolationDef def)
-        : CrossSectionInterpolant(DynamicData::Particle, param)
+        : CrossSectionInterpolant(InteractionType::Particle, param)
         , photoangle_(photoangle.clone()), rndc_(-1.){
     // Use own initialization
     PhotoPairInterpolant::InitdNdxInterpolation(def);

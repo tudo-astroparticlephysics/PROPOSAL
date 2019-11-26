@@ -9,7 +9,7 @@
 using namespace PROPOSAL;
 
 EpairIntegral::EpairIntegral(const EpairProduction& param)
-    : CrossSectionIntegral(DynamicData::Epair, param)
+    : CrossSectionIntegral(InteractionType::Epair, param)
 {
 }
 

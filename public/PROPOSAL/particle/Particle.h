@@ -36,28 +36,30 @@
 
 namespace PROPOSAL {
 
+enum class InteractionType
+{
+    None = 0,
+    Particle,
+    Brems,
+    DeltaE,
+    Epair,
+    NuclInt,
+    MuPair,
+    Hadrons,
+    ContinuousEnergyLoss,
+    WeakInt,
+    Compton,
+    Decay,
+};
+
 class DynamicData
 {
 public:
-    enum Type
-    {
-        None = 0,
-        Particle,
-        Brems,
-        DeltaE,
-        Epair,
-        NuclInt,
-        MuPair,
-        Hadrons,
-        ContinuousEnergyLoss,
-        WeakInt,
-        Compton,
-    };
 
 public:
     DynamicData();
-    DynamicData(DynamicData::Type);
-    DynamicData(const DynamicData::Type&, const Vector3D&, const Vector3D&, const double&, const double&, const double&, const double&);
+    DynamicData(InteractionType);
+    DynamicData(const InteractionType&, const Vector3D&, const Vector3D&, const double&, const double&, const double&, const double&);
     DynamicData(const DynamicData&);
     /* DynamicData(DynamicData&&); */
     virtual ~DynamicData();
@@ -79,8 +81,8 @@ public:
     void SetPropagatedDistance(double prop_dist) { propagated_distance_ = prop_dist; }
 
     // Getter
-    Type GetTypeId() const { return type_id_; }
-    static std::string GetNameFromType(Type);
+    InteractionType GetTypeId() const { return type_id_; }
+    static std::string GetNameFromType(InteractionType);
 
     Vector3D GetPosition() const { return position_; }
     Vector3D GetDirection() const { return direction_; }
@@ -93,7 +95,7 @@ public:
 protected:
     virtual void print(std::ostream&) const {}
 
-    const Type type_id_;
+    const InteractionType type_id_;
 
     Vector3D position_;  //!< position coordinates [cm]
     Vector3D direction_; //!< direction vector, angles in [rad]

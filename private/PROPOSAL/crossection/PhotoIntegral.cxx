@@ -9,7 +9,7 @@
 using namespace PROPOSAL;
 
 PhotoIntegral::PhotoIntegral(const Photonuclear& param)
-    : CrossSectionIntegral(DynamicData::NuclInt, param)
+    : CrossSectionIntegral(InteractionType::NuclInt, param)
 {
 }
 

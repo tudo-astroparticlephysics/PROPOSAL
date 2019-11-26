@@ -30,6 +30,7 @@
 
 
 #include "PROPOSAL/particle/Particle.h"
+
 #include "PROPOSAL/math/Vector3D.h"
 #include <memory>
 #include <vector>
@@ -44,8 +45,8 @@ public:
 
     /* void push_back(const Particle& particle); */
     void push_back(const DynamicData& continuous_loss);
-    void push_back(const Particle& particle, const DynamicData::Type& secondary, const double& energyloss);
-    void emplace_back(const DynamicData::Type& type, const Vector3D& position,
+    void push_back(const Particle& particle, const InteractionType& secondary, const double& energyloss);
+    void emplace_back(const InteractionType& type, const Vector3D& position,
         const Vector3D& direction, const double& energy, const double& parent_particle_energy,
         const double& time, const double& distance);
 

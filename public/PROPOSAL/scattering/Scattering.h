@@ -28,10 +28,11 @@
 
 
 #pragma once
+#include "PROPOSAL/particle/Particle.h"
 
 namespace PROPOSAL {
 
-class Particle;
+/* class Particle; */
 class Utility;
 
 class Scattering

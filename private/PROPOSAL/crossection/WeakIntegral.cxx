@@ -10,7 +10,7 @@
 using namespace PROPOSAL;
 
 WeakIntegral::WeakIntegral(const WeakInteraction& param)
-        : CrossSectionIntegral(DynamicData::WeakInt, param)
+        : CrossSectionIntegral(InteractionType::WeakInt, param)
 {
 }
 

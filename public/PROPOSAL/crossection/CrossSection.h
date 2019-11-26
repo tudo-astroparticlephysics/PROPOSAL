@@ -44,7 +44,7 @@ class Parametrization;
 class CrossSection
 {
 public:
-    CrossSection(const DynamicData::Type&, const Parametrization&);
+    CrossSection(const InteractionType&, const Parametrization&);
     CrossSection(const CrossSection&);
     virtual ~CrossSection();
 
@@ -84,7 +84,7 @@ public:
     // Getter
     // ----------------------------------------------------------------- //
 
-    DynamicData::Type GetTypeId() const { return type_id_; }
+    InteractionType GetTypeId() const { return type_id_; }
     Parametrization& GetParametrization() const { return *parametrization_; }
 
 protected:
@@ -102,7 +102,7 @@ protected:
     // Protected member
     // ----------------------------------------------------------------- //
 
-    const DynamicData::Type type_id_;
+    const InteractionType type_id_;
 
     Parametrization* parametrization_;
 
