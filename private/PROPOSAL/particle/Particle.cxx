@@ -10,8 +10,10 @@
 #include <cmath>
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/methods.h"
+#include <iostream>
 
 using namespace PROPOSAL;
+
 
 /******************************************************************************
  *                              Dynamic Particle                              *
@@ -101,32 +103,11 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DynamicData const& data)
 // ------------------------------------------------------------------------- //
 std::string DynamicData::GetNameFromType(InteractionType type)
 {
-    switch (type)
-    {
-        case InteractionType::None:
-            return "None";
-        case InteractionType::Particle:
-            return "Particle";
-        case InteractionType::Brems:
-            return "Brems";
-        case InteractionType::DeltaE:
-            return "DeltaE";
-        case InteractionType::Epair:
-            return "Epair";
-        case InteractionType::NuclInt:
-            return "NuclInt";
-        case InteractionType::MuPair:
-            return "MuPair";
-        case InteractionType::Hadrons:
-            return "Hadrons";
-        case InteractionType::ContinuousEnergyLoss:
-            return "ContinuousEnergyLoss";
-        case InteractionType::WeakInt:
-            return "WeakInt";
-        case InteractionType::Compton:
-            return "Compton";
-        default:
-            return "Type not found";
+    auto search = Interaction_Id_Name_map.find(type);
+    if (search != Interaction_Id_Name_map.end()) {
+        return search->second;
+    } else {
+        return "Not found." ;
     }
 }
 

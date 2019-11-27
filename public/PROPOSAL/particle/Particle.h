@@ -30,12 +30,12 @@
 #pragma once
 
 #include <string>
+#include <map>
 
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
 namespace PROPOSAL {
-
 enum class InteractionType
 {
     None = 0,
@@ -51,7 +51,27 @@ enum class InteractionType
     Compton,
     Decay,
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+    static std::map<InteractionType, std::string> Interaction_Id_Name_map {
+        {InteractionType::None, "None"},
+        {InteractionType::Particle , "Particle"},
+        {InteractionType::Brems, "Brems"},
+        {InteractionType::DeltaE, "DeltaE"},
+        {InteractionType::Epair, "Epair"},
+        {InteractionType::NuclInt, "NuclInt"},
+        {InteractionType::MuPair, "MuPair"},
+        {InteractionType::Hadrons, "Hadrons"},
+        {InteractionType::ContinuousEnergyLoss, "ContinousEnergyLoss"},
+        {InteractionType::WeakInt, "WeakInt"},
+        {InteractionType::Compton, "Compton"},
+        {InteractionType::Decay, "Decay"},
+    };
+} // namespace PROPOSAL
+
+
+namespace PROPOSAL {
 class DynamicData
 {
 public:
@@ -247,5 +267,4 @@ private:
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::DynamicData const&);
-
 } // namespace PROPOSAL
