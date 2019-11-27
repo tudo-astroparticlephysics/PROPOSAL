@@ -84,7 +84,7 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DynamicData const& data)
     ss << " DynamicData (" << &data << ") ";
     os << Helper::Centered(60, ss.str()) << '\n';
 
-    os << "type: " << DynamicData::GetNameFromType(data.type_id_) << '\n';
+    os << "type: " << data.GetName() << '\n';
     os << "position:" << '\n';
     os << data.position_ << '\n';
     os << "direction:" << '\n';
@@ -101,9 +101,9 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DynamicData const& data)
 }
 
 // ------------------------------------------------------------------------- //
-std::string DynamicData::GetNameFromType(InteractionType type)
+std::string DynamicData::GetName() const
 {
-    auto search = Interaction_Id_Name_map.find(type);
+    auto search = Interaction_Id_Name_map.find(type_id_);
     if (search != Interaction_Id_Name_map.end()) {
         return search->second;
     } else {

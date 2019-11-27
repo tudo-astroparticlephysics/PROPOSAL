@@ -54,20 +54,20 @@ enum class InteractionType
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-    static std::map<InteractionType, std::string> Interaction_Id_Name_map {
-        {InteractionType::None, "None"},
-        {InteractionType::Particle , "Particle"},
-        {InteractionType::Brems, "Brems"},
-        {InteractionType::DeltaE, "DeltaE"},
-        {InteractionType::Epair, "Epair"},
-        {InteractionType::NuclInt, "NuclInt"},
-        {InteractionType::MuPair, "MuPair"},
-        {InteractionType::Hadrons, "Hadrons"},
-        {InteractionType::ContinuousEnergyLoss, "ContinousEnergyLoss"},
-        {InteractionType::WeakInt, "WeakInt"},
-        {InteractionType::Compton, "Compton"},
-        {InteractionType::Decay, "Decay"},
-    };
+static const std::map<InteractionType, std::string> Interaction_Id_Name_map {
+    {InteractionType::None, "None"},
+    {InteractionType::Particle , "Particle"},
+    {InteractionType::Brems, "Brems"},
+    {InteractionType::DeltaE, "DeltaE"},
+    {InteractionType::Epair, "Epair"},
+    {InteractionType::NuclInt, "NuclInt"},
+    {InteractionType::MuPair, "MuPair"},
+    {InteractionType::Hadrons, "Hadrons"},
+    {InteractionType::ContinuousEnergyLoss, "ContinousEnergyLoss"},
+    {InteractionType::WeakInt, "WeakInt"},
+    {InteractionType::Compton, "Compton"},
+    {InteractionType::Decay, "Decay"},
+};
 } // namespace PROPOSAL
 
 
@@ -102,7 +102,6 @@ public:
 
     // Getter
     InteractionType GetTypeId() const { return type_id_; }
-    static std::string GetNameFromType(InteractionType);
 
     Vector3D GetPosition() const { return position_; }
     Vector3D GetDirection() const { return direction_; }
@@ -115,6 +114,8 @@ public:
 protected:
     virtual void print(std::ostream&) const {}
 
+    std::string GetName() const;
+
     const InteractionType type_id_;
 
     Vector3D position_;  //!< position coordinates [cm]
@@ -125,12 +126,14 @@ protected:
     double time_;                   //!< age [sec]
     double propagated_distance_;    //!< propagation distance [cm]
 };
+} // namespace PROPOSAL
 
 // ----------------------------------------------------------------------------
 /// @brief This class provides the main particle properties and functions.
 ///
 /// All coordinates, angles and physical values are stored in this class.
 // ----------------------------------------------------------------------------
+namespace PROPOSAL {
 class Particle : public DynamicData
 {
 public:
