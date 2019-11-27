@@ -1,3 +1,4 @@
+#include <string>
 
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/Secondaries.h"
@@ -334,8 +335,16 @@ void init_particle(py::module& m) {
 
     py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries",
             R"pbdoc(List of secondaries)pbdoc")
+        .def("Query", overload_cast_<const InteractionType&>()(&Secondaries::Query, py::const_), py::arg("Interaction"))
+        .def("Query", overload_cast_<const std::string&>()(&Secondaries::Query, py::const_), py::arg("Interaction"))
         .def_property_readonly("particles", &Secondaries::GetSecondaries)
-        .def_property_readonly("number_of_particles", &Secondaries::GetNumberOfParticles);
+        .def_property_readonly("number_of_particles", &Secondaries::GetNumberOfParticles)
+        .def_property_readonly("position", &Secondaries::GetDirection)
+        .def_property_readonly("direction", &Secondaries::GetPosition)
+        .def_property_readonly("parent_particle_energy", &Secondaries::GetParentParticleEnergy)
+        .def_property_readonly("energy", &Secondaries::GetEnergy)
+        .def_property_readonly("time", &Secondaries::GetTime)
+        .def_property_readonly("propagated_distance", &Secondaries::GetPropagatedDistance);
 
 }
 

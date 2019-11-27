@@ -34,6 +34,7 @@
 #include "PROPOSAL/math/Vector3D.h"
 #include <memory>
 #include <vector>
+#include <string>
 
 namespace PROPOSAL {
 
@@ -52,7 +53,18 @@ public:
 
     void append(Secondaries secondaries);
 
+    Secondaries Query(const InteractionType&) const;
+    Secondaries Query(const std::string&) const;
+
+    std::vector<Vector3D> GetPosition() const;
+    std::vector<Vector3D> GetDirection() const;
+    std::vector<double> GetEnergy() const;
+    std::vector<double> GetParentParticleEnergy() const;
+    std::vector<double> GetTime() const;
+    std::vector<double> GetPropagatedDistance() const;
+
     void clear() { secondaries_.clear(); };
+
     std::vector<DynamicData> GetSecondaries() { secondaries_.shrink_to_fit(); return secondaries_; };
     unsigned int GetNumberOfParticles() { return secondaries_.size(); };
 
