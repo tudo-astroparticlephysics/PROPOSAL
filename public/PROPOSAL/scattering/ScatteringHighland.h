@@ -60,7 +60,7 @@ private:
 
     bool compare(const Scattering&) const;
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4);
     double CalculateTheta0(double dr);
 
     const Medium* medium_;

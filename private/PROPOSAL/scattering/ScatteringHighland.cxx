@@ -68,25 +68,30 @@ double ScatteringHighland::CalculateTheta0(double dr) {
 
 //----------------------------------------------------------------------------//
 
+
 Scattering::RandomAngles ScatteringHighland::CalculateRandomAngle(double dr,
                                                                   double ei,
-                                                                  double ef) {
+                                                                  double ef,
+                                                                  double rnd1,
+                                                                  double rnd2,
+                                                                  double rnd3,
+                                                                  double rnd4) {
     (void)ei;
     (void)ef;
 
-    double Theta0, rnd1, rnd2;
+    double Theta0;
     Scattering::RandomAngles random_angles;
 
     Theta0 = CalculateTheta0(dr);
 
-    rnd1 = Theta0 * inverseErrorFunction(RandomGenerator::Get().RandomDouble());
-    rnd2 = Theta0 * inverseErrorFunction(RandomGenerator::Get().RandomDouble());
+    rnd1 = Theta0 * inverseErrorFunction(rnd1);
+    rnd2 = Theta0 * inverseErrorFunction(rnd2);
 
     random_angles.sx = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.tx = rnd2;
 
-    rnd1 = Theta0 * inverseErrorFunction(RandomGenerator::Get().RandomDouble());
-    rnd2 = Theta0 * inverseErrorFunction(RandomGenerator::Get().RandomDouble());
+    rnd1 = Theta0 * inverseErrorFunction(rnd3);
+    rnd2 = Theta0 * inverseErrorFunction(rnd4);
 
     random_angles.sy = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.ty = rnd2;
