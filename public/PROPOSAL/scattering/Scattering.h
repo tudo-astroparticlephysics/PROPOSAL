@@ -39,6 +39,7 @@ class Utility;
 
 struct Directions : std::enable_shared_from_this<Directions>
 {
+    Directions() : u_(0,0,0), n_i_(0,0,0) {};
     Directions(Vector3D u, Vector3D n_i) : u_(u), n_i_(n_i) {};
 
     Vector3D u_;
@@ -59,8 +60,8 @@ public:
     virtual Scattering* clone(Particle&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies)
 
 
-    std::shared_ptr<Directions> Scatter(double dr, double ei, double ef);
-    std::shared_ptr<Directions> Scatter(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4);
+    Directions Scatter(double dr, double ei, double ef);
+    Directions Scatter(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4);
 
     const Particle& GetParticle() const { return particle_; }
 
@@ -79,7 +80,6 @@ protected:
     virtual RandomAngles CalculateRandomAngle(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4) = 0;
 
     Particle& particle_;
-    Directions directions_;
 };
 
 } // namespace PROPOSAL

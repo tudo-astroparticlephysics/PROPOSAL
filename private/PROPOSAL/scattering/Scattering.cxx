@@ -22,14 +22,12 @@ using namespace PROPOSAL;
  ******************************************************************************/
 
 Scattering::Scattering(Particle& particle)
-    : particle_(particle),
-      directions_(Vector3D(), Vector3D())
+    : particle_(particle)
 {
 }
 
 Scattering::Scattering(const Scattering& scattering)
-    : particle_(scattering.particle_),
-      directions_(scattering.directions_)
+    : particle_(scattering.particle_)
 {
 }
 
@@ -48,7 +46,7 @@ bool Scattering::operator!=(const Scattering& scattering) const
     return !(*this == scattering);
 }
 
-std::shared_ptr<Directions> Scattering::Scatter(double dr, double ei, double ef)
+Directions Scattering::Scatter(double dr, double ei, double ef)
 {
     double rnd1 = RandomGenerator::Get().RandomDouble();
     double rnd2 = RandomGenerator::Get().RandomDouble();
@@ -58,16 +56,16 @@ std::shared_ptr<Directions> Scattering::Scatter(double dr, double ei, double ef)
     return Scattering::Scatter(dr, ei, ef, rnd1, rnd2, rnd3, rnd4);
 }
 
-std::shared_ptr<Directions> Scattering::Scatter(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4)
+Directions Scattering::Scatter(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4)
 {
+    Directions directions_;
     // u averaged continous propagation direction
     // n_i direction after continous propagation
-    directions_.u_ = Vector3D(0, 0, 0);
     directions_.n_i_ = Vector3D(particle_.GetDirection());
 
     if(dr<=0)
     {
-        return std::make_shared<Directions>(directions_);
+        return directions_;
     }
 
     double sz, tz;
@@ -99,7 +97,7 @@ std::shared_ptr<Directions> Scattering::Scatter(double dr, double ei, double ef,
     directions_.n_i_ = directions_.n_i_ + random_angles.ty * rotate_vector_y;
     directions_.n_i_.CalculateSphericalCoordinates();
 
-    return std::make_shared<Directions>(directions_);
+    return directions_;
 }
 
 Scattering::RandomAngles Scattering::CalculateRandomAngle(double dr, double ei, double ef)
