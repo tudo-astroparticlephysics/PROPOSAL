@@ -1,7 +1,8 @@
 
+#include <cmath>
+
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/math/MathMethods.h"

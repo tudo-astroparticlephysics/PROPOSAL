@@ -1,7 +1,7 @@
 
+#include <cmath>
 
 #include "PROPOSAL/Logging.h"
-#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 

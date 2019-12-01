@@ -145,6 +145,7 @@ TEST(Scattering, Scatter)
     std::string parametrization;
 
     double energy_init, energy_final, distance;
+    double rnd1, rnd2, rnd3, rnd4;
     double energy_previous = -1;
     double ecut, vcut;
     Vector3D position_init  = Vector3D(0, 0, 0);
@@ -163,7 +164,7 @@ TEST(Scattering, Scatter)
         if (first_line)
         {
             in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >>
-                distance >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
+                distance >> rnd1 >> rnd2 >> rnd3 >> rnd4 >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
 
             first_line = false;
         }
@@ -200,7 +201,7 @@ TEST(Scattering, Scatter)
             particle.SetPosition(position_init);
             particle.SetDirection(direction_init);
 
-            Directions directions = scattering->Scatter(distance, energy_init, energy_final);
+            Directions directions = scattering->Scatter(distance, energy_init, energy_final, rnd1, rnd2, rnd3, rnd4);
             particle.SetPosition(particle.GetPosition() + distance * directions.u_);
             particle.SetDirection(directions.n_i_);
 
@@ -213,7 +214,7 @@ TEST(Scattering, Scatter)
             ASSERT_NEAR(particle.GetDirection().GetTheta(), theta_f, std::abs(error * theta_f));
 
             in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >>
-                distance >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
+                distance >> rnd1 >> rnd2 >> rnd3 >> rnd4 >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
         }
 
         delete medium;

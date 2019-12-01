@@ -8,7 +8,6 @@
  **/
 
 #include <cmath>
-#include <memory>
 
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/Particle.h"
