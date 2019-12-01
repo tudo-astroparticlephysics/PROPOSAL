@@ -29,6 +29,7 @@
 
 #pragma once
 #include <utility>
+#include <memory>
 #include "PROPOSAL/math/Vector3D.h"
 
 namespace PROPOSAL {
