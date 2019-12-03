@@ -14,7 +14,7 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-CrossSectionIntegral::CrossSectionIntegral(const DynamicData::Type& type, const Parametrization& param)
+CrossSectionIntegral::CrossSectionIntegral(const InteractionType& type, const Parametrization& param)
     : CrossSection(type, param)
     , dedx_integral_(IROMB, IMAXS, IPREC)
     , de2dx_integral_(IROMB, IMAXS, IPREC)

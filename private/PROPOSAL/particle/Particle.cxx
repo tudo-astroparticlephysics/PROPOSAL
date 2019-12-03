@@ -10,19 +10,21 @@
 #include <cmath>
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/methods.h"
+#include <iostream>
 
 using namespace PROPOSAL;
+
 
 /******************************************************************************
  *                              Dynamic Particle                              *
  ******************************************************************************/
 
 DynamicData::DynamicData()
-    : type_id_(DynamicData::Type::None)
+    : type_id_(InteractionType::None)
 {
 }
 
-DynamicData::DynamicData(DynamicData::Type type)
+DynamicData::DynamicData(InteractionType type)
     : type_id_(type)
     , position_(Vector3D())
     , direction_(Vector3D())
@@ -33,7 +35,7 @@ DynamicData::DynamicData(DynamicData::Type type)
 {
 }
 
-DynamicData::DynamicData(const DynamicData::Type& type, const Vector3D& position, const Vector3D& direction, const double& energy, const double& parent_particle_energy, const double& time, const double& distance)
+DynamicData::DynamicData(const InteractionType& type, const Vector3D& position, const Vector3D& direction, const double& energy, const double& parent_particle_energy, const double& time, const double& distance)
     : type_id_(type)
     , position_(position)
     , direction_(direction)
@@ -82,7 +84,7 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DynamicData const& data)
     ss << " DynamicData (" << &data << ") ";
     os << Helper::Centered(60, ss.str()) << '\n';
 
-    os << "type: " << DynamicData::GetNameFromType(data.type_id_) << '\n';
+    os << "type: " << data.GetName() << '\n';
     os << "position:" << '\n';
     os << data.position_ << '\n';
     os << "direction:" << '\n';
@@ -99,34 +101,13 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DynamicData const& data)
 }
 
 // ------------------------------------------------------------------------- //
-std::string DynamicData::GetNameFromType(Type type)
+std::string DynamicData::GetName() const
 {
-    switch (type)
-    {
-        case None:
-            return "None";
-        case Particle:
-            return "Particle";
-        case Brems:
-            return "Brems";
-        case DeltaE:
-            return "DeltaE";
-        case Epair:
-            return "Epair";
-        case NuclInt:
-            return "NuclInt";
-        case MuPair:
-            return "MuPair";
-        case Hadrons:
-            return "Hadrons";
-        case ContinuousEnergyLoss:
-            return "ContinuousEnergyLoss";
-        case WeakInt:
-            return "WeakInt";
-        case Compton:
-            return "Compton";
-        default:
-            return "Type not found";
+    auto search = Interaction_Id_Name_map.find(type_id_);
+    if (search != Interaction_Id_Name_map.end()) {
+        return search->second;
+    } else {
+        return "Not found." ;
     }
 }
 
@@ -135,7 +116,7 @@ std::string DynamicData::GetNameFromType(Type type)
  ******************************************************************************/
 
 Particle::Particle()
-    : DynamicData(DynamicData::Particle)
+    : DynamicData(InteractionType::Particle)
     , particle_def_(MuMinusDef::Get())
     , momentum_(0)
     , parent_particle_id_(0)
@@ -174,7 +155,7 @@ Particle::Particle(const Particle& particle)
 }
 
 Particle::Particle(const ParticleDef& particleDef)
-    : DynamicData(DynamicData::Particle)
+    : DynamicData(InteractionType::Particle)
     , particle_def_(particleDef)
     , momentum_(0)
     , parent_particle_id_(0)

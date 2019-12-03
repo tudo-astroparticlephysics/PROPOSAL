@@ -20,6 +20,8 @@
 
 #include "PROPOSAL/medium/MediumFactory.h"
 
+#include "PROPOSAL/particle/Particle.h"
+
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Constants.h"

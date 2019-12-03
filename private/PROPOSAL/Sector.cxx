@@ -303,9 +303,9 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
 
     /* std::vector<Particle*> products; */
 
-    std::pair<double, DynamicData::Type> energy_loss;
+    std::pair<double, InteractionType> energy_loss;
 
-    DynamicData continuous_loss {DynamicData::Type::None};
+    DynamicData continuous_loss {InteractionType::None};
 
     // TODO(mario): check Fri 2017/08/25
     // int secondary_id    =   0;
@@ -422,70 +422,16 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
                     particle_.GetDirection(), energy_loss.first, particle_.GetEnergy(),
                     particle_.GetTime(), particle_.GetPropagatedDistance());
 
-            /* if (energy_loss.second == DynamicData::None) { */
-            /*     // in this case, no cross section is chosen, so there is no */
-            /*     // interaction due to the parameterization of the cross section */
-            /*     // cutoffs */
-            /*     log_debug( */
-            /*         "no interaction due to the parameterization of the cross " */
-            /*         "section cutoffs. final energy: %f\n", */
-            /*         final_energy); */
-            /*     initial_energy = final_energy; */
-            /*     continue; */
-            /* } */
-
-            /* if(!products.empty()){ */
-            /*     // add produced particles to SecondaryVector */
-            /*     for(unsigned int i=0; i<products.size(); i++){ */
-            /*         products[i]->SetPosition(particle_.GetPosition()); */
-            /*         products[i]->SetTime(particle_.GetTime()); */
-            /*         products[i]->SetParentParticleEnergy(particle_.GetEnergy()); */
-            /*     } */
-
-
-            /*     if (not (sector_def_.only_loss_inside_detector && sector_def_.location != Sector::ParticleLocation::InsideDetector) ) */
-            /*     { */
-            /*         for (auto p : products) { */
-            /*             secondaries.push_back(*p); */
-            /*         } */
-            /*     } */
-            /* } */
-
-            /* if(energy_loss.second != DynamicData::Particle){ */
-            /*     // DynamicData::Particle means no DynamicData object will be added to SecondaryVector */
-            /*     // add energy loss with DynamicData to SecondaryVector */
-
-            /*     if (not (sector_def_.only_loss_inside_detector && sector_def_.location != Sector::ParticleLocation::InsideDetector)) */
-            /*     { */
-            /*             secondaries.push_back(particle_, energy_loss.second, energy_loss.first); */
-            /*     } */
-            /* } */
-
-            /* if(std::get<2>(aux).second == true){ */
-            /*     // fatal loss -> initial particle is destroyed */
-            /*     is_decayed = true; */
-            /*     final_energy -= energy_loss.first; */
-            /*     break; */
-            /* } */
-
             final_energy -= energy_loss.first;
 
         }else
         {
-            /* products = particle_.GetDecayTable().SelectChannel().Decay(particle_); */
-            /* if (not (sector_def_.only_loss_inside_detector && sector_def_.location == Sector::ParticleLocation::InsideDetector)) */
-            /* { */
-            /*         for (auto p : products) { */
-            /*             secondaries.push_back(*p); */
-            /*         } */
-            /* } */
-
             is_decayed = true;
             final_energy = particle_.GetMass();
 
-            // log_debug("Sampled decay of particle: %s",
-            // particle_->GetName().c_str()); secondary_id    =
-            // particle_->GetParticleId()  +   1;
+            secondaries.emplace_back(InteractionType::Decay, particle_.GetPosition(),
+                    particle_.GetDirection(), final_energy, particle_.GetEnergy(),
+                    particle_.GetTime(), particle_.GetPropagatedDistance());
         }
 
         // break if the lower limit of particle energy is reached
@@ -606,7 +552,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef) {
     particle_.SetTime(time);
 }
 
-std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss(double particle_energy)
+std::pair<double, InteractionType> Sector::MakeStochasticLoss(double particle_energy)
 {
     double rnd1 = RandomGenerator::Get().RandomDouble();
     double rnd2 = RandomGenerator::Get().RandomDouble();
@@ -619,9 +565,9 @@ std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss(double particle_
     std::vector<CrossSection*> cross_sections = utility_.GetCrosssections();
 
     // return 0 and unknown, if there is no interaction
-    std::pair<double, DynamicData::Type> energy_loss;
+    std::pair<double, InteractionType> energy_loss;
     energy_loss.first = 0.;
-    energy_loss.second = DynamicData::None;
+    energy_loss.second = InteractionType::None;
 
     /* std::pair<std::vector<Particle*>, bool> products; */
 
@@ -672,5 +618,5 @@ std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss(double particle_
     }
 
 
-    return std::pair<double, DynamicData::Type>(energy_loss.first, energy_loss.second);
+    return std::pair<double, InteractionType>(energy_loss.first, energy_loss.second);
 }

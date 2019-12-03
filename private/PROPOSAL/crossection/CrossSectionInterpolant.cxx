@@ -19,7 +19,7 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, const Parametrization& param)
+CrossSectionInterpolant::CrossSectionInterpolant(const InteractionType& type, const Parametrization& param)
     : CrossSection(type, param)
     , dedx_interpolant_(NULL)
     , de2dx_interpolant_(NULL)

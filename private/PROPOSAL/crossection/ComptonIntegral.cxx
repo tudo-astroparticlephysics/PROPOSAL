@@ -12,7 +12,7 @@
 using namespace PROPOSAL;
 
 ComptonIntegral::ComptonIntegral(const Compton& param)
-        : CrossSectionIntegral(DynamicData::Compton, param)
+        : CrossSectionIntegral(InteractionType::Compton, param)
 {
 }
 

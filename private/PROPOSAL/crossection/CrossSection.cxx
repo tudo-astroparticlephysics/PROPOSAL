@@ -10,7 +10,7 @@ using namespace PROPOSAL;
 // CrossSection
 // ------------------------------------------------------------------------- //
 
-CrossSection::CrossSection(const DynamicData::Type& type, const Parametrization& param)
+CrossSection::CrossSection(const InteractionType& type, const Parametrization& param)
     : type_id_(type)
     , parametrization_(param.clone())
     , prob_for_component_(param.GetMedium().GetNumComponents(), 0)
@@ -65,25 +65,25 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, CrossSection const& cross)
     std::string name;
     switch (cross.type_id_)
     {
-        case DynamicData::Brems:
+        case InteractionType::Brems:
             name = "Bremsstrahlung";
             break;
-        case DynamicData::Epair:
+        case InteractionType::Epair:
             name = "EPairProduction";
             break;
-        case DynamicData::DeltaE:
+        case InteractionType::DeltaE:
             name = "Ionization";
             break;
-        case DynamicData::NuclInt:
+        case InteractionType::NuclInt:
             name = "PhotoNuclear";
             break;
-        case DynamicData::MuPair:
+        case InteractionType::MuPair:
             name = "MuPairProduction";
             break;
-        case DynamicData::WeakInt:
+        case InteractionType::WeakInt:
             name = "WeakInteraction";
             break;
-        case DynamicData::Compton:
+        case InteractionType::Compton:
             name = "Compton";
             break;
         default:

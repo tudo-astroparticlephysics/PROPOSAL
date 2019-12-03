@@ -14,7 +14,7 @@
 using namespace PROPOSAL;
 
 EpairInterpolant::EpairInterpolant(const EpairProduction& param, InterpolationDef def)
-    : CrossSectionInterpolant(DynamicData::Epair, param)
+    : CrossSectionInterpolant(InteractionType::Epair, param)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInterpolation(def);

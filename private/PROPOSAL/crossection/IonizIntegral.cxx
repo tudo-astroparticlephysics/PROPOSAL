@@ -14,7 +14,7 @@
 using namespace PROPOSAL;
 
 IonizIntegral::IonizIntegral(const Ionization& param)
-    : CrossSectionIntegral(DynamicData::DeltaE, param)
+    : CrossSectionIntegral(InteractionType::DeltaE, param)
 {
 }
 

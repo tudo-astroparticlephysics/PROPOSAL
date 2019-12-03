@@ -49,7 +49,6 @@
 #include <vector>
 
 #include "PROPOSAL/Sector.h"
-#include "PROPOSAL/Secondaries.h"
 
 namespace PROPOSAL {
 
