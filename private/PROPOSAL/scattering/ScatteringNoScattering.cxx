@@ -17,8 +17,8 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-ScatteringNoScattering::ScatteringNoScattering(Particle& particle, const Medium& medium)
-    : Scattering(particle)
+ScatteringNoScattering::ScatteringNoScattering(const ParticleDef& particle_def, const Medium& medium)
+    : Scattering(particle_def)
     , medium_(medium.clone())
 {
 }
@@ -29,8 +29,8 @@ ScatteringNoScattering::ScatteringNoScattering(const ScatteringNoScattering& sca
 {
 }
 
-ScatteringNoScattering::ScatteringNoScattering(Particle& particle, const ScatteringNoScattering& scattering)
-    : Scattering(particle)
+ScatteringNoScattering::ScatteringNoScattering(const ParticleDef& particle_def, const ScatteringNoScattering& scattering)
+    : Scattering(particle_def)
     , medium_(scattering.medium_->clone())
 {
 }
@@ -53,11 +53,19 @@ bool ScatteringNoScattering::compare(const Scattering& scattering) const
 }
 
 //----------------------------------------------------------------------------//
-Scattering::RandomAngles ScatteringNoScattering::CalculateRandomAngle(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4)
+Scattering::RandomAngles ScatteringNoScattering::CalculateRandomAngle(double dr,
+                                                                      double ei,
+                                                                      double ef,
+                                                                      const Vector3D& pos,
+                                                                      double rnd1,
+                                                                      double rnd2,
+                                                                      double rnd3,
+                                                                      double rnd4)
 {
     (void)ei;
     (void)ef;
     (void)dr;
+    (void)pos;
     (void)rnd1;
     (void)rnd2;
     (void)rnd3;

@@ -53,20 +53,16 @@ def create_table_scatter(dir_name):
             for medium in mediums:
                 for cut in cuts:
                     for idx, parametrization in enumerate(parametrizations):
-                        particle = pp.particle.Particle(particle_def)
 
                         if scat_names[idx] == "HighlandIntegral":
                             util = pp.Utility(particle_def, medium, cut, pp.UtilityDefinition(), pp.InterpolationDef())
-                            scattering = parametrization(particle, util, pp.InterpolationDef())
+                            scattering = parametrization(particle_def, util, pp.InterpolationDef())
                         else:
-                            scattering = parametrization(particle, medium)
+                            scattering = parametrization(particle_def, medium)
 
                         buf = [""]
                         for jdx, energy in enumerate(energies):
                             # TODO wrap UtilityDecorator
-                            particle.energy = energy
-                            particle.position = position_init
-                            particle.direction = direction_init
 
                             rnd1 = pp.RandomGenerator.get().random_double()
                             rnd2 = pp.RandomGenerator.get().random_double()
@@ -75,9 +71,11 @@ def create_table_scatter(dir_name):
                             directions = scattering.scatter(distance,
                                                             energy,
                                                             energies_out[jdx],
+                                                            position_init,
+                                                            direction_init,
                                                             rnd1, rnd2, rnd3, rnd4)
 
-                            posi = particle.position + distance * directions.u
+                            posi = position_init + distance * directions.u
                             dire = directions.n_i
 
                             buf.append(particle_def.name)

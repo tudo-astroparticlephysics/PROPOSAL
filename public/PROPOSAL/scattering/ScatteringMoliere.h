@@ -41,16 +41,16 @@ class ScatteringMoliere : public Scattering
 {
 public:
     // constructor
-    ScatteringMoliere(Particle&, const Medium&);
-    ScatteringMoliere(Particle&, const ScatteringMoliere&);
+    ScatteringMoliere(const ParticleDef&, const Medium&);
+    ScatteringMoliere(const ParticleDef&, const ScatteringMoliere&);
     ScatteringMoliere(const ScatteringMoliere&);
     ~ScatteringMoliere();
 
     Scattering* clone() const { return new ScatteringMoliere(*this); }
-    virtual Scattering* clone(Particle& particle, const Utility& utility) const
+    virtual Scattering* clone(const ParticleDef& particle_def, const Utility& utility) const
     {
         (void)utility;
-        return new ScatteringMoliere(particle, *this);
+        return new ScatteringMoliere(particle_def, *this);
     }
 
 private:
@@ -58,7 +58,7 @@ private:
 
     bool compare(const Scattering&) const;
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4);
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, double rnd1, double rnd2, double rnd3, double rnd4);
 
     const Medium* medium_;
 

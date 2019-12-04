@@ -43,16 +43,16 @@ class Medium;
 class ScatteringNoScattering : public Scattering
 {
 public:
-    ScatteringNoScattering(Particle&, const Medium&);
-    ScatteringNoScattering(Particle&, const ScatteringNoScattering&);
+    ScatteringNoScattering(const ParticleDef&, const Medium&);
+    ScatteringNoScattering(const ParticleDef&, const ScatteringNoScattering&);
     ScatteringNoScattering(const ScatteringNoScattering&);
     ~ScatteringNoScattering();
 
     virtual Scattering* clone() const { return new ScatteringNoScattering(*this); }
-    virtual Scattering* clone(Particle& particle, const Utility& utility) const
+    virtual Scattering* clone(const ParticleDef& particle_def, const Utility& utility) const
     {
         (void)utility;
-        return new ScatteringNoScattering(particle, *this);
+        return new ScatteringNoScattering(particle_def, *this);
     }
 
 private:
@@ -60,7 +60,7 @@ private:
 
     bool compare(const Scattering&) const;
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, double rnd1, double rnd2, double rnd3, double rnd4);
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, double rnd1, double rnd2, double rnd3, double rnd4);
 
     const Medium* medium_;
 };

@@ -150,7 +150,7 @@ Sector::Sector(Particle& particle, const Definition& sector_def)
       cont_rand_(NULL),
       scattering_(ScatteringFactory::Get().CreateScattering(
           sector_def_.scattering_model,
-          particle_,
+          particle_.GetParticleDef(),
           utility_)) {
     // These are optional, therfore check NULL
     if (sector_def_.do_exact_time_calculation) {
@@ -183,7 +183,7 @@ Sector::Sector(Particle& particle,
       cont_rand_(NULL),
       scattering_(ScatteringFactory::Get().CreateScattering(
           sector_def_.scattering_model,
-          particle_,
+          particle_.GetParticleDef(),
           utility_,
           interpolation_def)) {
     // These are optional, therfore check NULL
@@ -207,7 +207,7 @@ Sector::Sector(Particle& particle, const Sector& sector)
       decay_calculator_(sector.decay_calculator_->clone(utility_)),
       exact_time_calculator_(NULL),
       cont_rand_(NULL),
-      scattering_(sector.scattering_->clone(particle_, utility_))
+      scattering_(sector.scattering_->clone(particle_.GetParticleDef(), utility_))
 {
     if (particle.GetParticleDef() != sector.GetParticle().GetParticleDef())
     {
@@ -627,7 +627,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef) {
 
 
     if( sector_def_.scattering_model != ScatteringFactory::Enum::NoScattering ){
-        Directions directions = scattering_->Scatter(dr, ei, ef);
+        Directions directions = scattering_->Scatter(dr, ei, ef, particle_.GetPosition(), particle_.GetDirection());
         particle_.SetPosition(particle_.GetPosition() + dr * directions.u_);
         particle_.SetDirection(directions.n_i_);
     } else {
