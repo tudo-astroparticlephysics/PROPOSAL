@@ -186,13 +186,15 @@ double ComptonIntegral::CalculateCumulativeCrossSection(double energy, int i, do
             2);
 }
 
-void ComptonIntegral::StochasticDeflection(Particle *particle, double energy, double energy_loss) {
+std::pair<double, double> ComptonIntegral::StochasticDeflection(double energy, double energy_loss) {
+    std::pair<double, double> deflection_angles;
     double theta_deflect = RandomGenerator::Get().RandomDouble() * 2 * PI; // random azimuth
     double cosphi = 1. - (ME * (1. / (energy - energy_loss) - 1. / energy));
+    deflection_angles.first = cosphi;
+    deflection_angles.second = theta_deflect;
 
-    particle->DeflectDirection(cosphi, theta_deflect);
+    return deflection_angles;
 }
-
 // ------------------------------------------------------------------------- //
 // Private methods
 // ------------------------------------------------------------------------- //

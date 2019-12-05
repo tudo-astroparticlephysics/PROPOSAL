@@ -55,7 +55,7 @@ namespace PROPOSAL {
         virtual double CalculatedNdx(double energy, double rnd);
 
         double CalculateCumulativeCrossSection(double energy, int i, double v);
-        virtual void StochasticDeflection(Particle* particle, double energy, double energy_loss);
+        virtual std::pair<double, double> StochasticDeflection(double energy, double energy_loss);
     private:
         double CalculateStochasticLoss(double energy, double rnd1);
 

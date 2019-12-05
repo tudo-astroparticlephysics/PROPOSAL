@@ -30,6 +30,7 @@
 #pragma once
 
 #include <vector>
+#include <utility>
 
 #include "PROPOSAL/particle/Particle.h"
 
@@ -73,10 +74,7 @@ public:
         (void)energy; (void)energy_loss; (void)initial_direction; return std::make_pair(std::vector<Particle*>(), false);
     }
 
-    virtual void StochasticDeflection(Particle* particle, double energy, double energy_loss){
-        // per default the particle is not deflected
-        (void)particle; (void) energy; (void) energy_loss;
-    }
+    virtual std::pair<double, double> StochasticDeflection(double energy, double energy_loss);
 
     virtual double CalculateCumulativeCrossSection(double energy, int component, double v) = 0;
 

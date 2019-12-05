@@ -674,6 +674,7 @@ std::tuple<double, DynamicData::Type, std::pair<std::vector<Particle*>, bool> > 
                 std::pow(rnd2, std::abs(sector_def_.stochastic_loss_weighting));
         }
     }
+    std::pair<double, double> deflection_angles;
 
     for (unsigned int i = 0; i < cross_sections.size(); i++) {
         rates[i] = cross_sections[i]->CalculatedNdx(particle_energy, rnd2);
@@ -694,7 +695,7 @@ std::tuple<double, DynamicData::Type, std::pair<std::vector<Particle*>, bool> > 
             energy_loss.second = cross_sections[i]->GetTypeId();
 
             // Deflect the particle if necessary
-            cross_sections[i]->StochasticDeflection(&particle_, particle_energy, energy_loss.first);
+            deflection_angles = cross_sections[i]->StochasticDeflection(particle_energy, energy_loss.first);
 
             // calculate produced particles, get an empty list if no particles are produced in interaction
             products           = cross_sections[i]->CalculateProducedParticles(particle_energy, energy_loss.first, particle_.GetDirection());
@@ -703,6 +704,10 @@ std::tuple<double, DynamicData::Type, std::pair<std::vector<Particle*>, bool> > 
         }
     }
 
+    if (deflection_angles.first != particle_energy && deflection_angles.second != energy_loss.first)
+    {
+        particle_.DeflectDirection(deflection_angles.first, deflection_angles.second);
+    }
 
     return std::make_tuple(energy_loss.first, energy_loss.second, products);
 }
