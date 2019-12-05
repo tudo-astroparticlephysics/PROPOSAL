@@ -100,13 +100,3 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, CrossSection const& cross)
     return os;
 }
 
-std::pair<double, double> CrossSection::StochasticDeflection(double energy, double energy_loss) {
-    // per default the particle is not deflected
-    // for now do this dirty hack
-    std::pair<double, double> deflection_angles;
-    deflection_angles.first = energy;
-    deflection_angles.second = energy_loss;
-
-    return deflection_angles;
-}
-

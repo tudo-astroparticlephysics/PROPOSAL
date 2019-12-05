@@ -99,7 +99,7 @@ double MupairInterpolant::CalculatedEdx(double energy)
     return parametrization_->GetMultiplier() * std::max(dedx_interpolant_->Interpolate(energy), 0.0);
 }
 
-std::pair<std::vector<Particle*>, bool> MupairInterpolant::CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction){
+std::pair<std::vector<Particle*>, bool> MupairInterpolant::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
     std::vector<Particle*> mupair;
 
     if(parametrization_->IsParticleOutputEnabled() == false){

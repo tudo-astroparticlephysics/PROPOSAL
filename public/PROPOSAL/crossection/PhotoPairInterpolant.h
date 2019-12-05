@@ -56,7 +56,7 @@ namespace PROPOSAL {
         double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }
         double CalculatedE2dx(double energy){ (void)energy; return 0; }
 
-        std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D);
+        std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D&);
         double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
 
         PhotoAngleDistribution& GetPhotoAngleDistribution() const { return *photoangle_; }

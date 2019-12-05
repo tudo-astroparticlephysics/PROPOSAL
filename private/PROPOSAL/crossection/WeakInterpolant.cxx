@@ -51,7 +51,7 @@ bool WeakInterpolant::compare(const CrossSection& cross_section) const
     return true;
 }
 
-std::pair<std::vector<Particle*>, bool> WeakInterpolant::CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction){
+std::pair<std::vector<Particle*>, bool> WeakInterpolant::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
     // interaction is fatal and the initial particle is converted to a neutrino
     Particle* return_particle;
     return_particle = new Particle(*parametrization_->GetParticleDef().GetWeakPartner());

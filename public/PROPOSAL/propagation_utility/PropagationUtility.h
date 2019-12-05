@@ -44,6 +44,7 @@
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/Particle.h"
 
 namespace PROPOSAL {
 
@@ -96,6 +97,9 @@ class Utility {
     const std::vector<CrossSection*>& GetCrosssections() const {
         return crosssections_;
     }
+
+    std::pair<double, DynamicData::Type> StochasticLoss(
+        double particle_energy, double rnd1, double rnd2, double rnd3);
 
    protected:
     Utility& operator=(const Utility&);  // Undefined & not allowed

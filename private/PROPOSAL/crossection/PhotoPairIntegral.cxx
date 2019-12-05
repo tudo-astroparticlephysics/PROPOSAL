@@ -51,7 +51,7 @@ double PhotoPairIntegral::CalculateStochasticLoss(double energy, double rnd1, do
 }
 
 // ------------------------------------------------------------------------- //
-std::pair<std::vector<Particle*>, bool> PhotoPairIntegral::CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction){
+std::pair<std::vector<Particle*>, bool> PhotoPairIntegral::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
     (void)energy_loss;
     double rnd;
     double rsum;

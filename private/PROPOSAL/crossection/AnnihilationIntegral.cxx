@@ -26,7 +26,7 @@ AnnihilationIntegral::~AnnihilationIntegral() {}
 
 std::pair<std::vector<Particle*>, bool> AnnihilationIntegral::CalculateProducedParticles(double energy,
                                                                                          double energy_loss,
-                                                                                         const Vector3D initial_direction) {
+                                                                                         const Vector3D& initial_direction) {
     (void)energy_loss;
     double rnd, rsum, rho;
 
