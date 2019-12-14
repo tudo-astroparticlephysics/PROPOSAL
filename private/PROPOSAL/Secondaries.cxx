@@ -19,14 +19,18 @@ void Secondaries::push_back(const DynamicData& continuous_loss)
 }
 
 
-void Secondaries::emplace_back(const InteractionType& type,const  Vector3D& position,
+void Secondaries::emplace_back(const int& type,const  Vector3D& position,
         const Vector3D& direction, const double& energy, const double& parent_particle_energy,
         const double& time, const double& distance)
 {
     secondaries_.emplace_back(type, position, direction, energy, parent_particle_energy, time, distance);
 }
+void Secondaries::emplace_back(const int& type)
+{
+    secondaries_.emplace_back(type);
+}
 
-void Secondaries::push_back(const Particle& particle, const InteractionType& interaction_type, const double& energy_loss)
+void Secondaries::push_back(const Particle& particle, const int& interaction_type, const double& energy_loss)
 {
     DynamicData data(interaction_type);
 
@@ -46,7 +50,7 @@ void Secondaries::append(Secondaries secondaries)
     secondaries_.insert(secondaries_.end(), secondaries.secondaries_.begin(), secondaries.secondaries_.end());
 }
 
-Secondaries Secondaries::Query(const InteractionType& interaction_type) const
+Secondaries Secondaries::Query(const int& interaction_type) const
 {
     Secondaries sec;
     for (auto i : secondaries_) {

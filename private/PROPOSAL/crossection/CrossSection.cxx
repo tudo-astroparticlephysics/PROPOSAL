@@ -10,7 +10,7 @@ using namespace PROPOSAL;
 // CrossSection
 // ------------------------------------------------------------------------- //
 
-CrossSection::CrossSection(const InteractionType& type, const Parametrization& param)
+CrossSection::CrossSection(const int& type, const Parametrization& param)
     : type_id_(type)
     , parametrization_(param.clone())
     , prob_for_component_(param.GetMedium().GetNumComponents(), 0)

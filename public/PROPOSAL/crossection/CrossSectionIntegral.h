@@ -40,7 +40,7 @@ public:
     typedef std::vector<Integral> IntegralVec;
 
 public:
-    CrossSectionIntegral(const InteractionType&, const Parametrization&);
+    CrossSectionIntegral(const int&, const Parametrization&);
     CrossSectionIntegral(const CrossSectionIntegral&);
     virtual ~CrossSectionIntegral();
 

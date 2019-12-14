@@ -52,7 +52,7 @@ public:
     std::pair<std::vector<Particle*>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction);
 
 private:
-    InteractionType GetType(const MupairProduction& param);
+    int GetType(const MupairProduction& param);
     ParticleDef const* muminus_def_;
     ParticleDef const* muplus_def;
 };

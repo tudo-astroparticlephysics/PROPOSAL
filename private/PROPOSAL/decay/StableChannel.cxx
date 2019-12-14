@@ -28,8 +28,8 @@ bool StableChannel::compare(const DecayChannel& channel) const
         return true;
 }
 
-DecayChannel::DecayProducts StableChannel::Decay(const Particle&)
+Secondaries StableChannel::Decay(const ParticleDef&, const DynamicData&)
 {
     // return empty vector;
-    return DecayProducts();
+    return Secondaries();
 }

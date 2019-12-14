@@ -32,31 +32,28 @@
 #include <string>
 #include <map>
 
-#include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/math/Vector3D.h"
 
 namespace PROPOSAL {
-enum class InteractionType
-{
-    None = 0,
-    Particle,
-    Brems,
-    DeltaE,
-    Epair,
-    NuclInt,
-    MuPair,
-    Hadrons,
-    ContinuousEnergyLoss,
-    WeakInt,
-    Compton,
-    Decay,
+struct InteractionType {
+    static const int Particle               = 1000000001;
+    static const int Brems                  = 1000000002;
+    static const int DeltaE                 = 1000000003;
+    static const int Epair                  = 1000000004;
+    static const int NuclInt                = 1000000005;
+    static const int MuPair                 = 1000000006;
+    static const int Hadrons                = 1000000007;
+    static const int ContinuousEnergyLoss   = 1000000008;
+    static const int WeakInt                = 1000000009;
+    static const int Compton                = 1000000010;
+    static const int Decay                  = 1000000011;
 };
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-static const std::map<InteractionType, std::string> Interaction_Id_Name_map {
-    {InteractionType::None, "None"},
-    {InteractionType::Particle , "Particle"},
+static const std::map<int, std::string> Id_Interaction_Name_Map {
+    {InteractionType::Particle, "Particle"},
     {InteractionType::Brems, "Brems"},
     {InteractionType::DeltaE, "DeltaE"},
     {InteractionType::Epair, "Epair"},
@@ -75,11 +72,14 @@ namespace PROPOSAL {
 class DynamicData
 {
 public:
+    struct Type :public InteractionType, public ParticleType {
+        /* static const int None = 0; */
+    };
 
 public:
     DynamicData();
-    DynamicData(InteractionType);
-    DynamicData(const InteractionType&, const Vector3D&, const Vector3D&, const double&, const double&, const double&, const double&);
+    DynamicData(const int&);
+    DynamicData(const int&, const Vector3D&, const Vector3D&, const double&, const double&, const double&, const double&);
     DynamicData(const DynamicData&);
     /* DynamicData(DynamicData&&); */
     virtual ~DynamicData();
@@ -95,28 +95,31 @@ public:
     void SetPosition(const Vector3D& position) { position_ = position; }
     void SetDirection(const Vector3D& direction) { direction_ = direction; }
 
-    virtual void SetEnergy(double energy) { energy_ = energy; }
     void SetParentParticleEnergy(double parent_particle_energy) { parent_particle_energy_ = parent_particle_energy; }
     void SetTime(double time) { time_ = time; }
     void SetPropagatedDistance(double prop_dist) { propagated_distance_ = prop_dist; }
 
     // Getter
-    InteractionType GetTypeId() const { return type_id_; }
+    int GetTypeId() const { return type_id_; }
 
     Vector3D GetPosition() const { return position_; }
     Vector3D GetDirection() const { return direction_; }
 
+    void SetEnergy(double energy);
+    void SetMomentum(double momentum);
+
     double GetEnergy() const { return energy_; }
+    double GetMomentum() const;
     double GetParentParticleEnergy() const { return parent_particle_energy_; }
     double GetTime() const { return time_; }
     double GetPropagatedDistance() const { return propagated_distance_; }
+    std::string GetName() const;
 
 protected:
     virtual void print(std::ostream&) const {}
 
-    std::string GetName() const;
 
-    const InteractionType type_id_;
+    const int type_id_;
 
     Vector3D position_;  //!< position coordinates [cm]
     Vector3D direction_; //!< direction vector, angles in [rad]
@@ -174,8 +177,8 @@ public:
     // --------------------------------------------------------------------- //
 
     // Setter
-    void SetEnergy(double energy);
-    void SetMomentum(double momentum);
+    /* void SetEnergy(double energy); */
+    /* void SetMomentum(double momentum); */
 
     void SetParentParticleId(int parent_particle_id) { parent_particle_id_ = parent_particle_id; }
     void SetParticleId(int particle_id) { particle_id_ = particle_id; }
@@ -207,7 +210,7 @@ public:
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const DecayTable& GetDecayTable() const { return particle_def_.decay_table; }
 
-    double GetMomentum() const { return momentum_; }
+    /* double GetMomentum() const { return std::sqrt(std::max((energy_ + particle_def_.mass) * (energy_ - particle_def_.mass), 0.0)) }; */
     double GetLow() const { return particle_def_.low; }
 
     double GetMass() const { return particle_def_.mass; }

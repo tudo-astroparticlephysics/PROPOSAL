@@ -2,6 +2,8 @@
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/Secondaries.h"
 
 using namespace PROPOSAL;
 
@@ -37,26 +39,25 @@ bool TwoBodyPhaseSpace::compare(const DecayChannel& channel) const
         return true;
 }
 
-DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(const Particle& particle)
+/* DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(const Particle& particle) */
+Secondaries TwoBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
 {
-    DecayProducts products;
-    products.push_back(new Particle(first_daughter_));
-    products.push_back(new Particle(second_daughter_));
+    Secondaries products(2);
+    products.emplace_back(first_daughter_.particle_type);
+    products.emplace_back(second_daughter_.particle_type);
 
-    double momentum    = Momentum(particle.GetMass(), first_daughter_.mass, second_daughter_.mass);
+    double momentum    = Momentum(p_def.mass, first_daughter_.mass, second_daughter_.mass);
     Vector3D direction = GenerateRandomDirection();
 
-    products[0]->SetDirection(direction);
-    products[0]->SetMomentum(momentum);
+    products[0].SetDirection(direction);
+    products[0].SetMomentum(momentum);
 
     Vector3D opposite_direction = -direction;
     opposite_direction.CalculateSphericalCoordinates();
-    products[1]->SetDirection(opposite_direction);
-    products[1]->SetMomentum(momentum);
+    products[1].SetDirection(opposite_direction);
+    products[1].SetMomentum(momentum);
 
-    Boost(products, particle.GetDirection(), particle.GetEnergy() / particle.GetMass(), particle.GetMomentum() / particle.GetMass());
-
-    CopyParticleProperties(products, particle);
+    Boost(products, p_condition.GetDirection(), p_condition.GetEnergy() / p_def.mass, p_condition.GetMomentum() / p_def.mass);
 
     return products;
 }

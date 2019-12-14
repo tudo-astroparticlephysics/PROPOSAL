@@ -51,10 +51,10 @@ void init_particle(py::module& m) {
     py::class_<ParticleDef, std::shared_ptr<ParticleDef>>(m_sub, "ParticleDef")
         .def(py::init<>())
         .def(py::init<std::string, double, double, double, double,
-                      const HardComponentTables::VecType&, const DecayTable&>(),
+                      const HardComponentTables::VecType&, const DecayTable&, const int>(),
              py::arg("name"), py::arg("mass"), py::arg("low"),
              py::arg("lifetime"), py::arg("charge"), py::arg("hard_component"),
-             py::arg("decay_table"))
+             py::arg("decay_table"), py::arg("particle_type"))
         .def(py::init<const ParticleDef&>())
 
         .def("__str__", &py_print<ParticleDef>)
@@ -184,18 +184,80 @@ void init_particle(py::module& m) {
     PARTICLE_DEF(m_sub, SMPMinus)
     PARTICLE_DEF(m_sub, SMPPlus)
 
-    py::enum_<InteractionType>(m_sub, "Data")
-        .value("None", InteractionType::None)
-        .value("Particle", InteractionType::Particle)
-        .value("Brems", InteractionType::Brems)
-        .value("DeltaE", InteractionType::DeltaE)
-        .value("Epair", InteractionType::Epair)
-        .value("NuclInt", InteractionType::NuclInt)
-        .value("MuPair", InteractionType::MuPair)
-        .value("Hadrons", InteractionType::Hadrons)
-        .value("ContinuousEnergyLoss", InteractionType::ContinuousEnergyLoss)
-        .value("Compton", InteractionType::Compton)
-        .value("WeakInt", InteractionType::WeakInt);
+    py::class_<InteractionType, std::shared_ptr<InteractionType>>(m_sub, "interation_type_id")
+        .def_readonly_static("Particle", &InteractionType::Particle)
+        .def_readonly_static("Brems", &InteractionType::Brems)
+        .def_readonly_static("DeltaE", &InteractionType::DeltaE)
+        .def_readonly_static("Epair", &InteractionType::Epair)
+        .def_readonly_static("NuclInt", &InteractionType::NuclInt)
+        .def_readonly_static("MuPair", &InteractionType::MuPair)
+        .def_readonly_static("Hadrons", &InteractionType::Hadrons)
+        .def_readonly_static("ContinuousEnergyLoss", &InteractionType::ContinuousEnergyLoss)
+        .def_readonly_static("Compton", &InteractionType::Compton)
+        .def_readonly_static("WeakInt", &InteractionType::WeakInt);
+
+    py::class_<ParticleType, std::shared_ptr<ParticleType>>(m_sub, "particle_type_id")
+        .def_readonly_static("None", &ParticleType::None)
+        .def_readonly_static("EMinus", &ParticleType::EMinus)
+        .def_readonly_static("EPlus", &ParticleType::EPlus)
+        .def_readonly_static("NuE", &ParticleType::NuE)
+        .def_readonly_static("NuEBar", &ParticleType::NuEBar)
+        .def_readonly_static("MuMinus", &ParticleType::MuMinus)
+        .def_readonly_static("NuMu", &ParticleType::NuMu)
+        .def_readonly_static("NuMuBar", &ParticleType::NuMuBar)
+        .def_readonly_static("MuPlus", &ParticleType::MuPlus)
+        .def_readonly_static("TauMinus", &ParticleType::TauMinus)
+        .def_readonly_static("TauPlus", &ParticleType::TauPlus)
+        .def_readonly_static("NuTau", &ParticleType::NuTau)
+        .def_readonly_static("NuTauBar", &ParticleType::NuTauBar)
+        .def_readonly_static("Gamma", &ParticleType::Gamma)
+        .def_readonly_static("Pi0", &ParticleType::Pi0)
+        .def_readonly_static("PiPlus", &ParticleType::PiPlus)
+        .def_readonly_static("PiMinus", &ParticleType::PiMinus)
+        .def_readonly_static("K0", &ParticleType::K0)
+        .def_readonly_static("KPlus", &ParticleType::KPlus)
+        .def_readonly_static("KMinus", &ParticleType::KMinus)
+        .def_readonly_static("STauMinus", &ParticleType::STauMinus)
+        .def_readonly_static("STauPlus", &ParticleType::STauPlus)
+        .def_readonly_static("PPlus", &ParticleType::PPlus)
+        .def_readonly_static("PMinus", &ParticleType::PMinus)
+        .def_readonly_static("Monopole", &ParticleType::Monopole);
+
+    py::class_<DynamicData::Type, std::shared_ptr<DynamicData::Type>>(m_sub, "dyndata_type_id")
+        .def_readonly_static("Particle", &DynamicData::Type::Particle)
+        .def_readonly_static("Brems", &DynamicData::Type::Brems)
+        .def_readonly_static("DeltaE", &DynamicData::Type::DeltaE)
+        .def_readonly_static("Epair", &DynamicData::Type::Epair)
+        .def_readonly_static("NuclInt", &DynamicData::Type::NuclInt)
+        .def_readonly_static("MuPair", &DynamicData::Type::MuPair)
+        .def_readonly_static("Hadrons", &DynamicData::Type::Hadrons)
+        .def_readonly_static("ContinuousEnergyLoss", &DynamicData::Type::ContinuousEnergyLoss)
+        .def_readonly_static("Compton", &DynamicData::Type::Compton)
+        .def_readonly_static("WeakInt", &DynamicData::Type::WeakInt)
+        .def_readonly_static("EMinus", &DynamicData::Type::EMinus)
+        .def_readonly_static("EPlus", &DynamicData::Type::EPlus)
+        .def_readonly_static("NuE", &DynamicData::Type::NuE)
+        .def_readonly_static("NuEBar", &DynamicData::Type::NuEBar)
+        .def_readonly_static("MuMinus", &DynamicData::Type::MuMinus)
+        .def_readonly_static("NuMu", &DynamicData::Type::NuMu)
+        .def_readonly_static("NuMuBar", &DynamicData::Type::NuMuBar)
+        .def_readonly_static("MuPlus", &DynamicData::Type::MuPlus)
+        .def_readonly_static("TauMinus", &DynamicData::Type::TauMinus)
+        .def_readonly_static("TauPlus", &DynamicData::Type::TauPlus)
+        .def_readonly_static("NuTau", &DynamicData::Type::NuTau)
+        .def_readonly_static("NuTauBar", &DynamicData::Type::NuTauBar)
+        .def_readonly_static("Gamma", &DynamicData::Type::Gamma)
+        .def_readonly_static("Pi0", &DynamicData::Type::Pi0)
+        .def_readonly_static("PiPlus", &DynamicData::Type::PiPlus)
+        .def_readonly_static("PiMinus", &DynamicData::Type::PiMinus)
+        .def_readonly_static("K0", &DynamicData::Type::K0)
+        .def_readonly_static("KPlus", &DynamicData::Type::KPlus)
+        .def_readonly_static("KMinus", &DynamicData::Type::KMinus)
+        .def_readonly_static("STauMinus", &DynamicData::Type::STauMinus)
+        .def_readonly_static("STauPlus", &DynamicData::Type::STauPlus)
+        .def_readonly_static("PPlus", &DynamicData::Type::PPlus)
+        .def_readonly_static("PMinus", &DynamicData::Type::PMinus)
+        .def_readonly_static("Monopole", &DynamicData::Type::Monopole);
 
     py::class_<DynamicData, std::shared_ptr<DynamicData>>(m_sub, "DynamicData",
                                                           R"pbdoc(
@@ -203,7 +265,7 @@ void init_particle(py::module& m) {
                 It is used as an array with all important values for
                 secondary particles. Secondary particles are not propagated.
             )pbdoc")
-        .def(py::init<InteractionType>())
+        .def(py::init<const int&>())
         .def(py::init<const DynamicData&>())
         .def("__str__", &py_print<DynamicData>)
         .def_property_readonly("id", &DynamicData::GetTypeId,
@@ -335,7 +397,7 @@ void init_particle(py::module& m) {
 
     py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries",
             R"pbdoc(List of secondaries)pbdoc")
-        .def("Query", overload_cast_<const InteractionType&>()(&Secondaries::Query, py::const_), py::arg("Interaction"))
+        .def("Query", overload_cast_<const int&>()(&Secondaries::Query, py::const_), py::arg("Interaction"))
         .def("Query", overload_cast_<const std::string&>()(&Secondaries::Query, py::const_), py::arg("Interaction"))
         .def_property_readonly("particles", &Secondaries::GetSecondaries)
         .def_property_readonly("number_of_particles", &Secondaries::GetNumberOfParticles)

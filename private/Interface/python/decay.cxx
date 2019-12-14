@@ -1,8 +1,10 @@
 
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
 #include "PROPOSAL/decay/StableChannel.h"
+#include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "pyBindings.h"
 
@@ -18,10 +20,8 @@ void init_decay(py::module& m) {
         .def("__eq__", &DecayChannel::operator==)
         .def("__ne__", &DecayChannel::operator!=)
         .def("decay", &DecayChannel::Decay, "Decay the given particle")
-        .def_static("boost",
-                    (void (*)(Particle&, const Vector3D&, double, double)) &
-                        DecayChannel::Boost,
-                    "Boost the particle along a direction");
+        .def_static("boost", overload_cast_<DynamicData&, const Vector3D&, double, double>()(&DecayChannel::Boost))
+        .def_static("boost", overload_cast_<Secondaries&, const Vector3D&, double, double>()(&DecayChannel::Boost));
 
     py::class_<LeptonicDecayChannelApprox,
                std::shared_ptr<LeptonicDecayChannelApprox>, DecayChannel>(

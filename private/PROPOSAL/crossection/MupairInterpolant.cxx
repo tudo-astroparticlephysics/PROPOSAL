@@ -125,7 +125,7 @@ std::pair<std::vector<Particle*>, bool> MupairInterpolant::CalculateProducedPart
 
 }
 
-InteractionType MupairInterpolant::GetType(const MupairProduction& param){
+int MupairInterpolant::GetType(const MupairProduction& param){
     if(param.IsParticleOutputEnabled()){
         return InteractionType::Particle;
     }

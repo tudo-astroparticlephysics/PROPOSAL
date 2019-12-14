@@ -58,7 +58,8 @@ OPTION(ADD_CPPEXAMPLE "Choose to compile Cpp example." ON)
 
 IF(ADD_PYTHON)
     MESSAGE(STATUS "Enabled to build the python wrapper library.")
-    FIND_PACKAGE( PythonLibs 2.7 REQUIRED )
+    # FIND_PACKAGE( PythonLibs 2.7 REQUIRED )
+    FIND_PACKAGE( PythonLibs REQUIRED )
 
     IF(PYTHONLIBS_FOUND)
         # TODO(mario): Find a better way to search for pybind11!

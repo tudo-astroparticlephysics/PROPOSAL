@@ -8,23 +8,28 @@
  */
 
 #include <cmath>
+#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/methods.h"
 #include <iostream>
+#include <string>
 
 using namespace PROPOSAL;
 
+
+std::map<const int, const ParticleDef&> Id_Particle_Map;
+std::map<const int, std::string> Id_Interaction_Name_Map;
 
 /******************************************************************************
  *                              Dynamic Particle                              *
  ******************************************************************************/
 
 DynamicData::DynamicData()
-    : type_id_(InteractionType::None)
+    : type_id_(0)
 {
 }
 
-DynamicData::DynamicData(InteractionType type)
+DynamicData::DynamicData(const int& type)
     : type_id_(type)
     , position_(Vector3D())
     , direction_(Vector3D())
@@ -35,7 +40,7 @@ DynamicData::DynamicData(InteractionType type)
 {
 }
 
-DynamicData::DynamicData(const InteractionType& type, const Vector3D& position, const Vector3D& direction, const double& energy, const double& parent_particle_energy, const double& time, const double& distance)
+DynamicData::DynamicData(const int& type, const Vector3D& position, const Vector3D& direction, const double& energy, const double& parent_particle_energy, const double& time, const double& distance)
     : type_id_(type)
     , position_(position)
     , direction_(direction)
@@ -100,16 +105,57 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DynamicData const& data)
     return os;
 }
 
+
 // ------------------------------------------------------------------------- //
 std::string DynamicData::GetName() const
 {
-    auto search = Interaction_Id_Name_map.find(type_id_);
-    if (search != Interaction_Id_Name_map.end()) {
-        return search->second;
+    auto p_search = Id_Particle_Map.find(type_id_);
+    if (p_search != Id_Particle_Map.end()) {
+        return p_search->second.name;
+    }
+
+    auto i_search = Id_Interaction_Name_Map.find(type_id_);
+    if (i_search != Id_Interaction_Name_Map.end()) {
+        return i_search->second;
+    }
+
+    return "Not found." ;
+}
+
+void DynamicData::SetEnergy(double energy)
+{
+    auto particle = Id_Particle_Map.find(type_id_);
+
+    if (particle != Id_Particle_Map.end()) {
+        energy_   = std::max(energy, particle->second.mass);
     } else {
-        return "Not found." ;
+        energy_ = energy;
     }
 }
+
+// ------------------------------------------------------------------------- //
+void DynamicData::SetMomentum(double momentum)
+{
+    auto particle = Id_Particle_Map.find(type_id_);
+
+    if (particle != Id_Particle_Map.end()) {
+        energy_   = std::sqrt(momentum * momentum + particle->second.mass * particle->second.mass);
+    }
+}
+
+
+
+double DynamicData::GetMomentum() const
+{
+    auto particle = Id_Particle_Map.find(type_id_);
+
+    if (particle != Id_Particle_Map.end()) {
+        return std::sqrt(std::max((energy_ + particle->second.mass) * (energy_ - particle->second.mass), 0.0));
+    }
+
+    return energy_;
+
+};
 
 /******************************************************************************
  *                              Particle                                       *
@@ -260,18 +306,18 @@ void Particle::InjectState(const Particle& particle)
 // Setter
 // ------------------------------------------------------------------------- //
 
-void Particle::SetEnergy(double energy)
-{
-    energy_   = std::max(energy, particle_def_.mass);
-    momentum_ = std::sqrt(std::max((energy_ + particle_def_.mass) * (energy_ - particle_def_.mass), 0.0));
-}
+/* void Particle::SetEnergy(double energy) */
+/* { */
+/*     energy_   = std::max(energy, particle_def_.mass); */
+/*     momentum_ = std::sqrt(std::max((energy_ + particle_def_.mass) * (energy_ - particle_def_.mass), 0.0)); */
+/* } */
 
 // ------------------------------------------------------------------------- //
-void Particle::SetMomentum(double momentum)
-{
-    momentum_ = momentum;
-    energy_   = std::sqrt(momentum_ * momentum_ + particle_def_.mass * particle_def_.mass);
-}
+/* void Particle::SetMomentum(double momentum) */
+/* { */
+/*     momentum_ = momentum; */
+/*     energy_   = std::sqrt(momentum_ * momentum_ + particle_def_.mass * particle_def_.mass); */
+/* } */
 
 void Particle::DeflectDirection(double cosphi_deflect, double theta_deflect) {
 

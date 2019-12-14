@@ -44,16 +44,19 @@ public:
     Secondaries();
     Secondaries(size_t number_secondaries);
 
+    DynamicData& operator[](std::size_t idx){ return secondaries_[idx]; };
+
     /* void push_back(const Particle& particle); */
     void push_back(const DynamicData& continuous_loss);
-    void push_back(const Particle& particle, const InteractionType& secondary, const double& energyloss);
-    void emplace_back(const InteractionType& type, const Vector3D& position,
+    void push_back(const Particle& particle, const int& secondary, const double& energyloss);
+    void emplace_back(const int& type);
+    void emplace_back(const int& type, const Vector3D& position,
         const Vector3D& direction, const double& energy, const double& parent_particle_energy,
         const double& time, const double& distance);
 
     void append(Secondaries secondaries);
 
-    Secondaries Query(const InteractionType&) const;
+    Secondaries Query(const int&) const;
     Secondaries Query(const std::string&) const;
 
     std::vector<Vector3D> GetPosition() const;
@@ -65,8 +68,8 @@ public:
 
     void clear() { secondaries_.clear(); };
 
-    std::vector<DynamicData> GetSecondaries() { secondaries_.shrink_to_fit(); return secondaries_; };
-    unsigned int GetNumberOfParticles() { return secondaries_.size(); };
+    std::vector<DynamicData> GetSecondaries() const { return secondaries_; } ;
+    unsigned int GetNumberOfParticles() const { return secondaries_.size(); };
 
 private:
     std::vector<DynamicData> secondaries_;

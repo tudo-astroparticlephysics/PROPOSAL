@@ -29,8 +29,10 @@
 
 #pragma once
 
+#include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/Particle.h"
 
 namespace PROPOSAL {
 
@@ -45,7 +47,7 @@ public:
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() const { return new TwoBodyPhaseSpace(*this); }
 
-    DecayProducts Decay(const Particle&);
+    Secondaries Decay(const ParticleDef& p_def, const DynamicData& p_condition);
 
     const std::string& GetName() const { return name_; }
 
