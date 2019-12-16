@@ -36,34 +36,34 @@
 #include "PROPOSAL/math/Vector3D.h"
 
 namespace PROPOSAL {
-struct InteractionType {
-    static const int Particle               = 1000000001;
-    static const int Brems                  = 1000000002;
-    static const int DeltaE                 = 1000000003;
-    static const int Epair                  = 1000000004;
-    static const int NuclInt                = 1000000005;
-    static const int MuPair                 = 1000000006;
-    static const int Hadrons                = 1000000007;
-    static const int ContinuousEnergyLoss   = 1000000008;
-    static const int WeakInt                = 1000000009;
-    static const int Compton                = 1000000010;
-    static const int Decay                  = 1000000011;
+enum class InteractionType {
+    Particle               = 1000000001,
+    Brems                  = 1000000002,
+    DeltaE                 = 1000000003,
+    Epair                  = 1000000004,
+    NuclInt                = 1000000005,
+    MuPair                 = 1000000006,
+    Hadrons                = 1000000007,
+    ContinuousEnergyLoss   = 1000000008,
+    WeakInt                = 1000000009,
+    Compton                = 1000000010,
+    Decay                  = 1000000011,
 };
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-static const std::map<int, std::string> Id_Interaction_Name_Map {
-    {InteractionType::Particle, "Particle"},
-    {InteractionType::Brems, "Brems"},
-    {InteractionType::DeltaE, "DeltaE"},
-    {InteractionType::Epair, "Epair"},
-    {InteractionType::NuclInt, "NuclInt"},
-    {InteractionType::MuPair, "MuPair"},
-    {InteractionType::Hadrons, "Hadrons"},
-    {InteractionType::ContinuousEnergyLoss, "ContinousEnergyLoss"},
-    {InteractionType::WeakInt, "WeakInt"},
-    {InteractionType::Compton, "Compton"},
-    {InteractionType::Decay, "Decay"},
+static const std::map<const int, std::string> Id_Interaction_Name_Map {
+    {static_cast<int>(InteractionType::Particle), "Particle"},
+    {static_cast<int>(InteractionType::Brems), "Brems"},
+    {static_cast<int>(InteractionType::DeltaE), "DeltaE"},
+    {static_cast<int>(InteractionType::Epair), "Epair"},
+    {static_cast<int>(InteractionType::NuclInt), "NuclInt"},
+    {static_cast<int>(InteractionType::MuPair), "MuPair"},
+    {static_cast<int>(InteractionType::Hadrons), "Hadrons"},
+    {static_cast<int>(InteractionType::ContinuousEnergyLoss), "ContinousEnergyLoss"},
+    {static_cast<int>(InteractionType::WeakInt), "WeakInt"},
+    {static_cast<int>(InteractionType::Compton), "Compton"},
+    {static_cast<int>(InteractionType::Decay), "Decay"},
 };
 } // namespace PROPOSAL
 
@@ -71,11 +71,6 @@ static const std::map<int, std::string> Id_Interaction_Name_Map {
 namespace PROPOSAL {
 class DynamicData
 {
-public:
-    struct Type :public InteractionType, public ParticleType {
-        /* static const int None = 0; */
-    };
-
 public:
     DynamicData();
     DynamicData(const int&);

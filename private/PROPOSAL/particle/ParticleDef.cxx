@@ -109,7 +109,7 @@ ParticleDef::ParticleDef()
     , hard_component_table(HardComponentTables::EmptyTable)
     , decay_table()
     , weak_partner(nullptr)
-    , particle_type(ParticleType::None)
+    , particle_type(static_cast<int>(ParticleType::None))
 {
 }
 
@@ -254,7 +254,7 @@ ParticleDef::Builder::Builder()
     , hard_component_table(&HardComponentTables::EmptyTable)
     , decay_table()
     , weak_partner(nullptr)
-    , particle_type(ParticleType::None)
+    , particle_type(static_cast<int>(ParticleType::None))
 {
 }
 
@@ -272,7 +272,7 @@ EMinusDef::EMinusDef()
             HardComponentTables::EmptyTable,
             DecayTable().addChannel(1.1, StableChannel()),
             NuEDef::Get(),
-            ParticleType::EMinus)
+            static_cast<int>(ParticleType::EMinus))
 {
 }
 
@@ -288,7 +288,7 @@ EPlusDef::EPlusDef()
             HardComponentTables::EmptyTable,
             DecayTable().addChannel(1.1, StableChannel()),
             NuEBarDef::Get(),
-            ParticleType::EPlus)
+            static_cast<int>(ParticleType::EPlus))
 {
 }
 
@@ -304,7 +304,7 @@ MuMinusDef::MuMinusDef()
             HardComponentTables::MuonTable,
             DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get())),
             NuMuDef::Get(),
-            ParticleType::MuMinus)
+            static_cast<int>(ParticleType::MuMinus))
 {
 }
 
@@ -319,7 +319,7 @@ MuPlusDef::MuPlusDef()
                   HardComponentTables::MuonTable,
                   DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())),
                   NuMuBarDef::Get(),
-                  ParticleType::NuMuBar)
+                  static_cast<int>(ParticleType::MuPlus))
 {
 }
 
@@ -386,7 +386,7 @@ TauMinusDef::TauMinusDef()
                                       .addDaughter(NuTauDef::Get())
                                       .build()),
                   NuTauDef::Get(),
-                  ParticleType::TauMinus)
+                  static_cast<int>(ParticleType::TauMinus))
 {
 }
 
@@ -453,7 +453,7 @@ TauPlusDef::TauPlusDef()
                                       .addDaughter(NuTauBarDef::Get())
                                       .build()),
                   NuTauBarDef::Get(),
-                  ParticleType::TauPlus)
+                  static_cast<int>(ParticleType::TauPlus))
 {
 }
 
@@ -474,7 +474,7 @@ GammaDef::GammaDef()
         0.0,
         HardComponentTables::EmptyTable,
         DecayTable().addChannel(1.1, StableChannel()),
-        ParticleType::Gamma)
+        static_cast<int>(ParticleType::Gamma))
 {
 }
 
@@ -488,32 +488,32 @@ GammaDef::~GammaDef() {}
 // ------------------------------------------------------------------------- //
 
 
-PARTICLE_IMP(StauMinus, MSTAU, STABLE_PARTICLE, -1.0, ParticleType::STauMinus)
-PARTICLE_IMP(StauPlus, MSTAU, STABLE_PARTICLE, 1.0, ParticleType::STauPlus)
+PARTICLE_IMP(StauMinus, MSTAU, STABLE_PARTICLE, -1.0, static_cast<int>(ParticleType::STauMinus))
+PARTICLE_IMP(StauPlus, MSTAU, STABLE_PARTICLE, 1.0, static_cast<int>(ParticleType::STauPlus))
 
-PARTICLE_IMP(Pi0, MPI0, LPI0, 0.0, ParticleType::Pi0)
-PARTICLE_IMP(PiMinus, MPI, LPI, -1.0, ParticleType::PiMinus)
-PARTICLE_IMP(PiPlus, MPI, LPI, 1.0, ParticleType::PiPlus)
+PARTICLE_IMP(Pi0, MPI0, LPI0, 0.0, static_cast<int>(ParticleType::Pi0))
+PARTICLE_IMP(PiMinus, MPI, LPI, -1.0, static_cast<int>(ParticleType::PiMinus))
+PARTICLE_IMP(PiPlus, MPI, LPI, 1.0, static_cast<int>(ParticleType::PiPlus))
 
-PARTICLE_IMP(K0, MKAON, -1.0, 0.0, ParticleType::K0)
-PARTICLE_IMP(KMinus, MKAON, LKAON, -1.0, ParticleType::KMinus)
-PARTICLE_IMP(KPlus, MKAON, LKAON, 1.0, ParticleType::KPlus)
+PARTICLE_IMP(K0, MKAON, -1.0, 0.0, static_cast<int>(ParticleType::K0))
+PARTICLE_IMP(KMinus, MKAON, LKAON, -1.0, static_cast<int>(ParticleType::KMinus))
+PARTICLE_IMP(KPlus, MKAON, LKAON, 1.0, static_cast<int>(ParticleType::KPlus))
 
-PARTICLE_IMP(PMinus, MP, STABLE_PARTICLE, -1.0, ParticleType::PMinus)
-PARTICLE_IMP(PPlus, MP, STABLE_PARTICLE, 1.0, ParticleType::PPlus)
+PARTICLE_IMP(PMinus, MP, STABLE_PARTICLE, -1.0, static_cast<int>(ParticleType::PMinus))
+PARTICLE_IMP(PPlus, MP, STABLE_PARTICLE, 1.0, static_cast<int>(ParticleType::PPlus))
 
-PARTICLE_IMP(NuE, 0.0, STABLE_PARTICLE, 0.0, ParticleType::NuE)
-PARTICLE_IMP(NuEBar, 0.0, STABLE_PARTICLE, 0.0, ParticleType::NuEBar)
+PARTICLE_IMP(NuE, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuE))
+PARTICLE_IMP(NuEBar, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuEBar))
 
-PARTICLE_IMP(NuMu, 0.0, STABLE_PARTICLE, 0.0, ParticleType::NuMu)
-PARTICLE_IMP(NuMuBar, 0.0, STABLE_PARTICLE, 0.0, ParticleType::NuMuBar)
+PARTICLE_IMP(NuMu, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuMu))
+PARTICLE_IMP(NuMuBar, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuMuBar))
 
-PARTICLE_IMP(NuTau, 0.0, STABLE_PARTICLE, 0.0, ParticleType::NuTau)
-PARTICLE_IMP(NuTauBar, 0.0, STABLE_PARTICLE, 0.0, ParticleType::NuTauBar)
+PARTICLE_IMP(NuTau, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuTau))
+PARTICLE_IMP(NuTauBar, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuTauBar))
 
-PARTICLE_IMP(Monopole, MMON, STABLE_PARTICLE, CMON, ParticleType::Monopole)
+PARTICLE_IMP(Monopole, MMON, STABLE_PARTICLE, CMON, static_cast<int>(ParticleType::Monopole))
 
-PARTICLE_IMP(SMPMinus, MSMP, STABLE_PARTICLE, -1.0, ParticleType::SMPMinus)
-PARTICLE_IMP(SMPPlus, MSMP, STABLE_PARTICLE, 1.0, ParticleType::SMPPlus)
+PARTICLE_IMP(SMPMinus, MSMP, STABLE_PARTICLE, -1.0, static_cast<int>(ParticleType::SMPMinus))
+PARTICLE_IMP(SMPPlus, MSMP, STABLE_PARTICLE, 1.0, static_cast<int>(ParticleType::SMPPlus))
 
 #undef PARTICLE_IMP

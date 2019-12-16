@@ -84,7 +84,7 @@ std::pair<std::vector<Particle*>, bool> MupairIntegral::CalculateProducedParticl
 
 }
 
-int MupairIntegral::GetType(const MupairProduction& param){
+InteractionType MupairIntegral::GetType(const MupairProduction& param){
     if(param.IsParticleOutputEnabled()){
         return InteractionType::Particle;
     }

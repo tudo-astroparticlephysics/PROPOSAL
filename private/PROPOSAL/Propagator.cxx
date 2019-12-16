@@ -551,7 +551,8 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
     bool propagationstep_till_closest_approach = false;
     bool already_reached_closest_approach = false;
 
-    Secondaries secondaries_(static_cast<size_t>(produced_particle_moments_.first + 2 * std::sqrt(produced_particle_moments_.second)));
+    Secondaries secondaries_(std::make_shared<ParticleDef>(particle_.GetParticleDef()));
+    secondaries_.reserve(static_cast<size_t>(produced_particle_moments_.first + 2 * std::sqrt(produced_particle_moments_.second)));
 
     while (1)
     {
@@ -657,6 +658,8 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
     }
 
     particle_.SetElost(particle_.GetEntryEnergy() - particle_.GetExitEnergy());
+
+    secondaries_.DoDecay();
 
     n_th_call_ += 1.;
     double produced_particles_ = static_cast<double>(secondaries_.GetNumberOfParticles());

@@ -42,7 +42,7 @@ bool TwoBodyPhaseSpace::compare(const DecayChannel& channel) const
 /* DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(const Particle& particle) */
 Secondaries TwoBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
 {
-    Secondaries products(2);
+    Secondaries products;
     products.emplace_back(first_daughter_.particle_type);
     products.emplace_back(second_daughter_.particle_type);
 

@@ -86,35 +86,35 @@ extern const VecType EmptyTable;
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-struct ParticleType
+enum class ParticleType : int
 {
-    static const int None = 0;
-    static const int EMinus = 11;
-    static const int EPlus = -11;
-    static const int NuE = 12;
-    static const int NuEBar = -12;
-    static const int MuMinus = 14;
-    static const int NuMu = 14;
-    static const int NuMuBar = -14;
-    static const int MuPlus = -13;
-    static const int TauMinus = 15;
-    static const int TauPlus = -15;
-    static const int NuTau = 16;
-    static const int NuTauBar = -16;
-    static const int Gamma = 22;
-    static const int Pi0 = 111;
-    static const int PiPlus  = 211;
-    static const int PiMinus = -211;
-    static const int K0 = 311;
-    static const int KPlus = 321;
-    static const int KMinus= -321;
-    static const int STauMinus = 1000015;
-    static const int STauPlus= -1000015;
-    static const int PPlus = 2212;
-    static const int PMinus = -2212;
-    static const int Monopole = 41;
-    static const int SMPPlus = 9500;
-    static const int SMPMinus = -9500;
+    None = 0,
+    EMinus = 11,
+    EPlus = -11,
+    NuE = 12,
+    NuEBar = -12,
+    MuMinus = 14,
+    NuMu = 14,
+    NuMuBar = -14,
+    MuPlus = -13,
+    TauMinus = 15,
+    TauPlus = -15,
+    NuTau = 16,
+    NuTauBar = -16,
+    Gamma = 22,
+    Pi0 = 111,
+    PiPlus  = 211,
+    PiMinus = -211,
+    K0 = 311,
+    KPlus = 321,
+    KMinus= -321,
+    STauMinus = 1000015,
+    STauPlus= -1000015,
+    PPlus = 2212,
+    PMinus = -2212,
+    Monopole = 41,
+    SMPPlus = 9500,
+    SMPMinus = -9500,
 };
 } // namespace PROPOSAL
 
@@ -332,29 +332,29 @@ PROPOSAL_MAKE_HASHABLE(PROPOSAL::ParticleDef, t.mass, t.lifetime, t.charge)
 namespace PROPOSAL {
 static std::map<const int, const ParticleDef&> Id_Particle_Map
 {
-    {ParticleType::EMinus, EMinusDef::Get()},
-    {ParticleType::EPlus, EPlusDef::Get()},
-    {ParticleType::NuE, NuEDef::Get()},
-    {ParticleType::NuEBar,NuEBarDef::Get()},
-    {ParticleType::MuMinus,MuMinusDef::Get()},
-    {ParticleType::NuMu, NuMuDef::Get()},
-    {ParticleType::NuMuBar, NuMuBarDef::Get()},
-    {ParticleType::MuPlus, MuPlusDef::Get()},
-    {ParticleType::TauMinus, TauMinusDef::Get()},
-    {ParticleType::TauPlus, TauPlusDef::Get()},
-    {ParticleType::NuTau, NuTauDef::Get()},
-    {ParticleType::NuTauBar, NuTauBarDef::Get()},
-    {ParticleType::Gamma, GammaDef::Get()},
-    {ParticleType::Pi0, Pi0Def::Get()},
-    {ParticleType::PiPlus, PiPlusDef::Get()},
-    {ParticleType::PiMinus ,PiMinusDef::Get()},
-    {ParticleType::K0, K0Def::Get()},
-    {ParticleType::KPlus, KPlusDef::Get()},
-    {ParticleType::KMinus, KMinusDef::Get()},
-    {ParticleType::PPlus, PPlusDef::Get()},
-    {ParticleType::PMinus, PMinusDef::Get()},
-    {ParticleType::Monopole, MonopoleDef::Get()},
-    {ParticleType::SMPPlus, SMPPlusDef::Get()},
-    {ParticleType::SMPMinus, SMPMinusDef::Get()},
+    {static_cast<int>(ParticleType::EMinus), EMinusDef::Get()},
+    {static_cast<int>(ParticleType::EPlus), EPlusDef::Get()},
+    {static_cast<int>(ParticleType::NuE), NuEDef::Get()},
+    {static_cast<int>(ParticleType::NuEBar), NuEBarDef::Get()},
+    {static_cast<int>(ParticleType::MuMinus), MuMinusDef::Get()},
+    {static_cast<int>(ParticleType::NuMu), NuMuDef::Get()},
+    {static_cast<int>(ParticleType::NuMuBar), NuMuBarDef::Get()},
+    {static_cast<int>(ParticleType::MuPlus), MuPlusDef::Get()},
+    {static_cast<int>(ParticleType::TauMinus), TauMinusDef::Get()},
+    {static_cast<int>(ParticleType::TauPlus), TauPlusDef::Get()},
+    {static_cast<int>(ParticleType::NuTau), NuTauDef::Get()},
+    {static_cast<int>(ParticleType::NuTauBar), NuTauBarDef::Get()},
+    {static_cast<int>(ParticleType::Gamma), GammaDef::Get()},
+    {static_cast<int>(ParticleType::Pi0), Pi0Def::Get()},
+    {static_cast<int>(ParticleType::PiPlus), PiPlusDef::Get()},
+    {static_cast<int>(ParticleType::PiMinus ),PiMinusDef::Get()},
+    {static_cast<int>(ParticleType::K0), K0Def::Get()},
+    {static_cast<int>(ParticleType::KPlus), KPlusDef::Get()},
+    {static_cast<int>(ParticleType::KMinus), KMinusDef::Get()},
+    {static_cast<int>(ParticleType::PPlus), PPlusDef::Get()},
+    {static_cast<int>(ParticleType::PMinus), PMinusDef::Get()},
+    {static_cast<int>(ParticleType::Monopole), MonopoleDef::Get()},
+    {static_cast<int>(ParticleType::SMPPlus), SMPPlusDef::Get()},
+    {static_cast<int>(ParticleType::SMPMinus), SMPMinusDef::Get()},
 };
 } // namespace PROPOSAL

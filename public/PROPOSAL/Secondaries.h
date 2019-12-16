@@ -30,6 +30,7 @@
 
 
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 #include "PROPOSAL/math/Vector3D.h"
 #include <memory>
@@ -42,7 +43,10 @@ class Secondaries {
 
 public:
     Secondaries();
-    Secondaries(size_t number_secondaries);
+    Secondaries(std::shared_ptr<ParticleDef>);
+
+    void reserve(size_t number_secondaries);
+    void clear() { secondaries_.clear(); };
 
     DynamicData& operator[](std::size_t idx){ return secondaries_[idx]; };
 
@@ -59,20 +63,21 @@ public:
     Secondaries Query(const int&) const;
     Secondaries Query(const std::string&) const;
 
+    void DoDecay();
+
+
     std::vector<Vector3D> GetPosition() const;
     std::vector<Vector3D> GetDirection() const;
     std::vector<double> GetEnergy() const;
     std::vector<double> GetParentParticleEnergy() const;
     std::vector<double> GetTime() const;
     std::vector<double> GetPropagatedDistance() const;
-
-    void clear() { secondaries_.clear(); };
-
     std::vector<DynamicData> GetSecondaries() const { return secondaries_; } ;
     unsigned int GetNumberOfParticles() const { return secondaries_.size(); };
 
 private:
     std::vector<DynamicData> secondaries_;
+    std::shared_ptr<ParticleDef> primary_def_;
 };
 
 } // namespace PROPOSAL

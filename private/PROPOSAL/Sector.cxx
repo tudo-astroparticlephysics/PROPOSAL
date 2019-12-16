@@ -300,13 +300,14 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
     bool is_decayed = false;
     bool particle_interaction = false;
 
-    Secondaries secondaries(static_cast<size_t>(produced_particle_moments_.first + 2 * std::sqrt(produced_particle_moments_.second)));
+    Secondaries secondaries;
+    secondaries.reserve(static_cast<size_t>(produced_particle_moments_.first + 2 * std::sqrt(produced_particle_moments_.second)));
 
     /* std::vector<Particle*> products; */
 
     std::pair<double, int> energy_loss;
 
-    DynamicData continuous_loss {DynamicData::Type::None};
+    DynamicData continuous_loss {0};
 
     // TODO(mario): check Fri 2017/08/25
     // int secondary_id    =   0;
@@ -379,8 +380,6 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
         // Advance the Particle according to the displacement
         // Initial energy and final energy are needed if Molier Scattering is
         // enabled
-        AdvanceParticle(displacement, initial_energy, final_energy);
-
         propagated_distance += displacement;
 
         if (std::abs(distance - propagated_distance) <
@@ -430,7 +429,7 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
             is_decayed = true;
             final_energy = particle_.GetMass();
 
-            secondaries.emplace_back(InteractionType::Decay, particle_.GetPosition(),
+            secondaries.emplace_back(static_cast<int>(InteractionType::Decay), particle_.GetPosition(),
                     particle_.GetDirection(), final_energy, particle_.GetEnergy(),
                     particle_.GetTime(), particle_.GetPropagatedDistance());
         }
@@ -459,14 +458,9 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
         // time and set the new position as the endpoint.
         particle_.SetEnergy(particle_.GetMass());
 
-        /* products = particle_.GetDecayTable().SelectChannel().Decay(particle_); */
-
-        /* if (not (sector_def_.only_loss_inside_detector && sector_def_.location != Sector::ParticleLocation::InsideDetector)) */
-        /* { */
-        /*     for (auto p : products) { */
-        /*         secondaries.push_back(*p); */
-        /*     } */
-        /* } */
+        secondaries.emplace_back(static_cast<int>(InteractionType::Decay), particle_.GetPosition(),
+                particle_.GetDirection(), final_energy, particle_.GetEnergy(),
+                particle_.GetTime(), particle_.GetPropagatedDistance());
 
         final_energy = particle_.GetMass();
     }
@@ -568,7 +562,7 @@ std::pair<double, int> Sector::MakeStochasticLoss(double particle_energy)
     // return 0 and unknown, if there is no interaction
     std::pair<double, int> energy_loss;
     energy_loss.first = 0.;
-    energy_loss.second = DynamicData::Type::None;
+    energy_loss.second = 0;
 
     /* std::pair<std::vector<Particle*>, bool> products; */
 

@@ -1,15 +1,21 @@
 #include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/decay/DecayChannel.h"
+
 #include <memory>
 #include <vector>
 #include <iostream>
 
 using namespace PROPOSAL;
 
-Secondaries::Secondaries() {}
+Secondaries::Secondaries() : primary_def_(nullptr) {}
 
-Secondaries::Secondaries(size_t number_secondaries) {
+Secondaries::Secondaries(std::shared_ptr<ParticleDef> p_def) {
+    primary_def_ = p_def;
+}
+
+void Secondaries::reserve(size_t number_secondaries) {
     secondaries_.reserve(number_secondaries);
 }
 
@@ -46,7 +52,6 @@ void Secondaries::push_back(const Particle& particle, const int& interaction_typ
 
 void Secondaries::append(Secondaries secondaries)
 {
-    secondaries_.shrink_to_fit();
     secondaries_.insert(secondaries_.end(), secondaries.secondaries_.begin(), secondaries.secondaries_.end());
 }
 
@@ -68,6 +73,20 @@ Secondaries Secondaries::Query(const std::string& interaction_type) const
             sec.push_back(i);
     }
     return sec;
+}
+
+void Secondaries::DoDecay()
+{
+    for (auto it = secondaries_.begin(); it != secondaries_.end(); ) {
+        if (it->GetTypeId() == static_cast<int>(InteractionType::Decay)){
+            Secondaries products = primary_def_->decay_table.SelectChannel().Decay(*primary_def_, *it);
+            it = secondaries_.erase(it); // delete old decay
+            for (auto p : products.GetSecondaries()) {
+                it = secondaries_.insert(it, p); // and insert decayparticles inplace of old decay
+                it++;
+            }
+        } else { it++; }
+    }
 }
 
 std::vector<Vector3D> Secondaries::GetPosition() const

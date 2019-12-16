@@ -266,7 +266,7 @@ void ManyBodyPhaseSpace::EstimateMaxWeight(PhaseSpaceParameters& params, const P
 void ManyBodyPhaseSpace::SampleEstimateMaxWeight(PhaseSpaceParameters& params, const ParticleDef& parent_def)
 {
     // Create vector for decay products
-    Secondaries products(daughters_.size());
+    Secondaries products;
 
     for (auto d : daughters_) {
         products.emplace_back(d->particle_type);

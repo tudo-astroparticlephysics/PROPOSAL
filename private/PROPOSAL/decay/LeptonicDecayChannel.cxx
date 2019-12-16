@@ -104,7 +104,7 @@ double LeptonicDecayChannelApprox::FindRoot(double min, double parent_mass, doub
 // ------------------------------------------------------------------------- //
 Secondaries LeptonicDecayChannelApprox::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
 {
-    Secondaries secondaries(3);
+    Secondaries secondaries;
 
     // Sample energy from decay rate
     double emax       = (p_def.mass * p_def.mass + massive_lepton_.mass * massive_lepton_.mass) / (2 * p_def.mass);

@@ -44,7 +44,7 @@ class Parametrization;
 class CrossSection
 {
 public:
-    CrossSection(const int&, const Parametrization&);
+    CrossSection(const InteractionType&, const Parametrization&);
     CrossSection(const CrossSection&);
     virtual ~CrossSection();
 
@@ -84,7 +84,7 @@ public:
     // Getter
     // ----------------------------------------------------------------- //
 
-    int GetTypeId() const { return type_id_; }
+    int GetTypeId() const { return static_cast<int>(type_id_); }
     Parametrization& GetParametrization() const { return *parametrization_; }
 
 protected:
@@ -102,7 +102,7 @@ protected:
     // Protected member
     // ----------------------------------------------------------------- //
 
-    const int type_id_;
+    InteractionType type_id_;
 
     Parametrization* parametrization_;
 

@@ -17,8 +17,8 @@
 using namespace PROPOSAL;
 
 
-std::map<const int, const ParticleDef&> Id_Particle_Map;
-std::map<const int, std::string> Id_Interaction_Name_Map;
+/* std::map<const int, const ParticleDef&> Id_Particle_Map; */
+/* std::map<const int, std::string> Id_Interaction_Name_Map; */
 
 /******************************************************************************
  *                              Dynamic Particle                              *
@@ -162,7 +162,7 @@ double DynamicData::GetMomentum() const
  ******************************************************************************/
 
 Particle::Particle()
-    : DynamicData(InteractionType::Particle)
+    : DynamicData(static_cast<int>(InteractionType::Particle))
     , particle_def_(MuMinusDef::Get())
     , momentum_(0)
     , parent_particle_id_(0)
@@ -201,7 +201,7 @@ Particle::Particle(const Particle& particle)
 }
 
 Particle::Particle(const ParticleDef& particleDef)
-    : DynamicData(InteractionType::Particle)
+    : DynamicData(static_cast<int>(InteractionType::Particle))
     , particle_def_(particleDef)
     , momentum_(0)
     , parent_particle_id_(0)

@@ -3,6 +3,7 @@
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 using namespace PROPOSAL;
 
@@ -10,7 +11,7 @@ using namespace PROPOSAL;
 // CrossSection
 // ------------------------------------------------------------------------- //
 
-CrossSection::CrossSection(const int& type, const Parametrization& param)
+CrossSection::CrossSection(const InteractionType& type, const Parametrization& param)
     : type_id_(type)
     , parametrization_(param.clone())
     , prob_for_component_(param.GetMedium().GetNumComponents(), 0)
