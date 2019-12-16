@@ -88,9 +88,6 @@ Medium::Medium(std::string name,
       massDensity_(massDensity),
       molDensity_(0),
       radiationLength_(0),
-      ecut_(0),
-      vcut_(0),
-      vCut_(0),
       MM_(0),
       sumNucleons_(0),
       dens_distr_(new Density_homogeneous(rho)) {
@@ -119,9 +116,6 @@ Medium::Medium(const Medium& medium)
       massDensity_(medium.massDensity_),
       molDensity_(medium.molDensity_),
       radiationLength_(medium.radiationLength_),
-      ecut_(medium.ecut_),
-      vcut_(medium.vcut_),
-      vCut_(medium.vCut_),
       MM_(medium.MM_),
       sumNucleons_(medium.sumNucleons_),
       dens_distr_(medium.dens_distr_->clone()) {
@@ -167,9 +161,6 @@ void Medium::swap(Medium& medium) {
     swap(massDensity_, medium.massDensity_);
     swap(molDensity_, medium.molDensity_);
     swap(radiationLength_, medium.radiationLength_);
-    swap(ecut_, medium.ecut_);
-    swap(vcut_, medium.vcut_);
-    swap(vCut_, medium.vCut_);
     swap(MM_, medium.MM_);
     swap(sumNucleons_, medium.sumNucleons_);
     swap(dens_distr_, medium.dens_distr_);
@@ -193,9 +184,6 @@ Medium& Medium::operator=(const Medium& medium) {
         massDensity_ = medium.massDensity_;
         molDensity_ = medium.molDensity_;
         radiationLength_ = medium.radiationLength_;
-        ecut_ = medium.ecut_;
-        vcut_ = medium.vcut_;
-        vCut_ = medium.vCut_;
         MM_ = medium.MM_;
         sumNucleons_ = medium.sumNucleons_;
         dens_distr_ = medium.dens_distr_->clone();
@@ -242,12 +230,6 @@ bool Medium::operator==(const Medium& medium) const {
     else if (molDensity_ != medium.molDensity_)
         return false;
     else if (radiationLength_ != medium.radiationLength_)
-        return false;
-    else if (ecut_ != medium.ecut_)
-        return false;
-    else if (vcut_ != medium.vcut_)
-        return false;
-    else if (vCut_ != medium.vCut_)
         return false;
     else if (MM_ != medium.MM_)
         return false;

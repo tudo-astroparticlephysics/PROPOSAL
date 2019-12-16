@@ -91,7 +91,7 @@ double PhotoPairInterpolant::CalculateStochasticLoss(double energy, double rnd1,
 
 
 // ------------------------------------------------------------------------- //
-std::pair<std::vector<Particle*>, bool> PhotoPairInterpolant::CalculateProducedParticles(double energy, double energy_loss, const Vector3D initial_direction){
+std::pair<std::vector<Particle*>, bool> PhotoPairInterpolant::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
     (void)energy_loss;
     double rnd;
     double rsum;

@@ -53,23 +53,30 @@ def create_table_scatter(dir_name):
             for medium in mediums:
                 for cut in cuts:
                     for idx, parametrization in enumerate(parametrizations):
-                        particle = pp.particle.Particle(particle_def)
 
                         if scat_names[idx] == "HighlandIntegral":
                             util = pp.Utility(particle_def, medium, cut, pp.UtilityDefinition(), pp.InterpolationDef())
-                            scattering = parametrization(particle, util, pp.InterpolationDef())
+                            scattering = parametrization(particle_def, util, pp.InterpolationDef())
                         else:
-                            scattering = parametrization(particle, medium)
+                            scattering = parametrization(particle_def, medium)
 
                         buf = [""]
                         for jdx, energy in enumerate(energies):
                             # TODO wrap UtilityDecorator
-                            particle.energy = energy
-                            particle.position = position_init
-                            particle.direction = direction_init
 
-                            scattering.scatter(distance, energy, energies_out[jdx])
+                            rnd1 = pp.RandomGenerator.get().random_double()
+                            rnd2 = pp.RandomGenerator.get().random_double()
+                            rnd3 = pp.RandomGenerator.get().random_double()
+                            rnd4 = pp.RandomGenerator.get().random_double()
+                            directions = scattering.scatter(distance,
+                                                            energy,
+                                                            energies_out[jdx],
+                                                            position_init,
+                                                            direction_init,
+                                                            rnd1, rnd2, rnd3, rnd4)
 
+                            posi = position_init + distance * directions.u
+                            dire = directions.n_i
 
                             buf.append(particle_def.name)
                             buf.append(medium.name)
@@ -79,12 +86,16 @@ def create_table_scatter(dir_name):
                             buf.append(str(energy))
                             buf.append(str(energies_out[jdx]))
                             buf.append(str(distance))
-                            buf.append(str(particle.position.x))
-                            buf.append(str(particle.position.y))
-                            buf.append(str(particle.position.z))
-                            buf.append(str(particle.direction.radius))
-                            buf.append(str(particle.direction.phi))
-                            buf.append(str(particle.direction.theta))
+                            buf.append(str(rnd1))
+                            buf.append(str(rnd2))
+                            buf.append(str(rnd3))
+                            buf.append(str(rnd4))
+                            buf.append(str(posi.x))
+                            buf.append(str(posi.y))
+                            buf.append(str(posi.z))
+                            buf.append(str(dire.radius))
+                            buf.append(str(dire.phi))
+                            buf.append(str(dire.theta))
                             buf.append("\n")
 
                         file.write("\t".join(buf))

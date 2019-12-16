@@ -64,7 +64,7 @@ double AnnihilationInterpolant::CalculateStochasticLoss(double energy, double rn
 
 std::pair<std::vector<Particle*>, bool> AnnihilationInterpolant::CalculateProducedParticles(double energy,
                                                                                             double energy_loss,
-                                                                                            const Vector3D initial_direction) {
+                                                                                            const Vector3D& initial_direction) {
     (void)energy_loss;
     double rnd, rsum, rho;
 

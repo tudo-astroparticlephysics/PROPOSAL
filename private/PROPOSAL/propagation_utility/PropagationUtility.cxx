@@ -268,6 +268,47 @@ bool Utility::operator!=(const Utility& utility) const {
     return !(*this == utility);
 }
 
+
+std::pair<double, int> Utility::StochasticLoss(
+    double particle_energy, double rnd1, double rnd2, double rnd3)
+{
+    double total_rate = 0;
+    double total_rate_weighted = 0;
+    double rates_sum = 0;
+    std::vector<double> rates;
+    rates.resize(crosssections_.size());
+
+    // return 0 and unknown, if there is no interaction
+    std::pair<double, int> energy_loss;
+    energy_loss.first = 0.;
+    energy_loss.second = 0;
+
+    for (unsigned int i = 0; i < crosssections_.size(); i++) {
+        rates[i] = crosssections_[i]->CalculatedNdx(particle_energy, rnd2);
+        total_rate += rates[i];
+    }
+
+    total_rate_weighted = total_rate * rnd1;
+
+    log_debug("Total rate = %f, total rate weighted = %f", total_rate,
+              total_rate_weighted);
+
+    for (unsigned int i = 0; i < rates.size(); i++) {
+        rates_sum += rates[i];
+
+        if (rates_sum >= total_rate_weighted) {
+            energy_loss.first = crosssections_[i]->CalculateStochasticLoss(
+                particle_energy, rnd2, rnd3);
+            energy_loss.second = crosssections_[i]->GetTypeId();
+
+            break;
+        }
+    }
+
+    return energy_loss;
+}
+
+
 /******************************************************************************
  *                            Utility Decorator                            *
  ******************************************************************************/

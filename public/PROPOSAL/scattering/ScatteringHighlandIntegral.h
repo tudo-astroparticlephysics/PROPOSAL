@@ -44,18 +44,18 @@ struct InterpolationDef;
 class ScatteringHighlandIntegral : public Scattering
 {
 public:
-    ScatteringHighlandIntegral(Particle&, const Utility&);
-    ScatteringHighlandIntegral(Particle&, const Utility&, const InterpolationDef&);
+    ScatteringHighlandIntegral(const ParticleDef&, const Utility&);
+    ScatteringHighlandIntegral(const ParticleDef&, const Utility&, const InterpolationDef&);
 
     // Copy constructor
-    ScatteringHighlandIntegral(Particle&, const Utility&, const ScatteringHighlandIntegral&);
+    ScatteringHighlandIntegral(const ParticleDef&, const Utility&, const ScatteringHighlandIntegral&);
     ScatteringHighlandIntegral(const ScatteringHighlandIntegral&);
     ~ScatteringHighlandIntegral();
 
     virtual Scattering* clone() const { return new ScatteringHighlandIntegral(*this); }
-    virtual Scattering* clone(Particle& particle, const Utility& utility) const
+    virtual Scattering* clone(const ParticleDef& particle_def, const Utility& utility) const
     {
-        return new ScatteringHighlandIntegral(particle, utility, *this);
+        return new ScatteringHighlandIntegral(particle_def, utility, *this);
     }
 
 private:
@@ -63,8 +63,8 @@ private:
 
     bool compare(const Scattering&) const;
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
-    long double CalculateTheta0(double dr, double ei, double ef);
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, double rnd1, double rnd2, double rnd3, double rnd4);
+    long double CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos);
 
     UtilityDecorator* scatter_;
 };

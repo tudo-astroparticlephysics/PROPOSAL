@@ -159,10 +159,6 @@ class Medium {
     double molDensity_;       ///< molecule density [number/cm3]
     double radiationLength_;  ///< radiation length [cm]
 
-    double ecut_;  ///< cutoff energy [MeV]
-    double vcut_;  ///< relative cutoff energy
-    double vCut_;  ///< relative cutoff energy - call setCut(E) to set this
-
     double MM_;           ///< average all-component nucleon weight
     double sumNucleons_;  ///< sum of nucleons of all nuclei
 

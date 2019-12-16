@@ -28,17 +28,28 @@
 
 
 #pragma once
-#include "PROPOSAL/particle/Particle.h"
+#include <utility>
+#include <memory>
+#include "PROPOSAL/math/Vector3D.h"
 
 namespace PROPOSAL {
 
-/* class Particle; */
+struct ParticleDef;
 class Utility;
+
+struct Directions : std::enable_shared_from_this<Directions>
+{
+    Directions() : u_(0,0,0), n_i_(0,0,0) {};
+    Directions(Vector3D u, Vector3D n_i) : u_(u), n_i_(n_i) {};
+
+    Vector3D u_;
+    Vector3D n_i_;
+};
 
 class Scattering
 {
 public:
-    Scattering(Particle&);
+    Scattering(const ParticleDef&);
     Scattering(const Scattering&);
     virtual ~Scattering();
 
@@ -46,11 +57,21 @@ public:
     bool operator!=(const Scattering& scattering) const;
 
     virtual Scattering* clone() const                          = 0; // virtual constructor idiom (used for deep copies)
-    virtual Scattering* clone(Particle&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies)
+    virtual Scattering* clone(const ParticleDef&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies)
 
-    void Scatter(double dr, double ei, double ef);
 
-    const Particle& GetParticle() const { return particle_; }
+    Directions Scatter(double dr, double ei, double ef, const Vector3D& pos, const Vector3D& old_direction);
+    Directions Scatter(double dr,
+                        double ei,
+                        double ef,
+                        const Vector3D& pos,
+                        const Vector3D& old_direction,
+                        double rnd1,
+                        double rnd2,
+                        double rnd3,
+                        double rnd4);
+
+    const ParticleDef& GetParticleDef() const { return particle_def_; }
 
 protected:
     Scattering& operator=(const Scattering&); // Undefined & not allowed
@@ -63,9 +84,17 @@ protected:
         double sx, sy, tx, ty;
     };
 
-    virtual RandomAngles CalculateRandomAngle(double dr, double ei, double ef) = 0;
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos);
+    virtual RandomAngles CalculateRandomAngle(double dr,
+                                              double ei,
+                                              double ef,
+                                              const Vector3D& pos,
+                                              double rnd1,
+                                              double rnd2,
+                                              double rnd3,
+                                              double rnd4) = 0;
 
-    Particle& particle_;
+    const ParticleDef& particle_def_;
 };
 
 } // namespace PROPOSAL

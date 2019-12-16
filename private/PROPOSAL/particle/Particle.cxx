@@ -155,7 +155,7 @@ double DynamicData::GetMomentum() const
 
     return energy_;
 
-};
+}
 
 /******************************************************************************
  *                              Particle                                       *

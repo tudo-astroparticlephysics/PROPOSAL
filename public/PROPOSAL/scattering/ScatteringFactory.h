@@ -56,11 +56,11 @@ public:
 
     typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
-    Scattering* CreateScattering(const std::string&, Particle&, const Utility&, const InterpolationDef&);
-    Scattering* CreateScattering(const Enum, Particle&, const Utility&, const InterpolationDef&);
+    Scattering* CreateScattering(const std::string&, const ParticleDef&, const Utility&, const InterpolationDef&);
+    Scattering* CreateScattering(const Enum, const ParticleDef&, const Utility&, const InterpolationDef&);
 
-    Scattering* CreateScattering(const std::string&, Particle&, const Utility&);
-    Scattering* CreateScattering(const Enum, Particle&, const Utility&);
+    Scattering* CreateScattering(const std::string&, const ParticleDef&, const Utility&);
+    Scattering* CreateScattering(const Enum, const ParticleDef&, const Utility&);
 
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for photo parametrizations

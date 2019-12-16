@@ -1,38 +1,36 @@
 import pyPROPOSAL as pp
 import numpy as np 
 
-def create_table(dir_name):
-    """TODO: Docstring for create_table.
-    Returns: TODO
-
-    """
-
-    statistics = int(1e6)
-    NUM_bins = 50
-
+def create_table(dir_name, particle_def, init_energy, decay_products, filename, statistics=int(1e6), NUM_bins=50):
     pp.RandomGenerator.get().set_seed(1234)
 
-    mu = pp.particle.Particle(pp.particle.MuMinusDef.get())
-    products = [pp.particle.EMinusDef.get(), pp.particle.NuMuDef.get(), pp.particle.NuEBarDef.get()]
+    init_particle = pp.particle.Particle(particle_def)
+    init_particle.energy = init_energy
+    products = decay_products
     decay_channels = [pp.decay.LeptonicDecayChannelApprox(*products),
-                      pp.decay.LeptonicDecayChannel(*products) 
+                      pp.decay.LeptonicDecayChannel(*products),
+                      pp.decay.ManyBodyPhaseSpace(products) 
                      ]
-    decay_names = ["LeptonicDecayChannelApprox", "LeptonicDecayChannel"]
+    decay_names = ["LeptonicDecayChannelApprox", "LeptonicDecayChannel", "ManyBody"]
 
     histrogram_list = []
 
+    v_max = ( init_particle.particle_def.mass**2 + products[0].mass**2 ) / (2 * init_particle.particle_def.mass)
+    gamma = init_particle.energy / particle_def.mass
+    betagamma = init_particle.momentum / particle_def.mass
+    E_max = gamma * v_max + betagamma * np.sqrt(v_max**2 - products[0].mass**2)
 
     for channel in decay_channels:
         prod_0_energies = []
         prod_1_energies = []
         prod_2_energies = []
         for i in range(statistics):
-            mu.position = pp.Vector3D(0, 0, 0)
-            mu.direction = pp.Vector3D(0, 0, -1)
-            mu.energy = mu.particle_def.mass
-            mu.propagated_distance = 0
+            init_particle.position = pp.Vector3D(0, 0, 0)
+            init_particle.direction = pp.Vector3D(0, 0, -1)
+            init_particle.energy = init_energy
+            init_particle.propagated_distance = 0
             
-            decay_products = channel.decay(mu)
+            decay_products = channel.decay(init_particle)
             for p in decay_products:
                 if p.particle_def==products[0]:
                     prod_0_energies.append(p.energy)
@@ -44,16 +42,21 @@ def create_table(dir_name):
                     assert("This should never happen")
         
         histogram = []
-        histogram.append(np.histogram(prod_0_energies, bins=NUM_bins, range=(0, mu.particle_def.mass/2))[0])
-        histogram.append(np.histogram(prod_1_energies, bins=NUM_bins, range=(0, mu.particle_def.mass/2))[0])
-        histogram.append(np.histogram(prod_2_energies, bins=NUM_bins, range=(0, mu.particle_def.mass/2))[0])
+        histogram.append(np.histogram(prod_0_energies, bins=NUM_bins, range=(0, E_max))[0])
+        histogram.append(np.histogram(prod_1_energies, bins=NUM_bins, range=(0, E_max))[0])
+        histogram.append(np.histogram(prod_2_energies, bins=NUM_bins, range=(0, E_max))[0])
 
         histrogram_list.append(histogram)
 
-    with open(dir_name + "Decay_Leptonic.txt", "a") as file:
+    with open(dir_name + filename, "a") as file:
         buf = [""]
         buf.append(str(statistics))
         buf.append(str(NUM_bins))
+        buf.append(str(particle_def.name))
+        buf.append(str(init_particle.energy))
+        buf.append(str(products[0].name))
+        buf.append(str(products[1].name))
+        buf.append(str(products[2].name))
         buf.append("\n")
         file.write("\t".join(buf))
 
@@ -71,8 +74,10 @@ def create_table(dir_name):
 
 
 def main(dir_name):
-    create_table(dir_name)
-
+    create_table(dir_name, pp.particle.MuMinusDef.get(), pp.particle.MuMinusDef.get().mass, [pp.particle.EMinusDef.get(), pp.particle.NuMuDef.get(), pp.particle.NuEBarDef.get()], "Decay_MuMinus_rest.txt", int(1e6), 50)
+    create_table(dir_name, pp.particle.MuMinusDef.get(), 1e5, [pp.particle.EMinusDef.get(), pp.particle.NuMuDef.get(), pp.particle.NuEBarDef.get()], "Decay_MuMinus_energy.txt", int(1e6), 50)
+    create_table(dir_name, pp.particle.TauMinusDef.get(), pp.particle.TauMinusDef.get().mass, [pp.particle.EMinusDef.get(), pp.particle.NuTauDef.get(), pp.particle.NuEBarDef.get()], "Decay_TauMinus_rest.txt", int(1e6), 50)
+    create_table(dir_name, pp.particle.TauMinusDef.get(), 1e5, [pp.particle.EMinusDef.get(), pp.particle.NuTauDef.get(), pp.particle.NuEBarDef.get()], "Decay_TauMinus_energy.txt", int(1e6), 50)
 
 if __name__ == "__main__":
 
@@ -87,3 +92,4 @@ if __name__ == "__main__":
         print("Directory {} created".format(dir_name))
 
     main(dir_name)
+ 

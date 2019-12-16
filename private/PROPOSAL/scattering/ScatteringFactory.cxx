@@ -37,7 +37,7 @@ void ScatteringFactory::Register(const std::string& name, const Enum model)
 
 // ------------------------------------------------------------------------- //
 Scattering* ScatteringFactory::CreateScattering(const std::string& name,
-                                                Particle& particle,
+                                                const ParticleDef& particle_def,
                                                 const Utility& utility,
                                                 const InterpolationDef& interpolation_def)
 {
@@ -51,16 +51,16 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name,
     {
         if (*iter == "highlandintegral")
         {
-            return new ScatteringHighlandIntegral(particle, utility, interpolation_def);
+            return new ScatteringHighlandIntegral(particle_def, utility, interpolation_def);
         } else if (*iter == "moliere")
         {
-            return new ScatteringMoliere(particle, utility.GetMedium());
+            return new ScatteringMoliere(particle_def, utility.GetMedium());
         } else if (*iter == "highland")
         {
-            return new ScatteringHighland(particle, utility.GetMedium());
+            return new ScatteringHighland(particle_def, utility.GetMedium());
         } else if (*iter == "noscattering")
         {
-            return new ScatteringNoScattering(particle, utility.GetMedium());
+            return new ScatteringNoScattering(particle_def, utility.GetMedium());
         } else
         {
             log_fatal("Scattering %s not registerd!", name.c_str());
@@ -75,7 +75,7 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name,
 
 // ------------------------------------------------------------------------- //
 Scattering* ScatteringFactory::CreateScattering(const Enum model,
-                                                Particle& particle,
+                                                const ParticleDef& particle_def,
                                                 const Utility& utility,
                                                 const InterpolationDef& interpolation_def)
 {
@@ -86,16 +86,16 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model,
     {
         if (*iter == HighlandIntegral)
         {
-            return new ScatteringHighlandIntegral(particle, utility, interpolation_def);
+            return new ScatteringHighlandIntegral(particle_def, utility, interpolation_def);
         } else if (*iter == Moliere)
         {
-            return new ScatteringMoliere(particle, utility.GetMedium());
+            return new ScatteringMoliere(particle_def, utility.GetMedium());
         } else if (*iter == Highland)
         {
-            return new ScatteringHighland(particle, utility.GetMedium());
+            return new ScatteringHighland(particle_def, utility.GetMedium());
         } else if (*iter == NoScattering)
         {
-            return new ScatteringNoScattering(particle, utility.GetMedium());
+            return new ScatteringNoScattering(particle_def, utility.GetMedium());
         } else
         {
             log_fatal("Scattering %s not registerd!", typeid(model).name());
@@ -109,7 +109,7 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model,
 }
 
 // ------------------------------------------------------------------------- //
-Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, const Utility& utility)
+Scattering* ScatteringFactory::CreateScattering(const std::string& name, const ParticleDef& particle_def, const Utility& utility)
 {
     std::string name_lower = name;
     std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
@@ -121,16 +121,16 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particl
     {
         if (*iter == "highlandintegral")
         {
-            return new ScatteringHighlandIntegral(particle, utility);
+            return new ScatteringHighlandIntegral(particle_def, utility);
         } else if (*iter == "moliere")
         {
-            return new ScatteringMoliere(particle, utility.GetMedium());
+            return new ScatteringMoliere(particle_def, utility.GetMedium());
         } else if (*iter == "highland")
         {
-            return new ScatteringHighland(particle, utility.GetMedium());
+            return new ScatteringHighland(particle_def, utility.GetMedium());
         } else if (*iter == "noscattering")
         {
-            return new ScatteringNoScattering(particle, utility.GetMedium());
+            return new ScatteringNoScattering(particle_def, utility.GetMedium());
         } else
         {
             log_fatal("Scattering %s not registerd!", name.c_str());
@@ -144,7 +144,7 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particl
 }
 
 // ------------------------------------------------------------------------- //
-Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& particle, const Utility& utility)
+Scattering* ScatteringFactory::CreateScattering(const Enum model, const ParticleDef& particle_def, const Utility& utility)
 {
     std::vector<Enum>::const_iterator iter;
     iter = std::find(registerd_enum.begin(), registerd_enum.end(), model);
@@ -153,16 +153,16 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& part
     {
         if (*iter == HighlandIntegral)
         {
-            return new ScatteringHighlandIntegral(particle, utility);
+            return new ScatteringHighlandIntegral(particle_def, utility);
         } else if (*iter == Moliere)
         {
-            return new ScatteringMoliere(particle, utility.GetMedium());
+            return new ScatteringMoliere(particle_def, utility.GetMedium());
         } else if (*iter == Highland)
         {
-            return new ScatteringHighland(particle, utility.GetMedium());
+            return new ScatteringHighland(particle_def, utility.GetMedium());
         } else if (*iter == NoScattering)
         {
-            return new ScatteringNoScattering(particle, utility.GetMedium());
+            return new ScatteringNoScattering(particle_def, utility.GetMedium());
         } else
         {
             log_fatal("Scattering %s not registerd!", typeid(model).name());

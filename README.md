@@ -71,6 +71,8 @@ and our zenodo entry of the version you use
             Alameddine, Jean-Marco and
             Sackel, Maximilian and
             van Santen, Jacob and
+            Menne, Thorben and
+            Sandrock, Alexander and
             Kopper, Claudio and
             Krings, Kai and
             Olivas, Alex},

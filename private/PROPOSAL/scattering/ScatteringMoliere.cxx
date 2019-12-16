@@ -1,11 +1,12 @@
 
+#include <cmath>
+
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/math/MathMethods.h"
-#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/scattering/Coefficients.h"
 
 using namespace PROPOSAL;
@@ -18,27 +19,31 @@ using namespace PROPOSAL;
 
 Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
                                                                  double ei,
-                                                                 double ef) {
-    (void)ei;
+                                                                 double ef,
+                                                                 const Vector3D& pos,
+                                                                 double rnd1,
+                                                                 double rnd2,
+                                                                 double rnd3,
+                                                                 double rnd4) {
     (void)ef;
 
-    double momentum = particle_.GetMomentum();  // momentum in MeV/c
-    double mass = particle_.GetMass();          // mass in MeV/c^2
+    double momentum_Sq = (ei - particle_def_.mass) * (ei + particle_def_.mass);
+    double beta_Sq = 1. / (1. + particle_def_.mass * particle_def_.mass / momentum_Sq);  // beta^2 = (v/c)^2
 
-    double beta_Sq =
-        1. / (1. + mass * mass / (momentum * momentum));  // beta^2 = (v/c)^2
+    // beta^2 p^2 with beta^2 = (v/c)^2 = 1/(1+m^2/p^2)
+    double beta_p_Sq = momentum_Sq / ei;
+    beta_p_Sq *= beta_p_Sq;
+
     double chi_0 = 0.;
 
-    std::vector<double> chi_A_Sq;  // screening angle^2 in rad^2
+    std::vector<double> chi_A_Sq; // screening angle^2 in rad^2
     chi_A_Sq.resize(numComp_);
 
     for (int i = 0; i < numComp_; i++) {
-        // Calculate Chi_0
-        chi_0 =
-            (ME * ALPHA * std::pow(Zi_[i] * 128. / (9. * PI * PI), 1. / 3.)) /
-            momentum;
+        // Calculate Chi_0 * p
+        chi_0 = ME * ALPHA * std::pow(Zi_[i] * 128. / (9. * PI * PI), 1. / 3.);
         // Calculate Chi_a^2
-        chi_A_Sq[i] = chi_0 * chi_0 *
+        chi_A_Sq[i] = chi_0 * chi_0 / momentum_Sq *
                       (1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq);
     }
 
@@ -46,9 +51,8 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
     chiCSq_ =
         ((4. * PI * NA * ALPHA * ALPHA * HBAR * HBAR * SPEED * SPEED) *
          (medium_->GetMassDensity() *
-          medium_->GetDensityDistribution().Evaluate(particle_.GetPosition()) *
-          dr) /
-         (momentum * momentum * beta_Sq)) *
+          medium_->GetDensityDistribution().Evaluate(pos) *
+          dr) / beta_p_Sq) *
         ZSq_A_average_;
 
     // Calculate B
@@ -80,16 +84,14 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
 
     double pre_factor = std::sqrt(chiCSq_ * B_[max_weight_index_]);
 
-    double rnd1, rnd2;
-
-    rnd1 = GetRandom(pre_factor);
-    rnd2 = GetRandom(pre_factor);
+    rnd1 = GetRandom(pre_factor, rnd1);
+    rnd2 = GetRandom(pre_factor, rnd2);
 
     random_angles.sx = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.tx = rnd2;
 
-    rnd1 = GetRandom(pre_factor);
-    rnd2 = GetRandom(pre_factor);
+    rnd1 = GetRandom(pre_factor, rnd3);
+    rnd2 = GetRandom(pre_factor, rnd4);
 
     random_angles.sy = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.ty = rnd2;
@@ -103,8 +105,8 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-ScatteringMoliere::ScatteringMoliere(Particle& particle, const Medium& medium)
-    : Scattering(particle),
+ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, const Medium& medium)
+    : Scattering(particle_def),
       medium_(medium.clone()),
       numComp_(medium_->GetNumComponents()),
       ZSq_A_average_(0.0),
@@ -141,9 +143,9 @@ ScatteringMoliere::ScatteringMoliere(Particle& particle, const Medium& medium)
         weight_ZZ_sum_ += weight_ZZ_[i];
 
         // Calculate Z^2_average for Chi_c^2
-        // if case of an electron, replace Z^2 by Z(Z+1) to into account
+        // in case of an electron, replace Z^2 by Z(Z+1) to take into account
         // scatterings on atomic electrons in the medium
-        if (particle_.GetMass() == ME)
+        if (particle_def_.mass == ME)
             ZSq_average += weight[i] * Zi_[i] * (Zi_[i] + 1.);
         else
             ZSq_average += weight_ZZ_[i];
@@ -172,9 +174,9 @@ ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)
       chiCSq_(scattering.chiCSq_),
       B_(scattering.B_) {}
 
-ScatteringMoliere::ScatteringMoliere(Particle& particle,
+ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def,
                                      const ScatteringMoliere& scattering)
-    : Scattering(particle),
+    : Scattering(particle_def),
       medium_(scattering.medium_->clone()),
       numComp_(scattering.numComp_),
       ZSq_A_average_(scattering.ZSq_A_average_),
@@ -376,13 +378,11 @@ double ScatteringMoliere::F(double theta) {
 //-------------------------generate random angle------------------------------//
 //----------------------------------------------------------------------------//
 
-double ScatteringMoliere::GetRandom(double pre_factor) {
+double ScatteringMoliere::GetRandom(double pre_factor, double rnd) {
     //  Generate random angles following Moliere's distribution by comparing a
     //  uniformly distributed random number with the integral of the
     //  distribution. Therefore, determine the angle where the integral is equal
     //  to the random number.
-
-    double rnd = RandomGenerator::Get().RandomDouble();
 
     // Newton-Raphson method:
     double theta_n;

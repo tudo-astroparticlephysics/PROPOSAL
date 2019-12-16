@@ -138,11 +138,11 @@ double ComptonInterpolant::CalculateCumulativeCrossSection(double energy, int co
     return dndx_interpolant_2d_.at(component)->Interpolate(energy, v);
 }
 
-void ComptonInterpolant::StochasticDeflection(Particle *particle, double energy, double energy_loss) {
+std::pair<double, double> ComptonInterpolant::StochasticDeflection(double energy, double energy_loss) {
     double theta_deflect = RandomGenerator::Get().RandomDouble() * 2 * PI; // random azimuth
     double cosphi = 1. - (ME * (1. / (energy - energy_loss) - 1. / energy));
 
-    particle->DeflectDirection(cosphi, theta_deflect);
+    return std::make_pair(cosphi, theta_deflect);
 }
 
 // ------------------------------------------------------------------------- //

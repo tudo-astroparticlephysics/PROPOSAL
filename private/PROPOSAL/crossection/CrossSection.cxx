@@ -100,3 +100,4 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, CrossSection const& cross)
     os << Helper::Centered(80, "");
     return os;
 }
+

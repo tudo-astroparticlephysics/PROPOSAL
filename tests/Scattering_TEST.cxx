@@ -34,7 +34,7 @@ ParticleDef getParticleDef(const std::string& name)
 
 TEST(Comparison, Comparison_equal)
 {
-    Particle mu = Particle(MuMinusDef::Get());
+    ParticleDef mu = MuMinusDef::Get();
     Water water(1.0);
 
     Scattering* noScat1 = new ScatteringNoScattering(mu, water);
@@ -64,8 +64,8 @@ TEST(Comparison, Comparison_equal)
 
 TEST(Comparison, Comparison_not_equal)
 {
-    Particle mu  = Particle(MuMinusDef::Get());
-    Particle tau = Particle(TauMinusDef::Get());
+    ParticleDef mu  = MuMinusDef::Get();
+    ParticleDef tau = TauMinusDef::Get();
     Water water(1.0);
     Ice ice;
 
@@ -110,7 +110,7 @@ TEST(Comparison, Comparison_not_equal)
 
 TEST(Assignment, Copyconstructor)
 {
-    Particle mu = Particle(MuMinusDef::Get());
+    ParticleDef mu = MuMinusDef::Get();
     Water water(1.0);
 
     ScatteringMoliere moliere1(mu, water);
@@ -120,7 +120,7 @@ TEST(Assignment, Copyconstructor)
 
 TEST(Assignment, Copyconstructor2)
 {
-    Particle mu = Particle(MuMinusDef::Get());
+    ParticleDef mu = MuMinusDef::Get();
     Water water(1.0);
 
     ScatteringMoliere moliere1(mu, water);
@@ -145,10 +145,13 @@ TEST(Scattering, Scatter)
     std::string parametrization;
 
     double energy_init, energy_final, distance;
+    double rnd1, rnd2, rnd3, rnd4;
     double energy_previous = -1;
     double ecut, vcut;
     Vector3D position_init  = Vector3D(0, 0, 0);
     Vector3D direction_init = Vector3D(1, 0, 0);
+    Vector3D position_out;
+    Vector3D direction_out;
     direction_init.CalculateSphericalCoordinates();
     double x_f, y_f, z_f;
     double radius_f, phi_f, theta_f;
@@ -163,7 +166,7 @@ TEST(Scattering, Scatter)
         if (first_line)
         {
             in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >>
-                distance >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
+                distance >> rnd1 >> rnd2 >> rnd3 >> rnd4 >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
 
             first_line = false;
         }
@@ -171,10 +174,6 @@ TEST(Scattering, Scatter)
         energy_previous = -1;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Particle particle        = Particle(particle_def);
-        particle.SetEnergy(energy_init);
-        particle.SetPosition(position_init);
-        particle.SetDirection(direction_init);
 
         Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
@@ -184,34 +183,37 @@ TEST(Scattering, Scatter)
         if (parametrization == "HighlandIntegral")
         {
             Utility utility(particle_def, *medium, ecuts, Utility::Definition(), InterpolationDef());
-            scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle, utility, InterpolationDef());
+            scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle_def, utility, InterpolationDef());
         }
         else
         {
             Utility utility(particle_def, *medium, ecuts, Utility::Definition());
-            scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle, utility, InterpolationDef());
+            scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle_def, utility, InterpolationDef());
         }
 
         while (energy_previous < energy_init)
         {
             energy_previous = energy_init;
 
-            particle.SetEnergy(energy_init);
-            particle.SetPosition(position_init);
-            particle.SetDirection(direction_init);
+            Directions directions = scattering->Scatter(distance,
+                                                        energy_init,
+                                                        energy_final,
+                                                        position_init,
+                                                        direction_init,
+                                                        rnd1, rnd2, rnd3, rnd4);
+            position_out = position_init + distance * directions.u_;
+            direction_out = directions.n_i_;
 
-            scattering->Scatter(distance, energy_init, energy_final);
+            ASSERT_NEAR(position_out.GetX(), x_f, std::abs(error * x_f));
+            ASSERT_NEAR(position_out.GetY(), y_f, std::abs(error * y_f));
+            ASSERT_NEAR(position_out.GetZ(), z_f, std::abs(error * z_f));
 
-            ASSERT_NEAR(particle.GetPosition().GetX(), x_f, std::abs(error * x_f));
-            ASSERT_NEAR(particle.GetPosition().GetY(), y_f, std::abs(error * y_f));
-            ASSERT_NEAR(particle.GetPosition().GetZ(), z_f, std::abs(error * z_f));
-
-            ASSERT_NEAR(particle.GetDirection().GetRadius(), radius_f, std::abs(error * radius_f));
-            ASSERT_NEAR(particle.GetDirection().GetPhi(), phi_f, std::abs(error * phi_f));
-            ASSERT_NEAR(particle.GetDirection().GetTheta(), theta_f, std::abs(error * theta_f));
+            ASSERT_NEAR(direction_out.GetRadius(), radius_f, std::abs(error * radius_f));
+            ASSERT_NEAR(direction_out.GetPhi(), phi_f, std::abs(error * phi_f));
+            ASSERT_NEAR(direction_out.GetTheta(), theta_f, std::abs(error * theta_f));
 
             in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >>
-                distance >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
+                distance >> rnd1 >> rnd2 >> rnd3 >> rnd4 >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
         }
 
         delete medium;

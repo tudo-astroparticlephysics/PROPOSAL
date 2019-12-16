@@ -152,7 +152,7 @@ Sector::Sector(Particle& particle, const Definition& sector_def)
       cont_rand_(NULL),
       scattering_(ScatteringFactory::Get().CreateScattering(
           sector_def_.scattering_model,
-          particle_,
+          particle_.GetParticleDef(),
           utility_)) {
     // These are optional, therfore check NULL
     if (sector_def_.do_exact_time_calculation) {
@@ -185,7 +185,7 @@ Sector::Sector(Particle& particle,
       cont_rand_(NULL),
       scattering_(ScatteringFactory::Get().CreateScattering(
           sector_def_.scattering_model,
-          particle_,
+          particle_.GetParticleDef(),
           utility_,
           interpolation_def)) {
     // These are optional, therfore check NULL
@@ -209,7 +209,7 @@ Sector::Sector(Particle& particle, const Sector& sector)
       decay_calculator_(sector.decay_calculator_->clone(utility_)),
       exact_time_calculator_(NULL),
       cont_rand_(NULL),
-      scattering_(sector.scattering_->clone(particle_, utility_))
+      scattering_(sector.scattering_->clone(particle_.GetParticleDef(), utility_))
 {
     if (particle.GetParticleDef() != sector.GetParticle().GetParticleDef())
     {
@@ -541,7 +541,15 @@ void Sector::AdvanceParticle(double dr, double ei, double ef) {
         time += dr / SPEED;
     }
 
-    scattering_->Scatter(dr, ei, ef);
+
+    if( sector_def_.scattering_model != ScatteringFactory::Enum::NoScattering ){
+        Directions directions = scattering_->Scatter(dr, ei, ef, particle_.GetPosition(), particle_.GetDirection());
+        particle_.SetPosition(particle_.GetPosition() + dr * directions.u_);
+        particle_.SetDirection(directions.n_i_);
+    } else {
+        particle_.SetPosition(particle_.GetPosition() + dr * particle_.GetDirection());
+    }
+
 
     particle_.SetPropagatedDistance(dist);
     particle_.SetTime(time);
@@ -553,65 +561,38 @@ std::pair<double, int> Sector::MakeStochasticLoss(double particle_energy)
     double rnd2 = RandomGenerator::Get().RandomDouble();
     double rnd3 = RandomGenerator::Get().RandomDouble();
 
-    double total_rate = 0;
-    double total_rate_weighted = 0;
-    double rates_sum = 0;
+    // do an optional bias to the randomly sampled energy loss
+    if (sector_def_.do_stochastic_loss_weighting) {
+        double aux = rnd2 * std::pow(rnd2, std::abs(sector_def_.stochastic_loss_weighting));
+        if (sector_def_.stochastic_loss_weighting > 0) {
+            rnd2 = 1 - aux;
+        } else {
+            rnd2 = aux;
+        }
+    }
+
+    std::pair<double, int> energy_loss;
+    std::pair<std::vector<Particle*>, bool> products;
+    std::pair<double, double> deflection_angles;
+
+    energy_loss = utility_.StochasticLoss(particle_energy, rnd1, rnd2, rnd3);
 
     std::vector<CrossSection*> cross_sections = utility_.GetCrosssections();
-
-    // return 0 and unknown, if there is no interaction
-    std::pair<double, int> energy_loss;
-    energy_loss.first = 0.;
-    energy_loss.second = 0;
-
-    /* std::pair<std::vector<Particle*>, bool> products; */
-
-    std::vector<double> rates;
-
-    rates.resize(cross_sections.size());
-
-    if (sector_def_.do_stochastic_loss_weighting) {
-        if (sector_def_.stochastic_loss_weighting > 0) {
-            rnd2 =
-                1 - rnd2 * std::pow(
-                               rnd2,
-                               std::abs(sector_def_.stochastic_loss_weighting));
-        } else {
-            rnd2 =
-                rnd2 *
-                std::pow(rnd2, std::abs(sector_def_.stochastic_loss_weighting));
-        }
-    }
-
     for (unsigned int i = 0; i < cross_sections.size(); i++) {
-        rates[i] = cross_sections[i]->CalculatedNdx(particle_energy, rnd2);
-        total_rate += rates[i];
-    }
-
-    total_rate_weighted = total_rate * rnd1;
-
-    log_debug("Total rate = %f, total rate weighted = %f", total_rate,
-              total_rate_weighted);
-
-    for (unsigned int i = 0; i < rates.size(); i++) {
-        rates_sum += rates[i];
-
-        if (rates_sum >= total_rate_weighted) {
-            energy_loss.first = cross_sections[i]->CalculateStochasticLoss(
-                particle_energy, rnd2, rnd3);
-            energy_loss.second = cross_sections[i]->GetTypeId();
-
-
-            // Deflect the particle if necessary
-            cross_sections[i]->StochasticDeflection(&particle_, particle_energy, energy_loss.first);
-
+        if (cross_sections[i]->GetTypeId() == energy_loss.second)
+        {
+            deflection_angles = cross_sections[i]->StochasticDeflection(particle_energy, energy_loss.first);
+            // TODO: dirty hack until alternative output branch is merged and particle deflection is calculated later
+            if (deflection_angles.first != particle_energy)
+            {
+                particle_.DeflectDirection(deflection_angles.first, deflection_angles.second);
+            }
             // calculate produced particles, get an empty list if no particles are produced in interaction
-            /* products           = cross_sections[i]->CalculateProducedParticles(particle_energy, energy_loss.first, particle_.GetDirection()); */
-
+            products = cross_sections[i]->CalculateProducedParticles(particle_energy, energy_loss.first, particle_.GetDirection());
             break;
         }
-    }
 
+    }
 
     return std::pair<double, int>(energy_loss.first, energy_loss.second);
 }
