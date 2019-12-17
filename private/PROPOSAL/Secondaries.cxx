@@ -75,6 +75,16 @@ Secondaries Secondaries::Query(const std::string& interaction_type) const
     return sec;
 }
 
+Secondaries Secondaries::Query(const Geometry& geometry) const
+{
+    Secondaries sec;
+    for (auto i : secondaries_) {
+        if (geometry.IsInside(i.GetPosition(), i.GetDirection()))
+            sec.push_back(i);
+    }
+    return sec;
+}
+
 void Secondaries::DoDecay()
 {
     for (auto it = secondaries_.begin(); it != secondaries_.end(); ) {

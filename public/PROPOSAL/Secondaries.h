@@ -33,6 +33,8 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/geometry/Geometry.h"
+
 #include <memory>
 #include <vector>
 #include <string>
@@ -62,6 +64,7 @@ public:
 
     Secondaries Query(const int&) const;
     Secondaries Query(const std::string&) const;
+    Secondaries Query(const Geometry& geometry) const;
 
     void DoDecay();
 

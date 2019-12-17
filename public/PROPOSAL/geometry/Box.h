@@ -50,7 +50,7 @@ public:
     Box& operator=(const Geometry&);
 
     // Methods
-    std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction);
+    std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction) const override;
 
     // Getter & Setter
     double GetX() const { return x_; }

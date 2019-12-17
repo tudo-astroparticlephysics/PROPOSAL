@@ -94,7 +94,7 @@ void Sphere::print(std::ostream& os) const
 }
 
 // ------------------------------------------------------------------------- //
-std::pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Vector3D& direction)
+std::pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Vector3D& direction) const
 {
     // Calculate intersection of particle trajectory and the sphere
     // sphere (x1 + x0)^2 + (x2 + y0)^2 + (x3 + z0)^2 = radius^2
