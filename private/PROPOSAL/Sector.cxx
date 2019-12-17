@@ -380,6 +380,8 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
         // Advance the Particle according to the displacement
         // Initial energy and final energy are needed if Molier Scattering is
         // enabled
+        AdvanceParticle(displacement, initial_energy, final_energy);
+
         propagated_distance += displacement;
 
         if (std::abs(distance - propagated_distance) <
