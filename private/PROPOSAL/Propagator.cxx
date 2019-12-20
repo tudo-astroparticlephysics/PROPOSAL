@@ -568,7 +568,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 
         ChooseCurrentSector(particle_position, particle_direction);
 
-        if (current_sector_ == NULL)
+        if (current_sector_ == nullptr)
         {
             log_info("particle_ reached the border");
             break;
@@ -693,8 +693,8 @@ void Propagator::ChooseCurrentSector(const Vector3D& particle_position, const Ve
     // No sector was found
     if (crossed_sector.size() == 0)
     {
-        current_sector_ = NULL;
-        log_fatal("There is no sector defined at position [%f, %f, %f] !!!",
+        current_sector_ = nullptr;
+        log_warn("There is no sector defined at position [%f, %f, %f] !!!",
                   particle_position.GetX(), particle_position.GetY(), particle_position.GetZ());
     } else
     {
