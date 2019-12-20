@@ -11,6 +11,11 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/math/MathMethods.h"
 
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
 
 using namespace PROPOSAL;
 
@@ -104,7 +109,6 @@ double LeptonicDecayChannelApprox::FindRoot(double min, double parent_mass, doub
 // ------------------------------------------------------------------------- //
 Secondaries LeptonicDecayChannelApprox::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
 {
-    Secondaries secondaries;
 
     // Sample energy from decay rate
     double emax       = (p_def.mass * p_def.mass + massive_lepton_.mass * massive_lepton_.mass) / (2 * p_def.mass);
@@ -118,53 +122,58 @@ Secondaries LeptonicDecayChannelApprox::Decay(const ParticleDef& p_def, const Dy
 
     double lepton_energy   = std::max(find_root * emax, massive_lepton_.mass);
     double lepton_momentum = std::sqrt((lepton_energy - massive_lepton_.mass) * (lepton_energy + massive_lepton_.mass));
+    std::cout << "lepton_energy: " << lepton_energy << std::endl;
+    std::cout << "lepton_momentum: " << lepton_momentum << std::endl;
 
     // Sample directions For the massive letpon
-    DynamicData massive_lepton(massive_lepton_.particle_type,
-                               p_condition.GetPosition(),
-                               GenerateRandomDirection(),
-                               lepton_energy,
-                               p_condition.GetEnergy(),
-                               p_condition.GetTime(),
-                               0.);
+    auto massive_lepton = make_unique<DynamicData>(massive_lepton_.particle_type,
+                                                   p_condition.GetPosition(),
+                                                   GenerateRandomDirection(),
+                                                   lepton_energy,
+                                                   p_condition.GetEnergy(),
+                                                   p_condition.GetTime(),
+                                                   0.);
 
     // Sample directions For the massless letpon
     double energy_neutrinos   = p_def.mass - lepton_energy;
     double virtual_mass       = std::sqrt((energy_neutrinos - lepton_momentum) * (energy_neutrinos + lepton_momentum));
-    energy_neutrinos *= 0.5;
+    double momentum_neutrinos = 0.5 * virtual_mass;
 
-    DynamicData neutrino(neutrino_.particle_type,
-                         p_condition.GetPosition(),
-                         GenerateRandomDirection(),
-                         energy_neutrinos,
-                         p_condition.GetEnergy(),
-                         p_condition.GetTime(),
-                         0.);
+    auto neutrino = make_unique<DynamicData>(neutrino_.particle_type,
+                                             p_condition.GetPosition(),
+                                             GenerateRandomDirection(),
+                                             momentum_neutrinos,
+                                             p_condition.GetEnergy(),
+                                             p_condition.GetTime(),
+                                             0.);
 
-    DynamicData anti_neutrino(anti_neutrino_.particle_type,
-                              p_condition.GetPosition(),
-                              -neutrino.GetDirection(),
-                              energy_neutrinos,
-                              p_condition.GetEnergy(),
-                              p_condition.GetTime(),
-                              0.);
+    auto anti_neutrino = make_unique<DynamicData>(anti_neutrino_.particle_type,
+                                                  p_condition.GetPosition(),
+                                                  -neutrino->GetDirection(),
+                                                  momentum_neutrinos,
+                                                  p_condition.GetEnergy(),
+                                                  p_condition.GetTime(),
+                                                  0.);
 
     // Boost neutrinos to lepton frame
     // double beta = lepton_momentum / energy_neutrinos;
     double gamma = energy_neutrinos / virtual_mass;
     double betagamma = lepton_momentum / virtual_mass;
-    Boost(neutrino, massive_lepton.GetDirection(), gamma, betagamma);
-    Boost(anti_neutrino, massive_lepton.GetDirection(), gamma, betagamma);
 
-    secondaries.push_back(massive_lepton);
-    secondaries.push_back(neutrino);
-    secondaries.push_back(anti_neutrino);
+    Boost(*neutrino, massive_lepton->GetDirection(), gamma, betagamma);
+    Boost(*anti_neutrino, massive_lepton->GetDirection(), gamma, betagamma);
 
+    Secondaries secondaries;
+    secondaries.push_back(*massive_lepton);
+    secondaries.push_back(*neutrino);
+    secondaries.push_back(*anti_neutrino);
 
+    auto sec = make_unique<Secondaries>(secondaries);
     // Boost all products in Lab frame (the reason, why the boosting goes in the negative direction of the particle)
-    Boost(secondaries, -p_condition.GetDirection(), -p_condition.GetEnergy()/p_def.mass, p_condition.GetMomentum()/p_def.mass);
+    Boost(*sec, -p_condition.GetDirection(), -p_condition.GetEnergy()/p_def.mass, p_condition.GetMomentum()/p_def.mass);
 
-    return secondaries;
+
+    return *sec;
 }
 
 

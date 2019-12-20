@@ -140,6 +140,8 @@ void DynamicData::SetMomentum(double momentum)
 
     if (particle != Id_Particle_Map.end()) {
         energy_   = std::sqrt(momentum * momentum + particle->second.mass * particle->second.mass);
+    } else {
+        energy_ = momentum;
     }
 }
 
@@ -150,7 +152,7 @@ double DynamicData::GetMomentum() const
     auto particle = Id_Particle_Map.find(type_id_);
 
     if (particle != Id_Particle_Map.end()) {
-        return std::sqrt(std::max((energy_ + particle->second.mass) * (energy_ - particle->second.mass), 0.0));
+        return std::sqrt((energy_ + particle->second.mass) * (energy_ - particle->second.mass));
     }
 
     return energy_;
