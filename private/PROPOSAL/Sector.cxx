@@ -491,7 +491,8 @@ double Sector::Propagate(double distance) {
 
         }else
         {
-            products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
+            double random_ch = RandomGenerator::Get().RandomDouble();
+            products = particle_.GetDecayTable().SelectChannel(random_ch).Decay(particle_);
             if (sector_def_.only_loss_inside_detector)
             {
                 if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
@@ -536,7 +537,8 @@ double Sector::Propagate(double distance) {
         // time and set the new position as the endpoint.
         particle_.SetEnergy(particle_.GetMass());
 
-        products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
+        double random_ch = RandomGenerator::Get().RandomDouble();
+        products = particle_.GetDecayTable().SelectChannel(random_ch).Decay(particle_);
         if (sector_def_.only_loss_inside_detector)
         {
             if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
