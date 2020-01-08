@@ -346,6 +346,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
 
     // LeptonicDecayChannelApproxTest
 
+
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //skip comment
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
@@ -414,6 +415,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
     }
 
     // LeptonicDecayChannelTest
+
 
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //skip comment
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

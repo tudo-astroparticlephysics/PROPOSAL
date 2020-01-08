@@ -76,6 +76,7 @@ public:
     std::vector<double> GetTime() const;
     std::vector<double> GetPropagatedDistance() const;
     std::vector<DynamicData> GetSecondaries() const { return secondaries_; } ;
+    std::vector<DynamicData>& GetModifyableSecondaries() { return secondaries_; } ;
     unsigned int GetNumberOfParticles() const { return secondaries_.size(); };
 
 private:
