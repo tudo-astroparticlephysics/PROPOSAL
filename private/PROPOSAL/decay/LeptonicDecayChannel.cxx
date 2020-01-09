@@ -122,6 +122,7 @@ Secondaries LeptonicDecayChannelApprox::Decay(const ParticleDef& p_def, const Dy
     double lepton_energy   = std::max(find_root * emax, massive_lepton_.mass);
     double lepton_momentum = std::sqrt((lepton_energy - massive_lepton_.mass) * (lepton_energy + massive_lepton_.mass));
 
+
     // Sample directions For the massive letpon
     DynamicData massive_lepton(massive_lepton_.particle_type,
                                p_condition.GetPosition(),
@@ -129,7 +130,7 @@ Secondaries LeptonicDecayChannelApprox::Decay(const ParticleDef& p_def, const Dy
                                lepton_energy,
                                p_condition.GetEnergy(),
                                p_condition.GetTime(),
-                               p_condition.GetPropagatedDistance());
+                               0.);
 
     // Sample directions For the massless letpon
     double energy_neutrinos   = p_def.mass - lepton_energy;
@@ -138,24 +139,26 @@ Secondaries LeptonicDecayChannelApprox::Decay(const ParticleDef& p_def, const Dy
 
 
     Vector3D direction = GenerateRandomDirection();
+    direction.CalculateSphericalCoordinates();
+
     DynamicData neutrino(neutrino_.particle_type,
                          p_condition.GetPosition(),
                          direction,
                          momentum_neutrinos,
                          p_condition.GetEnergy(),
                          p_condition.GetTime(),
-                         p_condition.GetPropagatedDistance());
+                         0.);
 
-    direction = -direction;
-    direction.CalculateSphericalCoordinates();
+    Vector3D opposite_direction = -direction;
+    opposite_direction.CalculateSphericalCoordinates();
 
     DynamicData anti_neutrino(anti_neutrino_.particle_type,
                               p_condition.GetPosition(),
-                              direction,
+                              opposite_direction,
                               momentum_neutrinos,
                               p_condition.GetEnergy(),
                               p_condition.GetTime(),
-                              p_condition.GetPropagatedDistance());
+                              0.);
 
     // Boost neutrinos to lepton frame
     // double beta = lepton_momentum / energy_neutrinos;
@@ -166,14 +169,17 @@ Secondaries LeptonicDecayChannelApprox::Decay(const ParticleDef& p_def, const Dy
     Boost(neutrino, massive_lepton.GetDirection(), gamma, betagamma);
     Boost(anti_neutrino, massive_lepton.GetDirection(), gamma, betagamma);
 
+
     Secondaries secondaries;
     secondaries.push_back(massive_lepton);
     secondaries.push_back(neutrino);
     secondaries.push_back(anti_neutrino);
 
-
+    // Get Momentum is not defined for pseudo particle decay, so it must be
+    // calculated manually
+    double primary_momentum = std::sqrt(std::max((p_condition.GetEnergy() + p_def.mass) * (p_condition.GetEnergy() - p_def.mass), 0.0));
     // Boost all products in Lab frame (the reason, why the boosting goes in the negative direction of the particle)
-    Boost(secondaries, -p_condition.GetDirection(), p_condition.GetEnergy()/p_def.mass, p_condition.GetMomentum()/p_def.mass);
+    Boost(secondaries, -p_condition.GetDirection(), p_condition.GetEnergy()/p_def.mass, primary_momentum/p_def.mass);
 
     return secondaries;
 }

@@ -458,13 +458,14 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
 
         // TODO: one should also advance the particle according to the sampeled
         // time and set the new position as the endpoint.
-        particle_.SetEnergy(particle_.GetMass());
+
+        final_energy = particle_.GetMass();
 
         secondaries.emplace_back(static_cast<int>(InteractionType::Decay), particle_.GetPosition(),
                 particle_.GetDirection(), final_energy, particle_.GetEnergy(),
                 particle_.GetTime(), particle_.GetPropagatedDistance());
 
-        final_energy = particle_.GetMass();
+        particle_.SetEnergy(particle_.GetMass());
     }
 
     particle_.SetEnergy(final_energy);
