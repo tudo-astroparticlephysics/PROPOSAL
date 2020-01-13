@@ -2,10 +2,10 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/decay/DecayChannel.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 
 #include <memory>
 #include <vector>
-#include <iostream>
 
 using namespace PROPOSAL;
 
@@ -89,7 +89,8 @@ void Secondaries::DoDecay()
 {
     for (auto it = secondaries_.begin(); it != secondaries_.end(); ) {
         if (it->GetTypeId() == static_cast<int>(InteractionType::Decay)){
-            Secondaries products = primary_def_->decay_table.SelectChannel().Decay(*primary_def_, *it);
+            double random_ch = RandomGenerator::Get().RandomDouble();
+            Secondaries products = primary_def_->decay_table.SelectChannel(random_ch).Decay(*primary_def_, *it);
             it = secondaries_.erase(it); // delete old decay
             for (auto p : products.GetSecondaries()) {
                 it = secondaries_.insert(it, p); // and insert decayparticles inplace of old decay

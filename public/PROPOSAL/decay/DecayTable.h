@@ -64,7 +64,7 @@ public:
     ///
     /// @return Sampled Decay channel
     // ----------------------------------------------------------------------------
-    DecayChannel& SelectChannel() const;
+    DecayChannel& SelectChannel(double rnd) const;
 
     // ----------------------------------------------------------------------------
     /// @brief Add decay channels to the decay table

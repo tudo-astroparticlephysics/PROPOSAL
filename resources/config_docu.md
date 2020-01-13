@@ -125,6 +125,7 @@ The **bremsstrahlung** parametrizations are:
   - `"BremsPetrukhinShestakov"` (Canad. J. Phys. 46 (1968), 377)
   - `"BremsCompleteScreening"` (Tsai [Rev. Mod. Phys. 46 (1974), 815](https://doi.org/10.1103/RevModPhys.46.815))
   - `"BremsSandrockSoedingreksoRhode"`
+  - `"BremsElectronScreening"` (For electrons and positrons with empirical low-energy corrections, SLAC-R-730)
 
 There are two different approaches to parametrise the **nuclear interaction**:
 

@@ -6,7 +6,6 @@
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
-#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
 
@@ -107,18 +106,17 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayTable const& table)
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-DecayChannel& DecayTable::SelectChannel() const
+DecayChannel& DecayTable::SelectChannel(double rnd) const
 {
     for (int i = 0; i < 1000; ++i)
     {
         double sumBranchingRatio = 0.0;
-        double random            = RandomGenerator::Get().RandomDouble();
 
         for (DecayMap::const_iterator iter = channels_.begin(); iter != channels_.end(); ++iter)
         {
             sumBranchingRatio += iter->first;
 
-            if (random < sumBranchingRatio)
+            if (rnd < sumBranchingRatio)
             {
                 return *iter->second;
             }
