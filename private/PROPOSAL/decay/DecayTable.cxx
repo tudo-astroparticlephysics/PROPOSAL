@@ -108,18 +108,21 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayTable const& table)
 // ------------------------------------------------------------------------- //
 DecayChannel& DecayTable::SelectChannel(double rnd) const
 {
-    for (int i = 0; i < 1000; ++i)
+    double sumBranchingRatio = 0.0;
+    for (DecayMap::const_iterator iter = channels_.begin(); iter != channels_.end(); ++iter)
     {
-        double sumBranchingRatio = 0.0;
+        sumBranchingRatio += iter->first;
+    }
+    rnd = sumBranchingRatio * rnd;
+    double partial_br_sum = 0.0;
 
-        for (DecayMap::const_iterator iter = channels_.begin(); iter != channels_.end(); ++iter)
+    for (DecayMap::const_iterator iter = channels_.begin(); iter != channels_.end(); ++iter)
+    {
+        partial_br_sum += iter->first;
+
+        if (rnd < partial_br_sum)
         {
-            sumBranchingRatio += iter->first;
-
-            if (rnd < sumBranchingRatio)
-            {
-                return *iter->second;
-            }
+            return *iter->second;
         }
     }
 
