@@ -44,7 +44,7 @@ int main(int argc, const char* argv[])
     particle_tau.SetPosition(Vector3D(0, 0, 0));
     particle_tau.SetDirection(Vector3D(0, 0, -1));
 
-    std::vector<DynamicData*> sec_mu_direct = prop_mu.Propagate();
+    Secondaries sec_mu_direct = prop_mu.Propagate();
 
     /**************************************************************************
      *                        Using propagator service                         *
@@ -71,8 +71,8 @@ int main(int argc, const char* argv[])
     tau.SetDirection(Vector3D(0, 0, -1));
 
     // Use service to propagate different particle
-    std::vector<DynamicData*> sec_mu_service  = prop_service.Propagate(mu);
-    std::vector<DynamicData*> sec_tau_service = prop_service.Propagate(tau);
+    Secondaries sec_mu_service  = prop_service.Propagate(mu);
+    Secondaries sec_tau_service = prop_service.Propagate(tau);
 
-    Output::getInstance().ClearSecondaryVector();
+    //Output::getInstance().ClearSecondaryVector();
 }

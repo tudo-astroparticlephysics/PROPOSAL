@@ -8,7 +8,7 @@
 using namespace PROPOSAL;
 
 BremsIntegral::BremsIntegral(const Bremsstrahlung& param)
-    : CrossSectionIntegral(DynamicData::Brems, param)
+    : CrossSectionIntegral(InteractionType::Brems, param)
 {
 }
 

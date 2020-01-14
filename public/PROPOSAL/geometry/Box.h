@@ -40,17 +40,17 @@ public:
     Box(const Vector3D position, double x, double y, double z);
     Box(const Box&);
 
-    Geometry* clone() const { return new Box(*this); };
+    Geometry* clone() const override { return new Box(*this); };
     static Geometry* create() { return new Box(); }
-    void swap(Geometry&);
+    void swap(Geometry&) override;
 
     virtual ~Box() {}
 
     // Operators
-    Box& operator=(const Geometry&);
+    Box& operator=(const Geometry&) override;
 
     // Methods
-    std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction);
+    std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction) const override;
 
     // Getter & Setter
     double GetX() const { return x_; }
@@ -62,8 +62,8 @@ public:
     void SetZ(double z) { z_ = z; };
 
 private:
-    bool compare(const Geometry&) const;
-    void print(std::ostream&) const;
+    bool compare(const Geometry&) const override;
+    void print(std::ostream&) const override;
 
     double x_; //!< width of box in x-direction
     double y_; //!< width of box in y-direction

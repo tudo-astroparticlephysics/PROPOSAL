@@ -125,11 +125,11 @@ std::pair<std::vector<Particle*>, bool> MupairInterpolant::CalculateProducedPart
 
 }
 
-DynamicData::Type MupairInterpolant::GetType(const MupairProduction& param){
+InteractionType MupairInterpolant::GetType(const MupairProduction& param){
     if(param.IsParticleOutputEnabled()){
-        return DynamicData::Particle;
+        return InteractionType::Particle;
     }
     else{
-        return DynamicData::MuPair;
+        return InteractionType::MuPair;
     }
 }

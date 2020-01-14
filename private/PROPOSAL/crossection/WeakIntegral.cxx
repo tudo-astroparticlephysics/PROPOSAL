@@ -5,12 +5,13 @@
 #include "PROPOSAL/crossection/WeakIntegral.h"
 #include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 
 WeakIntegral::WeakIntegral(const WeakInteraction& param)
-        : CrossSectionIntegral(DynamicData::WeakInt, param)
+        : CrossSectionIntegral(InteractionType::WeakInt, param)
 {
 }
 
@@ -24,7 +25,9 @@ WeakIntegral::~WeakIntegral() {}
 std::pair<std::vector<Particle*>, bool> WeakIntegral::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
     // interaction is fatal and the initial particle is converted to a neutrino
     Particle* return_particle;
-    return_particle = new Particle(*parametrization_->GetParticleDef().GetWeakPartner());
+    int p_id(static_cast<int>(parametrization_->GetParticleDef().weak_partner));
+    auto p_def = Id_Particle_Map.find(p_id);
+    return_particle = new Particle(p_def->second);
     return_particle->SetEnergy(energy - energy_loss);
     return_particle->SetDirection(initial_direction);
 

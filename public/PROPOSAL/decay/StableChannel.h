@@ -30,6 +30,10 @@
 #pragma once
 
 #include "PROPOSAL/decay/DecayChannel.h"
+#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/Secondaries.h"
+
 
 namespace PROPOSAL {
 
@@ -44,7 +48,8 @@ public:
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() const { return new StableChannel(*this); }
 
-    DecayProducts Decay(const Particle&);
+
+    Secondaries Decay(const ParticleDef&, const DynamicData&);
 
     const std::string& GetName() const { return name_; }
 

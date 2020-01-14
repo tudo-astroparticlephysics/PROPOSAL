@@ -63,11 +63,11 @@ public:
     // Member functions
     // ----------------------------------------------------------------- //
 
-    bool IsInside(const Vector3D& position, const Vector3D& direction);
+    bool IsInside(const Vector3D& position, const Vector3D& direction) const;
 
-    bool IsInfront(const Vector3D& position, const Vector3D& direction);
+    bool IsInfront(const Vector3D& position, const Vector3D& direction) const;
 
-    bool IsBehind(const Vector3D& position, const Vector3D& direction);
+    bool IsBehind(const Vector3D& position, const Vector3D& direction) const;
 
 
 
@@ -85,7 +85,7 @@ public:
      * a particle on the geometry border which moves outside has no intersection.
      * Distances smaller then GEOMETRY_PRECISION (1e-9) are also set to -1
      */
-    virtual std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction) = 0;
+    virtual std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction) const = 0;
 
     /*!
      * Calculates the distance to the closest approch to the geometry center

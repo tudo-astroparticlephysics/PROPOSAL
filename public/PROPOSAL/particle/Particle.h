@@ -30,36 +30,57 @@
 #pragma once
 
 #include <string>
+#include <map>
 
-#include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/math/Vector3D.h"
 
 namespace PROPOSAL {
+enum class InteractionType {
+    Particle               = 1000000001,
+    Brems                  = 1000000002,
+    DeltaE                 = 1000000003,
+    Epair                  = 1000000004,
+    NuclInt                = 1000000005,
+    MuPair                 = 1000000006,
+    Hadrons                = 1000000007,
+    ContinuousEnergyLoss   = 1000000008,
+    WeakInt                = 1000000009,
+    Compton                = 1000000010,
+    Decay                  = 1000000011,
+};
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+static const std::map<const int, std::string> Id_Interaction_Name_Map {
+    {static_cast<int>(InteractionType::Particle), "Particle"},
+    {static_cast<int>(InteractionType::Brems), "Brems"},
+    {static_cast<int>(InteractionType::DeltaE), "DeltaE"},
+    {static_cast<int>(InteractionType::Epair), "Epair"},
+    {static_cast<int>(InteractionType::NuclInt), "NuclInt"},
+    {static_cast<int>(InteractionType::MuPair), "MuPair"},
+    {static_cast<int>(InteractionType::Hadrons), "Hadrons"},
+    {static_cast<int>(InteractionType::ContinuousEnergyLoss), "ContinousEnergyLoss"},
+    {static_cast<int>(InteractionType::WeakInt), "WeakInt"},
+    {static_cast<int>(InteractionType::Compton), "Compton"},
+    {static_cast<int>(InteractionType::Decay), "Decay"},
+};
+} // namespace PROPOSAL
+
+
+namespace PROPOSAL {
 class DynamicData
 {
 public:
-    enum Type
-    {
-        None = 0,
-        Particle,
-        Brems,
-        DeltaE,
-        Epair,
-        NuclInt,
-        MuPair,
-        Hadrons,
-        ContinuousEnergyLoss,
-        WeakInt,
-        Compton,
-    };
-
-public:
-    DynamicData(DynamicData::Type);
+    DynamicData();
+    DynamicData(const int&);
+    DynamicData(const int&, const Vector3D&, const Vector3D&, const double&, const double&, const double&, const double&);
     DynamicData(const DynamicData&);
+    /* DynamicData(DynamicData&&); */
     virtual ~DynamicData();
 
     friend std::ostream& operator<<(std::ostream&, DynamicData const&);
+    DynamicData& operator=(const DynamicData&);
 
     // --------------------------------------------------------------------- //
     // Getter & Setter
@@ -69,27 +90,31 @@ public:
     void SetPosition(const Vector3D& position) { position_ = position; }
     void SetDirection(const Vector3D& direction) { direction_ = direction; }
 
-    virtual void SetEnergy(double energy) { energy_ = energy; }
     void SetParentParticleEnergy(double parent_particle_energy) { parent_particle_energy_ = parent_particle_energy; }
     void SetTime(double time) { time_ = time; }
     void SetPropagatedDistance(double prop_dist) { propagated_distance_ = prop_dist; }
 
     // Getter
-    Type GetTypeId() const { return type_id_; }
-    static std::string GetNameFromType(Type);
+    int GetTypeId() const { return type_id_; }
 
     Vector3D GetPosition() const { return position_; }
     Vector3D GetDirection() const { return direction_; }
 
+    void SetEnergy(double energy);
+    void SetMomentum(double momentum);
+
     double GetEnergy() const { return energy_; }
+    double GetMomentum() const;
     double GetParentParticleEnergy() const { return parent_particle_energy_; }
     double GetTime() const { return time_; }
     double GetPropagatedDistance() const { return propagated_distance_; }
+    std::string GetName() const;
 
 protected:
     virtual void print(std::ostream&) const {}
 
-    const Type type_id_;
+
+    const int type_id_;
 
     Vector3D position_;  //!< position coordinates [cm]
     Vector3D direction_; //!< direction vector, angles in [rad]
@@ -99,12 +124,14 @@ protected:
     double time_;                   //!< age [sec]
     double propagated_distance_;    //!< propagation distance [cm]
 };
+} // namespace PROPOSAL
 
 // ----------------------------------------------------------------------------
 /// @brief This class provides the main particle properties and functions.
 ///
 /// All coordinates, angles and physical values are stored in this class.
 // ----------------------------------------------------------------------------
+namespace PROPOSAL {
 class Particle : public DynamicData
 {
 public:
@@ -145,8 +172,8 @@ public:
     // --------------------------------------------------------------------- //
 
     // Setter
-    void SetEnergy(double energy);
-    void SetMomentum(double momentum);
+    /* void SetEnergy(double energy); */
+    /* void SetMomentum(double momentum); */
 
     void SetParentParticleId(int parent_particle_id) { parent_particle_id_ = parent_particle_id; }
     void SetParticleId(int particle_id) { particle_id_ = particle_id; }
@@ -178,7 +205,7 @@ public:
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const DecayTable& GetDecayTable() const { return particle_def_.decay_table; }
 
-    double GetMomentum() const { return momentum_; }
+    /* double GetMomentum() const { return std::sqrt(std::max((energy_ + particle_def_.mass) * (energy_ - particle_def_.mass), 0.0)) }; */
     double GetLow() const { return particle_def_.low; }
 
     double GetMass() const { return particle_def_.mass; }
@@ -241,5 +268,4 @@ private:
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::DynamicData const&);
-
 } // namespace PROPOSAL

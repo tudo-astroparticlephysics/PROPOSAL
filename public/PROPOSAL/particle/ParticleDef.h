@@ -51,7 +51,6 @@
     };
 
 namespace PROPOSAL {
-
 namespace HardComponentTables {
 
 typedef std::vector<std::vector<double> > VecType;
@@ -84,12 +83,48 @@ extern const VecType TauTable;
 extern const VecType EmptyTable;
 
 } // namespace HardComponentTables
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+enum class ParticleType : int
+{
+    None = 0,
+    EMinus = 11,
+    EPlus = -11,
+    NuE = 12,
+    NuEBar = -12,
+    MuMinus = 13,
+    MuPlus = -13,
+    NuMu = 14,
+    NuMuBar = -14,
+    TauMinus = 15,
+    TauPlus = -15,
+    NuTau = 16,
+    NuTauBar = -16,
+    Gamma = 22,
+    Pi0 = 111,
+    PiPlus  = 211,
+    PiMinus = -211,
+    K0 = 311,
+    KPlus = 321,
+    KMinus= -321,
+    STauMinus = 1000015,
+    STauPlus= -1000015,
+    PPlus = 2212,
+    PMinus = -2212,
+    Monopole = 41,
+    SMPPlus = 9500,
+    SMPMinus = -9500,
+};
+} // namespace PROPOSAL
+
 
 // ----------------------------------------------------------------------------
 /// @brief Struct to define Basic Particle Properties
 ///
 /// Used to construct Particles
 // ----------------------------------------------------------------------------
+namespace PROPOSAL {
 struct ParticleDef
 {
     class Builder;
@@ -101,15 +136,10 @@ struct ParticleDef
     const double charge;
     const HardComponentTables::VecType& hard_component_table;
     const DecayTable decay_table;
+    const int particle_type;
+    const int weak_partner;
 
     ParticleDef();
-    ParticleDef(std::string name,
-                double mass,
-                double low,
-                double lifetime,
-                double charge,
-                const HardComponentTables::VecType& table,
-                const DecayTable&);
 
     ParticleDef(std::string name,
                 double mass,
@@ -118,14 +148,13 @@ struct ParticleDef
                 double charge,
                 const HardComponentTables::VecType& table,
                 const DecayTable&,
-                const ParticleDef&);
+                const int,
+                const int);
 
     ParticleDef(const ParticleDef&);
     virtual ~ParticleDef();
 
     ParticleDef* clone() const { return new ParticleDef(*this); }
-
-    const ParticleDef* GetWeakPartner() const;
 
     bool operator==(const ParticleDef&) const;
     bool operator!=(const ParticleDef&) const;
@@ -134,7 +163,6 @@ struct ParticleDef
 
 private:
     ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
-    const ParticleDef* weak_partner; //TODO: This will cause a deadlock if two particles have each other as weak partners
 };
 
 
@@ -184,9 +212,14 @@ public:
         decay_table = var;
         return *this;
     }
-    Builder& SetWeakPartner(const ParticleDef& partner)
+    Builder& SetParticleType(const int var)
     {
-        weak_partner = &partner;
+        particle_type = var;
+        return *this;
+    }
+    Builder& SetWeakPartner(const ParticleType& partner)
+    {
+        weak_partner = static_cast<int>(partner);
         return *this;
     }
     Builder& SetParticleDef(const ParticleDef& var)
@@ -198,6 +231,7 @@ public:
         charge               = var.charge;
         hard_component_table = &var.hard_component_table;
         decay_table          = var.decay_table;
+        particle_type        = var.particle_type;
         weak_partner         = var.weak_partner;
         return *this;
     }
@@ -210,7 +244,7 @@ public:
             low = mass;
         }
 
-        return ParticleDef(name, mass, low, lifetime, charge, *hard_component_table, decay_table, *weak_partner);
+        return ParticleDef(name, mass, low, lifetime, charge, *hard_component_table, decay_table, particle_type, weak_partner);
     }
 
 private:
@@ -221,7 +255,8 @@ private:
     double charge;
     const HardComponentTables::VecType* hard_component_table;
     DecayTable decay_table;
-    const ParticleDef* weak_partner;
+    int particle_type;
+    int weak_partner;
 };
 
 // ------------------------------------------------------------------------- //
@@ -283,3 +318,33 @@ PARTICLE_DEF(SMPPlus)
 PROPOSAL_MAKE_HASHABLE(PROPOSAL::ParticleDef, t.mass, t.lifetime, t.charge)
 
 #undef PARTICLE_DEF
+
+namespace PROPOSAL {
+static std::map<const int, const ParticleDef&> Id_Particle_Map
+{
+    {static_cast<int>(ParticleType::EMinus), EMinusDef::Get()},
+    {static_cast<int>(ParticleType::EPlus), EPlusDef::Get()},
+    {static_cast<int>(ParticleType::NuE), NuEDef::Get()},
+    {static_cast<int>(ParticleType::NuEBar), NuEBarDef::Get()},
+    {static_cast<int>(ParticleType::MuMinus), MuMinusDef::Get()},
+    {static_cast<int>(ParticleType::NuMu), NuMuDef::Get()},
+    {static_cast<int>(ParticleType::NuMuBar), NuMuBarDef::Get()},
+    {static_cast<int>(ParticleType::MuPlus), MuPlusDef::Get()},
+    {static_cast<int>(ParticleType::TauMinus), TauMinusDef::Get()},
+    {static_cast<int>(ParticleType::TauPlus), TauPlusDef::Get()},
+    {static_cast<int>(ParticleType::NuTau), NuTauDef::Get()},
+    {static_cast<int>(ParticleType::NuTauBar), NuTauBarDef::Get()},
+    {static_cast<int>(ParticleType::Gamma), GammaDef::Get()},
+    {static_cast<int>(ParticleType::Pi0), Pi0Def::Get()},
+    {static_cast<int>(ParticleType::PiPlus), PiPlusDef::Get()},
+    {static_cast<int>(ParticleType::PiMinus ),PiMinusDef::Get()},
+    {static_cast<int>(ParticleType::K0), K0Def::Get()},
+    {static_cast<int>(ParticleType::KPlus), KPlusDef::Get()},
+    {static_cast<int>(ParticleType::KMinus), KMinusDef::Get()},
+    {static_cast<int>(ParticleType::PPlus), PPlusDef::Get()},
+    {static_cast<int>(ParticleType::PMinus), PMinusDef::Get()},
+    {static_cast<int>(ParticleType::Monopole), MonopoleDef::Get()},
+    {static_cast<int>(ParticleType::SMPPlus), SMPPlusDef::Get()},
+    {static_cast<int>(ParticleType::SMPMinus), SMPMinusDef::Get()},
+};
+} // namespace PROPOSAL

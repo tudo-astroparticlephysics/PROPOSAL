@@ -269,7 +269,7 @@ bool Utility::operator!=(const Utility& utility) const {
 }
 
 
-std::pair<double, DynamicData::Type> Utility::StochasticLoss(
+std::pair<double, int> Utility::StochasticLoss(
     double particle_energy, double rnd1, double rnd2, double rnd3)
 {
     double total_rate = 0;
@@ -279,9 +279,9 @@ std::pair<double, DynamicData::Type> Utility::StochasticLoss(
     rates.resize(crosssections_.size());
 
     // return 0 and unknown, if there is no interaction
-    std::pair<double, DynamicData::Type> energy_loss;
+    std::pair<double, int> energy_loss;
     energy_loss.first = 0.;
-    energy_loss.second = DynamicData::None;
+    energy_loss.second = 0;
 
     for (unsigned int i = 0; i < crosssections_.size(); i++) {
         rates[i] = crosssections_[i]->CalculatedNdx(particle_energy, rnd2);

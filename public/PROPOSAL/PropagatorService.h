@@ -30,8 +30,10 @@
 #pragma once
 
 #include <unordered_map>
+#include <memory>
 
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/Secondaries.h"
 
 namespace PROPOSAL {
 
@@ -74,7 +76,7 @@ public:
     ///
     /// @return vector of secondary data
     // ----------------------------------------------------------------------------
-    std::vector<DynamicData*> Propagate(Particle&, double distance = 1e20);
+    Secondaries Propagate(Particle&, double distance = 1e20);
 
     // ----------------------------------------------------------------------------
     /// @brief Get Propagator for a given particle

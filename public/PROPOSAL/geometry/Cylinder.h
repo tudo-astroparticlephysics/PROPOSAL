@@ -40,17 +40,17 @@ public:
     Cylinder(const Vector3D position, double radius, double inner_radius, double z);
     Cylinder(const Cylinder&);
 
-    Geometry* clone() const { return new Cylinder(*this); };
+    Geometry* clone() const override { return new Cylinder(*this); };
     static Geometry* create() { return new Cylinder(); }
-    void swap(Geometry&);
+    void swap(Geometry&) override;
 
     virtual ~Cylinder() {}
 
     // Operators
-    Cylinder& operator=(const Geometry&);
+    Cylinder& operator=(const Geometry&) override;
 
     // Methods
-    std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction);
+    std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction) const override;
 
     // Getter & Setter
     double GetInnerRadius() const { return inner_radius_; }
@@ -62,8 +62,8 @@ public:
     void SetZ(double z) { z_ = z; };
 
 private:
-    bool compare(const Geometry&) const;
-    void print(std::ostream&) const;
+    bool compare(const Geometry&) const override;
+    void print(std::ostream&) const override;
 
     double radius_;       //!< the radius of the sphere/ cylinder
     double inner_radius_; //!< for spherical shells or hollow cylinder (0 for sphere / cylinder)

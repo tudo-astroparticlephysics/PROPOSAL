@@ -57,7 +57,7 @@ public:
     };
 
     typedef std::unordered_map<ParticleDef, PhaseSpaceParameters> ParameterMap;
-    typedef std::function<double(const Particle&, const DecayProducts&)> MatrixElementFunction;
+    typedef std::function<double(const ParticleDef&, const Secondaries&)> MatrixElementFunction;
     typedef std::function<void(PhaseSpaceParameters&, const ParticleDef&)> EstimateFunction;
 
 public:
@@ -77,7 +77,7 @@ public:
     ///
     /// @return Vector of particles, the decay products
     // ----------------------------------------------------------------------------
-    DecayProducts Decay(const Particle&);
+    Secondaries Decay(const ParticleDef& p_def, const DynamicData& p_condition);
 
     // ----------------------------------------------------------------------------
     /// @brief Evalutate the matrix element of this channel
@@ -88,14 +88,14 @@ public:
     ///
     /// @return matrix element
     // ----------------------------------------------------------------------------
-    static double DefaultEvaluate(const Particle&, const DecayProducts&);
+    static double DefaultEvaluate(const ParticleDef&, const Secondaries&);
 
     // ----------------------------------------------------------------------------
     /// @brief Evalutate the matrix element of this channel
     ///
     /// @return matrix element
     // ----------------------------------------------------------------------------
-    double Evaluate(const Particle&, const DecayProducts&);
+    double Evaluate(const ParticleDef&, const Secondaries&);
 
     // ----------------------------------------------------------------------------
     /// @brief Sets the uniform flag
@@ -124,7 +124,7 @@ private:
     ///
     /// @return Vector of particles, the decay products
     // ----------------------------------------------------------------------------
-    double GenerateEvent(DecayProducts& products, const PhaseSpaceParameters&, const Particle&);
+    double GenerateEvent(Secondaries& products, const PhaseSpaceParameters&, const ParticleDef&);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the normalization of the phase space density

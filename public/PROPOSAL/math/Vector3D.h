@@ -40,6 +40,7 @@ public:
     Vector3D();
     Vector3D(const double x, const double y, const double z);
     Vector3D(const Vector3D& vector_3d);
+    Vector3D(Vector3D&& other);
     ~Vector3D();
 
     //-------------------------------------//
@@ -62,6 +63,22 @@ public:
     Vector3D operator-() const;
     double magnitude() const;
     void normalise();
+    
+    struct CartesianCoordinates {
+        CartesianCoordinates() {};
+        CartesianCoordinates(double, double, double);
+        CartesianCoordinates(const CartesianCoordinates&);
+
+        double x_, y_, z_;
+    };
+
+    struct SphericalCoordinates {
+        SphericalCoordinates() {};
+        SphericalCoordinates(double, double, double);
+        SphericalCoordinates(const SphericalCoordinates&);
+
+        double radius_, azimuth_, zenith_;
+    };
 
     //-------------------------------------//
     // conversions to spherical and cylindrical coordinate
@@ -74,15 +91,15 @@ public:
     // setter
     void SetCartesianCoordinates(const double x, const double y, const double z)
     {
-        x_ = x;
-        y_ = y;
-        z_ = z;
+        cartesian_.x_ = x;
+        cartesian_.y_ = y;
+        cartesian_.z_ = z;
     }
     void SetSphericalCoordinates(const double radius, const double azimuth, const double zenith)
     {
-        spheric_radius_  = radius;
-        spheric_azimuth_ = azimuth;
-        spheric_zenith_  = zenith;
+        spherical_.radius_  = radius;
+        spherical_.azimuth_ = azimuth;
+        spherical_.zenith_  = zenith;
     }
     // void SetCylindricalCoordinates(const double radius, const double azimuth, const double height)
     // {
@@ -93,17 +110,20 @@ public:
 
     //-------------------------------------//
     // getter
-    double GetX() const { return x_; }
-    double GetY() const { return y_; }
-    double GetZ() const { return z_; }
-    double GetRadius() const { return spheric_radius_; }
-    double GetPhi() const { return spheric_azimuth_; }
-    double GetTheta() const { return spheric_zenith_; }
+    double GetX() const { return cartesian_.x_; }
+    double GetY() const { return cartesian_.y_; }
+    double GetZ() const { return cartesian_.z_; }
+    double GetRadius() const { return spherical_.radius_; }
+    double GetPhi() const { return spherical_.azimuth_; }
+    double GetTheta() const { return spherical_.zenith_; }
+    Vector3D::CartesianCoordinates GetCartesianCoordinates() const { return cartesian_; }
+    Vector3D::SphericalCoordinates GetSphericalCoordinates() const { return spherical_; }
 
     //----------------------------------------------//
 private:
-    double x_, y_, z_;
-    double spheric_radius_, spheric_azimuth_, spheric_zenith_;
+    CartesianCoordinates cartesian_;
+    SphericalCoordinates spherical_;
+
     // double cylindric_radius_, cylindric_azimuth_, cylindric_height_;
 };
 

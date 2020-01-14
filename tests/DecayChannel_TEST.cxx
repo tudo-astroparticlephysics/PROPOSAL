@@ -149,7 +149,7 @@ TEST(DecaySpectrum, MuMinus_Rest){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    Particle init_particle(init_particle_def);
+    DynamicData init_particle(init_particle_def.particle_type);
 
     ParticleDef p0  = getParticleDef(particleDecay0);
     ParticleDef p1  = getParticleDef(particleDecay1);
@@ -175,23 +175,22 @@ TEST(DecaySpectrum, MuMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = lep_approx.Decay(init_particle);
+        Secondaries aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -229,23 +228,22 @@ TEST(DecaySpectrum, MuMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = lep.Decay(init_particle);
+        Secondaries aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -284,23 +282,22 @@ TEST(DecaySpectrum, MuMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = many_body.Decay(init_particle);
+        Secondaries aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -349,11 +346,12 @@ TEST(DecaySpectrum, MuMinus_Energy){
 
     // LeptonicDecayChannelApproxTest
 
+
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //skip comment
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    Particle init_particle(init_particle_def);
+    DynamicData init_particle(init_particle_def.particle_type);
 
     ParticleDef p0  = getParticleDef(particleDecay0);
     ParticleDef p1  = getParticleDef(particleDecay1);
@@ -379,23 +377,22 @@ TEST(DecaySpectrum, MuMinus_Energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = lep_approx.Decay(init_particle);
+        Secondaries aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -419,6 +416,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
 
     // LeptonicDecayChannelTest
 
+
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //skip comment
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
@@ -433,23 +431,22 @@ TEST(DecaySpectrum, MuMinus_Energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = lep.Decay(init_particle);
+        Secondaries aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -488,23 +485,22 @@ TEST(DecaySpectrum, MuMinus_Energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = many_body.Decay(init_particle);
+        Secondaries aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -557,7 +553,7 @@ TEST(DecaySpectrum, TauMinus_Rest){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    Particle init_particle(init_particle_def);
+    DynamicData init_particle(init_particle_def.particle_type);
 
     ParticleDef p0  = getParticleDef(particleDecay0);
     ParticleDef p1  = getParticleDef(particleDecay1);
@@ -583,23 +579,22 @@ TEST(DecaySpectrum, TauMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = lep_approx.Decay(init_particle);
+        Secondaries aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -637,23 +632,22 @@ TEST(DecaySpectrum, TauMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = lep.Decay(init_particle);
+        Secondaries aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -692,23 +686,22 @@ TEST(DecaySpectrum, TauMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = many_body.Decay(init_particle);
+        Secondaries aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -762,7 +755,7 @@ TEST(DecaySpectrum, TauMinus_energy){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    Particle init_particle(init_particle_def);
+    DynamicData init_particle(init_particle_def.particle_type);
 
     ParticleDef p0  = getParticleDef(particleDecay0);
     ParticleDef p1  = getParticleDef(particleDecay1);
@@ -788,23 +781,22 @@ TEST(DecaySpectrum, TauMinus_energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = lep_approx.Decay(init_particle);
+        Secondaries aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -842,23 +834,22 @@ TEST(DecaySpectrum, TauMinus_energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = lep.Decay(init_particle);
+        Secondaries aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }
@@ -897,23 +888,22 @@ TEST(DecaySpectrum, TauMinus_energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        DecayChannel::DecayProducts aux = many_body.Decay(init_particle);
+        Secondaries aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(Particle* particle : aux){
-            aux_energy = particle->GetEnergy();
-            if(particle->GetParticleDef() == p0) {
+        for(DynamicData particle : aux.GetSecondaries()){
+            aux_energy = particle.GetEnergy();
+            if(particle.GetTypeId() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p1) {
+            else if(particle.GetTypeId() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle->GetParticleDef() == p2) {
+            else if(particle.GetTypeId() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
             energy_sum += aux_energy;
-            delete particle;
         }
         ASSERT_NEAR(energy_sum, init_energy, 1e-7*energy_sum); //conservation of energy
     }

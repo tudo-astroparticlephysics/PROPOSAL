@@ -107,7 +107,7 @@ bool Geometry::operator!=(const Geometry& geometry) const
 // Member functions
 // ------------------------------------------------------------------------- //
 
-bool Geometry::IsInside(const Vector3D& position, const Vector3D& direction)
+bool Geometry::IsInside(const Vector3D& position, const Vector3D& direction) const
 {
     bool is_inside = false;
 
@@ -121,7 +121,7 @@ bool Geometry::IsInside(const Vector3D& position, const Vector3D& direction)
 }
 
 // ------------------------------------------------------------------------- //
-bool Geometry::IsInfront(const Vector3D& position, const Vector3D& direction)
+bool Geometry::IsInfront(const Vector3D& position, const Vector3D& direction) const
 {
     bool is_infront = false;
 
@@ -135,7 +135,7 @@ bool Geometry::IsInfront(const Vector3D& position, const Vector3D& direction)
 }
 
 // ------------------------------------------------------------------------- //
-bool Geometry::IsBehind(const Vector3D& position, const Vector3D& direction)
+bool Geometry::IsBehind(const Vector3D& position, const Vector3D& direction) const
 {
     bool is_behind = false;
 

@@ -1,14 +1,20 @@
-
 #include <functional>
 #include <cmath>
 
 
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/math/MathMethods.h"
 
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
 
 using namespace PROPOSAL;
 
@@ -91,62 +97,84 @@ double LeptonicDecayChannelApprox::FindRoot(double min, double parent_mass, doub
 }
 
 // ------------------------------------------------------------------------- //
-DecayChannel::DecayProducts LeptonicDecayChannelApprox::Decay(const Particle& particle)
+Secondaries LeptonicDecayChannelApprox::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
 {
-    double parent_mass = particle.GetMass();
-
-    DecayProducts products;
-    products.push_back(new Particle(massive_lepton_));
-    products.push_back(new Particle(neutrino_));
-    products.push_back(new Particle(anti_neutrino_));
 
     // Sample energy from decay rate
-    double emax       = (parent_mass * parent_mass + massive_lepton_.mass * massive_lepton_.mass) / (2 * parent_mass);
+    double emax       = (p_def.mass * p_def.mass + massive_lepton_.mass * massive_lepton_.mass) / (2 * p_def.mass);
     double x_min      = massive_lepton_.mass / emax;
-    // double f_min      = x_min * x_min * x_min * (1 - 0.5 * x_min);
-    // double right_side = f_min + (0.5 - f_min) * RandomGenerator::Get().RandomDouble();
 
-    double f_min      = DecayRate(x_min, parent_mass, emax, 0.0);
-    double f_max      = DecayRate(1.0, parent_mass, emax, 0.0);
+    double f_min      = DecayRate(x_min, p_def.mass, emax, 0.0);
+    double f_max      = DecayRate(1.0, p_def.mass, emax, 0.0);
     double right_side = f_min + (f_max - f_min) * RandomGenerator::Get().RandomDouble();
 
-    double find_root = FindRoot(x_min, parent_mass, emax, right_side);
+    double find_root = FindRoot(x_min, p_def.mass, emax, right_side);
 
     double lepton_energy   = std::max(find_root * emax, massive_lepton_.mass);
     double lepton_momentum = std::sqrt((lepton_energy - massive_lepton_.mass) * (lepton_energy + massive_lepton_.mass));
 
+
     // Sample directions For the massive letpon
-    products[0]->SetDirection(GenerateRandomDirection());
-    products[0]->SetMomentum(lepton_momentum);
+    DynamicData massive_lepton(massive_lepton_.particle_type,
+                               p_condition.GetPosition(),
+                               GenerateRandomDirection(),
+                               lepton_energy,
+                               p_condition.GetEnergy(),
+                               p_condition.GetTime(),
+                               0.);
 
     // Sample directions For the massless letpon
-    double energy_neutrinos   = parent_mass - lepton_energy;
+    double energy_neutrinos   = p_def.mass - lepton_energy;
     double virtual_mass       = std::sqrt((energy_neutrinos - lepton_momentum) * (energy_neutrinos + lepton_momentum));
     double momentum_neutrinos = 0.5 * virtual_mass;
-    Vector3D direction        = GenerateRandomDirection();
 
-    products[1]->SetDirection(direction);
-    products[1]->SetMomentum(momentum_neutrinos);
+
+    Vector3D direction = GenerateRandomDirection();
+    direction.CalculateSphericalCoordinates();
+
+    DynamicData neutrino(neutrino_.particle_type,
+                         p_condition.GetPosition(),
+                         direction,
+                         momentum_neutrinos,
+                         p_condition.GetEnergy(),
+                         p_condition.GetTime(),
+                         0.);
 
     Vector3D opposite_direction = -direction;
     opposite_direction.CalculateSphericalCoordinates();
-    products[2]->SetDirection(opposite_direction);
-    products[2]->SetMomentum(momentum_neutrinos);
+
+    DynamicData anti_neutrino(anti_neutrino_.particle_type,
+                              p_condition.GetPosition(),
+                              opposite_direction,
+                              momentum_neutrinos,
+                              p_condition.GetEnergy(),
+                              p_condition.GetTime(),
+                              0.);
 
     // Boost neutrinos to lepton frame
     // double beta = lepton_momentum / energy_neutrinos;
     double gamma = energy_neutrinos / virtual_mass;
     double betagamma = lepton_momentum / virtual_mass;
-    Boost(*products[1], products[0]->GetDirection(), gamma, betagamma);
-    Boost(*products[2], products[0]->GetDirection(), gamma, betagamma);
 
+
+    Boost(neutrino, massive_lepton.GetDirection(), gamma, betagamma);
+    Boost(anti_neutrino, massive_lepton.GetDirection(), gamma, betagamma);
+
+
+    Secondaries secondaries;
+    secondaries.push_back(massive_lepton);
+    secondaries.push_back(neutrino);
+    secondaries.push_back(anti_neutrino);
+
+    // Get Momentum is not defined for pseudo particle decay, so it must be
+    // calculated manually
+    double primary_momentum = std::sqrt(std::max((p_condition.GetEnergy() + p_def.mass) * (p_condition.GetEnergy() - p_def.mass), 0.0));
     // Boost all products in Lab frame (the reason, why the boosting goes in the negative direction of the particle)
-    Boost(products, -particle.GetDirection(), particle.GetEnergy()/particle.GetMass(), particle.GetMomentum()/particle.GetMass());
+    Boost(secondaries, -p_condition.GetDirection(), p_condition.GetEnergy()/p_def.mass, primary_momentum/p_def.mass);
 
-    CopyParticleProperties(products, particle);
-
-    return products;
+    return secondaries;
 }
+
 
 // ------------------------------------------------------------------------- //
 // Print
@@ -168,8 +196,8 @@ const std::string LeptonicDecayChannel::name_ = "LeptonicDecayChannel";
 
 // ------------------------------------------------------------------------- //
 LeptonicDecayChannel::LeptonicDecayChannel(const ParticleDef& lepton,
-                                                 const ParticleDef& neutrino,
-                                                 const ParticleDef& anti_neutrino)
+                                           const ParticleDef& neutrino,
+                                           const ParticleDef& anti_neutrino)
     : LeptonicDecayChannelApprox(lepton, neutrino, anti_neutrino)
 {
 }

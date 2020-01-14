@@ -152,8 +152,8 @@ TEST(Propagation, Test_nan)
         tau.SetDirection(Vector3D(0, 0, -1));
 
         // Use service to propagate different particle
-        std::vector<DynamicData*> sec_mu  = prop_service.Propagate(mu);
-        std::vector<DynamicData*> sec_tau = prop_service.Propagate(tau);
+        Secondaries sec_mu  = prop_service.Propagate(mu);
+        Secondaries sec_tau = prop_service.Propagate(tau);
 
         // ----------------------------------------------------------------- //
         // Using propagator directly
@@ -167,7 +167,7 @@ TEST(Propagation, Test_nan)
         particle.SetPosition(Vector3D(0, 0, 0));
         particle.SetDirection(Vector3D(0, 0, -1));
 
-        std::vector<DynamicData*> sec_mu_direct = prop_mu.Propagate();
+        Secondaries sec_mu_direct = prop_mu.Propagate();
     }
 }
 
@@ -226,43 +226,44 @@ TEST(Propagation, particle_type)
         mu.SetPosition(Vector3D(0, 0, 0));
         mu.SetDirection(Vector3D(0, 0, -1));
 
-        std::vector<DynamicData*> sec_mu_direct = prop_mu.Propagate();
+        std::vector<DynamicData> sec_mu_direct = prop_mu.Propagate().GetSecondaries();
 
         std::string name_new = "";
 
         for (unsigned int j = 0; j < sec_mu_direct.size(); ++j)
         {
-            if (sec_mu_direct[j]->GetTypeId() == DynamicData::Particle)
-            {
-                Particle* particle = dynamic_cast<Particle*>(sec_mu_direct[j]);
-                name_new           = particle->GetName();
-            } else
-            {
-                switch (sec_mu_direct[j]->GetTypeId())
-                {
-                    case DynamicData::Brems:
-                        name_new = "Brems";
-                        break;
-                    case DynamicData::Epair:
-                        name_new = "Epair";
-                        break;
-                    case DynamicData::NuclInt:
-                        name_new = "NuclInt";
-                        break;
-                    case DynamicData::DeltaE:
-                        name_new = "DeltaE";
-                        break;
-                    default:
-                        break;
-                }
-            }
+            // if (sec_mu_direct[j].GetTypeId() == DynamicData::Particle)
+            // {
+            //     Particle* particle = dynamic_cast<Particle*>(sec_mu_direct[j]);
+            //     name_new           = particle->GetName();
+            // } else
+            // {
+            //     switch (sec_mu_direct[j].GetTypeId())
+            //     {
+            //         case DynamicData::Brems:
+            //             name_new = "Brems";
+            //             break;
+            //         case DynamicData::Epair:
+            //             name_new = "Epair";
+            //             break;
+            //         case DynamicData::NuclInt:
+            //             name_new = "NuclInt";
+            //             break;
+            //         case DynamicData::DeltaE:
+            //             name_new = "DeltaE";
+            //             break;
+            //         default:
+            //             break;
+            //     }
+            // }
+            name_new = sec_mu_direct[j].GetName();
 
             in >> name >> length >> sec_energy >> x >> y >> z >> dx >> dy >> dz;
 
-            double energy_new  = sec_mu_direct[j]->GetEnergy();
-            double lenght_new  = sec_mu_direct[j]->GetPropagatedDistance();
-            Vector3D position  = sec_mu_direct[j]->GetPosition();
-            Vector3D direction = sec_mu_direct[j]->GetDirection();
+            double energy_new  = sec_mu_direct[j].GetEnergy();
+            double lenght_new  = sec_mu_direct[j].GetPropagatedDistance();
+            Vector3D position  = sec_mu_direct[j].GetPosition();
+            Vector3D direction = sec_mu_direct[j].GetDirection();
 
             EXPECT_TRUE(name == name_new);
             ASSERT_NEAR(length, lenght_new, error * length);

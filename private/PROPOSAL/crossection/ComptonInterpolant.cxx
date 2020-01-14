@@ -17,7 +17,7 @@
 using namespace PROPOSAL;
 
 ComptonInterpolant::ComptonInterpolant(const Compton& param, InterpolationDef def)
-        : CrossSectionInterpolant(DynamicData::Compton, param)
+        : CrossSectionInterpolant(InteractionType::Compton, param)
 {
     // Use own CrossSecition dNdx interpolation
     ComptonInterpolant::InitdNdxInterpolation(def);

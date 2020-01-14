@@ -618,7 +618,6 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
 // #undef COMPONENT_DEF
 // #undef MEDIUM_DEF
 // #undef AXIS_DEF
-// #undef PARTICLE_DEF
 // #undef BREMS_DEF
 // #undef PHOTO_REAL_DEF
 // #undef PHOTO_Q2_DEF

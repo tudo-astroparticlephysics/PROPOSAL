@@ -12,6 +12,8 @@
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
 
+#include "PROPOSAL/Secondaries.h"
+
 using namespace PROPOSAL;
 
 DecayChannel::DecayChannel() {}
@@ -46,7 +48,36 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayChannel const& channel
 }
 
 // ------------------------------------------------------------------------- //
-void DecayChannel::Boost(Particle& particle, const Vector3D& direction_unnormalized, double gamma, double betagamma)
+/* void DecayChannel::Boost(Particle& particle, const Vector3D& direction_unnormalized, double gamma, double betagamma) */
+/* { */
+/*     Vector3D direction = direction_unnormalized; */
+/*     direction.normalise(); */
+
+/*     Vector3D momentum_vec(particle.GetMomentum() * particle.GetDirection()); */
+
+/*     double direction_correction = */
+/*         (gamma - 1.0) * scalar_product(momentum_vec, direction) - betagamma * particle.GetEnergy(); */
+
+/*     momentum_vec = momentum_vec + direction_correction * direction; */
+
+/*     // Energy will be implicit corrected with respect to the mass: */
+/*     particle.SetMomentum(momentum_vec.magnitude()); */
+
+/*     momentum_vec.normalise(); */
+/*     momentum_vec.CalculateSphericalCoordinates(); */
+/*     particle.SetDirection(momentum_vec); */
+/* } */
+
+/* // ------------------------------------------------------------------------- // */
+/* void DecayChannel::Boost(DecayProducts& products, const Vector3D& direction, double gamma, double betagamma) */
+/* { */
+/*     for (DecayProducts::const_iterator iter = products.begin(); iter != products.end(); ++iter) */
+/*     { */
+/*         Boost(**iter, direction, gamma, betagamma); */
+/*     } */
+/* } */
+
+void DecayChannel::Boost(DynamicData& particle, const Vector3D& direction_unnormalized, double gamma, double betagamma)
 {
     Vector3D direction = direction_unnormalized;
     direction.normalise();
@@ -67,11 +98,11 @@ void DecayChannel::Boost(Particle& particle, const Vector3D& direction_unnormali
 }
 
 // ------------------------------------------------------------------------- //
-void DecayChannel::Boost(DecayProducts& products, const Vector3D& direction, double gamma, double betagamma)
+void DecayChannel::Boost(Secondaries& secondaries, const Vector3D& direction, double gamma, double betagamma)
 {
-    for (DecayProducts::const_iterator iter = products.begin(); iter != products.end(); ++iter)
+    for (auto& p : secondaries.GetModifyableSecondaries())
     {
-        Boost(**iter, direction, gamma, betagamma);
+        Boost(p, direction, gamma, betagamma);
     }
 }
 

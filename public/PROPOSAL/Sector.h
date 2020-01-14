@@ -30,7 +30,9 @@
 
 // #include <string>
 // #include <vector>
+#include <memory>
 
+#include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 
@@ -128,7 +130,7 @@ class Sector {
      *  \return energy at distance OR -(track length)
      */
 
-    double Propagate(double distance);
+    std::pair<double, Secondaries> Propagate(double distance);
 
     /**
      * Calculates the contiuous loss till the first stochastic loss happend
@@ -160,7 +162,7 @@ class Sector {
      *
      *  \return tuple of energy loss [MeV], kind of interaction and list of produced particles
      */
-    std::tuple<double, DynamicData::Type, std::pair<std::vector<Particle*>, bool> > MakeStochasticLoss(double particle_energy);
+    std::pair<double, int> MakeStochasticLoss(double particle_energy);
 
     // --------------------------------------------------------------------- //
     // Enable options & Setter
@@ -204,5 +206,8 @@ class Sector {
 
     ContinuousRandomizer* cont_rand_;
     Scattering* scattering_;
+
+    std::pair<double,double> produced_particle_moments_ {100., 10000.};
+    unsigned int n_th_call_ {1};
 };
 }  // namespace PROPOSAL

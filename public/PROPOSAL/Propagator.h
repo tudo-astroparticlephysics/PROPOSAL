@@ -74,7 +74,7 @@ public:
     ///
     /// @return Secondary data
     // ----------------------------------------------------------------------------
-    std::vector<DynamicData*> Propagate(double MaxDistance_cm = 1e20);
+    Secondaries Propagate(double MaxDistance_cm = 1e20);
 
     // --------------------------------------------------------------------- //
     // Getter
@@ -197,7 +197,9 @@ private:
 
     Particle particle_;
     Geometry* detector_;
+
+    std::pair<double,double> produced_particle_moments_ {100., 10000.};
+    unsigned int n_th_call_ {1};
 };
 
 } // namespace PROPOSAL
-

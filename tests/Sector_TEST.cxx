@@ -171,6 +171,7 @@ TEST(Sector, Propagate)
     double energy_init;
     double distance;
     double ecut, vcut;
+    std::pair<double, Secondaries> prop_aux;
 
     bool first_line = true;
 
@@ -207,7 +208,8 @@ TEST(Sector, Propagate)
 
             energyTillStochastic_calc = sector.CalculateEnergyTillStochastic(energy_init).first;
             stochasticLoss_calc = std::get<0>(sector.MakeStochasticLoss(energy_init));
-            energy_final_calc = sector.Propagate(distance);
+            prop_aux = sector.Propagate(distance);
+            energy_final_calc = prop_aux.first;
 
             ASSERT_NEAR(energyTillStochastic_calc, energyTillStochastic_stored, std::abs(1e-3 * energyTillStochastic_calc));
             ASSERT_NEAR(stochasticLoss_calc, stochasticLoss_stored, std::abs(1e-3 * stochasticLoss_calc));

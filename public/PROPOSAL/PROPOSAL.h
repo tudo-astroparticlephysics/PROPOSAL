@@ -125,8 +125,12 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/PropagatorService.h"
 #include "PROPOSAL/Sector.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Secondaries.h"
+
+#if ROOT_SUPPORT
+    #include "PROPOSAL/interfaces/root.h"
+#endif

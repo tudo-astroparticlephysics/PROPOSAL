@@ -11,10 +11,12 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
 
+#include "PROPOSAL/particle/ParticleDef.h"
+
 using namespace PROPOSAL;
 
 IonizIntegral::IonizIntegral(const Ionization& param)
-    : CrossSectionIntegral(DynamicData::DeltaE, param)
+    : CrossSectionIntegral(InteractionType::DeltaE, param)
 {
 }
 

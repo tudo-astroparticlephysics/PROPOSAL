@@ -58,7 +58,7 @@ OPTION(ADD_CPPEXAMPLE "Choose to compile Cpp example." ON)
 
 IF(ADD_PYTHON)
     MESSAGE(STATUS "Enabled to build the python wrapper library.")
-    FIND_PACKAGE( PythonLibs 2.7 REQUIRED )
+    FIND_PACKAGE( PythonLibs REQUIRED )
 
     IF(PYTHONLIBS_FOUND)
         # TODO(mario): Find a better way to search for pybind11!
@@ -152,8 +152,10 @@ endif (ADD_TESTS)
 #################################################################
 
 SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${CMAKE_THREAD_LIBS_INIT})
+SET(PROJECT_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/public/")
 
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/public" "${PROJECT_SOURCE_DIR}" ${LOG4CPLUS_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES(${PROJECT_INCLUDE_DIR} ${LOG4CPLUS_INCLUDE_DIR} )
+MESSAGE(STATUS ${PROJECT_INCLUDE_DIR})
 
 FILE(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*)
 ADD_LIBRARY(PROPOSAL SHARED ${SRC_FILES})
@@ -178,23 +180,18 @@ ENDIF()
 
 INSTALL(TARGETS PROPOSAL DESTINATION lib)
 
-FILE(GLOB_RECURSE INC_FILES ${PROJECT_SOURCE_DIR}/public/PROPOSAL/*.h)
+FILE(GLOB_RECURSE INC_FILES ${PROJECT_SOURCE_DIR}/public/PROPOSAL/*)
 # INSTALL(FILES ${INC_FILES} DESTINATION include/PROPOSAL)
 
 foreach(INC_FILE ${INC_FILES})
     file(RELATIVE_PATH REL_FILE ${PROJECT_SOURCE_DIR}/public ${INC_FILE})
-    GET_FILENAME_COMPONENT(DIR "${REL_FILE}" DIRECTORY)
+    GET_FILENAME_COMPONENT(DIR "PROPOSAL/${REL_FILE}" DIRECTORY)
     INSTALL(FILES "public/${REL_FILE}" DESTINATION include/${DIR})
 endforeach()
 
 #################################################################
 #################           Executables        ##################
 #################################################################
-
-ADD_EXECUTABLE(WriteSectorsFromDomList
-    private/test/WriteSectorsFromDomList.cxx
-)
-TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
 
 IF(ADD_CPPEXAMPLE)
     ADD_EXECUTABLE(example
@@ -324,8 +321,9 @@ ADD_SUBDIRECTORY( doc )
 
 IF(ADD_PYTHON)
     IF(PYTHONLIBS_FOUND AND pybind11_FOUND)
-        FILE(GLOB_RECURSE PYTHON_SRC_FILES ${PROJECT_SOURCE_DIR}/private/python/*)
-        INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/public/python )
+        FILE(GLOB_RECURSE PYTHON_SRC_FILES
+            ${PROJECT_SOURCE_DIR}/private/Interface/python/*)
+        INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/public/Interface/python )
         PYBIND11_ADD_MODULE(pyPROPOSAL SHARED ${PYTHON_SRC_FILES})
         TARGET_LINK_LIBRARIES(pyPROPOSAL PRIVATE PROPOSAL)
         SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" SUFFIX ".so"

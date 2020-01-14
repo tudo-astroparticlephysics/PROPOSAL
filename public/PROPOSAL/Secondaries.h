@@ -1,4 +1,3 @@
-
 /******************************************************************************
  *                                                                            *
  * This file is part of the simulation tool PROPOSAL.                         *
@@ -29,38 +28,60 @@
 
 #pragma once
 
-#include "PROPOSAL/Secondaries.h"
-#include "PROPOSAL/decay/DecayChannel.h"
-#include "PROPOSAL/particle/ParticleDef.h"
+
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
+
+#include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/geometry/Geometry.h"
+
+#include <memory>
+#include <vector>
+#include <string>
 
 namespace PROPOSAL {
 
-class Particle;
+class Secondaries {
 
-class TwoBodyPhaseSpace : public DecayChannel
-{
 public:
-    TwoBodyPhaseSpace(const ParticleDef&, const ParticleDef&);
-    TwoBodyPhaseSpace(const TwoBodyPhaseSpace& mode);
-    virtual ~TwoBodyPhaseSpace();
-    // No copy and assignemnt -> done by clone
-    DecayChannel* clone() const { return new TwoBodyPhaseSpace(*this); }
+    Secondaries();
+    Secondaries(std::shared_ptr<ParticleDef>);
 
-    Secondaries Decay(const ParticleDef& p_def, const DynamicData& p_condition);
+    void reserve(size_t number_secondaries);
+    void clear() { secondaries_.clear(); };
 
-    const std::string& GetName() const { return name_; }
+    DynamicData& operator[](std::size_t idx){ return secondaries_[idx]; };
+
+    /* void push_back(const Particle& particle); */
+    void push_back(const DynamicData& continuous_loss);
+    void push_back(const Particle& particle, const int& secondary, const double& energyloss);
+    void emplace_back(const int& type);
+    void emplace_back(const int& type, const Vector3D& position,
+        const Vector3D& direction, const double& energy, const double& parent_particle_energy,
+        const double& time, const double& distance);
+
+    void append(Secondaries secondaries);
+
+    Secondaries Query(const int&) const;
+    Secondaries Query(const std::string&) const;
+    Secondaries Query(const Geometry& geometry) const;
+
+    void DoDecay();
+
+
+    std::vector<Vector3D> GetPosition() const;
+    std::vector<Vector3D> GetDirection() const;
+    std::vector<double> GetEnergy() const;
+    std::vector<double> GetParentParticleEnergy() const;
+    std::vector<double> GetTime() const;
+    std::vector<double> GetPropagatedDistance() const;
+    std::vector<DynamicData> GetSecondaries() const { return secondaries_; } ;
+    std::vector<DynamicData>& GetModifyableSecondaries() { return secondaries_; } ;
+    unsigned int GetNumberOfParticles() const { return secondaries_.size(); };
 
 private:
-    TwoBodyPhaseSpace& operator=(const TwoBodyPhaseSpace&); // Undefined & not allowed
-
-    bool compare(const DecayChannel&) const;
-    void print(std::ostream&) const;
-
-    ParticleDef first_daughter_;
-    ParticleDef second_daughter_;
-
-    static const std::string name_;
+    std::vector<DynamicData> secondaries_;
+    std::shared_ptr<ParticleDef> primary_def_;
 };
 
 } // namespace PROPOSAL

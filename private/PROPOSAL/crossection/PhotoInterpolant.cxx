@@ -14,7 +14,7 @@
 using namespace PROPOSAL;
 
 PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef def)
-    : CrossSectionInterpolant(DynamicData::NuclInt, param)
+    : CrossSectionInterpolant(InteractionType::NuclInt, param)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInterpolation(def);

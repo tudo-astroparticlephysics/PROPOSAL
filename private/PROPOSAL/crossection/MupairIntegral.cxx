@@ -35,7 +35,7 @@ double MupairIntegral::CalculatedEdx(double energy)
     {
         return 0;
     }
-    
+
     return parametrization_->GetMultiplier() * MupairIntegral::CalculatedEdxWithoutMultiplier(energy);
 }
 
@@ -47,7 +47,7 @@ double MupairIntegral::CalculatedEdxWithoutMultiplier(double energy)
     {
         parametrization_->SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
-            
+
         sum += dedx_integral_.Integrate(
             limits.vMin,
             limits.vUp,
@@ -84,11 +84,11 @@ std::pair<std::vector<Particle*>, bool> MupairIntegral::CalculateProducedParticl
 
 }
 
-DynamicData::Type MupairIntegral::GetType(const MupairProduction& param){
+InteractionType MupairIntegral::GetType(const MupairProduction& param){
     if(param.IsParticleOutputEnabled()){
-        return DynamicData::Particle;
+        return InteractionType::Particle;
     }
     else{
-        return DynamicData::MuPair;
+        return InteractionType::MuPair;
     }
 }

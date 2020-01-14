@@ -16,10 +16,12 @@
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
 
+#include "PROPOSAL/particle/ParticleDef.h"
+
 using namespace PROPOSAL;
 
 IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def)
-    : CrossSectionInterpolant(DynamicData::DeltaE, param)
+    : CrossSectionInterpolant(InteractionType::DeltaE, param)
 {
     // Use overwritten dNdx interpolation
     InitdNdxInterpolation(def);

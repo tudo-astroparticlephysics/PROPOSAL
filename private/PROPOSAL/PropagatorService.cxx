@@ -2,6 +2,9 @@
 #include "PROPOSAL/PropagatorService.h"
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/Secondaries.h"
+
+#include <memory>
 
 using namespace PROPOSAL;
 
@@ -42,7 +45,7 @@ bool PropagatorService::IsRegistered(const ParticleDef& particle_def)
 }
 
 // ------------------------------------------------------------------------- //
-std::vector<DynamicData*> PropagatorService::Propagate(Particle& particle, double distance)
+Secondaries PropagatorService::Propagate(Particle& particle, double distance)
 {
     ParticleDef particle_def = particle.GetParticleDef();
 
@@ -61,7 +64,7 @@ std::vector<DynamicData*> PropagatorService::Propagate(Particle& particle, doubl
         prop_particle.SetTime(particle.GetTime());
         prop_particle.SetElost(particle.GetElost());
 
-        std::vector<DynamicData*> secondaries = propagator->Propagate(distance);
+        Secondaries secondaries = propagator->Propagate(distance);
 
         particle.SetEnergy(prop_particle.GetEnergy());
         particle.SetParentParticleEnergy(prop_particle.GetParentParticleEnergy());
@@ -86,7 +89,7 @@ std::vector<DynamicData*> PropagatorService::Propagate(Particle& particle, doubl
     {
         log_warn("Propagator for particle %s not found! Empty secondary vector will be returned!",
                  particle_def.name.c_str());
-        return std::vector<DynamicData*>();
+        return Secondaries();
     }
 }
 

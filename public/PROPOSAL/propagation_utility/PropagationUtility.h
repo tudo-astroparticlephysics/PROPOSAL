@@ -98,7 +98,7 @@ class Utility {
         return crosssections_;
     }
 
-    std::pair<double, DynamicData::Type> StochasticLoss(
+    std::pair<double, int> StochasticLoss(
         double particle_energy, double rnd1, double rnd2, double rnd3);
 
    protected:

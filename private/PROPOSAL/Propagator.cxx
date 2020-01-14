@@ -20,9 +20,11 @@
 
 #include "PROPOSAL/medium/MediumFactory.h"
 
+#include "PROPOSAL/particle/Particle.h"
+
+#include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/json.hpp"
 
@@ -513,22 +515,10 @@ bool Propagator::operator!=(const Propagator& propagator) const
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
+Secondaries Propagator::Propagate(double MaxDistance_cm)
 {
-    Output::getInstance().ClearSecondaryVector();
-
-    Output::getInstance().GetSecondarys().reserve(1000);
-
-#if ROOT_SUPPORT
-    Output::getInstance().StorePrimaryInTree(&particle_);
-#endif
-
-    if (Output::store_in_ASCII_file_)
-        Output::getInstance().StorePrimaryInASCII(&particle_);
-
     double distance = 0;
     double distance_to_closest_approach  = 0;
-    double result   = 0;
 
     // These two variables are needed to calculate the energy loss inside the detector
     // energy_at_entry_point is initialized with the current energy because this is a
@@ -560,6 +550,9 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
     bool was_in_detector    = false;
     bool propagationstep_till_closest_approach = false;
     bool already_reached_closest_approach = false;
+
+    Secondaries secondaries_(std::make_shared<ParticleDef>(particle_.GetParticleDef()));
+    secondaries_.reserve(static_cast<size_t>(produced_particle_moments_.first + 2 * std::sqrt(produced_particle_moments_.second)));
 
     while (1)
     {
@@ -639,7 +632,11 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             distance = MaxDistance_cm - particle_.GetPropagatedDistance();
         }
 
-        result = current_sector_->Propagate(distance);
+        std::pair<double,Secondaries> sector_result = current_sector_->Propagate(distance);
+
+        secondaries_.append(sector_result.second);
+        /* for (auto p : sector_result.second->GetSecondaries()) { */
+        /* } */
 
         if (propagationstep_till_closest_approach)
         {
@@ -650,7 +647,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             propagationstep_till_closest_approach = false;
         }
 
-        if (result <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance() || particle_.GetEnergy() <= particle_.GetLow())
+        if (sector_result.first <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance() || particle_.GetEnergy() <= particle_.GetLow())
             break;
     }
     if (detector_->IsInside(particle_.GetPosition(), particle_.GetDirection()))
@@ -662,13 +659,13 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 
     particle_.SetElost(particle_.GetEntryEnergy() - particle_.GetExitEnergy());
 
-#if ROOT_SUPPORT
-    Output::getInstance().StorePropagatedPrimaryInTree(&particle_);
-#endif
-    if (Output::store_in_ASCII_file_)
-        Output::getInstance().StorePropagatedPrimaryInASCII(&particle_);
+    secondaries_.DoDecay();
 
-    return Output::getInstance().GetSecondarys();
+    n_th_call_ += 1.;
+    double produced_particles_ = static_cast<double>(secondaries_.GetNumberOfParticles());
+    produced_particle_moments_ = welfords_online_algorithm(produced_particles_, n_th_call_, produced_particle_moments_.first, produced_particle_moments_.second);
+
+    return secondaries_;
 }
 
 // ------------------------------------------------------------------------- //
