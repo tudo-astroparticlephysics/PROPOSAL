@@ -172,6 +172,7 @@ TEST(Sector, Propagate)
     double distance;
     double ecut, vcut;
     std::pair<double, Secondaries> prop_aux;
+    double random_ch;
 
     bool first_line = true;
 
@@ -210,6 +211,14 @@ TEST(Sector, Propagate)
             stochasticLoss_calc = std::get<0>(sector.MakeStochasticLoss(energy_init));
             prop_aux = sector.Propagate(distance);
             energy_final_calc = prop_aux.first;
+
+            // TODO: this is just to include the random numbers, sampeled in the decay
+            // to get the correct rnd ordering for the unit test.
+            if (particle.GetEnergy() == particle.GetMass())
+            {
+                random_ch = RandomGenerator::Get().RandomDouble();
+                Secondaries products = particle.GetDecayTable().SelectChannel(random_ch).Decay(particle.GetParticleDef(), particle);
+            }
 
             ASSERT_NEAR(energyTillStochastic_calc, energyTillStochastic_stored, std::abs(1e-3 * energyTillStochastic_calc));
             ASSERT_NEAR(stochasticLoss_calc, stochasticLoss_stored, std::abs(1e-3 * stochasticLoss_calc));
