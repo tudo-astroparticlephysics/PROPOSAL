@@ -269,6 +269,15 @@ bool Utility::operator!=(const Utility& utility) const {
 }
 
 
+CrossSection* Utility::GetCrosssection(int typeId) const {
+    for (auto& i : crosssections_) {
+        if (i->GetTypeId() == typeId) {
+            return i;
+        }
+    }
+}
+
+
 std::pair<double, int> Utility::StochasticLoss(
     double particle_energy, double rnd1, double rnd2, double rnd3)
 {

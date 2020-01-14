@@ -74,11 +74,7 @@ public:
         (void)energy; (void)energy_loss; (void)initial_direction; return std::make_pair(std::vector<Particle*>(), false);
     }
 
-    virtual std::pair<double, double> StochasticDeflection(double energy, double energy_loss){
-        // per default the particle is not deflected
-        // for now do this dirty hack
-        return std::make_pair(energy, energy_loss);
-    }
+    virtual std::pair<double, double> StochasticDeflection(double energy, double energy_loss);
 
     virtual double CalculateCumulativeCrossSection(double energy, int component, double v) = 0;
 

@@ -116,7 +116,6 @@ double UtilityIntegralInteraction::FunctionToIntegral(double energy) {
 
 // ------------------------------------------------------------------------- //
 double UtilityIntegralInteraction::Calculate(double ei, double ef, double rnd) {
-    (void)ef;
 
     return integral_.IntegrateWithRandomRatio(
         ei, ef,
@@ -154,7 +153,6 @@ double UtilityIntegralDecay::FunctionToIntegral(double energy) {
 
 // ------------------------------------------------------------------------- //
 double UtilityIntegralDecay::Calculate(double ei, double ef, double rnd) {
-    (void)ef;
 
     return integral_.IntegrateWithRandomRatio(
         ei, ef,

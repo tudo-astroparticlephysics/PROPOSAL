@@ -31,6 +31,7 @@
 // #include <string>
 // #include <vector>
 #include <memory>
+#include <tuple>
 
 #include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/particle/Particle.h"
@@ -100,9 +101,9 @@ class Sector {
 
    public:
     // Sector(Particle&);
-    Sector(Particle&, const Definition&);
-    Sector(Particle&, const Definition&, const InterpolationDef&);
-    Sector(Particle&, const Sector&);
+    Sector(const ParticleDef&, const Definition&);
+    Sector(const ParticleDef&, const Definition&, const InterpolationDef&);
+    Sector(const ParticleDef&, const Sector&);
     // Sector(Particle&, const Geometry&, const Utility&, const Scattering&,
     // bool do_interpolation, const Definition& def = Definition());
     Sector(const Sector&);
@@ -130,32 +131,21 @@ class Sector {
      *  \return energy at distance OR -(track length)
      */
 
-    std::pair<double, Secondaries> Propagate(double distance);
+    double DecayEnergy(double inital_energy, double rnd);
+    double InteractionEnergy(double inital_energy, double rnd);
 
-    /**
-     * Calculates the contiuous loss till the first stochastic loss happend
-     * and subtract it from initial energy
-     * Also caluclate the energy at which the particle decay
-     * These to energys can be compared to decide if a decay or particle
-     * interaction happens
-     *
-     *  \param  initial_energy   initial energy
-     *  \return pair.first final energy befor first interaction pair.second
-     * decay energy at which the particle decay
-     */
-    std::pair<double, double> CalculateEnergyTillStochastic(
-        double initial_energy);
+    double GetDisplacement(const DynamicData, const double, const double);
+    double BorderLength(const DynamicData);
 
-    /*!
-     * advances the particle by the given distance
-     * Sets the x,y and z coordinates of particle_
-     * and its time and propagation distance
-     *
-     * \param    dr  flight distance
-     * \param    ei  initial energy
-     * \param    ef  final energy
-     */
-    void AdvanceParticle(double dr, double ei, double ef);
+    std::vector<std::tuple<int, double, double>> GetSteplengths(const DynamicData);
+    std::tuple<int, double, double> minimizeSteplengths(const std::vector<std::tuple<int, double, double>>);
+
+    DynamicData DoInteraction(const DynamicData);
+    DynamicData DoDecay(const DynamicData);
+    DynamicData DoContinous(const DynamicData, double, double);
+
+    std::pair<double, Secondaries> Propagate(DynamicData particle_condition);
+
 
     /**
      *  Makes Stochastic Energyloss
@@ -179,7 +169,7 @@ class Sector {
     ParticleLocation::Enum GetLocation() const { return sector_def_.location; }
 
     Scattering* GetScattering() const { return scattering_; }
-    Particle& GetParticle() const { return particle_; }
+    const ParticleDef GetParticleDef() const { return particle_def_; }
     Geometry* GetGeometry() const { return geometry_; }
     const Utility& GetUtility() const { return utility_; }
     const Medium* GetMedium() const { return &utility_.GetMedium(); }
@@ -195,7 +185,7 @@ class Sector {
 
     Definition sector_def_;
 
-    Particle& particle_;
+    ParticleDef particle_def_;
     Geometry* geometry_;
 
     Utility utility_;

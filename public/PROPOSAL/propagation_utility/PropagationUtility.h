@@ -97,6 +97,7 @@ class Utility {
     const std::vector<CrossSection*>& GetCrosssections() const {
         return crosssections_;
     }
+    CrossSection* GetCrosssection(int typeId) const;
 
     std::pair<double, int> StochasticLoss(
         double particle_energy, double rnd1, double rnd2, double rnd3);

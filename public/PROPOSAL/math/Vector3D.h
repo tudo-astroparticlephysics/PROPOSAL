@@ -63,7 +63,8 @@ public:
     Vector3D operator-() const;
     double magnitude() const;
     void normalise();
-    
+    void deflect(const double , const double);
+
     struct CartesianCoordinates {
         CartesianCoordinates() {};
         CartesianCoordinates(double, double, double);

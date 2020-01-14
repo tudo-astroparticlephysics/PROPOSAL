@@ -54,7 +54,7 @@ const bool Propagator::uniform_               = true;
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geometry) try
     : current_sector_(NULL),
-      particle_(sectors.at(0)->GetParticle()),
+      particle_(Particle()),
       detector_(geometry.clone())
 {
     // --------------------------------------------------------------------- //
@@ -63,7 +63,7 @@ Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geom
 
     for (auto sector: sectors)
     {
-        if (sector->GetParticle().GetParticleDef() != particle_.GetParticleDef())
+        if (sector->GetParticleDef() != particle_.GetParticleDef())
         {
             log_fatal("The particle definitions of the sectors must be identical for proper propagation!");
         } else
@@ -87,7 +87,7 @@ Propagator::Propagator(const ParticleDef& particle_def,
 {
     for (auto def: sector_defs)
     {
-        sectors_.push_back(new Sector(particle_, def));
+        sectors_.push_back(new Sector(particle_def, def));
     }
 
     try
@@ -109,7 +109,7 @@ Propagator::Propagator(const ParticleDef& particle_def,
 {
     for (auto def: sector_defs)
     {
-        sectors_.push_back(new Sector(particle_, def, interpolation_def));
+        sectors_.push_back(new Sector(particle_def, def, interpolation_def));
     }
 
     try
@@ -130,7 +130,7 @@ Propagator::Propagator(const Propagator& propagator)
 {
     for (unsigned int i = 0; i < propagator.sectors_.size(); ++i)
     {
-        sectors_[i] = new Sector(particle_, *propagator.sectors_[i]);
+        sectors_[i] = new Sector(particle_.GetParticleDef(), *propagator.sectors_[i]);
 
         if (propagator.sectors_[i] == propagator.current_sector_)
         {
@@ -448,14 +448,14 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
 
         if (do_interpolation)
         {
-            sectors_.push_back(new Sector(particle_, sec_def_infront, interpolation_def));
-            sectors_.push_back(new Sector(particle_, sec_def_inside, interpolation_def));
-            sectors_.push_back(new Sector(particle_, sec_def_behind, interpolation_def));
+            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_infront, interpolation_def));
+            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_inside, interpolation_def));
+            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_behind, interpolation_def));
         } else
         {
-            sectors_.push_back(new Sector(particle_, sec_def_infront));
-            sectors_.push_back(new Sector(particle_, sec_def_inside));
-            sectors_.push_back(new Sector(particle_, sec_def_behind));
+            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_infront));
+            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_inside));
+            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_behind));
         }
 
         delete geometry;
@@ -632,11 +632,35 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
             distance = MaxDistance_cm - particle_.GetPropagatedDistance();
         }
 
-        std::pair<double,Secondaries> sector_result = current_sector_->Propagate(distance);
+        DynamicData p_condition(particle_);
 
-        secondaries_.append(sector_result.second);
+        while (true) {
+            std::vector<std::tuple<int, double, double>> steplengths = current_sector_->GetSteplengths(p_condition);
+            std::tuple<int, double, double> steplength = current_sector_->minimizeSteplengths(steplengths);
+
+            DynamicData continuous = current_sector_->DoContinous(p_condition, std::get<1>(steplength), std::get<2>(steplength));
+            if(std::get<0>(steplength) == 0){
+                p_condition = current_sector_->DoInteraction(continuous);
+                secondaries_.push_back(p_condition);
+            }
+            if(std::get<0>(steplength) == 1){
+                p_condition = current_sector_->DoDecay(continuous);
+                secondaries_.push_back(p_condition);
+            }
+            if(std::get<0>(steplength) == 2){
+                particle_.SetPosition(p_condition.GetPosition());
+                particle_.SetDirection(p_condition.GetDirection());
+                particle_.SetEnergy(p_condition.GetEnergy());
+                particle_.SetParentParticleEnergy(p_condition.GetParentParticleEnergy());
+                particle_.SetTime(p_condition.GetTime());
+                particle_.SetPropagatedDistance(p_condition.GetPropagatedDistance());
+                break;
+            }
+        }
+
         /* for (auto p : sector_result.second->GetSecondaries()) { */
         /* } */
+        double tmp_energy = secondaries_.GetSecondaries().back().GetEnergy();
 
         if (propagationstep_till_closest_approach)
         {
@@ -647,7 +671,7 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
             propagationstep_till_closest_approach = false;
         }
 
-        if (sector_result.first <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance() || particle_.GetEnergy() <= particle_.GetLow())
+        if (tmp_energy <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance() || particle_.GetEnergy() <= particle_.GetLow())
             break;
     }
     if (detector_->IsInside(particle_.GetPosition(), particle_.GetDirection()))
