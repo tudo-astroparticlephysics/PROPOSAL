@@ -136,18 +136,10 @@ struct ParticleDef
     const double charge;
     const HardComponentTables::VecType& hard_component_table;
     const DecayTable decay_table;
-    const int weak_partner;
     const int particle_type;
+    const int weak_partner;
 
     ParticleDef();
-    ParticleDef(std::string name,
-                double mass,
-                double low,
-                double lifetime,
-                double charge,
-                const HardComponentTables::VecType& table,
-                const DecayTable&,
-                const int);
 
     ParticleDef(std::string name,
                 double mass,
@@ -220,14 +212,14 @@ public:
         decay_table = var;
         return *this;
     }
-    Builder& SetWeakPartner(const ParticleType& partner)
-    {
-        weak_partner = static_cast<int>(partner) ;
-        return *this;
-    }
     Builder& SetParticleType(const int var)
     {
         particle_type = var;
+        return *this;
+    }
+    Builder& SetWeakPartner(const ParticleType& partner)
+    {
+        weak_partner = static_cast<int>(partner);
         return *this;
     }
     Builder& SetParticleDef(const ParticleDef& var)
@@ -239,8 +231,8 @@ public:
         charge               = var.charge;
         hard_component_table = &var.hard_component_table;
         decay_table          = var.decay_table;
-        weak_partner         = var.weak_partner;
         particle_type        = var.particle_type;
+        weak_partner         = var.weak_partner;
         return *this;
     }
 
@@ -252,7 +244,7 @@ public:
             low = mass;
         }
 
-        return ParticleDef(name, mass, low, lifetime, charge, *hard_component_table, decay_table, weak_partner, particle_type);
+        return ParticleDef(name, mass, low, lifetime, charge, *hard_component_table, decay_table, particle_type, weak_partner);
     }
 
 private:
@@ -263,8 +255,8 @@ private:
     double charge;
     const HardComponentTables::VecType* hard_component_table;
     DecayTable decay_table;
-    int weak_partner;
     int particle_type;
+    int weak_partner;
 };
 
 // ------------------------------------------------------------------------- //

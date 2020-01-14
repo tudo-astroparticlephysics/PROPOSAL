@@ -30,7 +30,8 @@
                       CHARGE,                                           \
                       HardComponentTables::EmptyTable,                  \
                       DecayTable().addChannel(1.1, StableChannel()),    \
-                      PARTICLE_TYPE)                                    \
+                      PARTICLE_TYPE,                                    \
+                      static_cast<int>(ParticleType::None))             \
     {                                                                   \
     }                                                                   \
                                                                         \
@@ -96,6 +97,12 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, ParticleDef const& def)
         os << '\n';
     }
 
+    os << "PartycleType:"
+       << "\t" << def.particle_type << '\n';
+    os << "WeakPartner:"
+       << "\t" << def.weak_partner << '\n';
+
+
     os << Helper::Centered(60, "");
     return os;
 }
@@ -108,8 +115,8 @@ ParticleDef::ParticleDef()
     , charge(0.0)
     , hard_component_table(HardComponentTables::EmptyTable)
     , decay_table()
-    , particle_type(0)
-    , weak_partner(0)
+    , particle_type(static_cast<int>(ParticleType::None))
+    , weak_partner(static_cast<int>(ParticleType::None))
 {
 }
 
@@ -120,8 +127,8 @@ ParticleDef::ParticleDef(std::string name,
                          double charge,
                          const HardComponentTables::VecType& table,
                          const DecayTable& decay_table,
-                         const int weak_partner,
-                         const int particle_type)
+                         const int particle_type,
+                         const int weak_partner)
     : name(name)
     , mass(mass)
     , low(low)
@@ -129,30 +136,11 @@ ParticleDef::ParticleDef(std::string name,
     , charge(charge)
     , hard_component_table(table)
     , decay_table(decay_table)
-    , weak_partner(weak_partner)
     , particle_type(particle_type)
+    , weak_partner(weak_partner)
 {
 }
 
-ParticleDef::ParticleDef(std::string name,
-                         double mass,
-                         double low,
-                         double lifetime,
-                         double charge,
-                         const HardComponentTables::VecType& table,
-                         const DecayTable& decay_table,
-                         const int particle_type)
-        : name(name)
-        , mass(mass)
-        , low(low)
-        , lifetime(lifetime)
-        , charge(charge)
-        , hard_component_table(table)
-        , decay_table(decay_table)
-        , weak_partner(static_cast<int>(ParticleType::None))
-        , particle_type(particle_type)
-{
-}
 ParticleDef::~ParticleDef() {}
 
 ParticleDef::ParticleDef(const ParticleDef& def)
@@ -163,8 +151,8 @@ ParticleDef::ParticleDef(const ParticleDef& def)
     , charge(def.charge)
     , hard_component_table(def.hard_component_table)
     , decay_table(def.decay_table)
-    , weak_partner(def.weak_partner)
     , particle_type(def.particle_type)
+    , weak_partner(def.weak_partner)
 {
 }
 
@@ -214,10 +202,10 @@ bool ParticleDef::operator==(const ParticleDef& def) const
     } else if (decay_table != def.decay_table)
     {
         return false;
-    } else if (weak_partner != def.weak_partner)
+    } else if (particle_type != def.particle_type)
     {
         return false;
-    } else if (particle_type != def.particle_type)
+    } else if (weak_partner != def.weak_partner)
     {
         return false;
     } else
@@ -243,8 +231,8 @@ ParticleDef::Builder::Builder()
     , charge(-1)
     , hard_component_table(&HardComponentTables::EmptyTable)
     , decay_table()
-    , weak_partner(static_cast<int>(ParticleType::None))
     , particle_type(static_cast<int>(ParticleType::None))
+    , weak_partner(static_cast<int>(ParticleType::None))
 {
 }
 
@@ -261,8 +249,8 @@ EMinusDef::EMinusDef()
             -1.0,
             HardComponentTables::EmptyTable,
             DecayTable().addChannel(1.1, StableChannel()),
-            static_cast<int>(ParticleType::NuE),
-            static_cast<int>(ParticleType::EMinus))
+            static_cast<int>(ParticleType::EMinus),
+            static_cast<int>(ParticleType::NuE))
 {
 }
 
@@ -277,8 +265,8 @@ EPlusDef::EPlusDef()
             1.0,
             HardComponentTables::EmptyTable,
             DecayTable().addChannel(1.1, StableChannel()),
-            static_cast<int>(ParticleType::NuEBar),
-            static_cast<int>(ParticleType::EPlus))
+            static_cast<int>(ParticleType::EPlus),
+            static_cast<int>(ParticleType::NuEBar))
 {
 }
 
@@ -293,8 +281,8 @@ MuMinusDef::MuMinusDef()
             -1.0,
             HardComponentTables::MuonTable,
             DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get())),
-            static_cast<int>(ParticleType::NuMu),
-            static_cast<int>(ParticleType::MuMinus))
+            static_cast<int>(ParticleType::MuMinus),
+            static_cast<int>(ParticleType::NuMu))
 {
 }
 
@@ -308,8 +296,8 @@ MuPlusDef::MuPlusDef()
                   1.0,
                   HardComponentTables::MuonTable,
                   DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())),
-                  static_cast<int>(ParticleType::NuMuBar),
-                  static_cast<int>(ParticleType::MuPlus))
+                  static_cast<int>(ParticleType::MuPlus),
+                  static_cast<int>(ParticleType::NuMuBar))
 {
 }
 
@@ -375,8 +363,8 @@ TauMinusDef::TauMinusDef()
                                       .addDaughter(PiMinusDef::Get())
                                       .addDaughter(NuTauDef::Get())
                                       .build()),
-                  static_cast<int>(ParticleType::NuTau),
-                  static_cast<int>(ParticleType::TauMinus))
+                  static_cast<int>(ParticleType::TauMinus),
+                  static_cast<int>(ParticleType::NuTau))
 {
 }
 
@@ -442,8 +430,8 @@ TauPlusDef::TauPlusDef()
                                       .addDaughter(PiMinusDef::Get())
                                       .addDaughter(NuTauBarDef::Get())
                                       .build()),
-                  static_cast<int>(ParticleType::NuTauBar),
-                  static_cast<int>(ParticleType::TauPlus))
+                  static_cast<int>(ParticleType::TauPlus),
+                  static_cast<int>(ParticleType::NuTauBar))
 {
 }
 
@@ -464,11 +452,108 @@ GammaDef::GammaDef()
         0.0,
         HardComponentTables::EmptyTable,
         DecayTable().addChannel(1.1, StableChannel()),
-        static_cast<int>(ParticleType::Gamma))
+        static_cast<int>(ParticleType::Gamma),
+        static_cast<int>(ParticleType::None))
 {
 }
 
 GammaDef::~GammaDef() {}
+
+NuEDef::NuEDef()
+    : ParticleDef(
+        "NuE",
+        0.0,
+        0.0,
+        STABLE_PARTICLE,
+        0.0,
+        HardComponentTables::EmptyTable,
+        DecayTable().addChannel(1.1, StableChannel()),
+        static_cast<int>(ParticleType::NuE),
+        static_cast<int>(ParticleType::EMinus))
+{
+}
+
+NuEDef::~NuEDef() {}
+
+NuEBarDef::NuEBarDef()
+    : ParticleDef(
+        "NuEBar",
+        0.0,
+        0.0,
+        STABLE_PARTICLE,
+        0.0,
+        HardComponentTables::EmptyTable,
+        DecayTable().addChannel(1.1, StableChannel()),
+        static_cast<int>(ParticleType::NuEBar),
+        static_cast<int>(ParticleType::EPlus))
+{
+}
+
+NuEBarDef::~NuEBarDef() {}
+
+NuMuDef::NuMuDef()
+    : ParticleDef(
+        "NuMu",
+        0.0,
+        0.0,
+        STABLE_PARTICLE,
+        0.0,
+        HardComponentTables::EmptyTable,
+        DecayTable().addChannel(1.1, StableChannel()),
+        static_cast<int>(ParticleType::NuMu),
+        static_cast<int>(ParticleType::MuMinus))
+{
+}
+
+NuMuDef::~NuMuDef() {}
+
+NuMuBarDef::NuMuBarDef()
+    : ParticleDef(
+        "NuMuBar",
+        0.0,
+        0.0,
+        STABLE_PARTICLE,
+        0.0,
+        HardComponentTables::EmptyTable,
+        DecayTable().addChannel(1.1, StableChannel()),
+        static_cast<int>(ParticleType::NuMuBar),
+        static_cast<int>(ParticleType::MuPlus))
+{
+}
+
+NuMuBarDef::~NuMuBarDef() {}
+
+NuTauDef::NuTauDef()
+    : ParticleDef(
+        "NuTau",
+        0.0,
+        0.0,
+        STABLE_PARTICLE,
+        0.0,
+        HardComponentTables::EmptyTable,
+        DecayTable().addChannel(1.1, StableChannel()),
+        static_cast<int>(ParticleType::NuTau),
+        static_cast<int>(ParticleType::TauMinus))
+{
+}
+
+NuTauDef::~NuTauDef() {}
+
+NuTauBarDef::NuTauBarDef()
+    : ParticleDef(
+        "NuTauBar",
+        0.0,
+        0.0,
+        STABLE_PARTICLE,
+        0.0,
+        HardComponentTables::EmptyTable,
+        DecayTable().addChannel(1.1, StableChannel()),
+        static_cast<int>(ParticleType::NuTauBar),
+        static_cast<int>(ParticleType::TauPlus))
+{
+}
+
+NuTauBarDef::~NuTauBarDef() {}
 
 // ------------------------------------------------------------------------- //
 // Signature for following macro definitions:
@@ -491,15 +576,6 @@ PARTICLE_IMP(KPlus, MKAON, LKAON, 1.0, static_cast<int>(ParticleType::KPlus))
 
 PARTICLE_IMP(PMinus, MP, STABLE_PARTICLE, -1.0, static_cast<int>(ParticleType::PMinus))
 PARTICLE_IMP(PPlus, MP, STABLE_PARTICLE, 1.0, static_cast<int>(ParticleType::PPlus))
-
-PARTICLE_IMP(NuE, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuE))
-PARTICLE_IMP(NuEBar, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuEBar))
-
-PARTICLE_IMP(NuMu, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuMu))
-PARTICLE_IMP(NuMuBar, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuMuBar))
-
-PARTICLE_IMP(NuTau, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuTau))
-PARTICLE_IMP(NuTauBar, 0.0, STABLE_PARTICLE, 0.0, static_cast<int>(ParticleType::NuTauBar))
 
 PARTICLE_IMP(Monopole, MMON, STABLE_PARTICLE, CMON, static_cast<int>(ParticleType::Monopole))
 

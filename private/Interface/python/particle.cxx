@@ -52,10 +52,11 @@ void init_particle(py::module& m) {
     py::class_<ParticleDef, std::shared_ptr<ParticleDef>>(m_sub, "ParticleDef")
         .def(py::init<>())
         .def(py::init<std::string, double, double, double, double,
-                      const HardComponentTables::VecType&, const DecayTable&, const int>(),
+                      const HardComponentTables::VecType&, const DecayTable&,
+                      const int, const int>(),
              py::arg("name"), py::arg("mass"), py::arg("low"),
              py::arg("lifetime"), py::arg("charge"), py::arg("hard_component"),
-             py::arg("decay_table"), py::arg("particle_type"))
+             py::arg("decay_table"), py::arg("particle_type"), py::arg("weak_partner"))
         .def(py::init<const ParticleDef&>())
 
         .def("__str__", &py_print<ParticleDef>)
@@ -80,6 +81,14 @@ void init_particle(py::module& m) {
         .def_readonly("decay_table", &ParticleDef::decay_table,
                       R"pbdoc(
                 generate a static particle with in ParticleDefBuilder properties
+            )pbdoc")
+        .def_readonly("particle_type", &ParticleDef::particle_type,
+                      R"pbdoc(
+                particle type of the particle
+            )pbdoc")
+        .def_readonly("weak_partner", &ParticleDef::weak_partner,
+                      R"pbdoc(
+                particle type of the weak partner particle
             )pbdoc")
         // .def_readonly("harc_component_table",
         // &ParticleDef::hard_component_table)
@@ -145,6 +154,16 @@ void init_particle(py::module& m) {
              R"pbdoc(
                 Args:
                     arg1 (???): ???
+            )pbdoc")
+        .def("SetParticleType", &ParticleDef::Builder::SetParticleType,
+             R"pbdoc(
+                Args:
+                    arg1 (int): particle type of the particle
+            )pbdoc")
+        .def("SetWeakPartner", &ParticleDef::Builder::SetWeakPartner,
+             R"pbdoc(
+                Args:
+                    arg1 (ParticleType): particle type of the weak partner particle
             )pbdoc")
         .def("SetParticleDef", &ParticleDef::Builder::SetParticleDef,
              R"pbdoc(
