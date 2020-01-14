@@ -108,8 +108,8 @@ ParticleDef::ParticleDef()
     , charge(0.0)
     , hard_component_table(HardComponentTables::EmptyTable)
     , decay_table()
-    , weak_partner(nullptr)
-    , particle_type(static_cast<int>(ParticleType::None))
+    , particle_type(0)
+    , weak_partner(0)
 {
 }
 
@@ -120,6 +120,7 @@ ParticleDef::ParticleDef(std::string name,
                          double charge,
                          const HardComponentTables::VecType& table,
                          const DecayTable& decay_table,
+                         const int weak_partner,
                          const int particle_type)
     : name(name)
     , mass(mass)
@@ -128,7 +129,7 @@ ParticleDef::ParticleDef(std::string name,
     , charge(charge)
     , hard_component_table(table)
     , decay_table(decay_table)
-    , weak_partner(nullptr)
+    , weak_partner(weak_partner)
     , particle_type(particle_type)
 {
 }
@@ -140,7 +141,6 @@ ParticleDef::ParticleDef(std::string name,
                          double charge,
                          const HardComponentTables::VecType& table,
                          const DecayTable& decay_table,
-                         const ParticleDef& partner,
                          const int particle_type)
         : name(name)
         , mass(mass)
@@ -149,7 +149,7 @@ ParticleDef::ParticleDef(std::string name,
         , charge(charge)
         , hard_component_table(table)
         , decay_table(decay_table)
-        , weak_partner(&partner)
+        , weak_partner(static_cast<int>(ParticleType::None))
         , particle_type(particle_type)
 {
 }
@@ -166,16 +166,6 @@ ParticleDef::ParticleDef(const ParticleDef& def)
     , weak_partner(def.weak_partner)
     , particle_type(def.particle_type)
 {
-}
-
-const ParticleDef* ParticleDef::GetWeakPartner() const {
-    if(weak_partner == nullptr){
-        log_fatal("WeakPartner not defined for particle %s.", name.c_str());
-        return nullptr;
-    }
-    else{
-        return weak_partner;
-    }
 }
 
 // ParticleDef& ParticleDef::operator=(const ParticleDef& def)
@@ -253,7 +243,7 @@ ParticleDef::Builder::Builder()
     , charge(-1)
     , hard_component_table(&HardComponentTables::EmptyTable)
     , decay_table()
-    , weak_partner(nullptr)
+    , weak_partner(static_cast<int>(ParticleType::None))
     , particle_type(static_cast<int>(ParticleType::None))
 {
 }
@@ -271,7 +261,7 @@ EMinusDef::EMinusDef()
             -1.0,
             HardComponentTables::EmptyTable,
             DecayTable().addChannel(1.1, StableChannel()),
-            NuEDef::Get(),
+            static_cast<int>(ParticleType::NuE),
             static_cast<int>(ParticleType::EMinus))
 {
 }
@@ -287,7 +277,7 @@ EPlusDef::EPlusDef()
             1.0,
             HardComponentTables::EmptyTable,
             DecayTable().addChannel(1.1, StableChannel()),
-            NuEBarDef::Get(),
+            static_cast<int>(ParticleType::NuEBar),
             static_cast<int>(ParticleType::EPlus))
 {
 }
@@ -303,7 +293,7 @@ MuMinusDef::MuMinusDef()
             -1.0,
             HardComponentTables::MuonTable,
             DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get())),
-            NuMuDef::Get(),
+            static_cast<int>(ParticleType::NuMu),
             static_cast<int>(ParticleType::MuMinus))
 {
 }
@@ -318,7 +308,7 @@ MuPlusDef::MuPlusDef()
                   1.0,
                   HardComponentTables::MuonTable,
                   DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())),
-                  NuMuBarDef::Get(),
+                  static_cast<int>(ParticleType::NuMuBar),
                   static_cast<int>(ParticleType::MuPlus))
 {
 }
@@ -385,7 +375,7 @@ TauMinusDef::TauMinusDef()
                                       .addDaughter(PiMinusDef::Get())
                                       .addDaughter(NuTauDef::Get())
                                       .build()),
-                  NuTauDef::Get(),
+                  static_cast<int>(ParticleType::NuTau),
                   static_cast<int>(ParticleType::TauMinus))
 {
 }
@@ -452,7 +442,7 @@ TauPlusDef::TauPlusDef()
                                       .addDaughter(PiMinusDef::Get())
                                       .addDaughter(NuTauBarDef::Get())
                                       .build()),
-                  NuTauBarDef::Get(),
+                  static_cast<int>(ParticleType::NuTauBar),
                   static_cast<int>(ParticleType::TauPlus))
 {
 }
