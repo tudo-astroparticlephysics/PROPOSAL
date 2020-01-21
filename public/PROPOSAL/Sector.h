@@ -137,14 +137,19 @@ class Sector {
     double GetDisplacement(const DynamicData, const double, const double);
     double BorderLength(const DynamicData);
 
+
+    double BorderEnergy(double distance, double rnd);
+    double CalculateTime(const DynamicData& p_condition, double final_energy, double displacement);
+
     std::vector<std::tuple<int, double, double>> GetSteplengths(const DynamicData);
-    std::tuple<int, double, double> minimizeSteplengths(const std::vector<std::tuple<int, double, double>>);
+    std::tuple<int, double, double> minimizeSteplengths(std::vector<std::tuple<int, double, double>>);
 
-    DynamicData DoInteraction(const DynamicData);
-    DynamicData DoDecay(const DynamicData);
-    DynamicData DoContinous(const DynamicData, double, double);
+    std::shared_ptr<DynamicData> DoInteraction(const DynamicData);
+    std::shared_ptr<DynamicData> DoDecay(const DynamicData);
+    std::shared_ptr<DynamicData> DoContinuous(const DynamicData, double, double);
+    std::shared_ptr<DynamicData> DoBorder(const DynamicData p_condition);
 
-    std::pair<double, Secondaries> Propagate(DynamicData particle_condition);
+    Secondaries Propagate(DynamicData& particle_condition, double distance, double minimal_energy);
 
 
     /**
