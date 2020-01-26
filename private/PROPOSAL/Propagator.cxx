@@ -635,34 +635,7 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
 
         auto p_condition = std::make_shared<DynamicData>(particle_);
 
-        while (true) {
-            std::vector<std::tuple<int, double, double>> steplengths = current_sector_->GetSteplengths(*p_condition);
-            std::tuple<int, double, double> steplength = current_sector_->minimizeSteplengths(steplengths);
-
-            auto continuous = current_sector_->DoContinuous(*p_condition, std::get<1>(steplength), std::get<2>(steplength));
-            if(std::get<0>(steplength) == 0){
-                p_condition = std::move(current_sector_->DoInteraction(*continuous));
-                secondaries_.push_back(*p_condition);
-            }
-            if(std::get<0>(steplength) == 1){
-                p_condition = std::move(current_sector_->DoDecay(*continuous));
-                particle_.SetEnergy(particle_.GetMass());
-                secondaries_.push_back(*p_condition);
-                break;
-            }
-            if(std::get<0>(steplength) == 2){
-                particle_.SetPosition(p_condition->GetPosition());
-                particle_.SetDirection(p_condition->GetDirection());
-                particle_.SetEnergy(p_condition->GetEnergy());
-                break;
-            }
-            particle_.SetPosition(p_condition->GetPosition());
-            particle_.SetDirection(p_condition->GetDirection());
-            particle_.SetEnergy(p_condition->GetEnergy());
-            particle_.SetParentParticleEnergy(p_condition->GetParentParticleEnergy());
-            particle_.SetTime(p_condition->GetTime());
-            particle_.SetPropagatedDistance(p_condition->GetPropagatedDistance());
-        }
+        current_sector_->Propagate(particle_, distance, 0);
 
         /* for (auto p : sector_result.second->GetSecondaries()) { */
         /* } */

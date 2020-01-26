@@ -23,8 +23,10 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
+#include <algorithm>
+#include <array>
 #include <memory>
-#include <tuple>
+#include <utility>
 using namespace PROPOSAL;
 
 /******************************************************************************
@@ -294,149 +296,12 @@ Sector::~Sector()
     }
 }
 
-// ------------------------------------------------------------------------- //
-double Sector::DecayEnergy(double initial_energy, double rnd)
-{
-    double rndd = -std::log(rnd);
-    double rnddMin = 0;
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %                          Sector Utilities                               %
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    std::pair<double, double> final;
-
-    // solving the tracking integral
-    if (particle_def_.lifetime < 0) {
-        return particle_def_.low;
-    }
-
-    rnddMin
-        = decay_calculator_->Calculate(initial_energy, particle_def_.low, rndd);
-
-    // evaluating the energy loss
-    if (rndd < rnddMin || rnddMin <= 0) {
-        return particle_def_.low;
-    }
-
-    return decay_calculator_->GetUpperLimit(initial_energy, rndd);
-}
-
-double Sector::InteractionEnergy(double initial_energy, double rnd)
-{
-    double rndi = -std::log(rnd);
-    double rndiMin = 0;
-
-    // solving the tracking integral
-    rndiMin = interaction_calculator_->Calculate(
-        initial_energy, particle_def_.low, rndi);
-
-    if (rndi >= rndiMin || rndiMin <= 0) {
-        return particle_def_.low;
-    }
-
-    return interaction_calculator_->GetUpperLimit(initial_energy, rndi);
-}
-
-double Sector::BorderEnergy(double distance, double rnd)
-{
-    return displacement_calculator_->GetUpperLimit(distance, rnd);
-}
-
-double Sector::GetDisplacement(const DynamicData p_condition,
-    const double final_energy, const double border_length)
-{
-    return displacement_calculator_->Calculate(p_condition.GetEnergy(),
-        final_energy, border_length, p_condition.GetPosition(),
-        p_condition.GetDirection());
-}
-
-double Sector::BorderLength(const DynamicData p_condition)
-{
-    // loop ueber alle sektoren hoeherer ordnung die im aktuellen sektor liegen
-    // und getroffen werden koennten
-    return geometry_
-        ->DistanceToBorder(
-            p_condition.GetPosition(), p_condition.GetDirection())
-        .first;
-}
-
-std::vector<std::tuple<int, double, double>> Sector::GetSteplengths(
-    const DynamicData p_condition)
-{
-    double rnd1{ RandomGenerator::Get().RandomDouble() };
-    double rnd2{ RandomGenerator::Get().RandomDouble() };
-
-    double distance_border{ BorderLength(p_condition) };
-
-    double energy_interaction{ InteractionEnergy(
-        p_condition.GetEnergy(), rnd1) };
-    double energy_decay{ DecayEnergy(p_condition.GetEnergy(), rnd2) };
-
-    double distance_interaction{ GetDisplacement(
-        p_condition, energy_interaction, distance_border) };
-    double distance_decay{ GetDisplacement(
-        p_condition, energy_decay, distance_border) };
-
-    int InteractionTypeId = 0;
-    int DecayTypeId = 1;
-    int BorderTypeId = 2;
-
-    double borderEnergy = 0;
-
-    auto interaction = std::make_tuple(
-        InteractionTypeId, energy_interaction, distance_interaction);
-    auto decay = std::make_tuple(DecayTypeId, energy_decay, distance_decay);
-    auto border = std::make_tuple(BorderTypeId, borderEnergy, distance_border);
-
-    std::vector<std::tuple<int, double, double>> stepLengths{ interaction,
-        decay, border };
-
-    return stepLengths;
-}
-
-std::tuple<int, double, double> Sector::minimizeSteplengths(
-    std::vector<std::tuple<int, double, double>> stepLengths)
-{
-    std::tuple<int, double, double> minimalStepLength = stepLengths.front();
-    for (auto& i : stepLengths) {
-        if (std::get<2>(i) <= std::get<2>(minimalStepLength)) {
-            minimalStepLength = i;
-        }
-    }
-    return minimalStepLength;
-}
-
-std::shared_ptr<DynamicData> Sector::DoInteraction(
-    const DynamicData p_condition)
-{
-    std::pair<int, double> stochastic_loss
-        = MakeStochasticLoss(p_condition.GetEnergy());
-
-    CrossSection* cross_section
-        = utility_.GetCrosssection(stochastic_loss.second);
-    std::pair<double, double> deflection_angles
-        = cross_section->StochasticDeflection(
-            p_condition.GetEnergy(), stochastic_loss.first);
-
-    Vector3D new_direction(p_condition.GetDirection());
-    new_direction.deflect(deflection_angles.first, deflection_angles.second);
-
-    double new_energy = p_condition.GetEnergy() - stochastic_loss.first;
-    return std::make_shared<DynamicData>(stochastic_loss.second,
-        p_condition.GetPosition(), new_direction, new_energy,
-        p_condition.GetEnergy(), p_condition.GetTime(),
-        p_condition.GetPropagatedDistance());
-}
-
-std::shared_ptr<DynamicData> Sector::DoDecay(const DynamicData p_condition)
-{
-
-    return std::make_shared<DynamicData>(
-        static_cast<int>(InteractionType::Decay), p_condition.GetPosition(),
-        p_condition.GetDirection(), p_condition.GetEnergy(),
-        p_condition.GetParentParticleEnergy(), p_condition.GetTime(),
-        p_condition.GetPropagatedDistance());
-}
-
-double Sector::CalculateTime(
-    const DynamicData& p_condition, double final_energy, double displacement)
+double Sector::CalculateTime(const DynamicData& p_condition,
+    const double final_energy, const double displacement)
 {
     if (exact_time_calculator_) {
         // DensityDistribution Approximation: Use the DensityDistribution at the
@@ -451,52 +316,29 @@ double Sector::CalculateTime(
     return p_condition.GetTime() + displacement / SPEED;
 }
 
-std::shared_ptr<DynamicData> Sector::DoBorder(const DynamicData p_condition)
+void Sector::Scatter(const double displacement, const double initial_energy,
+    const double final_energy, Vector3D& position, Vector3D& direction)
 {
-    double distance = BorderLength(p_condition);
-    double final_energy = BorderEnergy(distance, 0);
-    double time = CalculateTime(p_condition, final_energy, distance);
-    Vector3D position
-        = p_condition.GetPosition() + distance * p_condition.GetDirection();
-
-    return std::make_shared<DynamicData>(
-        static_cast<int>(InteractionType::ContinuousEnergyLoss), position,
-        p_condition.GetDirection(), final_energy, p_condition.GetEnergy(), time,
-        distance);
-}
-
-std::shared_ptr<DynamicData> Sector::DoContinuous(
-    const DynamicData p_condition, double final_energy, double displacement)
-{
-    double dist{ p_condition.GetPropagatedDistance() };
-    double time{ p_condition.GetTime() };
-
-    Vector3D position{ p_condition.GetPosition() };
-    Vector3D direction{ p_condition.GetDirection() };
-
-    dist += displacement;
-
-    time = CalculateTime(p_condition, final_energy, displacement);
-
     if (sector_def_.scattering_model != ScatteringFactory::Enum::NoScattering) {
-        Directions directions = scattering_->Scatter(displacement,
-            p_condition.GetEnergy(), final_energy, position, direction);
+        Directions directions = scattering_->Scatter(
+            displacement, initial_energy, final_energy, position, direction);
         position = position + displacement * directions.u_;
         direction = directions.n_i_;
     } else {
         position = position + displacement * direction;
     }
+}
 
+double Sector::ContinuousRandomize(
+    const double initial_energy, const double final_energy)
+{
     if (cont_rand_) {
         if (final_energy != particle_def_.low) {
-            final_energy = cont_rand_->Randomize(p_condition.GetEnergy(),
-                final_energy, RandomGenerator::Get().RandomDouble());
+            double rnd = RandomGenerator::Get().RandomDouble();
+            return cont_rand_->Randomize(initial_energy, final_energy, rnd);
         }
     }
-
-    return std::make_shared<DynamicData>(
-        static_cast<int>(InteractionType::ContinuousEnergyLoss), position,
-        direction, final_energy, p_condition.GetEnergy(), time, dist);
+    return final_energy;
 }
 
 std::pair<double, int> Sector::MakeStochasticLoss(double particle_energy)
@@ -524,79 +366,229 @@ std::pair<double, int> Sector::MakeStochasticLoss(double particle_energy)
     return energy_loss;
 }
 
-Secondaries Sector::Propagate(
-    DynamicData& p_initial, double distance, double minimal_energy)
+double Sector::Displacement(const DynamicData& p_condition,
+    const double final_energy, const double border_length)
+{
+    return displacement_calculator_->Calculate(p_condition.GetEnergy(),
+        final_energy, border_length, p_condition.GetPosition(),
+        p_condition.GetDirection());
+}
+
+double Sector::BorderLength(const Vector3D& position, const Vector3D& direction)
+{
+    // loop ueber alle sektoren hoeherer ordnung die im aktuellen sektor liegen
+    // und getroffen werden koennten
+    return geometry_->DistanceToBorder(position, direction).first;
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %                          LossEnergies                                   %
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+double Sector::EnergyDecay(const double initial_energy, const double rnd)
+{
+    double rndd = -std::log(rnd);
+    double rnddMin = 0;
+
+    std::pair<double, double> final;
+
+    // solving the tracking integral
+    if (particle_def_.lifetime < 0) {
+        return particle_def_.low;
+    }
+
+    rnddMin
+        = decay_calculator_->Calculate(initial_energy, particle_def_.low, rndd);
+
+    // evaluating the energy loss
+    if (rndd < rnddMin || rnddMin <= 0) {
+        return particle_def_.low;
+    }
+
+    return decay_calculator_->GetUpperLimit(initial_energy, rndd);
+}
+
+double Sector::EnergyInteraction(const double initial_energy, const double rnd)
+{
+    double rndi = -std::log(rnd);
+    double rndiMin = 0;
+
+    // solving the tracking integral
+    rndiMin = interaction_calculator_->Calculate(
+        initial_energy, particle_def_.low, rndi);
+
+    if (rndi >= rndiMin || rndiMin <= 0) {
+        return particle_def_.low;
+    }
+
+    return interaction_calculator_->GetUpperLimit(initial_energy, rndi);
+}
+
+double Sector::EnergyMinimal(const double current_energy, const double cut)
+{
+    return std::min({ current_energy, cut });
+}
+
+double Sector::EnergyDistance(const double initial_energy, const double distance)
+{
+    return displacement_calculator_->GetUpperLimit(initial_energy, distance);
+}
+
+std::shared_ptr<std::pair<LossType, double>> Sector::maximizeEnergy(
+    const std::array<std::pair<LossType, double>, 5>& LossEnergies)
+{
+    auto minimalLoss
+        = std::make_shared<std::pair<LossType, double>>(LossEnergies.at(0));
+    for (auto& loss : LossEnergies) {
+        if (loss.second > minimalLoss->second) {
+            minimalLoss = std::make_shared<std::pair<LossType, double>>(loss);
+        }
+    }
+    return minimalLoss;
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %                               Do Loss                                   %
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+std::shared_ptr<DynamicData> Sector::DoInteraction(
+    const DynamicData& p_condition)
+{
+    std::pair<int, double> stochastic_loss
+        = MakeStochasticLoss(p_condition.GetEnergy());
+
+    CrossSection* cross_section
+        = utility_.GetCrosssection(stochastic_loss.second);
+    std::pair<double, double> deflection_angles
+        = cross_section->StochasticDeflection(
+            p_condition.GetEnergy(), stochastic_loss.first);
+
+    Vector3D new_direction(p_condition.GetDirection());
+    new_direction.deflect(deflection_angles.first, deflection_angles.second);
+
+    double new_energy = p_condition.GetEnergy() - stochastic_loss.first;
+    return std::make_shared<DynamicData>(stochastic_loss.second,
+        p_condition.GetPosition(), new_direction, new_energy,
+        p_condition.GetEnergy(), p_condition.GetTime(),
+        p_condition.GetPropagatedDistance());
+}
+
+std::shared_ptr<DynamicData> Sector::DoDecay(const DynamicData& p_condition)
 {
 
-    distance += p_initial.GetPropagatedDistance();
-    std::shared_ptr<DynamicData> p_condition
-        = std::make_shared<DynamicData>(p_initial);
-    Secondaries secondaries;
+    return std::make_shared<DynamicData>(
+        static_cast<int>(InteractionType::Decay), p_condition.GetPosition(),
+        p_condition.GetDirection(), p_condition.GetEnergy(),
+        p_condition.GetParentParticleEnergy(), p_condition.GetTime(),
+        p_condition.GetPropagatedDistance());
+}
 
-    do {
+std::shared_ptr<DynamicData> Sector::DoBorder(const DynamicData& p_condition)
+{
+    std::cout << "Further Work required!!" << std::endl;
+
+    double distance
+        = BorderLength(p_condition.GetPosition(), p_condition.GetDirection());
+    double final_energy = displacement_calculator_->GetUpperLimit(
+        p_condition.GetEnergy(), distance);
+
+    double time = CalculateTime(p_condition, final_energy, distance);
+    Vector3D position
+        = p_condition.GetPosition() + distance * p_condition.GetDirection();
+
+    return std::make_shared<DynamicData>(
+        static_cast<int>(InteractionType::ContinuousEnergyLoss), position,
+        p_condition.GetDirection(), final_energy, p_condition.GetEnergy(), time,
+        distance);
+}
+
+std::shared_ptr<DynamicData> Sector::DoContinuous(
+    const DynamicData& p_condition, double final_energy, double sector_border)
+{
+
+    double initial_energy{ p_condition.GetEnergy() };
+    double displacement
+        = Displacement(p_condition, final_energy, sector_border);
+    double dist{ p_condition.GetPropagatedDistance() + displacement };
+    double time{ CalculateTime(p_condition, final_energy, displacement) };
+
+    Vector3D position{ p_condition.GetPosition() };
+    Vector3D direction{ p_condition.GetDirection() };
+
+    time = CalculateTime(p_condition, final_energy, displacement);
+    Scatter(displacement, p_condition.GetEnergy(), final_energy, position,
+        direction);
+    final_energy = ContinuousRandomize(p_condition.GetEnergy(), final_energy);
+
+    return std::make_shared<DynamicData>(
+        static_cast<int>(InteractionType::ContinuousEnergyLoss), position,
+        direction, final_energy, initial_energy, time, dist);
+}
+
+Secondaries Sector::Propagate(
+    const DynamicData& p_initial, double distance, const double minimal_energy)
+{
+
+    Secondaries secondaries(std::make_shared<ParticleDef>(particle_def_));
+
+    auto p_condition = std::make_shared<DynamicData>(p_initial);
+    double dist_limit{ p_initial.GetPropagatedDistance() + distance };
+    double rnd;
+    double dist_border;
+    double e_inter, e_decay, e_border, e_minimal, e_distance;
+    while (true) {
         secondaries.push_back(*p_condition);
 
-        std::vector<std::tuple<int, double, double>> steplengths
-            = GetSteplengths(*p_condition);
-        std::tuple<int, double, double> steplength
-            = minimizeSteplengths(steplengths);
+        rnd = RandomGenerator::Get().RandomDouble();
+        e_inter = EnergyInteraction(p_condition->GetEnergy(), rnd);
 
-        auto continuous = DoContinuous(
-            *p_condition, std::get<1>(steplength), std::get<2>(steplength));
-        if (std::get<0>(steplength) == 0) {
-            p_condition = std::move(DoInteraction(*continuous));
-        }
-        if (std::get<0>(steplength) == 1) {
-            p_condition = std::move(DoDecay(*continuous));
-            secondaries.push_back(*p_condition);
+        rnd = RandomGenerator::Get().RandomDouble();
+        e_decay = EnergyDecay(p_condition->GetEnergy(), rnd);
+
+        dist_border = BorderLength(
+            p_condition->GetPosition(), p_condition->GetDirection());
+        std::cout << "Border Distance:" << dist_border << std::endl;
+        e_border = EnergyDistance(p_condition->GetEnergy(), dist_border);
+
+        e_minimal = EnergyMinimal(p_condition->GetEnergy(), minimal_energy);
+
+        distance = dist_limit - p_condition->GetPropagatedDistance();
+        std::cout << "Max Distance:" << distance << std::endl;
+        e_distance = EnergyDistance(p_condition->GetEnergy(), distance);
+
+        // make them to only array of doubles not array of pairs
+        // position has losstype information
+        std::array<std::pair<LossType, double>, 5> LossEnergies{
+            std::make_pair(LossType::Interaction, e_inter),
+            std::make_pair(LossType::Decay, e_decay),
+            std::make_pair(LossType::Border, e_border),
+            std::make_pair(LossType::MinimalE, e_minimal),
+            std::make_pair(LossType::Distance, e_distance)
+        };
+
+        auto loss = maximizeEnergy(LossEnergies);
+
+        std::cout << "loss: " << loss->first << std::endl;
+        std::cout << "initial_energy: " << p_condition->GetEnergy()
+                  << ", final_energy: " << loss->second
+                  << ", distance: " << distance << std::endl;
+        /* secondaries.push_back(*p_condition); */
+
+        p_condition = DoContinuous(*p_condition, loss->second, distance);
+
+        std::cout << *p_condition << "\n\n" << std::endl;
+
+        if (loss->first == LossType::Interaction) {
+            p_condition = DoInteraction(*p_condition);
+            /* secondaries.push_back(*p_condition); */
+        } else {
+            std::cout << "BREAAAAAAAAAAAAAAAAAAK!!!!" << std::endl;
             break;
         }
-        if (std::get<0>(steplength) == 2) {
-            p_condition = std::move(DoBorder(*continuous));
-            secondaries.push_back(*p_condition);
-            break;
-        }
 
-        std::cout << "p_condition->GetPropagatedDistance():"
-                  << p_condition->GetPropagatedDistance() << std::endl;
-        std::cout << "p_condition->GetEnergy():" << p_condition->GetEnergy()
-                  << std::endl;
-        std::cout << "distance > p_condition->GetPropagatedDistance():"
-                  << (distance > p_condition->GetPropagatedDistance())
-                  << std::endl;
-        std::cout << "minimal_energy < p_condition->GetEnergy()"
-                  << (minimal_energy < p_condition->GetEnergy()) << std::endl;
-    } while (distance > p_condition->GetPropagatedDistance()
-        and minimal_energy < p_condition->GetEnergy());
-
-    DynamicData p_last = secondaries.GetSecondaries().back();
-
-    double border_distance{ p_last.GetPropagatedDistance() };
-    double border_energy{ p_last.GetEnergy() };
-
-    DynamicData p_final(
-        static_cast<int>(InteractionType::ContinuousEnergyLoss));
-    if (distance < border_distance) {
-        border_distance = distance - p_last.GetPropagatedDistance();
-        border_energy = BorderEnergy(border_distance, border_distance);
-    }
-
-    if (minimal_energy > border_energy) {
-        border_energy = minimal_energy;
-        border_distance
-            = GetDisplacement(p_last, minimal_energy, border_distance);
-        distance =p_last.GetPropagatedDistance() + border_distance;
-    }
-    p_final.SetPosition(
-        p_last.GetPosition() + border_distance * p_last.GetDirection());
-    p_final.SetDirection(p_last.GetDirection());
-
-    p_final.SetParentParticleEnergy(p_last.GetEnergy());
-    p_final.SetTime(CalculateTime(p_last, p_last.GetEnergy(), border_distance));
-    p_final.SetPropagatedDistance(distance);
-    p_final.SetEnergy(border_energy);
-
-    secondaries.push_back(p_final);
+    };
+    std::cout << "After do loop:" << std::endl;
+    std::cout << *p_condition << std::endl;
 
     return secondaries;
 }
