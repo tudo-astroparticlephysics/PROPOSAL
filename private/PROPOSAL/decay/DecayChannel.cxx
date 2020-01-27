@@ -116,7 +116,18 @@ double DecayChannel::Momentum(double m1, double m2, double m3)
         return std::sqrt(kaellen) / (2.0 * m1);
     } else
     {
-        log_fatal("Kaellen function is negative. Cannot caluclate momentum");
+        // here this term is numerically unstable,
+        // to handle also the cases at the edge of the phase space
+        // use COMPUTER_PRECISION or std::numeric_limits<double>::epsilon()
+        if (std::abs(m1 - m2 - m3) < m1*COMPUTER_PRECISION)
+        {
+            log_warn("(m1-m2-m3) in Kaellen function is numerically unstable and slightly negative %f. Now set to zero.",
+                (m1 - m2 - m3));
+        }
+        else
+        {
+            log_fatal("Kaellen function is negative. Cannot caluclate momentum");
+        }
         return 0.0;
     }
 }
