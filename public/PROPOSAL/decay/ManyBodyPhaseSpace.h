@@ -57,8 +57,8 @@ public:
     };
 
     typedef std::unordered_map<ParticleDef, PhaseSpaceParameters> ParameterMap;
-    typedef std::function<double(const ParticleDef&, const Secondaries&)> MatrixElementFunction;
-    typedef std::function<void(PhaseSpaceParameters&, const ParticleDef&)> EstimateFunction;
+    typedef std::function<double(const DynamicData&, const Secondaries&)> MatrixElementFunction;
+    typedef std::function<void(PhaseSpaceParameters&, double, const DynamicData&)> EstimateFunction;
 
 public:
     ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters, MatrixElementFunction ME = nullptr);
@@ -88,14 +88,14 @@ public:
     ///
     /// @return matrix element
     // ----------------------------------------------------------------------------
-    static double DefaultEvaluate(const ParticleDef&, const Secondaries&);
+    static double DefaultEvaluate(const DynamicData&, const Secondaries&);
 
     // ----------------------------------------------------------------------------
     /// @brief Evalutate the matrix element of this channel
     ///
     /// @return matrix element
     // ----------------------------------------------------------------------------
-    double Evaluate(const ParticleDef&, const Secondaries&);
+    double Evaluate(const DynamicData&, const Secondaries&);
 
     // ----------------------------------------------------------------------------
     /// @brief Sets the uniform flag
@@ -124,7 +124,7 @@ private:
     ///
     /// @return Vector of particles, the decay products
     // ----------------------------------------------------------------------------
-    double GenerateEvent(Secondaries& products, const PhaseSpaceParameters&, const ParticleDef&);
+    void GenerateEvent(Secondaries& products, const PhaseSpaceKinematics& kinematics);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the normalization of the phase space density
@@ -146,7 +146,7 @@ private:
     ///
     /// @return maximum weight
     // ----------------------------------------------------------------------------
-    void EstimateMaxWeight(PhaseSpaceParameters&, const ParticleDef& parent);
+    void EstimateMaxWeight(PhaseSpaceParameters&, double parent_mass, const DynamicData& p_condition);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the maximum weight for the phase space
@@ -159,7 +159,7 @@ private:
     ///
     /// @return maximum weight
     // ----------------------------------------------------------------------------
-    void SampleEstimateMaxWeight(PhaseSpaceParameters&, const ParticleDef& parent);
+    void SampleEstimateMaxWeight(PhaseSpaceParameters&, double parent_mass, const DynamicData& p_condition);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the normalization and maximum weight
@@ -171,7 +171,7 @@ private:
     ///
     /// @return struct containing the normalization and maximum weight
     // ----------------------------------------------------------------------------
-    PhaseSpaceParameters GetPhaseSpaceParams(const ParticleDef& parent);
+    PhaseSpaceParameters GetPhaseSpaceParams(const ParticleDef& parent_def, const DynamicData& p_condition);
 
 
     // ----------------------------------------------------------------------------
