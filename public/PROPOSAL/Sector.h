@@ -47,7 +47,7 @@ class ContinuousRandomizer;
 // class EnergyCutSettings;
 class Geometry;
 
-enum LossType {
+enum LossType : int {
     Interaction = 0,
     Decay = 1,
     Border = 2,
@@ -140,15 +140,11 @@ public:
      *  \return energy at distance OR -(track length)
      */
 
-    double DecayEnergy(double inital_energy, double rnd);
-    double InteractionEnergy(double inital_energy, double rnd);
-
     // Utilites
     double CalculateTime(const DynamicData& p_condition,
         const double final_energy, const double displacement);
     void Scatter(const double displacement, const double initial_energy,
         const double final_energy, Vector3D& position, Vector3D& direction);
-    double BorderEnergy(double distance, double rnd);
     double ContinuousRandomize(
         const double initial_energy, const double final_energy);
     double Displacement(const DynamicData& p_condition,
@@ -160,18 +156,17 @@ public:
     double EnergyDecay(const double initial_energy, const double rnd);
     double EnergyInteraction(const double initial_energy, const double rnd);
     double EnergyDistance(const double initial_energy, const double distance);
-    std::shared_ptr<std::pair<LossType, double>> maximizeEnergy(
-        const std::array<std::pair<LossType, double>, 5>& LossEnergies);
+    int maximizeEnergy(const std::array<double, 5>& LossEnergies);
 
 
     std::shared_ptr<DynamicData> DoInteraction(const DynamicData&);
     std::shared_ptr<DynamicData> DoDecay(const DynamicData&);
     std::shared_ptr<DynamicData> DoContinuous(
         const DynamicData&, double, double);
-    std::shared_ptr<DynamicData> DoBorder(const DynamicData& );
+    /* std::shared_ptr<DynamicData> DoBorder(const DynamicData& ); */
 
     Secondaries Propagate(const DynamicData& particle_condition, double distance,
-        double minimal_energy);
+        double minimal_energy=0);
 
     /**
      *  Makes Stochastic Energyloss

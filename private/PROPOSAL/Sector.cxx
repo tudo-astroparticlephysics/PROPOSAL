@@ -429,22 +429,22 @@ double Sector::EnergyMinimal(const double current_energy, const double cut)
     return std::min({ current_energy, cut });
 }
 
-double Sector::EnergyDistance(const double initial_energy, const double distance)
+double Sector::EnergyDistance(
+    const double initial_energy, const double distance)
 {
-    return displacement_calculator_->GetUpperLimit(initial_energy, distance);
+    displacement_calculator_->Calculate(
+        initial_energy, particle_def_.low, distance);
+    double aux
+        = displacement_calculator_->GetUpperLimit(initial_energy, distance);
+    return aux;
 }
 
-std::shared_ptr<std::pair<LossType, double>> Sector::maximizeEnergy(
-    const std::array<std::pair<LossType, double>, 5>& LossEnergies)
+int Sector::maximizeEnergy(const std::array<double, 5>& LossEnergies)
 {
-    auto minimalLoss
-        = std::make_shared<std::pair<LossType, double>>(LossEnergies.at(0));
-    for (auto& loss : LossEnergies) {
-        if (loss.second > minimalLoss->second) {
-            minimalLoss = std::make_shared<std::pair<LossType, double>>(loss);
-        }
-    }
-    return minimalLoss;
+    const auto minmax
+        = std::minmax_element(begin(LossEnergies), end(LossEnergies));
+    return std::distance(
+        LossEnergies.begin(), minmax.second); // from postion to indes
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -483,25 +483,6 @@ std::shared_ptr<DynamicData> Sector::DoDecay(const DynamicData& p_condition)
         p_condition.GetPropagatedDistance());
 }
 
-std::shared_ptr<DynamicData> Sector::DoBorder(const DynamicData& p_condition)
-{
-    std::cout << "Further Work required!!" << std::endl;
-
-    double distance
-        = BorderLength(p_condition.GetPosition(), p_condition.GetDirection());
-    double final_energy = displacement_calculator_->GetUpperLimit(
-        p_condition.GetEnergy(), distance);
-
-    double time = CalculateTime(p_condition, final_energy, distance);
-    Vector3D position
-        = p_condition.GetPosition() + distance * p_condition.GetDirection();
-
-    return std::make_shared<DynamicData>(
-        static_cast<int>(InteractionType::ContinuousEnergyLoss), position,
-        p_condition.GetDirection(), final_energy, p_condition.GetEnergy(), time,
-        distance);
-}
-
 std::shared_ptr<DynamicData> Sector::DoContinuous(
     const DynamicData& p_condition, double final_energy, double sector_border)
 {
@@ -509,6 +490,7 @@ std::shared_ptr<DynamicData> Sector::DoContinuous(
     double initial_energy{ p_condition.GetEnergy() };
     double displacement
         = Displacement(p_condition, final_energy, sector_border);
+
     double dist{ p_condition.GetPropagatedDistance() + displacement };
     double time{ CalculateTime(p_condition, final_energy, displacement) };
 
@@ -535,60 +517,41 @@ Secondaries Sector::Propagate(
     double dist_limit{ p_initial.GetPropagatedDistance() + distance };
     double rnd;
     double dist_border;
-    double e_inter, e_decay, e_border, e_minimal, e_distance;
+    int minimalLoss;
+    std::array<double, 5> LossEnergies;
     while (true) {
-        secondaries.push_back(*p_condition);
+        rnd = RandomGenerator::Get().RandomDouble();
+        LossEnergies[LossType::Interaction]
+            = EnergyInteraction(p_condition->GetEnergy(), rnd);
 
         rnd = RandomGenerator::Get().RandomDouble();
-        e_inter = EnergyInteraction(p_condition->GetEnergy(), rnd);
+        LossEnergies[LossType::Decay]
+            = EnergyDecay(p_condition->GetEnergy(), rnd);
 
-        rnd = RandomGenerator::Get().RandomDouble();
-        e_decay = EnergyDecay(p_condition->GetEnergy(), rnd);
+        distance = dist_limit - p_condition->GetPropagatedDistance();
+        LossEnergies[LossType::Distance]
+            = EnergyDistance(p_condition->GetEnergy(), distance);
+
+        LossEnergies[LossType::MinimalE]
+            = EnergyMinimal(p_condition->GetEnergy(), minimal_energy);
 
         dist_border = BorderLength(
             p_condition->GetPosition(), p_condition->GetDirection());
-        std::cout << "Border Distance:" << dist_border << std::endl;
-        e_border = EnergyDistance(p_condition->GetEnergy(), dist_border);
+        LossEnergies[LossType::Border]
+            = EnergyDistance(p_condition->GetEnergy(), dist_border);
 
-        e_minimal = EnergyMinimal(p_condition->GetEnergy(), minimal_energy);
+        minimalLoss = maximizeEnergy(LossEnergies);
 
-        distance = dist_limit - p_condition->GetPropagatedDistance();
-        std::cout << "Max Distance:" << distance << std::endl;
-        e_distance = EnergyDistance(p_condition->GetEnergy(), distance);
+        p_condition = DoContinuous(*p_condition, LossEnergies[minimalLoss], distance);
+        secondaries.push_back(*p_condition);
 
-        // make them to only array of doubles not array of pairs
-        // position has losstype information
-        std::array<std::pair<LossType, double>, 5> LossEnergies{
-            std::make_pair(LossType::Interaction, e_inter),
-            std::make_pair(LossType::Decay, e_decay),
-            std::make_pair(LossType::Border, e_border),
-            std::make_pair(LossType::MinimalE, e_minimal),
-            std::make_pair(LossType::Distance, e_distance)
-        };
-
-        auto loss = maximizeEnergy(LossEnergies);
-
-        std::cout << "loss: " << loss->first << std::endl;
-        std::cout << "initial_energy: " << p_condition->GetEnergy()
-                  << ", final_energy: " << loss->second
-                  << ", distance: " << distance << std::endl;
-        /* secondaries.push_back(*p_condition); */
-
-        p_condition = DoContinuous(*p_condition, loss->second, distance);
-
-        std::cout << *p_condition << "\n\n" << std::endl;
-
-        if (loss->first == LossType::Interaction) {
+        if (minimalLoss == LossType::Interaction) {
             p_condition = DoInteraction(*p_condition);
-            /* secondaries.push_back(*p_condition); */
+            secondaries.push_back(*p_condition);
         } else {
-            std::cout << "BREAAAAAAAAAAAAAAAAAAK!!!!" << std::endl;
             break;
         }
-
     };
-    std::cout << "After do loop:" << std::endl;
-    std::cout << *p_condition << std::endl;
 
     return secondaries;
 }

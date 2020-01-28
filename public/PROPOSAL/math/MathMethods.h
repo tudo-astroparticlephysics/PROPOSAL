@@ -86,7 +86,7 @@ double dilog(double x);
 /// @return root of x
 
 double NewtonRaphson(std::function<double(double)> f, std::function<double(double)> df, double x1, double x2,
-        double xinit, int MAX_STEPS = 100, double xacc = 1.e-6);
+        double xinit, int MAX_STEPS = 101, double xacc = 1.e-6);
 
 struct SplineCoefficients{
     SplineCoefficients()
