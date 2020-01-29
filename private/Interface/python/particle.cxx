@@ -61,6 +61,10 @@ void init_particle(py::module& m) {
         .def("__str__", &py_print<ParticleDef>)
         .def("__eq__", &ParticleDef::operator==)
         .def("__ne__", &ParticleDef::operator!=)
+        .def_readonly("id", &ParticleDef::particle_type,
+                      R"pbdoc(
+                id ot the particle
+            )pbdoc")
         .def_readonly("name", &ParticleDef::name,
                       R"pbdoc(
                 name ot the particle
