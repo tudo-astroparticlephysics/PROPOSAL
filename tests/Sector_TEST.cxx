@@ -1,5 +1,6 @@
 
 #include "gtest/gtest.h"
+#include <algorithm>
 
 #include "PROPOSAL/PROPOSAL.h"
 
@@ -34,8 +35,8 @@ TEST(Comparison, Comparison_equal)
     sector_def.cut_settings                = ecuts;
     sector_def.do_continuous_randomization = true;
 
-    Sector sector(Mu, sector_def);
-    Sector sector_2 = Sector(Mu, sector_def);
+    Sector sector(Mu.GetParticleDef(), sector_def);
+    Sector sector_2 = Sector(Mu.GetParticleDef(), sector_def);
 
     EXPECT_TRUE(sector == sector_2);
 }
@@ -85,16 +86,16 @@ TEST(Comparison, Comparison_not_equal)
     Sector::Definition sector_def9 = sector_def1;
     sector_def9.stopping_decay     = false;
 
-    Sector sector(Mu, sector_def1);
-    Sector sector_1(Tau, sector_def1);
-    Sector sector_2(Mu, sector_def2);
-    Sector sector_3(Mu, sector_def3);
-    Sector sector_4(Mu, sector_def4);
-    Sector sector_5(Mu, sector_def5);
-    Sector sector_6(Mu, sector_def6);
-    Sector sector_7(Mu, sector_def7);
-    Sector sector_8(Mu, sector_def8);
-    Sector sector_9(Mu, sector_def9);
+    Sector sector(Mu.GetParticleDef(), sector_def1);
+    Sector sector_1(Tau.GetParticleDef(), sector_def1);
+    Sector sector_2(Mu.GetParticleDef(), sector_def2);
+    Sector sector_3(Mu.GetParticleDef(), sector_def3);
+    Sector sector_4(Mu.GetParticleDef(), sector_def4);
+    Sector sector_5(Mu.GetParticleDef(), sector_def5);
+    Sector sector_6(Mu.GetParticleDef(), sector_def6);
+    Sector sector_7(Mu.GetParticleDef(), sector_def7);
+    Sector sector_8(Mu.GetParticleDef(), sector_def8);
+    Sector sector_9(Mu.GetParticleDef(), sector_def9);
 
     EXPECT_TRUE(sector != sector_1);
     EXPECT_TRUE(sector != sector_2);
@@ -121,7 +122,7 @@ TEST(Assignment, Copyconstructor)
     sector_def.scattering_model = ScatteringFactory::Moliere;
     sector_def.cut_settings     = ecuts;
 
-    Sector sector_1(mu, sector_def);
+    Sector sector_1(mu.GetParticleDef(), sector_def);
     Sector sector_2 = sector_1;
     EXPECT_TRUE(sector_1 == sector_2);
 }
@@ -140,7 +141,7 @@ TEST(Assignment, Copyconstructor2)
     sector_def.scattering_model = ScatteringFactory::Moliere;
     sector_def.cut_settings     = ecuts;
 
-    Sector sector_1(mu, sector_def);
+    Sector sector_1(mu.GetParticleDef(), sector_def);
     Sector sector_2(sector_1);
     EXPECT_TRUE(sector_1 == sector_2);
 }
@@ -167,12 +168,11 @@ TEST(Sector, Propagate)
     double stochasticLoss_stored;
     double energy_final_calc;
     double energy_final_stored;
-    double energy_previous = -1;
     double energy_init;
     double distance;
     double ecut, vcut;
-    std::pair<double, Secondaries> prop_aux;
 
+    Medium* medium;
     bool first_line = true;
 
     std::cout.precision(16);
@@ -187,39 +187,44 @@ TEST(Sector, Propagate)
             first_line = false;
         }
 
-        energy_previous   = -1;
-        Particle particle = Particle(getParticleDef(particleName));
-        particle.SetEnergy(energy_init);
-        particle.SetDirection(Vector3D(1, 0, 0));
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        ParticleDef p_def= getParticleDef(particleName);
+
+        DynamicData p_condition(p_def.particle_type);
+        p_condition.SetEnergy(energy_init);
+        p_condition.SetDirection(Vector3D(1, 0, 0));
+        p_condition.SetEnergy(energy_init);
+        medium = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         Sector::Definition sector_def;
         sector_def.SetMedium(*medium);
         sector_def.cut_settings = ecuts;
 
-        Sector sector(particle, sector_def, InterpolationDef());
+        Sector sector(p_def, sector_def, InterpolationDef());
 
-        while (energy_previous < energy_init)
-        {
-            energy_previous = energy_init;
-            particle.SetEnergy(energy_init);
-            particle.SetDirection(Vector3D(1, 0, 0));
+        p_condition.SetDirection(Vector3D(1, 0, 0));
 
-            energyTillStochastic_calc = sector.CalculateEnergyTillStochastic(energy_init).first;
-            stochasticLoss_calc = std::get<0>(sector.MakeStochasticLoss(energy_init));
-            prop_aux = sector.Propagate(distance);
-            energy_final_calc = prop_aux.first;
+        double rndd = RandomGenerator::Get().RandomDouble();
+        double DecayEnergy = sector.EnergyDecay(p_condition.GetEnergy(), rndd);
+        double rndi = RandomGenerator::Get().RandomDouble();
+        double InteractionEnergy = sector.EnergyInteraction(p_condition.GetEnergy(), rndi);
+        energyTillStochastic_calc = std::max({InteractionEnergy, DecayEnergy});
 
-            ASSERT_NEAR(energyTillStochastic_calc, energyTillStochastic_stored, std::abs(1e-3 * energyTillStochastic_calc));
-            ASSERT_NEAR(stochasticLoss_calc, stochasticLoss_stored, std::abs(1e-3 * stochasticLoss_calc));
-            ASSERT_NEAR(energy_final_calc, energy_final_stored, std::abs(1e-3 * energy_final_calc));
+        stochasticLoss_calc = std::get<0>(sector.MakeStochasticLoss(energy_init));
 
-            in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energyTillStochastic_stored >> stochasticLoss_stored >> energy_final_stored >> distance;
-        }
+        Secondaries secondaries = sector.Propagate(p_condition, distance, 105);
+        /* secondaries.DoDecay(); */
 
-        delete medium;
+        energy_final_calc = secondaries.GetSecondaries().back().GetEnergy();
+
+        ASSERT_NEAR(energyTillStochastic_calc, energyTillStochastic_stored, std::abs(1e-3 * energyTillStochastic_calc));
+        ASSERT_NEAR(stochasticLoss_calc, stochasticLoss_stored, std::abs(1e-3 * stochasticLoss_calc));
+        ASSERT_NEAR(energy_final_calc, energy_final_stored, std::abs(1e-3 * energy_final_calc));
+
+        in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energyTillStochastic_stored >> stochasticLoss_stored >> energy_final_stored >> distance;
+
     }
+    delete medium;
 }
 
 int main(int argc, char** argv)

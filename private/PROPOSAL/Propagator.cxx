@@ -635,14 +635,11 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
 
         auto p_condition = std::make_shared<DynamicData>(particle_);
 
-        current_sector_->Propagate(particle_, distance, 0);
+        secondaries_.append(current_sector_->Propagate(particle_, distance, 0));
 
         /* for (auto p : sector_result.second->GetSecondaries()) { */
         /* } */
         double tmp_energy = secondaries_.GetSecondaries().back().GetEnergy();
-        std::cout << "tmp_energy: " << tmp_energy << std::endl;
-        std::cout << "particle energy: " << particle_.GetEnergy()<< std::endl;
-        std::cout << "particle low: " << particle_.GetLow()<< std::endl;
         if (propagationstep_till_closest_approach)
         {
             particle_.SetClosestApproachPoint(particle_.GetPosition());

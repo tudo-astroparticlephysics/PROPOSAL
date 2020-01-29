@@ -432,19 +432,19 @@ double Sector::EnergyMinimal(const double current_energy, const double cut)
 double Sector::EnergyDistance(
     const double initial_energy, const double distance)
 {
-    displacement_calculator_->Calculate(
-        initial_energy, particle_def_.low, distance);
-    double aux
-        = displacement_calculator_->GetUpperLimit(initial_energy, distance);
-    return aux;
+    return  displacement_calculator_->GetUpperLimit(initial_energy, distance);
 }
 
-int Sector::maximizeEnergy(const std::array<double, 5>& LossEnergies)
+int Sector::maximizeEnergy(const std::array<double, 4>& LossEnergies)
 {
     const auto minmax
         = std::minmax_element(begin(LossEnergies), end(LossEnergies));
-    return std::distance(
-        LossEnergies.begin(), minmax.second); // from postion to indes
+
+    if (*minmax.second == LossEnergies[LossType::Decay]) {
+        return LossType::Decay;
+    } else {
+        return std::distance(LossEnergies.begin(), minmax.second);
+    }
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -473,14 +473,16 @@ std::shared_ptr<DynamicData> Sector::DoInteraction(
         p_condition.GetPropagatedDistance());
 }
 
-std::shared_ptr<DynamicData> Sector::DoDecay(const DynamicData& p_condition)
+std::shared_ptr<DynamicData> Sector::DoDecay(
+    const DynamicData& p_condition, double decay_energy, double sector_border)
 {
+    auto continuous = DoContinuous(p_condition, decay_energy, sector_border);
 
     return std::make_shared<DynamicData>(
-        static_cast<int>(InteractionType::Decay), p_condition.GetPosition(),
-        p_condition.GetDirection(), p_condition.GetEnergy(),
-        p_condition.GetParentParticleEnergy(), p_condition.GetTime(),
-        p_condition.GetPropagatedDistance());
+        static_cast<int>(InteractionType::Decay), continuous->GetPosition(),
+        continuous->GetDirection(), continuous->GetEnergy(),
+        continuous->GetParentParticleEnergy(), continuous->GetTime(),
+        continuous->GetPropagatedDistance());
 }
 
 std::shared_ptr<DynamicData> Sector::DoContinuous(
@@ -516,17 +518,17 @@ Secondaries Sector::Propagate(
     auto p_condition = std::make_shared<DynamicData>(p_initial);
     double dist_limit{ p_initial.GetPropagatedDistance() + distance };
     double rnd;
-    double dist_border;
     int minimalLoss;
-    std::array<double, 5> LossEnergies;
-    while (true) {
-        rnd = RandomGenerator::Get().RandomDouble();
-        LossEnergies[LossType::Interaction]
-            = EnergyInteraction(p_condition->GetEnergy(), rnd);
+    std::array<double, 4> LossEnergies;
 
+    while (true) {
         rnd = RandomGenerator::Get().RandomDouble();
         LossEnergies[LossType::Decay]
             = EnergyDecay(p_condition->GetEnergy(), rnd);
+
+        rnd = RandomGenerator::Get().RandomDouble();
+        LossEnergies[LossType::Interaction]
+            = EnergyInteraction(p_condition->GetEnergy(), rnd);
 
         distance = dist_limit - p_condition->GetPropagatedDistance();
         LossEnergies[LossType::Distance]
@@ -535,23 +537,25 @@ Secondaries Sector::Propagate(
         LossEnergies[LossType::MinimalE]
             = EnergyMinimal(p_condition->GetEnergy(), minimal_energy);
 
-        dist_border = BorderLength(
-            p_condition->GetPosition(), p_condition->GetDirection());
-        LossEnergies[LossType::Border]
-            = EnergyDistance(p_condition->GetEnergy(), dist_border);
-
         minimalLoss = maximizeEnergy(LossEnergies);
 
         p_condition = DoContinuous(*p_condition, LossEnergies[minimalLoss], distance);
         secondaries.push_back(*p_condition);
 
-        if (minimalLoss == LossType::Interaction) {
+        if (minimalLoss != LossType::Interaction) {
+            break;
+        } else {
             p_condition = DoInteraction(*p_condition);
             secondaries.push_back(*p_condition);
-        } else {
-            break;
         }
     };
+
+    if (minimalLoss == LossType::Decay) {
+        p_condition
+            = DoDecay(*p_condition, LossEnergies[LossType::Decay], distance);
+    }
+
+    secondaries.push_back(*p_condition);
 
     return secondaries;
 }

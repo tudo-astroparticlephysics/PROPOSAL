@@ -140,6 +140,7 @@ TEST(Propagation, Test_nan)
         // Using propagator service
         // ----------------------------------------------------------------- //
 
+        std::cout << i << std::endl;
         // Set particle properties
         mu.SetEnergy(std::pow(10, EmaxLog10));
         mu.SetPropagatedDistance(0);
@@ -152,7 +153,9 @@ TEST(Propagation, Test_nan)
         tau.SetDirection(Vector3D(0, 0, -1));
 
         // Use service to propagate different particle
+        std::cout << "Muon" << std::endl;
         Secondaries sec_mu  = prop_service.Propagate(mu);
+        std::cout << "Tau" << std::endl;
         Secondaries sec_tau = prop_service.Propagate(tau);
 
         // ----------------------------------------------------------------- //

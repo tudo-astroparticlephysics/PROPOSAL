@@ -50,9 +50,8 @@ class Geometry;
 enum LossType : int {
     Interaction = 0,
     Decay = 1,
-    Border = 2,
+    Distance = 2,
     MinimalE = 3,
-    Distance = 4,
 };
 
 
@@ -156,11 +155,11 @@ public:
     double EnergyDecay(const double initial_energy, const double rnd);
     double EnergyInteraction(const double initial_energy, const double rnd);
     double EnergyDistance(const double initial_energy, const double distance);
-    int maximizeEnergy(const std::array<double, 5>& LossEnergies);
+    int maximizeEnergy(const std::array<double, 4>& LossEnergies);
 
 
     std::shared_ptr<DynamicData> DoInteraction(const DynamicData&);
-    std::shared_ptr<DynamicData> DoDecay(const DynamicData&);
+    std::shared_ptr<DynamicData> DoDecay(const DynamicData&, double, double);
     std::shared_ptr<DynamicData> DoContinuous(
         const DynamicData&, double, double);
     /* std::shared_ptr<DynamicData> DoBorder(const DynamicData& ); */
