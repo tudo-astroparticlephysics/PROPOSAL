@@ -1,26 +1,41 @@
 import pyPROPOSAL as pp
 import numpy as np 
 
+def matrix_element_evaluate(particle, products):
+    G_F = 1.1663787*1e-2  # MeV
+    # G_F = scipy.constants.value(u'Fermi coupling constant') * 1e1
+
+    muon = particle
+    electron = products.particles[0]
+    numu = products.particles[1]
+    nuebar = products.particles[2]
+
+    p1 = muon.energy * nuebar.energy - (muon.momentum * muon.direction) * (nuebar.momentum * nuebar.direction)
+    p2 = electron.energy * numu.energy - (electron.momentum * electron.direction) * (numu.momentum * numu.direction)
+
+    return 64 * G_F**2 * p1 * p2
+
 def create_table(dir_name, particle_def, init_energy, decay_products, filename, statistics=int(1e6), NUM_bins=50):
     pp.RandomGenerator.get().set_seed(1234)
 
-    init_particle = pp.particle.Particle(particle_def)
+    init_particle = pp.particle.DynamicData(particle_def.particle_type)
     init_particle.energy = init_energy
     products = decay_products
     decay_channels = [pp.decay.LeptonicDecayChannelApprox(*products),
                       pp.decay.LeptonicDecayChannel(*products),
-                      pp.decay.ManyBodyPhaseSpace(products) 
+                      pp.decay.ManyBodyPhaseSpace(products, matrix_element_evaluate)
                      ]
     decay_names = ["LeptonicDecayChannelApprox", "LeptonicDecayChannel", "ManyBody"]
 
     histrogram_list = []
 
-    v_max = ( init_particle.particle_def.mass**2 + products[0].mass**2 ) / (2 * init_particle.particle_def.mass)
+    v_max = ( particle_def.mass**2 + products[0].mass**2 ) / (2 * particle_def.mass)
     gamma = init_particle.energy / particle_def.mass
     betagamma = init_particle.momentum / particle_def.mass
     E_max = gamma * v_max + betagamma * np.sqrt(v_max**2 - products[0].mass**2)
 
     for channel in decay_channels:
+        print(particle_def.name, init_energy, channel)
         prod_0_energies = []
         prod_1_energies = []
         prod_2_energies = []
@@ -29,14 +44,14 @@ def create_table(dir_name, particle_def, init_energy, decay_products, filename, 
             init_particle.direction = pp.Vector3D(0, 0, -1)
             init_particle.energy = init_energy
             init_particle.propagated_distance = 0
-            
-            decay_products = channel.decay(init_particle)
-            for p in decay_products:
-                if p.particle_def==products[0]:
+
+            decay_products = channel.decay(particle_def, init_particle)
+            for p in decay_products.particles:
+                if p.id==products[0].particle_type:
                     prod_0_energies.append(p.energy)
-                elif p.particle_def==products[1]:
+                elif p.id==products[1].particle_type:
                     prod_1_energies.append(p.energy)
-                elif p.particle_def==products[2]:
+                elif p.id==products[2].particle_type:
                     prod_2_energies.append(p.energy)
                 else:
                     assert("This should never happen")
