@@ -241,8 +241,8 @@ public:
 
     // --------------------------------------------------------------------- //
 
+    Particle operator=(const Particle&);
 private:
-    Particle& operator=(const Particle&);
     virtual void print(std::ostream&) const;
 
     const ParticleDef particle_def_; //!< static defenitions of the particle
