@@ -295,7 +295,7 @@ MuPlusDef::MuPlusDef()
                   LMU,
                   1.0,
                   HardComponentTables::MuonTable,
-                  DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())),
+                  DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EPlusDef::Get(), NuMuBarDef::Get(), NuEDef::Get())),
                   static_cast<int>(ParticleType::MuPlus),
                   static_cast<int>(ParticleType::NuMuBar))
 {

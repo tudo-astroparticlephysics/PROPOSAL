@@ -242,6 +242,11 @@ void init_particle(py::module& m) {
                       R"pbdoc(
                 Energy of secondary particle.
             )pbdoc")
+        .def_property("momentum", &DynamicData::GetMomentum,
+                      &DynamicData::SetMomentum,
+                      R"pbdoc(
+                Momentum of primary particle in MeV
+            )pbdoc")
         .def_property("parent_particle_energy",
                       &DynamicData::GetParentParticleEnergy,
                       &DynamicData::SetParentParticleEnergy,
@@ -286,7 +291,7 @@ void init_particle(py::module& m) {
         .def_property("momentum", &Particle::GetMomentum,
                       &Particle::SetMomentum,
                       R"pbdoc(
-                Momentum of primary particle in eV
+                Momentum of primary particle in MeV
             )pbdoc")
         .def_property("entry_point", &Particle::GetEntryPoint,
                       &Particle::SetEntryPoint,
