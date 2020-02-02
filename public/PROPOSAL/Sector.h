@@ -164,6 +164,8 @@ class Sector {
      */
     std::pair<double, int> MakeStochasticLoss(double particle_energy);
 
+    double EnergyDistance(double initial_energy, double disp);
+
     // --------------------------------------------------------------------- //
     // Enable options & Setter
     // --------------------------------------------------------------------- //

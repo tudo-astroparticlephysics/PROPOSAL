@@ -2,19 +2,19 @@
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/PROPOSAL.h"
-
+#include <string>
 using namespace PROPOSAL;
+
+/* std::string PATH_TO_TABLES = "~/.local/share/PROPOSAL/tables"; */
+std::string PATH_TO_TABLES = "";
 
 ParticleDef getParticleDef(const std::string& name)
 {
-    if (name == "MuMinus")
-    {
+    if (name == "MuMinus") {
         return MuMinusDef::Get();
-    } else if (name == "TauMinus")
-    {
+    } else if (name == "TauMinus") {
         return TauMinusDef::Get();
-    } else
-    {
+    } else {
         return EMinusDef::Get();
     }
 }
@@ -30,8 +30,8 @@ TEST(Comparison, Comparison_equal)
     sector_def.location = Sector::ParticleLocation::InsideDetector;
     sector_def.SetMedium(medium);
     sector_def.SetGeometry(sphere);
-    sector_def.scattering_model            = ScatteringFactory::Moliere;
-    sector_def.cut_settings                = ecuts;
+    sector_def.scattering_model = ScatteringFactory::Moliere;
+    sector_def.cut_settings = ecuts;
     sector_def.do_continuous_randomization = true;
 
     Sector sector(Mu, sector_def);
@@ -55,14 +55,14 @@ TEST(Comparison, Comparison_not_equal)
     sector_def1.location = Sector::ParticleLocation::InsideDetector;
     sector_def1.SetMedium(medium1);
     sector_def1.SetGeometry(geometry1);
-    sector_def1.scattering_model            = ScatteringFactory::Moliere;
-    sector_def1.cut_settings                = ecuts1;
+    sector_def1.scattering_model = ScatteringFactory::Moliere;
+    sector_def1.cut_settings = ecuts1;
     sector_def1.do_continuous_randomization = true;
-    sector_def1.do_exact_time_calculation   = true;
-    sector_def1.stopping_decay              = true;
+    sector_def1.do_exact_time_calculation = true;
+    sector_def1.stopping_decay = true;
 
     Sector::Definition sector_def2 = sector_def1;
-    sector_def2.location           = Sector::ParticleLocation::InfrontDetector;
+    sector_def2.location = Sector::ParticleLocation::InfrontDetector;
 
     Sector::Definition sector_def3 = sector_def1;
     sector_def3.SetMedium(medium2);
@@ -71,19 +71,19 @@ TEST(Comparison, Comparison_not_equal)
     sector_def4.SetGeometry(geometry2);
 
     Sector::Definition sector_def5 = sector_def1;
-    sector_def5.scattering_model   = ScatteringFactory::Highland;
+    sector_def5.scattering_model = ScatteringFactory::Highland;
 
     Sector::Definition sector_def6 = sector_def1;
-    sector_def6.cut_settings       = ecuts2;
+    sector_def6.cut_settings = ecuts2;
 
-    Sector::Definition sector_def7          = sector_def1;
+    Sector::Definition sector_def7 = sector_def1;
     sector_def7.do_continuous_randomization = false;
 
-    Sector::Definition sector_def8        = sector_def1;
+    Sector::Definition sector_def8 = sector_def1;
     sector_def8.do_exact_time_calculation = false;
 
     Sector::Definition sector_def9 = sector_def1;
-    sector_def9.stopping_decay     = false;
+    sector_def9.stopping_decay = false;
 
     Sector sector(Mu, sector_def1);
     Sector sector_1(Tau, sector_def1);
@@ -119,7 +119,7 @@ TEST(Assignment, Copyconstructor)
     sector_def.SetMedium(water);
     sector_def.SetGeometry(geometry);
     sector_def.scattering_model = ScatteringFactory::Moliere;
-    sector_def.cut_settings     = ecuts;
+    sector_def.cut_settings = ecuts;
 
     Sector sector_1(mu, sector_def);
     Sector sector_2 = sector_1;
@@ -138,96 +138,235 @@ TEST(Assignment, Copyconstructor2)
     sector_def.SetMedium(water);
     sector_def.SetGeometry(geometry);
     sector_def.scattering_model = ScatteringFactory::Moliere;
-    sector_def.cut_settings     = ecuts;
+    sector_def.cut_settings = ecuts;
 
     Sector sector_1(mu, sector_def);
     Sector sector_2(sector_1);
     EXPECT_TRUE(sector_1 == sector_2);
 }
 
-TEST(Sector, Propagate)
+TEST(Sector, Continous)
 {
     std::ifstream in;
-    std::string filename = "bin/TestFiles/Sector_propagate.txt";
+    std::string filename = "bin/TestFiles/Sector_ContinousLoss.txt";
     in.open(filename.c_str());
 
-    if (!in.good())
-    {
+    if (!in.good()) {
         std::cerr << "File \"" << filename << "\" not found" << std::endl;
     }
 
+    std::cout.precision(16);
+    RandomGenerator::Get().SetSeed(1234);
     std::string particleName;
     std::string mediumName;
-
-    Utility::Definition utility_def;
-
-    double energyTillStochastic_calc;
-    double energyTillStochastic_stored;
-    double stochasticLoss_calc;
-    double stochasticLoss_stored;
-    double energy_final_calc;
-    double energy_final_stored;
-    double energy_previous = -1;
-    double energy_init;
-    double distance;
     double ecut, vcut;
-    std::pair<double, Secondaries> prop_aux;
-    double random_ch;
+    double energy, initial_energy;
+    InterpolationDef inter_def;
+    inter_def.path_to_tables = PATH_TO_TABLES;
+    inter_def.path_to_tables_readonly = PATH_TO_TABLES;
 
-    bool first_line = true;
+    Sector::Definition sector_def;
+    Particle* particle = new Particle(MuMinusDef::Get());
+    Medium* medium = new Medium(sector_def.GetMedium());
+    EnergyCutSettings* cuts = new EnergyCutSettings(sector_def.cut_settings);
+    Sector* sector = new Sector(*particle, sector_def, inter_def);
+
+    std::string str;
+    while (getline(in, str)) {
+        std::istringstream ss(str);
+        ss >> particleName >> mediumName >> ecut >> vcut >> initial_energy;
+
+        if (particle->GetParticleDef().name != particleName
+            || cuts->GetEcut() != ecut || cuts->GetVcut() != vcut
+            || medium->GetName() != mediumName) {
+            delete particle, sector, medium, cuts;
+
+            cuts = new EnergyCutSettings(ecut, vcut);
+            medium = MediumFactory::Get().CreateMedium(mediumName);
+            particle = new Particle(getParticleDef(particleName));
+
+            sector_def.SetMedium(*medium);
+            sector_def.cut_settings = *cuts;
+
+            sector = new Sector(*particle, sector_def, inter_def);
+        }
+
+        while (ss >> energy) {
+            std::pair<double, double> energies
+                = sector->CalculateEnergyTillStochastic(initial_energy);
+            double energy_calc = std::max(energies.first, energies.second);
+            ASSERT_NEAR(energy_calc, energy, std::abs(1e-3 * energy_calc));
+            initial_energy = energy;
+        }
+    }
+
+}
+
+TEST(Sector, Stochastic)
+{
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Sector_StochasticLoss.txt";
+    in.open(filename.c_str());
+
+    if (!in.good()) {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
 
     std::cout.precision(16);
-
     RandomGenerator::Get().SetSeed(1234);
+    std::string particleName;
+    std::string mediumName;
+    double ecut, vcut;
+    double energy, initial_energy;
+    InterpolationDef inter_def;
+    inter_def.path_to_tables = PATH_TO_TABLES;
+    inter_def.path_to_tables_readonly = PATH_TO_TABLES;
 
-    while (in.good())
-    {
-        if (first_line)
-        {
-            in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energyTillStochastic_stored >> stochasticLoss_stored >> energy_final_stored >> distance;
-            first_line = false;
+    Sector::Definition sector_def;
+    Particle* particle = new Particle(MuMinusDef::Get());
+    Medium* medium = new Medium(sector_def.GetMedium());
+    EnergyCutSettings* cuts = new EnergyCutSettings(sector_def.cut_settings);
+    Sector* sector = new Sector(*particle, sector_def, inter_def);
+
+    std::string str;
+    while (getline(in, str)) {
+        std::istringstream ss(str);
+        ss >> particleName >> mediumName >> ecut >> vcut >> initial_energy;
+
+        if (particle->GetParticleDef().name != particleName
+            || cuts->GetEcut() != ecut || cuts->GetVcut() != vcut
+            || medium->GetName() != mediumName) {
+            delete particle, sector, medium, cuts;
+
+            cuts = new EnergyCutSettings(ecut, vcut);
+            medium = MediumFactory::Get().CreateMedium(mediumName);
+            particle = new Particle(getParticleDef(particleName));
+
+            sector_def.SetMedium(*medium);
+            sector_def.cut_settings = *cuts;
+
+            sector = new Sector(*particle, sector_def, inter_def);
         }
 
-        energy_previous   = -1;
-        Particle particle = Particle(getParticleDef(particleName));
-        particle.SetEnergy(energy_init);
-        particle.SetDirection(Vector3D(1, 0, 0));
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut, vcut);
+        while (ss >> energy) {
+            double energy_calc
+                = std::get<0>(sector->MakeStochasticLoss(initial_energy));
+            ASSERT_NEAR(energy_calc, energy, std::abs(1e-3 * energy_calc));
+            initial_energy = energy;
+        }
+    }
+}
 
-        Sector::Definition sector_def;
-        sector_def.SetMedium(*medium);
-        sector_def.cut_settings = ecuts;
+TEST(Sector, EnergyDisplacement)
+{
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Sector_Energy_Distance.txt";
+    in.open(filename.c_str());
 
-        Sector sector(particle, sector_def, InterpolationDef());
+    if (!in.good()) {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
 
-        while (energy_previous < energy_init)
-        {
-            energy_previous = energy_init;
-            particle.SetEnergy(energy_init);
-            particle.SetDirection(Vector3D(1, 0, 0));
+    std::cout.precision(16);
+    RandomGenerator::Get().SetSeed(1234);
+    std::string particleName;
+    std::string mediumName;
+    double ecut, vcut;
+    double displacement, energy, initial_energy;
+    InterpolationDef inter_def;
+    inter_def.path_to_tables = PATH_TO_TABLES;
+    inter_def.path_to_tables_readonly = PATH_TO_TABLES;
 
-            energyTillStochastic_calc = sector.CalculateEnergyTillStochastic(energy_init).first;
-            stochasticLoss_calc = std::get<0>(sector.MakeStochasticLoss(energy_init));
-            prop_aux = sector.Propagate(distance);
-            energy_final_calc = prop_aux.first;
+    Sector::Definition sector_def;
+    Particle* particle = new Particle(MuMinusDef::Get());
+    Medium* medium = new Medium(sector_def.GetMedium());
+    EnergyCutSettings* cuts = new EnergyCutSettings(sector_def.cut_settings);
+    Sector* sector = new Sector(*particle, sector_def, inter_def);
 
-            // TODO: this is just to include the random numbers, sampeled in the decay
-            // to get the correct rnd ordering for the unit test.
-            if (particle.GetEnergy() == particle.GetMass())
-            {
-                random_ch = RandomGenerator::Get().RandomDouble();
-                Secondaries products = particle.GetDecayTable().SelectChannel(random_ch).Decay(particle.GetParticleDef(), particle);
-            }
+    std::string str;
+    while (getline(in, str)) {
+        std::istringstream ss(str);
+        ss >> particleName >> mediumName >> ecut >> vcut >> initial_energy;
 
-            ASSERT_NEAR(energyTillStochastic_calc, energyTillStochastic_stored, std::abs(1e-3 * energyTillStochastic_calc));
-            ASSERT_NEAR(stochasticLoss_calc, stochasticLoss_stored, std::abs(1e-3 * stochasticLoss_calc));
-            ASSERT_NEAR(energy_final_calc, energy_final_stored, std::abs(1e-3 * energy_final_calc));
+        if (particle->GetParticleDef().name != particleName
+            || cuts->GetEcut() != ecut || cuts->GetVcut() != vcut
+            || medium->GetName() != mediumName) {
+            delete particle, sector, medium, cuts;
 
-            in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energyTillStochastic_stored >> stochasticLoss_stored >> energy_final_stored >> distance;
+            cuts = new EnergyCutSettings(ecut, vcut);
+            medium = MediumFactory::Get().CreateMedium(mediumName);
+            particle = new Particle(getParticleDef(particleName));
+
+            sector_def.SetMedium(*medium);
+            sector_def.cut_settings = *cuts;
+
+            sector = new Sector(*particle, sector_def, inter_def);
         }
 
-        delete medium;
+        while (ss >> displacement >> energy) {
+            double energy_calc
+                = sector->EnergyDistance(initial_energy, displacement);
+            ASSERT_NEAR(energy_calc, energy, std::abs(1e-3 * energy_calc));
+        }
+    }
+}
+
+TEST(Sector, Propagate)
+{
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Sector_Propagate.txt";
+    in.open(filename.c_str());
+
+    if (!in.good()) {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    std::cout.precision(16);
+    RandomGenerator::Get().SetSeed(1234);
+    std::string particleName;
+    std::string mediumName;
+    double ecut, vcut;
+    double energy, initial_energy;
+    int produced_particle;
+    InterpolationDef inter_def;
+    inter_def.path_to_tables = PATH_TO_TABLES;
+    inter_def.path_to_tables_readonly = PATH_TO_TABLES;
+
+    Sector::Definition sector_def;
+    Particle* particle = new Particle(MuMinusDef::Get());
+    Medium* medium = new Medium(sector_def.GetMedium());
+    EnergyCutSettings* cuts = new EnergyCutSettings(sector_def.cut_settings);
+    Sector* sector = new Sector(*particle, sector_def, inter_def);
+
+    std::string str;
+    while (getline(in, str)) {
+        std::istringstream ss(str);
+        ss >> particleName >> mediumName >> ecut >> vcut >> initial_energy;
+
+        if (particle->GetParticleDef().name != particleName
+            || cuts->GetEcut() != ecut || cuts->GetVcut() != vcut
+            || medium->GetName() != mediumName) {
+            delete particle, sector, medium, cuts;
+
+            cuts = new EnergyCutSettings(ecut, vcut);
+            medium = MediumFactory::Get().CreateMedium(mediumName);
+            particle = new Particle(getParticleDef(particleName));
+
+            sector_def.SetMedium(*medium);
+            sector_def.cut_settings = *cuts;
+
+            sector = new Sector(*particle, sector_def, inter_def);
+        }
+
+        while (ss >> produced_particle >> energy) {
+            particle->SetDirection(Vector3D(0, 0, -1));
+            particle->SetPosition(Vector3D(0, 0, 0));
+            particle->SetEnergy(initial_energy);
+
+            std::pair<double, Secondaries> aux = sector->Propagate(1000);
+            int produced_particle = aux.second.GetNumberOfParticles();
+            ASSERT_NEAR(aux.first, energy, std::abs(1e-3 * aux.first));
+        }
     }
 }
 
