@@ -221,9 +221,10 @@ double UtilityInterpolantDisplacement::GetUpperLimit(double ei, double rnd)
     f = [&](double ef) { return Calculate(ei, ef, rnd) - rnd; };
     df = [&](double ef) { return interpolant_diff_->Interpolate(ef); };
 
+    int MaxSteps = 200;
+
     try {
-        int MaxSteps = 200;
-        return NewtonRaphson(f, df, 0, ei, ei, MaxSteps);
+        return std::max(NewtonRaphson(f, df, 0, ei, ei, MaxSteps), utility_.GetParticleDef().mass);
     } catch (MathException& e) {
         return utility_.GetParticleDef().mass;
     }
