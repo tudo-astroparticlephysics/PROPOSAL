@@ -84,15 +84,6 @@ double LeptonicDecayChannelApprox::DifferentialDecayRate(double x, double parent
 }
 
 // ------------------------------------------------------------------------- //
-std::pair<double, double> LeptonicDecayChannelApprox::function_and_derivative(double x,
-                                                                        double parent_mass,
-                                                                        double E_max,
-                                                                        double right_side)
-{
-    return std::make_pair(DecayRate(x, parent_mass, E_max, right_side), DifferentialDecayRate(x, parent_mass, E_max));
-}
-
-// ------------------------------------------------------------------------- //
 double LeptonicDecayChannelApprox::FindRoot(double min, double parent_mass, double E_max, double right_side)
 {
     double max        = 1;

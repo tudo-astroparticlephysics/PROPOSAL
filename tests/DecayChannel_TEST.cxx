@@ -12,6 +12,20 @@
 
 using namespace PROPOSAL;
 
+double matrix_element_evaluate(const DynamicData& p_condition, const Secondaries& products)
+{
+    double G_F = 1.1663787*1e-2; // MeV
+
+    DynamicData electron = products.GetSecondaries().at(0);
+    DynamicData numu = products.GetSecondaries().at(1);
+    DynamicData nuebar = products.GetSecondaries().at(2);
+
+    double p1 = p_condition.GetEnergy() * nuebar.GetEnergy() - (p_condition.GetMomentum() * p_condition.GetDirection()) * (nuebar.GetMomentum() * nuebar.GetDirection());
+    double p2 = electron.GetEnergy() * numu.GetEnergy() - (electron.GetMomentum() * electron.GetDirection()) * (numu.GetMomentum() * numu.GetDirection());
+
+    return 64 * G_F*G_F * p1 * p2;
+}
+
 ParticleDef getParticleDef(const std::string& name)
 {
     if (name == "MuMinus")
@@ -271,7 +285,7 @@ TEST(DecaySpectrum, MuMinus_Rest){
 
     std::vector<const ParticleDef*> daughters{&p0, &p1, &p2};
 
-    ManyBodyPhaseSpace many_body(daughters);
+    ManyBodyPhaseSpace many_body(daughters, matrix_element_evaluate);
 
     std::fill(prod_0.begin(), prod_0.end(), 0); //reset histogram
     std::fill(prod_1.begin(), prod_1.end(), 0);
@@ -474,7 +488,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
 
     std::vector<const ParticleDef*> daughters{&p0, &p1, &p2};
 
-    ManyBodyPhaseSpace many_body(daughters);
+    ManyBodyPhaseSpace many_body(daughters, matrix_element_evaluate);
 
     std::fill(prod_0.begin(), prod_0.end(), 0); //reset histogram
     std::fill(prod_1.begin(), prod_1.end(), 0);
@@ -675,7 +689,7 @@ TEST(DecaySpectrum, TauMinus_Rest){
 
     std::vector<const ParticleDef*> daughters{&p0, &p1, &p2};
 
-    ManyBodyPhaseSpace many_body(daughters);
+    ManyBodyPhaseSpace many_body(daughters, matrix_element_evaluate);
 
     std::fill(prod_0.begin(), prod_0.end(), 0); //reset histogram
     std::fill(prod_1.begin(), prod_1.end(), 0);
@@ -877,7 +891,7 @@ TEST(DecaySpectrum, TauMinus_energy){
 
     std::vector<const ParticleDef*> daughters{&p0, &p1, &p2};
 
-    ManyBodyPhaseSpace many_body(daughters);
+    ManyBodyPhaseSpace many_body(daughters, matrix_element_evaluate);
 
     std::fill(prod_0.begin(), prod_0.end(), 0); //reset histogram
     std::fill(prod_1.begin(), prod_1.end(), 0);
