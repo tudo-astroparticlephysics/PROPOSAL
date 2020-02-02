@@ -81,6 +81,8 @@ bool Sector::Definition::operator==(const Definition& sector_def) const {
         return false;
     else if (utility_def != sector_def.utility_def)
         return false;
+    else if (cut_settings != sector_def.cut_settings)
+        return false;
     else if (*medium_ != *sector_def.medium_)
         return false;
     else if (*geometry_ != *sector_def.geometry_)
@@ -106,6 +108,7 @@ void Sector::Definition::swap(Definition& definition) {
     swap(scattering_model, definition.scattering_model);
     swap(location, definition.location);
     swap(utility_def, definition.utility_def);
+    swap(cut_settings, definition.cut_settings);
     medium_->swap(*definition.medium_);
     geometry_->swap(*definition.geometry_);
 }
