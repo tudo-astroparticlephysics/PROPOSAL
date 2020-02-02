@@ -350,8 +350,7 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
                     particle_.GetPosition(), particle_.GetDirection(),
                     displacement);
 
-            final_energy = displacement_calculator_->GetUpperLimit(
-                initial_energy, displacement_aequivaltent);
+            final_energy = EnergyDistance(initial_energy, displacement_aequivaltent);
         }
 
         // The first interaction or decay happens behind the distance we want to
@@ -364,9 +363,7 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
                 utility_.GetMedium().GetDensityDistribution().Calculate(
                     particle_.GetPosition(), particle_.GetDirection(),
                     displacement);
-
-            final_energy = displacement_calculator_->GetUpperLimit(
-                initial_energy, displacement_aequivaltent);
+            final_energy = EnergyDistance(initial_energy, displacement_aequivaltent);
         }
 
         if (sector_def_.do_continuous_energy_loss_output) {
@@ -527,6 +524,10 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(
 
     return final;
 }
+
+double Sector::EnergyDistance(double initial_energy, double disp) {
+    return displacement_calculator_->GetUpperLimit(initial_energy, disp);
+};
 
 void Sector::AdvanceParticle(double dr, double ei, double ef) {
     double dist = particle_.GetPropagatedDistance();
