@@ -159,7 +159,7 @@ public:
 
 
     std::shared_ptr<DynamicData> DoInteraction(const DynamicData&);
-    std::shared_ptr<DynamicData> DoDecay(const DynamicData&, double, double);
+    std::shared_ptr<DynamicData> DoDecay(const DynamicData&);
     std::shared_ptr<DynamicData> DoContinuous(
         const DynamicData&, double, double);
     /* std::shared_ptr<DynamicData> DoBorder(const DynamicData& ); */

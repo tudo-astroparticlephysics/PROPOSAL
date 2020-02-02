@@ -433,7 +433,7 @@ double Sector::EnergyMinimal(const double current_energy, const double cut)
 double Sector::EnergyDistance(
     const double initial_energy, const double distance)
 {
-    return  displacement_calculator_->GetUpperLimit(initial_energy, distance);
+    return displacement_calculator_->GetUpperLimit(initial_energy, distance);
 }
 
 int Sector::maximizeEnergy(const std::array<double, 4>& LossEnergies)
@@ -474,16 +474,14 @@ std::shared_ptr<DynamicData> Sector::DoInteraction(
         p_condition.GetPropagatedDistance());
 }
 
-std::shared_ptr<DynamicData> Sector::DoDecay(
-    const DynamicData& p_condition, double decay_energy, double sector_border)
+std::shared_ptr<DynamicData> Sector::DoDecay(const DynamicData& p_condition)
 {
-    auto continuous = DoContinuous(p_condition, decay_energy, sector_border);
 
     return std::make_shared<DynamicData>(
-        static_cast<int>(InteractionType::Decay), continuous->GetPosition(),
-        continuous->GetDirection(), continuous->GetEnergy(),
-        continuous->GetParentParticleEnergy(), continuous->GetTime(),
-        continuous->GetPropagatedDistance());
+        static_cast<int>(InteractionType::Decay), p_condition.GetPosition(),
+        p_condition.GetDirection(), p_condition.GetEnergy(),
+        p_condition.GetParentParticleEnergy(), p_condition.GetTime(),
+        p_condition.GetPropagatedDistance());
 }
 
 std::shared_ptr<DynamicData> Sector::DoContinuous(
@@ -539,7 +537,8 @@ Secondaries Sector::Propagate(
 
         minimalLoss = maximizeEnergy(LossEnergies);
 
-        p_condition = DoContinuous(*p_condition, LossEnergies[minimalLoss], distance);
+        p_condition
+            = DoContinuous(*p_condition, LossEnergies[minimalLoss], distance);
         secondaries.push_back(*p_condition);
 
         if (minimalLoss != LossType::Interaction) {
@@ -551,8 +550,7 @@ Secondaries Sector::Propagate(
     };
 
     if (minimalLoss == LossType::Decay) {
-        p_condition
-            = DoDecay(*p_condition, LossEnergies[LossType::Decay], distance);
+        p_condition = DoDecay(*p_condition);
     }
 
     secondaries.push_back(*p_condition);
