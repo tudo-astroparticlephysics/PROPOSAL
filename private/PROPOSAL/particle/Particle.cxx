@@ -279,6 +279,11 @@ bool Particle::operator!=(const Particle& particle) const
     return !(*this == particle);
 }
 
+Particle Particle::operator=(const Particle&)
+{
+    return Particle(*this);
+}
+
 // ------------------------------------------------------------------------- //
 // Methods
 // ------------------------------------------------------------------------- //

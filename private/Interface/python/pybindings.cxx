@@ -444,6 +444,8 @@ PYBIND11_MODULE(pyPROPOSAL, m) {
                 Returns:
                     float: if the value is positive, the energy after the propagated distance. If negativ the propagated distance is return with a minus sign.
 			)pbdoc")
+        .def("energy_distance",
+             &Sector::EnergyDistance, py::arg("initial_energy"),py::arg("initial_energy"))
         .def("CalculateEnergyTillStochastic",
              &Sector::CalculateEnergyTillStochastic, py::arg("initial_energy"),
              R"pbdoc(

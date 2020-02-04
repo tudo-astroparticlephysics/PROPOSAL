@@ -81,6 +81,8 @@ bool Sector::Definition::operator==(const Definition& sector_def) const {
         return false;
     else if (utility_def != sector_def.utility_def)
         return false;
+    else if (cut_settings != sector_def.cut_settings)
+        return false;
     else if (*medium_ != *sector_def.medium_)
         return false;
     else if (*geometry_ != *sector_def.geometry_)
@@ -106,6 +108,7 @@ void Sector::Definition::swap(Definition& definition) {
     swap(scattering_model, definition.scattering_model);
     swap(location, definition.location);
     swap(utility_def, definition.utility_def);
+    swap(cut_settings, definition.cut_settings);
     medium_->swap(*definition.medium_);
     geometry_->swap(*definition.geometry_);
 }
@@ -350,8 +353,7 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
                     particle_.GetPosition(), particle_.GetDirection(),
                     displacement);
 
-            final_energy = displacement_calculator_->GetUpperLimit(
-                initial_energy, displacement_aequivaltent);
+            final_energy = EnergyDistance(initial_energy, displacement_aequivaltent);
         }
 
         // The first interaction or decay happens behind the distance we want to
@@ -364,9 +366,7 @@ std::pair<double, Secondaries> Sector::Propagate(double distance) {
                 utility_.GetMedium().GetDensityDistribution().Calculate(
                     particle_.GetPosition(), particle_.GetDirection(),
                     displacement);
-
-            final_energy = displacement_calculator_->GetUpperLimit(
-                initial_energy, displacement_aequivaltent);
+            final_energy = EnergyDistance(initial_energy, displacement_aequivaltent);
         }
 
         if (sector_def_.do_continuous_energy_loss_output) {
@@ -527,6 +527,10 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(
 
     return final;
 }
+
+double Sector::EnergyDistance(double initial_energy, double disp) {
+    return displacement_calculator_->GetUpperLimit(initial_energy, disp);
+};
 
 void Sector::AdvanceParticle(double dr, double ei, double ef) {
     double dist = particle_.GetPropagatedDistance();
