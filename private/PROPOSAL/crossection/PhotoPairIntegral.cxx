@@ -51,13 +51,13 @@ double PhotoPairIntegral::CalculateStochasticLoss(double energy, double rnd1, do
 }
 
 // ------------------------------------------------------------------------- //
-std::pair<std::vector<Particle*>, bool> PhotoPairIntegral::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
+std::pair<std::vector<DynamicData>, bool> PhotoPairIntegral::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
     (void)energy_loss;
     double rnd;
     double rsum;
     double rho;
 
-    std::vector<Particle*> particle_list{};
+    std::vector<DynamicData> particle_list{};
 
     if(rndc_<0){
         //CalculateStochasticLoss has never been called before, return empty list
@@ -66,8 +66,8 @@ std::pair<std::vector<Particle*>, bool> PhotoPairIntegral::CalculateProducedPart
         return std::make_pair(particle_list, true);
     }
 
-    particle_list.push_back(new Particle(*eplus_def_));
-    particle_list.push_back(new Particle(*eminus_def_));
+    particle_list.push_back(DynamicData(eplus_def_->particle_type));
+    particle_list.push_back(DynamicData(eminus_def_->particle_type));
 
     rnd  = rndc_ * sum_of_rates_;
     rsum = 0;
@@ -81,15 +81,15 @@ std::pair<std::vector<Particle*>, bool> PhotoPairIntegral::CalculateProducedPart
             parametrization_->SetCurrentComponent(i);
             rho = dndx_integral_[i].GetUpperLimit();
 
-            particle_list[0]->SetEnergy(energy * (1-rho));
-            particle_list[1]->SetEnergy(energy * rho);
+            particle_list[0].SetEnergy(energy * (1-rho));
+            particle_list[1].SetEnergy(energy * rho);
 
             PhotoAngleDistribution::DeflectionAngles angles;
             angles = photoangle_->SampleAngles(energy, rho, i);
-            particle_list[0]->SetDirection(initial_direction);
-            particle_list[1]->SetDirection(initial_direction);
-            particle_list[0]->DeflectDirection(angles.cosphi0, angles.theta0);
-            particle_list[1]->DeflectDirection(angles.cosphi1, angles.theta1);
+            particle_list[0].SetDirection(initial_direction);
+            particle_list[1].SetDirection(initial_direction);
+            particle_list[0].DeflectDirection(angles.cosphi0, angles.theta0);
+            particle_list[1].DeflectDirection(angles.cosphi1, angles.theta1);
 
             return std::make_pair(particle_list, true);
         }

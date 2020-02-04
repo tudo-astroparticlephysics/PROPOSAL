@@ -447,7 +447,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
             py::arg("initial_energy"), py::arg("distance"))
         .def("make_stochastic_loss", &Sector::MakeStochasticLoss,
             py::arg("minimal_energy"))
-        .def("propagate", &Sector::Propagate, py::arg("distance"), py::arg("distance"), py::arg("minimal_energy"));
+        .def("propagate", &Sector::Propagate,
+            py::arg("particle_condition"), py::arg("max_distance"), py::arg("min_energy"));
 
     // ---------------------------------------------------------------------
     // // Randomgenerator
@@ -492,7 +493,9 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def(py::init<const ParticleDef&, const std::string&>(),
             py::arg("particle_def"), py::arg("config_file"))
         .def("propagate", &Propagator::Propagate,
+            py::arg("particle_condition"),
             py::arg("max_distance_cm") = 1e20,
+            py::arg("minimal_energy") = 0.,
             py::return_value_policy::reference,
             R"pbdoc(
                     Propagate a particle through sectors and produce stochastic
@@ -545,13 +548,13 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                     will be calculated and the produced secondary particles
                     returned.
                 )pbdoc")
-        .def_property_readonly("particle", &Propagator::GetParticle,
-            R"pbdoc(
-                    Get the internal created particle to modify its properties.
+        // .def_property_readonly("particle", &Propagator::GetParticle,
+        //     R"pbdoc(
+        //             Get the internal created particle to modify its properties.
 
-                    Returns:
-                        Particle: the propagated particle.
-                )pbdoc")
+        //             Returns:
+        //                 Particle: the propagated particle.
+        //         )pbdoc")
         .def_property_readonly("sector", &Propagator::GetCurrentSector,
             R"pbdoc(
                     "Get the current sector"
@@ -575,8 +578,9 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     py::class_<PropagatorService, std::shared_ptr<PropagatorService>>(
         m, "PropagatorService")
         .def(py::init<>())
-        .def("propagate", &PropagatorService::Propagate, py::arg("particle"),
-            py::arg("distance") = 1e20)
+        .def("propagate", &PropagatorService::Propagate,
+            py::arg("particle_definition"), py::arg("particle_condition"),
+            py::arg("max_distance") = 1e20, py::arg("min_energy") = 1e20)
         .def("register_propagator", &PropagatorService::RegisterPropagator,
             py::arg("propagator"));
 }

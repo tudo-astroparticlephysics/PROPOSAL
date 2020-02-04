@@ -27,12 +27,14 @@ int main(int argc, const char* argv[])
      *              One Propagator for each particle definition                *
      **************************************************************************/
 
-    Propagator prop_mu(MuMinusDef::Get(), "resources/config_ice.json");
-    Propagator prop_tau(TauMinusDef::Get(), "resources/config_ice.json");
+    ParticleDef mu_def = MuMinusDef::Get();
+    ParticleDef tau_def = TauMinusDef::Get();
+    Propagator prop_mu(mu_def, "resources/config_ice.json");
+    Propagator prop_tau(tau_def, "resources/config_ice.json");
 
     // Therefor its needed to get the internal created particle first
-    Particle& particle_mu  = prop_mu.GetParticle();
-    Particle& particle_tau = prop_tau.GetParticle();
+    DynamicData particle_mu(mu_def.particle_type);
+    DynamicData particle_tau(tau_def.particle_type);
 
     particle_mu.SetEnergy(1e7); // [MeV]
     particle_mu.SetPropagatedDistance(0);
@@ -44,7 +46,7 @@ int main(int argc, const char* argv[])
     particle_tau.SetPosition(Vector3D(0, 0, 0));
     particle_tau.SetDirection(Vector3D(0, 0, -1));
 
-    Secondaries sec_mu_direct = prop_mu.Propagate();
+    Secondaries sec_mu_direct = prop_mu.Propagate(particle_mu);
 
     /**************************************************************************
      *                        Using propagator service                         *
@@ -56,8 +58,8 @@ int main(int argc, const char* argv[])
     prop_service.RegisterPropagator(prop_tau);
 
     // Define Particles to propagate
-    Particle mu(MuMinusDef::Get());
-    Particle tau(TauMinusDef::Get());
+    DynamicData mu(mu_def.particle_type);
+    DynamicData tau(tau_def.particle_type);
 
     // Set particle properties
     mu.SetEnergy(1e8); // [MeV]
@@ -71,8 +73,8 @@ int main(int argc, const char* argv[])
     tau.SetDirection(Vector3D(0, 0, -1));
 
     // Use service to propagate different particle
-    Secondaries sec_mu_service  = prop_service.Propagate(mu);
-    Secondaries sec_tau_service = prop_service.Propagate(tau);
+    Secondaries sec_mu_service  = prop_service.Propagate(mu_def, mu);
+    Secondaries sec_tau_service = prop_service.Propagate(tau_def, tau);
 
     //Output::getInstance().ClearSecondaryVector();
 }

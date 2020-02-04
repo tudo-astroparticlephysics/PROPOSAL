@@ -395,8 +395,6 @@ double E2_new;
 
 double rho;
 
-std::vector<Particle*> particles;
-
 
 std::cout.precision(16);
 RandomGenerator::Get().SetSeed(0);

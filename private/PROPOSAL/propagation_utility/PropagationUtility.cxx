@@ -275,6 +275,8 @@ CrossSection* Utility::GetCrosssection(int typeId) const {
             return i;
         }
     }
+    log_fatal("No CrossSection found");
+    return nullptr;
 }
 
 

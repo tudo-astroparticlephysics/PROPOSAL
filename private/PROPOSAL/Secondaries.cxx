@@ -36,19 +36,19 @@ void Secondaries::emplace_back(const int& type)
     secondaries_.emplace_back(type);
 }
 
-void Secondaries::push_back(const Particle& particle, const int& interaction_type, const double& energy_loss)
-{
-    DynamicData data(interaction_type);
+// void Secondaries::push_back(const Particle& particle, const int& interaction_type, const double& energy_loss)
+// {
+//     DynamicData data(interaction_type);
 
-    data.SetEnergy(energy_loss);
-    data.SetPosition(particle.GetPosition());
-    data.SetDirection(particle.GetDirection());
-    data.SetTime(particle.GetTime());
-    data.SetParentParticleEnergy(particle.GetEnergy());
-    data.SetPropagatedDistance(particle.GetPropagatedDistance());
+//     data.SetEnergy(energy_loss);
+//     data.SetPosition(particle.GetPosition());
+//     data.SetDirection(particle.GetDirection());
+//     data.SetTime(particle.GetTime());
+//     data.SetParentParticleEnergy(particle.GetEnergy());
+//     data.SetPropagatedDistance(particle.GetPropagatedDistance());
 
-    secondaries_.push_back(data);
-}
+//     secondaries_.push_back(data);
+// }
 
 void Secondaries::append(Secondaries secondaries)
 {

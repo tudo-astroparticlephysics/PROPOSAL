@@ -24,13 +24,13 @@ AnnihilationIntegral::AnnihilationIntegral(const AnnihilationIntegral& annihilat
 
 AnnihilationIntegral::~AnnihilationIntegral() {}
 
-std::pair<std::vector<Particle*>, bool> AnnihilationIntegral::CalculateProducedParticles(double energy,
+std::pair<std::vector<DynamicData>, bool> AnnihilationIntegral::CalculateProducedParticles(double energy,
                                                                                          double energy_loss,
                                                                                          const Vector3D& initial_direction) {
     (void)energy_loss;
     double rnd, rsum, rho;
 
-    std::vector<Particle*> particle_list{};
+    std::vector<DynamicData> particle_list{};
 
     if(rndc_<0){
         //CalculateStochasticLoss has never been called before, return empty list
@@ -39,8 +39,8 @@ std::pair<std::vector<Particle*>, bool> AnnihilationIntegral::CalculateProducedP
         return std::make_pair(particle_list, true);
     }
 
-    particle_list.push_back(new Particle(*gamma_def_));
-    particle_list.push_back(new Particle(*gamma_def_));
+    particle_list.push_back(DynamicData(gamma_def_->particle_type));
+    particle_list.push_back(DynamicData(gamma_def_->particle_type));
 
     rnd  = rndc_ * sum_of_rates_;
     rsum = 0;
@@ -55,19 +55,19 @@ std::pair<std::vector<Particle*>, bool> AnnihilationIntegral::CalculateProducedP
             rho = dndx_integral_[i].GetUpperLimit();
 
             // The available energy is the positron energy plus the mass of the electron
-            particle_list[0]->SetEnergy((energy + ME) * (1-rho));
-            particle_list[1]->SetEnergy((energy + ME) * rho);
+            particle_list[0].SetEnergy((energy + ME) * (1-rho));
+            particle_list[1].SetEnergy((energy + ME) * rho);
 
-            particle_list[0]->SetDirection(initial_direction);
-            particle_list[1]->SetDirection(initial_direction);
+            particle_list[0].SetDirection(initial_direction);
+            particle_list[1].SetDirection(initial_direction);
 
             double cosphi0 = ((energy + ME) * (1. - rho) - ME)/( (1. - rho) * std::sqrt( (energy + ME) * (energy - ME) ) );
             double cosphi1 = ((energy + ME) * rho - ME)/( rho * std::sqrt((energy + ME) * (energy - ME)));
 
             double rndtheta = RandomGenerator::Get().RandomDouble();
 
-            particle_list[0]->DeflectDirection(cosphi0, rndtheta * 2. * PI);
-            particle_list[1]->DeflectDirection(cosphi1, std::fmod(rndtheta * 2. * PI + PI, 2. * PI));
+            particle_list[0].DeflectDirection(cosphi0, rndtheta * 2. * PI);
+            particle_list[1].DeflectDirection(cosphi1, std::fmod(rndtheta * 2. * PI + PI, 2. * PI));
 
             return std::make_pair(particle_list, true);
         }

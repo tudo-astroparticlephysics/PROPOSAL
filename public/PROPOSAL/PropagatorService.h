@@ -76,7 +76,7 @@ public:
     ///
     /// @return vector of secondary data
     // ----------------------------------------------------------------------------
-    Secondaries Propagate(Particle&, double distance = 1e20);
+    Secondaries Propagate(const ParticleDef&, DynamicData&, double distance = 1e20, double min_energy=0.);
 
     // ----------------------------------------------------------------------------
     /// @brief Get Propagator for a given particle

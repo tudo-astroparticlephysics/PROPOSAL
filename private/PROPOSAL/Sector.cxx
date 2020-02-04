@@ -351,7 +351,6 @@ std::pair<double, int> Sector::MakeStochasticLoss(double particle_energy)
     double rnd3 = RandomGenerator::Get().RandomDouble();
 
     std::pair<double, int> energy_loss;
-    std::pair<double, double> deflection_angles;
 
     // do an optional bias to the randomly sampled energy loss
     if (sector_def_.do_stochastic_loss_weighting) {
@@ -455,7 +454,7 @@ int Sector::maximizeEnergy(const std::array<double, 4>& LossEnergies)
 std::shared_ptr<DynamicData> Sector::DoInteraction(
     const DynamicData& p_condition)
 {
-    std::pair<int, double> stochastic_loss
+    std::pair<double, int> stochastic_loss
         = MakeStochasticLoss(p_condition.GetEnergy());
 
     CrossSection* cross_section
@@ -468,9 +467,13 @@ std::shared_ptr<DynamicData> Sector::DoInteraction(
     new_direction.deflect(deflection_angles.first, deflection_angles.second);
 
     double new_energy = p_condition.GetEnergy() - stochastic_loss.first;
-    return std::make_shared<DynamicData>(stochastic_loss.second,
-        p_condition.GetPosition(), new_direction, new_energy,
-        p_condition.GetEnergy(), p_condition.GetTime(),
+    return std::make_shared<DynamicData>(
+        stochastic_loss.second,
+        p_condition.GetPosition(),
+        new_direction,
+        new_energy,
+        p_condition.GetEnergy(),
+        p_condition.GetTime(),
         p_condition.GetPropagatedDistance());
 }
 

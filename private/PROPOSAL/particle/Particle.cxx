@@ -83,6 +83,33 @@ DynamicData& DynamicData::operator=(const DynamicData&)
 }
 
 // ------------------------------------------------------------------------- //
+bool DynamicData::operator==(const DynamicData& dynamic_data) const
+{
+    if (type_id_ != dynamic_data.type_id_)
+        return false;
+    if (position_ != dynamic_data.position_)
+        return false;
+    if (direction_ != dynamic_data.direction_)
+        return false;
+    if (energy_ != dynamic_data.energy_)
+        return false;
+    if (parent_particle_energy_ != dynamic_data.parent_particle_energy_)
+        return false;
+    if (time_ != dynamic_data.time_)
+        return false;
+    if (propagated_distance_ != dynamic_data.propagated_distance_)
+        return false;
+
+    return true;
+}
+
+// ------------------------------------------------------------------------- //
+bool DynamicData::operator!=(const DynamicData& dynamic_data) const
+{
+    return !(*this == dynamic_data);
+}
+
+// ------------------------------------------------------------------------- //
 std::ostream& PROPOSAL::operator<<(std::ostream& os, DynamicData const& data)
 {
     std::stringstream ss;
@@ -159,174 +186,7 @@ double DynamicData::GetMomentum() const
 
 }
 
-/******************************************************************************
- *                              Particle                                       *
- ******************************************************************************/
-
-Particle::Particle()
-    : DynamicData(static_cast<int>(InteractionType::Particle))
-    , particle_def_(MuMinusDef::Get())
-    , momentum_(0)
-    , parent_particle_id_(0)
-    , particle_id_(1)
-    , entry_point_(Vector3D())
-    , entry_time_(0)
-    , entry_energy_(0)
-    , exit_point_(Vector3D())
-    , exit_time_(0)
-    , exit_energy_(0)
-    , closest_approach_point_(Vector3D())
-    , closest_approach_time_(0)
-    , closest_approach_energy_(0)
-    , elost_(0)
-{
-    SetEnergy(energy_);
-}
-
-Particle::Particle(const Particle& particle)
-    : DynamicData(particle)
-    , particle_def_(particle.particle_def_)
-    , momentum_(particle.momentum_)
-    , parent_particle_id_(particle.parent_particle_id_)
-    , particle_id_(particle.particle_id_)
-    , entry_point_(particle.entry_point_)
-    , entry_time_(particle.entry_time_)
-    , entry_energy_(particle.entry_energy_)
-    , exit_point_(particle.exit_point_)
-    , exit_time_(particle.exit_time_)
-    , exit_energy_(particle.exit_energy_)
-    , closest_approach_point_(particle.closest_approach_point_)
-    , closest_approach_time_(particle.closest_approach_time_)
-    , closest_approach_energy_(particle.closest_approach_energy_)
-    , elost_(particle.elost_)
-{
-}
-
-Particle::Particle(const ParticleDef& particleDef)
-    : DynamicData(static_cast<int>(InteractionType::Particle))
-    , particle_def_(particleDef)
-    , momentum_(0)
-    , parent_particle_id_(0)
-    , particle_id_(1)
-    , entry_point_(Vector3D())
-    , entry_time_(0)
-    , entry_energy_(0)
-    , exit_point_(Vector3D())
-    , exit_time_(0)
-    , exit_energy_(0)
-    , closest_approach_point_(Vector3D())
-    , closest_approach_time_(0)
-    , closest_approach_energy_(0)
-    , elost_(0)
-{
-    SetEnergy(energy_);
-}
-
-// ------------------------------------------------------------------------- //
-// Operators
-// ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
-bool Particle::operator==(const Particle& particle) const
-{
-    if (propagated_distance_ != particle.propagated_distance_)
-        return false;
-    if (position_ != particle.position_)
-        return false;
-    if (direction_ != particle.direction_)
-        return false;
-    if (momentum_ != particle.momentum_)
-        return false;
-    if (energy_ != particle.energy_)
-        return false;
-    if (parent_particle_id_ != particle.parent_particle_id_)
-        return false;
-    if (parent_particle_energy_ != particle.parent_particle_energy_)
-        return false;
-    if (particle_id_ != particle.particle_id_)
-        return false;
-    if (entry_point_ != particle.entry_point_)
-        return false;
-    if (entry_time_ != particle.entry_time_)
-        return false;
-    if (entry_energy_ != particle.entry_energy_)
-        return false;
-    if (exit_point_ != particle.exit_point_)
-        return false;
-    if (exit_time_ != particle.exit_time_)
-        return false;
-    if (exit_energy_ != particle.exit_energy_)
-        return false;
-    if (closest_approach_point_ != particle.closest_approach_point_)
-        return false;
-    if (closest_approach_time_ != particle.closest_approach_time_)
-        return false;
-    if (closest_approach_energy_ != particle.closest_approach_energy_)
-        return false;
-    if (elost_ != particle.elost_)
-        return false;
-    if (particle_def_ != particle.particle_def_)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-// ------------------------------------------------------------------------- //
-bool Particle::operator!=(const Particle& particle) const
-{
-    return !(*this == particle);
-}
-
-Particle Particle::operator=(const Particle&)
-{
-    return Particle(*this);
-}
-
-// ------------------------------------------------------------------------- //
-// Methods
-// ------------------------------------------------------------------------- //
-
-void Particle::InjectState(const Particle& particle)
-{
-    position_                = particle.position_;
-    direction_               = particle.direction_;
-    energy_                  = particle.energy_;
-    parent_particle_energy_  = particle.parent_particle_energy_;
-    time_                    = particle.time_;
-    propagated_distance_     = particle.propagated_distance_;
-    momentum_                = particle.momentum_;
-    entry_point_             = particle.entry_point_;
-    entry_time_              = particle.entry_time_;
-    entry_energy_            = particle.entry_energy_;
-    exit_point_              = particle.exit_point_;
-    exit_time_               = particle.exit_time_;
-    exit_energy_             = particle.exit_energy_;
-    closest_approach_point_  = particle.closest_approach_point_;
-    closest_approach_time_   = particle.closest_approach_time_;
-    closest_approach_energy_ = particle.closest_approach_energy_;
-    elost_                   = particle.elost_;
-}
-
-// ------------------------------------------------------------------------- //
-// Setter
-// ------------------------------------------------------------------------- //
-
-/* void Particle::SetEnergy(double energy) */
-/* { */
-/*     energy_   = std::max(energy, particle_def_.mass); */
-/*     momentum_ = std::sqrt(std::max((energy_ + particle_def_.mass) * (energy_ - particle_def_.mass), 0.0)); */
-/* } */
-
-// ------------------------------------------------------------------------- //
-/* void Particle::SetMomentum(double momentum) */
-/* { */
-/*     momentum_ = momentum; */
-/*     energy_   = std::sqrt(momentum_ * momentum_ + particle_def_.mass * particle_def_.mass); */
-/* } */
-
-void Particle::DeflectDirection(double cosphi_deflect, double theta_deflect) {
+void DynamicData::DeflectDirection(double cosphi_deflect, double theta_deflect) {
 
     Vector3D old_direction = GetDirection();
 
@@ -352,31 +212,228 @@ void Particle::DeflectDirection(double cosphi_deflect, double theta_deflect) {
     // Rotation towards all tree axes
     Vector3D new_direction( tz * old_direction + tx * rotate_vector_x + ty * rotate_vector_y );
 
-    SetDirection(new_direction);
-
+    direction_ = new_direction;
+    direction_.CalculateSphericalCoordinates();
 }
 
-// ------------------------------------------------------------------------- //
-// Print
-// ------------------------------------------------------------------------- //
+/******************************************************************************
+ *                              Particle                                       *
+ ******************************************************************************/
 
-void Particle::print(std::ostream& os) const
-{
-    os << "definition:" << '\n';
-    os << particle_def_ << '\n';
-    os << "momentum [MeV]: " << momentum_ << '\n';
-    os << "energy lost in detector [MeV]: " << elost_ << '\n';
+// Particle::Particle()
+//     : DynamicData(static_cast<int>(InteractionType::Particle))
+//     , particle_def_(MuMinusDef::Get())
+//     , momentum_(0)
+//     , parent_particle_id_(0)
+//     , particle_id_(1)
+//     , entry_point_(Vector3D())
+//     , entry_time_(0)
+//     , entry_energy_(0)
+//     , exit_point_(Vector3D())
+//     , exit_time_(0)
+//     , exit_energy_(0)
+//     , closest_approach_point_(Vector3D())
+//     , closest_approach_time_(0)
+//     , closest_approach_energy_(0)
+//     , elost_(0)
+// {
+//     SetEnergy(energy_);
+// }
 
-    os << "detector entry point:" << '\n';
-    os << entry_point_ << '\n';
-    os << "entry time [s]: " << entry_time_ << '\n';
-    os << "entry energy [MeV]: " << entry_energy_ << '\n';
-    os << "detector exit point:" << '\n';
-    os << exit_point_ << '\n';
-    os << "exit time [s]: " << exit_time_ << '\n';
-    os << "exit energy [MeV]: " << exit_energy_ << '\n';
-    os << "detector closest approach point:" << '\n';
-    os << closest_approach_point_ << '\n';
-    os << "closest approach time [s]: " << closest_approach_time_ << '\n';
-    os << "closest approach energy [MeV]: " << closest_approach_energy_ << '\n';
-}
+// Particle::Particle(const Particle& particle)
+//     : DynamicData(particle)
+//     , particle_def_(particle.particle_def_)
+//     , momentum_(particle.momentum_)
+//     , parent_particle_id_(particle.parent_particle_id_)
+//     , particle_id_(particle.particle_id_)
+//     , entry_point_(particle.entry_point_)
+//     , entry_time_(particle.entry_time_)
+//     , entry_energy_(particle.entry_energy_)
+//     , exit_point_(particle.exit_point_)
+//     , exit_time_(particle.exit_time_)
+//     , exit_energy_(particle.exit_energy_)
+//     , closest_approach_point_(particle.closest_approach_point_)
+//     , closest_approach_time_(particle.closest_approach_time_)
+//     , closest_approach_energy_(particle.closest_approach_energy_)
+//     , elost_(particle.elost_)
+// {
+// }
+
+// Particle::Particle(const ParticleDef& particleDef)
+//     : DynamicData(static_cast<int>(InteractionType::Particle))
+//     , particle_def_(particleDef)
+//     , momentum_(0)
+//     , parent_particle_id_(0)
+//     , particle_id_(1)
+//     , entry_point_(Vector3D())
+//     , entry_time_(0)
+//     , entry_energy_(0)
+//     , exit_point_(Vector3D())
+//     , exit_time_(0)
+//     , exit_energy_(0)
+//     , closest_approach_point_(Vector3D())
+//     , closest_approach_time_(0)
+//     , closest_approach_energy_(0)
+//     , elost_(0)
+// {
+//     SetEnergy(energy_);
+// }
+
+// // ------------------------------------------------------------------------- //
+// // Operators
+// // ------------------------------------------------------------------------- //
+
+// // ------------------------------------------------------------------------- //
+// bool Particle::operator==(const Particle& particle) const
+// {
+//     if (propagated_distance_ != particle.propagated_distance_)
+//         return false;
+//     if (position_ != particle.position_)
+//         return false;
+//     if (direction_ != particle.direction_)
+//         return false;
+//     if (momentum_ != particle.momentum_)
+//         return false;
+//     if (energy_ != particle.energy_)
+//         return false;
+//     if (parent_particle_id_ != particle.parent_particle_id_)
+//         return false;
+//     if (parent_particle_energy_ != particle.parent_particle_energy_)
+//         return false;
+//     if (particle_id_ != particle.particle_id_)
+//         return false;
+//     if (entry_point_ != particle.entry_point_)
+//         return false;
+//     if (entry_time_ != particle.entry_time_)
+//         return false;
+//     if (entry_energy_ != particle.entry_energy_)
+//         return false;
+//     if (exit_point_ != particle.exit_point_)
+//         return false;
+//     if (exit_time_ != particle.exit_time_)
+//         return false;
+//     if (exit_energy_ != particle.exit_energy_)
+//         return false;
+//     if (closest_approach_point_ != particle.closest_approach_point_)
+//         return false;
+//     if (closest_approach_time_ != particle.closest_approach_time_)
+//         return false;
+//     if (closest_approach_energy_ != particle.closest_approach_energy_)
+//         return false;
+//     if (elost_ != particle.elost_)
+//         return false;
+//     if (particle_def_ != particle.particle_def_)
+//     {
+//         return false;
+//     }
+
+//     return true;
+// }
+
+// // ------------------------------------------------------------------------- //
+// bool Particle::operator!=(const Particle& particle) const
+// {
+//     return !(*this == particle);
+// }
+
+// Particle Particle::operator=(const Particle&)
+// {
+//     return Particle(*this);
+// }
+
+// // ------------------------------------------------------------------------- //
+// // Methods
+// // ------------------------------------------------------------------------- //
+
+// void Particle::InjectState(const Particle& particle)
+// {
+//     position_                = particle.position_;
+//     direction_               = particle.direction_;
+//     energy_                  = particle.energy_;
+//     parent_particle_energy_  = particle.parent_particle_energy_;
+//     time_                    = particle.time_;
+//     propagated_distance_     = particle.propagated_distance_;
+//     momentum_                = particle.momentum_;
+//     entry_point_             = particle.entry_point_;
+//     entry_time_              = particle.entry_time_;
+//     entry_energy_            = particle.entry_energy_;
+//     exit_point_              = particle.exit_point_;
+//     exit_time_               = particle.exit_time_;
+//     exit_energy_             = particle.exit_energy_;
+//     closest_approach_point_  = particle.closest_approach_point_;
+//     closest_approach_time_   = particle.closest_approach_time_;
+//     closest_approach_energy_ = particle.closest_approach_energy_;
+//     elost_                   = particle.elost_;
+// }
+
+// // ------------------------------------------------------------------------- //
+// // Setter
+// // ------------------------------------------------------------------------- //
+
+// /* void Particle::SetEnergy(double energy) */
+// /* { */
+// /*     energy_   = std::max(energy, particle_def_.mass); */
+// /*     momentum_ = std::sqrt(std::max((energy_ + particle_def_.mass) * (energy_ - particle_def_.mass), 0.0)); */
+// /* } */
+
+// // ------------------------------------------------------------------------- //
+// /* void Particle::SetMomentum(double momentum) */
+// /* { */
+// /*     momentum_ = momentum; */
+// /*     energy_   = std::sqrt(momentum_ * momentum_ + particle_def_.mass * particle_def_.mass); */
+// /* } */
+
+// void Particle::DeflectDirection(double cosphi_deflect, double theta_deflect) {
+
+//     Vector3D old_direction = GetDirection();
+
+//     old_direction.CalculateSphericalCoordinates();
+//     double sinphi_deflect = std::sqrt( std::max(0., (1. - cosphi_deflect) * (1. + cosphi_deflect) ));
+//     double tx = sinphi_deflect * std::cos(theta_deflect);
+//     double ty = sinphi_deflect * std::sin(theta_deflect);
+//     double tz = std::sqrt(std::max(1. - tx * tx - ty * ty, 0.));
+//     if(cosphi_deflect < 0. ){
+//         // Backward deflection
+//         tz = -tz;
+//     }
+
+//     long double sinth, costh, sinph, cosph;
+//     sinth = (long double)std::sin(old_direction.GetTheta());
+//     costh = (long double)std::cos(old_direction.GetTheta());
+//     sinph = (long double)std::sin(old_direction.GetPhi());
+//     cosph = (long double)std::cos(old_direction.GetPhi());
+
+//     const Vector3D rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
+//     const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
+
+//     // Rotation towards all tree axes
+//     Vector3D new_direction( tz * old_direction + tx * rotate_vector_x + ty * rotate_vector_y );
+
+//     SetDirection(new_direction);
+
+// }
+
+// // ------------------------------------------------------------------------- //
+// // Print
+// // ------------------------------------------------------------------------- //
+
+// void Particle::print(std::ostream& os) const
+// {
+//     os << "definition:" << '\n';
+//     os << particle_def_ << '\n';
+//     os << "momentum [MeV]: " << momentum_ << '\n';
+//     os << "energy lost in detector [MeV]: " << elost_ << '\n';
+
+//     os << "detector entry point:" << '\n';
+//     os << entry_point_ << '\n';
+//     os << "entry time [s]: " << entry_time_ << '\n';
+//     os << "entry energy [MeV]: " << entry_energy_ << '\n';
+//     os << "detector exit point:" << '\n';
+//     os << exit_point_ << '\n';
+//     os << "exit time [s]: " << exit_time_ << '\n';
+//     os << "exit energy [MeV]: " << exit_energy_ << '\n';
+//     os << "detector closest approach point:" << '\n';
+//     os << closest_approach_point_ << '\n';
+//     os << "closest approach time [s]: " << closest_approach_time_ << '\n';
+//     os << "closest approach energy [MeV]: " << closest_approach_energy_ << '\n';
+// }

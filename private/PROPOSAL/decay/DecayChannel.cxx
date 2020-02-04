@@ -149,17 +149,17 @@ Vector3D DecayChannel::GenerateRandomDirection()
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-void DecayChannel::CopyParticleProperties(DecayProducts& products, const Particle& particle)
-{
-    int id = 1;
-    for (std::vector<Particle*>::iterator iter = products.begin(); iter != products.end(); ++iter)
-    {
-        (*iter)->SetPosition(particle.GetPosition());
-        (*iter)->SetTime(particle.GetTime());
-        (*iter)->SetParentParticleEnergy(particle.GetEnergy());
-        (*iter)->SetParticleId(particle.GetParticleId() + id);
-        (*iter)->SetParentParticleId(particle.GetParticleId());
+// void DecayChannel::CopyParticleProperties(DecayProducts& products, const Particle& particle)
+// {
+//     int id = 1;
+//     for (std::vector<Particle*>::iterator iter = products.begin(); iter != products.end(); ++iter)
+//     {
+//         (*iter)->SetPosition(particle.GetPosition());
+//         (*iter)->SetTime(particle.GetTime());
+//         (*iter)->SetParentParticleEnergy(particle.GetEnergy());
+//         (*iter)->SetParticleId(particle.GetParticleId() + id);
+//         (*iter)->SetParentParticleId(particle.GetParticleId());
 
-        id++;
-    }
-}
+//         id++;
+//     }
+// }

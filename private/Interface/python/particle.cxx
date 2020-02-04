@@ -268,90 +268,90 @@ void init_particle(py::module& m) {
                 Propagated distance of primary particle.
             )pbdoc");
 
-    py::class_<Particle, std::shared_ptr<Particle>, DynamicData>(m_sub,
-                                                                 "Particle",
-                                                                 R"pbdoc(
-                The particle class is used as a container to store data
-                while propagation process. There every information about
-                the primary particle will be stored.
+    // py::class_<Particle, std::shared_ptr<Particle>, DynamicData>(m_sub,
+    //                                                              "Particle",
+    //                                                              R"pbdoc(
+    //             The particle class is used as a container to store data
+    //             while propagation process. There every information about
+    //             the primary particle will be stored.
 
-                Information about secondary particles will be found in
-                :meth:`particle.DynamicData`
-            )pbdoc")
-        .def(py::init<>())
-        .def(py::init<const ParticleDef&>())
-        .def(py::init<const Particle&>())
-        .def("inject_state", &Particle::InjectState,
-             R"pbdoc(
-            )pbdoc")
-        .def_property_readonly("particle_def", &Particle::GetParticleDef,
-                               R"pbdoc(
-                Definition of particle actuell in container
-            )pbdoc")
-        .def_property_readonly("decay_table", &Particle::GetDecayTable,
-                               R"pbdoc(
-                Decay table of actuell particle
-            )pbdoc")
-        .def_property("momentum", &Particle::GetMomentum,
-                      &Particle::SetMomentum,
-                      R"pbdoc(
-                Momentum of primary particle in MeV
-            )pbdoc")
-        .def_property("entry_point", &Particle::GetEntryPoint,
-                      &Particle::SetEntryPoint,
-                      R"pbdoc(
-                Entry point in detector in form of a Vector3d.
-            )pbdoc")
-        .def_property("entry_time", &Particle::GetEntryTime,
-                      &Particle::SetEntryTime,
-                      R"pbdoc(
-                Time primary particle entered the detector.
-            )pbdoc")
-        .def_property("entry_energy", &Particle::GetEntryEnergy,
-                      &Particle::SetEntryEnergy,
-                      R"pbdoc(
-                Energy primary particle entered the detector.
-            )pbdoc")
-        .def_property("exit_point", &Particle::GetExitPoint,
-                      &Particle::SetExitPoint,
-                      R"pbdoc(
-                Point particle exit the detector in form of a Vector3d.
-            )pbdoc")
-        .def_property("exit_time", &Particle::GetExitTime,
-                      &Particle::SetExitTime,
-                      R"pbdoc(
-                Time primary particle exit the detector.
-            )pbdoc")
-        .def_property("exit_energy", &Particle::GetExitEnergy,
-                      &Particle::SetExitEnergy,
-                      R"pbdoc(
-                Energy primary particle exit the detector.
-            )pbdoc")
-        .def_property("closet_approach_point",
-                      &Particle::GetClosestApproachPoint,
-                      &Particle::SetClosestApproachPoint,
-                      R"pbdoc(
-                In a first order the point where distance between particle
-                and detector center is minimal.
-            )pbdoc")
-        .def_property("closet_approach_time", &Particle::GetClosestApproachTime,
-                      &Particle::SetClosestApproachTime,
-                      R"pbdoc(
-                In a first order the time where distance between particle
-                and detector center is minimal.
-            )pbdoc")
-        .def_property("closet_approach_energy",
-                      &Particle::GetClosestApproachEnergy,
-                      &Particle::SetClosestApproachEnergy,
-                      R"pbdoc(
-                In a first order the energy where distance between particle
-                and detector center is minimal.
-            )pbdoc")
-        .def_property("e_lost", &Particle::GetElost, &Particle::SetElost,
-                      R"pbdoc(
-                Energy primary particle lost in detector.
-                Energy primary particle lost in detector...
-            )pbdoc");
+    //             Information about secondary particles will be found in
+    //             :meth:`particle.DynamicData`
+    //         )pbdoc")
+    //     .def(py::init<>())
+    //     .def(py::init<const ParticleDef&>())
+    //     .def(py::init<const Particle&>())
+    //     .def("inject_state", &Particle::InjectState,
+    //          R"pbdoc(
+    //         )pbdoc")
+    //     .def_property_readonly("particle_def", &Particle::GetParticleDef,
+    //                            R"pbdoc(
+    //             Definition of particle actuell in container
+    //         )pbdoc")
+    //     .def_property_readonly("decay_table", &Particle::GetDecayTable,
+    //                            R"pbdoc(
+    //             Decay table of actuell particle
+    //         )pbdoc")
+    //     .def_property("momentum", &Particle::GetMomentum,
+    //                   &Particle::SetMomentum,
+    //                   R"pbdoc(
+    //             Momentum of primary particle in MeV
+    //         )pbdoc")
+    //     .def_property("entry_point", &Particle::GetEntryPoint,
+    //                   &Particle::SetEntryPoint,
+    //                   R"pbdoc(
+    //             Entry point in detector in form of a Vector3d.
+    //         )pbdoc")
+    //     .def_property("entry_time", &Particle::GetEntryTime,
+    //                   &Particle::SetEntryTime,
+    //                   R"pbdoc(
+    //             Time primary particle entered the detector.
+    //         )pbdoc")
+    //     .def_property("entry_energy", &Particle::GetEntryEnergy,
+    //                   &Particle::SetEntryEnergy,
+    //                   R"pbdoc(
+    //             Energy primary particle entered the detector.
+    //         )pbdoc")
+    //     .def_property("exit_point", &Particle::GetExitPoint,
+    //                   &Particle::SetExitPoint,
+    //                   R"pbdoc(
+    //             Point particle exit the detector in form of a Vector3d.
+    //         )pbdoc")
+    //     .def_property("exit_time", &Particle::GetExitTime,
+    //                   &Particle::SetExitTime,
+    //                   R"pbdoc(
+    //             Time primary particle exit the detector.
+    //         )pbdoc")
+    //     .def_property("exit_energy", &Particle::GetExitEnergy,
+    //                   &Particle::SetExitEnergy,
+    //                   R"pbdoc(
+    //             Energy primary particle exit the detector.
+    //         )pbdoc")
+    //     .def_property("closet_approach_point",
+    //                   &Particle::GetClosestApproachPoint,
+    //                   &Particle::SetClosestApproachPoint,
+    //                   R"pbdoc(
+    //             In a first order the point where distance between particle
+    //             and detector center is minimal.
+    //         )pbdoc")
+    //     .def_property("closet_approach_time", &Particle::GetClosestApproachTime,
+    //                   &Particle::SetClosestApproachTime,
+    //                   R"pbdoc(
+    //             In a first order the time where distance between particle
+    //             and detector center is minimal.
+    //         )pbdoc")
+    //     .def_property("closet_approach_energy",
+    //                   &Particle::GetClosestApproachEnergy,
+    //                   &Particle::SetClosestApproachEnergy,
+    //                   R"pbdoc(
+    //             In a first order the energy where distance between particle
+    //             and detector center is minimal.
+    //         )pbdoc")
+    //     .def_property("e_lost", &Particle::GetElost, &Particle::SetElost,
+    //                   R"pbdoc(
+    //             Energy primary particle lost in detector.
+    //             Energy primary particle lost in detector...
+    //         )pbdoc");
 
     py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries",
             R"pbdoc(List of secondaries)pbdoc")

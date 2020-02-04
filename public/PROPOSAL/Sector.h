@@ -164,8 +164,8 @@ public:
         const DynamicData&, double, double);
     /* std::shared_ptr<DynamicData> DoBorder(const DynamicData& ); */
 
-    Secondaries Propagate(const DynamicData& particle_condition, double distance,
-        double minimal_energy=0);
+    Secondaries Propagate(const DynamicData& particle_condition,
+        double max_distance=1e20, double minimal_energy=0.);
 
     /**
      *  Makes Stochastic Energyloss

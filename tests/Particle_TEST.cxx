@@ -16,14 +16,14 @@ TEST(Comparison, Comparison_equal)
     direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
     direction.CalculateCartesianFromSpherical();
 
-    Particle A;
-    Particle B;
+    DynamicData A;
+    DynamicData B;
     EXPECT_TRUE(A == B);
 
-    Particle* C = new Particle(TauMinusDef::Get());
+    DynamicData* C = new DynamicData(TauMinusDef::Get().particle_type);
     C->SetPosition(position);
     C->SetDirection(direction);
-    Particle* D = new Particle(TauMinusDef::Get());
+    DynamicData* D = new DynamicData(TauMinusDef::Get().particle_type);
     D->SetPosition(position);
     D->SetDirection(direction);
 
@@ -33,7 +33,7 @@ TEST(Comparison, Comparison_equal)
 
     position    = Vector3D();
     direction   = Vector3D();
-    Particle* E = new Particle(MuMinusDef::Get());
+    DynamicData* E = new DynamicData(MuMinusDef::Get().particle_type);
     E->SetPosition(position);
     E->SetDirection(direction);
     EXPECT_TRUE(A == *E);
@@ -44,14 +44,14 @@ TEST(Comparison, Comparison_not_equal)
     direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
     direction.CalculateCartesianFromSpherical();
 
-    Particle A;
-    Particle B(TauMinusDef::Get());
+    DynamicData A;
+    DynamicData B(TauMinusDef::Get().particle_type);
     EXPECT_TRUE(A != B);
 
-    Particle* C = new Particle(TauMinusDef::Get());
+    DynamicData* C = new DynamicData(TauMinusDef::Get().particle_type);
     C->SetPosition(position);
     C->SetDirection(direction);
-    Particle* D = new Particle(TauMinusDef::Get());
+    DynamicData* D = new DynamicData(TauMinusDef::Get().particle_type);
 
     D->SetPosition(position);
     D->SetDirection(direction);
@@ -61,8 +61,8 @@ TEST(Comparison, Comparison_not_equal)
 
 TEST(Assignment, Copyconstructor)
 {
-    Particle A;
-    Particle B = A;
+    DynamicData A;
+    DynamicData B = A;
 
     EXPECT_TRUE(A == B);
 }
@@ -71,10 +71,10 @@ TEST(Assignment, Copyconstructor2)
 {
     direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
     direction.CalculateCartesianFromSpherical();
-    Particle A(TauMinusDef::Get());
+    DynamicData A(TauMinusDef::Get().particle_type);
     A.SetPosition(position);
     A.SetDirection(direction);
-    Particle B(A);
+    DynamicData B(A);
 
     EXPECT_TRUE(A == B);
 }
@@ -85,7 +85,7 @@ TEST(Deflection, Deflection)
     Vector3D direction_B(0., -1./SQRT2, 1./SQRT2);
     Vector3D direction_C(1./3., 2./3., -2./3.);
     Vector3D direction_tmp(1., 0., 0.);
-    Particle particle(MuMinusDef::Get());
+    DynamicData particle(MuMinusDef::Get().particle_type);
     double cosangle;
 
     std::vector<double> cos_phi_list{-1, -0.8, -0.2, 0., 0.2, 0.8, 1.};

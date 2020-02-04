@@ -15,11 +15,13 @@ MupairIntegral::MupairIntegral(const MupairProduction& param)
     : CrossSectionIntegral(GetType(param), param)
 {
     muminus_def_ = &MuMinusDef::Get();
-    muplus_def = &MuPlusDef::Get();
+    muplus_def_ = &MuPlusDef::Get();
 }
 
 MupairIntegral::MupairIntegral(const MupairIntegral& mupair)
-    : CrossSectionIntegral(mupair), muminus_def_(mupair.muminus_def_), muplus_def(mupair.muplus_def)
+    : CrossSectionIntegral(mupair)
+    , muminus_def_(mupair.muminus_def_)
+    , muplus_def_(mupair.muplus_def_)
 {
 }
 
@@ -58,16 +60,16 @@ double MupairIntegral::CalculatedEdxWithoutMultiplier(double energy)
     return energy * sum;
 }
 
-std::pair<std::vector<Particle*>, bool> MupairIntegral::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
-    std::vector<Particle*> mupair;
+std::pair<std::vector<DynamicData>, bool> MupairIntegral::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
+    std::vector<DynamicData> mupair;
 
     if(parametrization_->IsParticleOutputEnabled() == false){
         return std::make_pair(mupair, false);
     }
 
     //Create MuPair particles
-    mupair.push_back(new Particle(*muminus_def_));
-    mupair.push_back(new Particle(*muplus_def));
+    mupair.push_back(DynamicData(muminus_def_->particle_type));
+    mupair.push_back(DynamicData(muplus_def_->particle_type));
 
     //Sample random numbers
     double rnd1 = RandomGenerator::Get().RandomDouble();
@@ -76,10 +78,10 @@ std::pair<std::vector<Particle*>, bool> MupairIntegral::CalculateProducedParticl
     //Sample and assign energies
     double rho = parametrization_->Calculaterho(energy, energy_loss/energy, rnd1, rnd2);
 
-    mupair[0]->SetEnergy(0.5*energy_loss*(1 + rho));
-    mupair[1]->SetEnergy(0.5*energy_loss*(1 - rho));
-    mupair[0]->SetDirection(initial_direction);
-    mupair[1]->SetDirection(initial_direction);
+    mupair[0].SetEnergy(0.5*energy_loss*(1 + rho));
+    mupair[1].SetEnergy(0.5*energy_loss*(1 - rho));
+    mupair[0].SetDirection(initial_direction);
+    mupair[1].SetDirection(initial_direction);
     return std::make_pair(mupair, false);
 
 }

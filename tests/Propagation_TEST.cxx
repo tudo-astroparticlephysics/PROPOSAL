@@ -121,13 +121,15 @@ TEST(Propagation, Test_nan)
     int EmaxLog10 = 8;
 
     // Define Particles
-    Particle mu(MuMinusDef::Get());
-    Particle tau(TauMinusDef::Get());
+    ParticleDef mu_def = MuMinusDef::Get();
+    ParticleDef tau_def = TauMinusDef::Get();
+    DynamicData mu(mu_def.particle_type);
+    DynamicData tau(tau_def.particle_type);
 
     // one propagator for each particle definition
     // medium/detector configuration
-    Propagator prop_mu(mu.GetParticleDef(), "resources/config_ice.json");
-    Propagator prop_tau(tau.GetParticleDef(), "resources/config_ice.json");
+    Propagator prop_mu(mu_def, "resources/config_ice.json");
+    Propagator prop_tau(tau_def, "resources/config_ice.json");
 
     // Possibility to register propagator in a service
     PropagatorService prop_service;
@@ -154,23 +156,23 @@ TEST(Propagation, Test_nan)
 
         // Use service to propagate different particle
         std::cout << "Muon" << std::endl;
-        Secondaries sec_mu  = prop_service.Propagate(mu);
+        Secondaries sec_mu  = prop_service.Propagate(mu_def, mu);
         std::cout << "Tau" << std::endl;
-        Secondaries sec_tau = prop_service.Propagate(tau);
+        Secondaries sec_tau = prop_service.Propagate(tau_def, tau);
 
         // ----------------------------------------------------------------- //
         // Using propagator directly
         // ----------------------------------------------------------------- //
 
         // Therefor its needed to get the internal created particle first
-        Particle& particle = prop_mu.GetParticle();
+        // Particle& particle = prop_mu.GetParticle();
 
-        particle.SetEnergy(std::pow(10, EmaxLog10));
-        particle.SetPropagatedDistance(0);
-        particle.SetPosition(Vector3D(0, 0, 0));
-        particle.SetDirection(Vector3D(0, 0, -1));
+        mu.SetEnergy(std::pow(10, EmaxLog10));
+        mu.SetPropagatedDistance(0);
+        mu.SetPosition(Vector3D(0, 0, 0));
+        mu.SetDirection(Vector3D(0, 0, -1));
 
-        Secondaries sec_mu_direct = prop_mu.Propagate();
+        Secondaries sec_mu_direct = prop_mu.Propagate(mu);
     }
 }
 
@@ -194,8 +196,9 @@ TEST(Propagation, particle_type)
 
     in >> statistic >> energy;
 
-    Propagator prop_mu(MuMinusDef::Get(), "resources/config_ice.json");
-    Particle& mu = prop_mu.GetParticle();
+    ParticleDef mu_def = MuMinusDef::Get();
+    Propagator prop_mu(mu_def, "resources/config_ice.json");
+    DynamicData mu(mu_def.particle_type);
 
     mu.SetEnergy(energy);
     mu.SetPropagatedDistance(0);
@@ -229,7 +232,7 @@ TEST(Propagation, particle_type)
         mu.SetPosition(Vector3D(0, 0, 0));
         mu.SetDirection(Vector3D(0, 0, -1));
 
-        std::vector<DynamicData> sec_mu_direct = prop_mu.Propagate().GetSecondaries();
+        std::vector<DynamicData> sec_mu_direct = prop_mu.Propagate(mu).GetSecondaries();
 
         std::string name_new = "";
 

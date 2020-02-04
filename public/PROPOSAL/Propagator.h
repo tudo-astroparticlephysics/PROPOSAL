@@ -74,7 +74,8 @@ public:
     ///
     /// @return Secondary data
     // ----------------------------------------------------------------------------
-    Secondaries Propagate(double MaxDistance_cm = 1e20);
+    Secondaries Propagate(DynamicData& particle_condition,
+        double max_distance=1e20, double minimal_energy=0.);
 
     // --------------------------------------------------------------------- //
     // Getter
@@ -84,7 +85,11 @@ public:
     const std::vector<Sector*> GetSectors() const { return sectors_; }
 
     Geometry& GetDetector() const { return *detector_; };
-    Particle& GetParticle() { return particle_; };
+    ParticleDef& GetParticleDef() { return particle_def_; };
+    DynamicData& GetEntryCondition() { return entry_condition_; };
+    DynamicData& GetExitCondition() { return exit_condition_; };
+    DynamicData& GetClosestApproachCondition() { return closest_approach_condition_; };
+    double GetELost() { return elost_; };
 
 private:
 
@@ -195,11 +200,15 @@ private:
     std::vector<Sector*> sectors_;
     Sector* current_sector_;
 
-    Particle particle_;
+    ParticleDef particle_def_;
     Geometry* detector_;
 
     std::pair<double,double> produced_particle_moments_ {100., 10000.};
     unsigned int n_th_call_ {1};
+    DynamicData entry_condition_;
+    DynamicData exit_condition_;
+    DynamicData closest_approach_condition_;
+    double elost_;
 };
 
 } // namespace PROPOSAL

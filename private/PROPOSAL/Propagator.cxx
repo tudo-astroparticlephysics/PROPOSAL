@@ -55,8 +55,12 @@ const bool Propagator::uniform_               = true;
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geometry) try
     : current_sector_(NULL),
-      particle_(Particle()),
-      detector_(geometry.clone())
+      particle_def_(sectors.at(0)->GetParticleDef()),
+      detector_(geometry.clone()),
+      entry_condition_(DynamicData()),
+      exit_condition_(DynamicData()),
+      closest_approach_condition_(DynamicData()),
+      elost_(0.)
 {
     // --------------------------------------------------------------------- //
     // Check if all ParticleDefs are the same
@@ -64,7 +68,7 @@ Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geom
 
     for (auto sector: sectors)
     {
-        if (sector->GetParticleDef() != particle_.GetParticleDef())
+        if (sector->GetParticleDef() != particle_def_)
         {
             log_fatal("The particle definitions of the sectors must be identical for proper propagation!");
         } else
@@ -83,8 +87,12 @@ Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geom
 Propagator::Propagator(const ParticleDef& particle_def,
                        const std::vector<Sector::Definition>& sector_defs,
                        const Geometry& geometry)
-    : particle_(particle_def)
+    : particle_def_(particle_def)
     , detector_(geometry.clone())
+    , entry_condition_(DynamicData())
+    , exit_condition_(DynamicData())
+    , closest_approach_condition_(DynamicData())
+    , elost_(0.)
 {
     for (auto def: sector_defs)
     {
@@ -105,8 +113,12 @@ Propagator::Propagator(const ParticleDef& particle_def,
                        const std::vector<Sector::Definition>& sector_defs,
                        const Geometry& geometry,
                        const InterpolationDef& interpolation_def)
-    : particle_(particle_def)
+    : particle_def_(particle_def)
     , detector_(geometry.clone())
+    , entry_condition_(DynamicData())
+    , exit_condition_(DynamicData())
+    , closest_approach_condition_(DynamicData())
+    , elost_(0.)
 {
     for (auto def: sector_defs)
     {
@@ -126,12 +138,16 @@ Propagator::Propagator(const ParticleDef& particle_def,
 Propagator::Propagator(const Propagator& propagator)
     : sectors_(propagator.sectors_.size(), NULL)
     , current_sector_(NULL)
-    , particle_(propagator.particle_)
+    , particle_def_(propagator.particle_def_)
     , detector_(propagator.detector_->clone())
+    , entry_condition_(DynamicData())
+    , exit_condition_(DynamicData())
+    , closest_approach_condition_(DynamicData())
+    , elost_(0.)
 {
     for (unsigned int i = 0; i < propagator.sectors_.size(); ++i)
     {
-        sectors_[i] = new Sector(particle_.GetParticleDef(), *propagator.sectors_[i]);
+        sectors_[i] = new Sector(particle_def_, *propagator.sectors_[i]);
 
         if (propagator.sectors_[i] == propagator.current_sector_)
         {
@@ -143,8 +159,12 @@ Propagator::Propagator(const Propagator& propagator)
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(const ParticleDef& particle_def, const std::string& config_file)
     : current_sector_(NULL)
-    , particle_(particle_def)
+    , particle_def_(particle_def)
     , detector_(NULL)
+    , entry_condition_(DynamicData())
+    , exit_condition_(DynamicData())
+    , closest_approach_condition_(DynamicData())
+    , elost_(0.)
 {
     int global_seed  = global_seed_;
     bool do_interpolation = do_interpolation_;
@@ -280,7 +300,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     {
         log_debug("The 'uniform' option (uniform phasespace sampling for decays) is not set. Use default (true)");
     }
-    particle_.GetDecayTable().SetUniformSampling(uniform);
+    particle_def_.decay_table.SetUniformSampling(uniform);
 
 
     // Parse detector geometry
@@ -449,14 +469,14 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
 
         if (do_interpolation)
         {
-            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_infront, interpolation_def));
-            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_inside, interpolation_def));
-            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_behind, interpolation_def));
+            sectors_.push_back(new Sector(particle_def_, sec_def_infront, interpolation_def));
+            sectors_.push_back(new Sector(particle_def_, sec_def_inside, interpolation_def));
+            sectors_.push_back(new Sector(particle_def_, sec_def_behind, interpolation_def));
         } else
         {
-            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_infront));
-            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_inside));
-            sectors_.push_back(new Sector(particle_.GetParticleDef(), sec_def_behind));
+            sectors_.push_back(new Sector(particle_def_, sec_def_infront));
+            sectors_.push_back(new Sector(particle_def_, sec_def_inside));
+            sectors_.push_back(new Sector(particle_def_, sec_def_behind));
         }
 
         delete geometry;
@@ -491,6 +511,22 @@ bool Propagator::operator==(const Propagator& propagator) const
     {
         return false;
     }
+    if (entry_condition_ != propagator.entry_condition_)
+    {
+        return false;
+    }
+    if (exit_condition_ != propagator.exit_condition_)
+    {
+        return false;
+    }
+    if (closest_approach_condition_ != propagator.closest_approach_condition_)
+    {
+        return false;
+    }
+    if (elost_ != propagator.elost_)
+    {
+        return false;
+    }
     else
     {
         for (unsigned int i = 0; i < sectors_.size(); ++i)
@@ -516,35 +552,41 @@ bool Propagator::operator!=(const Propagator& propagator) const
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-Secondaries Propagator::Propagate(double MaxDistance_cm)
+Secondaries Propagator::Propagate(DynamicData& particle_condition,
+        double max_distance, double minimal_energy)
 {
     double distance = 0;
     double distance_to_closest_approach  = 0;
 
     // These two variables are needed to calculate the energy loss inside the detector
     // energy_at_entry_point is initialized with the current energy because this is a
-    // reasonable value for particle_ which starts inside the detector
+    // reasonable value for particle which starts inside the detector
     // They should be set below, so there is no need to init them here.
     // But for safetiness, if an edge case is not considered
     // one could include them.
     // particle_.SetEntryEnergy(particle_.GetEnergy());
     // particle_.SetExitEnergy(particle_.GetMass());
 
-    Vector3D particle_position  = particle_.GetPosition();
-    Vector3D particle_direction = particle_.GetDirection();
+    Vector3D particle_position  = particle_condition.GetPosition();
+    Vector3D particle_direction = particle_condition.GetDirection();
+
+    // TODO: what to do with the entry, exit closest approach point?
+    // DynamicData entry_condition;
+    // DynamicData exit_condition;
+    // DynamicData closest_approach_condition;
 
     bool starts_in_detector = detector_->IsInside(particle_position, particle_direction);
     if (starts_in_detector)
     {
-        particle_.SetEntryPoint(particle_position);
-        particle_.SetEntryEnergy(particle_.GetEnergy());
-        particle_.SetEntryTime(particle_.GetTime());
+        entry_condition_.SetPosition(particle_position);
+        entry_condition_.SetEnergy(particle_condition.GetEnergy());
+        entry_condition_.SetTime(particle_condition.GetTime());
         distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
         if (distance_to_closest_approach < 0)
         {
-            particle_.SetClosestApproachPoint(particle_position);
-            particle_.SetClosestApproachEnergy(particle_.GetEnergy());
-            particle_.SetClosestApproachTime(particle_.GetTime());
+            closest_approach_condition_.SetPosition(particle_position);
+            closest_approach_condition_.SetEnergy(particle_condition.GetEnergy());
+            closest_approach_condition_.SetTime(particle_condition.GetTime());
         }
     }
     bool is_in_detector     = false;
@@ -552,19 +594,19 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
     bool propagationstep_till_closest_approach = false;
     bool already_reached_closest_approach = false;
 
-    Secondaries secondaries_(std::make_shared<ParticleDef>(particle_.GetParticleDef()));
+    Secondaries secondaries_(std::make_shared<ParticleDef>(particle_def_));
     secondaries_.reserve(static_cast<size_t>(produced_particle_moments_.first + 2 * std::sqrt(produced_particle_moments_.second)));
 
     while (1)
     {
-        particle_position  = particle_.GetPosition();
-        particle_direction = particle_.GetDirection();
+        particle_position  = particle_condition.GetPosition();
+        particle_direction = particle_condition.GetDirection();
 
         ChooseCurrentSector(particle_position, particle_direction);
 
         if (current_sector_ == nullptr)
         {
-            log_info("particle_ reached the border");
+            log_info("particle reached the border");
             break;
         }
 
@@ -583,9 +625,9 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
 
                     if (std::abs(distance_to_closest_approach) < GEOMETRY_PRECISION)
                     {
-                        particle_.SetClosestApproachPoint(particle_position);
-                        particle_.SetClosestApproachEnergy(particle_.GetEnergy());
-                        particle_.SetClosestApproachTime(particle_.GetTime());
+                        closest_approach_condition_.SetPosition(particle_position);
+                        closest_approach_condition_.SetEnergy(particle_condition.GetEnergy());
+                        closest_approach_condition_.SetTime(particle_condition.GetTime());
                     }
                     else
                     {
@@ -601,18 +643,18 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
         // entry point of the detector
         if (!starts_in_detector && !was_in_detector && is_in_detector)
         {
-            particle_.SetEntryPoint(particle_position);
-            particle_.SetEntryEnergy(particle_.GetEnergy());
-            particle_.SetEntryTime(particle_.GetTime());
+            entry_condition_.SetPosition(particle_position);
+            entry_condition_.SetEnergy(particle_condition.GetEnergy());
+            entry_condition_.SetTime(particle_condition.GetTime());
 
             was_in_detector = true;
         }
         // exit point of the detector
         else if (was_in_detector && !is_in_detector)
         {
-            particle_.SetExitPoint(particle_position);
-            particle_.SetExitEnergy(particle_.GetEnergy());
-            particle_.SetExitTime(particle_.GetTime());
+            exit_condition_.SetPosition(particle_position);
+            exit_condition_.SetEnergy(particle_condition.GetEnergy());
+            exit_condition_.SetTime(particle_condition.GetTime());
 
             // we don't want to run in this case a second time so we set was_in_detector to false
             was_in_detector = false;
@@ -621,45 +663,52 @@ Secondaries Propagator::Propagate(double MaxDistance_cm)
         // if particle_ starts inside the detector we only ant to fill the exit point
         else if (starts_in_detector && !is_in_detector)
         {
-            particle_.SetExitPoint(particle_position);
-            particle_.SetExitEnergy(particle_.GetEnergy());
-            particle_.SetExitTime(particle_.GetTime());
+            exit_condition_.SetPosition(particle_position);
+            exit_condition_.SetEnergy(particle_condition.GetEnergy());
+            exit_condition_.SetTime(particle_condition.GetTime());
 
             // we don't want to run in this case a second time so we set starts_in_detector to false
             starts_in_detector = false;
         }
-        if (MaxDistance_cm <= particle_.GetPropagatedDistance() + distance)
+        if (max_distance <= particle_condition.GetPropagatedDistance() + distance)
         {
-            distance = MaxDistance_cm - particle_.GetPropagatedDistance();
+            distance = max_distance - particle_condition.GetPropagatedDistance();
         }
 
-        auto p_condition = std::make_shared<DynamicData>(particle_);
+        // auto p_condition = std::make_shared<DynamicData>(particle_);
 
-        secondaries_.append(current_sector_->Propagate(particle_, distance, 0));
+        secondaries_.append(current_sector_->Propagate(particle_condition, distance, minimal_energy));
+        // TODO: this is not god, because the seconday can have other conditions
+        DynamicData last_sec = secondaries_.GetSecondaries().back();
+        particle_condition.SetEnergy(last_sec.GetEnergy());
+        particle_condition.SetTime(last_sec.GetTime());
+        particle_condition.SetPropagatedDistance(last_sec.GetPropagatedDistance());
+        particle_condition.SetPosition(last_sec.GetPosition());
+        particle_condition.SetDirection(last_sec.GetDirection());
 
         /* for (auto p : sector_result.second->GetSecondaries()) { */
         /* } */
-        double tmp_energy = secondaries_.GetSecondaries().back().GetEnergy();
         if (propagationstep_till_closest_approach)
         {
-            particle_.SetClosestApproachPoint(particle_.GetPosition());
-            particle_.SetClosestApproachEnergy(particle_.GetEnergy());
-            particle_.SetClosestApproachTime(particle_.GetTime());
+            closest_approach_condition_.SetPosition(particle_condition.GetPosition());
+            closest_approach_condition_.SetEnergy(particle_condition.GetEnergy());
+            closest_approach_condition_.SetTime(particle_condition.GetTime());
 
             propagationstep_till_closest_approach = false;
         }
 
-        if (tmp_energy <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance() || particle_.GetEnergy() <= particle_.GetLow())
+        if (last_sec.GetEnergy() <= 0 || max_distance <= particle_condition.GetPropagatedDistance() || particle_condition.GetEnergy() <= particle_def_.low || particle_condition.GetEnergy() <= minimal_energy)
             break;
     }
-    if (detector_->IsInside(particle_.GetPosition(), particle_.GetDirection()))
+    if (detector_->IsInside(particle_condition.GetPosition(), particle_condition.GetDirection()))
     {
-        particle_.SetExitPoint(particle_.GetPosition());
-        particle_.SetExitEnergy(particle_.GetEnergy());
-        particle_.SetExitTime(particle_.GetTime());
+        exit_condition_.SetPosition(particle_condition.GetPosition());
+        exit_condition_.SetEnergy(particle_condition.GetEnergy());
+        exit_condition_.SetTime(particle_condition.GetTime());
     }
 
-    particle_.SetElost(particle_.GetEntryEnergy() - particle_.GetExitEnergy());
+    // TODO: what is now with ELost?
+    double elost_ = entry_condition_.GetEnergy() - exit_condition_.GetEnergy();
 
     secondaries_.DoDecay();
 

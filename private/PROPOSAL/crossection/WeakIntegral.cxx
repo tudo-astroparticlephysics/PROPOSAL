@@ -22,14 +22,14 @@ WeakIntegral::WeakIntegral(const WeakIntegral& weak)
 
 WeakIntegral::~WeakIntegral() {}
 
-std::pair<std::vector<Particle*>, bool> WeakIntegral::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
+std::pair<std::vector<DynamicData>, bool> WeakIntegral::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
     // interaction is fatal and the initial particle is converted to a neutrino
-    Particle* return_particle;
-    int p_id(static_cast<int>(parametrization_->GetParticleDef().weak_partner));
-    auto p_def = Id_Particle_Map.find(p_id);
-    return_particle = new Particle(p_def->second);
-    return_particle->SetEnergy(energy - energy_loss);
-    return_particle->SetDirection(initial_direction);
+    DynamicData return_particle(parametrization_->GetParticleDef().weak_partner);
+    // int p_id(static_cast<int>(parametrization_->GetParticleDef().weak_partner));
+    // auto p_def = Id_Particle_Map.find(p_id);
+    // return_particle = new Particle(p_def->second);
+    return_particle.SetEnergy(energy - energy_loss);
+    return_particle.SetDirection(initial_direction);
 
-    return std::make_pair(std::vector<Particle*>{return_particle}, true);
+    return std::make_pair(std::vector<DynamicData>{return_particle}, true);
 }

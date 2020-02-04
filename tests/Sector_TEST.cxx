@@ -22,7 +22,7 @@ ParticleDef getParticleDef(const std::string& name)
 
 TEST(Comparison, Comparison_equal)
 {
-    Particle Mu(MuMinusDef::Get());
+    ParticleDef mu_def = MuMinusDef::Get();
     Water medium;
     Sphere sphere;
     EnergyCutSettings ecuts;
@@ -35,16 +35,16 @@ TEST(Comparison, Comparison_equal)
     sector_def.cut_settings = ecuts;
     sector_def.do_continuous_randomization = true;
 
-    Sector sector(Mu.GetParticleDef(), sector_def);
-    Sector sector_2 = Sector(Mu.GetParticleDef(), sector_def);
+    Sector sector(mu_def, sector_def);
+    Sector sector_2 = Sector(mu_def, sector_def);
 
     EXPECT_TRUE(sector == sector_2);
 }
 
 TEST(Comparison, Comparison_not_equal)
 {
-    Particle Mu(MuMinusDef::Get());
-    Particle Tau(TauMinusDef::Get());
+    ParticleDef mu_def = MuMinusDef::Get();
+    ParticleDef tau_def = TauMinusDef::Get();
     Water medium1;
     Ice medium2;
     Sphere geometry1;
@@ -86,16 +86,16 @@ TEST(Comparison, Comparison_not_equal)
     Sector::Definition sector_def9 = sector_def1;
     sector_def9.stopping_decay = false;
 
-    Sector sector(Mu.GetParticleDef(), sector_def1);
-    Sector sector_1(Tau.GetParticleDef(), sector_def1);
-    Sector sector_2(Mu.GetParticleDef(), sector_def2);
-    Sector sector_3(Mu.GetParticleDef(), sector_def3);
-    Sector sector_4(Mu.GetParticleDef(), sector_def4);
-    Sector sector_5(Mu.GetParticleDef(), sector_def5);
-    Sector sector_6(Mu.GetParticleDef(), sector_def6);
-    Sector sector_7(Mu.GetParticleDef(), sector_def7);
-    Sector sector_8(Mu.GetParticleDef(), sector_def8);
-    Sector sector_9(Mu.GetParticleDef(), sector_def9);
+    Sector sector(mu_def, sector_def1);
+    Sector sector_1(tau_def, sector_def1);
+    Sector sector_2(mu_def, sector_def2);
+    Sector sector_3(mu_def, sector_def3);
+    Sector sector_4(mu_def, sector_def4);
+    Sector sector_5(mu_def, sector_def5);
+    Sector sector_6(mu_def, sector_def6);
+    Sector sector_7(mu_def, sector_def7);
+    Sector sector_8(mu_def, sector_def8);
+    Sector sector_9(mu_def, sector_def9);
 
     EXPECT_TRUE(sector != sector_1);
     EXPECT_TRUE(sector != sector_2);
@@ -110,7 +110,7 @@ TEST(Comparison, Comparison_not_equal)
 
 TEST(Assignment, Copyconstructor)
 {
-    Particle mu = Particle(MuMinusDef::Get());
+    ParticleDef mu_def = MuMinusDef::Get();
     Water water(1.0);
     Sphere geometry(Vector3D(0, 0, 0), 1000, 0);
     EnergyCutSettings ecuts(500, 0.05);
@@ -122,14 +122,14 @@ TEST(Assignment, Copyconstructor)
     sector_def.scattering_model = ScatteringFactory::Moliere;
     sector_def.cut_settings = ecuts;
 
-    Sector sector_1(mu.GetParticleDef(), sector_def);
+    Sector sector_1(mu_def, sector_def);
     Sector sector_2 = sector_1;
     EXPECT_TRUE(sector_1 == sector_2);
 }
 
 TEST(Assignment, Copyconstructor2)
 {
-    Particle mu = Particle(MuMinusDef::Get());
+    ParticleDef mu = MuMinusDef::Get();
     Water water(1.0);
     Sphere geometry(Vector3D(), 1000, 0);
     EnergyCutSettings ecuts(500, 0.05);
@@ -141,7 +141,7 @@ TEST(Assignment, Copyconstructor2)
     sector_def.scattering_model = ScatteringFactory::Moliere;
     sector_def.cut_settings = ecuts;
 
-    Sector sector_1(mu.GetParticleDef(), sector_def);
+    Sector sector_1(mu, sector_def);
     Sector sector_2(sector_1);
     EXPECT_TRUE(sector_1 == sector_2);
 }
