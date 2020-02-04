@@ -124,6 +124,7 @@ def propagate():
 
     interpolation_def = pp.InterpolationDef()
     interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
+    interpolation_def.path_to_tables_readonly = "~/.local/share/PROPOSAL/tables"
 
     # Propagator
 
@@ -147,7 +148,7 @@ def propagate():
 
     mu_start = pp.particle.Particle(mu)
 
-    secondarys = prop.propagate()
+    secondarys = prop.propagate().particles
 
     return mu_start, geo_detector, secondarys
 
@@ -203,13 +204,13 @@ def plot_track(mu_start, geo_detector, secondarys):
     for interaction in secondarys:
         if geo_detector.is_inside(interaction.position, interaction.direction):
             color = 'b'
-            if interaction.id == pp.particle.Data.Brems:
+            if interaction.id == int(pp.particle.Interaction_Id.Brems):
                 color = 'b'
-            elif interaction.id == pp.particle.Data.Epair:
+            elif interaction.id == int(pp.particle.Interaction_Id.Epair):
                 color = 'r'
-            elif interaction.id == pp.particle.Data.NuclInt:
+            elif interaction.id == int(pp.particle.Interaction_Id.NuclInt):
                 color = 'm'
-            elif interaction.id == pp.particle.Data.DeltaE:
+            elif interaction.id == int(pp.particle.Interaction_Id.DeltaE):
                 color = 'g'
             else:
                 color = 'k'

@@ -1,5 +1,6 @@
 import pyPROPOSAL as pp
 import time
+from tqdm import tqdm
 
 try:
     import matplotlib as mpl
@@ -31,9 +32,9 @@ def filter_hadr(secondarys):
     return sum(E)
 
 
-def filter_particle(secondarys, particle):
-    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
-    E = [p.energy for p in prods if p.particle_def == particle]
+def filter_particle(secondarys, particle_type):
+    prods = [p for p in secondarys if p.id == int(particle_type)]
+    E = [p.energy for p in prods]
     return sum(E)
 
 
@@ -64,9 +65,10 @@ if __name__ == "__main__":
     # =========================================================
 
     statistics = int(1e5)
-    binning = 50
+    binning = np.linspace(0, 0.5, 50)
 
-    mu = pp.particle.Particle(pp.particle.MuMinusDef.get())
+    pdef = pp.particle.MuMinusDef.get()
+    mu = pp.particle.DynamicData(pdef.particle_type)
     mu.direction = pp.Vector3D(0, 0, -1)
 
     products = [pp.particle.EMinusDef.get(), pp.particle.NuMuDef.get(), pp.particle.NuEBarDef.get()]
@@ -79,24 +81,24 @@ if __name__ == "__main__":
 
     passed_time = 0.0
 
-    for i in range(statistics):
+    for i in tqdm(range(statistics)):
         mu.position = pp.Vector3D(0, 0, 0)
         mu.direction = pp.Vector3D(0, 0, -1)
-        mu.energy = mu.particle_def.mass
+        mu.energy = pdef.mass
         mu.propagated_distance = 0
 
         t = time.time()
 
-        d = lep_ME.decay(mu)
-        E_lep_ME.append(filter_particle(d, pp.particle.EMinusDef.get()))
+        d = lep_ME.decay(pdef, mu).particles
+        E_lep_ME.append(filter_particle(d, pp.particle.Particle_Id.EMinus))
 
         mu.position = pp.Vector3D(0, 0, 0)
         mu.direction = pp.Vector3D(0, 0, -1)
-        mu.energy = mu.particle_def.mass
+        mu.energy = pdef.mass
         mu.propagated_distance = 0
 
-        d = lep.decay(mu)
-        E_lep.append(filter_particle(d, pp.particle.EMinusDef.get()))
+        d = lep.decay(pdef, mu).particles
+        E_lep.append(filter_particle(d, pp.particle.Particle_Id.EMinus))
 
         passed_time += time.time() - t
 

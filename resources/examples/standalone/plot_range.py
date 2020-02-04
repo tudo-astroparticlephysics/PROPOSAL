@@ -1,10 +1,5 @@
 import pyPROPOSAL as pp
-
-try:
-    import matplotlib as mpl
-    import matplotlib.pyplot as plt
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
+import matplotlib.pyplot as plt
 
 
 if __name__ == "__main__":
@@ -30,6 +25,7 @@ if __name__ == "__main__":
 
     interpolation_def = pp.InterpolationDef()
     interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
+    interpolation_def.path_to_tables_readonly = "~/.local/share/PROPOSAL/tables"
 
     prop = pp.Propagator(
             particle_def=pp.particle.MuMinusDef.get(),
@@ -49,7 +45,7 @@ if __name__ == "__main__":
         mu.energy = energy
         mu.propagated_distance = 0
 
-        d = prop.propagate()
+        d = prop.propagate().particles
 
         mu_length.append(mu.propagated_distance / 100)
         n_secondarys.append(len(d))

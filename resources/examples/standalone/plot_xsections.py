@@ -2,19 +2,8 @@
 import pyPROPOSAL as pp
 import pyPROPOSAL.parametrization as parametrization
 
-try:
-    import matplotlib as mpl
-    mpl.use('Agg')
-    import matplotlib.pyplot as plt
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
-
-try:
-    import numpy as np
-except ImportError:
-    raise ImportError(
-        "Numpy not installed! Needed to calculate the detector cylinder"
-    )
+import matplotlib.pyplot as plt
+import numpy as np
 
 import math
 
@@ -31,6 +20,7 @@ if __name__ == "__main__":
 
     interpolation_def = pp.InterpolationDef()
     interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
+    interpolation_def.path_to_tables_readonly = "~/.local/share/PROPOSAL/tables"
 
     # =========================================================
     # 	Constructor args for parametrizations
@@ -94,7 +84,7 @@ if __name__ == "__main__":
         )
 
     ioniz = pp.crosssection.IonizInterpolant(
-        parametrization.ionization.Ionization(
+        parametrization.ionization.BetheBlochRossi(
             mu,
             medium,
             cuts,

@@ -1,11 +1,8 @@
 import pyPROPOSAL as pp
 
-try:
-    import matplotlib as mpl
-    import matplotlib.pyplot as plt
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
+import matplotlib.pyplot as plt
 
+from tqdm import tqdm
 
 if __name__ == "__main__":
 
@@ -32,6 +29,7 @@ if __name__ == "__main__":
 
     interpolation_def = pp.InterpolationDef()
     interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
+    interpolation_def.path_to_tables_readonly = "~/.local/share/PROPOSAL/tables"
 
     prop = pp.Propagator(
             particle_def=pp.particle.MuMinusDef.get(),
@@ -44,21 +42,21 @@ if __name__ == "__main__":
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    for i in range(statistics):
+    for i in tqdm(range(statistics)):
         mu.position = pp.Vector3D(0, 0, 0)
         mu.direction = pp.Vector3D(0, 0, -1)
         mu.energy = energy
         mu.propagated_distance = 0
 
-        secondaries = prop.propagate()
+        secondaries = prop.propagate().particles
 
         for idx, sec in enumerate(secondaries):
             if idx < 1:
                 continue
             if idx > len(secondaries) - 2:
                 break
-            if sec.id == pp.particle.Data.ContinuousEnergyLoss:
-                if secondaries[idx-1].id == pp.particle.Data.ContinuousEnergyLoss or secondaries[idx+1].id == pp.particle.Data.ContinuousEnergyLoss:
+            if sec.id == int(pp.particle.Interaction_Id.ContinuousEnergyLoss):
+                if secondaries[idx-1].id == int(pp.particle.Interaction_Id.ContinuousEnergyLoss) or secondaries[idx+1].id == int(pp.particle.Interaction_Id.ContinuousEnergyLoss):
                     print("2 Continuous Losses in a row")
                     continue
                 energy_diff = secondaries[idx-1].parent_particle_energy - secondaries[idx-1].energy - secondaries[idx+1].parent_particle_energy

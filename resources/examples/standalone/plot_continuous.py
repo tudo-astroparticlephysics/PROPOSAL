@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 try:
-    import matplotlib as mpl
     import matplotlib.pyplot as plt
 except ImportError:
     raise ImportError("Matplotlib not installed!")

@@ -87,7 +87,7 @@ def main():
         secondarys = propagate_particle(prop,
                            position=start_positions[jdx],
                            direction=start_directions[jdx],
-                           energy=start_energies[jdx])
+                           energy=start_energies[jdx]).particles
 
         # print(prop.particle)
         nsecs = len(secondarys) # to get rid of the decay neutrinos
@@ -102,20 +102,23 @@ def main():
                                        secondarys[idx].position.z])
             secs_energy[idx] = secondarys[idx].energy
             mu_energies[idx] = secondarys[idx].parent_particle_energy
-            if secondarys[idx].id == pp.particle.Data.Epair:
+            if secondarys[idx].id == int(pp.particle.Interaction_Id.Epair):
                 secs_ids[idx] = 0
-            elif secondarys[idx].id == pp.particle.Data.Brems:
+            elif secondarys[idx].id == int(pp.particle.Interaction_Id.Brems):
                 secs_ids[idx] = 1
-            elif secondarys[idx].id == pp.particle.Data.DeltaE:
+            elif secondarys[idx].id == int(pp.particle.Interaction_Id.DeltaE):
                 secs_ids[idx] = 2
-            elif secondarys[idx].id == pp.particle.Data.NuclInt:
+            elif secondarys[idx].id == int(pp.particle.Interaction_Id.NuclInt):
                 secs_ids[idx] = 3
-            elif secondarys[idx].id == pp.particle.Data.Particle:
-                # decay
-                if secondarys[idx].particle_def == pp.particle.EMinusDef.get():
-                    secs_ids[idx] = 4
-                else:
-                    secs_ids[idx] = 5 # Neutrinos
+            # decay
+            elif secondarys[idx].id == int(pp.particle.Particle_Id.EMinus):
+                secs_ids[idx] = 4
+            elif secondarys[idx].id == int(pp.particle.Particle_Id.NuMu):
+                secs_ids[idx] = 5
+            elif secondarys[idx].id == int(pp.particle.Particle_Id.NuEBar):
+                secs_ids[idx] = 5
+            else:
+                print('unknown secondary id {}'.format(secondarys[idx].id))
 
         for idx in range(len(labels)):
             ax2.plot(positions[:,0][secs_ids == idx],
