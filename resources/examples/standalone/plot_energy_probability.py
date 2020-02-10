@@ -19,101 +19,101 @@ import numpy as np
 # np.set_printoptions(threshold='nan')
 
 
-class ProgressBar(object):
+# class ProgressBar(object):
 
-    def __init__(self, loops, bar_lenght=50, start=0, **keywords):
+#     def __init__(self, loops, bar_lenght=50, start=0, **keywords):
 
-        self._bar_lenght = bar_lenght
-        self._bar = []
-        self._loops = loops
-        self._start = float(start)
-        self._current_loop = start
+#         self._bar_lenght = bar_lenght
+#         self._bar = []
+#         self._loops = loops
+#         self._start = float(start)
+#         self._current_loop = start
 
-        self._started_process = False
-        self._start_time = None
+#         self._started_process = False
+#         self._start_time = None
 
-        self._pacman = False
+#         self._pacman = False
 
-        self._status = ""
-        self._text = "\rPercent: [{0}] {1}% Time: {2} Iteration: {3}/{4} {5}"
+#         self._status = ""
+#         self._text = "\rPercent: [{0}] {1}% Time: {2} Iteration: {3}/{4} {5}"
 
-        self._bar_full = "="
-        self._bar_empty = " "
+#         self._bar_full = "="
+#         self._bar_empty = " "
 
-        for key, value in keywords.iteritems():
-            if key is "pacman":
-                assert type(value) is bool
-                self._pacman = value
+#         for key, value in keywords.iteritems():
+#             if key is "pacman":
+#                 assert type(value) is bool
+#                 self._pacman = value
 
-        if self._pacman:
-            self._bar_full = "-"
-            self._bar_empty = "o"
+#         if self._pacman:
+#             self._bar_full = "-"
+#             self._bar_empty = "o"
 
-            current = self._bar_empty
-            for i in range(self._bar_lenght):
-                if current is self._bar_empty:
-                    current = " "
-                    self._bar.append(current)
-                else:
-                    current = self._bar_empty
-                    self._bar.append(current)
-        else:
-            for i in range(self._bar_lenght):
-                self._bar.append(self._bar_empty)
+#             current = self._bar_empty
+#             for i in range(self._bar_lenght):
+#                 if current is self._bar_empty:
+#                     current = " "
+#                     self._bar.append(current)
+#                 else:
+#                     current = self._bar_empty
+#                     self._bar.append(current)
+#         else:
+#             for i in range(self._bar_lenght):
+#                 self._bar.append(self._bar_empty)
 
-        self._current_pac_state = "C"
-        self._current_pac_block = 0
+#         self._current_pac_state = "C"
+#         self._current_pac_block = 0
 
-    def reset(self):
-        self._current_loop = self._start
-        self._status = ""
-        self._started_process = False
+#     def reset(self):
+#         self._current_loop = self._start
+#         self._status = ""
+#         self._started_process = False
 
-    def start(self):
-        self._started_process = True
-        self._start_time = time.time()
+#     def start(self):
+#         self._started_process = True
+#         self._start_time = time.time()
 
-    def update(self):
-        if self._started_process is False:
-            print("Pleas start ProgressBar before updating it!")
-            return
+#     def update(self):
+#         if self._started_process is False:
+#             print("Pleas start ProgressBar before updating it!")
+#             return
 
-        self._current_loop += 1.0
-        progress = self._current_loop / self._loops
+#         self._current_loop += 1.0
+#         progress = self._current_loop / self._loops
 
-        if progress >= 1.0:
-            self._status = "Done...\n"
+#         if progress >= 1.0:
+#             self._status = "Done...\n"
 
-        if self._pacman:
-            block = int((self._bar_lenght - 1) * progress)
+#         if self._pacman:
+#             block = int((self._bar_lenght - 1) * progress)
 
-            if self._current_pac_block < block:
-                self._current_pac_block = block
-                if self._current_pac_state is "c":
-                    self._current_pac_state = "C"
-                else:
-                    self._current_pac_state = "c"
-            else:
-                pass
+#             if self._current_pac_block < block:
+#                 self._current_pac_block = block
+#                 if self._current_pac_state is "c":
+#                     self._current_pac_state = "C"
+#                 else:
+#                     self._current_pac_state = "c"
+#             else:
+#                 pass
 
-            self._bar[block] = '\033[1m' + "\033[93m" + \
-                               self._current_pac_state + '\033[0m'
-            self._bar[:block] = block * [self._bar_full]
-        else:
-            block = int(self._bar_lenght * progress)
-            self._bar[:block] = block * [self._bar_full]
+#             self._bar[block] = '\033[1m' + "\033[93m" + \
+#                                self._current_pac_state + '\033[0m'
+#             self._bar[:block] = block * [self._bar_full]
+#         else:
+#             block = int(self._bar_lenght * progress)
+#             self._bar[:block] = block * [self._bar_full]
 
-        text = self._text.format(
-            "".join(self._bar),
-            progress*100,
-            str(datetime.timedelta(seconds=(time.time() - self._start_time))),
-            int(self._current_loop),
-            self._loops,
-            self._status
-        )
+#         text = self._text.format(
+#             "".join(self._bar),
+#             progress*100,
+#             str(datetime.timedelta(seconds=(time.time() - self._start_time))),
+#             int(self._current_loop),
+#             self._loops,
+#             self._status
+#         )
 
-        sys.stdout.write(text)
-        sys.stdout.flush()
+#         sys.stdout.write(text)
+#         sys.stdout.flush()
 
 
 def plot_hist(ax, prim, sec):
@@ -132,8 +132,8 @@ def plot_hist(ax, prim, sec):
             bins=100,
         )
 
-    ax.set_xlim(xmin=2, xmax=14)
-    ax.set_ylim(ymin=-2, ymax=14)
+    ax.set_xlim(left=2, right=14)
+    ax.set_ylim(bottom=-2, top=14)
     ax.grid(ls=":", lw=0.2)
 
     textstr = "count = {:g}\ntotal energy loss = {:.1e} MeV".format(
@@ -194,18 +194,18 @@ if __name__ == "__main__":
     length = []
     n_secondarys = []
 
-    progress = ProgressBar(statistics, pacman=True)
-    progress.start()
+    # progress = ProgressBar(statistics, pacman=True)
+    # progress.start()
 
     for i in range(statistics):
-        progress.update()
+        # progress.update()
 
         mu.position = pyPROPOSAL.Vector3D(0, 0, 0)
         mu.direction = pyPROPOSAL.Vector3D(0, 0, -1)
         mu.energy = math.pow(10, E_max_log)
         mu.propagated_distance = 0
 
-        secondarys = prop.propagate()
+        secondarys = prop.propagate().particles
 
         length.append(mu.propagated_distance / 100)
         n_secondarys.append(len(secondarys))
@@ -214,18 +214,20 @@ if __name__ == "__main__":
             log_sec_energy = math.log10(sec.energy)
             log_energy = math.log10(sec.parent_particle_energy)
 
-            if sec.id == pyPROPOSAL.particle.Data.Epair:
+            if sec.id == int(pyPROPOSAL.particle.Interaction_Id.Epair):
                 epair_primary_energy.append(log_energy)
                 epair_secondary_energy.append(log_sec_energy)
-            if sec.id == pyPROPOSAL.particle.Data.Brems:
+            elif sec.id == int(pyPROPOSAL.particle.Interaction_Id.Brems):
                 brems_primary_energy.append(log_energy)
                 brems_secondary_energy.append(log_sec_energy)
-            if sec.id == pyPROPOSAL.particle.Data.DeltaE:
+            elif sec.id == int(pyPROPOSAL.particle.Interaction_Id.DeltaE):
                 ioniz_primary_energy.append(log_energy)
                 ioniz_secondary_energy.append(log_sec_energy)
-            if sec.id == pyPROPOSAL.particle.Data.NuclInt:
+            elif sec.id == int(pyPROPOSAL.particle.Interaction_Id.NuclInt):
                 photo_primary_energy.append(log_energy)
                 photo_secondary_energy.append(log_sec_energy)
+            # else:
+                # print("No valid interaction id {}".format(sec.id))
 
     # =========================================================
     #   Plot

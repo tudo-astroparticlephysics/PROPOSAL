@@ -216,18 +216,25 @@ double UtilityInterpolantDisplacement::Calculate(double ei, double ef,
         (interpolant_diff_->Interpolate((ei + ef) / 2)) * (ef - ei), 0.0);
 }
 
-double UtilityInterpolantDisplacement::GetUpperLimit(double ei, double rnd)
-{
-    f = [&](double ef) { return Calculate(ei, ef, rnd) - rnd; };
-    df = [&](double ef) { return interpolant_diff_->Interpolate(ef); };
+double UtilityInterpolantDisplacement::GetUpperLimit(double ei, double rnd) {
+    /* if (stored_result_ == 0) { */
+        f = [&](double ef) { return Calculate(ei, ef, rnd) - rnd; };
+        df = [&](double ef) { return interpolant_diff_->Interpolate(ef); };
 
-    int MaxSteps = 200;
+        int MaxSteps = 200;
+        try {
+            return std::max(NewtonRaphson(f, df, 0, ei, ei, MaxSteps), utility_.GetParticleDef().mass);
+        } catch (MathException& e) {
+            return utility_.GetParticleDef().mass;
+        }
+    /* } else { */
+    /*     double aux; */
+    /*     aux = interpolant_->FindLimit(stored_result_ - rnd); */
 
-    try {
-        return std::max(NewtonRaphson(f, df, 0, ei, ei, MaxSteps), utility_.GetParticleDef().mass);
-    } catch (MathException& e) {
-        return utility_.GetParticleDef().mass;
-    }
+    /*     if (std::abs(aux) > std::abs(ei) * HALF_PRECISION) { */
+    /*         return std::min(std::max(aux, utility_.GetParticleDef().low), ei); */
+    /*     } */
+    /* } */
 }
 
 double UtilityInterpolantDisplacement::BuildInterpolant(

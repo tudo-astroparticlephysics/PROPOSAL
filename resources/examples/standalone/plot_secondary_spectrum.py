@@ -5,9 +5,10 @@ import math
 import time
 import datetime
 
+from tqdm import tqdm
 try:
-    import matplotlib
-    matplotlib.use("Agg")
+    # import matplotlib
+    # matplotlib.use("Agg")
 
     import matplotlib.pyplot as plt
     from matplotlib.colors import LogNorm
@@ -201,6 +202,7 @@ def propagate_muons():
 
     interpolation_def = pp.InterpolationDef()
     interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
+    interpolation_def.path_to_tables_readonly = "~/.local/share/PROPOSAL/tables"
 
     prop = pp.Propagator(mu_def, [sector_def], detector, interpolation_def)
 
@@ -221,11 +223,11 @@ def propagate_muons():
     ioniz_secondary_energy = []
     photo_secondary_energy = []
 
-    progress = ProgressBar(statistics, pacman=True)
-    progress.start()
+    # progress = ProgressBar(statistics, pacman=True)
+    # progress.start()
 
-    for mu_energy in muon_energies:
-        progress.update()
+    for mu_energy in tqdm(muon_energies):
+        # progress.update()
 
         prop.particle.position = pp.Vector3D(0, 0, 0)
         prop.particle.direction = pp.Vector3D(0, 0, -1)
@@ -234,16 +236,16 @@ def propagate_muons():
 
         secondarys = prop.propagate(propagation_length)
 
-        for sec in secondarys:
+        for sec in secondarys.particles:
             log_sec_energy = math.log10(sec.energy)
 
-            if sec.id == pp.particle.Data.Epair:
+            if sec.id == int(pp.particle.Interaction_Id.Epair):
                 epair_secondary_energy.append(log_sec_energy)
-            if sec.id == pp.particle.Data.Brems:
+            if sec.id == int(pp.particle.Interaction_Id.Brems):
                 brems_secondary_energy.append(log_sec_energy)
-            if sec.id == pp.particle.Data.DeltaE:
+            if sec.id == int(pp.particle.Interaction_Id.DeltaE):
                 ioniz_secondary_energy.append(log_sec_energy)
-            if sec.id == pp.particle.Data.NuclInt:
+            if sec.id == int(pp.particle.Interaction_Id.NuclInt):
                 photo_secondary_energy.append(log_sec_energy)
 
     # =========================================================

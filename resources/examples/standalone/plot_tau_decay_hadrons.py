@@ -1,5 +1,6 @@
 import pyPROPOSAL as pp
 import time
+from tqdm import tqdm
 
 try:
     import matplotlib as mpl
@@ -45,8 +46,8 @@ def filter_hadr(secondarys):
 
 
 def filter_particle(secondarys, particle):
-    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
-    E = [p.energy for p in prods if p.particle_def == particle]
+    prods = [p for p in secondarys if p.id == particle.particle_type]
+    E = [p.energy for p in prods]
     return sum(E)
 
 
@@ -98,7 +99,9 @@ if __name__ == "__main__":
     statistics = int(1e5)
     binning = 50
 
-    tau = pp.particle.Particle(pp.particle.TauMinusDef.get())
+    tau_def = pp.particle.TauMinusDef.get()
+    tau = pp.particle.DynamicData(tau_def.particle_type)
+    tau.energy = tau_def.mass
     tau.direction = pp.Vector3D(0, 0, -1)
 
     products = [
@@ -107,7 +110,7 @@ if __name__ == "__main__":
         pp.particle.NuTauDef.get()
     ]
 
-    products_particles = [pp.particle.Particle(p) for p in products]
+    products_particles = [pp.particle.DynamicData(p.particle_type) for p in products]
     for p in products_particles:
         p.direction = pp.Vector3D(0, 0, -1)
         p.energy = 1e2
@@ -125,19 +128,19 @@ if __name__ == "__main__":
 
     passed_time = 0.0
 
-    for i in range(statistics):
+    for i in tqdm(range(statistics)):
         tau.position = pp.Vector3D(0, 0, 0)
         tau.direction = pp.Vector3D(0, 0, -1)
-        tau.energy = tau.particle_def.mass
+        tau.energy = tau_def.mass
         tau.propagated_distance = 0
 
         t = time.time()
 
-        d = ME.decay(tau)
+        d = ME.decay(tau_def, tau).particles
 
-        E_lep_pi0.append(filter_particle(d, pp.particle.Pi0Def.get()))
-        E_lep_pim.append(filter_particle(d, pp.particle.PiMinusDef.get()))
-        E_lep_nu.append(filter_particle(d, pp.particle.NuTauDef.get()))
+        E_lep_pi0.append(filter_particle(d, products[0]))
+        E_lep_pim.append(filter_particle(d, products[1]))
+        E_lep_nu.append(filter_particle(d, products[2]))
 
         p1 = add((d[0].energy, d[0].momentum * d[0].direction), (d[1].energy, d[1].momentum * d[1].direction))
         p2 = add((d[1].energy, d[1].momentum * d[1].direction), (d[2].energy, d[2].momentum * d[2].direction))

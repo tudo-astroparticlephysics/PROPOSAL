@@ -57,8 +57,8 @@ public:
     };
 
     typedef std::unordered_map<ParticleDef, PhaseSpaceParameters> ParameterMap;
-    typedef std::function<double(const DynamicData&, const Secondaries&)> MatrixElementFunction;
-    typedef std::function<void(PhaseSpaceParameters&, double, const DynamicData&)> EstimateFunction;
+    typedef std::function<double(const DynamicData&, const std::vector<DynamicData>&)> MatrixElementFunction;
+    typedef std::function<void(PhaseSpaceParameters&, const ParticleDef&)> EstimateFunction;
 
 public:
     ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters, MatrixElementFunction ME = nullptr);
@@ -88,14 +88,14 @@ public:
     ///
     /// @return matrix element
     // ----------------------------------------------------------------------------
-    static double DefaultEvaluate(const DynamicData&, const Secondaries&);
+    static double DefaultEvaluate(const DynamicData&, const std::vector<DynamicData>&);
 
     // ----------------------------------------------------------------------------
     /// @brief Evalutate the matrix element of this channel
     ///
     /// @return matrix element
     // ----------------------------------------------------------------------------
-    double Evaluate(const DynamicData&, const Secondaries&);
+    double Evaluate(const DynamicData&, const std::vector<DynamicData>&);
 
     // ----------------------------------------------------------------------------
     /// @brief Sets the uniform flag
@@ -124,7 +124,7 @@ private:
     ///
     /// @return Vector of particles, the decay products
     // ----------------------------------------------------------------------------
-    void GenerateEvent(Secondaries& products, const PhaseSpaceKinematics& kinematics);
+    void GenerateEvent(std::vector<DynamicData>& products, const PhaseSpaceKinematics& kinematics);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the normalization of the phase space density
@@ -133,7 +133,7 @@ private:
     ///
     /// @return \f$ \rho(\Phi) = \frac{{(M - \mu_n)}^{n-2}}{(n-2)!} \cdot \prod_{i=2}^{n} (2\pi P_i)~. \f$
     // ----------------------------------------------------------------------------
-    void CalculateNormalization(PhaseSpaceParameters&, double parent_mass);
+    double CalculateNormalization(double parent_mass);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the maximum weight for the phase space
@@ -146,7 +146,7 @@ private:
     ///
     /// @return maximum weight
     // ----------------------------------------------------------------------------
-    void EstimateMaxWeight(PhaseSpaceParameters&, double parent_mass, const DynamicData& p_condition);
+    void EstimateMaxWeight(PhaseSpaceParameters&, const ParticleDef&);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the maximum weight for the phase space
@@ -159,7 +159,7 @@ private:
     ///
     /// @return maximum weight
     // ----------------------------------------------------------------------------
-    void SampleEstimateMaxWeight(PhaseSpaceParameters&, double parent_mass, const DynamicData& p_condition);
+    void SampleEstimateMaxWeight(PhaseSpaceParameters&, const ParticleDef&);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the normalization and maximum weight
@@ -171,7 +171,7 @@ private:
     ///
     /// @return struct containing the normalization and maximum weight
     // ----------------------------------------------------------------------------
-    PhaseSpaceParameters GetPhaseSpaceParams(const ParticleDef& parent_def, const DynamicData& p_condition);
+    PhaseSpaceParameters GetPhaseSpaceParams(const ParticleDef& parent_def);
 
 
     // ----------------------------------------------------------------------------

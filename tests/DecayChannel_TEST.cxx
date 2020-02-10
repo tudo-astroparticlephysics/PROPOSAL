@@ -12,13 +12,13 @@
 
 using namespace PROPOSAL;
 
-double matrix_element_evaluate(const DynamicData& p_condition, const Secondaries& products)
+double matrix_element_evaluate(const DynamicData& p_condition, const std::vector<DynamicData>& products)
 {
     double G_F = 1.1663787*1e-2; // MeV
 
-    DynamicData electron = products.GetSecondaries().at(0);
-    DynamicData numu = products.GetSecondaries().at(1);
-    DynamicData nuebar = products.GetSecondaries().at(2);
+    DynamicData electron = products.at(0);
+    DynamicData numu = products.at(1);
+    DynamicData nuebar = products.at(2);
 
     double p1 = p_condition.GetEnergy() * nuebar.GetEnergy() - (p_condition.GetMomentum() * p_condition.GetDirection()) * (nuebar.GetMomentum() * nuebar.GetDirection());
     double p2 = electron.GetEnergy() * numu.GetEnergy() - (electron.GetMomentum() * electron.GetDirection()) * (numu.GetMomentum() * numu.GetDirection());
