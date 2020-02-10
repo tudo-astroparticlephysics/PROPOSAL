@@ -149,9 +149,6 @@ private:
 
     /* virtual bool compare(const UtilityDecorator&) const; */
 
-    std::function<double(double)> f;
-    std::function<double(double)> df;
-
     double BuildInterpolant(double, UtilityIntegral&, Integral&);
     void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);
 
