@@ -217,7 +217,8 @@ TEST(Sector, Stochastic)
     std::string particleName;
     std::string mediumName;
     double ecut, vcut;
-    double energy, initial_energy;
+    double energy, initial_energy, rnd;
+    int interaction_type;
     InterpolationDef inter_def;
     inter_def.path_to_tables = PATH_TO_TABLES;
     inter_def.path_to_tables_readonly = PATH_TO_TABLES;
@@ -248,9 +249,12 @@ TEST(Sector, Stochastic)
             sector = new Sector(*particle, sector_def, inter_def);
         }
 
-        while (ss >> energy) {
-            double energy_calc
-                = std::get<0>(sector->MakeStochasticLoss(initial_energy));
+        while (ss >> energy >> interaction_type >> rnd) {
+            std::pair<double, int> loss =sector->MakeStochasticLoss(initial_energy);
+            double energy_calc = initial_energy - loss.first;
+            double random = RandomGenerator::Get().RandomDouble();
+            ASSERT_NEAR(random, rnd, std::abs(1e-3 * energy_calc));
+            ASSERT_NEAR(loss.second, interaction_type, std::abs(1e-3 * energy_calc));
             ASSERT_NEAR(energy_calc, energy, std::abs(1e-3 * energy_calc));
             initial_energy = energy;
         }

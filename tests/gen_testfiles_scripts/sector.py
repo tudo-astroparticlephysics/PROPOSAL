@@ -88,8 +88,11 @@ def create_table_stochastic(dir_name):
                     buf.append(str(initial_energy))
 
                     for i in range(statistics):
-                        energy = sector.MakeStochasticLoss(energy)[0]
+                        loss, interaction_type = sector.MakeStochasticLoss(energy)
+                        energy -= loss
                         buf.append(str(energy))
+                        buf.append(str(interaction_type))
+                        buf.append(str(pp.RandomGenerator.get().random_double()))
 
                     buf.append("\n")
                     file.write("\t".join(buf))
