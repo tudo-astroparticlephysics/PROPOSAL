@@ -365,8 +365,16 @@ TEST(Sector, Propagate)
 
             Secondaries secondaries = sector->Propagate(p_condition, 1000, 0);
             int produced_particle = secondaries.GetNumberOfParticles();
+
             double energy_calc = secondaries.GetSecondaries().back().GetEnergy();
-            ASSERT_NEAR(energy_calc, energy, std::abs(1e-3 * energy_calc));
+            DynamicData last_condition = secondaries.GetSecondaries().back();
+            if (last_condition.GetTypeId() != static_cast<int>(InteractionType::Decay)) {
+                ASSERT_NEAR(last_condition.GetEnergy(), energy, std::abs(1e-3 * energy_calc));
+            } else {
+                ASSERT_NEAR(-last_condition.GetPropagatedDistance(), energy, std::abs(1e-3 * energy_calc));
+            }
+            /* double energy_calc = secondaries.GetSecondaries().back().GetEnergy(); */
+            /* ASSERT_NEAR(energy_calc, energy, std::abs(1e-3 * energy_calc)); */
         }
     }
     delete medium;
