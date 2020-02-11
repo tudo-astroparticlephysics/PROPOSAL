@@ -542,7 +542,8 @@ Secondaries Sector::Propagate(
 
         p_condition
             = DoContinuous(*p_condition, LossEnergies[minimalLoss], distance);
-        secondaries.push_back(*p_condition);
+        if (sector_def_.do_continuous_energy_loss_output)
+            secondaries.push_back(*p_condition);
 
         if (minimalLoss != LossType::Interaction) {
             break;
