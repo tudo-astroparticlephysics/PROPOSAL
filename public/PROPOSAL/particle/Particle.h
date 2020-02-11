@@ -76,7 +76,7 @@ public:
     DynamicData(const int&);
     DynamicData(const int&, const Vector3D&, const Vector3D&, const double&, const double&, const double&, const double&);
     DynamicData(const DynamicData&);
-    /* DynamicData(DynamicData&&); */
+    DynamicData(DynamicData&&);
     virtual ~DynamicData();
 
     friend std::ostream& operator<<(std::ostream&, DynamicData const&);
@@ -119,7 +119,7 @@ protected:
     virtual void print(std::ostream&) const {}
 
 
-    const int type_id_;
+    int type_id_;
 
     Vector3D position_;  //!< position coordinates [cm]
     Vector3D direction_; //!< direction vector, angles in [rad]
@@ -210,7 +210,7 @@ protected:
 //     const ParticleDef& GetParticleDef() const { return particle_def_; }
 //     const DecayTable& GetDecayTable() const { return particle_def_.decay_table; }
 
-//      double GetMomentum() const { return std::sqrt(std::max((energy_ + particle_def_.mass) * (energy_ - particle_def_.mass), 0.0)) }; 
+//      double GetMomentum() const { return std::sqrt(std::max((energy_ + particle_def_.mass) * (energy_ - particle_def_.mass), 0.0)) };
 //     double GetLow() const { return particle_def_.low; }
 
 //     double GetMass() const { return particle_def_.mass; }

@@ -74,7 +74,7 @@ public:
     ///
     /// @return Secondary data
     // ----------------------------------------------------------------------------
-    Secondaries Propagate(DynamicData& particle_condition,
+    Secondaries Propagate(DynamicData particle_condition,
         double max_distance=1e20, double minimal_energy=0.);
 
     // --------------------------------------------------------------------- //
@@ -86,8 +86,8 @@ public:
 
     Geometry& GetDetector() const { return *detector_; };
     ParticleDef& GetParticleDef() { return particle_def_; };
-    DynamicData& GetEntryCondition() { return entry_condition_; };
-    DynamicData& GetExitCondition() { return exit_condition_; };
+    /* DynamicData& GetEntryCondition() { return entry_condition_; }; */
+    /* DynamicData& GetExitCondition() { return exit_condition_; }; */
     DynamicData& GetClosestApproachCondition() { return closest_approach_condition_; };
     double GetELost() { return elost_; };
 
@@ -205,8 +205,8 @@ private:
 
     std::pair<double,double> produced_particle_moments_ {100., 10000.};
     unsigned int n_th_call_ {1};
-    DynamicData entry_condition_;
-    DynamicData exit_condition_;
+    /* DynamicData entry_condition_; */
+    /* DynamicData exit_condition_; */
     DynamicData closest_approach_condition_;
     double elost_;
 };

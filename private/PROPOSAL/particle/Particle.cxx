@@ -26,6 +26,12 @@ using namespace PROPOSAL;
 
 DynamicData::DynamicData()
     : type_id_(0)
+    , position_(Vector3D())
+    , direction_(Vector3D())
+    , energy_(0)
+    , parent_particle_energy_(0)
+    , time_(0)
+    , propagated_distance_(0)
 {
 }
 
@@ -64,21 +70,30 @@ DynamicData::DynamicData(const DynamicData& data)
 
 
 
-/* DynamicData::DynamicData(DynamicData&& other) */
-/*     : type_id_(std::move(other.type_id_)) */
-/*     , position_(std::move(other.position_)) */
-/*     , direction_(std::move(other.direction_)) */
-/*     , energy_(std::move(other.energy_)) */
-/*     , parent_particle_energy_(std::move(other.parent_particle_energy_)) */
-/*     , time_(std::move(other.time_)) */
-/*     , propagated_distance_(std::move(other.propagated_distance_)) */
-/* { */
-/* } */
+DynamicData::DynamicData(DynamicData&& other)
+    : type_id_(std::move(other.type_id_))
+    , position_(std::move(other.position_))
+    , direction_(std::move(other.direction_))
+    , energy_(std::move(other.energy_))
+    , parent_particle_energy_(std::move(other.parent_particle_energy_))
+    , time_(std::move(other.time_))
+    , propagated_distance_(std::move(other.propagated_distance_))
+{
+}
 
 DynamicData::~DynamicData() {}
 
-DynamicData& DynamicData::operator=(const DynamicData&)
+DynamicData& DynamicData::operator=(const DynamicData& data)
 {
+    if (this != &data){
+        type_id_ = data.type_id_;
+        position_ = data.position_;
+        direction_ = data.direction_;
+        energy_ = data.energy_;
+        parent_particle_energy_ = data.parent_particle_energy_;
+        time_ = data.time_;
+        propagated_distance_ = data.propagated_distance_;
+    }
     return *this;
 }
 

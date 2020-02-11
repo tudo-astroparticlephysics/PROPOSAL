@@ -66,14 +66,10 @@ Secondaries PropagatorService::Propagate(
         // prop_particle.SetTime(particle.GetTime());
         // prop_particle.SetElost(particle.GetElost());
 
-        Secondaries secondaries = propagator->Propagate(particle_condition, max_distance, min_energy);
+        return propagator->Propagate(particle_condition, max_distance, min_energy);
 
-        particle_condition.SetEnergy(propagator->GetExitCondition().GetEnergy());
         // particle.SetParentParticleEnergy(prop_particle.GetParentParticleEnergy());
-        particle_condition.SetPosition(propagator->GetExitCondition().GetPosition());
-        particle_condition.SetDirection(propagator->GetExitCondition().GetDirection());
         // particle_condition.SetPropagatedDistance(prop_particle.GetPropagatedDistance());
-        particle_condition.SetTime(propagator->GetExitCondition().GetTime());
         // particle.SetElost(prop_particle.GetElost());
         // particle.SetEntryPoint(prop_particle.GetEntryPoint());
         // particle.SetEntryEnergy(prop_particle.GetEntryEnergy());
@@ -86,7 +82,6 @@ Secondaries PropagatorService::Propagate(
         // particle.SetClosestApproachTime(prop_particle.GetClosestApproachTime());
         // particle.InjectState(prop_particle);
 
-        return secondaries;
     } else
     {
         log_warn("Propagator for particle %s not found! Empty secondary vector will be returned!",
