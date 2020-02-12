@@ -6,9 +6,9 @@ def matrix_element_evaluate(particle, products):
     # G_F = scipy.constants.value(u'Fermi coupling constant') * 1e1
 
     muon = particle
-    electron = products.particles[0]
-    numu = products.particles[1]
-    nuebar = products.particles[2]
+    electron = products[0]
+    numu = products[1]
+    nuebar = products[2]
 
     p1 = muon.energy * nuebar.energy - (muon.momentum * muon.direction) * (nuebar.momentum * nuebar.direction)
     p2 = electron.energy * numu.energy - (electron.momentum * electron.direction) * (numu.momentum * numu.direction)
@@ -35,7 +35,7 @@ def create_table(dir_name, particle_def, init_energy, decay_products, filename, 
     E_max = gamma * v_max + betagamma * np.sqrt(v_max**2 - products[0].mass**2)
 
     for channel in decay_channels:
-        print(particle_def.name, init_energy, channel)
+        # print(particle_def.name, init_energy, channel)
         prod_0_energies = []
         prod_1_energies = []
         prod_2_energies = []
