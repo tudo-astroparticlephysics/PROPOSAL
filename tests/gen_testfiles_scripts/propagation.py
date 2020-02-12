@@ -14,7 +14,7 @@ def create_table(dir_name):
         "resources/config_ice.json"
     )
 
-    mu = prop.particle
+    mu = pp.particle.DynamicData(pp.particle.Particle_Id.MuMinus)
 
     mu.energy = 1e8
     mu.propagated_distance = 0
@@ -42,19 +42,11 @@ def create_table(dir_name):
         file.write("\t".join(buf))
 
         for i in range(statistics):
-            mu.energy = 1e8
-            mu.propagated_distance = 0
-            mu.position = pp.Vector3D(0, 0, 0)
-            mu.direction = pp.Vector3D(0, 0, -1)
-
-            daughters = prop.propagate()
+            daughters = prop.propagate(mu)
 
             buf = [""]
-            for d in daughters:
-                if d.id == pp.particle.Data.Particle:
-                    buf.append(d.particle_def.name)
-                else:
-                    buf.append(str(d.id).split(".")[1])
+            for d in daughters.particles:
+                buf.append(str(d.name))
                 buf.append(str(d.propagated_distance))
                 buf.append(str(d.energy))
                 buf.append(str(d.position.x))
