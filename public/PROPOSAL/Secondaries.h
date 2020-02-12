@@ -84,8 +84,10 @@ public:
     // TODO: Prelimary, see note below
     DynamicData GetEntryPoint() const;
     DynamicData GetExitPoint() const;
+    DynamicData GetClosestApproachPoint() const;
     void SetEntryPoint(DynamicData& entry_point);
     void SetExitPoint(DynamicData& exit_point);
+    void SetClosestApproachPoint(DynamicData& closest_approach_point);
 
 private:
     std::vector<DynamicData> secondaries_;
@@ -95,6 +97,7 @@ private:
     // It can be calculated by a given structure
     std::unique_ptr<DynamicData> entry_point_;
     std::unique_ptr<DynamicData> exit_point_;
+    std::unique_ptr<DynamicData> closest_approach_point_;
 };
 
 } // namespace PROPOSAL
