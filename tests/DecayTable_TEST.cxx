@@ -127,7 +127,7 @@ TEST(SelectChannel, Muon)
 {
 
     // Leptinic decay channel in muon case
-    ParticleDef mu_def;
+    ParticleDef mu_def = MuMinusDef::Get();
     DecayChannel& dc_muon = mu_def.decay_table.SelectChannel(0.5);
 
     LeptonicDecayChannel leptonic_channel(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get());
