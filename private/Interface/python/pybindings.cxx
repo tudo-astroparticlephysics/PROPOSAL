@@ -64,7 +64,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def("cartesian_from_spherical",
             &Vector3D::CalculateCartesianFromSpherical)
         .def("spherical_from_cartesian",
-            &Vector3D::CalculateSphericalCoordinates);
+            &Vector3D::CalculateSphericalCoordinates)
+        .def("deflect", &Vector3D::deflect, py::arg("cosphi"), py::arg("theta"));
 
     py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings>>(m,
         "EnergyCutSettings",
