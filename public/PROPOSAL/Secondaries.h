@@ -82,6 +82,7 @@ public:
     unsigned int GetNumberOfParticles() const { return secondaries_.size(); };
 
     // TODO: Prelimary, see note below
+    double GetELost() const;
     DynamicData GetEntryPoint() const;
     DynamicData GetExitPoint() const;
     DynamicData GetClosestApproachPoint() const;

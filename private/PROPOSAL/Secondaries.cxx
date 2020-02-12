@@ -161,6 +161,8 @@ std::vector<double> Secondaries::GetPropagatedDistance() const
     return vec;
 }
 
+double Secondaries::GetELost() const { return entry_point_->GetEnergy() - exit_point_->GetEnergy(); }
+
 DynamicData Secondaries::GetEntryPoint() const { return *entry_point_; }
 
 DynamicData Secondaries::GetExitPoint() const { return *exit_point_; }
