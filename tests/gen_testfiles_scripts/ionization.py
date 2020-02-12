@@ -35,7 +35,7 @@ interpoldef = pp.InterpolationDef()
 
 def create_table_dEdx(dir_name, interpolate=False):
 
-    with open(dir_name + "Ioniz_dEdx{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Ioniz_dEdx{}.txt".format("_interpol" if interpolate else ""), "w") as file:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -52,12 +52,12 @@ def create_table_dEdx(dir_name, interpolate=False):
                             Ioniz_Int = pp.crosssection.IonizInterpolant(Ioniz_param, interpoldef)
                         else:
                             Ioniz_Int = pp.crosssection.IonizIntegral(Ioniz_param)
-    
+
                         buf = [""]
-    
+
                         for energy in energies:
                             dEdx = Ioniz_Int.calculate_dEdx(energy)
-    
+
                             buf.append(particle.name)
                             buf.append(medium.name)
                             buf.append(str(cut.ecut))
@@ -67,13 +67,13 @@ def create_table_dEdx(dir_name, interpolate=False):
                             buf.append(str(dEdx))
                             buf.append(Ioniz_param.name)
                             buf.append("\n")
-    
+
                         file.write("\t".join(buf))
 
 
 def create_table_dNdx(dir_name, interpolate=False):
 
-    with open(dir_name + "Ioniz_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Ioniz_dNdx{}.txt".format("_interpol" if interpolate else ""), "w") as file:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -89,12 +89,12 @@ def create_table_dNdx(dir_name, interpolate=False):
                             Ioniz_Int = pp.crosssection.IonizInterpolant(Ioniz_param, interpoldef)
                         else:
                             Ioniz_Int = pp.crosssection.IonizIntegral(Ioniz_param)
-    
+
                         buf = [""]
-    
+
                         for energy in energies:
                             dNdx = Ioniz_Int.calculate_dNdx(energy)
-    
+
                             buf.append(particle.name)
                             buf.append(medium.name)
                             buf.append(str(cut.ecut))
@@ -104,7 +104,7 @@ def create_table_dNdx(dir_name, interpolate=False):
                             buf.append(str(dNdx))
                             buf.append(Ioniz_param.name)
                             buf.append("\n")
-    
+
                         file.write("\t".join(buf))
 
 
@@ -112,7 +112,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open(dir_name + "Ioniz_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Ioniz_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "w") as file:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -128,13 +128,13 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
                             Ioniz_Int = pp.crosssection.IonizInterpolant(Ioniz_param, interpoldef)
                         else:
                             Ioniz_Int = pp.crosssection.IonizIntegral(Ioniz_param)
-    
+
                         buf = [""]
-    
+
                         for energy in energies:
                             rnd = pp.RandomGenerator.get().random_double()
                             dNdx_rnd = Ioniz_Int.calculate_dNdx_rnd(energy, rnd)
-    
+
                             buf.append(particle.name)
                             buf.append(medium.name)
                             buf.append(str(cut.ecut))
@@ -145,7 +145,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
                             buf.append(str(dNdx_rnd))
                             buf.append(Ioniz_param.name)
                             buf.append("\n")
-    
+
                         file.write("\t".join(buf))
 
 
@@ -153,7 +153,7 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open(dir_name + "Ioniz_e{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Ioniz_e{}.txt".format("_interpol" if interpolate else ""), "w") as file:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -169,14 +169,14 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
                             Ioniz_Int = pp.crosssection.IonizInterpolant(Ioniz_param, interpoldef)
                         else:
                             Ioniz_Int = pp.crosssection.IonizIntegral(Ioniz_param)
-    
+
                         buf = [""]
-    
+
                         for energy in energies:
                             rnd1 = pp.RandomGenerator.get().random_double()
                             rnd2 = pp.RandomGenerator.get().random_double()
                             stochastic_loss = Ioniz_Int.calculate_stochastic_loss(energy, rnd1, rnd2)
-    
+
                             buf.append(particle.name)
                             buf.append(medium.name)
                             buf.append(str(cut.ecut))
@@ -188,7 +188,7 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
                             buf.append(str(stochastic_loss))
                             buf.append(Ioniz_param.name)
                             buf.append("\n")
-    
+
                         file.write("\t".join(buf))
 
 

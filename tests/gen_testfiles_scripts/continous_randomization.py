@@ -29,7 +29,7 @@ def create_table(dir_name):
     pp.RandomGenerator.get().set_seed(0)
     np.random.seed(123)
 
-    with open(dir_name + "continous_randomization.txt", "a") as file:
+    with open(dir_name + "continous_randomization.txt", "w") as file:
 
         for particle in particle_defs:
             for medium in mediums:

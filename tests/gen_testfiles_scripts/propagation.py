@@ -22,7 +22,7 @@ def create_table(dir_name):
     mu.direction = pp.Vector3D(0, 0, -1)
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open(dir_name + "Propagator_propagation.txt", "a") as file:
+    with open(dir_name + "Propagator_propagation.txt", "w") as file:
 
         buf = [""]
         buf.append("name")

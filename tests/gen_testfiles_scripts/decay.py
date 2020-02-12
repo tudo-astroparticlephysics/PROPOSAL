@@ -1,5 +1,5 @@
 import pyPROPOSAL as pp
-import numpy as np 
+import numpy as np
 
 def matrix_element_evaluate(particle, products):
     G_F = 1.1663787*1e-2  # MeV
@@ -55,7 +55,7 @@ def create_table(dir_name, particle_def, init_energy, decay_products, filename, 
                     prod_2_energies.append(p.energy)
                 else:
                     assert("This should never happen")
-        
+
         histogram = []
         histogram.append(np.histogram(prod_0_energies, bins=NUM_bins, range=(0, E_max))[0])
         histogram.append(np.histogram(prod_1_energies, bins=NUM_bins, range=(0, E_max))[0])
@@ -63,7 +63,7 @@ def create_table(dir_name, particle_def, init_energy, decay_products, filename, 
 
         histrogram_list.append(histogram)
 
-    with open(dir_name + filename, "a") as file:
+    with open(dir_name + filename, "w") as file:
         buf = [""]
         buf.append(str(statistics))
         buf.append(str(NUM_bins))
@@ -107,4 +107,3 @@ if __name__ == "__main__":
         print("Directory {} created".format(dir_name))
 
     main(dir_name)
- 

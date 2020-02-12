@@ -29,7 +29,7 @@ interpoldef = pp.InterpolationDef()
 
 def create_table_dEdx(dir_name, interpolate=False):
 
-    with open(dir_name + "Compton_dEdx{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Compton_dEdx{}.txt".format("_interpol" if interpolate else ""), "w") as file:
         for medium in mediums:
             for cut in cuts:
                     for parametrization in parametrizations:
@@ -62,7 +62,7 @@ def create_table_dEdx(dir_name, interpolate=False):
 
 def create_table_dNdx(dir_name, interpolate=False):
 
-    with open(dir_name + "Compton_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Compton_dNdx{}.txt".format("_interpol" if interpolate else ""), "w") as file:
             for medium in mediums:
                 for cut in cuts:
                     for parametrization in parametrizations:
@@ -98,7 +98,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open(dir_name + "Compton_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Compton_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "w") as file:
         for medium in mediums:
             for cut in cuts:
                 rnd = pp.RandomGenerator.get().random_double()
@@ -136,7 +136,7 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open(dir_name + "Compton_e{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Compton_e{}.txt".format("_interpol" if interpolate else ""), "w") as file:
         for medium in mediums:
             for cut in cuts:
                 for parametrization in parametrizations:

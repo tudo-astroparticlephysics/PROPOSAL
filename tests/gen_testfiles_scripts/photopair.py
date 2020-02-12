@@ -35,10 +35,10 @@ def create_tables(dir_name, interpolate=False, **kwargs):
 
     for key in kwargs:
         if key == "dNdx" and kwargs[key] is True:
-            f_dNdx = open(dir_name + "PhotoPair_dNdx{}.txt".format("_interpol" if interpolate else ""), "a")
+            f_dNdx = open(dir_name + "PhotoPair_dNdx{}.txt".format("_interpol" if interpolate else ""), "w")
             buf["dNdx"] = [f_dNdx, [""]]
         if key == "dNdx_rnd" and kwargs[key] is True:
-            f_dNdx_rnd = open(dir_name + "PhotoPair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a")
+            f_dNdx_rnd = open(dir_name + "PhotoPair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "w")
             buf["dNdx_rnd"] = [f_dNdx_rnd, [""]]
 
     # print(buf)

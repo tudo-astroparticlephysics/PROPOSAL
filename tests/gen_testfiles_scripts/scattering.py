@@ -47,7 +47,7 @@ pp.RandomGenerator.get().set_seed(1234)
 
 def create_table_scatter(dir_name):
 
-    with open(dir_name + "Scattering_scatter.txt", "a") as file:
+    with open(dir_name + "Scattering_scatter.txt", "w") as file:
 
         for particle_def in particle_defs:
             for medium in mediums:

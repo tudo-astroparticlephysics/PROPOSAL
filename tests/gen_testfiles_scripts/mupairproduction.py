@@ -51,16 +51,16 @@ def create_tables(dir_name, interpolate=False, **kwargs):
 
     for key in kwargs:
         if key == "dEdx" and kwargs[key] is True:
-            f_dEdx = open(dir_name + "Mupair_dEdx{}.txt".format("_interpol" if interpolate else ""), "a")
+            f_dEdx = open(dir_name + "Mupair_dEdx{}.txt".format("_interpol" if interpolate else ""), "w")
             buf["dEdx"] = [f_dEdx, [""]]
         if key == "dNdx" and kwargs[key] is True:
-            f_dNdx = open(dir_name + "Mupair_dNdx{}.txt".format("_interpol" if interpolate else ""), "a")
+            f_dNdx = open(dir_name + "Mupair_dNdx{}.txt".format("_interpol" if interpolate else ""), "w")
             buf["dNdx"] = [f_dNdx, [""]]
         if key == "dNdx_rnd" and kwargs[key] is True:
-            f_dNdx_rnd = open(dir_name + "Mupair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a")
+            f_dNdx_rnd = open(dir_name + "Mupair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "w")
             buf["dNdx_rnd"] = [f_dNdx_rnd, [""]]
         if key == "stoch" and kwargs[key] is True:
-            f_stoch = open(dir_name + "Mupair_e{}.txt".format("_interpol" if interpolate else ""), "a")
+            f_stoch = open(dir_name + "Mupair_e{}.txt".format("_interpol" if interpolate else ""), "w")
             buf["stoch"] = [f_stoch, [""]]
 
     # print(buf)
@@ -128,7 +128,7 @@ def create_table_dNdx(dir_name, interpolate=False):
     else:
         params = mupair
 
-    with open(dir_name + "Mupair_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Mupair_dNdx{}.txt".format("_interpol" if interpolate else ""), "w") as file:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -180,7 +180,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
     else:
         params = mupair
 
-    with open(dir_name + "Mupair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Mupair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "w") as file:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -234,7 +234,7 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
     else:
         params = mupair
 
-    with open(dir_name + "Mupair_e{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Mupair_e{}.txt".format("_interpol" if interpolate else ""), "w") as file:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -289,7 +289,7 @@ def create_table_rho(dir_name, interpolate=False):
     else:
         params = mupair
 
-    with open(dir_name + "Mupair_rho{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+    with open(dir_name + "Mupair_rho{}.txt".format("_interpol" if interpolate else ""), "w") as file:
 
         for particle in particle_defs:
             for medium in mediums:
