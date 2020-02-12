@@ -80,6 +80,7 @@ public:
         return secondaries_;
     };
     unsigned int GetNumberOfParticles() const { return secondaries_.size(); };
+    Secondaries GetOnlyLostInsideDetector() const;
 
     // TODO: Prelimary, see note below
     DynamicData GetEntryPoint() const;

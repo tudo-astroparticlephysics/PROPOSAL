@@ -181,3 +181,14 @@ void Secondaries::SetClosestApproachPoint(DynamicData& closest_approach_point)
 {
     closest_approach_point_ = std::unique_ptr<DynamicData>(new DynamicData(closest_approach_point));
 }
+
+Secondaries Secondaries::GetOnlyLostInsideDetector() const
+{
+    Secondaries croped_secondaries;
+    for (DynamicData p: secondaries_) {
+        if (p.GetTime() >= entry_point_->GetTime() && p.GetTime() <= exit_point_->GetTime()){
+            croped_secondaries.push_back(p);
+        }
+    }
+    return croped_secondaries;
+}
