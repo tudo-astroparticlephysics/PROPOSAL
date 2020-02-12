@@ -214,30 +214,33 @@ void Vector3D::normalise()
 
 void Vector3D::deflect(const double cosphi_deflect, const double theta_deflect)
 {
-    CalculateSphericalCoordinates();
+    if(cosphi_deflect != 1 || theta_deflect != 0)
+    {
+        CalculateSphericalCoordinates();
 
-    double sinphi_deflect = std::sqrt( std::max(0., (1. - cosphi_deflect) * (1. + cosphi_deflect) ));
-    double tx = sinphi_deflect * std::cos(theta_deflect);
-    double ty = sinphi_deflect * std::sin(theta_deflect);
-    double tz = std::sqrt(std::max(1. - tx * tx - ty * ty, 0.));
-    if(cosphi_deflect < 0. ){
-        // Backward deflection
-        tz = -tz;
+        double sinphi_deflect = std::sqrt( std::max(0., (1. - cosphi_deflect) * (1. + cosphi_deflect) ));
+        double tx = sinphi_deflect * std::cos(theta_deflect);
+        double ty = sinphi_deflect * std::sin(theta_deflect);
+        double tz = std::sqrt(std::max(1. - tx * tx - ty * ty, 0.));
+        if(cosphi_deflect < 0. ){
+            // Backward deflection
+            tz = -tz;
+        }
+
+        double sinth, costh, sinph, cosph;
+        sinth = std::sin(spherical_.zenith_);
+        costh = std::cos(spherical_.zenith_);
+        sinph = std::sin(spherical_.azimuth_);
+        cosph = std::cos(spherical_.azimuth_);
+
+        const Vector3D rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
+        const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
+
+        // Rotation towards all tree axes
+        Vector3D new_direction( tz * *this + tx * rotate_vector_x + ty * rotate_vector_y );
+
+        *this = new_direction;
     }
-
-    double sinth, costh, sinph, cosph;
-    sinth = std::sin(spherical_.zenith_);
-    costh = std::cos(spherical_.zenith_);
-    sinph = std::sin(spherical_.azimuth_);
-    cosph = std::cos(spherical_.azimuth_);
-
-    const Vector3D rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
-    const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
-
-    // Rotation towards all tree axes
-    Vector3D new_direction( tz * *this + tx * rotate_vector_x + ty * rotate_vector_y );
-
-    *this = new_direction;
 }
 
 //----------------------------------------------------------------------//

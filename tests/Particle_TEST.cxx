@@ -33,7 +33,7 @@ TEST(Comparison, Comparison_equal)
 
     position    = Vector3D();
     direction   = Vector3D();
-    DynamicData* E = new DynamicData(MuMinusDef::Get().particle_type);
+    DynamicData* E = new DynamicData(0);
     E->SetPosition(position);
     E->SetDirection(direction);
     EXPECT_TRUE(A == *E);

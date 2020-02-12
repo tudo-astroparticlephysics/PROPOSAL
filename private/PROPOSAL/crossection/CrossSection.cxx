@@ -105,5 +105,5 @@ std::pair<double, double> CrossSection::StochasticDeflection(double energy, doub
     // per default the particle is not deflected
     (void) energy;
     (void) energy_loss;
-    return std::make_pair(0, 0);
+    return std::make_pair(1, 0);
 }
