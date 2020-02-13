@@ -495,13 +495,12 @@ std::shared_ptr<DynamicData> Sector::DoContinuous(
     double displacement
         = Displacement(p_condition, final_energy, sector_border);
 
-    double dist{ p_condition.GetPropagatedDistance() + displacement };
-    double time{ CalculateTime(p_condition, final_energy, displacement) };
+    double dist = p_condition.GetPropagatedDistance() + displacement;
+    double time = CalculateTime(p_condition, final_energy, displacement);
 
     Vector3D position{ p_condition.GetPosition() };
     Vector3D direction{ p_condition.GetDirection() };
 
-    time = CalculateTime(p_condition, final_energy, displacement);
     Scatter(displacement, p_condition.GetEnergy(), final_energy, position,
         direction);
     final_energy = ContinuousRandomize(p_condition.GetEnergy(), final_energy);
@@ -545,13 +544,21 @@ Secondaries Sector::Propagate(
         if (sector_def_.do_continuous_energy_loss_output)
             secondaries.push_back(*p_condition);
 
-        if (minimalLoss != LossType::Interaction) {
-            break;
-        } else {
+        if (minimalLoss == LossType::Interaction)
+        {
             p_condition = DoInteraction(*p_condition);
             secondaries.push_back(*p_condition);
         }
+        else
+        {
+            break;
+        }
     };
+
+    if (minimalLoss == LossType::Decay)
+    {
+        p_condition = DoDecay(*p_condition);
+    }
 
     secondaries.push_back(*p_condition);
 

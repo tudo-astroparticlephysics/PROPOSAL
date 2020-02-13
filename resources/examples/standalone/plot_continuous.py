@@ -1,20 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
-
-try:
-    import numpy as np
-except ImportError:
-    raise ImportError("Numpy not installed!")
-
-try:
-    import pyPROPOSAL as pp
-except ImportError:
-    raise ImportError("pyPROPOSAL not installed!")
+import matplotlib.pyplot as plt
+import numpy as np
+import pyPROPOSAL as pp
+from tqdm import tqdm
 
 
 def muons(energy, statistics, vcut, do_continuous_randomization, dist):
@@ -24,36 +14,40 @@ def muons(energy, statistics, vcut, do_continuous_randomization, dist):
     sec_def.geometry = pp.geometry.Sphere(pp.Vector3D(), 1e20, 0)
     sec_def.particle_location = pp.ParticleLocation.inside_detector
 
-    sec_def.scattering_model = pp.scattering.ScatteringModel.Moliere
+    sec_def.scattering_model = pp.scattering.ScatteringModel.Highland
     sec_def.do_continuous_randomization = do_continuous_randomization
 
     sec_def.cut_settings.ecut = 0
     sec_def.cut_settings.vcut = vcut
 
     interpolation_def = pp.InterpolationDef()
-    interpolation_def.path_to_tables = ""
+    interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
+    interpolation_def.path_to_tables_readonly = "~/.local/share/PROPOSAL/tables"
 
+    mu_def = pp.particle.MuMinusDef.get()
     prop = pp.Propagator(
-            particle_def=pp.particle.MuMinusDef.get(),
+            particle_def=mu_def,
             sector_defs=[sec_def],
             detector=pp.geometry.Sphere(pp.Vector3D(), 1e20, 0),
             interpolation_def=interpolation_def
     )
 
-    mu = prop.particle
+    mu = pp.particle.DynamicData(mu_def.id)
+    mu.position = pp.Vector3D(0, 0, 0)
+    mu.direction = pp.Vector3D(0, 0, -1)
+    mu.energy = energy
+    mu.propagated_distance = 0.
+    mu.time = 0.
 
     mu_energies = []
+    pp.RandomGenerator.get().set_seed(1234)
 
-    for i in range(statistics):
+    for i in tqdm(range(statistics)):
 
-        mu.position = pp.Vector3D(0, 0, 0)
-        mu.direction = pp.Vector3D(0, 0, -1)
-        mu.energy = energy
-        mu.propagated_distance = 0
+        secondaries = prop.propagate(mu, dist * 100)
 
-        d = prop.propagate(dist * 100)
-
-        mu_energies.append(mu.energy)
+        mu_energies.append(secondaries.parent_particle_energy[-1])
+        # del secondaries
 
     return mu_energies
 
@@ -102,7 +96,7 @@ if __name__ == "__main__":
     # 	Plot energies
     # =========================================================
 
-    binning = 100
+    binning = np.linspace(0, energy, 100)
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
