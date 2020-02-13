@@ -553,10 +553,6 @@ Secondaries Sector::Propagate(
         }
     };
 
-    if (minimalLoss == LossType::Decay) {
-        p_condition = DoDecay(*p_condition);
-    }
-
     secondaries.push_back(*p_condition);
 
     return secondaries;

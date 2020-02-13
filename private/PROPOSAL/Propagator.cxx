@@ -572,7 +572,7 @@ Secondaries Propagator::Propagate(
             propagationstep_till_closest_approach = false;
         }
 
-        if (max_distance <= p_condition->GetPropagatedDistance()
+        if (std::abs(max_distance - p_condition->GetPropagatedDistance()) < PARTICLE_POSITION_RESOLUTION
             || p_condition->GetEnergy() <= minimal_energy
             || p_condition->GetTypeId()
                 == static_cast<int>(InteractionType::Decay))
