@@ -19,7 +19,7 @@
 ```
 
 [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3066511.svg)](https://doi.org/10.5281/zenodo.3066511)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3665606.svg)](https://doi.org/10.5281/zenodo.3665606)
 
 # PROPOSAL #
 
@@ -79,8 +79,8 @@ and our zenodo entry of the version you use
   title  = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
   month  = may,
   year   = 2019,
-  doi    = {10.5281/zenodo.3066511},
-  url    = {https://doi.org/10.5281/zenodo.3066511}
+  doi    = {10.5281/zenodo.3665606},
+  url    = {https://doi.org/10.5281/zenodo.3665606}
 }
 ```
 and if you want to cite the latest improvements
