@@ -49,6 +49,11 @@ bool ScatteringHighland::compare(const Scattering& scattering) const {
         return true;
 }
 
+void ScatteringHighland::print(std::ostream& os) const
+{
+    os << "Medium: " << medium_ << '\n';
+}
+
 // ------------------------------------------------------------------------- //
 // Private methods
 // ------------------------------------------------------------------------- //

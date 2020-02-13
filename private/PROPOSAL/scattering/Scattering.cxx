@@ -17,6 +17,29 @@
 using namespace PROPOSAL;
 
 /******************************************************************************
+ *                                  OStream                                    *
+ ******************************************************************************/
+
+namespace PROPOSAL {
+
+std::ostream& operator<<(std::ostream& os, Scattering const& scattering)
+{
+    std::stringstream ss;
+    ss << " Scattering (" << &scattering << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << scattering.particle_def_ << std::endl;
+
+    scattering.print(os);
+
+    os << Helper::Centered(60, "");
+
+    return os;
+}
+
+} // namespace PROPOSAL
+
+/******************************************************************************
  *                                 Scattering                                  *
  ******************************************************************************/
 

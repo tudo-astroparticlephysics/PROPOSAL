@@ -55,6 +55,7 @@ public:
 
     bool operator==(const Scattering& scattering) const;
     bool operator!=(const Scattering& scattering) const;
+    friend std::ostream& operator<<(std::ostream&, Scattering const&);
 
     virtual Scattering* clone() const                          = 0; // virtual constructor idiom (used for deep copies)
     virtual Scattering* clone(const ParticleDef&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies)
@@ -78,6 +79,7 @@ protected:
 
     // Implemented in child classes to be able to use equality operator
     virtual bool compare(const Scattering&) const = 0;
+    virtual void print(std::ostream&) const     = 0;
 
     struct RandomAngles
     {

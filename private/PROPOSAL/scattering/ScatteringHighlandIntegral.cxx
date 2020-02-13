@@ -86,6 +86,11 @@ bool ScatteringHighlandIntegral::compare(const Scattering& scattering) const
         return true;
 }
 
+void ScatteringHighlandIntegral::print(std::ostream& os) const
+{
+    os << "Medium: " << scatter_->GetUtility().GetMedium() << '\n';
+}
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //------------------------private member functions----------------------------//

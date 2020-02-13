@@ -52,6 +52,11 @@ bool ScatteringNoScattering::compare(const Scattering& scattering) const
         return true;
 }
 
+void ScatteringNoScattering::print(std::ostream& os) const
+{
+    os << "Medium: " << medium_ << '\n';
+}
+
 //----------------------------------------------------------------------------//
 Scattering::RandomAngles ScatteringNoScattering::CalculateRandomAngle(double dr,
                                                                       double ei,

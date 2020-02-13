@@ -52,8 +52,8 @@ public:
     ScatteringHighlandIntegral(const ScatteringHighlandIntegral&);
     ~ScatteringHighlandIntegral();
 
-    virtual Scattering* clone() const { return new ScatteringHighlandIntegral(*this); }
-    virtual Scattering* clone(const ParticleDef& particle_def, const Utility& utility) const
+    virtual Scattering* clone() const override { return new ScatteringHighlandIntegral(*this); }
+    virtual Scattering* clone(const ParticleDef& particle_def, const Utility& utility) const override
     {
         return new ScatteringHighlandIntegral(particle_def, utility, *this);
     }
@@ -61,9 +61,10 @@ public:
 private:
     ScatteringHighlandIntegral& operator=(const ScatteringHighlandIntegral&); // Undefined & not allowed
 
-    bool compare(const Scattering&) const;
+    bool compare(const Scattering&) const override;
+    void print(std::ostream&) const override;
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, double rnd1, double rnd2, double rnd3, double rnd4);
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, double rnd1, double rnd2, double rnd3, double rnd4) override;
     long double CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos);
 
     UtilityDecorator* scatter_;
