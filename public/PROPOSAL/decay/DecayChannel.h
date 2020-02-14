@@ -43,8 +43,6 @@ class DecayChannel
 {
 
 public:
-    // typedef std::vector<Particle*> DecayProducts;
-
     DecayChannel();
     DecayChannel(const DecayChannel&);
     virtual ~DecayChannel();
@@ -139,8 +137,6 @@ public:
 protected:
     virtual bool compare(const DecayChannel&) const = 0;
     virtual void print(std::ostream&) const {};
-
-    // static void CopyParticleProperties(DecayProducts&, const Particle&);
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::DecayChannel const&);

@@ -48,35 +48,6 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayChannel const& channel
 }
 
 // ------------------------------------------------------------------------- //
-/* void DecayChannel::Boost(Particle& particle, const Vector3D& direction_unnormalized, double gamma, double betagamma) */
-/* { */
-/*     Vector3D direction = direction_unnormalized; */
-/*     direction.normalise(); */
-
-/*     Vector3D momentum_vec(particle.GetMomentum() * particle.GetDirection()); */
-
-/*     double direction_correction = */
-/*         (gamma - 1.0) * scalar_product(momentum_vec, direction) - betagamma * particle.GetEnergy(); */
-
-/*     momentum_vec = momentum_vec + direction_correction * direction; */
-
-/*     // Energy will be implicit corrected with respect to the mass: */
-/*     particle.SetMomentum(momentum_vec.magnitude()); */
-
-/*     momentum_vec.normalise(); */
-/*     momentum_vec.CalculateSphericalCoordinates(); */
-/*     particle.SetDirection(momentum_vec); */
-/* } */
-
-/* // ------------------------------------------------------------------------- // */
-/* void DecayChannel::Boost(DecayProducts& products, const Vector3D& direction, double gamma, double betagamma) */
-/* { */
-/*     for (DecayProducts::const_iterator iter = products.begin(); iter != products.end(); ++iter) */
-/*     { */
-/*         Boost(**iter, direction, gamma, betagamma); */
-/*     } */
-/* } */
-
 void DecayChannel::Boost(DynamicData& particle, const Vector3D& direction_unnormalized, double gamma, double betagamma)
 {
     Vector3D direction = direction_unnormalized;
@@ -147,19 +118,3 @@ Vector3D DecayChannel::GenerateRandomDirection()
 // ------------------------------------------------------------------------- //
 // Protected Member functions
 // ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
-// void DecayChannel::CopyParticleProperties(DecayProducts& products, const Particle& particle)
-// {
-//     int id = 1;
-//     for (std::vector<Particle*>::iterator iter = products.begin(); iter != products.end(); ++iter)
-//     {
-//         (*iter)->SetPosition(particle.GetPosition());
-//         (*iter)->SetTime(particle.GetTime());
-//         (*iter)->SetParentParticleEnergy(particle.GetEnergy());
-//         (*iter)->SetParticleId(particle.GetParticleId() + id);
-//         (*iter)->SetParentParticleId(particle.GetParticleId());
-
-//         id++;
-//     }
-// }

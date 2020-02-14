@@ -549,13 +549,13 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                     will be calculated and the produced secondary particles
                     returned.
                 )pbdoc")
-        // .def_property_readonly("particle", &Propagator::GetParticle,
-        //     R"pbdoc(
-        //             Get the internal created particle to modify its properties.
+        .def_property_readonly("particle_def", &Propagator::GetParticleDef,
+            R"pbdoc(
+                    Get the internal particle definition to use its properties.
 
-        //             Returns:
-        //                 Particle: the propagated particle.
-        //         )pbdoc")
+                    Returns:
+                        ParticleDefinition: the definition of the propagated particle.
+                )pbdoc")
         .def_property_readonly("sector", &Propagator::GetCurrentSector,
             R"pbdoc(
                     "Get the current sector"

@@ -124,7 +124,6 @@ bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
 Secondaries ManyBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
 {
     // Create vector for decay products
-    /* DecayProducts products; */
     Secondaries products;
 
     for (auto p : daughters_) {

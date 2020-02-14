@@ -39,7 +39,6 @@ bool TwoBodyPhaseSpace::compare(const DecayChannel& channel) const
         return true;
 }
 
-/* DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(const Particle& particle) */
 Secondaries TwoBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
 {
     Secondaries products;
@@ -57,7 +56,8 @@ Secondaries TwoBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData
     products[1].SetDirection(opposite_direction);
     products[1].SetMomentum(momentum);
 
-    Boost(products, p_condition.GetDirection(), p_condition.GetEnergy() / p_def.mass, p_condition.GetMomentum() / p_def.mass);
+    // Boost all products in Lab frame (the reason, why the boosting goes in the negative direction of the particle)
+    Boost(products, -p_condition.GetDirection(), p_condition.GetEnergy() / p_def.mass, p_condition.GetMomentum() / p_def.mass);
 
     return products;
 }
