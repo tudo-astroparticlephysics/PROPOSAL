@@ -148,7 +148,7 @@ bool Geometry::IsBehind(const Vector3D& position, const Vector3D& direction) con
     return is_behind;
 }
 
-Geometry::ParticleLocation::Enum Geometry::GetLocation(const Vector3D& position, const Vector3D& direction) {
+Geometry::ParticleLocation::Enum Geometry::GetLocation(const Vector3D& position, const Vector3D& direction) const {
     if(IsInfront(position, direction))
         return Geometry::ParticleLocation::InfrontGeometry;
     if(IsInside(position, direction))
@@ -158,7 +158,7 @@ Geometry::ParticleLocation::Enum Geometry::GetLocation(const Vector3D& position,
 }
 
 // ------------------------------------------------------------------------- //
-double Geometry::DistanceToClosestApproach(const Vector3D& position, const Vector3D& direction)
+double Geometry::DistanceToClosestApproach(const Vector3D& position, const Vector3D& direction) const
 {
     return scalar_product(position_ - position, direction);
 }

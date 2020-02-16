@@ -43,7 +43,7 @@ class Medium;
 class ScatteringNoScattering : public Scattering
 {
 public:
-    ScatteringNoScattering(const ParticleDef&, const Medium&);
+    ScatteringNoScattering(const ParticleDef&, std::shared_ptr<const Medium>);
     ScatteringNoScattering(const ParticleDef&, const ScatteringNoScattering&);
     ScatteringNoScattering(const ScatteringNoScattering&);
     ~ScatteringNoScattering();
@@ -63,7 +63,7 @@ private:
 
     RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, double rnd1, double rnd2, double rnd3, double rnd4) override;
 
-    const Medium* medium_;
+    std::shared_ptr<const Medium> medium_;
 };
 
 } // namespace PROPOSAL

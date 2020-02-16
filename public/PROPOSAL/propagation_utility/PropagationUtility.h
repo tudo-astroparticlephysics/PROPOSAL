@@ -75,11 +75,11 @@ class Utility {
 
    public:
     Utility(const ParticleDef&,
-            const Medium&,
+            std::shared_ptr<const Medium>,
             const EnergyCutSettings&,
             Definition);
     Utility(const ParticleDef&,
-            const Medium&,
+            std::shared_ptr<const Medium>,
             const EnergyCutSettings&,
             Definition,
             const InterpolationDef&);
@@ -93,7 +93,7 @@ class Utility {
     bool operator!=(const Utility& utility) const;
 
     const ParticleDef& GetParticleDef() const { return particle_def_; }
-    const Medium& GetMedium() const { return *medium_; }
+    std::shared_ptr<const Medium> GetMedium() const { return medium_; }
     const std::vector<CrossSection*>& GetCrosssections() const {
         return crosssections_;
     }
@@ -110,7 +110,7 @@ class Utility {
     // --------------------------------------------------------------------- //
 
     ParticleDef particle_def_;
-    Medium* medium_;
+    std::shared_ptr<const Medium> medium_;
     EnergyCutSettings cut_settings_;
 
     std::vector<CrossSection*> crosssections_;

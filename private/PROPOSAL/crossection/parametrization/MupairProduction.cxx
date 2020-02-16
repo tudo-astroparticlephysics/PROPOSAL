@@ -11,7 +11,7 @@
 
 #define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                                                              \
     Mupair##param::Mupair##param(const ParticleDef& particle_def,                                                      \
-                               const Medium& medium,                                                                   \
+                               std::shared_ptr<const Medium> medium,                                                                   \
                                const EnergyCutSettings& cuts,                                                          \
                                double multiplier,                                                                      \
                                bool particle_output)                                                                   \
@@ -39,7 +39,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 MupairProduction::MupairProduction(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  const EnergyCutSettings& cuts,
                                  double multiplier,
                                  bool particle_output)
@@ -123,7 +123,7 @@ double MupairProduction::Calculaterho(double energy, double v, double rnd1, doub
 
 // ------------------------------------------------------------------------- //
 MupairProductionRhoIntegral::MupairProductionRhoIntegral(const ParticleDef& particle_def,
-                                                       const Medium& medium,
+                                                       std::shared_ptr<const Medium> medium,
                                                        const EnergyCutSettings& cuts,
                                                        double multiplier,
                                                        bool particle_output)
@@ -236,7 +236,7 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v
     aux1    *= std::log(1 + xi);
     aux2    = -1 - 3 * r2 + beta * (1 - 2 * r2);
 
-    phi     = aux + aux1 + aux2; 
+    phi     = aux + aux1 + aux2;
 
     //X Calculation (22)
     Y       = 12 * std::sqrt(MMU / energy); //(21)

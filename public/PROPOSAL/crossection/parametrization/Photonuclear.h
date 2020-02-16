@@ -191,7 +191,7 @@ private:
 class Photonuclear : public Parametrization
 {
 public:
-    Photonuclear(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    Photonuclear(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier);
     Photonuclear(const Photonuclear&);
     virtual ~Photonuclear();
 

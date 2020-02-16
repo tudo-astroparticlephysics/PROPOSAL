@@ -30,6 +30,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include "PROPOSAL/methods.h"
 
@@ -84,7 +85,7 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         typedef std::function<WeakInteraction*(const ParticleDef&,
-                                               const Medium&,
+                                               std::shared_ptr<const Medium>,
                                                double multiplier)>
                 RegisterFunction;
 
@@ -99,11 +100,11 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         CrossSection* CreateWeakInteraction(const ParticleDef&,
-                                            const Medium&,
+                                            std::shared_ptr<const Medium>,
                                             const Definition&) const;
 
         CrossSection* CreateWeakInteraction(const ParticleDef&,
-                                            const Medium&,
+                                            std::shared_ptr<const Medium>,
                                             const Definition&,
                                             InterpolationDef) const;
 

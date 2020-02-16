@@ -33,7 +33,7 @@ EpairProductionFactory::~EpairProductionFactory()
 
 // ------------------------------------------------------------------------- //
 CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
+                                                            std::shared_ptr<const Medium> medium,
                                                             const EnergyCutSettings& cuts,
                                                             const Definition& def) const
 {
@@ -56,7 +56,7 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
 
 // ------------------------------------------------------------------------- //
 CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
+                                                            std::shared_ptr<const Medium> medium,
                                                             const EnergyCutSettings& cuts,
                                                             const Definition& def,
                                                             InterpolationDef interpolation_def) const

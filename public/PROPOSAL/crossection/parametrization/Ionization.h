@@ -35,7 +35,7 @@ namespace PROPOSAL {
 class Ionization : public Parametrization
 {
 public:
-    Ionization(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    Ionization(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier);
     Ionization(const Ionization&);
     virtual ~Ionization();
 
@@ -57,13 +57,13 @@ private:
 class IonizBetheBlochRossi : public Ionization
 {
 public:
-    IonizBetheBlochRossi(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    IonizBetheBlochRossi(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier);
     IonizBetheBlochRossi(const IonizBetheBlochRossi&);
     ~IonizBetheBlochRossi();
 
     Parametrization* clone() const { return new IonizBetheBlochRossi(*this); }
     static Ionization* create(const ParticleDef& particle_def,
-                                      const Medium& medium,
+                                      std::shared_ptr<const Medium> medium,
                                       const EnergyCutSettings& cuts,
                                       double multiplier)
         {
@@ -85,13 +85,13 @@ private:
 class IonizBergerSeltzerBhabha : public Ionization
 {
 public:
-    IonizBergerSeltzerBhabha(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    IonizBergerSeltzerBhabha(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier);
     IonizBergerSeltzerBhabha(const IonizBergerSeltzerBhabha&);
     ~IonizBergerSeltzerBhabha();
 
     Parametrization* clone() const { return new IonizBergerSeltzerBhabha(*this); }
     static Ionization* create(const ParticleDef& particle_def,
-                                    const Medium& medium,
+                                    std::shared_ptr<const Medium> medium,
                                     const EnergyCutSettings& cuts,
                                     double multiplier)
         {
@@ -111,13 +111,13 @@ private:
 class IonizBergerSeltzerMoller : public Ionization
     {
     public:
-    IonizBergerSeltzerMoller(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    IonizBergerSeltzerMoller(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier);
     IonizBergerSeltzerMoller(const IonizBergerSeltzerMoller&);
     ~IonizBergerSeltzerMoller();
 
     Parametrization* clone() const { return new IonizBergerSeltzerMoller(*this); }
         static Ionization* create(const ParticleDef& particle_def,
-                                  const Medium& medium,
+                                  std::shared_ptr<const Medium> medium,
                                   const EnergyCutSettings& cuts,
                                   double multiplier)
         {

@@ -87,9 +87,9 @@ public:
     DynamicData GetEntryPoint() const;
     DynamicData GetExitPoint() const;
     DynamicData GetClosestApproachPoint() const;
-    void SetEntryPoint(DynamicData& entry_point);
-    void SetExitPoint(DynamicData& exit_point);
-    void SetClosestApproachPoint(DynamicData& closest_approach_point);
+    void SetEntryPoint(const DynamicData& entry_point);
+    void SetExitPoint(const DynamicData& exit_point);
+    void SetClosestApproachPoint(const DynamicData& closest_approach_point);
 
 private:
     std::vector<DynamicData> secondaries_;

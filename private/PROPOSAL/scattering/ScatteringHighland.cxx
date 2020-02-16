@@ -23,18 +23,17 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-ScatteringHighland::ScatteringHighland(const ParticleDef& particle_def, const Medium& medium)
-    : Scattering(particle_def), medium_(medium.clone()) {}
+ScatteringHighland::ScatteringHighland(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium)
+    : Scattering(particle_def), medium_(medium) {}
 
 ScatteringHighland::ScatteringHighland(const ScatteringHighland& scattering)
-    : Scattering(scattering), medium_(scattering.medium_->clone()) {}
+    : Scattering(scattering), medium_(scattering.medium_) {}
 
 ScatteringHighland::ScatteringHighland(const ParticleDef& particle_def,
                                        const ScatteringHighland& scattering)
-    : Scattering(particle_def), medium_(scattering.medium_->clone()) {}
+    : Scattering(particle_def), medium_(scattering.medium_) {}
 
 ScatteringHighland::~ScatteringHighland() {
-    delete medium_;
 }
 
 bool ScatteringHighland::compare(const Scattering& scattering) const {
@@ -51,7 +50,7 @@ bool ScatteringHighland::compare(const Scattering& scattering) const {
 
 void ScatteringHighland::print(std::ostream& os) const
 {
-    os << "Medium: " << medium_ << '\n';
+    os << "Medium: " << *medium_ << '\n';
 }
 
 // ------------------------------------------------------------------------- //

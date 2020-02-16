@@ -41,7 +41,7 @@ void IonizationFactory::Register(const std::string& name, Enum enum_t, RegisterF
 
 // ------------------------------------------------------------------------- //
 CrossSection* IonizationFactory::CreateIonization(const ParticleDef& particle_def,
-                                                  const Medium& medium,
+                                                  std::shared_ptr<const Medium> medium,
                                                   const EnergyCutSettings& cuts,
                                                   const Definition& def) const
 {
@@ -64,7 +64,7 @@ CrossSection* IonizationFactory::CreateIonization(const ParticleDef& particle_de
 
 // ------------------------------------------------------------------------- //
 CrossSection* IonizationFactory::CreateIonization(const ParticleDef& particle_def,
-                                                  const Medium& medium,
+                                                  std::shared_ptr<const Medium> medium,
                                                   const EnergyCutSettings& cuts,
                                                   const Definition& def,
                                                   InterpolationDef interpolation_def) const

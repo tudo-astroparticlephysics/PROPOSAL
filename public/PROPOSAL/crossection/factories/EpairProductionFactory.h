@@ -30,6 +30,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include "PROPOSAL/methods.h"
 
@@ -89,14 +90,14 @@ public:
     // --------------------------------------------------------------------- //
 
     typedef std::function<EpairProduction*(const ParticleDef&,
-                                          const Medium&,
+                                          std::shared_ptr<const Medium>,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           bool lpm)>
         RegisterFunction;
 
     typedef std::function<EpairProduction*(const ParticleDef&,
-                                          const Medium&,
+                                          std::shared_ptr<const Medium>,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           bool lpm,
@@ -113,12 +114,12 @@ public:
     // --------------------------------------------------------------------- //
 
     CrossSection* CreateEpairProduction(const ParticleDef&,
-                                        const Medium&,
+                                        std::shared_ptr<const Medium>,
                                         const EnergyCutSettings&,
                                         const Definition&) const;
 
     CrossSection* CreateEpairProduction(const ParticleDef&,
-                                        const Medium&,
+                                        std::shared_ptr<const Medium>,
                                         const EnergyCutSettings&,
                                         const Definition&,
                                         InterpolationDef) const;

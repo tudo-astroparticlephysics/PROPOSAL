@@ -54,10 +54,10 @@ const bool Propagator::uniform_ = true;
 
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(
-    const std::vector<Sector*>& sectors, const Geometry& geometry) try
+    const std::vector<Sector*>& sectors, std::shared_ptr<const Geometry> geometry) try
     : current_sector_(NULL),
       particle_def_(sectors.at(0)->GetParticleDef()),
-      detector_(geometry.clone())
+      detector_(geometry)
 {
     // --------------------------------------------------------------------- //
     // Check if all ParticleDefs are the same
@@ -80,9 +80,9 @@ Propagator::Propagator(
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(const ParticleDef& particle_def,
     const std::vector<Sector::Definition>& sector_defs,
-    const Geometry& geometry)
+    std::shared_ptr<const Geometry> geometry)
     : particle_def_(particle_def)
-    , detector_(geometry.clone())
+    , detector_(geometry)
 {
     for (auto def : sector_defs) {
         sectors_.push_back(new Sector(particle_def, def));
@@ -98,9 +98,9 @@ Propagator::Propagator(const ParticleDef& particle_def,
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(const ParticleDef& particle_def,
     const std::vector<Sector::Definition>& sector_defs,
-    const Geometry& geometry, const InterpolationDef& interpolation_def)
+    std::shared_ptr<const Geometry> geometry, const InterpolationDef& interpolation_def)
     : particle_def_(particle_def)
-    , detector_(geometry.clone())
+    , detector_(geometry)
 {
     for (auto def : sector_defs) {
         sectors_.push_back(new Sector(particle_def, def, interpolation_def));
@@ -118,7 +118,7 @@ Propagator::Propagator(const Propagator& propagator)
     : sectors_(propagator.sectors_.size(), NULL)
     , current_sector_(NULL)
     , particle_def_(propagator.particle_def_)
-    , detector_(propagator.detector_->clone())
+    , detector_(propagator.detector_)
 {
     for (unsigned int i = 0; i < propagator.sectors_.size(); ++i) {
         sectors_[i] = new Sector(particle_def_, *propagator.sectors_[i]);
@@ -249,7 +249,7 @@ Propagator::Propagator(
     // Parse detector geometry
     if (json_config.find("detector") != json_config.end()) {
         std::string json_str = json_config["detector"].dump();
-        detector_ = ParseGeometryConifg(json_str);
+        detector_ = ParseGeometryConfig(json_str);
     } else {
         log_fatal("You need to specify a detector geometry.");
     }
@@ -279,11 +279,11 @@ Propagator::Propagator(
         std::string json_sector_str = json_sectors.dump();
 
         // Create medium
-        MediumFactory::Definition medium_def;
+        double density_correction = 1.0;
+
         if (json_sectors.find("density_correction") != json_sectors.end()) {
             if (json_sectors["density_correction"].is_number()) {
-                medium_def.density_correction
-                    = json_sectors["density_correction"].get<double>();
+                density_correction = json_sectors["density_correction"].get<double>();
             } else {
                 log_fatal("Invalid input for option 'density_correction'. "
                           "Expected a number.");
@@ -293,8 +293,7 @@ Propagator::Propagator(
                       "(1.0)");
         }
 
-        std::string medium_name
-            = MediumFactory::Get().GetStringFromEnum(medium_def.type);
+        std::string medium_name = "water";
         if (json_sectors.find("medium") != json_sectors.end()) {
             if (json_sectors["medium"].is_string()) {
                 medium_name = json_sectors["medium"].get<std::string>();
@@ -305,47 +304,47 @@ Propagator::Propagator(
         } else {
             log_debug("The 'medium' option is not set. Use default (Water)");
         }
-        Medium* med = MediumFactory::Get().CreateMedium(
-            medium_name, medium_def.density_correction);
+        std::shared_ptr<const Medium> med = CreateMedium(medium_name, density_correction);
 
         // Create Geometry
-        Geometry* geometry = NULL;
+        std::shared_ptr<const Geometry> geo;
 
         if (json_sectors.find("geometry") != json_sectors.end()) {
             std::string json_str = json_sectors["geometry"].dump();
-            geometry = ParseGeometryConifg(json_str);
+            geo= ParseGeometryConfig(json_str);
         } else {
             log_fatal("You need to specify a geometry for each sector");
         }
 
-        double hierarchy = geometry->GetHierarchy();
-        if (json_sectors.find("hierarchy") != json_sectors.end()) {
-            if (json_sectors["hierarchy"].is_number()) {
-                hierarchy = json_sectors["hierarchy"].get<int>();
-            } else {
-                log_fatal(
-                    "Invalid input for option 'hierarchy'. Expected a number.");
-            }
-        } else {
-            log_debug("The 'hierarchy' option is not set. Use default (0)");
-        }
-        geometry->SetHierarchy(hierarchy);
+        /* double hierarchy = geometry->GetHierarchy(); */
+        /* if (json_sectors.find("hierarchy") != json_sectors.end()) { */
+        /*     if (json_sectors["hierarchy"].is_number()) { */
+        /*         hierarchy = json_sectors["hierarchy"].get<int>(); */
+        /*     } else { */
+        /*         log_fatal( */
+        /*             "Invalid input for option 'hierarchy'. Expected a number."); */
+        /*     } */
+        /* } else { */
+        /*     log_debug("The 'hierarchy' option is not set. Use default (0)"); */
+        /* } */
+        /* geometry->SetHierarchy(hierarchy); */
 
+        /* auto geo = std::make_shared<const Geometry>(*geometry); */
         // Use global options in case they will not be overridden
         Sector::Definition sec_def_infront = sec_def_global;
         sec_def_infront.location = Sector::ParticleLocation::InfrontDetector;
-        sec_def_infront.SetMedium(*med);
-        sec_def_infront.SetGeometry(*geometry);
+        sec_def_infront.SetMedium(med);
+        sec_def_infront.SetGeometry(geo);
 
         Sector::Definition sec_def_inside = sec_def_global;
         sec_def_inside.location = Sector::ParticleLocation::InsideDetector;
-        sec_def_inside.SetMedium(*med);
-        sec_def_inside.SetGeometry(*geometry);
+        sec_def_inside.SetMedium(med);
+        sec_def_inside.SetGeometry(geo);
 
         Sector::Definition sec_def_behind = sec_def_global;
         sec_def_behind.location = Sector::ParticleLocation::BehindDetector;
-        sec_def_behind.SetMedium(*med);
-        sec_def_behind.SetGeometry(*geometry);
+        sec_def_behind.SetMedium(med);
+        sec_def_behind.SetGeometry(geo);
 
         nlohmann::json json_cutsettings;
 
@@ -404,8 +403,6 @@ Propagator::Propagator(
             sectors_.push_back(new Sector(particle_def_, sec_def_behind));
         }
 
-        delete geometry;
-        delete med;
     }
 }
 
@@ -416,8 +413,6 @@ Propagator::~Propagator()
     }
 
     sectors_.clear();
-
-    delete detector_;
 }
 
 // ------------------------------------------------------------------------- //
@@ -455,7 +450,7 @@ bool Propagator::operator!=(const Propagator& propagator) const
 
 // ------------------------------------------------------------------------- //
 Secondaries Propagator::Propagate(
-    DynamicData initial_condition, double max_distance, double minimal_energy)
+    const DynamicData& initial_condition, double max_distance, double minimal_energy)
 {
     double distance = 0;
     double distance_to_closest_approach = 0;
@@ -479,8 +474,11 @@ Secondaries Propagator::Propagate(
     // DynamicData exit_condition;
     // DynamicData closest_approach_condition;
 
-    bool starts_in_detector = detector_->IsInside(
-        initial_condition.GetPosition(), initial_condition.GetDirection());
+    Vector3D position(initial_condition.GetPosition());
+    Vector3D direction(initial_condition.GetDirection());
+
+    /* bool starts_in_detector = detector_->IsInside( initial_condition.GetPosition(), initial_condition.GetDirection()); */
+    bool starts_in_detector = detector_->IsInside( position, direction);
     if (starts_in_detector) {
         secondaries_.SetEntryPoint(initial_condition);
         distance_to_closest_approach = detector_->DistanceToClosestApproach(
@@ -607,7 +605,7 @@ void Propagator::ChooseCurrentSector(
         = detector_->GetLocation(particle_position, particle_direction);
 
     for (unsigned int i = 0; i < sectors_.size(); ++i) {
-        if (sectors_[i]->GetGeometry()->IsInside(
+        if (sectors_[i]->GetSectorDef().GetGeometry()->IsInside(
                 particle_position, particle_direction)) {
             if (static_cast<int>(sectors_[i]->GetLocation())
                 == static_cast<int>(detector_location))
@@ -637,8 +635,8 @@ void Propagator::ChooseCurrentSector(
 
         // Current Hierarchy is equal -> Look at the density!
         //
-        if (current_sector_->GetGeometry()->GetHierarchy()
-            == sectors_[*iter]->GetGeometry()->GetHierarchy()) {
+        if (current_sector_->GetSectorDef().GetGeometry()->GetHierarchy()
+            == sectors_[*iter]->GetSectorDef().GetGeometry()->GetHierarchy()) {
             // Current Density is smaller -> Set the new sector!
             //
             if (current_sector_->GetMedium()->GetCorrectedMassDensity(
@@ -650,8 +648,8 @@ void Propagator::ChooseCurrentSector(
 
         // Current Hierarchy is smaller -> Set the new sector!
         //
-        if (current_sector_->GetGeometry()->GetHierarchy()
-            < sectors_[*iter]->GetGeometry()->GetHierarchy())
+        if (current_sector_->GetSectorDef().GetGeometry()->GetHierarchy()
+            < sectors_[*iter]->GetSectorDef().GetGeometry()->GetHierarchy())
             current_sector_ = sectors_[*iter];
     }
 }
@@ -664,7 +662,7 @@ double Propagator::CalculateEffectiveDistance(
     double distance_to_detector = 0;
 
     distance_to_sector_border
-        = current_sector_->GetGeometry()
+        = current_sector_->GetSectorDef().GetGeometry()
               ->DistanceToBorder(particle_position, particle_direction)
               .first;
     double tmp_distance_to_border;
@@ -677,11 +675,11 @@ double Propagator::CalculateEffectiveDistance(
 
         if (static_cast<int>((*iter)->GetLocation())
             == static_cast<int>(detector_location)) {
-            if ((*iter)->GetGeometry()->GetHierarchy()
-                >= current_sector_->GetGeometry()->GetHierarchy()) {
+            if ((*iter)->GetSectorDef().GetGeometry()->GetHierarchy()
+                >= current_sector_->GetSectorDef().GetGeometry()->GetHierarchy()) {
                 tmp_distance_to_border
                     = (*iter)
-                          ->GetGeometry()
+                          ->GetSectorDef().GetGeometry()
                           ->DistanceToBorder(
                               particle_position, particle_direction)
                           .first;
@@ -709,7 +707,7 @@ double Propagator::CalculateEffectiveDistance(
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
+std::shared_ptr<const Geometry> Propagator::ParseGeometryConfig(const std::string& json_object_str)
 {
     nlohmann::json json_object = nlohmann::json::parse(json_object_str);
     if (!json_object.is_object()) {
@@ -732,12 +730,12 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
     // Get geometry from default constructor
     // --------------------------------------------------------------------- //
 
-    Geometry* geometry = NULL;
+    std::shared_ptr<Geometry> geometry;
 
     if (json_object.find("shape") != json_object.end()) {
         if (json_object["shape"].is_string()) {
             std::string name = json_object["shape"].get<std::string>();
-            geometry = GeometryFactory::Get().CreateGeometry(name);
+            geometry = GetGeometry(name);
         } else {
             log_fatal("Invalid input for option 'shape'. Expected a string.");
         }
@@ -801,13 +799,27 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
 
     Vector3D vec(x, y, z);
 
+    double hierarchy = geometry->GetHierarchy();
+    if (json_object.find("hierarchy") != json_object.end()) {
+        if (json_object["hierarchy"].is_number()) {
+            hierarchy = json_object["hierarchy"].get<int>();
+        } else {
+            log_fatal(
+                "Invalid input for option 'hierarchy'. Expected a number.");
+        }
+    } else {
+        log_debug("The 'hierarchy' option is not set. Use default (0)");
+    }
+
     // --------------------------------------------------------------------- //
     // Check type of geometry and set members
     // --------------------------------------------------------------------- //
-
-    if (PROPOSAL::Sphere* sphere = dynamic_cast<PROPOSAL::Sphere*>(geometry)) {
+    
+    if (geometry->GetName() == "Sphere") {
+        auto sphere = std::dynamic_pointer_cast<Sphere>(geometry);
         double radius = 0;
         double inner_radius = 0;
+        sphere->SetHierarchy(hierarchy);
 
         if (json_object.find(outer_radius_str) != json_object.end()) {
             if (json_object[outer_radius_str].is_number()) {
@@ -839,11 +851,13 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         sphere->SetRadius(radius);
         sphere->SetInnerRadius(inner_radius);
 
-        return sphere;
-    } else if (PROPOSAL::Box* box = dynamic_cast<PROPOSAL::Box*>(geometry)) {
+        return sphere->create();
+    } else if (geometry->GetName() == "Box") {
+        auto box = std::static_pointer_cast<Box>(geometry);
         double x = 0;
         double y = 0;
         double z = 0;
+        box->SetHierarchy(hierarchy);
 
         if (json_object.find(length_str) != json_object.end()) {
             if (json_object[length_str].is_number()) {
@@ -886,12 +900,13 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         box->SetY(y);
         box->SetZ(z);
 
-        return box;
-    } else if (PROPOSAL::Cylinder* cylinder
-        = dynamic_cast<PROPOSAL::Cylinder*>(geometry)) {
+        return box->create();
+    } else if (geometry->GetName() == "Cylinder") {
+        auto cylinder = std::static_pointer_cast<Cylinder>(geometry);
         double radius = 0;
         double inner_radius = 0;
         double z = 0;
+        cylinder->SetHierarchy(hierarchy);
 
         if (json_object.find(outer_radius_str) != json_object.end()) {
             if (json_object[outer_radius_str].is_number()) {
@@ -936,7 +951,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         cylinder->SetInnerRadius(inner_radius);
         cylinder->SetZ(z);
 
-        return cylinder;
+        return cylinder->create();
     } else {
         log_fatal("Dynamic casts of Geometries failed. Should not end here!");
         return NULL;

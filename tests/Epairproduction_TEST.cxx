@@ -33,7 +33,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());
     EnergyCutSettings ecuts;
     double multiplier = 1.;
     bool lpm          = true;
@@ -78,8 +78,8 @@ TEST(Comparison, Comparison_not_equal)
 {
     ParticleDef mu_def  = MuMinusDef::Get();
     ParticleDef tau_def = TauMinusDef::Get();
-    Water medium_1;
-    Ice medium_2;
+    std::shared_ptr<const Medium> medium_1(Water().create());
+    std::shared_ptr<const Medium> medium_2(Ice().create());
     EnergyCutSettings ecuts_1(500, -1);
     EnergyCutSettings ecuts_2(-1, 0.05);
     double multiplier_1 = 1.;
@@ -124,7 +124,7 @@ TEST(Comparison, Comparison_not_equal)
 TEST(Assignment, Copyconstructor)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());
     EnergyCutSettings ecuts;
     double multiplier = 1.;
     bool lpm          = true;
@@ -150,7 +150,7 @@ TEST(Assignment, Copyconstructor)
 TEST(Assignment, Copyconstructor2)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());
     EnergyCutSettings ecuts;
     double multiplier = 1.;
     bool lpm          = true;
@@ -205,7 +205,7 @@ TEST(Epairproduction, Test_of_dEdx)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dEdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -213,12 +213,11 @@ TEST(Epairproduction, Test_of_dEdx)
         epair_def.parametrization = EpairProductionFactory::Get().GetEnumFromString(parametrization);
         epair_def.lpm_effect  = lpm;
 
-        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, *medium, ecuts, epair_def);
+        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, medium, ecuts, epair_def);
         dEdx_new = epair->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
 
-        delete medium;
         delete epair;
     }
 }
@@ -253,7 +252,7 @@ TEST(Epairproduction, Test_of_dNdx)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dNdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -261,12 +260,11 @@ TEST(Epairproduction, Test_of_dNdx)
         epair_def.parametrization = EpairProductionFactory::Get().GetEnumFromString(parametrization);
         epair_def.lpm_effect  = lpm;
 
-        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, *medium, ecuts, epair_def);
+        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, medium, ecuts, epair_def);
         dNdx_new = epair->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
-        delete medium;
         delete epair;
     }
 }
@@ -304,7 +302,7 @@ TEST(Epairproduction, Test_of_dNdx_rnd)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -312,13 +310,12 @@ TEST(Epairproduction, Test_of_dNdx_rnd)
         epair_def.parametrization = EpairProductionFactory::Get().GetEnumFromString(parametrization);
         epair_def.lpm_effect  = lpm;
 
-        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, *medium, ecuts, epair_def);
+        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, medium, ecuts, epair_def);
 
         dNdx_rnd_new = epair->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-        delete medium;
         delete epair;
     }
 }
@@ -359,7 +356,7 @@ TEST(Epairproduction, Test_Stochastic_Loss)
 
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -367,13 +364,12 @@ TEST(Epairproduction, Test_Stochastic_Loss)
         epair_def.parametrization = EpairProductionFactory::Get().GetEnumFromString(parametrization);
         epair_def.lpm_effect  = lpm;
 
-        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, *medium, ecuts, epair_def);
+        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, medium, ecuts, epair_def);
 
         stochastic_loss_new = epair->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
-        delete medium;
         delete epair;
     }
 }
@@ -410,7 +406,7 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dEdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -418,13 +414,12 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
         epair_def.parametrization = EpairProductionFactory::Get().GetEnumFromString(parametrization);
         epair_def.lpm_effect  = lpm;
 
-        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, *medium, ecuts, epair_def, InterpolDef);
+        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, medium, ecuts, epair_def, InterpolDef);
 
         dEdx_new = epair->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
 
-        delete medium;
         delete epair;
     }
 }
@@ -461,7 +456,7 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dNdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -469,13 +464,12 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
         epair_def.parametrization = EpairProductionFactory::Get().GetEnumFromString(parametrization);
         epair_def.lpm_effect  = lpm;
 
-        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, *medium, ecuts, epair_def, InterpolDef);
+        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, medium, ecuts, epair_def, InterpolDef);
 
         dNdx_new = epair->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
-        delete medium;
         delete epair;
     }
 }
@@ -515,7 +509,7 @@ TEST(Epairproduction, Test_of_dNdxrnd_interpol)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -523,13 +517,12 @@ TEST(Epairproduction, Test_of_dNdxrnd_interpol)
         epair_def.parametrization = EpairProductionFactory::Get().GetEnumFromString(parametrization);
         epair_def.lpm_effect  = lpm;
 
-        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, *medium, ecuts, epair_def, InterpolDef);
+        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, medium, ecuts, epair_def, InterpolDef);
 
         dNdx_rnd_new = epair->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-        delete medium;
         delete epair;
     }
 }
@@ -570,7 +563,7 @@ TEST(Epairproduction, Test_of_e_interpol)
             stochastic_loss_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -578,13 +571,12 @@ TEST(Epairproduction, Test_of_e_interpol)
         epair_def.parametrization = EpairProductionFactory::Get().GetEnumFromString(parametrization);
         epair_def.lpm_effect  = lpm;
 
-        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, *medium, ecuts, epair_def, InterpolDef);
+        CrossSection* epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, medium, ecuts, epair_def, InterpolDef);
 
         stochastic_loss_new = epair->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
-        delete medium;
         delete epair;
     }
 }

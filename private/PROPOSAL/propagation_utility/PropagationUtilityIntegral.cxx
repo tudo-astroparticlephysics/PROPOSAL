@@ -88,7 +88,7 @@ double UtilityIntegralDisplacement::Calculate(double ei,
         std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, this,
                   std::placeholders::_1),
         4, -distance_to_border);
-    return utility_.GetMedium().GetDensityDistribution().Correct(
+    return utility_.GetMedium()->GetDensityDistribution().Correct(
         xi, direction, aux, distance_to_border);
 }
 

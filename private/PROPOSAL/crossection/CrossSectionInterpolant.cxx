@@ -23,8 +23,8 @@ CrossSectionInterpolant::CrossSectionInterpolant(const InteractionType& type, co
     : CrossSection(type, param)
     , dedx_interpolant_(NULL)
     , de2dx_interpolant_(NULL)
-    , dndx_interpolant_1d_(param.GetMedium().GetNumComponents(), NULL)
-    , dndx_interpolant_2d_(param.GetMedium().GetNumComponents(), NULL)
+    , dndx_interpolant_1d_(param.GetMedium()->GetNumComponents(), NULL)
+    , dndx_interpolant_2d_(param.GetMedium()->GetNumComponents(), NULL)
 {
 }
 
@@ -151,7 +151,7 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
         de2dx_interpolant_ = NULL;
     }
 
-    int num_components = cross_section.parametrization_->GetMedium().GetNumComponents();
+    int num_components = cross_section.parametrization_->GetMedium()->GetNumComponents();
 
     dndx_interpolant_1d_.reserve(num_components);
     for (auto interpolant: cross_section.dndx_interpolant_1d_)
@@ -208,7 +208,7 @@ double CrossSectionInterpolant::CalculatedNdx(double energy)
 
     sum_of_rates_ = 0;
 
-    const ComponentVec& components = parametrization_->GetMedium().GetComponents();
+    const ComponentVec& components = parametrization_->GetMedium()->GetComponents();
     for (size_t i = 0; i < components.size(); ++i)
     {
         prob_for_component_[i] = std::max(dndx_interpolant_1d_[i]->Interpolate(energy), 0.);
@@ -232,7 +232,7 @@ double CrossSectionInterpolant::CalculatedNdx(double energy, double rnd)
 
     sum_of_rates_ = 0;
 
-    const ComponentVec& components = parametrization_->GetMedium().GetComponents();
+    const ComponentVec& components = parametrization_->GetMedium()->GetComponents();
     for (size_t i = 0; i < components.size(); ++i)
     {
         prob_for_component_[i] = std::max(dndx_interpolant_1d_[i]->Interpolate(energy), 0.);

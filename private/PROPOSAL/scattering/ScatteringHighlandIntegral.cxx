@@ -88,7 +88,7 @@ bool ScatteringHighlandIntegral::compare(const Scattering& scattering) const
 
 void ScatteringHighlandIntegral::print(std::ostream& os) const
 {
-    os << "Medium: " << scatter_->GetUtility().GetMedium() << '\n';
+    os << "Medium: " << *scatter_->GetUtility().GetMedium() << '\n';
 }
 
 //----------------------------------------------------------------------------//
@@ -101,9 +101,9 @@ void ScatteringHighlandIntegral::print(std::ostream& os) const
 long double ScatteringHighlandIntegral::CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos)
 {
     double aux              = scatter_->Calculate(ei, ef, 0.0) *
-                              scatter_->GetUtility().GetMedium().GetDensityDistribution().Evaluate(pos);
+                              scatter_->GetUtility().GetMedium()->GetDensityDistribution().Evaluate(pos);
     double cutoff           = 1;
-    double radiation_length = scatter_->GetUtility().GetMedium().GetRadiationLength(pos);
+    double radiation_length = scatter_->GetUtility().GetMedium()->GetRadiationLength(pos);
 
     aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_length) * std::abs(particle_def_.charge);
     aux *= std::max(1 + 0.038 * std::log(dr / radiation_length), 0.0);

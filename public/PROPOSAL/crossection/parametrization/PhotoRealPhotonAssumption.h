@@ -36,7 +36,7 @@
     {                                                                                                                  \
     public:                                                                                                            \
         Photo##param(const ParticleDef&,                                                                               \
-                     const Medium&,                                                                                    \
+                     std::shared_ptr<const Medium>,                                                                                    \
                      const EnergyCutSettings&,                                                                         \
                      double multiplier,                                                                                \
                      bool hard_component);                                                                             \
@@ -45,7 +45,7 @@
                                                                                                                        \
         Parametrization* clone() const { return new Photo##param(*this); }                                             \
         static Photonuclear* create(const ParticleDef& particle_def,                                                   \
-                                    const Medium& medium,                                                              \
+                                    std::shared_ptr<const Medium> medium,                                                              \
                                     const EnergyCutSettings& cuts,                                                     \
                                     double multiplier,                                                                 \
                                     bool hard_component)                                                               \
@@ -71,7 +71,7 @@ class PhotoRealPhotonAssumption : public Photonuclear
 {
 public:
     PhotoRealPhotonAssumption(const ParticleDef&,
-                              const Medium&,
+                              std::shared_ptr<const Medium>,
                               const EnergyCutSettings&,
                               double multiplier,
                               bool hard_component);
@@ -118,13 +118,13 @@ PHOTO_PARAM_REAL_DEC(Kokoulin, BezrukovBugaev) // Kokoulin derives from Bezrukov
 class PhotoRhode : public PhotoRealPhotonAssumption
 {
 public:
-    PhotoRhode(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool hard_component);
+    PhotoRhode(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier, bool hard_component);
     PhotoRhode(const PhotoRhode&);
     virtual ~PhotoRhode();
 
     Parametrization* clone() const { return new PhotoRhode(*this); }
     static Photonuclear* create(const ParticleDef&,
-                                const Medium&,
+                                std::shared_ptr<const Medium>,
                                 const EnergyCutSettings&,
                                 double multiplier,
                                 bool hard_component);

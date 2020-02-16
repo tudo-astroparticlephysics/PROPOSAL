@@ -12,11 +12,11 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 Parametrization::Parametrization(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  const EnergyCutSettings& cuts,
                                  double multiplier)
     : particle_def_(particle_def),
-      medium_(medium.clone()),
+      medium_(medium),
       cut_settings_(cuts),
       components_(medium_->GetComponents()),
       component_index_(0),
@@ -24,7 +24,7 @@ Parametrization::Parametrization(const ParticleDef& particle_def,
 
 Parametrization::Parametrization(const Parametrization& param)
     : particle_def_(param.particle_def_),
-      medium_(param.medium_->clone()),
+      medium_(param.medium_),
       cut_settings_(param.cut_settings_),
       components_(medium_->GetComponents()),
       component_index_(param.component_index_)  // //TODO(mario): Check better
@@ -33,7 +33,6 @@ Parametrization::Parametrization(const Parametrization& param)
       multiplier_(param.multiplier_) {}
 
 Parametrization::~Parametrization() {
-    delete medium_;
 }
 
 bool Parametrization::operator==(const Parametrization& parametrization) const {

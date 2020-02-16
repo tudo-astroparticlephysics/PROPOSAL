@@ -32,7 +32,7 @@ WeakInteractionFactory::~WeakInteractionFactory()
 
 // ------------------------------------------------------------------------- //
 CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
+                                                            std::shared_ptr<const Medium> medium,
                                                             const Definition& def) const
 {
     if(def.parametrization == WeakInteractionFactory::Enum::None){
@@ -54,7 +54,7 @@ CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& p
 
 // ------------------------------------------------------------------------- //
 CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
+                                                            std::shared_ptr<const Medium> medium,
                                                             const Definition& def,
                                                             InterpolationDef interpolation_def) const
 {

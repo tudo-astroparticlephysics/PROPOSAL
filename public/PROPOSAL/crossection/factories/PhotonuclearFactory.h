@@ -30,6 +30,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include <map>
 #include <string>
@@ -116,21 +117,21 @@ public:
     typedef std::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
 
     typedef std::function<Photonuclear*(const ParticleDef&,
-                                          const Medium&,
+                                          std::shared_ptr<const Medium>,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           bool hard_component)>
         RegisterRealPhotonFunction;
 
     typedef std::function<Photonuclear*(const ParticleDef&,
-                                          const Medium&,
+                                          std::shared_ptr<const Medium>,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           const ShadowEffect&)>
         RegisterQ2Function;
 
     typedef std::function<Photonuclear*(const ParticleDef&,
-                                          const Medium&,
+                                          std::shared_ptr<const Medium>,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           const ShadowEffect&,
@@ -161,12 +162,12 @@ public:
     // --------------------------------------------------------------------- //
 
     CrossSection* CreatePhotonuclear(const ParticleDef&,
-                                     const Medium&,
+                                     std::shared_ptr<const Medium>,
                                      const EnergyCutSettings&,
                                      const Definition&) const;
 
     CrossSection* CreatePhotonuclear(const ParticleDef&,
-                                     const Medium&,
+                                     std::shared_ptr<const Medium>,
                                      const EnergyCutSettings&,
                                      const Definition&,
                                      InterpolationDef) const;

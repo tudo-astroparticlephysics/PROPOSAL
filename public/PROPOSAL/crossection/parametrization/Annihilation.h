@@ -50,7 +50,7 @@ namespace PROPOSAL {
     class Annihilation : public Parametrization
     {
     public:
-        Annihilation(const ParticleDef&, const Medium&, double multiplier);
+        Annihilation(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
         Annihilation(const Annihilation&);
         virtual ~Annihilation();
 
@@ -77,13 +77,13 @@ namespace PROPOSAL {
     public:
         typedef std::vector<Interpolant*> InterpolantVec;
 
-        AnnihilationHeitler(const ParticleDef&, const Medium&, double multiplier);
+        AnnihilationHeitler(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
         AnnihilationHeitler(const AnnihilationHeitler&);
         virtual ~AnnihilationHeitler();
 
         virtual Parametrization* clone() const { return new AnnihilationHeitler(*this); }
         static Annihilation* create(const ParticleDef& particle_def,
-                                       const Medium& medium,
+                                       std::shared_ptr<const Medium> medium,
                                        double multiplier)
         {
             return new AnnihilationHeitler(particle_def, medium, multiplier);

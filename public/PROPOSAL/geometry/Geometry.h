@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <map>
+#include <memory>
 
 #include "PROPOSAL/math/Vector3D.h"
 
@@ -48,7 +49,8 @@ public:
     Geometry(const std::string, const Vector3D position);
     Geometry(const Geometry&);
 
-    virtual Geometry* clone() const = 0; // virtual constructor idiom (used for deep copies)
+    /* virtual Geometry* clone() const = 0; // virtual constructor idiom (used for deep copies) */
+    virtual std::shared_ptr<const Geometry> create() const = 0;
     virtual void swap(Geometry&);
 
     virtual ~Geometry(){};
@@ -90,7 +92,7 @@ public:
     /*!
      * Calculates the distance to the closest approch to the geometry center
      */
-    double DistanceToClosestApproach(const Vector3D& position, const Vector3D& direction);
+    double DistanceToClosestApproach(const Vector3D& position, const Vector3D& direction) const;
 
     // void swap(Geometry &geometry);
 
@@ -98,7 +100,7 @@ public:
     // Getter & Setter
     // ----------------------------------------------------------------- //
 
-    ParticleLocation::Enum GetLocation(const Vector3D& position, const Vector3D& direction);
+    ParticleLocation::Enum GetLocation(const Vector3D& position, const Vector3D& direction) const;
 
     Vector3D GetPosition() const { return position_; }
 

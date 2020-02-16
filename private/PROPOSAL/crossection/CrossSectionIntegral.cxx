@@ -18,7 +18,7 @@ CrossSectionIntegral::CrossSectionIntegral(const InteractionType& type, const Pa
     : CrossSection(type, param)
     , dedx_integral_(IROMB, IMAXS, IPREC)
     , de2dx_integral_(IROMB, IMAXS, IPREC)
-    , dndx_integral_(param.GetMedium().GetNumComponents(), Integral(IROMB, IMAXS, IPREC))
+    , dndx_integral_(param.GetMedium()->GetNumComponents(), Integral(IROMB, IMAXS, IPREC))
 {
 }
 

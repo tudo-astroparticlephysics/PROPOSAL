@@ -31,6 +31,7 @@
 
 #include <map>
 #include <functional>
+#include <memory>
 
 #include "PROPOSAL/methods.h"
 
@@ -85,7 +86,7 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         typedef std::function<Annihilation*(const ParticleDef&,
-                                               const Medium&,
+                                               std::shared_ptr<const Medium>,
                                                double multiplier)>
                 RegisterFunction;
 
@@ -100,11 +101,11 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         CrossSection* CreateAnnihilation(const ParticleDef&,
-                                            const Medium&,
+                                            std::shared_ptr<const Medium>,
                                             const Definition&) const;
 
         CrossSection* CreateAnnihilation(const ParticleDef&,
-                                            const Medium&,
+                                            std::shared_ptr<const Medium>,
                                             const Definition&,
                                             InterpolationDef) const;
 
