@@ -68,6 +68,7 @@ class Utility {
 
         bool operator==(const Utility::Definition& utility_def) const;
         bool operator!=(const Utility::Definition& utility_def) const;
+        friend std::ostream& operator<<(std::ostream&, Definition const&);
 
         Definition();
         ~Definition();
@@ -91,6 +92,7 @@ class Utility {
 
     bool operator==(const Utility& utility) const;
     bool operator!=(const Utility& utility) const;
+    friend std::ostream& operator<<(std::ostream&, Utility const&);
 
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const Medium& GetMedium() const { return *medium_; }

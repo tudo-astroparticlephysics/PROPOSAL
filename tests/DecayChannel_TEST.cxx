@@ -193,13 +193,13 @@ TEST(DecaySpectrum, MuMinus_Rest){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -246,13 +246,13 @@ TEST(DecaySpectrum, MuMinus_Rest){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -300,13 +300,13 @@ TEST(DecaySpectrum, MuMinus_Rest){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -395,13 +395,13 @@ TEST(DecaySpectrum, MuMinus_Energy){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -449,13 +449,13 @@ TEST(DecaySpectrum, MuMinus_Energy){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -503,13 +503,13 @@ TEST(DecaySpectrum, MuMinus_Energy){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -597,13 +597,13 @@ TEST(DecaySpectrum, TauMinus_Rest){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -650,13 +650,13 @@ TEST(DecaySpectrum, TauMinus_Rest){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -704,13 +704,13 @@ TEST(DecaySpectrum, TauMinus_Rest){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -799,13 +799,13 @@ TEST(DecaySpectrum, TauMinus_energy){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -852,13 +852,13 @@ TEST(DecaySpectrum, TauMinus_energy){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -906,13 +906,13 @@ TEST(DecaySpectrum, TauMinus_energy){
         energy_sum = 0;
         for(DynamicData particle : aux.GetSecondaries()){
             aux_energy = particle.GetEnergy();
-            if(particle.GetTypeId() == p0.particle_type) {
+            if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p1.particle_type) {
+            else if(particle.GetType() == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetTypeId() == p2.particle_type) {
+            else if(particle.GetType() == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";

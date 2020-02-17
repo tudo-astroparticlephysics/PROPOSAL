@@ -204,13 +204,13 @@ def plot_track(mu_start, geo_detector, secondarys):
     for interaction in secondarys:
         if geo_detector.is_inside(interaction.position, interaction.direction):
             color = 'b'
-            if interaction.id == int(pp.particle.Interaction_Id.Brems):
+            if interaction.type == int(pp.particle.Interaction_Id.Brems):
                 color = 'b'
-            elif interaction.id == int(pp.particle.Interaction_Id.Epair):
+            elif interaction.type == int(pp.particle.Interaction_Id.Epair):
                 color = 'r'
-            elif interaction.id == int(pp.particle.Interaction_Id.NuclInt):
+            elif interaction.type == int(pp.particle.Interaction_Id.NuclInt):
                 color = 'm'
-            elif interaction.id == int(pp.particle.Interaction_Id.DeltaE):
+            elif interaction.type == int(pp.particle.Interaction_Id.DeltaE):
                 color = 'g'
             else:
                 color = 'k'

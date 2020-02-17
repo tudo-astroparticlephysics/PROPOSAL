@@ -31,6 +31,8 @@
 
 #include <map>
 #include <functional>
+#include <iostream>
+#include <sstream>
 
 #include "PROPOSAL/methods.h"
 
@@ -56,8 +58,8 @@ namespace PROPOSAL {
         struct Definition
         {
             Definition()
-                    : parametrization(None)
-                    , multiplier(1.0)
+                : parametrization(None)
+                , multiplier(1.0)
             {
             }
 
@@ -76,6 +78,19 @@ namespace PROPOSAL {
                 return !(*this == def);
             }
 
+            friend std::ostream& operator<<(std::ostream& os, PROPOSAL::AnnihilationFactory::Definition const& definition)
+            {
+                std::stringstream ss;
+                ss << " Annihilation Definition (" << &definition << ") ";
+                os << Helper::Centered(60, ss.str()) << '\n';
+
+                os << "Parametrization: " << definition.parametrization << std::endl;
+                os << "Multiplier: " << definition.multiplier << std::endl;
+
+                os << Helper::Centered(60, "");
+                return os;
+            }
+
             Enum parametrization;
             double multiplier;
         };
@@ -85,8 +100,8 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         typedef std::function<Annihilation*(const ParticleDef&,
-                                               const Medium&,
-                                               double multiplier)>
+                                            const Medium&,
+                                            double multiplier)>
                 RegisterFunction;
 
 

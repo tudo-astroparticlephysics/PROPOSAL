@@ -320,7 +320,7 @@ PROPOSAL_MAKE_HASHABLE(PROPOSAL::ParticleDef, t.mass, t.lifetime, t.charge)
 #undef PARTICLE_DEF
 
 namespace PROPOSAL {
-static std::map<const int, const ParticleDef&> Id_Particle_Map
+static std::map<const int, const ParticleDef&> Type_Particle_Map
 {
     {static_cast<int>(ParticleType::EMinus), EMinusDef::Get()},
     {static_cast<int>(ParticleType::EPlus), EPlusDef::Get()},

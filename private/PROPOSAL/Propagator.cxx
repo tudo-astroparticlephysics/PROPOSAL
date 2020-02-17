@@ -574,8 +574,7 @@ Secondaries Propagator::Propagate(
 
         if (std::abs(max_distance - p_condition->GetPropagatedDistance()) < PARTICLE_POSITION_RESOLUTION
             || p_condition->GetEnergy() <= minimal_energy
-            || p_condition->GetTypeId()
-                == static_cast<int>(InteractionType::Decay))
+            || p_condition->GetType() == static_cast<int>(InteractionType::Decay))
             break;
     }
     if (detector_->IsInside(

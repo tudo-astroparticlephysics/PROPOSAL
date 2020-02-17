@@ -7,20 +7,17 @@ def propagate_particle(propagator,
                        position=[-1e5, 0, 1e4],
                        direction=[1, 0, 0],
                        energy=1e9):
-    propagator.particle.position = pp.Vector3D(position[0],
-                                         position[1],
-                                         position[2])
-    tmp_dir = pp.Vector3D(direction[0],
-                          direction[1],
-                          direction[2])
+    mu_data = pp.particle.DynamicData(propagator.particle_def.particle_type)
+    mu_data.position = pp.Vector3D(position[0], position[1], position[2])
+    tmp_dir = pp.Vector3D(direction[0], direction[1], direction[2])
     tmp_dir.spherical_from_cartesian()
-    propagator.particle.direction = tmp_dir
+    mu_data.direction = tmp_dir
 
-    propagator.particle.energy = energy
-    propagator.particle.propagated_distance = 0
-    propagator.particle.time = 0
+    mu_data.energy = energy
+    mu_data.propagated_distance = 0
+    mu_data.time = 0
 
-    return propagator.propagate()
+    return propagator.propagate(mu_data)
 
 
 def main():
@@ -89,7 +86,6 @@ def main():
                            direction=start_directions[jdx],
                            energy=start_energies[jdx]).particles
 
-        # print(prop.particle)
         nsecs = len(secondarys) # to get rid of the decay neutrinos
         positions = np.empty((nsecs, 3))
         secs_energy = np.empty(nsecs)
@@ -102,23 +98,23 @@ def main():
                                        secondarys[idx].position.z])
             secs_energy[idx] = secondarys[idx].energy
             mu_energies[idx] = secondarys[idx].parent_particle_energy
-            if secondarys[idx].id == int(pp.particle.Interaction_Id.Epair):
+            if secondarys[idx].type == int(pp.particle.Interaction_Id.Epair):
                 secs_ids[idx] = 0
-            elif secondarys[idx].id == int(pp.particle.Interaction_Id.Brems):
+            elif secondarys[idx].type == int(pp.particle.Interaction_Id.Brems):
                 secs_ids[idx] = 1
-            elif secondarys[idx].id == int(pp.particle.Interaction_Id.DeltaE):
+            elif secondarys[idx].type == int(pp.particle.Interaction_Id.DeltaE):
                 secs_ids[idx] = 2
-            elif secondarys[idx].id == int(pp.particle.Interaction_Id.NuclInt):
+            elif secondarys[idx].type == int(pp.particle.Interaction_Id.NuclInt):
                 secs_ids[idx] = 3
             # decay
-            elif secondarys[idx].id == int(pp.particle.Particle_Id.EMinus):
+            elif secondarys[idx].type == int(pp.particle.Particle_Id.EMinus):
                 secs_ids[idx] = 4
-            elif secondarys[idx].id == int(pp.particle.Particle_Id.NuMu):
+            elif secondarys[idx].type == int(pp.particle.Particle_Id.NuMu):
                 secs_ids[idx] = 5
-            elif secondarys[idx].id == int(pp.particle.Particle_Id.NuEBar):
+            elif secondarys[idx].type == int(pp.particle.Particle_Id.NuEBar):
                 secs_ids[idx] = 5
             else:
-                print('unknown secondary id {}'.format(secondarys[idx].id))
+                print('unknown secondary id {}'.format(secondarys[idx].type))
 
         for idx in range(len(labels)):
             ax2.plot(positions[:,0][secs_ids == idx],
@@ -127,9 +123,11 @@ def main():
                     marker='.',
                     label=labels[idx])
 
-        end_position = np.array([[prop.particle.position.x,
-                                  prop.particle.position.y,
-                                  prop.particle.position.z]])
+        last_sec = secondarys[-1]
+
+        end_position = np.array([[last_sec.position.x,
+                                  last_sec.position.y,
+                                  last_sec.position.z]])
 
         # now after ploting the losss, one can add the start position/energy of the muon to plot it
         positions = np.concatenate(([start_positions[jdx]],

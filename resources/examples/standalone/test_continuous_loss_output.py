@@ -55,8 +55,8 @@ if __name__ == "__main__":
                 continue
             if idx > len(secondaries) - 2:
                 break
-            if sec.id == int(pp.particle.Interaction_Id.ContinuousEnergyLoss):
-                if secondaries[idx-1].id == int(pp.particle.Interaction_Id.ContinuousEnergyLoss) or secondaries[idx+1].id == int(pp.particle.Interaction_Id.ContinuousEnergyLoss):
+            if sec.type == int(pp.particle.Interaction_Id.ContinuousEnergyLoss):
+                if secondaries[idx-1].type == int(pp.particle.Interaction_Id.ContinuousEnergyLoss) or secondaries[idx+1].type == int(pp.particle.Interaction_Id.ContinuousEnergyLoss):
                     print("2 Continuous Losses in a row")
                     continue
                 energy_diff = secondaries[idx-1].parent_particle_energy - secondaries[idx-1].energy - secondaries[idx+1].parent_particle_energy

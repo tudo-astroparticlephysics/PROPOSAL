@@ -30,6 +30,8 @@
 #pragma once
 
 #include <functional>
+#include <iostream>
+#include <sstream>
 
 #include "PROPOSAL/methods.h"
 
@@ -73,6 +75,19 @@ namespace PROPOSAL {
             bool operator!=(const WeakInteractionFactory::Definition& def) const
             {
                 return !(*this == def);
+            }
+
+            friend std::ostream& operator<<(std::ostream& os, PROPOSAL::WeakInteractionFactory::Definition const& definition)
+            {
+                std::stringstream ss;
+                ss << " Weak Interaction Definition (" << &definition << ") ";
+                os << Helper::Centered(60, ss.str()) << '\n';
+
+                os << "Parametrization: " << definition.parametrization << std::endl;
+                os << "Multiplier: " << definition.multiplier << std::endl;
+
+                os << Helper::Centered(60, "");
+                return os;
             }
 
             Enum parametrization;

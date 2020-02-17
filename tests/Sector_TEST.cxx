@@ -372,7 +372,7 @@ TEST(Sector, Propagate)
 
             double energy_calc = secondaries.GetSecondaries().back().GetEnergy();
             DynamicData last_condition = secondaries.GetSecondaries().back();
-            if (last_condition.GetTypeId() != static_cast<int>(InteractionType::Decay)) {
+            if (last_condition.GetType() != static_cast<int>(InteractionType::Decay)) {
                 ASSERT_NEAR(last_condition.GetEnergy(), energy, std::abs(1e-3 * energy_calc));
             } else {
                 ASSERT_NEAR(-last_condition.GetPropagatedDistance(), energy, std::abs(1e-3 * energy_calc));

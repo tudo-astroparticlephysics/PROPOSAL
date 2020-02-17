@@ -88,7 +88,7 @@ bool ScatteringHighlandIntegral::compare(const Scattering& scattering) const
 
 void ScatteringHighlandIntegral::print(std::ostream& os) const
 {
-    os << "Medium: " << scatter_->GetUtility().GetMedium() << '\n';
+    os << "Propagation Utility:\n" << scatter_->GetUtility() << '\n';
 }
 
 //----------------------------------------------------------------------------//

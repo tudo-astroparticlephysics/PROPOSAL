@@ -33,6 +33,8 @@
 
 #include <map>
 #include <string>
+#include <iostream>
+#include <sstream>
 
 #include "PROPOSAL/methods.h"
 
@@ -101,6 +103,21 @@ public:
         bool operator!=(const PhotonuclearFactory::Definition& def) const
         {
             return !(*this == def);
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, PROPOSAL::PhotonuclearFactory::Definition const& definition)
+        {
+            std::stringstream ss;
+            ss << " Photonuclear Definition (" << &definition << ") ";
+            os << Helper::Centered(60, ss.str()) << '\n';
+
+            os << "Parametrization: " << definition.parametrization << std::endl;
+            os << "Multiplier: " << definition.multiplier << std::endl;
+            os << "Shadowing Parametrization: " << definition.shadow << std::endl;
+            os << "Hard Component: " << definition.hard_component << std::endl;
+
+            os << Helper::Centered(60, "");
+            return os;
         }
 
         Enum parametrization;
