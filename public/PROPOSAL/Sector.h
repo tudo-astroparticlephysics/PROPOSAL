@@ -120,6 +120,7 @@ public:
 
     bool operator==(const Sector&) const;
     bool operator!=(const Sector&) const;
+    friend std::ostream& operator<<(std::ostream&, Sector const&);
 
     // Sector& operator=(const Sector& collection);
     // friend std::ostream& operator<<(std::ostream& os, Sector const&

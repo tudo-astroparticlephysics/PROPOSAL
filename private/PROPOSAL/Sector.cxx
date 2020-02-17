@@ -304,6 +304,22 @@ bool Sector::operator!=(const Sector& sector) const
     return !(*this == sector);
 }
 
+std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::Sector const& sector)
+{
+    std::stringstream ss;
+    ss << " Sector (" << &sector << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "Sector Definition:\n" << sector.sector_def_ << std::endl;
+    os << "Particle Definition:\n" << sector.particle_def_ << std::endl;
+    os << "Geometry:\n" << *sector.geometry_ << std::endl;
+    os << "Propagation Utility:\n" << sector.utility_ << std::endl;
+    os << "Scattering:\n" << *sector.scattering_ << std::endl;
+
+    os << Helper::Centered(60, "");
+    return os;
+}
+
 Sector::~Sector()
 {
     delete geometry_;

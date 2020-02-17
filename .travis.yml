@@ -89,12 +89,12 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
+            - llvm-toolchain-trusty-9
           packages:
-            - clang-9.0
+            - clang-9
             - g++-9
       env:
-        - MATRIX_EVAL="CC=clang-9.0 && CXX=clang++-9.0"
+        - MATRIX_EVAL="CC=clang-9 && CXX=clang++-9"
 
     # - os: osx
     #   osx_image: xcode8
