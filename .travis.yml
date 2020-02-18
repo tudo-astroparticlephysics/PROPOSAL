@@ -49,7 +49,7 @@ git:
 matrix:
   include:
     - os: linux
-      dist: trusty
+      dist: xenial
       addons:
         apt:
           sources:
@@ -89,12 +89,12 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-9
+            - llvm-toolchain-xenial-8
           packages:
-            - clang-9
-            - g++-9
+            - clang-8
+            - g++-8
       env:
-        - MATRIX_EVAL="CC=clang-9 && CXX=clang++-9"
+        - MATRIX_EVAL="CC=clang-8 && CXX=clang++-8"
 
     # - os: osx
     #   osx_image: xcode8
@@ -103,6 +103,9 @@ matrix:
     #     - MATRIX_EVAL="CC=clang && CXX=clang++"
 
 before_install:
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        sudo apt-get update -q || true;
+      fi
     - pyenv global system 3.7
     - eval "${MATRIX_EVAL}"
 
