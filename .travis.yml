@@ -71,12 +71,12 @@ matrix:
         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
 
     - os: linux
-      dist: trusty
+      dist: xenial
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
+            - llvm-toolchain-xenial-3.6
           packages:
             - clang-3.6
             - g++-4.9
@@ -103,7 +103,7 @@ matrix:
     #     - MATRIX_EVAL="CC=clang && CXX=clang++"
 
 before_install:
-    - pyenv global system 3.6
+    - pyenv global system 3.7
     - eval "${MATRIX_EVAL}"
 
 install:
