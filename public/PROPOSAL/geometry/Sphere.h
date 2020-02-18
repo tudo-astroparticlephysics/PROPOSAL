@@ -30,6 +30,7 @@
 #pragma once
 
 #include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -39,6 +40,7 @@ public:
     Sphere();
     Sphere(const Vector3D position, double radius, double inner_radius);
     Sphere(const Sphere&);
+    Sphere(const nlohmann::json& config);
 
     /* Geometry* clone() const override{ return new Sphere(*this); }; */
     std::shared_ptr<const Geometry> create() const override{ return std::shared_ptr<const Geometry>( new Sphere(*this) ); }

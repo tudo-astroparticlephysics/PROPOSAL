@@ -47,6 +47,21 @@ Vector3D::Vector3D(Vector3D&& other)
 {
 }
 
+Vector3D::Vector3D(const nlohmann::json& config)
+    : spherical_(0,0,0)
+{
+    if (config.is_array()) {
+        if (config.size() == 3) {
+            assert(config[0].is_number());
+            cartesian_.x_ = config[0].get<double>() * 100; // cm
+            assert(config[1].is_number());
+            cartesian_.y_ = config[1].get<double>() * 100; // cm
+            assert(config[2].is_number());
+            cartesian_.z_ = config[2].get<double>() * 100; // cm
+        }
+    }
+}
+
 
 // destructor
 Vector3D::~Vector3D() {}

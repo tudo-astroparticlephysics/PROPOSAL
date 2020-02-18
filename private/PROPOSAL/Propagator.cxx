@@ -25,7 +25,6 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
-#include "PROPOSAL/json.hpp"
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 
@@ -246,13 +245,21 @@ Propagator::Propagator(
     }
     particle_def_.decay_table.SetUniformSampling(uniform);
 
-    // Parse detector geometry
+    std::unique_ptr<Geometry> detector_geo;
     if (json_config.find("detector") != json_config.end()) {
-        std::string json_str = json_config["detector"].dump();
-        detector_ = ParseGeometryConfig(json_str);
-    } else {
-        log_fatal("You need to specify a detector geometry.");
+        std::string shape = json_config["detector"]["shape"];
+        if (shape == "sphere") {
+            detector_geo.reset(new Sphere(json_config["detector"]));
+        } else if (shape == "box") {
+            detector_geo.reset(new Box(json_config["detector"]));
+        } else if (shape == "cylinder") {
+            detector_geo.reset(new Cylinder(json_config["detector"]));
+        } else {
+            log_fatal("You need to specify a detector for each sector");
+        }
     }
+
+    detector_ = detector_geo->create();
 
     // Read in all sector definitions
     nlohmann::json json_sectors;
@@ -307,44 +314,37 @@ Propagator::Propagator(
         std::shared_ptr<const Medium> med = CreateMedium(medium_name, density_correction);
 
         // Create Geometry
-        std::shared_ptr<const Geometry> geo;
-
+        std::unique_ptr<Geometry> geo;
         if (json_sectors.find("geometry") != json_sectors.end()) {
-            std::string json_str = json_sectors["geometry"].dump();
-            geo= ParseGeometryConfig(json_str);
-        } else {
-            log_fatal("You need to specify a geometry for each sector");
+            std::string shape = json_sectors["geometry"]["shape"];
+            if (shape == "sphere") {
+                geo.reset(new Sphere(json_sectors["geometry"]));
+            } else if (shape == "box") {
+                geo.reset(new Box(json_sectors["geometry"]));
+            } else if (shape == "cylinder") {
+                geo.reset(new Cylinder(json_sectors["geometry"]));
+            } else {
+                log_fatal("You need to specify a geometry for each sector");
+            }
         }
 
-        /* double hierarchy = geometry->GetHierarchy(); */
-        /* if (json_sectors.find("hierarchy") != json_sectors.end()) { */
-        /*     if (json_sectors["hierarchy"].is_number()) { */
-        /*         hierarchy = json_sectors["hierarchy"].get<int>(); */
-        /*     } else { */
-        /*         log_fatal( */
-        /*             "Invalid input for option 'hierarchy'. Expected a number."); */
-        /*     } */
-        /* } else { */
-        /*     log_debug("The 'hierarchy' option is not set. Use default (0)"); */
-        /* } */
-        /* geometry->SetHierarchy(hierarchy); */
 
         /* auto geo = std::make_shared<const Geometry>(*geometry); */
         // Use global options in case they will not be overridden
         Sector::Definition sec_def_infront = sec_def_global;
         sec_def_infront.location = Sector::ParticleLocation::InfrontDetector;
         sec_def_infront.SetMedium(med);
-        sec_def_infront.SetGeometry(geo);
+        sec_def_infront.SetGeometry(geo->create());
 
         Sector::Definition sec_def_inside = sec_def_global;
         sec_def_inside.location = Sector::ParticleLocation::InsideDetector;
         sec_def_inside.SetMedium(med);
-        sec_def_inside.SetGeometry(geo);
+        sec_def_inside.SetGeometry(geo->create());
 
         Sector::Definition sec_def_behind = sec_def_global;
         sec_def_behind.location = Sector::ParticleLocation::BehindDetector;
         sec_def_behind.SetMedium(med);
-        sec_def_behind.SetGeometry(geo);
+        sec_def_behind.SetGeometry(geo->create());
 
         nlohmann::json json_cutsettings;
 
@@ -707,257 +707,6 @@ double Propagator::CalculateEffectiveDistance(
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-std::shared_ptr<const Geometry> Propagator::ParseGeometryConfig(const std::string& json_object_str)
-{
-    nlohmann::json json_object = nlohmann::json::parse(json_object_str);
-    if (!json_object.is_object()) {
-        log_fatal("This geometry option should be a json object.");
-    }
-
-    std::string origin_str = "origin";
-    std::string outer_radius_str = "outer_radius";
-    std::string inner_radius_str = "inner_radius";
-    std::string length_str = "length";
-    std::string width_str = "width";
-    std::string height_str = "height";
-
-    std::string warning_str
-        = "Geometry %s needs to specify \"%s\" in the config file!";
-
-    double cm_to_meter = 100.0;
-
-    // --------------------------------------------------------------------- //
-    // Get geometry from default constructor
-    // --------------------------------------------------------------------- //
-
-    std::shared_ptr<Geometry> geometry;
-
-    if (json_object.find("shape") != json_object.end()) {
-        if (json_object["shape"].is_string()) {
-            std::string name = json_object["shape"].get<std::string>();
-            geometry = GetGeometry(name);
-        } else {
-            log_fatal("Invalid input for option 'shape'. Expected a string.");
-        }
-    } else {
-        log_fatal(warning_str.c_str(), "", "shape");
-    }
-
-    // --------------------------------------------------------------------- //
-    // Get the position vector from the property tree
-    // --------------------------------------------------------------------- //
-
-    double x = 0;
-    double y = 0;
-    double z = 0;
-
-    if (json_object.find(origin_str) != json_object.end()) {
-        if (json_object[origin_str].is_array()) {
-            if (json_object[origin_str].size() == 3) {
-                for (size_t idx = 0; idx < json_object[origin_str]
-                                               .get<std::vector<double>>()
-                                               .size();
-                     idx++) {
-                    if (json_object[origin_str][idx].is_number()) {
-                        double coord
-                            = json_object[origin_str][idx].get<double>()
-                            * cm_to_meter;
-
-                        switch (idx) {
-                        case 0:
-                            x = coord;
-                            break;
-                        case 1:
-                            y = coord;
-                            break;
-                        case 2:
-                            z = coord;
-                            break;
-                        default:
-                            // Do nothing
-                            break;
-                        }
-                    } else {
-                        log_fatal("Invalid input for option 'origin'. Expected "
-                                  "an array consisting of three numbers, but "
-                                  "the objects in the array are no numbers.");
-                    }
-                }
-            } else {
-                log_fatal("Invalid input for option 'origin'. Expected an "
-                          "array consisting of three numbers, but the array "
-                          "has not the length three.");
-            }
-        } else {
-            log_fatal(
-                "Invalid input for option 'origin'. Expected an array "
-                "consisting of three numbers, but the input is not an array.");
-        }
-    } else {
-        log_fatal(warning_str.c_str(), "", "origin");
-    }
-
-    Vector3D vec(x, y, z);
-
-    double hierarchy = geometry->GetHierarchy();
-    if (json_object.find("hierarchy") != json_object.end()) {
-        if (json_object["hierarchy"].is_number()) {
-            hierarchy = json_object["hierarchy"].get<int>();
-        } else {
-            log_fatal(
-                "Invalid input for option 'hierarchy'. Expected a number.");
-        }
-    } else {
-        log_debug("The 'hierarchy' option is not set. Use default (0)");
-    }
-
-    // --------------------------------------------------------------------- //
-    // Check type of geometry and set members
-    // --------------------------------------------------------------------- //
-    
-    if (geometry->GetName() == "Sphere") {
-        auto sphere = std::dynamic_pointer_cast<Sphere>(geometry);
-        double radius = 0;
-        double inner_radius = 0;
-        sphere->SetHierarchy(hierarchy);
-
-        if (json_object.find(outer_radius_str) != json_object.end()) {
-            if (json_object[outer_radius_str].is_number()) {
-                radius
-                    = json_object[outer_radius_str].get<double>() * cm_to_meter;
-            } else {
-                log_fatal("Invalid input for option 'outer_radius'. Expected a "
-                          "number.");
-            }
-        } else {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(),
-                outer_radius_str.c_str());
-        }
-
-        if (json_object.find(inner_radius_str) != json_object.end()) {
-            if (json_object[inner_radius_str].is_number()) {
-                inner_radius
-                    = json_object[inner_radius_str].get<double>() * cm_to_meter;
-            } else {
-                log_fatal("Invalid input for option 'inner_radius'. Expected a "
-                          "number.");
-            }
-        } else {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(),
-                inner_radius_str.c_str());
-        }
-
-        sphere->SetPosition(vec);
-        sphere->SetRadius(radius);
-        sphere->SetInnerRadius(inner_radius);
-
-        return sphere->create();
-    } else if (geometry->GetName() == "Box") {
-        auto box = std::static_pointer_cast<Box>(geometry);
-        double x = 0;
-        double y = 0;
-        double z = 0;
-        box->SetHierarchy(hierarchy);
-
-        if (json_object.find(length_str) != json_object.end()) {
-            if (json_object[length_str].is_number()) {
-                x = json_object[length_str].get<double>() * cm_to_meter;
-            } else {
-                log_fatal(
-                    "Invalid input for option 'length'. Expected a number.");
-            }
-        } else {
-            log_fatal(warning_str.c_str(), box->GetName().c_str(),
-                length_str.c_str());
-        }
-
-        if (json_object.find(width_str) != json_object.end()) {
-            if (json_object[width_str].is_number()) {
-                y = json_object[width_str].get<double>() * cm_to_meter;
-            } else {
-                log_fatal(
-                    "Invalid input for option 'width'. Expected a number.");
-            }
-        } else {
-            log_fatal(
-                warning_str.c_str(), box->GetName().c_str(), width_str.c_str());
-        }
-
-        if (json_object.find(height_str) != json_object.end()) {
-            if (json_object[height_str].is_number()) {
-                z = json_object[height_str].get<double>() * cm_to_meter;
-            } else {
-                log_fatal(
-                    "Invalid input for option 'height'. Expected a number.");
-            }
-        } else {
-            log_fatal(warning_str.c_str(), box->GetName().c_str(),
-                height_str.c_str());
-        }
-
-        box->SetPosition(vec);
-        box->SetX(x);
-        box->SetY(y);
-        box->SetZ(z);
-
-        return box->create();
-    } else if (geometry->GetName() == "Cylinder") {
-        auto cylinder = std::static_pointer_cast<Cylinder>(geometry);
-        double radius = 0;
-        double inner_radius = 0;
-        double z = 0;
-        cylinder->SetHierarchy(hierarchy);
-
-        if (json_object.find(outer_radius_str) != json_object.end()) {
-            if (json_object[outer_radius_str].is_number()) {
-                radius
-                    = json_object[outer_radius_str].get<double>() * cm_to_meter;
-            } else {
-                log_fatal("Invalid input for option 'outer_radius'. Expected a "
-                          "number.");
-            }
-        } else {
-            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(),
-                outer_radius_str.c_str());
-        }
-
-        if (json_object.find(inner_radius_str) != json_object.end()) {
-            if (json_object[inner_radius_str].is_number()) {
-                inner_radius
-                    = json_object[inner_radius_str].get<double>() * cm_to_meter;
-            } else {
-                log_fatal("Invalid input for option 'inner_radius'. Expected a "
-                          "number.");
-            }
-        } else {
-            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(),
-                inner_radius_str.c_str());
-        }
-
-        if (json_object.find(height_str) != json_object.end()) {
-            if (json_object[height_str].is_number()) {
-                z = json_object[height_str].get<double>() * cm_to_meter;
-            } else {
-                log_fatal(
-                    "Invalid input for option 'height'. Expected a number.");
-            }
-        } else {
-            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(),
-                height_str.c_str());
-        }
-
-        cylinder->SetPosition(vec);
-        cylinder->SetRadius(radius);
-        cylinder->SetInnerRadius(inner_radius);
-        cylinder->SetZ(z);
-
-        return cylinder->create();
-    } else {
-        log_fatal("Dynamic casts of Geometries failed. Should not end here!");
-        return NULL;
-    }
-}
-
 InterpolationDef Propagator::CreateInterpolationDef(
     const std::string& json_object_str)
 {

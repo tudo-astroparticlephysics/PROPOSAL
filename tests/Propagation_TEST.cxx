@@ -115,66 +115,63 @@ TEST(Assignment, Copyconstructor2)
     EXPECT_TRUE(prop_a == prop_b);
 }
 
-/* TEST(Propagation, Test_nan) */
-/* { */
-/*     int statistic = 10; */
-/*     int EmaxLog10 = 8; */
+TEST(Propagation, Test_nan)
+{
+    int statistic = 10;
+    int EmaxLog10 = 8;
 
-/*     // Define Particles */
-/*     ParticleDef mu_def = MuMinusDef::Get(); */
-/*     ParticleDef tau_def = TauMinusDef::Get(); */
-/*     DynamicData mu(mu_def.particle_type); */
-/*     DynamicData tau(tau_def.particle_type); */
+    // Define Particles
+    ParticleDef mu_def = MuMinusDef::Get();
+    ParticleDef tau_def = TauMinusDef::Get();
+    DynamicData mu(mu_def.particle_type);
+    DynamicData tau(tau_def.particle_type);
 
-/*     // one propagator for each particle definition */
-/*     // medium/detector configuration */
-/*     Propagator prop_mu(mu_def, "resources/config_ice.json"); */
-/*     /1* Propagator prop_tau(tau_def, "resources/config_ice.json"); *1/ */
+    // one propagator for each particle definition
+    // medium/detector configuration
+    Propagator prop_mu(mu_def, "resources/config_ice.json");
+    Propagator prop_tau(tau_def, "resources/config_ice.json");
 
-/*     // Possibility to register propagator in a service */
-/*     PropagatorService prop_service; */
-/*     prop_service.RegisterPropagator(prop_mu); */
-/*     prop_service.RegisterPropagator(prop_tau); */
+    // Possibility to register propagator in a service
+    PropagatorService prop_service;
+    prop_service.RegisterPropagator(prop_mu);
+    prop_service.RegisterPropagator(prop_tau);
 
-/*     for (int i = 0; i < statistic; i++) */
-/*     { */
-/*         // ----------------------------------------------------------------- // */
-/*         // Using propagator service */
-/*         // ----------------------------------------------------------------- // */
+    for (int i = 0; i < statistic; i++)
+    {
+        // ----------------------------------------------------------------- //
+        // Using propagator service
+        // ----------------------------------------------------------------- //
 
-/*         std::cout << i << std::endl; */
-/*         // Set particle properties */
-/*         mu.SetEnergy(std::pow(10, EmaxLog10)); */
-/*         mu.SetPropagatedDistance(0); */
-/*         mu.SetPosition(Vector3D(0, 0, 0)); */
-/*         mu.SetDirection(Vector3D(0, 0, -1)); */
+        // Set particle properties
+        mu.SetEnergy(std::pow(10, EmaxLog10));
+        mu.SetPropagatedDistance(0);
+        mu.SetPosition(Vector3D(0, 0, 0));
+        mu.SetDirection(Vector3D(0, 0, -1));
 
-/*         tau.SetEnergy(std::pow(10, EmaxLog10)); */
-/*         tau.SetPropagatedDistance(0); */
-/*         tau.SetPosition(Vector3D(0, 0, 0)); */
-/*         tau.SetDirection(Vector3D(0, 0, -1)); */
+        tau.SetEnergy(std::pow(10, EmaxLog10));
+        tau.SetPropagatedDistance(0);
+        tau.SetPosition(Vector3D(0, 0, 0));
+        tau.SetDirection(Vector3D(0, 0, -1));
 
-/*         // Use service to propagate different particle */
-/*         std::cout << "Muon" << std::endl; */
-/*         Secondaries sec_mu  = prop_service.Propagate(mu_def, mu); */
-/*         std::cout << "Tau" << std::endl; */
-/*         Secondaries sec_tau = prop_service.Propagate(tau_def, tau); */
+        // Use service to propagate different particle
+        Secondaries sec_mu  = prop_service.Propagate(mu_def, mu);
+        Secondaries sec_tau = prop_service.Propagate(tau_def, tau);
 
-/*         // ----------------------------------------------------------------- // */
-/*         // Using propagator directly */
-/*         // ----------------------------------------------------------------- // */
+        // ----------------------------------------------------------------- //
+        // Using propagator directly
+        // ----------------------------------------------------------------- //
 
-/*         // Therefor its needed to get the internal created particle first */
-/*         // Particle& particle = prop_mu.GetParticle(); */
+        // Therefor its needed to get the internal created particle first
+        // Particle& particle = prop_mu.GetParticle();
 
-/*         mu.SetEnergy(std::pow(10, EmaxLog10)); */
-/*         mu.SetPropagatedDistance(0); */
-/*         mu.SetPosition(Vector3D(0, 0, 0)); */
-/*         mu.SetDirection(Vector3D(0, 0, -1)); */
+        mu.SetEnergy(std::pow(10, EmaxLog10));
+        mu.SetPropagatedDistance(0);
+        mu.SetPosition(Vector3D(0, 0, 0));
+        mu.SetDirection(Vector3D(0, 0, -1));
 
-/*         Secondaries sec_mu_direct = prop_mu.Propagate(mu); */
-/*     } */
-/* } */
+        Secondaries sec_mu_direct = prop_mu.Propagate(mu);
+    }
+}
 
 TEST(Propagation, particle_type)
 {
@@ -233,30 +230,6 @@ TEST(Propagation, particle_type)
 
         for (unsigned int j = 0; j < sec_mu_direct.size(); ++j)
         {
-            // if (sec_mu_direct[j].GetTypeId() == DynamicData::Particle)
-            // {
-            //     Particle* particle = dynamic_cast<Particle*>(sec_mu_direct[j]);
-            //     name_new           = particle->GetName();
-            // } else
-            // {
-            //     switch (sec_mu_direct[j].GetTypeId())
-            //     {
-            //         case DynamicData::Brems:
-            //             name_new = "Brems";
-            //             break;
-            //         case DynamicData::Epair:
-            //             name_new = "Epair";
-            //             break;
-            //         case DynamicData::NuclInt:
-            //             name_new = "NuclInt";
-            //             break;
-            //         case DynamicData::DeltaE:
-            //             name_new = "DeltaE";
-            //             break;
-            //         default:
-            //             break;
-            //     }
-            // }
             name_new = sec_mu_direct[j].GetName();
 
             in >> name >> length >> sec_energy >> x >> y >> z >> dx >> dy >> dz;

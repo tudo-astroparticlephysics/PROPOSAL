@@ -34,6 +34,8 @@
 #include <memory>
 
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/json.hpp"
+
 
 namespace PROPOSAL {
 
@@ -48,6 +50,7 @@ public:
     Geometry(const std::string);
     Geometry(const std::string, const Vector3D position);
     Geometry(const Geometry&);
+    Geometry(const nlohmann::json&);
 
     /* virtual Geometry* clone() const = 0; // virtual constructor idiom (used for deep copies) */
     virtual std::shared_ptr<const Geometry> create() const = 0;
@@ -105,6 +108,7 @@ public:
     Vector3D GetPosition() const { return position_; }
 
     std::string GetName() const { return name_; }
+
     unsigned int GetHierarchy() const { return hierarchy_; }
 
     void SetPosition(const Vector3D& position) { position_ = position; };

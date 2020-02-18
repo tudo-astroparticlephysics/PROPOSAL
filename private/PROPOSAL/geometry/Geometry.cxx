@@ -10,6 +10,7 @@
 #include "PROPOSAL/geometry/Geometry.h"
 
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 
@@ -63,6 +64,19 @@ Geometry::Geometry(const Geometry& geometry)
 {
 }
 
+Geometry::Geometry(const nlohmann::json& config)
+{
+    if (config.find("origin") !=config.end()) {
+        position_ = Vector3D(config["origin"]);
+    }
+    if (config.find("hierarchy") != config.end()) {
+        assert(config["hierarchy"].is_number());
+        hierarchy_ = config["hierarchy"].get<int>();
+    } else {
+        log_debug("The 'hierarchy' option is not set. Use default (0)");
+    }
+}
+
 // ------------------------------------------------------------------------- //
 void Geometry::swap(Geometry& geometry)
 {
@@ -70,6 +84,8 @@ void Geometry::swap(Geometry& geometry)
     name_.swap(geometry.name_);
     std::swap(hierarchy_, geometry.hierarchy_);
 }
+
+
 
 // ------------------------------------------------------------------------- //
 Geometry& Geometry::operator=(const Geometry& geometry)
