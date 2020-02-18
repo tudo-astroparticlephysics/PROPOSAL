@@ -399,8 +399,8 @@ double UtilityDecorator::FunctionToIntegral(double energy) {
 double UtilityDecorator::Calculate(double ei,
                                    double ef,
                                    double rnd,
-                                   Vector3D xi,
-                                   Vector3D direction) {
+                                   const Vector3D& xi,
+                                   const Vector3D& direction) {
     (void)xi;
     (void)direction;
 

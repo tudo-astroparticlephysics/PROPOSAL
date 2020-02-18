@@ -81,8 +81,8 @@ double UtilityIntegralDisplacement::Calculate(double ei,
 double UtilityIntegralDisplacement::Calculate(double ei,
                                               double ef,
                                               double distance_to_border,
-                                              Vector3D xi,
-                                              Vector3D direction) {
+                                              const Vector3D& xi,
+                                              const Vector3D& direction) {
     double aux = integral_.IntegrateWithRandomRatio(
         ei, ef,
         std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, this,

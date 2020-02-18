@@ -7,19 +7,17 @@
 
 // #include <cmath>
 
-#include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 #include <fstream>
 #include <memory>
 
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
 
 #include "PROPOSAL/geometry/Box.h"
 #include "PROPOSAL/geometry/Cylinder.h"
 #include "PROPOSAL/geometry/GeometryFactory.h"
 #include "PROPOSAL/geometry/Sphere.h"
-
-#include "PROPOSAL/medium/MediumFactory.h"
 
 #include "PROPOSAL/particle/Particle.h"
 

@@ -1,10 +1,10 @@
-#include "PROPOSAL/medium/density_distr/density_polynomial.h"
+
 #include <algorithm>
 #include <cmath>
 #include <functional>
 #include <iostream>
-#include "PROPOSAL/math/Function.h"
 #include "PROPOSAL/math/MathMethods.h"
+#include "PROPOSAL/medium/density_distr/density_polynomial.h"
 
 using namespace PROPOSAL;
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

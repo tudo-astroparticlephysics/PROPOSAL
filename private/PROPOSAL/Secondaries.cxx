@@ -1,8 +1,8 @@
+
 #include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/math/RandomGenerator.h"
-#include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/geometry/Geometry.h"
 
 #include <memory>
 #include <vector>

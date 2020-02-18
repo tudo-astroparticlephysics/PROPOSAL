@@ -41,15 +41,12 @@
 #include "PROPOSAL/crossection/factories/AnnihilationFactory.h"
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/particle/Particle.h"
 
 namespace PROPOSAL {
 
 class CrossSection;
-class Medium;
 
 struct InterpolationDef;
 
@@ -134,7 +131,7 @@ class UtilityDecorator {
     // Methods
     virtual double FunctionToIntegral(double energy);
     virtual double Calculate(double ei, double ef, double rnd) = 0;
-    virtual double Calculate(double, double, double, Vector3D, Vector3D);
+    virtual double Calculate(double, double, double, const Vector3D&, const Vector3D&);
     virtual double GetUpperLimit(double ei, double rnd) = 0;
 
     const Utility& GetUtility() const { return utility_; }

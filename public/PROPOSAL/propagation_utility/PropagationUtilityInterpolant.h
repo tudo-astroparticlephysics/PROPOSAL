@@ -141,7 +141,7 @@ public:
 
     // Methods
     double Calculate(double ei, double ef, double rnd);
-    double Calculate(double ei, double ef, double rnd, Vector3D xi, Vector3D direction);
+    double Calculate(double ei, double ef, double rnd, const Vector3D& xi, const Vector3D& direction);
     double GetUpperLimit(double ei, double rnd);
 
 private:

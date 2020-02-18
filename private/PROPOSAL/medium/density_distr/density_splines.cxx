@@ -1,9 +1,8 @@
-#include "PROPOSAL/medium/density_distr/density_splines.h"
+
 #include <algorithm>
 #include <functional>
 #include <iostream>
-#include "PROPOSAL/math/MathMethods.h"
-#include "PROPOSAL/math/Spline.h"
+#include "PROPOSAL/medium/density_distr/density_splines.h"
 
 using namespace PROPOSAL;
 

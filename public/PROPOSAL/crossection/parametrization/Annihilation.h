@@ -34,18 +34,9 @@
 #include <fstream>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
-#include "PROPOSAL/medium/Medium.h"
-
-#include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
-
-#include "PROPOSAL/methods.h"
 
 
 namespace PROPOSAL {
-
-    class Interpolant;
 
     class Annihilation : public Parametrization
     {
@@ -75,7 +66,6 @@ namespace PROPOSAL {
     class AnnihilationHeitler : public Annihilation
     {
     public:
-        typedef std::vector<Interpolant*> InterpolantVec;
 
         AnnihilationHeitler(const ParticleDef&, const Medium&, double multiplier);
         AnnihilationHeitler(const AnnihilationHeitler&);

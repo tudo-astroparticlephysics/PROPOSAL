@@ -32,10 +32,8 @@
 #include <string>
 #include <vector>
 
-#include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/density_distr/density_distr.h"
-#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
 
 #define MEDIUM_DEF(cls)                                          \
     class cls : public Medium {                                  \
@@ -106,9 +104,9 @@ class Medium {
     double GetD0() const { return d0_; }
     double GetR() const { return r_; }
     double GetMassDensity() const { return massDensity_; }
-    double GetCorrectedMassDensity(Vector3D xi) const { return massDensity_ * dens_distr_->Evaluate(xi); }
+    double GetCorrectedMassDensity(const Vector3D& xi) const { return massDensity_ * dens_distr_->Evaluate(xi); }
     double GetRadiationLength() const { return radiationLength_; }
-    double GetRadiationLength(Vector3D position) const;
+    double GetRadiationLength(const Vector3D& position) const;
     double GetMolDensity() const { return molDensity_; }
     std::string GetName() const { return name_; }
     double GetMM() const { return MM_; }

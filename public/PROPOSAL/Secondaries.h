@@ -27,17 +27,17 @@
 
 #pragma once
 
-#include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/particle/ParticleDef.h"
-
-#include "PROPOSAL/geometry/Geometry.h"
-#include "PROPOSAL/math/Vector3D.h"
-
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/math/Vector3D.h"
+
 namespace PROPOSAL {
+
+class Geometry;
 
 class Secondaries {
 
@@ -50,10 +50,7 @@ public:
 
     DynamicData& operator[](std::size_t idx) { return secondaries_[idx]; };
 
-    /* void push_back(const Particle& particle); */
     void push_back(const DynamicData& continuous_loss);
-    // void push_back(const Particle& particle, const int& secondary, const
-    // double& energyloss);
     void emplace_back(const int& type);
     void emplace_back(const int& type, const Vector3D& position,
         const Vector3D& direction, const double& energy,
