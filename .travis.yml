@@ -60,7 +60,7 @@ matrix:
          - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
 
     - os: linux
-      dist: trusty
+      dist: xenial
       addons:
         apt:
           sources:
@@ -84,12 +84,12 @@ matrix:
         - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
     - os: linux
-      dist: trusty
+      dist: xenial
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-9
+            - llvm-toolchain-xenial-9
           packages:
             - clang-9
             - g++-9
