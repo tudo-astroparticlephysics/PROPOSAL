@@ -129,7 +129,7 @@ TEST(ContinuousRandomization, Randomize_interpol) {
         first = false;
         energy_old = -1;
 
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
         EnergyCutSettings cut_settings(ecut, vcut);
         ParticleDef particle_def = getParticleDef(particleName);
 

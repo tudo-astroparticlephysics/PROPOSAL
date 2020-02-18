@@ -4,19 +4,8 @@
 #include <stdexcept>
 
 #include "PROPOSAL/Logging.h"
-#include "PROPOSAL/geometry/Box.h"
-#include "PROPOSAL/geometry/Cylinder.h"
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/geometry/GeometryFactory.h"
-#include "PROPOSAL/geometry/Sphere.h"
-
-namespace PROPOSAL {
-static std::map<const std::string, std::shared_ptr<Geometry>> Geometry_Map{
-    { "sphere", std::shared_ptr<Geometry>(new Sphere) },
-    { "box", std::shared_ptr<Geometry>(new Box) },
-    { "cylinder", std::shared_ptr<Geometry>(new Cylinder) },
-};
-} // namespace PROPOSAL
 
 namespace PROPOSAL {
 std::shared_ptr<Geometry> GetGeometry(std::string name)
@@ -32,7 +21,9 @@ std::shared_ptr<Geometry> GetGeometry(std::string name)
 
     throw std::invalid_argument("Geometry not found.");
 }
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
 std::shared_ptr<const Geometry> CreateGeometry(std::string name)
 {
     return GetGeometry(name)->create();

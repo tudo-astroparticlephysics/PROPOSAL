@@ -23,7 +23,7 @@ TEST(Comparison, Comparison_equal)
     Water D;
     EXPECT_TRUE(D == *C);
 
-    std::shared_ptr<const Medium> E = CreateMedium("IcE");
+    std::shared_ptr<const Medium> E = GetMedium("IcE");
     Ice F;
     EXPECT_TRUE(F == *E);
 
@@ -46,7 +46,7 @@ TEST(Comparison, Comparison_not_equal)
     std::unique_ptr<Medium> F(new Water(1.0));
     EXPECT_TRUE(*E != *F);
 
-    std::shared_ptr<const Medium> G = CreateMedium("WaTeR");
+    std::shared_ptr<const Medium> G = GetMedium("WaTeR");
     EXPECT_TRUE(*E != *G);
 
     Components::Hydrogen a;

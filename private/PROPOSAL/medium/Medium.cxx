@@ -721,3 +721,7 @@ double Medium::X0_inv(unsigned int Z, double M) {
     return 4. * ALPHA * RE * RE * NA / M *
            (Z * Z * (Lrad - fZ) + Z * Lrad_dash);
 }
+
+namespace PROPOSAL {
+const std::string GetMediumName( int enumVal ) { return Medium_Name[enumVal]; }
+} // namespace PROPOSAL

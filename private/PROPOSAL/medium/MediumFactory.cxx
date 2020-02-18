@@ -9,38 +9,33 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 
-namespace PROPOSAL {
-static std::map<const std::string, std::shared_ptr<Medium>> Medium_Map
-{
-    {"water", std::shared_ptr<Medium>(new Water)},
-    {"ice", std::shared_ptr<Medium>(new Ice)},
-    {"salt", std::shared_ptr<Medium>(new Salt)},
-    {"standardrock", std::shared_ptr<Medium>(new StandardRock)},
-    {"frejusrock", std::shared_ptr<Medium>(new FrejusRock)},
-    {"iron", std::shared_ptr<Medium>(new Iron)},
-    {"hydrogen", std::shared_ptr<Medium>(new Hydrogen)},
-    {"lead", std::shared_ptr<Medium>(new Lead)},
-    {"copper", std::shared_ptr<Medium>(new Copper)},
-    {"uranium", std::shared_ptr<Medium>(new Uranium)},
-    {"air", std::shared_ptr<Medium>(new Air)},
-    {"paraffin", std::shared_ptr<Medium>(new Paraffin)},
-    {"antareswater", std::shared_ptr<Medium>(new AntaresWater)},
-    {"cascadiabasinwater", std::shared_ptr<Medium>(new CascadiaBasinWater)},
-};
 
-std::shared_ptr<const Medium> CreateMedium(std::string name, double density_correction)
+namespace PROPOSAL {
+std::shared_ptr<Medium> GetMedium(Medium_Type type, double density_correction)
+{
+    std::unique_ptr<Density_distr> density_distr(new Density_homogeneous(density_correction));
+    auto searched_medium = Medium_Map.find(type);
+    if (searched_medium != Medium_Map.end()) {
+        searched_medium->second->SetDensityDistribution(*density_distr);
+    } else {
+        throw std::invalid_argument("Medium not found.");
+    }
+
+    return searched_medium->second;
+}
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+std::shared_ptr<Medium> GetMedium(std::string name, double density_correction)
 {
     std::transform(name.begin(), name.end(), name.begin(),
         [](unsigned char c){ return std::tolower(c); });
 
-    std::unique_ptr<Density_distr> density_distr(new Density_homogeneous(density_correction));
-    auto searched_medium = Medium_Map.find(name);
-    if (searched_medium != Medium_Map.end()) {
-        searched_medium->second->SetDensityDistribution(*density_distr);
-    } else {
-        log_fatal("Medium %s not registered!", name);
+    for (size_t id = 0; id < Medium_Name.size(); ++id) {
+        if (name ==Medium_Name[id]){
+            return GetMedium(static_cast<Medium_Type>(id), density_correction);
+        }
     }
-
-    return searched_medium->second->create();
+    throw std::invalid_argument("Medium not found.");
 }
 } // namespace PROPOSAL

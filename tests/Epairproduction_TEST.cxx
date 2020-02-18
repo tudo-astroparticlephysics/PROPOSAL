@@ -205,7 +205,7 @@ TEST(Epairproduction, Test_of_dEdx)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dEdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -252,7 +252,7 @@ TEST(Epairproduction, Test_of_dNdx)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dNdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -302,7 +302,7 @@ TEST(Epairproduction, Test_of_dNdx_rnd)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -356,7 +356,7 @@ TEST(Epairproduction, Test_Stochastic_Loss)
 
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -406,7 +406,7 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dEdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -456,7 +456,7 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dNdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -509,7 +509,7 @@ TEST(Epairproduction, Test_of_dNdxrnd_interpol)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;
@@ -563,7 +563,7 @@ TEST(Epairproduction, Test_of_e_interpol)
             stochastic_loss_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         EpairProductionFactory::Definition epair_def;

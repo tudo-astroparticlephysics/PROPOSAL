@@ -232,5 +232,19 @@ MEDIUM_DEF(AntaresWater)
 MEDIUM_DEF(CascadiaBasinWater)
 
 } // namespace PROPOSAL
-
 #undef MEDIUM_DEF
+
+namespace PROPOSAL {
+enum Medium_Type { WATER, ICE, SALT, STANDARDROCK, FREJUSROCK, IRON, HYDROGEN, LEAD,
+    COPPER, URANIUM, AIR, PARAFFIN, ANTARESWATER, CASCADIABASINWATER, };
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+static const std::array<std::string, 14>  Medium_Name = { "water", "ice", "salt", "standardrock",
+    "frejusrock", "iron", "hydrogen", "lead", "copper", "uranium", "air", "paraffin",
+    "antareswater", "cascadiabasinwater", };
+} // namespace PROPOSAL
+
+/* namespace PROPOSAL { */
+/* const std::string GetMediumName( int enumVal ); */
+/* } // namespace PROPOSAL */

@@ -182,7 +182,7 @@ TEST(Sector, Continuous)
             delete particle, sector, medium, cuts;
 
             cuts = new EnergyCutSettings(ecut, vcut);
-            std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+            std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
             particle = new ParticleDef(getParticleDef(particleName));
 
             sector_def.SetMedium(medium);
@@ -241,7 +241,7 @@ TEST(Sector, Stochastic)
             delete particle, sector, medium, cuts;
 
             cuts = new EnergyCutSettings(ecut, vcut);
-            std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+            std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
             particle = new ParticleDef(getParticleDef(particleName));
 
             sector_def.SetMedium(medium);
@@ -298,7 +298,7 @@ TEST(Sector, EnergyDisplacement)
             delete particle, sector, medium, cuts;
 
             cuts = new EnergyCutSettings(ecut, vcut);
-            std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+            std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
             particle = new ParticleDef(getParticleDef(particleName));
 
             sector_def.SetMedium(medium);
@@ -352,7 +352,7 @@ TEST(Sector, Propagate)
             delete particle, sector, medium, cuts;
 
             cuts = new EnergyCutSettings(ecut, vcut);
-            std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+            std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
             particle = new ParticleDef(getParticleDef(particleName));
 
             sector_def.SetMedium(medium);

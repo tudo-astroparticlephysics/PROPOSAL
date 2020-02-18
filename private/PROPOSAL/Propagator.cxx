@@ -311,7 +311,7 @@ Propagator::Propagator(
         } else {
             log_debug("The 'medium' option is not set. Use default (Water)");
         }
-        std::shared_ptr<const Medium> med = CreateMedium(medium_name, density_correction);
+        std::shared_ptr<const Medium> med = GetMedium(medium_name, density_correction)->create();
 
         // Create Geometry
         std::unique_ptr<Geometry> geo;

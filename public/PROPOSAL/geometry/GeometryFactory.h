@@ -33,6 +33,17 @@
 #include <map>
 
 #include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/geometry/Sphere.h"
+#include "PROPOSAL/geometry/Box.h"
+#include "PROPOSAL/geometry/Cylinder.h"
+
+namespace PROPOSAL {
+static std::map<const std::string, std::shared_ptr<Geometry>> Geometry_Map{
+    { "sphere", std::shared_ptr<Geometry>(new Sphere) },
+    { "box", std::shared_ptr<Geometry>(new Box) },
+    { "cylinder", std::shared_ptr<Geometry>(new Cylinder) },
+};
+} // namespace PROPOSAL
 
 namespace PROPOSAL {
 std::shared_ptr<Geometry> GetGeometry(std::string name);

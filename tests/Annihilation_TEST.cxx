@@ -161,7 +161,7 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;
@@ -206,7 +206,7 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;
@@ -255,7 +255,7 @@ stochastic_loss_stored;
 
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;
@@ -301,7 +301,7 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;
@@ -349,7 +349,7 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;
@@ -398,7 +398,7 @@ in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> 
 stochastic_loss_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;

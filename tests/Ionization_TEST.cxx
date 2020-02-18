@@ -164,7 +164,7 @@ TEST(Ionization, Test_of_dEdx)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
@@ -209,7 +209,7 @@ TEST(Ionization, Test_of_dNdx)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
 
         ParticleDef particle_def                = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium    = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium    = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
@@ -257,7 +257,7 @@ TEST(Ionization, Test_of_dNdx_rnd)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium    = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium    = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
@@ -306,7 +306,7 @@ TEST(Ionization, Test_Stochastic_Loss)
             stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
@@ -353,7 +353,7 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
@@ -401,7 +401,7 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
@@ -452,7 +452,7 @@ TEST(Ionization, Test_of_dNdxrnd_interpol)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
@@ -504,7 +504,7 @@ TEST(Ionization, Test_of_e_interpol)
             stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
