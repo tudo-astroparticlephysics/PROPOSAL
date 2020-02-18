@@ -109,12 +109,8 @@ public:
     };
 
 public:
-    // Sector(Particle&);
     Sector(const ParticleDef&, const Definition&);
     Sector(const ParticleDef&, const Definition&, const InterpolationDef&);
-    Sector(const ParticleDef&, const Sector&);
-    // Sector(Particle&, const Geometry&, const Utility&, const Scattering&,
-    // bool do_interpolation, const Definition& def = Definition());
     Sector(const Sector&);
     ~Sector();
 

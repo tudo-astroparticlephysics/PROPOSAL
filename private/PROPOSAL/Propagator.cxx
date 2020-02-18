@@ -121,7 +121,7 @@ Propagator::Propagator(const Propagator& propagator)
     , detector_(propagator.detector_->clone())
 {
     for (unsigned int i = 0; i < propagator.sectors_.size(); ++i) {
-        sectors_[i] = new Sector(particle_def_, *propagator.sectors_[i]);
+        sectors_[i] = new Sector(*propagator.sectors_[i]);
 
         if (propagator.sectors_[i] == propagator.current_sector_) {
             current_sector_ = sectors_[i];

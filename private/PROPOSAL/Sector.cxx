@@ -233,33 +233,6 @@ Sector::Sector(const ParticleDef& particle_def, const Definition& sector_def,
     }
 }
 
-Sector::Sector(const ParticleDef& particle_def, const Sector& sector)
-    : sector_def_(sector.sector_def_)
-    , particle_def_(particle_def)
-    , geometry_(sector.geometry_->clone())
-    , utility_(sector.utility_)
-    , displacement_calculator_(sector.displacement_calculator_->clone(utility_))
-    , interaction_calculator_(sector.interaction_calculator_->clone(utility_))
-    , decay_calculator_(sector.decay_calculator_->clone(utility_))
-    , exact_time_calculator_(NULL)
-    , cont_rand_(NULL)
-    , scattering_(sector.scattering_->clone(particle_def, utility_))
-{
-    if (particle_def_ != sector.GetParticleDef()) {
-        log_fatal("Particle definition should be equal to the sector particle "
-                  "definition!");
-    }
-
-    // These are optional, therfore check NULL
-    if (sector.exact_time_calculator_ != NULL) {
-        exact_time_calculator_ = sector.exact_time_calculator_->clone(utility_);
-    }
-
-    if (sector.cont_rand_ != NULL) {
-        cont_rand_ = new ContinuousRandomizer(utility_, *sector.cont_rand_);
-    }
-}
-
 Sector::Sector(const Sector& sector)
     : sector_def_(sector.sector_def_)
     , particle_def_(sector.particle_def_)
