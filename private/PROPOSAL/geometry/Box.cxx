@@ -38,18 +38,17 @@ Box::Box(const Box& box)
 Box::Box(const nlohmann::json& config)
     : Geometry(config)
 {
-    if (config.find("length") != config.end()) {
-        assert(config["length"].is_number());
-        x_ = config["length"].get<double>() * 100;
-    }
-    if (config.find("width") != config.end()) {
-        assert(config["width"].is_number());
-        y_ = config["width"].get<double>() * 100;
-    }
-    if (config.find("height") != config.end()) {
-        assert(config["height"].is_number());
-        z_ = config["height"].get<double>() * 100;
-    }
+    assert(config["length"].is_number());
+    assert(config["width"].is_number());
+    assert(config["height"].is_number());
+
+    x_ = config["length"].get<double>() * 100;
+    y_ = config["width"].get<double>() * 100;
+    z_ = config["height"].get<double>() * 100;
+
+    assert(x_ > 0);
+    assert(y_ > 0);
+    assert(z_ > 0);
 }
 
 // ------------------------------------------------------------------------- //

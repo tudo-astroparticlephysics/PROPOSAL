@@ -42,15 +42,13 @@ Sphere::Sphere(const Sphere& sphere)
 Sphere::Sphere(const nlohmann::json& config)
     : Geometry(config)
 {
+    assert(config.at("outer_radius").is_number());
 
-    if (config.find("outer_radius") != config.end()) {
-        assert(config["outer_radius"].is_number());
-        radius_ = config["outer_radius"].get<double>() * 100;
-    }
-    if (config.find("inner_radius") != config.end()) {
-        assert(config["inner_radius"].is_number());
-        inner_radius_ = config["inner_radius"].get<double>() * 100;
-    }
+    radius_ = config["outer_radius"].get<double>() * 100;
+    inner_radius_ = config.value("inner_radius", 0);
+
+    assert(inner_radius_ >= 0);
+    assert(radius_ > inner_radius_);
 }
 
 // ------------------------------------------------------------------------- //

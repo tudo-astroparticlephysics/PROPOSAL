@@ -66,14 +66,15 @@ Geometry::Geometry(const Geometry& geometry)
 
 Geometry::Geometry(const nlohmann::json& config)
 {
+    assert(config.is_object());
+
+    name_ = config.value("shape", "unknown");
+    hierarchy_ = config.value("hierarchy", 0);
+
     if (config.find("origin") !=config.end()) {
         position_ = Vector3D(config["origin"]);
-    }
-    if (config.find("hierarchy") != config.end()) {
-        assert(config["hierarchy"].is_number());
-        hierarchy_ = config["hierarchy"].get<int>();
     } else {
-        log_debug("The 'hierarchy' option is not set. Use default (0)");
+        position_ = Vector3D();
     }
 }
 
