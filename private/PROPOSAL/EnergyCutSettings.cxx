@@ -69,6 +69,14 @@ EnergyCutSettings::EnergyCutSettings(const double ecut, const double vcut)
 {
 }
 
+EnergyCutSettings::EnergyCutSettings(const nlohmann::json& config)
+{
+    assert(config.is_object());
+
+    ecut_ = config.value("e_cut", 500);
+    vcut_ = config.value("v_cut", 0.05);
+}
+
 //----------------------------------------------------------------------------//
 //-------------------------operators and swap function------------------------//
 //----------------------------------------------------------------------------//

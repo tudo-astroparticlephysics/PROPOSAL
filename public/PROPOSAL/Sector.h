@@ -38,6 +38,7 @@
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -68,6 +69,7 @@ public:
     public:
         Definition();
         Definition(const Definition&);
+        Definition(const nlohmann::json&);
         ~Definition();
 
         bool operator==(const Definition&) const;

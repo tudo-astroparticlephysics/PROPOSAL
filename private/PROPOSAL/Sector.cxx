@@ -41,7 +41,7 @@ Sector::Definition::Definition()
     , do_continuous_energy_loss_output(false)
     , do_exact_time_calculation(true)
     , only_loss_inside_detector(false)
-    , scattering_model(ScatteringFactory::HighlandIntegral)
+    , scattering_model(scattering_model)
     , location(Sector::ParticleLocation::InsideDetector)
     , utility_def()
     , cut_settings()
@@ -65,6 +65,27 @@ Sector::Definition::Definition(const Definition& def)
     , medium_(def.medium_)
     , geometry_(def.geometry_)
 {
+}
+
+Sector::Definition::Definition(const nlohmann::json& config)
+    : location(config)
+    , cut_settings(config)
+    , medium_(config)
+    , geometry_(config)
+    , utility_def(config)
+{
+    assert(config.is_object());
+
+    std::string scattering_model_str = config.value("scattering", "highland_integral");
+    scattering_model = ScatteringFactory::Get().GetEnumFromString(scattering_model_str);
+
+    do_stochastic_loss_weighting = config.value("stochastic_loss_weighting", false);
+    stochastic_loss_weighting = config.value("stochastic_loss_weighting", 0);
+    stopping_decay = config.value("stopping_decay", true);
+    do_continuous_randomization = config.value("cont_rand", true);
+    do_continuous_energy_loss_output = config.value("do_continuous_energy_loss_output", false);
+    do_exact_time_calculation = config.value("exact_time", true);
+    only_loss_inside_detector = config.value("only_loss_inside_detector", false);
 }
 
 bool Sector::Definition::operator==(const Definition& sector_def) const

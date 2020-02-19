@@ -29,6 +29,66 @@ Utility::Definition::Definition()
 {
 }
 
+Utility::Definition::Definition(const nlohmann::json& config)
+    // : do_interpolation(true)
+    // , interpolation_def()
+    : brems_def()
+    , compton_def()
+    , photo_def()
+    , epair_def()
+    , ioniz_def()
+    , mupair_def()
+    , weak_def()
+    , photopair_def()
+    , annihilation_def()
+{
+    assert(config.is_object());
+
+    std::string brems_str = config.value("brems", "none");
+    brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(brems_str);
+    brems_def.multiplier = config.value("brems_multiplier", 1.0);
+    brems_def.lpm_effect = config.value("lpm", true);
+
+    std::string compton_str = config.value("compton", "none");
+    compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(compton_str);
+    compton_def.multiplier = config.value("compton_multiplier", 1.0);
+
+    std::string photo_str = config.value("photo", "none");
+    photo_def.parametrization = PhotonuclearFactory::Get().GetEnumFromString(photo_str);
+    photo_def.multiplier = config.value("photo_multiplier", 1.0);
+    std::string photo_shadow = config.value("photo_shadow", "shadow_none");
+    photo_def.shadow = PhotonuclearFactory::Get().GetShadowEnumFromString(photo_shadow);
+    photo_def.hard_component = config.value("photo_hard_component", true);
+
+    std::string epair_str = config.value("epair", "none");
+    epair_def.parametrization = EpairProductionFactory::Get().GetEnumFromString(epair_str);
+    epair_def.multiplier = config.value("epair_multiplier", 1.0);
+    epair_def.lpm_effect = config.value("lpm", true);
+
+    std::string ioniz_str = config.value("ioniz", "none");
+    ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(ioniz_str);
+    ioniz_def.multiplier = config.value("ioniz_multiplier", 1.0);
+
+    std::string mupair_str = config.value("mupair", "none");
+    mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(mupair_str);
+    mupair_def.multiplier = config.value("mupair_multiplier", 1.0);
+    mupair_def.particle_output = config.value("mupair_particle_output", true);
+
+    std::string weak_str = config.value("weak", "none");
+    weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(weak_str);
+    weak_def.multiplier = config.value("weak_multiplier", 1.0);
+
+    std::string photopair_str = config.value("photopair", "none");
+    photopair_def.parametrization = PhotoPairFactory::Get().GetEnumFromString(photopair_str);
+    photopair_def.multiplier = config.value("photopair_multiplier", 1.0);
+    std::string photoangle_str = config.value("photangle", "PhotoAngleNoDeflection");
+    photopair_def.photoangle = PhotoPairFactory::Get().GetPhotoAngleEnumFromString(photoangle_str);
+
+    std::string annihilation_str = config.value("annihilation", "none");
+    annihilation_def.parametrization = AnnihilationFactory::Get().GetEnumFromString(annihilation_str);
+    annihilation_def.multiplier = config.value("annihilation_multiplier", 1.0);
+}
+
 
 bool Utility::Definition::operator==(
     const Utility::Definition& utility_def) const {

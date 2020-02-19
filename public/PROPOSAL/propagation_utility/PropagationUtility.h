@@ -45,6 +45,7 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -70,6 +71,7 @@ class Utility {
         bool operator!=(const Utility::Definition& utility_def) const;
 
         Definition();
+        Definition(const nlohmann::json&);
         ~Definition();
     };
 

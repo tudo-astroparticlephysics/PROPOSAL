@@ -30,6 +30,7 @@
 #pragma once
 
 #include <iostream>
+#include "PROPOSAL/json.hpp"
 
 
 namespace PROPOSAL {
@@ -60,6 +61,7 @@ public:
     EnergyCutSettings(const EnergyCutSettings&);
     EnergyCutSettings& operator=(const EnergyCutSettings& energyCutSettings);
     EnergyCutSettings(const double ecut, const double vcut);
+    EnergyCutSettings(const nlohmann::json&);
     bool operator==(const EnergyCutSettings& energyCutSettings) const;
     bool operator!=(const EnergyCutSettings& energyCutSettings) const;
     friend std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings);

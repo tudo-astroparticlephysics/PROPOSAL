@@ -31,6 +31,7 @@
 #include <utility>
 #include <memory>
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -51,6 +52,7 @@ class Scattering
 public:
     Scattering(const ParticleDef&);
     Scattering(const Scattering&);
+    /* Scattering(const nlohmann::json&); */
     virtual ~Scattering();
 
     bool operator==(const Scattering& scattering) const;
