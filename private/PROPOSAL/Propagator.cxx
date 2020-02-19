@@ -245,21 +245,18 @@ Propagator::Propagator(
     }
     particle_def_.decay_table.SetUniformSampling(uniform);
 
-    std::unique_ptr<Geometry> detector_geo;
     if (json_config.find("detector") != json_config.end()) {
         std::string shape = json_config["detector"]["shape"];
         if (shape == "sphere") {
-            detector_geo.reset(new Sphere(json_config["detector"]));
+            detector_ = std::make_shared<const Sphere>(json_config["detector"]);
         } else if (shape == "box") {
-            detector_geo.reset(new Box(json_config["detector"]));
+            detector_ = std::make_shared<const Box>(json_config["detector"]);
         } else if (shape == "cylinder") {
-            detector_geo.reset(new Cylinder(json_config["detector"]));
+            detector_ = std::make_shared<const Cylinder>(json_config["detector"]);
         } else {
-            log_fatal("You need to specify a detector for each sector");
+            throw std::invalid_argument("You need to specify a detector for each sector");
         }
     }
-
-    detector_ = detector_geo->create();
 
     // Read in all sector definitions
     nlohmann::json json_sectors;
@@ -277,20 +274,17 @@ Propagator::Propagator(
         log_fatal("The 'sectors' option is not set.");
     }
 
-    for (size_t idx = 0; idx < json_config["sectors"].size(); idx++) {
-        json_sectors = json_config["sectors"][idx];
-        if (!json_sectors.is_object()) {
+    for (const auto& json_sector: json_config["sectors"]) {
+        if (!json_sector.is_object()) {
             log_fatal("Invalid input for an object in 'sectors'. Each sector "
                       "must be a json object.");
         }
-        std::string json_sector_str = json_sectors.dump();
-
         // Create medium
         double density_correction = 1.0;
 
-        if (json_sectors.find("density_correction") != json_sectors.end()) {
-            if (json_sectors["density_correction"].is_number()) {
-                density_correction = json_sectors["density_correction"].get<double>();
+        if (json_sector.find("density_correction") != json_sector.end()) {
+            if (json_sector["density_correction"].is_number()) {
+                density_correction = json_sector["density_correction"].get<double>();
             } else {
                 log_fatal("Invalid input for option 'density_correction'. "
                           "Expected a number.");
@@ -301,9 +295,9 @@ Propagator::Propagator(
         }
 
         std::string medium_name = "water";
-        if (json_sectors.find("medium") != json_sectors.end()) {
-            if (json_sectors["medium"].is_string()) {
-                medium_name = json_sectors["medium"].get<std::string>();
+        if (json_sector.find("medium") != json_sector.end()) {
+            if (json_sector["medium"].is_string()) {
+                medium_name = json_sector["medium"].get<std::string>();
             } else {
                 log_fatal(
                     "Invalid input for option 'medium'. Expected a string.");
@@ -311,43 +305,42 @@ Propagator::Propagator(
         } else {
             log_debug("The 'medium' option is not set. Use default (Water)");
         }
-        std::shared_ptr<const Medium> med = GetMedium(medium_name, density_correction)->create();
+        std::shared_ptr<const Medium> med = GetMedium(medium_name, density_correction);
 
         // Create Geometry
-        std::unique_ptr<Geometry> geo;
-        if (json_sectors.find("geometry") != json_sectors.end()) {
-            std::string shape = json_sectors["geometry"]["shape"];
+        std::shared_ptr<const Geometry> geo;
+        if (json_sector.find("geometry") != json_sector.end()) {
+            std::string shape = json_sector["geometry"]["shape"];
             if (shape == "sphere") {
-                geo.reset(new Sphere(json_sectors["geometry"]));
+                geo = std::make_shared<const Sphere>(json_sector["geometry"]);
             } else if (shape == "box") {
-                geo.reset(new Box(json_sectors["geometry"]));
+                geo = std::make_shared<const Box>(json_sector["geometry"]);
             } else if (shape == "cylinder") {
-                geo.reset(new Cylinder(json_sectors["geometry"]));
+                geo = std::make_shared<const Cylinder>(json_sector["geometry"]);
             } else {
-                log_fatal("You need to specify a geometry for each sector");
+                throw std::invalid_argument("You need to specify a detector for each sector");
             }
         }
-
-
-        /* auto geo = std::make_shared<const Geometry>(*geometry); */
+        
         // Use global options in case they will not be overridden
         Sector::Definition sec_def_infront = sec_def_global;
         sec_def_infront.location = Sector::ParticleLocation::InfrontDetector;
         sec_def_infront.SetMedium(med);
-        sec_def_infront.SetGeometry(geo->create());
+        sec_def_infront.SetGeometry(geo);
 
         Sector::Definition sec_def_inside = sec_def_global;
         sec_def_inside.location = Sector::ParticleLocation::InsideDetector;
         sec_def_inside.SetMedium(med);
-        sec_def_inside.SetGeometry(geo->create());
+        sec_def_inside.SetGeometry(geo);
 
         Sector::Definition sec_def_behind = sec_def_global;
         sec_def_behind.location = Sector::ParticleLocation::BehindDetector;
         sec_def_behind.SetMedium(med);
-        sec_def_behind.SetGeometry(geo->create());
+        sec_def_behind.SetGeometry(geo);
 
         nlohmann::json json_cutsettings;
 
+        std::string json_sector_str = json_sector.dump();
         // cut settings infront
         cut_object_str = ParseCutSettings(json_sector_str, "cuts_infront",
             cuts_infront_object["e_cut"].get<double>(),
@@ -598,17 +591,13 @@ void Propagator::ChooseCurrentSector(
     const Vector3D& particle_position, const Vector3D& particle_direction)
 {
     std::vector<int> crossed_sector;
-    crossed_sector.resize(0);
 
     // Get Location of the detector (Inside/Infront/Behind)
     Geometry::ParticleLocation::Enum detector_location
         = detector_->GetLocation(particle_position, particle_direction);
-
     for (unsigned int i = 0; i < sectors_.size(); ++i) {
-        if (sectors_[i]->GetSectorDef().GetGeometry()->IsInside(
-                particle_position, particle_direction)) {
-            if (static_cast<int>(sectors_[i]->GetLocation())
-                == static_cast<int>(detector_location))
+        if (sectors_[i]->GetSectorDef().GetGeometry()->IsInside(particle_position, particle_direction)) {
+            if (static_cast<int>(sectors_[i]->GetLocation()) == static_cast<int>(detector_location))
                 crossed_sector.push_back(i);
         }
     }
