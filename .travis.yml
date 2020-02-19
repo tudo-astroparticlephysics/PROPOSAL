@@ -111,7 +111,6 @@ install:
         brew upgrade;
         brew install cmake;
       fi
-    - ./install_log4cplus.sh
 
 before_script:
     - mkdir build
