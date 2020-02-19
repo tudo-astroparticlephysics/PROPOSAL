@@ -118,7 +118,6 @@ private:
     //     }
     // }
 
-    InterpolationDef CreateInterpolationDef(const std::string& json_object_str);
     Sector::Definition CreateSectorDefinition(const std::string& json_object_str);
     std::string ParseCutSettings(const std::string& json_object_str,
                                  const std::string& json_key,

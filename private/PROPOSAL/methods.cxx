@@ -28,6 +28,105 @@
 
 namespace PROPOSAL {
 
+InterpolationDef::InterpolationDef(const nlohmann::json& config){
+    nodes_propagate = config.value("nodes_propagate", 1000);
+    nodes_continous_randomization = config.value("nodes_continous_randomization", 200);
+    nodes_cross_section = config.value("nodes_cross_section", 100);
+    max_node_energy = config.value("max_node_energy", 1e14);
+    do_binary_tables = config.value("do_binary_tables", true);
+    just_use_readonly_path = config.value("just_use_readonly_path", false);
+    order_of_interpolation = config.value("order_of_interpolation", 1000);
+
+    assert(nodes_propagate > 0);
+    assert(nodes_continous_randomization > 0);
+    assert(nodes_cross_section > 0);
+    assert(max_node_energy > 0);
+    assert(order_of_interpolation > 0);
+
+    // Parse to find path to interpolation tables
+    if (config.find("path_to_tables") != config.end()) {
+        std::string table_path_str = "";
+        if (config["path_to_tables"].is_string()) {
+            table_path_str = config["path_to_tables"];
+            path_to_tables = Helper::ResolvePath(table_path_str);
+        } else if (config["path_to_tables"].is_array()) {
+            for (size_t idx = 0; idx < config["path_to_tables"]
+            .get<std::vector<std::string>>()
+            .size();
+            idx++) {
+                if (config["path_to_tables"][idx].is_string()) {
+                    table_path_str = Helper::ResolvePath(
+                            config["path_to_tables"][idx].get<std::string>());
+                    if (table_path_str != "")
+                        break;
+                } else {
+                    log_fatal("Invalid input for option 'path_to_tables'. "
+                              "Expected a string or a list of strings.");
+                }
+            }
+        } else {
+            log_fatal("Invalid input for option 'path_to_tables'. Expected a "
+                      "string or a list of strings.");
+        }
+
+        if (table_path_str != "") {
+            path_to_tables = table_path_str;
+            log_info("The writable Path to interpolation tables set to: \"%s\"",
+                    table_path_str.c_str());
+        } else {
+            log_warn(
+                    "No valid writable path to interpolation tables found. Save "
+                    "tables in memory, if readonly path is also not working!");
+        }
+    } else {
+        log_debug("No writable path to tables set. Use default and save in "
+                  "memory, if readonly path is also not working!");
+    }
+
+    // Parse to find path to interpolation tables for readonly
+    if (config.find("path_to_tables_readonly") != config.end()) {
+        std::string table_path_str = "";
+        if (config["path_to_tables_readonly"].is_string()) {
+            table_path_str = config["path_to_tables_readonly"];
+            path_to_tables_readonly = Helper::ResolvePath(table_path_str, true);
+        } else if (config["path_to_tables_readonly"].is_array()) {
+            for (size_t idx = 0; idx < config["path_to_tables_readonly"]
+            .get<std::vector<std::string>>()
+            .size();
+            idx++) {
+                if (config["path_to_tables_readonly"][idx].is_string()) {
+                    table_path_str = Helper::ResolvePath(
+                            config["path_to_tables_readonly"][idx]
+                            .get<std::string>(),
+                            true);
+                    if (table_path_str != "")
+                        break;
+                } else {
+                    log_fatal(
+                            "Invalid input for option 'path_to_tables_readonly'. "
+                            "Expected a string or a list of strings.");
+                }
+            }
+        } else {
+            log_fatal("Invalid input for option 'path_to_tables_readonly'. "
+                      "Expected a string or a list of strings.");
+        }
+
+        if (table_path_str != "") {
+            path_to_tables_readonly = table_path_str;
+            log_info("Path to readonly interpolation tables set to: \"%s\"",
+                    table_path_str.c_str());
+        } else {
+            log_warn("No valid path to readonly interpolation tables found. "
+                     "Just looking at writable path_to_tables.");
+        }
+    } else {
+        log_debug("No 'path_to_tables_readonly' option set. Use default and "
+                  "look at writable path to tables.");
+    }
+
+}
+
 // ------------------------------------------------------------------------- //
 size_t InterpolationDef::GetHash() const {
     size_t seed = 0;
