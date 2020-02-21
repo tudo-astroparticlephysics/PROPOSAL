@@ -42,13 +42,17 @@ Sphere::Sphere(const Sphere& sphere)
 Sphere::Sphere(const nlohmann::json& config)
     : Geometry(config)
 {
-    assert(config.at("outer_radius").is_number());
+    if(not config.is_object()) throw std::invalid_argument("No json object found.");
+    if(not config.at("outer_radius").is_number())
+        throw std::invalid_argument("Outer radius is not a number.");
 
-    radius_ = config["outer_radius"].get<double>() * 100;
+    config["outer_radius"].get_to(radius_);
+    radius_ *= 100;
     inner_radius_ = config.value("inner_radius", 0);
 
-    assert(inner_radius_ >= 0);
-    assert(radius_ > inner_radius_);
+    if(inner_radius_ < 0) throw std::logic_error("inner radius must be >= 0");
+    if(radius_ < inner_radius_)
+       throw std::logic_error("radius must be larger than inner radius");
 }
 
 // ------------------------------------------------------------------------- //

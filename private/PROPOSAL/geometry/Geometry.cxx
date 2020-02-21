@@ -66,16 +66,13 @@ Geometry::Geometry(const Geometry& geometry)
 
 Geometry::Geometry(const nlohmann::json& config)
 {
-    assert(config.is_object());
+    if(not config.is_object()) throw std::invalid_argument("No json object found.");
 
     name_ = config.value("shape", "unknown");
     hierarchy_ = config.value("hierarchy", 0);
 
-    if (config.find("origin") !=config.end()) {
-        position_ = Vector3D(config["origin"]);
-    } else {
-        position_ = Vector3D();
-    }
+    if(not config.contains("origin"))
+        throw std::invalid_argument("No geometry originfound.");
 }
 
 // ------------------------------------------------------------------------- //

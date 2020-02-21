@@ -38,17 +38,20 @@ Box::Box(const Box& box)
 Box::Box(const nlohmann::json& config)
     : Geometry(config)
 {
-    assert(config["length"].is_number());
-    assert(config["width"].is_number());
-    assert(config["height"].is_number());
+    if(not config.at("length").is_number())
+        throw std::invalid_argument("Length is not a number.");
+    if(not config.at("width").is_number())
+        throw std::invalid_argument("Width is not a number.");
+    if(not config.at("height").is_number())
+        throw std::invalid_argument("Height is not a number.");
 
     x_ = config["length"].get<double>() * 100;
     y_ = config["width"].get<double>() * 100;
     z_ = config["height"].get<double>() * 100;
 
-    assert(x_ > 0);
-    assert(y_ > 0);
-    assert(z_ > 0);
+    if(x_ < 0) throw std::logic_error("lenght must be > 0");
+    if(y_ < 0) throw std::logic_error("width must be > 0");
+    if(z_ < 0) throw std::logic_error("height must be > 0");
 }
 
 // ------------------------------------------------------------------------- //
