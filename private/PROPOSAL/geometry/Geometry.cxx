@@ -73,7 +73,7 @@ Geometry::Geometry(const nlohmann::json& config)
 
     if(not config.contains("origin"))
         throw std::invalid_argument("No geometry originfound.");
-    position = Vector3D(config.at("origin");
+    position_ = Vector3D(config.at("origin"));
 }
 
 // ------------------------------------------------------------------------- //
