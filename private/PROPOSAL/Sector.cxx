@@ -11,12 +11,14 @@
 #include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/geometry/GeometryFactory.h"
 #include "PROPOSAL/geometry/Sphere.h"
 
 #include "PROPOSAL/Sector.h"
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
 
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"
@@ -68,16 +70,50 @@ Sector::Definition::Definition(const Definition& def)
 }
 
 Sector::Definition::Definition(const nlohmann::json& config)
-    : location(config)
-    , cut_settings(config)
-    , medium_(config)
-    , geometry_(config)
-    , utility_def(config)
+    /* : utility_def(config) */
 {
-    assert(config.is_object());
+    if(not config.is_object()) throw std::invalid_argument("No json object found.");
 
-    std::string scattering_model_str = config.value("scattering", "highland_integral");
+    std::array<std::pair<std::string, Sector::ParticleLocation::Enum>, 3> cuts = {
+        std::make_pair("cuts_infront", Sector::ParticleLocation::InfrontDetector),
+        std::make_pair("cuts_inside",Sector::ParticleLocation::InsideDetector),
+        std::make_pair("cuts_behind",Sector::ParticleLocation::BehindDetector),
+    };
+
+    for (const auto& cut : cuts) {
+        if(config.contains(cut.first)) {
+            EnergyCutSettings cut_settings(config.at(cut.first));
+            location = cut.second;
+            break;
+        }
+    }
+
+    std::string scattering_model_str = config.value("scattering", "highlandintegral");
     scattering_model = ScatteringFactory::Get().GetEnumFromString(scattering_model_str);
+
+    if(config.contains("shape")) {
+        std::string shape = config["geometry"]["shape"];
+        if (shape == "sphere") {
+            geometry_ = std::make_shared<const Sphere>(config["geometry"]);
+        } else if (shape == "box") {
+            geometry_ = std::make_shared<const Box>(config["geometry"]);
+        } else if (shape == "cylinder") {
+            geometry_ = std::make_shared<const Cylinder>(config["geometry"]);
+        } else {
+            throw std::invalid_argument("You need to specify a detector for each sector");
+        }
+    }
+
+    std::string medium_name = "water";
+    double density_correction = 1.0;
+    if(config.contains("medium"))
+    {
+        config.at("medium").get_to(medium_name);
+        config.at("medium").at("density_correction").get_to(density_correction);
+    }
+
+    medium_ = CreateMedium(medium_name, density_correction);
+
 
     do_stochastic_loss_weighting = config.value("stochastic_loss_weighting", false);
     stochastic_loss_weighting = config.value("stochastic_loss_weighting", 0);

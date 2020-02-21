@@ -1,8 +1,7 @@
 /*
  * Propagator.cxx
- *
- *  Created on: 23.04.2013
- *      Author: koehne
+ * Created on: 23.04.2013
+ * Author: koehne
  */
 
 // #include <cmath>
@@ -135,12 +134,12 @@ Propagator::Propagator(
     , particle_def_(particle_def)
     , detector_(NULL)
 {
-    int global_seed = global_seed_;
-    bool do_interpolation = do_interpolation_;
-    bool uniform = uniform_;
+    int global_seed;
+    bool do_interpolation;
+    bool uniform;
 
     InterpolationDef interpolation_def;
-    Sector::Definition sec_def_global;
+    std::unique_ptr<Sector::Definition> sec_def_global(new Sector::Definition());
 
     // Create the json parser
     nlohmann::json json_config;
@@ -153,95 +152,18 @@ Propagator::Propagator(
         log_fatal("Unable parse \"%s\" as json file", config_file.c_str());
     }
 
-    // set global settings
-    if (json_config.find("global") == json_config.end()) {
-        log_fatal("The 'globals' option is not set. Use default options.");
-    }
-    if (!json_config["global"].is_object()) {
-        log_fatal("Invalid input for option 'nodes_propagate'. Expected a json "
-                  "object.");
-    }
-    nlohmann::json json_global = json_config["global"];
-    std::string json_global_str = json_global.dump();
+    nlohmann::json json_global;
+    if(json_config.contains("global")){
+        json_global = json_config["global"];
 
-    // set the seed of the random number generator
-    if (json_global.find("seed") != json_global.end()) {
-        if (json_global["seed"].is_number()) {
-            global_seed = json_global["seed"].get<int>();
-            // this can throw the error (nlohmann::detail::type_error& e) if no
-            // numbercheck
-        } else {
-            log_fatal("Invalid input for option 'seed'. Expected a number.");
-        }
+        global_seed = json_global.value("seed", global_seed_);
+        do_interpolation = json_global.value("do_interpolation", do_interpolation_);
+        uniform = json_global.value("uniform", uniform_);
+
+        sec_def_global.reset(new Sector::Definition(json_global));
     }
 
     RandomGenerator::Get().SetSeed(global_seed);
-    log_info("Seed of the default random generator set to %i", global_seed);
-
-    // Read in global cut and continuous randomization options
-    std::string cut_object_str;
-    nlohmann::json cuts_infront_object;
-    cut_object_str = ParseCutSettings(json_global_str, "cuts_infront",
-        global_ecut_infront_, global_vcut_infront_, global_cont_infront_);
-    cuts_infront_object = nlohmann::json::parse(cut_object_str);
-
-    nlohmann::json cuts_inside_object;
-    cut_object_str = ParseCutSettings(json_global_str, "cuts_inside",
-        global_ecut_inside_, global_vcut_inside_, global_cont_inside_);
-    cuts_inside_object = nlohmann::json::parse(cut_object_str);
-
-    nlohmann::json cuts_behind_object;
-    cut_object_str = ParseCutSettings(json_global_str, "cuts_behind",
-        global_ecut_behind_, global_vcut_behind_, global_cont_behind_);
-    cuts_behind_object = nlohmann::json::parse(cut_object_str);
-
-    // Read in interpolation options
-    if (json_global.find("interpolation") != json_global.end()) {
-        if (json_global["interpolation"].is_object()) {
-            if (json_global["interpolation"].find("do_interpolation")
-                != json_global["interpolation"].end()) {
-                if (json_global["interpolation"]["do_interpolation"]
-                        .is_boolean()) {
-                    do_interpolation
-                        = json_global["interpolation"]["do_interpolation"];
-                } else {
-                    log_fatal("Invalid input for option 'do_interpolation'. "
-                              "Expected a bool.");
-                }
-            } else {
-                log_debug("The 'do_interpolation' option is not set. Use "
-                          "default (true)");
-            }
-            if (do_interpolation) {
-                interpolation_def = InterpolationDef(json_config["interpolation"]);
-            } else {
-                log_info("Integration instead of interpolation is chosen. The "
-                         "propagation is now extremely slow.");
-            }
-        } else {
-            log_fatal("Invalid input for global option 'interpolation'. "
-                      "Expected a json object.");
-        }
-    } else {
-        log_debug("The 'interpolation' option is not set. Use default "
-                  "interpolation settings.");
-    }
-
-    // Read in global sector definition
-    sec_def_global = CreateSectorDefinition(json_global_str);
-
-    // read in the uniform flag
-    if (json_global.find("uniform") != json_global.end()) {
-        if (json_global["uniform"].is_boolean()) {
-            uniform = json_global["uniform"].get<bool>();
-        } else {
-            log_fatal("Invalid input for option 'uniform' (uniform phasespace "
-                      "sampling for decays). Expected a bool.");
-        }
-    } else {
-        log_debug("The 'uniform' option (uniform phasespace sampling for "
-                  "decays) is not set. Use default (true)");
-    }
     particle_def_.decay_table.SetUniformSampling(uniform);
 
     if (json_config.find("detector") != json_config.end()) {
@@ -257,145 +179,309 @@ Propagator::Propagator(
         }
     }
 
-    // Read in all sector definitions
-    nlohmann::json json_sectors;
-
-    if (json_config.find("sectors") != json_config.end()) {
-        if (json_config["sectors"].is_array()) {
-            if (1 > json_config["sectors"].size()) {
-                log_fatal("You need to specify at least one sector.");
-            }
-        } else {
-            log_fatal("Invalid input for option 'sectors'. Expected an array "
-                      "of json objects.");
+    std::shared_ptr<const Medium> med;
+    std::shared_ptr<const Geometry> geo;
+    std::array<std::pair<std::string, Sector::ParticleLocation::Enum>, 3> cuts {
+        std::make_pair("cuts_before", Sector::ParticleLocation::InfrontDetector),
+        std::make_pair("cuts_inside", Sector::ParticleLocation::InsideDetector),
+        std::make_pair("cuts_behind", Sector::ParticleLocation::BehindDetector)
+    };
+    for (const auto& cut : cuts) {
+        if(json_global.contains(cut.first)) {
+            sec_def_global->cut_settings = EnergyCutSettings(json_global.at(cut.first));
+            sec_def_global->location = cut.second;
         }
-    } else {
-        log_fatal("The 'sectors' option is not set.");
+
+        if (json_config.contains("sectors")) {
+            assert(json_config["sectors"].is_array());
+            for (const auto& json_sector : json_config.at("sectors")) {
+                double density_correction = json_sector.value("density_correction", 1.0);
+                std::string medium_name = json_sector.value("medium","water");
+                med = CreateMedium(medium_name, density_correction);
+                if (json_sector.contains("geometry"))
+                {
+                    std::string shape = json_sector["geometry"]["shape"];
+                    if (shape == "sphere") {
+                        geo = std::make_shared<const Sphere>(json_sector["geometry"]);
+                    } else if (shape == "box") {
+                        geo = std::make_shared<const Box>(json_sector["geometry"]);
+                    } else if (shape == "cylinder") {
+                        geo = std::make_shared<const Cylinder>(json_sector["geometry"]);
+                    } else {
+                        throw std::invalid_argument("You need to specify a detector for each sector");
+                    }
+                }
+
+                    Sector::Definition sec_def = *sec_def_global;
+                    sec_def.SetMedium(med);
+                    sec_def.SetGeometry(geo);
+
+                    if(json_sector.contains(cut.first))
+                    {
+                        nlohmann::json local_cuts = json_sector[cut.first];
+                        sec_def.cut_settings = EnergyCutSettings(local_cuts);
+                        if(local_cuts.contains("cont_rand")) {
+                            sec_def.do_continuous_randomization = local_cuts.value("cont_rand", true);
+                        }
+                    }
+
+                    /* std::cout << sec_def << std::endl; */
+                    if (do_interpolation) {
+                        sectors_.push_back(new Sector(particle_def_, sec_def, interpolation_def));
+                    } else {
+                        sectors_.push_back(new Sector(particle_def_, sec_def));
+                    }
+                }
+            }
     }
 
-    for (const auto& json_sector: json_config["sectors"]) {
-        if (!json_sector.is_object()) {
-            log_fatal("Invalid input for an object in 'sectors'. Each sector "
-                      "must be a json object.");
-        }
-        // Create medium
-        double density_correction = 1.0;
+// ---------------------------------------------------------------------------------//
+// ---------------------------------------------------------------------------------//
+// ---------------------------------------------------------------------------------//
+//
+    /* // set global settings */
+    /* if (json_config.find("global") == json_config.end()) { */
+    /*     log_fatal("The 'globals' option is not set. Use default options."); */
+    /* } */
+    /* if (!json_config["global"].is_object()) { */
+    /*     log_fatal("Invalid input for option 'nodes_propagate'. Expected a json " */
+    /*               "object."); */
+    /* } */
+    /* nlohmann::json json_global = json_config["global"]; */
+    /* std::string json_global_str = json_global.dump(); */
 
-        if (json_sector.find("density_correction") != json_sector.end()) {
-            if (json_sector["density_correction"].is_number()) {
-                density_correction = json_sector["density_correction"].get<double>();
-            } else {
-                log_fatal("Invalid input for option 'density_correction'. "
-                          "Expected a number.");
-            }
-        } else {
-            log_debug("The 'density_correction' option is not set. Use default "
-                      "(1.0)");
-        }
+    /* // set the seed of the random number generator */
+    /* /1* if (json_global.find("seed") != json_global.end()) { *1/ */
+    /* /1*     if (json_global["seed"].is_number()) { *1/ */
+    /* /1*         global_seed = json_global["seed"].get<int>(); *1/ */
+    /* /1*         // this can throw the error (nlohmann::detail::type_error& e) if no *1/ */
+    /* /1*         // numbercheck *1/ */
+    /* /1*     } else { *1/ */
+    /* /1*         log_fatal("Invalid input for option 'seed'. Expected a number."); *1/ */
+    /* /1*     } *1/ */
+    /* /1* } *1/ */
 
-        std::string medium_name = "water";
-        if (json_sector.find("medium") != json_sector.end()) {
-            if (json_sector["medium"].is_string()) {
-                medium_name = json_sector["medium"].get<std::string>();
-            } else {
-                log_fatal(
-                    "Invalid input for option 'medium'. Expected a string.");
-            }
-        } else {
-            log_debug("The 'medium' option is not set. Use default (Water)");
-        }
-        std::shared_ptr<const Medium> med = GetMedium(medium_name, density_correction);
+    /* /1* RandomGenerator::Get().SetSeed(global_seed); *1/ */
+    /* /1* log_info("Seed of the default random generator set to %i", global_seed); *1/ */
 
-        // Create Geometry
-        std::shared_ptr<const Geometry> geo;
-        if (json_sector.find("geometry") != json_sector.end()) {
-            std::string shape = json_sector["geometry"]["shape"];
-            if (shape == "sphere") {
-                geo = std::make_shared<const Sphere>(json_sector["geometry"]);
-            } else if (shape == "box") {
-                geo = std::make_shared<const Box>(json_sector["geometry"]);
-            } else if (shape == "cylinder") {
-                geo = std::make_shared<const Cylinder>(json_sector["geometry"]);
-            } else {
-                throw std::invalid_argument("You need to specify a detector for each sector");
-            }
-        }
+    /* // Read in global cut and continuous randomization options */
+    /* std::string cut_object_str; */
+    /* nlohmann::json cuts_infront_object; */
+    /* cut_object_str = ParseCutSettings(json_global_str, "cuts_infront", */
+    /*     global_ecut_infront_, global_vcut_infront_, global_cont_infront_); */
+    /* cuts_infront_object = nlohmann::json::parse(cut_object_str); */
+
+    /* nlohmann::json cuts_inside_object; */
+    /* cut_object_str = ParseCutSettings(json_global_str, "cuts_inside", */
+    /*     global_ecut_inside_, global_vcut_inside_, global_cont_inside_); */
+    /* cuts_inside_object = nlohmann::json::parse(cut_object_str); */
+
+    /* nlohmann::json cuts_behind_object; */
+    /* cut_object_str = ParseCutSettings(json_global_str, "cuts_behind", */
+    /*     global_ecut_behind_, global_vcut_behind_, global_cont_behind_); */
+    /* cuts_behind_object = nlohmann::json::parse(cut_object_str); */
+
+    /* /1* // Read in interpolation options *1/ */
+    /* /1* if (json_global.find("interpolation") != json_global.end()) { *1/ */
+    /* /1*     if (json_global["interpolation"].is_object()) { *1/ */
+    /* /1*         if (json_global["interpolation"].find("do_interpolation") *1/ */
+    /* /1*             != json_global["interpolation"].end()) { *1/ */
+    /* /1*             if (json_global["interpolation"]["do_interpolation"] *1/ */
+    /* /1*                     .is_boolean()) { *1/ */
+    /* /1*                 do_interpolation *1/ */
+    /* /1*                     = json_global["interpolation"]["do_interpolation"]; *1/ */
+    /* /1*             } else { *1/ */
+    /* /1*                 log_fatal("Invalid input for option 'do_interpolation'. " *1/ */
+    /* /1*                           "Expected a bool."); *1/ */
+    /* /1*             } *1/ */
+    /* /1*         } else { *1/ */
+    /* /1*             log_debug("The 'do_interpolation' option is not set. Use " *1/ */
+    /* /1*                       "default (true)"); *1/ */
+    /* /1*         } *1/ */
+    /* /1*         if (do_interpolation) { *1/ */
+    /* /1*             interpolation_def = InterpolationDef(json_config["interpolation"]); *1/ */
+    /* /1*         } else { *1/ */
+    /* /1*             log_info("Integration instead of interpolation is chosen. The " *1/ */
+    /* /1*                      "propagation is now extremely slow."); *1/ */
+    /* /1*         } *1/ */
+    /* /1*     } else { *1/ */
+    /* /1*         log_fatal("Invalid input for global option 'interpolation'. " *1/ */
+    /* /1*                   "Expected a json object."); *1/ */
+    /* /1*     } *1/ */
+    /* /1* } else { *1/ */
+    /* /1*     log_debug("The 'interpolation' option is not set. Use default " *1/ */
+    /* /1*               "interpolation settings."); *1/ */
+    /* /1* } *1/ */
+
+    /* // Read in global sector definition */
+    /* /1* sec_def_global = CreateSectorDefinition(json_global_str); *1/ */
+
+    /* // read in the uniform flag */
+    /* /1* if (json_global.find("uniform") != json_global.end()) { *1/ */
+    /* /1*     if (json_global["uniform"].is_boolean()) { *1/ */
+    /* /1*         uniform = json_global["uniform"].get<bool>(); *1/ */
+    /* /1*     } else { *1/ */
+    /* /1*         log_fatal("Invalid input for option 'uniform' (uniform phasespace " *1/ */
+    /* /1*                   "sampling for decays). Expected a bool."); *1/ */
+    /* /1*     } *1/ */
+    /* /1* } else { *1/ */
+    /* /1*     log_debug("The 'uniform' option (uniform phasespace sampling for " *1/ */
+    /* /1*               "decays) is not set. Use default (true)"); *1/ */
+    /* /1* } *1/ */
+    /* /1* particle_def_.decay_table.SetUniformSampling(uniform); *1/ */
+
+    /* /1* if (json_config.find("detector") != json_config.end()) { *1/ */
+    /* /1*     std::string shape = json_config["detector"]["shape"]; *1/ */
+    /* /1*     if (shape == "sphere") { *1/ */
+    /* /1*         detector_ = std::make_shared<const Sphere>(json_config["detector"]); *1/ */
+    /* /1*     } else if (shape == "box") { *1/ */
+    /* /1*         detector_ = std::make_shared<const Box>(json_config["detector"]); *1/ */
+    /* /1*     } else if (shape == "cylinder") { *1/ */
+    /* /1*         detector_ = std::make_shared<const Cylinder>(json_config["detector"]); *1/ */
+    /* /1*     } else { *1/ */
+    /* /1*         throw std::invalid_argument("You need to specify a detector for each sector"); *1/ */
+    /* /1*     } *1/ */
+    /* /1* } *1/ */
+
+    /* // Read in all sector definitions */
+    /* nlohmann::json json_sectors; */
+
+    /* /1* if (json_config.find("sectors") != json_config.end()) { *1/ */
+    /* /1*     if (json_config["sectors"].is_array()) { *1/ */
+    /* /1*         if (1 > json_config["sectors"].size()) { *1/ */
+    /* /1*             log_fatal("You need to specify at least one sector."); *1/ */
+    /* /1*         } *1/ */
+    /* /1*     } else { *1/ */
+    /* /1*         log_fatal("Invalid input for option 'sectors'. Expected an array " *1/ */
+    /* /1*                   "of json objects."); *1/ */
+    /* /1*     } *1/ */
+    /* /1* } else { *1/ */
+    /* /1*     log_fatal("The 'sectors' option is not set."); *1/ */
+    /* /1* } *1/ */
+
+    /* for (const auto& json_sector: json_config["sectors"]) { */
+    /*     if (!json_sector.is_object()) { */
+    /*         log_fatal("Invalid input for an object in 'sectors'. Each sector " */
+    /*                   "must be a json object."); */
+    /*     } */
+    /*     // Create medium */
+    /*     double density_correction = 1.0; */
+
+    /*     /1* if (json_sector.find("density_correction") != json_sector.end()) { *1/ */
+    /*     /1*     if (json_sector["density_correction"].is_number()) { *1/ */
+    /*     /1*         density_correction = json_sector["density_correction"].get<double>(); *1/ */
+    /*     /1*     } else { *1/ */
+    /*     /1*         log_fatal("Invalid input for option 'density_correction'. " *1/ */
+    /*     /1*                   "Expected a number."); *1/ */
+    /*     /1*     } *1/ */
+    /*     /1* } else { *1/ */
+    /*     /1*     log_debug("The 'density_correction' option is not set. Use default " *1/ */
+    /*     /1*               "(1.0)"); *1/ */
+    /*     /1* } *1/ */
+
+    /*     /1* std::string medium_name = "water"; *1/ */
+    /*     /1* if (json_sector.find("medium") != json_sector.end()) { *1/ */
+    /*     /1*     if (json_sector["medium"].is_string()) { *1/ */
+    /*     /1*         medium_name = json_sector["medium"].get<std::string>(); *1/ */
+    /*     /1*     } else { *1/ */
+    /*     /1*         log_fatal( *1/ */
+    /*     /1*             "Invalid input for option 'medium'. Expected a string."); *1/ */
+    /*     /1*     } *1/ */
+    /*     /1* } else { *1/ */
+    /*     /1*     log_debug("The 'medium' option is not set. Use default (Water)"); *1/ */
+    /*     /1* } *1/ */
+    /*     /1* std::shared_ptr<const Medium> med = GetMedium(medium_name, density_correction); *1/ */
+
+    /*     // Create Geometry */
+    /*     std::shared_ptr<const Geometry> geo; */
+    /*     if (json_sector.find("geometry") != json_sector.end()) { */
+    /*         std::string shape = json_sector["geometry"]["shape"]; */
+    /*         if (shape == "sphere") { */
+    /*             geo = std::make_shared<const Sphere>(json_sector["geometry"]); */
+    /*         } else if (shape == "box") { */
+    /*             geo = std::make_shared<const Box>(json_sector["geometry"]); */
+    /*         } else if (shape == "cylinder") { */
+    /*             geo = std::make_shared<const Cylinder>(json_sector["geometry"]); */
+    /*         } else { */
+    /*             throw std::invalid_argument("You need to specify a detector for each sector"); */
+    /*         } */
+    /*     } */
         
-        // Use global options in case they will not be overridden
-        Sector::Definition sec_def_infront = sec_def_global;
-        sec_def_infront.location = Sector::ParticleLocation::InfrontDetector;
-        sec_def_infront.SetMedium(med);
-        sec_def_infront.SetGeometry(geo);
+    /*     // Use global options in case they will not be overridden */
+    /*     Sector::Definition sec_def_infront = sec_def_global; */
+    /*     sec_def_infront.location = Sector::ParticleLocation::InfrontDetector; */
+    /*     sec_def_infront.SetMedium(med); */
+    /*     sec_def_infront.SetGeometry(geo); */
 
-        Sector::Definition sec_def_inside = sec_def_global;
-        sec_def_inside.location = Sector::ParticleLocation::InsideDetector;
-        sec_def_inside.SetMedium(med);
-        sec_def_inside.SetGeometry(geo);
+    /*     Sector::Definition sec_def_inside = sec_def_global; */
+    /*     sec_def_inside.location = Sector::ParticleLocation::InsideDetector; */
+    /*     sec_def_inside.SetMedium(med); */
+    /*     sec_def_inside.SetGeometry(geo); */
 
-        Sector::Definition sec_def_behind = sec_def_global;
-        sec_def_behind.location = Sector::ParticleLocation::BehindDetector;
-        sec_def_behind.SetMedium(med);
-        sec_def_behind.SetGeometry(geo);
+    /*     Sector::Definition sec_def_behind = sec_def_global; */
+    /*     sec_def_behind.location = Sector::ParticleLocation::BehindDetector; */
+    /*     sec_def_behind.SetMedium(med); */
+    /*     sec_def_behind.SetGeometry(geo); */
 
-        nlohmann::json json_cutsettings;
+    /*     nlohmann::json json_cutsettings; */
 
-        std::string json_sector_str = json_sector.dump();
-        // cut settings infront
-        cut_object_str = ParseCutSettings(json_sector_str, "cuts_infront",
-            cuts_infront_object["e_cut"].get<double>(),
-            cuts_infront_object["v_cut"].get<double>(),
-            cuts_infront_object["cont_rand"].get<bool>());
+    /*     std::string json_sector_str = json_sector.dump(); */
+    /*     // cut settings infront */
+    /*     cut_object_str = ParseCutSettings(json_sector_str, "cuts_infront", */
+    /*         cuts_infront_object["e_cut"].get<double>(), */
+    /*         cuts_infront_object["v_cut"].get<double>(), */
+    /*         cuts_infront_object["cont_rand"].get<bool>()); */
 
-        json_cutsettings = nlohmann::json::parse(cut_object_str);
-        sec_def_infront.cut_settings.SetEcut(
-            json_cutsettings["e_cut"].get<double>());
-        sec_def_infront.cut_settings.SetVcut(
-            json_cutsettings["v_cut"].get<double>());
-        sec_def_infront.do_continuous_randomization
-            = json_cutsettings["cont_rand"].get<bool>();
+    /*     json_cutsettings = nlohmann::json::parse(cut_object_str); */
+    /*     sec_def_infront.cut_settings.SetEcut( */
+    /*         json_cutsettings["e_cut"].get<double>()); */
+    /*     sec_def_infront.cut_settings.SetVcut( */
+    /*         json_cutsettings["v_cut"].get<double>()); */
+    /*     sec_def_infront.do_continuous_randomization */
+    /*         = json_cutsettings["cont_rand"].get<bool>(); */
 
-        // cut settings inside
-        cut_object_str = ParseCutSettings(json_sector_str, "cuts_inside",
-            cuts_inside_object["e_cut"].get<double>(),
-            cuts_inside_object["v_cut"].get<double>(),
-            cuts_inside_object["cont_rand"].get<bool>());
+    /*     // cut settings inside */
+    /*     cut_object_str = ParseCutSettings(json_sector_str, "cuts_inside", */
+    /*         cuts_inside_object["e_cut"].get<double>(), */
+    /*         cuts_inside_object["v_cut"].get<double>(), */
+    /*         cuts_inside_object["cont_rand"].get<bool>()); */
 
-        json_cutsettings = nlohmann::json::parse(cut_object_str);
-        sec_def_inside.cut_settings.SetEcut(
-            json_cutsettings["e_cut"].get<double>());
-        sec_def_inside.cut_settings.SetVcut(
-            json_cutsettings["v_cut"].get<double>());
-        sec_def_inside.do_continuous_randomization
-            = json_cutsettings["cont_rand"].get<bool>();
+    /*     json_cutsettings = nlohmann::json::parse(cut_object_str); */
+    /*     sec_def_inside.cut_settings.SetEcut( */
+    /*         json_cutsettings["e_cut"].get<double>()); */
+    /*     sec_def_inside.cut_settings.SetVcut( */
+    /*         json_cutsettings["v_cut"].get<double>()); */
+    /*     sec_def_inside.do_continuous_randomization */
+    /*         = json_cutsettings["cont_rand"].get<bool>(); */
 
-        // cut settings behind
-        cut_object_str = ParseCutSettings(json_sector_str, "cuts_behind",
-            cuts_behind_object["e_cut"].get<double>(),
-            cuts_behind_object["v_cut"].get<double>(),
-            cuts_behind_object["cont_rand"].get<bool>());
+    /*     // cut settings behind */
+    /*     cut_object_str = ParseCutSettings(json_sector_str, "cuts_behind", */
+    /*         cuts_behind_object["e_cut"].get<double>(), */
+    /*         cuts_behind_object["v_cut"].get<double>(), */
+    /*         cuts_behind_object["cont_rand"].get<bool>()); */
 
-        json_cutsettings = nlohmann::json::parse(cut_object_str);
-        sec_def_behind.cut_settings.SetEcut(
-            json_cutsettings["e_cut"].get<double>());
-        sec_def_behind.cut_settings.SetVcut(
-            json_cutsettings["v_cut"].get<double>());
-        sec_def_behind.do_continuous_randomization
-            = json_cutsettings["cont_rand"].get<bool>();
+    /*     json_cutsettings = nlohmann::json::parse(cut_object_str); */
+    /*     sec_def_behind.cut_settings.SetEcut( */
+    /*         json_cutsettings["e_cut"].get<double>()); */
+    /*     sec_def_behind.cut_settings.SetVcut( */
+    /*         json_cutsettings["v_cut"].get<double>()); */
+    /*     sec_def_behind.do_continuous_randomization */
+    /*         = json_cutsettings["cont_rand"].get<bool>(); */
 
-        if (do_interpolation) {
-            sectors_.push_back(
-                new Sector(particle_def_, sec_def_infront, interpolation_def));
-            sectors_.push_back(
-                new Sector(particle_def_, sec_def_inside, interpolation_def));
-            sectors_.push_back(
-                new Sector(particle_def_, sec_def_behind, interpolation_def));
-        } else {
-            sectors_.push_back(new Sector(particle_def_, sec_def_infront));
-            sectors_.push_back(new Sector(particle_def_, sec_def_inside));
-            sectors_.push_back(new Sector(particle_def_, sec_def_behind));
-        }
+    /*     if (do_interpolation) { */
+    /*         sectors_.push_back( */
+    /*             new Sector(particle_def_, sec_def_infront, interpolation_def)); */
+    /*         sectors_.push_back( */
+    /*             new Sector(particle_def_, sec_def_inside, interpolation_def)); */
+    /*         sectors_.push_back( */
+    /*             new Sector(particle_def_, sec_def_behind, interpolation_def)); */
+    /*     } else { */
+    /*         sectors_.push_back(new Sector(particle_def_, sec_def_infront)); */
+    /*         sectors_.push_back(new Sector(particle_def_, sec_def_inside)); */
+    /*         sectors_.push_back(new Sector(particle_def_, sec_def_behind)); */
+    /*     } */
 
-    }
+    /* } */
 }
 
 Propagator::~Propagator()
