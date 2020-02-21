@@ -163,6 +163,30 @@ bool Sector::Definition::operator!=(const Definition& sector_def) const
 }
 
 
+std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::Sector::Definition const& sec_definition)
+{
+    std::stringstream ss;
+    ss << " Sector Definition (" << &sec_definition << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "Do Stochastic Loss Weighting: " << sec_definition.do_stochastic_loss_weighting << std::endl;
+    os << "Stochastic Loss Weighting: " << sec_definition.stochastic_loss_weighting << std::endl;
+    os << "Dp Stopping Decay: " << sec_definition.stopping_decay << std::endl;
+    os << "Dp Continuous Randomization: " << sec_definition.do_continuous_randomization << std::endl;
+    os << "Dp Continuous Energy Loss output: " << sec_definition.do_continuous_energy_loss_output << std::endl;
+    os << "Dp Exact Time calculation: " << sec_definition.do_exact_time_calculation << std::endl;
+    os << "Only store loss inside the detector volume: " << sec_definition.only_loss_inside_detector << std::endl;
+    os << "Scattering Model: " << sec_definition.scattering_model << std::endl;
+    os << "Particle Location: " << sec_definition.location << std::endl;
+    os << "Propagation Utility Definition:\n" << sec_definition.utility_def << std::endl;
+    os << "Energy Cut Settings:\n" << sec_definition.cut_settings << std::endl;
+    os << "Medium:\n" << *sec_definition.medium_ << std::endl;
+    os << "Geometry:\n" << *sec_definition.geometry_ << std::endl;
+
+    os << Helper::Centered(60, "");
+    return os;
+}
+
 Sector::Definition::~Definition()
 {
 }
@@ -232,29 +256,6 @@ Sector::Sector(const ParticleDef& particle_def, const Definition& sector_def,
     }
 }
 
-Sector::Sector(const ParticleDef& particle_def, const Sector& sector)
-    : sector_def_(sector.sector_def_)
-    , particle_def_(particle_def)
-    , utility_(sector.utility_)
-    , displacement_calculator_(sector.displacement_calculator_->clone(utility_))
-    , interaction_calculator_(sector.interaction_calculator_->clone(utility_))
-    , decay_calculator_(sector.decay_calculator_->clone(utility_))
-    , exact_time_calculator_(NULL)
-    , cont_rand_(sector.cont_rand_)
-    , scattering_(sector.scattering_)
-{
-    if (particle_def_ != sector.GetParticleDef()) {
-        log_fatal("Particle definition should be equal to the sector particle "
-                  "definition!");
-    }
-
-    // These are optional, therfore check NULL
-    if (sector.exact_time_calculator_ != NULL) {
-        exact_time_calculator_ = sector.exact_time_calculator_;
-    }
-
-}
-
 Sector::Sector(const Sector& sector)
     : sector_def_(sector.sector_def_)
     , particle_def_(sector.particle_def_)
@@ -291,6 +292,22 @@ bool Sector::operator==(const Sector& sector) const
 bool Sector::operator!=(const Sector& sector) const
 {
     return !(*this == sector);
+}
+
+std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::Sector const& sector)
+{
+    std::stringstream ss;
+    ss << " Sector (" << &sector << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "Sector Definition:\n" << sector.sector_def_ << std::endl;
+    os << "Particle Definition:\n" << sector.particle_def_ << std::endl;
+    os << "Geometry:\n" << *sector.geometry_ << std::endl;
+    os << "Propagation Utility:\n" << sector.utility_ << std::endl;
+    os << "Scattering:\n" << *sector.scattering_ << std::endl;
+
+    os << Helper::Centered(60, "");
+    return os;
 }
 
 Sector::~Sector()

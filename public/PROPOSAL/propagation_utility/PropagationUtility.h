@@ -41,7 +41,6 @@
 #include "PROPOSAL/crossection/factories/AnnihilationFactory.h"
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/particle/Particle.h"
@@ -50,7 +49,6 @@
 namespace PROPOSAL {
 
 class CrossSection;
-class Medium;
 
 struct InterpolationDef;
 
@@ -69,6 +67,7 @@ class Utility {
 
         bool operator==(const Utility::Definition& utility_def) const;
         bool operator!=(const Utility::Definition& utility_def) const;
+        friend std::ostream& operator<<(std::ostream&, Definition const&);
 
         Definition();
         Definition(const nlohmann::json&);
@@ -93,6 +92,7 @@ class Utility {
 
     bool operator==(const Utility& utility) const;
     bool operator!=(const Utility& utility) const;
+    friend std::ostream& operator<<(std::ostream&, Utility const&);
 
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     std::shared_ptr<const Medium> GetMedium() const { return medium_; }
@@ -134,7 +134,7 @@ class UtilityDecorator {
     // Methods
     virtual double FunctionToIntegral(double energy);
     virtual double Calculate(double ei, double ef, double rnd) = 0;
-    virtual double Calculate(double, double, double, Vector3D, Vector3D);
+    virtual double Calculate(double, double, double, const Vector3D&, const Vector3D&);
     virtual double GetUpperLimit(double ei, double rnd) = 0;
 
     const Utility& GetUtility() const { return utility_; }

@@ -32,7 +32,6 @@
 #include <unordered_map>
 #include <memory>
 
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/Secondaries.h"
 
 namespace PROPOSAL {

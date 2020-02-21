@@ -11,9 +11,7 @@
 #include <sstream>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/medium/density_distr/density_distr.h"
 #include "PROPOSAL/medium/density_distr/density_homogeneous.h"
 #include "PROPOSAL/methods.h"
 
@@ -305,7 +303,7 @@ void Medium::init() {
 // Getter
 // ------------------------------------------------------------------------- //
 
-double Medium::GetRadiationLength(Vector3D position) const {
+double Medium::GetRadiationLength(const Vector3D& position) const {
     return radiationLength_ / dens_distr_->Evaluate(position);
 }
 

@@ -190,7 +190,7 @@ double UtilityInterpolantDisplacement::Calculate(
 }
 
 double UtilityInterpolantDisplacement::Calculate(double ei, double ef,
-    double distance_to_border, Vector3D xi, Vector3D direction)
+    double distance_to_border, const Vector3D& xi, const Vector3D& direction)
 {
     /* (void) rnd; */
 

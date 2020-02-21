@@ -1,6 +1,7 @@
-#include "PROPOSAL/medium/density_distr/density_exponential.h"
+
 #include <cmath>
 #include <iostream>
+#include "PROPOSAL/medium/density_distr/density_exponential.h"
 
 using namespace PROPOSAL;
 

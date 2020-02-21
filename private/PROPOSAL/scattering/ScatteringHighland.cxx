@@ -50,7 +50,7 @@ bool ScatteringHighland::compare(const Scattering& scattering) const {
 
 void ScatteringHighland::print(std::ostream& os) const
 {
-    os << "Medium: " << *medium_ << '\n';
+    os << "Medium:\n" << *medium_ << '\n';
 }
 
 // ------------------------------------------------------------------------- //

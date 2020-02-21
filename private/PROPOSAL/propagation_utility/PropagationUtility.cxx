@@ -119,6 +119,26 @@ bool Utility::Definition::operator!=(
     return !(*this == utility_def);
 }
 
+std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::Utility::Definition const& util_definition)
+{
+    std::stringstream ss;
+    ss << " Utility Definition (" << &util_definition << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "Annihilation Definition:\n" << util_definition.annihilation_def << std::endl;
+    os << "Bremsstrahlung Definition:\n" << util_definition.brems_def << std::endl;
+    os << "Compton Definition:\n" << util_definition.compton_def << std::endl;
+    os << "EPair Production Definition:\n" << util_definition.epair_def << std::endl;
+    os << "Ionization Definition:\n" << util_definition.ioniz_def << std::endl;
+    os << "MuPair Production Definition:\n" << util_definition.mupair_def << std::endl;
+    os << "Photonuclear Definition:\n" << util_definition.photo_def << std::endl;
+    os << "PhotoPair Production Definition:\n" << util_definition.photopair_def << std::endl;
+    os << "Weak Interaction Definition:\n" << util_definition.weak_def << std::endl;
+
+    os << Helper::Centered(60, "");
+    return os;
+}
+
 Utility::Definition::~Definition() {}
 
 // ------------------------------------------------------------------------- //
@@ -327,6 +347,19 @@ bool Utility::operator!=(const Utility& utility) const {
     return !(*this == utility);
 }
 
+std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::Utility const& utility)
+{
+    std::stringstream ss;
+    ss << " Propagation Utility (" << &utility << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "Particle Def:\n" << utility.particle_def_ << std::endl;
+    os << "Medium:\n" << *utility.medium_ << std::endl;
+    os << "EnergyCutSettings:\n" << utility.cut_settings_ << std::endl;
+
+    os << Helper::Centered(60, "");
+    return os;
+}
 
 CrossSection* Utility::GetCrosssection(int typeId) const {
     for (auto& i : crosssections_) {
@@ -425,8 +458,8 @@ double UtilityDecorator::FunctionToIntegral(double energy) {
 double UtilityDecorator::Calculate(double ei,
                                    double ef,
                                    double rnd,
-                                   Vector3D xi,
-                                   Vector3D direction) {
+                                   const Vector3D& xi,
+                                   const Vector3D& direction) {
     (void)xi;
     (void)direction;
 

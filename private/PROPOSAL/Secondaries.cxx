@@ -1,8 +1,8 @@
+
 #include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/math/RandomGenerator.h"
-#include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/geometry/Geometry.h"
 
 #include <memory>
 #include <vector>
@@ -67,7 +67,7 @@ Secondaries Secondaries::Query(const int& interaction_type) const
 {
     Secondaries sec;
     for (auto i : secondaries_) {
-        if (interaction_type == i.GetTypeId())
+        if (interaction_type == i.GetType())
             sec.push_back(i);
     }
     return sec;
@@ -96,7 +96,7 @@ Secondaries Secondaries::Query(const Geometry& geometry) const
 void Secondaries::DoDecay()
 {
     for (auto it = secondaries_.begin(); it != secondaries_.end();) {
-        if (it->GetTypeId() == static_cast<int>(InteractionType::Decay)) {
+        if (it->GetType() == static_cast<int>(InteractionType::Decay)) {
             double random_ch = RandomGenerator::Get().RandomDouble();
             Secondaries products
                 = primary_def_->decay_table.SelectChannel(random_ch).Decay(

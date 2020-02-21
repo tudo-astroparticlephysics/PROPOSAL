@@ -2,6 +2,7 @@
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/density_distr/density_exponential.h"
+#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
 #include "PROPOSAL/medium/density_distr/density_polynomial.h"
 #include "PROPOSAL/medium/density_distr/density_splines.h"
 #include "pyBindings.h"

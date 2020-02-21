@@ -53,7 +53,7 @@ enum class InteractionType {
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-static const std::map<const int, std::string> Id_Interaction_Name_Map {
+static const std::map<const int, std::string> Type_Interaction_Name_Map {
     {static_cast<int>(InteractionType::Particle), "Particle"},
     {static_cast<int>(InteractionType::Brems), "Brems"},
     {static_cast<int>(InteractionType::DeltaE), "DeltaE"},
@@ -100,7 +100,7 @@ public:
     void SetPropagatedDistance(double prop_dist) { propagated_distance_ = prop_dist; }
 
     // Getter
-    int GetTypeId() const { return type_id_; }
+    int GetType() const { return type_; }
 
     Vector3D GetPosition() const { return position_; }
     Vector3D GetDirection() const { return direction_; }
@@ -122,7 +122,7 @@ protected:
     virtual void print(std::ostream&) const {}
 
 
-    int type_id_;
+    int type_;
 
     Vector3D position_;  //!< position coordinates [cm]
     Vector3D direction_; //!< direction vector, angles in [rad]

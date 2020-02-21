@@ -90,9 +90,6 @@ class UtilityIntegralDisplacement : public UtilityIntegral {
         return new UtilityIntegralDisplacement(utility, *this);
     }
 
-    // double Calculate(double ei, double ef, double rnd, Vector3D xi, Vector3D
-    // direction);
-
     virtual ~UtilityIntegralDisplacement();
 
     // Methods
@@ -100,8 +97,8 @@ class UtilityIntegralDisplacement : public UtilityIntegral {
     double Calculate(double ei,
                      double ef,
                      double rnd,
-                     Vector3D xi,
-                     Vector3D direction);
+                     const Vector3D& xi,
+                     const Vector3D& direction);
 
    private:
     UtilityDecorator& operator=(

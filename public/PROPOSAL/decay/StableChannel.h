@@ -31,13 +31,10 @@
 
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/Secondaries.h"
 
 
 namespace PROPOSAL {
-
-class Particle;
 
 class StableChannel : public DecayChannel
 {

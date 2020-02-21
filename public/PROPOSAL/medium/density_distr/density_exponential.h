@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/medium/density_distr/density_distr.h"
 
 namespace PROPOSAL {

@@ -1,7 +1,7 @@
-#include "PROPOSAL/medium/density_distr/density_distr.h"
+
 #include <iostream>
 #include "PROPOSAL/Logging.h"
-#include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/medium/density_distr/density_distr.h"
 
 using namespace PROPOSAL;
 

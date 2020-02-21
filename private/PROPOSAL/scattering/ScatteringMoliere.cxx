@@ -223,7 +223,7 @@ bool ScatteringMoliere::compare(const Scattering& scattering) const {
 
 void ScatteringMoliere::print(std::ostream& os) const
 {
-    os << "Medium: " << *medium_ << '\n';
+    os << "Medium:\n" << *medium_ << '\n';
 }
 
 //----------------------------------------------------------------------------//

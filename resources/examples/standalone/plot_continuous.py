@@ -32,7 +32,7 @@ def muons(energy, statistics, vcut, do_continuous_randomization, dist):
             interpolation_def=interpolation_def
     )
 
-    mu = pp.particle.DynamicData(mu_def.id)
+    mu = pp.particle.DynamicData(mu_def.particle_type)
     mu.position = pp.Vector3D(0, 0, 0)
     mu.direction = pp.Vector3D(0, 0, -1)
     mu.energy = energy
@@ -46,7 +46,7 @@ def muons(energy, statistics, vcut, do_continuous_randomization, dist):
 
         secondaries = prop.propagate(mu, dist * 100)
 
-        mu_energies.append(secondaries.parent_particle_energy[-1])
+        mu_energies.append(secondaries.energy[-1])
         # del secondaries
 
     return mu_energies

@@ -33,7 +33,6 @@
 #include <vector>
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/Spline.h"
-#include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/medium/density_distr/density_polynomial.h"
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

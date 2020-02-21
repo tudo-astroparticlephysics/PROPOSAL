@@ -75,6 +75,8 @@ public:
         bool operator==(const Definition&) const;
         bool operator!=(const Definition&) const;
         /* Definition& operator=(const Definition&); */
+        friend std::ostream& operator<<(std::ostream&, Definition const&);
+        void swap(Definition&);
 
         void SetMedium(std::shared_ptr<const Medium>);
         std::shared_ptr<const Medium> GetMedium() const { return medium_; }
@@ -109,17 +111,14 @@ public:
     };
 
 public:
-    // Sector(Particle&);
     Sector(const ParticleDef&, const Definition&);
     Sector(const ParticleDef&, const Definition&, const InterpolationDef&);
-    Sector(const ParticleDef&, const Sector&);
-    // Sector(Particle&, const Geometry&, const Utility&, const Scattering&,
-    // bool do_interpolation, const Definition& def = Definition());
     Sector(const Sector&);
     ~Sector();
 
     bool operator==(const Sector&) const;
     bool operator!=(const Sector&) const;
+    friend std::ostream& operator<<(std::ostream&, Sector const&);
 
     // Sector& operator=(const Sector& collection);
     // friend std::ostream& operator<<(std::ostream& os, Sector const&

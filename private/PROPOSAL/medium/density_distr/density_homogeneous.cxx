@@ -1,7 +1,7 @@
 
-#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
 #include <cmath>
 #include <iostream>
+#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
 
 using namespace PROPOSAL;
 

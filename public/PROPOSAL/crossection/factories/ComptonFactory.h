@@ -34,6 +34,7 @@
 #include <map>
 #include <string>
 #include <memory>
+#include <sstream>
 
 #include "PROPOSAL/methods.h"
 
@@ -80,6 +81,19 @@ namespace PROPOSAL {
             bool operator!=(const ComptonFactory::Definition& def) const
             {
                 return !(*this == def);
+            }
+
+            friend std::ostream& operator<<(std::ostream& os, PROPOSAL::ComptonFactory::Definition const& definition)
+            {
+                std::stringstream ss;
+                ss << " Compton Definition (" << &definition << ") ";
+                os << Helper::Centered(60, ss.str()) << '\n';
+
+                os << "Parametrization: " << definition.parametrization << std::endl;
+                os << "Multiplier: " << definition.multiplier << std::endl;
+
+                os << Helper::Centered(60, "");
+                return os;
             }
 
             Enum parametrization;

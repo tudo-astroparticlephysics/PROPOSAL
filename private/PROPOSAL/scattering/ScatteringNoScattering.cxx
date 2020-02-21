@@ -52,7 +52,7 @@ bool ScatteringNoScattering::compare(const Scattering& scattering) const
 
 void ScatteringNoScattering::print(std::ostream& os) const
 {
-    os << "Medium: " << *medium_ << '\n';
+    os << "Medium:\n" << *medium_ << '\n';
 }
 
 //----------------------------------------------------------------------------//

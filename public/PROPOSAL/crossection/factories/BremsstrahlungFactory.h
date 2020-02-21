@@ -34,6 +34,7 @@
 #include <map>
 #include <string>
 #include <memory>
+#include <sstream>
 
 #include "PROPOSAL/methods.h"
 
@@ -88,6 +89,20 @@ public:
         bool operator!=(const BremsstrahlungFactory::Definition& def) const
         {
             return !(*this == def);
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, PROPOSAL::BremsstrahlungFactory::Definition const& definition)
+        {
+            std::stringstream ss;
+            ss << " Bremsstrahlung' Definition (" << &definition << ") ";
+            os << Helper::Centered(60, ss.str()) << '\n';
+
+            os << "Parametrization: " << definition.parametrization << std::endl;
+            os << "Multiplier: " << definition.multiplier << std::endl;
+            os << "LPM Effect: " << definition.lpm_effect << std::endl;
+
+            os << Helper::Centered(60, "");
+            return os;
         }
 
         Enum parametrization;

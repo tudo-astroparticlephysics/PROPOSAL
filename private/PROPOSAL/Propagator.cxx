@@ -6,19 +6,17 @@
 
 // #include <cmath>
 
-#include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 #include <fstream>
 #include <memory>
 
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
 
 #include "PROPOSAL/geometry/Box.h"
 #include "PROPOSAL/geometry/Cylinder.h"
 #include "PROPOSAL/geometry/GeometryFactory.h"
 #include "PROPOSAL/geometry/Sphere.h"
-
-#include "PROPOSAL/medium/MediumFactory.h"
 
 #include "PROPOSAL/particle/Particle.h"
 
@@ -119,7 +117,7 @@ Propagator::Propagator(const Propagator& propagator)
     , detector_(propagator.detector_)
 {
     for (unsigned int i = 0; i < propagator.sectors_.size(); ++i) {
-        sectors_[i] = new Sector(particle_def_, *propagator.sectors_[i]);
+        sectors_[i] = new Sector(*propagator.sectors_[i]);
 
         if (propagator.sectors_[i] == propagator.current_sector_) {
             current_sector_ = sectors_[i];
@@ -402,8 +400,7 @@ Secondaries Propagator::Propagate(
 
         if (std::abs(max_distance - p_condition->GetPropagatedDistance()) < PARTICLE_POSITION_RESOLUTION
             || p_condition->GetEnergy() <= minimal_energy
-            || p_condition->GetTypeId()
-                == static_cast<int>(InteractionType::Decay))
+            || p_condition->GetType() == static_cast<int>(InteractionType::Decay))
             break;
     }
     if (detector_->IsInside(
