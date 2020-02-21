@@ -132,9 +132,9 @@ Propagator::Propagator(
     , particle_def_(particle_def)
     , detector_(NULL)
 {
-    int global_seed;
-    bool do_interpolation;
-    bool uniform;
+    int global_seed = global_seed_;
+    bool do_interpolation = do_interpolation_;
+    bool uniform = uniform_;
 
     InterpolationDef interpolation_def;
     std::unique_ptr<Sector::Definition> sec_def_global(new Sector::Definition());
