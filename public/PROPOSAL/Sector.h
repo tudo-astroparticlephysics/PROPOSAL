@@ -189,13 +189,10 @@ public:
     // --------------------------------------------------------------------- //
 
     ParticleLocation::Enum GetLocation() const { return sector_def_.location; }
-
     std::shared_ptr<Scattering> GetScattering() const { return scattering_; }
     const ParticleDef GetParticleDef() const { return particle_def_; }
     const Utility& GetUtility() const { return utility_; }
-    std::shared_ptr<const Medium> GetMedium() const { return utility_.GetMedium(); }
     const Definition& GetSectorDef() const { return sector_def_; }
-    Definition& GetSectorDef() { return sector_def_; }
 
 protected:
     Sector& operator=(const Sector&); // Undefined & not allowed

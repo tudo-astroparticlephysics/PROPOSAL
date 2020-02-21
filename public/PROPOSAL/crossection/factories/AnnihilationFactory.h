@@ -100,13 +100,8 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         typedef std::function<Annihilation*(const ParticleDef&,
-<<<<<<< HEAD
                                                std::shared_ptr<const Medium>,
                                                double multiplier)>
-=======
-                                            const Medium&,
-                                            double multiplier)>
->>>>>>> origin/master
                 RegisterFunction;
 
 

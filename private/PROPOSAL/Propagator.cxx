@@ -223,7 +223,6 @@ Propagator::Propagator(
                         }
                     }
 
-                    std::cout << sec_def << std::endl;
                     if (do_interpolation) {
                         sectors_.push_back(new Sector(particle_def_, sec_def, interpolation_def));
                     } else {
@@ -462,9 +461,9 @@ void Propagator::ChooseCurrentSector(
             == sectors_[*iter]->GetSectorDef().GetGeometry()->GetHierarchy()) {
             // Current Density is smaller -> Set the new sector!
             //
-            if (current_sector_->GetMedium()->GetCorrectedMassDensity(
+            if (current_sector_->GetSectorDef().GetMedium()->GetCorrectedMassDensity(
                     particle_position)
-                < sectors_[*iter]->GetMedium()->GetCorrectedMassDensity(
+                < sectors_[*iter]->GetSectorDef().GetMedium()->GetCorrectedMassDensity(
                       particle_position))
                 current_sector_ = sectors_[*iter];
         }
