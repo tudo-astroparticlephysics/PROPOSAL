@@ -22,11 +22,19 @@
 		"photo_multiplier" : 1,
 		"ioniz_multiplier" : 1,
 		"epair_multiplier" : 1,
+        "annihilation": "none",
 		"brems" : "BremsAndreevBezrukovBugaev",
+		"compton" : "none",
 		"photo" : "PhotoButkevichMikhailov",
+        "photopair": "none",
+        "epair": "epairkelnerkokoulinpetrukhin",
+        "ioniz": "ionizbetheblochrossi",
+        "mupair": "none",
+        "weak": "none",
+
+		"photo_shadow" : "ShadowDuttaRenoSarcevicSeckel",
 		"lpm" : false,
 		"photo_hard_component" : true,
-		"photo_shadow" : "ShadowDuttaRenoSarcevicSeckel",
 
 		"cuts_infront":
 		{

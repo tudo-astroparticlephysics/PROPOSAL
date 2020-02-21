@@ -70,7 +70,7 @@ Sector::Definition::Definition(const Definition& def)
 }
 
 Sector::Definition::Definition(const nlohmann::json& config)
-    /* : utility_def(config) */
+    : utility_def(config)
 {
     if(not config.is_object()) throw std::invalid_argument("No json object found.");
 
