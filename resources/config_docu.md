@@ -99,7 +99,7 @@ Choosing a different scattering parametrization can significantly alter the comp
 | ---------------- | ------ | ----------- | ----------- |
 | `exact_time`     | Bool   | `True`      | Decides, whether the energy dependence is considered when calculating the elapsed time |
 | `stopping_decay` | Bool   | `True`      | Decides, whether the particle gets stopped and forced to decay, if its energy get below a pre-defined threshold. |
-| `scattering`     | String | `"Moliere"` | Multiple scattering parametrization describing the displacement from the initial propagation direction |
+| `scattering`     | String | `"HighlandIntegral"` | Multiple scattering parametrization describing the displacement from the initial propagation direction |
 
 
 ### Cross section parameters ###
