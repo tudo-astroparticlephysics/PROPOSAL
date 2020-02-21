@@ -199,7 +199,7 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dEdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
@@ -244,7 +244,7 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
@@ -292,7 +292,7 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
@@ -344,7 +344,7 @@ stochastic_loss_stored;
 
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
@@ -402,7 +402,7 @@ rnd2 >> E1_stored >> E2_stored;
 
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
@@ -453,7 +453,7 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dEdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
@@ -501,7 +501,7 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
@@ -552,7 +552,7 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>  energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
@@ -604,7 +604,7 @@ in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>  energy >> par
 stochastic_loss_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;

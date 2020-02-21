@@ -190,7 +190,7 @@ TEST(Bremsstrahlung, Test_of_dEdx)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -242,7 +242,7 @@ TEST(Bremsstrahlung, Test_of_dNdx)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -297,7 +297,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -352,7 +352,7 @@ TEST(Bremsstrahlung, Test_of_e)
             stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -405,7 +405,7 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -455,7 +455,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -511,7 +511,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -567,7 +567,7 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
             stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;

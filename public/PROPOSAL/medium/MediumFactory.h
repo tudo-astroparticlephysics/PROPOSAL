@@ -24,6 +24,6 @@ static std::map<const Medium_Type, std::shared_ptr<Medium>> Medium_Map
 } // namespace PROPOSAL
 
 namespace PROPOSAL{
-std::shared_ptr<Medium> GetMedium(Medium_Type type, double density_correction=1.0);
-std::shared_ptr<Medium> GetMedium(std::string name, double density_correction=1.0);
+std::shared_ptr<Medium> CreateMedium(Medium_Type type, double density_correction=1.0);
+std::shared_ptr<Medium> CreateMedium(std::string name, double density_correction=1.0);
 }

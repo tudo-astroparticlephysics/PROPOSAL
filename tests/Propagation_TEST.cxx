@@ -128,7 +128,9 @@ TEST(Propagation, Test_nan)
 
     // one propagator for each particle definition
     // medium/detector configuration
+    std::cout << "MU" << std::endl;
     Propagator prop_mu(mu_def, "resources/config_ice.json");
+    std::cout << "TAU" << std::endl;
     Propagator prop_tau(tau_def, "resources/config_ice.json");
 
     // Possibility to register propagator in a service

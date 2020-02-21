@@ -175,7 +175,7 @@ TEST(Scattering, Scatter)
 
         ParticleDef particle_def = getParticleDef(particleName);
 
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         Scattering* scattering = NULL;

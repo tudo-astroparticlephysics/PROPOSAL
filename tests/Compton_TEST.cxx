@@ -145,7 +145,7 @@ in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >>
 parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -194,7 +194,7 @@ in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >>
 parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -246,7 +246,7 @@ in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_stored >
 parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -298,7 +298,7 @@ in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >>
 stochastic_loss_stored >> parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -348,7 +348,7 @@ in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >>
 parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -394,7 +394,7 @@ while (in.good())
 in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -446,7 +446,7 @@ while (in.good())
 in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_stored >> parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -498,7 +498,7 @@ while (in.good())
 in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;

@@ -270,7 +270,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
             hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -318,7 +318,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
             hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -367,7 +367,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd)
             parametrization >> hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -416,7 +416,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
             stochastic_loss_stored >> parametrization >> hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -465,7 +465,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
             hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -515,7 +515,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
             hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -566,7 +566,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd_Interpolant)
             parametrization >> hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -617,7 +617,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
             stochastic_loss_stored >> parametrization >> hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -668,7 +668,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
             shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -716,7 +716,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
             shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -765,7 +765,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_rnd)
             parametrization >> shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -814,7 +814,7 @@ TEST(PhotoQ2Integration, Test_of_e)
             stochastic_loss_stored >> parametrization >> shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -863,7 +863,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
             shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -913,7 +913,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
             shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -964,7 +964,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_rnd_Interpolant)
             parametrization >> shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -1015,7 +1015,7 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
             stochastic_loss_stored >> parametrization >> shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = GetMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
