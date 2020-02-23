@@ -4,7 +4,7 @@
 #define BREMS_DEF(module, cls)                                           \
     py::class_<Brems##cls, std::shared_ptr<Brems##cls>, Bremsstrahlung>( \
         module, #cls)                                                    \
-        .def(py::init<const ParticleDef&, const Medium&,                 \
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>,                 \
                       const EnergyCutSettings&, double, bool>(),         \
              py::arg("particle_def"), py::arg("medium"),                 \
              py::arg("energy_cuts"), py::arg("multiplier"),              \
@@ -13,7 +13,7 @@
 #define PHOTO_REAL_DEF(module, cls, parent)                                    \
     py::class_<Photo##cls, std::shared_ptr<Photo##cls>, Photo##parent>(module, \
                                                                        #cls)   \
-        .def(py::init<const ParticleDef&, const Medium&,                       \
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>,                       \
                       const EnergyCutSettings&, double, bool>(),               \
              py::arg("particle_def"), py::arg("medium"),                       \
              py::arg("energy_cuts"), py::arg("multiplier"),                    \
@@ -23,7 +23,7 @@
     py::class_<Photo##cls, std::shared_ptr<Photo##cls>, PhotoQ2Integral>(      \
         module, #cls)                                                          \
         .def(                                                                  \
-            py::init<const ParticleDef&, const Medium&,                        \
+            py::init<const ParticleDef&, std::shared_ptr<const Medium>,                        \
                      const EnergyCutSettings&, double, const ShadowEffect&>(), \
             py::arg("particle_def"), py::arg("medium"),                        \
             py::arg("energy_cuts"), py::arg("multiplier"),                     \
@@ -33,7 +33,7 @@
     py::class_<PhotoQ2Interpolant<Photo##cls>,                               \
                std::shared_ptr<PhotoQ2Interpolant<Photo##cls>>, Photo##cls>( \
         module, #cls "Interpolant")                                          \
-        .def(py::init<const ParticleDef&, const Medium&,                     \
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>,                     \
                       const EnergyCutSettings&, double, const ShadowEffect&, \
                       InterpolationDef>(),                                   \
              py::arg("particle_def"), py::arg("medium"),                     \
@@ -43,7 +43,7 @@
 #define EPAIR_DEF(module, cls)                                   \
     py::class_<Epair##cls, std::shared_ptr<Epair##cls>,          \
                EpairProductionRhoIntegral>(module, #cls)         \
-        .def(py::init<const ParticleDef&, const Medium&,         \
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>,         \
                       const EnergyCutSettings&, double, bool>(), \
              py::arg("particle_def"), py::arg("medium"),         \
              py::arg("energy_cuts"), py::arg("multiplier"),      \
@@ -53,7 +53,7 @@
     py::class_<EpairProductionRhoInterpolant<Epair##cls>,                  \
                std::shared_ptr<EpairProductionRhoInterpolant<Epair##cls>>, \
                Epair##cls>(module, #cls "Interpolant")                     \
-        .def(py::init<const ParticleDef&, const Medium&,                   \
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>,                   \
                       const EnergyCutSettings&, double, bool,              \
                       InterpolationDef>(),                                 \
              py::arg("particle_def"), py::arg("medium"),                   \
@@ -63,7 +63,7 @@
 #define MUPAIR_DEF(module, cls)                                  \
     py::class_<Mupair##cls, std::shared_ptr<Mupair##cls>,        \
                MupairProductionRhoIntegral>(module, #cls)        \
-        .def(py::init<const ParticleDef&, const Medium&,         \
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>,         \
                       const EnergyCutSettings&, double, bool>(), \
              py::arg("particle_def"), py::arg("medium"),         \
              py::arg("energy_cuts"), py::arg("multiplier"),      \
@@ -73,7 +73,7 @@
     py::class_<MupairProductionRhoInterpolant<Mupair##cls>,                        \
                std::shared_ptr<MupairProductionRhoInterpolant<Mupair##cls>>,       \
                Mupair##cls>(module, #cls "Interpolant")                            \
-        .def(py::init<const ParticleDef&, const Medium&,                           \
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>,                           \
                       const EnergyCutSettings&, double, bool, InterpolationDef>(), \
              py::arg("particle_def"), py::arg("medium"),                           \
              py::arg("energy_cuts"), py::arg("multiplier"),                        \
@@ -315,7 +315,7 @@ void init_parametrization(py::module& m) {
              py::arg("parametrization_str"))
         .def("create_bremsstrahlung",
              (CrossSection *
-              (BremsstrahlungFactory::*)(const ParticleDef&, const Medium&,
+              (BremsstrahlungFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>,
                                          const EnergyCutSettings&,
                                          const BremsstrahlungFactory::
                                              Definition&)const) &
@@ -324,7 +324,7 @@ void init_parametrization(py::module& m) {
              py::arg("brems_def"))
         .def("create_bremsstrahlung_interpol",
              (CrossSection *
-              (BremsstrahlungFactory::*)(const ParticleDef&, const Medium&,
+              (BremsstrahlungFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>,
                                          const EnergyCutSettings&,
                                          const BremsstrahlungFactory::
                                              Definition&,
@@ -415,7 +415,7 @@ void init_parametrization(py::module& m) {
              py::arg("parametrization_str"))
         .def("create_pairproduction",
              (CrossSection *
-              (EpairProductionFactory::*)(const ParticleDef&, const Medium&,
+              (EpairProductionFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>,
                                           const EnergyCutSettings&,
                                           const EpairProductionFactory::
                                               Definition&)const) &
@@ -424,7 +424,7 @@ void init_parametrization(py::module& m) {
              py::arg("epair_def"))
         .def("create_pairproduction_interpol",
              (CrossSection *
-              (EpairProductionFactory::*)(const ParticleDef&, const Medium&,
+              (EpairProductionFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>,
                                           const EnergyCutSettings&,
                                           const EpairProductionFactory::
                                               Definition&,
@@ -475,7 +475,7 @@ void init_parametrization(py::module& m) {
 
 
     py::class_<AnnihilationHeitler, std::shared_ptr<AnnihilationHeitler>, Annihilation>(m_sub_annihilation, "Heitler")
-        .def(py::init<const ParticleDef&, const Medium&, double>(),
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>, double>(),
              py::arg("particle_def"),
              py::arg("medium"),
              py::arg("multiplier"));
@@ -488,10 +488,10 @@ void init_parametrization(py::module& m) {
     py::class_<AnnihilationFactory, std::unique_ptr<AnnihilationFactory, py::nodelete>>(m_sub_annihilation, "AnnihilationFactory")
             .def("get_enum_from_str", &AnnihilationFactory::GetEnumFromString, py::arg("parametrization_str"))
             .def("create_annihilation",
-                 (CrossSection* (AnnihilationFactory::*)(const ParticleDef&, const Medium&, const AnnihilationFactory::Definition&)const)&AnnihilationFactory::CreateAnnihilation,
+                 (CrossSection* (AnnihilationFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const AnnihilationFactory::Definition&)const)&AnnihilationFactory::CreateAnnihilation,
                  py::arg("particle_def"), py::arg("medium"), py::arg("annihilation_def"))
             .def("create_annihilation_interpol",
-                 (CrossSection* (AnnihilationFactory::*)(const ParticleDef&, const Medium&, const AnnihilationFactory::Definition&, InterpolationDef)const)&AnnihilationFactory::CreateAnnihilation,
+                 (CrossSection* (AnnihilationFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const AnnihilationFactory::Definition&, InterpolationDef)const)&AnnihilationFactory::CreateAnnihilation,
                  py::arg("particle_def"), py::arg("medium"), py::arg("annihilation_def"), py::arg("interpolation_def"))
             .def_static("get", &AnnihilationFactory::Get, py::return_value_policy::reference);
 
@@ -583,10 +583,10 @@ void init_parametrization(py::module& m) {
     py::class_<MupairProductionFactory, std::unique_ptr<MupairProductionFactory, py::nodelete>>(m_sub_mupair, "MuPairFactory")
         .def("get_enum_from_str", &MupairProductionFactory::GetEnumFromString, py::arg("parametrization_str"))
         .def("create_mupairproduction",
-            (CrossSection* (MupairProductionFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const MupairProductionFactory::Definition&)const)&MupairProductionFactory::CreateMupairProduction,
+            (CrossSection* (MupairProductionFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, const MupairProductionFactory::Definition&)const)&MupairProductionFactory::CreateMupairProduction,
             py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("mupair_def"))
         .def("create_mupairproduction_interpol",
-            (CrossSection* (MupairProductionFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const MupairProductionFactory::Definition&, InterpolationDef)const)&MupairProductionFactory::CreateMupairProduction,
+            (CrossSection* (MupairProductionFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, const MupairProductionFactory::Definition&, InterpolationDef)const)&MupairProductionFactory::CreateMupairProduction,
             py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("mupair_def"), py::arg("interpolation_def"))
         .def_static("get", &MupairProductionFactory::Get, py::return_value_policy::reference);
 
@@ -634,7 +634,7 @@ void init_parametrization(py::module& m) {
     py::class_<WeakCooperSarkarMertsch,
                std::shared_ptr<WeakCooperSarkarMertsch>, WeakInteraction>(
         m_sub_weak, "CooperSarkarMertsch")
-        .def(py::init<const ParticleDef&, const Medium&, double>(),
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>, double>(),
              py::arg("particle_def"), py::arg("medium"), py::arg("multiplier"));
 
     py::enum_<WeakInteractionFactory::Enum>(m_sub_weak, "WeakParametrization")
@@ -646,10 +646,10 @@ void init_parametrization(py::module& m) {
     py::class_<WeakInteractionFactory, std::unique_ptr<WeakInteractionFactory, py::nodelete>>(m_sub_weak, "WeakFactory")
         .def("get_enum_from_str", &WeakInteractionFactory::GetEnumFromString, py::arg("parametrization_str"))
         .def("create_weak",
-            (CrossSection* (WeakInteractionFactory::*)(const ParticleDef&, const Medium&, const WeakInteractionFactory::Definition&)const)&WeakInteractionFactory::CreateWeakInteraction,
+            (CrossSection* (WeakInteractionFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const WeakInteractionFactory::Definition&)const)&WeakInteractionFactory::CreateWeakInteraction,
             py::arg("particle_def"), py::arg("medium"), py::arg("weak_def"))
         .def("create_weak_interpol",
-            (CrossSection* (WeakInteractionFactory::*)(const ParticleDef&, const Medium&, const WeakInteractionFactory::Definition&, InterpolationDef)const)&WeakInteractionFactory::CreateWeakInteraction,
+            (CrossSection* (WeakInteractionFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const WeakInteractionFactory::Definition&, InterpolationDef)const)&WeakInteractionFactory::CreateWeakInteraction,
             py::arg("particle_def"), py::arg("medium"), py::arg("weak_def"), py::arg("interpolation_def"))
         .def_static("get", &WeakInteractionFactory::Get, py::return_value_policy::reference);
 
@@ -850,7 +850,7 @@ void init_parametrization(py::module& m) {
              py::arg("parametrization_str"))
         .def("create_photonuclear",
              (CrossSection *
-              (PhotonuclearFactory::*)(const ParticleDef&, const Medium&,
+              (PhotonuclearFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>,
                                        const EnergyCutSettings&,
                                        const PhotonuclearFactory::Definition&)
                   const) &
@@ -859,7 +859,7 @@ void init_parametrization(py::module& m) {
              py::arg("photo_def"))
         .def("create_photonuclear_interpol",
              (CrossSection *
-              (PhotonuclearFactory::*)(const ParticleDef&, const Medium&,
+              (PhotonuclearFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>,
                                        const EnergyCutSettings&,
                                        const PhotonuclearFactory::Definition&,
                                        InterpolationDef) const) &
@@ -916,21 +916,21 @@ void init_parametrization(py::module& m) {
                 )pbdoc");
 
     py::class_<IonizBetheBlochRossi, std::shared_ptr<IonizBetheBlochRossi>, Ionization>(m_sub_ioniz, "BetheBlochRossi")
-        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double>(),
              py::arg("particle_def"),
              py::arg("medium"),
              py::arg("energy_cuts"),
              py::arg("multiplier"));
 
     py::class_<IonizBergerSeltzerBhabha, std::shared_ptr<IonizBergerSeltzerBhabha>, Ionization>(m_sub_ioniz, "BergerSeltzerBhabha")
-            .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+            .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double>(),
              py::arg("particle_def"),
              py::arg("medium"),
              py::arg("energy_cuts"),
              py::arg("multiplier"));
 
     py::class_<IonizBergerSeltzerMoller, std::shared_ptr<IonizBergerSeltzerMoller>, Ionization>(m_sub_ioniz, "BergerSeltzerMoller")
-            .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+            .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double>(),
                  py::arg("particle_def"),
                  py::arg("medium"),
                  py::arg("energy_cuts"),
@@ -945,10 +945,10 @@ void init_parametrization(py::module& m) {
     py::class_<IonizationFactory, std::unique_ptr<IonizationFactory, py::nodelete>>(m_sub_ioniz, "IonizFactory")
             .def("get_enum_from_str", &IonizationFactory::GetEnumFromString, py::arg("parametrization_str"))
             .def("create_ionization",
-                 (CrossSection* (IonizationFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const IonizationFactory::Definition&)const)&IonizationFactory::CreateIonization,
+                 (CrossSection* (IonizationFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, const IonizationFactory::Definition&)const)&IonizationFactory::CreateIonization,
                  py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("ioniz_def"))
             .def("create_ionization_interpol",
-                 (CrossSection* (IonizationFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const IonizationFactory::Definition&, InterpolationDef)const)&IonizationFactory::CreateIonization,
+                 (CrossSection* (IonizationFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, const IonizationFactory::Definition&, InterpolationDef)const)&IonizationFactory::CreateIonization,
                  py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("ioniz_def"), py::arg("interpolation_def"))
             .def_static("get", &IonizationFactory::Get, py::return_value_policy::reference);
 
@@ -990,7 +990,7 @@ void init_parametrization(py::module& m) {
                 )pbdoc");
 
     py::class_<ComptonKleinNishina, std::shared_ptr<ComptonKleinNishina>, Compton>(m_sub_compton, "KleinNishina")
-            .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+            .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double>(),
                  py::arg("particle_def"),
                  py::arg("medium"),
                  py::arg("energy_cuts"),
@@ -1003,10 +1003,10 @@ void init_parametrization(py::module& m) {
     py::class_<ComptonFactory, std::unique_ptr<ComptonFactory, py::nodelete>>(m_sub_compton, "ComptonFactory")
             .def("get_enum_from_str", &ComptonFactory::GetEnumFromString, py::arg("parametrization_str"))
             .def("create_compton",
-                 (CrossSection* (ComptonFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ComptonFactory::Definition&)const)&ComptonFactory::CreateCompton,
+                 (CrossSection* (ComptonFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, const ComptonFactory::Definition&)const)&ComptonFactory::CreateCompton,
                  py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("compton_def"))
             .def("create_compton_interpol",
-                 (CrossSection* (ComptonFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ComptonFactory::Definition&, InterpolationDef)const)&ComptonFactory::CreateCompton,
+                 (CrossSection* (ComptonFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, const ComptonFactory::Definition&, InterpolationDef)const)&ComptonFactory::CreateCompton,
                  py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("compton_def"), py::arg("interpolation_def"))
             .def_static("get", &ComptonFactory::Get, py::return_value_policy::reference);
 
@@ -1044,7 +1044,7 @@ void init_parametrization(py::module& m) {
                 )pbdoc");
 
     py::class_<PhotoPairTsai, std::shared_ptr<PhotoPairTsai>, PhotoPairProduction>(m_sub_photopair, "Tsai")
-            .def(py::init<const ParticleDef&, const Medium&, double>(),
+            .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>, double>(),
                  py::arg("particle_def"), py::arg("medium"), py::arg("multiplier"));
 
     py::enum_<PhotoPairFactory::Enum>(m_sub_photopair, "PhotoPairParametrization")
@@ -1054,10 +1054,10 @@ void init_parametrization(py::module& m) {
     py::class_<PhotoPairFactory, std::unique_ptr<PhotoPairFactory, py::nodelete>>(m_sub_photopair, "PhotoPairFactory")
             .def("get_enum_from_str", &PhotoPairFactory::GetEnumFromString, py::arg("parametrization_str"))
             .def("create_photopair",
-                 (CrossSection* (PhotoPairFactory::*)(const ParticleDef&, const Medium&, const PhotoPairFactory::Definition&)const)&PhotoPairFactory::CreatePhotoPair,
+                 (CrossSection* (PhotoPairFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const PhotoPairFactory::Definition&)const)&PhotoPairFactory::CreatePhotoPair,
                  py::arg("particle_def"), py::arg("medium"), py::arg("photopair_def"))
             .def("create_photopair_interpol",
-                 (CrossSection* (PhotoPairFactory::*)(const ParticleDef&, const Medium&, const PhotoPairFactory::Definition&, InterpolationDef)const)&PhotoPairFactory::CreatePhotoPair,
+                 (CrossSection* (PhotoPairFactory::*)(const ParticleDef&, std::shared_ptr<const Medium>, const PhotoPairFactory::Definition&, InterpolationDef)const)&PhotoPairFactory::CreatePhotoPair,
                  py::arg("particle_def"), py::arg("medium"), py::arg("photopair_def"), py::arg("interpolation_def"))
             .def_static("get", &PhotoPairFactory::Get, py::return_value_policy::reference);
 
@@ -1101,7 +1101,7 @@ void init_parametrization(py::module& m) {
                  py::arg("component_index"));
 
     py::class_<PhotoAngleTsaiIntegral, std::shared_ptr<PhotoAngleTsaiIntegral>, PhotoAngleDistribution>(m_sub_photopair, "PhotoAngleTsaiIntegral")
-            .def(py::init<const ParticleDef&, const Medium&>(),
+            .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>>(),
                  py::arg("particle_def"),
                  py::arg("medium"))
             .def("FunctionToIntegral", &PhotoAngleTsaiIntegral::FunctionToIntegral,
@@ -1110,12 +1110,12 @@ void init_parametrization(py::module& m) {
                  py::arg("theta"));
 
     py::class_<PhotoAngleNoDeflection, std::shared_ptr<PhotoAngleNoDeflection>, PhotoAngleDistribution>(m_sub_photopair, "PhotoAngleNoDeflection")
-            .def(py::init<const ParticleDef&, const Medium&>(),
+            .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>>(),
                  py::arg("particle_def"),
                  py::arg("medium"));
 
     py::class_<PhotoAngleEGS, std::shared_ptr<PhotoAngleEGS>, PhotoAngleDistribution>(m_sub_photopair, "PhotoAngleEGS")
-            .def(py::init<const ParticleDef&, const Medium&>(),
+            .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>>(),
                  py::arg("particle_def"),
                  py::arg("medium"));
 
