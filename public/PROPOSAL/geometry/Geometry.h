@@ -38,7 +38,6 @@
 
 
 namespace PROPOSAL {
-
 class Geometry
 {
 public:
@@ -126,5 +125,12 @@ protected:
 
     unsigned int hierarchy_; //!< adds a hierarchy of geometry objects to allow crossing geometries
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+    enum Geometry_Type : int { SPHERE, BOX, CYLINDER };
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+    const std::array<std::string, 3>  Geometry_Name = { "sphere", "box", "cylinder" };
 } // namespace PROPOSAL

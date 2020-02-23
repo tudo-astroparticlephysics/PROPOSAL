@@ -38,14 +38,14 @@
 #include "PROPOSAL/geometry/Cylinder.h"
 
 namespace PROPOSAL {
-static std::map<const std::string, std::shared_ptr<Geometry>> Geometry_Map{
-    { "sphere", std::shared_ptr<Geometry>(new Sphere) },
-    { "box", std::shared_ptr<Geometry>(new Box) },
-    { "cylinder", std::shared_ptr<Geometry>(new Cylinder) },
+static std::map<const Geometry_Type, std::shared_ptr<Geometry>> Geometry_Map{
+    { Geometry_Type::SPHERE, std::shared_ptr<Geometry>(new Sphere) },
+    { Geometry_Type::BOX, std::shared_ptr<Geometry>(new Box) },
+    { Geometry_Type::CYLINDER, std::shared_ptr<Geometry>(new Cylinder) },
 };
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-std::shared_ptr<Geometry> GetGeometry(std::string name);
-std::shared_ptr<const Geometry> CreateGeometry(std::string name);
+std::shared_ptr<Geometry> CreateGeometry(std::string name);
+std::shared_ptr<Geometry> CreateGeometry(Geometry_Type type);
 } // namespace PROPOSAL
