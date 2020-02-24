@@ -144,6 +144,44 @@ double dilog(double x) {
     return x;
 }
 
+// double trilog(double x)
+// {
+//     if (x == 0.)
+//         return 0.;
+//     else if (x == 1.)
+//         return ZETA3;
+//     else if (x == -1.)
+//         return -0.75*ZETA3;
+//     else if (std::abs(x) < 1.)
+//     {
+//         int max_iter = 100;
+//         double uncertainty_limit = 1e-6;
+//         double power_series = 0.25*x;
+//         double x_k = x;
+//         double addend;
+//         for (int k=2; k <= max_iter; k++)
+//         {
+//             x_k = x_k*x;
+//             addend = x_k / (k*k*k * (k+1)*(k+1));
+//             if (k > 5 && std::abs(addend/power_series) < uncertainty_limit)
+//                 break;
+//             if (k == max_iter)
+//                 log_fatal("reach max iterations in trilog");
+//             power_series += addend;
+//         }
+//         return -4 + (3 - 3./x)*std::log(1 - x) + (2 + 1./x)*dilog(x) + power_series;
+//     }
+//     else if (x < -1)
+//     {
+//         double ln_x = std::log(-x);
+//         return trilog(1./x) - ln_x*ln_x*ln_x/6 - PI*PI/6*ln_x;
+//     }
+//     else // (x > 1)
+//     {
+//         double ln_x = std::log(x);
+//         return -trilog(1./x) - trilog(1 - 1./x) + ZETA3 + ln_x*ln_x*ln_x/6 - 0.5*ln_x*ln_x*std::log(x - 1) + PI*PI/6*ln_x;
+//     }
+// }
 
 double NewtonRaphson(std::function<double(double)> func,
                      std::function<double(double)> dfunc,

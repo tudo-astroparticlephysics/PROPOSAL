@@ -36,6 +36,7 @@ extern const double LOG10;            // log(10)
 extern const double SQRT2;            // sqrt(2)
 extern const double SQRT3;            // sqrt(3)
 extern const double SQRTE;            // sqrt(e)
+extern const double ZETA3;            // rieman zeta(3)
 extern const double EULER_MASCHERONI; // Euler-Mascheroni constant
 
 // integration parameters

@@ -220,7 +220,7 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Compone
         // eq. 48
         double Aosc = (1 - la * x) * (au - ac - MPI / component.GetAverageNucleonWeight() * (au * au - ac * ac));
         // eq. 44
-        G = 1 - Mb * component.GetMN() * Aosc;
+        G = 1 - Mb * component.GetWoodSaxon() * Aosc;
     } else
     {
         const double M1 = 0.129;
@@ -229,9 +229,9 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Compone
 
         double m1, m2, m3, x0, sgn, tmp;
 
-        m1 = M1 * component.GetMN();
-        m2 = M2 * component.GetMN();
-        m3 = M3 * component.GetMN();
+        m1 = M1 * component.GetWoodSaxon();
+        m2 = M2 * component.GetWoodSaxon();
+        m3 = M3 * component.GetWoodSaxon();
         nu *= 1.e-3;
         // eq. 53
         sgn = 112.2 * (0.609 * std::pow(nu, 0.0988) + 1.037 * std::pow(nu, -0.5944));

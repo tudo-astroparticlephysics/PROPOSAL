@@ -104,11 +104,7 @@ void init_components(py::module& m) {
                                R"pbdoc(
                     Explanation still has to be added.
                 )pbdoc")
-        .def_property_readonly("mn", &Components::Component::GetMN,
-                               R"pbdoc(
-                    Explanation still has to be added.
-                )pbdoc")
-        .def_property_readonly("r0", &Components::Component::GetR0,
+        .def_property_readonly("wood_saxon", &Components::Component::GetWoodSaxon,
                                R"pbdoc(
                     Explanation still has to be added.
                 )pbdoc");
