@@ -5,11 +5,9 @@
 #include "PROPOSAL/Secondaries.h"
 #include "pyBindings.h"
 
-#define PARTICLE_DEF(module, cls)                                           \
-    py::class_<cls##Def, ParticleDef,                                       \
-               std::unique_ptr<cls##Def, py::nodelete>>(module, #cls "Def") \
-        .def_static("get", &cls##Def::Get,                                  \
-                    py::return_value_policy::reference);
+#define PARTICLE_DEF(module, cls)                                                    \
+    py::class_<cls##Def, ParticleDef, std::shared_ptr<cls##Def>>(module, #cls "Def") \
+        .def(py::init<>());                                                          \
 
 namespace py = pybind11;
 using namespace PROPOSAL;
@@ -90,7 +88,7 @@ void init_particle(py::module& m) {
                       R"pbdoc(
                 particle type of the weak partner particle
             )pbdoc")
-        // .def_readonly("harc_component_table",
+        // .def_readonly("hard_component_table",
         // &ParticleDef::hard_component_table)
         // .add_property("hard_component_table",
         // make_function(&get_hard_component, return_internal_reference<>()))

@@ -45,7 +45,6 @@
             return instance;                                                                                           \
         }                                                                                                              \
                                                                                                                        \
-    private:                                                                                                           \
         cls##Def();                                                                                                    \
         ~cls##Def();                                                                                                   \
     };
