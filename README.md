@@ -18,10 +18,8 @@
 ###############################################################################
 ```
 
-[![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3665606.svg)](https://doi.org/10.5281/zenodo.3665606)
 
-# PROPOSAL #
+# PROPOSAL [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3665606.svg)](https://doi.org/10.5281/zenodo.3665606)
 
 PROPOSAL (Propagator with optimal precision and optimized speed for all
 leptons) is presented as a public tool for muon propagation through transparent
@@ -105,12 +103,12 @@ and if you want to cite the latest improvements
 ```
 
 
-## Requirements ##
+## Requirements
 
-- [log4cplus](https://github.com/log4cplus/log4cplus) 2.0.2
 - CMake 2.8 or higher
+- C++11 compatible compiler
 
-## Recommended ##
+## Recommended
 
 - Doxygen (For pdf and html documentation of the code)
 - [pybind11](https://github.com/pybind/pybind11)
@@ -119,15 +117,15 @@ and if you want to cite the latest improvements
   provided on your system, pybind11 will be cloned to the project
   source folder.
 
-## Installation ##
+## Installation
 
 Install and compiling instructions for the standalone installation
 are found in [install](INSTALL.md).
 
 
-## Usage ##
+## Usage
 
-### Deployment ###
+### Deployment
 
 PROPOSAL is built as library. So you can include this project in your own
 c++ project by including the header files. The following snippet uses the

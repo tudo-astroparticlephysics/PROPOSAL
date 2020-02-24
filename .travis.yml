@@ -64,7 +64,6 @@ before_install:
 
 install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade; brew install cmake; fi
-- "./install_log4cplus.sh"
 before_script:
 - mkdir build
 - cd build
