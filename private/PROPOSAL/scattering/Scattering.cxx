@@ -53,12 +53,6 @@ Scattering::Scattering(const Scattering& scattering)
 {
 }
 
-/* Scattering::Scattering(const nlohmann::json& config) */
-/*     : particle_def_(config) */
-/* { */
-/*     std::cout << "Scattering not implemented!!!" << std::endl; */
-/* } */
-
 Scattering::~Scattering() {}
 
 bool Scattering::operator==(const Scattering& scattering) const
