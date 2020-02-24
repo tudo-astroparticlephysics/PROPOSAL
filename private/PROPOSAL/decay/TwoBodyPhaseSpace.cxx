@@ -42,8 +42,8 @@ bool TwoBodyPhaseSpace::compare(const DecayChannel& channel) const
 Secondaries TwoBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
 {
     Secondaries products;
-    products.emplace_back(first_daughter_.particle_type);
-    products.emplace_back(second_daughter_.particle_type);
+    products.emplace_back(first_daughter_.particle_type, p_condition.GetPosition(), p_condition.GetDirection(), p_condition.GetEnergy(), p_condition.GetParentParticleEnergy(), p_condition.GetTime(), 0);
+    products.emplace_back(second_daughter_.particle_type, p_condition.GetPosition(), p_condition.GetDirection(), p_condition.GetEnergy(), p_condition.GetParentParticleEnergy(), p_condition.GetTime(), 0);
 
     double momentum    = Momentum(p_def.mass, first_daughter_.mass, second_daughter_.mass);
     Vector3D direction = GenerateRandomDirection();
