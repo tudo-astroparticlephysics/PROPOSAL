@@ -91,27 +91,33 @@ Sector::Definition::Definition(const nlohmann::json& config)
     std::string scattering_model_str = config.value("scattering", "highlandintegral");
     scattering_model = ScatteringFactory::Get().GetEnumFromString(scattering_model_str);
 
-    if(config.contains("shape")) {
-        std::string shape = config["geometry"]["shape"];
-        if (shape == "sphere") {
-            geometry_ = std::make_shared<const Sphere>(config["geometry"]);
-        } else if (shape == "box") {
-            geometry_ = std::make_shared<const Box>(config["geometry"]);
-        } else if (shape == "cylinder") {
-            geometry_ = std::make_shared<const Cylinder>(config["geometry"]);
-        } else {
-            throw std::invalid_argument("You need to specify a detector for each sector");
-        }
+    if(!config.contains("geometry")) {
+        throw std::invalid_argument("A geometry is needed for each sector.");
+    }
+    if(!config.at("geometry").contains("shape")) {
+        throw std::invalid_argument("A shape must be specified.");
     }
 
-    std::string medium_name = "water";
-    double density_correction = 1.0;
-    if(config.contains("medium"))
+    nlohmann::json config_geometry = config.at("geometry");
+    if (config_geometry.at("shape") == "sphere") {
+        geometry_ = std::make_shared<const Sphere>(config_geometry);
+    } else if (config_geometry.at("shape") == "box") {
+        geometry_ = std::make_shared<const Box>(config_geometry);
+    } else if (config_geometry.at("shape") == "cylinder") {
+        geometry_ = std::make_shared<const Cylinder>(config_geometry);
+    } else {
+        throw std::invalid_argument("Unkown shape.");
+    }
+
+    if(!config.contains("medium"))
     {
-        config.at("medium").get_to(medium_name);
-        config.at("medium").at("density_correction").get_to(density_correction);
+        throw std::invalid_argument("A medium is needed for each sector.");
     }
 
+    std::string medium_name;
+    double density_correction;
+    config.at("medium").get_to(medium_name);
+    config.at("medium").at("density_correction").get_to(density_correction);
     medium_ = CreateMedium(medium_name, density_correction);
 
 
