@@ -5,6 +5,7 @@
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
@@ -217,6 +218,28 @@ TEST(CalculateCartesianFromSpherical, Conversion)
     bool test_y = std::abs(A.GetY() - B.GetY()) < std::abs(std::min(A.GetY(), B.GetY())) * epsilon * error_factor;
     bool test_z = std::abs(A.GetZ() - B.GetZ()) < std::abs(std::min(A.GetZ(), B.GetZ())) * epsilon * error_factor;
     EXPECT_TRUE(A == B || test_x && test_y && test_z);
+}
+
+TEST(Distance, PointToLine)
+{
+    Vector3D reference_point(0,0,0);
+    Vector3D direction(1,0,0);
+    Vector3D abitrary_point(3,4,0);
+
+    double dist = distance_point_line(reference_point, direction, abitrary_point);
+
+    EXPECT_TRUE(std::abs(dist - 4) < COMPUTER_PRECISION);
+}
+
+TEST(Distance, PointToPlance)
+{
+    Vector3D reference_point(0,0,0);
+    Vector3D normal_vec(1,0,0);
+    Vector3D abitrary_point(3,4,5);
+
+    double dist = distance_point_plane(reference_point, normal_vec, abitrary_point);
+
+    EXPECT_TRUE((dist - 4) < COMPUTER_PRECISION);
 }
 
 int main(int argc, char** argv)

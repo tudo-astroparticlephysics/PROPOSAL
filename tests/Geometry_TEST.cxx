@@ -155,7 +155,7 @@ TEST(IsInside, Box)
     double volumia_ratio = 0;
 
     // MathModel M;
-    int number_particles = 1e6;
+    int number_particles = 1e4;
     int number_volumina  = 1e1;
 
     for (int i = 0; i < number_volumina; i++)
@@ -215,131 +215,6 @@ TEST(IsInside, Box)
         is_inside  = 0;
         is_outside = 0;
     }
-    // Check what happens if particles are on the border of the box
-
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Box A(Vector3D(0, 0, 0), width_x / 100, width_y / 100, height / 100);
-
-    // Particle is on the top surface.
-    // Theta 0° - 90° means particle is moving outside
-    // This should be treated as outside
-    // Theta 90° - 180° means particle is moving inside (should be treated as inside)
-    // The value of phi does not matter
-    particle_position.SetCartesianCoordinates(0, 0, 0.5 * height);
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        if (particle_direction.GetTheta() < 0.5 * PI)
-            EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-        if (particle_direction.GetTheta() > 0.5 * PI)
-            EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
-    }
-
-    // Make this test for every surface of the box
-
-    // bottom
-    particle_position.SetCartesianCoordinates(0, 0, -0.5 * height);
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        if (particle_direction.GetTheta() > 0.5 * PI)
-            EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-        if (particle_direction.GetTheta() < 0.5 * PI)
-            EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
-    }
-
-    // Surface in positiv x direction
-    particle_position.SetCartesianCoordinates(0.5 * width_x, 0, 0);
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        // phi = 0 is in positive x direction
-        if (particle_direction.GetPhi() < 0.5 * PI || particle_direction.GetPhi() > 1.5 * PI)
-            EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-        else
-            EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
-    }
-    // Surface in negativ x direction
-    particle_position.SetCartesianCoordinates(-0.5 * width_x, 0, 0);
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        // phi = 0 is in positive x direction
-        if (particle_direction.GetPhi() < 0.5 * PI || particle_direction.GetPhi() > 1.5 * PI)
-            EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
-        else
-            EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-    }
-    // Surface in positiv y direction
-    particle_position.SetCartesianCoordinates(0, 0.5 * width_y, 0);
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        // phi = 0 is in positive x direction
-        if (particle_direction.GetPhi() < PI)
-            EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-        else
-            EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
-    }
-    // Surface in negativ y direction
-    particle_position.SetCartesianCoordinates(0, -0.5 * width_y, 0);
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        // phi = 0 is in positive x direction
-        if (particle_direction.GetPhi() < PI)
-            EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
-        else
-            EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-    }
-
-    // For completness check one corner
-    particle_position.SetCartesianCoordinates(0.5 * width_x, 0.5 * width_y, 0.5 * height);
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        if (particle_direction.GetTheta() < 0.5 * PI || particle_direction.GetPhi() < PI ||
-            particle_direction.GetPhi() > 1.5 * PI)
-            EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-        else
-            EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
-    }
 }
 
 TEST(IsInside, Cylinder)
@@ -376,7 +251,7 @@ TEST(IsInside, Cylinder)
     double volumia_ratio = 0;
 
     // MathModel M;
-    int number_particles = 1e6;
+    int number_particles = 1e4;
     int number_volumina  = 1e1;
 
     for (int i = 0; i < number_volumina; i++)
@@ -433,7 +308,6 @@ TEST(IsInside, Cylinder)
             {
 
                 is_inside++;
-
                 EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
             } else
             {
@@ -441,117 +315,10 @@ TEST(IsInside, Cylinder)
                 EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
             }
         }
+
         ASSERT_NEAR(1. * is_inside, volumia_ratio * number_particles, 3 * sqrt(volumia_ratio * number_particles));
         is_inside  = 0;
         is_outside = 0;
-    }
-
-    // Test borders
-
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Sphere B(Vector3D(0, 0, 0), radius / 100, 0);
-
-    double cos;
-
-    int excluded = 0;
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_x = RandomGenerator::Get().RandomDouble();
-
-        particle_position.SetCartesianCoordinates(radius * rnd_x, radius * sqrt(1 - rnd_x * rnd_x), 0);
-
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        // cosine of angle between direction vector and position vector
-        cos = -scalar_product(particle_position, particle_direction) / radius;
-
-        if (cos < 1 && cos > 0)
-            EXPECT_TRUE(B.IsInside(particle_position, particle_direction));
-        else
-            EXPECT_FALSE(B.IsInside(particle_position, particle_direction));
-    }
-
-    // Particle is on the top surface.
-    // Theta 0° - 90° means particle is moving outside
-    // This should be treated as outside
-    // Theta 90° - 180° means particle is moving inside (should be treated as inside)
-    // The value of phi does not matter
-    particle_position.SetCartesianCoordinates(0, 0, 0.5 * height);
-
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Cylinder C(Vector3D(0, 0, 0), radius / 100, 0, height / 100);
-
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-        // Computer precision controll
-        if (particle_position.GetX() * particle_position.GetX() + particle_position.GetY() * particle_position.GetY() -
-                inner_radius * inner_radius ==
-            0)
-        {
-            if (particle_direction.GetTheta() < PI / 2.)
-                EXPECT_FALSE(C.IsInside(particle_position, particle_direction));
-            if (particle_direction.GetTheta() > PI / 2.)
-                EXPECT_TRUE(C.IsInside(particle_position, particle_direction));
-        }
-    }
-
-    // Make this test for every surface of the box
-
-    // bottom
-    particle_position.SetCartesianCoordinates(0, 0, -0.5 * height);
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        if (particle_direction.GetTheta() > PI / 2.)
-            EXPECT_FALSE(C.IsInside(particle_position, particle_direction));
-        if (particle_direction.GetTheta() < PI / 2.)
-            EXPECT_TRUE(C.IsInside(particle_position, particle_direction));
-    }
-
-    // Test inner border
-    inner_radius = 5;
-
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Cylinder A(Vector3D(0, 0, 0), radius / 100, inner_radius / 100, height / 100);
-
-    excluded = 0;
-
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_x = RandomGenerator::Get().RandomDouble();
-
-        particle_position.SetCartesianCoordinates(inner_radius * rnd_x, inner_radius * sqrt(1 - rnd_x * rnd_x), 0);
-
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        // cosine of angle between direction vector and position vector
-        cos = -scalar_product(particle_position, particle_direction) / radius;
-
-        if (cos < 1 && cos > 0)
-            EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-        else
-            EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
     }
 }
 
@@ -588,7 +355,7 @@ TEST(IsInside, Sphere)
     double volumia_ratio = 0;
 
     // MathModel M;
-    int number_particles = 1e6;
+    int number_particles = 1e4;
     int number_volumina  = 1e1;
 
     for (int i = 0; i < number_volumina; i++)
@@ -649,65 +416,6 @@ TEST(IsInside, Sphere)
         is_outside = 0;
     }
 
-    // Test borders
-
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Sphere A(Vector3D(0, 0, 0), radius / 100, 0);
-
-    double cos;
-
-    int excluded = 0;
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_x = RandomGenerator::Get().RandomDouble();
-
-        particle_position.SetCartesianCoordinates(radius * rnd_x, radius * sqrt(1 - rnd_x * rnd_x), 0);
-
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        // cosine of angle between direction vector and position vector
-        cos = -scalar_product(particle_position, particle_direction) / radius;
-
-        if (cos < 1 && cos > 0)
-            EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
-        else
-            EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-    }
-
-    // Test inner border
-    inner_radius = 5;
-
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Sphere B(Vector3D(0, 0, 0), radius / 100, inner_radius / 100);
-
-    excluded = 0;
-
-    for (int i = 0; i < 1e4; i++)
-    {
-        rnd_x = RandomGenerator::Get().RandomDouble();
-
-        particle_position.SetCartesianCoordinates(inner_radius * rnd_x, inner_radius * sqrt(1 - rnd_x * rnd_x), 0);
-
-        rnd_theta = RandomGenerator::Get().RandomDouble();
-        rnd_phi   = RandomGenerator::Get().RandomDouble();
-
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
-
-        // cosine of angle between direction vector and position vector
-        cos = -scalar_product(particle_position, particle_direction) / radius;
-
-        if (cos < 1 && cos > 0)
-            EXPECT_FALSE(B.IsInside(particle_position, particle_direction));
-        else
-            EXPECT_TRUE(B.IsInside(particle_position, particle_direction));
-    }
 }
 
 TEST(DistanceTo, Sphere)
@@ -726,7 +434,7 @@ TEST(DistanceTo, Sphere)
     std::pair<double, double> distance;
 
     // MathModel M;
-    int number_particles = 1e5;
+    int number_particles = 1e4;
 
     std::cout.precision(16);
 
@@ -802,7 +510,6 @@ TEST(DistanceTo, Sphere)
     }
 }
 
-//
 TEST(DistanceTo, Cylinder)
 {
     Vector3D particle_position(0, 0, 0);
@@ -821,7 +528,7 @@ TEST(DistanceTo, Cylinder)
     std::pair<double, double> distance;
 
     // MathModel M;
-    int number_particles = 1e5;
+    int number_particles = 1e4;
 
     std::cout.precision(16);
 
@@ -1055,7 +762,7 @@ TEST(DistanceTo, Box)
     std::pair<double, double> distance;
 
     // MathModel M;
-    int number_particles = 1e5;
+    int number_particles = 1e4;
 
     std::cout.precision(16);
 

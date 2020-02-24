@@ -93,6 +93,17 @@ void Sphere::print(std::ostream& os) const
     os << "Radius: " << radius_ << "\tInner radius: " << inner_radius_ << '\n';
 }
 
+bool Sphere::IsInside(const Vector3D& position, const Vector3D& direction) const
+{
+    (void)(direction);
+
+    double dist = (position - position_).magnitude();
+
+    if (dist > radius_  || dist < inner_radius_) return false;
+
+    return true;
+}
+
 // ------------------------------------------------------------------------- //
 std::pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Vector3D& direction) const
 {

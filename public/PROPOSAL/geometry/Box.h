@@ -49,6 +49,8 @@ public:
     // Operators
     Box& operator=(const Geometry&) override;
 
+    bool IsInside(const Vector3D& position, const Vector3D& direction) const override;
+
     // Methods
     std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction) const override;
 

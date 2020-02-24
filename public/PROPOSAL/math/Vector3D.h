@@ -127,5 +127,10 @@ private:
 
     // double cylindric_radius_, cylindric_azimuth_, cylindric_height_;
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+double distance_point_line(const Vector3D&, const Vector3D&, const Vector3D&);
+double distance_point_plane(const Vector3D&, const Vector3D&, const Vector3D&);
+double distance_point_plane(const Vector3D&, const Vector3D&, const Vector3D&, const Vector3D&);
 } // namespace PROPOSAL

@@ -1,6 +1,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <stdexcept>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Vector3D.h"
@@ -302,5 +303,37 @@ Vector3D::SphericalCoordinates::SphericalCoordinates(const SphericalCoordinates&
 {}
 
 //----------------------------------------------------------------------//
-//---------------------private member function--------------------------//
+//----------------------- utility functions ----------------------------//
 //----------------------------------------------------------------------//
+
+namespace PROPOSAL {
+double distance_point_line(const Vector3D& support_point, const Vector3D& unit_vector, const Vector3D& arbitrary_point)
+{
+    if ((unit_vector.magnitude() - 1) > COMPUTER_PRECISION)
+        throw std::invalid_argument("unit vector is not normed");
+
+    Vector3D aux = support_point - arbitrary_point;
+
+    return ( aux - ( aux * unit_vector ) * unit_vector ).magnitude();
+}
+
+double distance_point_plane(const Vector3D& support_point, const Vector3D& normal_vector, const Vector3D& arbitrary_point)
+{
+    if ((normal_vector.magnitude() - 1) > COMPUTER_PRECISION)
+        throw std::invalid_argument("unit vector is not normed");
+
+    return std::abs((support_point - arbitrary_point) * normal_vector) / normal_vector.magnitude();
+}
+
+double distance_point_plane(const Vector3D& support_point, const Vector3D& unit_vector1, const Vector3D& unit_vector2, const Vector3D& arbitrary_point)
+{
+    if ((unit_vector1.magnitude() - 1) > COMPUTER_PRECISION)
+        throw std::invalid_argument("unit vector 1 is not normed");
+    if ((unit_vector2.magnitude() - 1) > COMPUTER_PRECISION)
+        throw std::invalid_argument("unit vector 2 is not normed");
+
+    Vector3D normal_vector = vector_product(unit_vector1, unit_vector2);
+
+    return distance_point_plane(support_point, normal_vector, arbitrary_point);
+}
+} // namespace PROPOSAL
