@@ -87,7 +87,7 @@ Secondaries Secondaries::Query(const Geometry& geometry) const
 {
     Secondaries sec;
     for (auto i : secondaries_) {
-        if (geometry.IsInside(i.GetPosition(), i.GetDirection()))
+        if (geometry.IsInside(i.GetPosition()))
             sec.push_back(i);
     }
     return sec;

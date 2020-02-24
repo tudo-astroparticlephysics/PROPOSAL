@@ -107,20 +107,6 @@ bool Geometry::operator!=(const Geometry& geometry) const
 // Member functions
 // ------------------------------------------------------------------------- //
 
-bool Geometry::IsInside(const Vector3D& position, const Vector3D& direction) const
-{
-    bool is_inside = false;
-
-    std::pair<double, double> dist = DistanceToBorder(position, direction);
-
-    if (dist.first > 0 && dist.second < 0)
-    {
-        is_inside = true;
-    }
-    return is_inside;
-}
-
-// ------------------------------------------------------------------------- //
 bool Geometry::IsInfront(const Vector3D& position, const Vector3D& direction) const
 {
     bool is_infront = false;
@@ -151,7 +137,7 @@ bool Geometry::IsBehind(const Vector3D& position, const Vector3D& direction) con
 Geometry::ParticleLocation::Enum Geometry::GetLocation(const Vector3D& position, const Vector3D& direction) {
     if(IsInfront(position, direction))
         return Geometry::ParticleLocation::InfrontGeometry;
-    if(IsInside(position, direction))
+    if(IsInside(position))
         return Geometry::ParticleLocation::InsideGeometry;
     else
         return Geometry::ParticleLocation::BehindGeometry;

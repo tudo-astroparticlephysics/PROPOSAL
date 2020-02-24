@@ -99,10 +99,8 @@ void Cylinder::print(std::ostream& os) const
     os << "Radius: " << radius_ << "\tInnner radius: " << inner_radius_ << " Height: " << z_ << '\n';
 }
 
-bool Cylinder::IsInside(const Vector3D& position, const Vector3D& direction) const
+bool Cylinder::IsInside(const Vector3D& position) const
 {
-    (void)(direction);
-
     double dist = distance_point_line(position_, Vector3D(0,0,1), position);
 
     if (dist > radius_  || dist < inner_radius_) return false;

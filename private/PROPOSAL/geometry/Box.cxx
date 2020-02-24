@@ -93,10 +93,8 @@ void Box::print(std::ostream& os) const
     os << "Width_x: " << x_ << "\tWidth_y " << y_ << "\tHeight: " << z_ << '\n';
 }
 
-bool Box::IsInside(const Vector3D& position, const Vector3D& direction) const
+bool Box::IsInside(const Vector3D& position) const
 {
-    (void)(direction);
-
     if (distance_point_plane(position_, Vector3D(1, 0, 0), position) > x_ * 0.5 ) return false;
     if (distance_point_plane(position_, Vector3D(0, 1, 0), position) > y_ * 0.5 ) return false;
     if (distance_point_plane(position_, Vector3D(0, 0, 1), position) > z_ * 0.5 ) return false;

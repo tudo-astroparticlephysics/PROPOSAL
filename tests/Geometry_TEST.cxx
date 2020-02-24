@@ -204,11 +204,11 @@ TEST(IsInside, Box)
                 particle_position.GetZ() < position_geometry.GetZ() + 0.5 * height)
             {
                 is_inside++;
-                EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
+                EXPECT_TRUE(A.IsInside(particle_position));
             } else
             {
                 is_outside++;
-                EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
+                EXPECT_FALSE(A.IsInside(particle_position));
             }
         }
         ASSERT_NEAR(1. * is_inside, volumia_ratio * number_particles, 3 * sqrt(volumia_ratio * number_particles));
@@ -308,11 +308,11 @@ TEST(IsInside, Cylinder)
             {
 
                 is_inside++;
-                EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
+                EXPECT_TRUE(A.IsInside(particle_position));
             } else
             {
                 is_outside++;
-                EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
+                EXPECT_FALSE(A.IsInside(particle_position));
             }
         }
 
@@ -404,11 +404,11 @@ TEST(IsInside, Sphere)
                 (particle_position - position_geometry).magnitude() > inner_radius)
             {
                 is_inside++;
-                EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
+                EXPECT_TRUE(A.IsInside(particle_position));
             } else
             {
                 is_outside++;
-                EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
+                EXPECT_FALSE(A.IsInside(particle_position));
             }
         }
         ASSERT_NEAR(1. * is_inside, volumia_ratio * number_particles, 3 * sqrt(volumia_ratio * number_particles));

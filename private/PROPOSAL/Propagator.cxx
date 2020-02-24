@@ -477,8 +477,7 @@ Secondaries Propagator::Propagate(
     // DynamicData exit_condition;
     // DynamicData closest_approach_condition;
 
-    bool starts_in_detector = detector_->IsInside(
-        initial_condition.GetPosition(), initial_condition.GetDirection());
+    bool starts_in_detector = detector_->IsInside(initial_condition.GetPosition());
     if (starts_in_detector) {
         secondaries_.SetEntryPoint(initial_condition);
         distance_to_closest_approach = detector_->DistanceToClosestApproach(
@@ -526,8 +525,7 @@ Secondaries Propagator::Propagate(
             }
         }
 
-        is_in_detector = detector_->IsInside(
-            p_condition->GetPosition(), p_condition->GetDirection());
+        is_in_detector = detector_->IsInside(p_condition->GetPosition());
         // entry point of the detector
         if (!starts_in_detector && !was_in_detector && is_in_detector) {
             secondaries_.SetEntryPoint(*p_condition);
@@ -575,8 +573,7 @@ Secondaries Propagator::Propagate(
             || p_condition->GetType() == static_cast<int>(InteractionType::Decay))
             break;
     }
-    if (detector_->IsInside(
-            p_condition->GetPosition(), p_condition->GetDirection())) {
+    if (detector_->IsInside( p_condition->GetPosition())) {
         secondaries_.SetExitPoint(*p_condition);
     }
 
@@ -604,8 +601,7 @@ void Propagator::ChooseCurrentSector(
         = detector_->GetLocation(particle_position, particle_direction);
 
     for (unsigned int i = 0; i < sectors_.size(); ++i) {
-        if (sectors_[i]->GetGeometry()->IsInside(
-                particle_position, particle_direction)) {
+        if (sectors_[i]->GetGeometry()->IsInside(particle_position)) {
             if (static_cast<int>(sectors_[i]->GetLocation())
                 == static_cast<int>(detector_location))
                 crossed_sector.push_back(i);

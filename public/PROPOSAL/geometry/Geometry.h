@@ -63,7 +63,7 @@ public:
     // Member functions
     // ----------------------------------------------------------------- //
 
-    virtual bool IsInside(const Vector3D& position, const Vector3D& direction) const;
+    virtual bool IsInside(const Vector3D& position) const = 0;
 
     bool IsInfront(const Vector3D& position, const Vector3D& direction) const;
 
