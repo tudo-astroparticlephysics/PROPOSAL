@@ -96,7 +96,7 @@ Secondaries Secondaries::Query(const Geometry& geometry) const
 void Secondaries::DoDecay()
 {
     for (auto it = secondaries_.begin(); it != secondaries_.end();) {
-        if (it->GetTypeId() == static_cast<int>(InteractionType::Decay)) {
+        if (it->GetType() == static_cast<int>(InteractionType::Decay)) {
             DynamicData decaying_particle(primary_def_->particle_type,
                 it->GetPosition(), it->GetDirection(), it->GetEnergy(),
                 it->GetParentParticleEnergy(), it->GetTime(),
