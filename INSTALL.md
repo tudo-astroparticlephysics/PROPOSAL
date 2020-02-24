@@ -1,113 +1,122 @@
+# Installation
 
-# Installation #
-
-## Install dependencies ##
+## Build Prequesites
 
 The following commands can be used to install the required and optional
 dependencies on your system.
+The c++ dependencies are vendored using git submodules and are included in the
+release tar balls.
 
-### Ubuntu 16.10 ###
+### Ubuntu / Debian
 
-	apt install cmake \
-		doxygen \
-		liblog4cplus-dev \
-		git-lfs
+```
+$ apt install g++ \
+  cmake \
+  doxygen \
+  git-lfs
+```
 
-### Arch Linux ###
+### Arch Linux
 
-	pacman -S cmake \
-		doxygen \
-		log4cplus \
-		gtest \
-		git-lfs
+```
+$ pacman -S g++ \
+  cmake \
+  doxygen \
+  git-lfs
+```
 
-### Mac OS X ###
+### RHEL / Centos
 
-	brew install cmake \
-		doxygen \
-		log4cplus \
-		git-lfs
+Note: RHEL provides both cmake version 2.x and 3.x, the version 3.x executable is
+called `cmake3`.
+PROPOSAL needs cmake3.
 
-## Install PROPOSAL ##
+```
+$ yum install g++ cmake3 doxygen git-lfs
+```
 
+### MacOS
 
-1. 	Make a directory where the whole project will be, e.g.:
+```
+$ xcode-select --install
+$ brew install cmake \
+  doxygen \
+  git-lfs
+```
 
-		mkdir PROPOSAL
+## Building PROPOSAL
 
-2.	Create a build and src directory, e.g.:
+1. Download a release tarball from <https://github.com/tudo-astroparticlephysics/PROPOSAL/releases>
+  and extract it or use git (the recursive is needed because we use submodules for dependencies):
+  ```
+  $ git clone --recursive https://github.com/tudo-astroparticlephysics/PROPOSAL
+  ```
 
-		mkdir PROPOSAL/src PROPOSAL/build
+  To use a specific version of PROPOSAL, use `git checkout vX.Y.Z` after cloning.
 
-3. 	Extract the sources from the
-	[hompage](http://app.tu-dortmund.de/cms/de/Projekte/PROPOSAL/) or
-	gitlab to the folder, e.g.:
+  In case you want to perform the unit tests, you need install `git-lfs` first and do an extra pull to get the TestFiles.
+  This is only possible with a git checkout.
 
-		unzip PROPOSAL.zip PROPOSAL/
+  ```
+  $ git lfs pull
+  ```
 
-	or
+1.  Move to the build directory and generate the Makefile with cmake:
 
-		git clone https://github.com/tudo-astroparticlephysics/PROPOSAL.git PROPOSAL/src
+  ```
+  mkdir build
+  cmake ..
+  ```
 
-	In case you want to perform the unit tests, you need to install `git-lfs` first and do an extra pull to get the TestFiles.
+  If you don't want to compile the pybindings, call cmake with
 
-		git lfs pull
+  ```
+  cmake .. -DADD_PYTHON=OFF
+  ```
 
-4.	Move to the build directory and generate the Makefile with cmake:
+  To specify an installation prefix other than `/usr/local` use
 
-		cd PROPOSAL/build
-		cmake ../src
+  ```
+  cmake .. -DCMAKE_INSTALL_PREFIX=/custom/prefix
+  ```
 
-	If you don't want to compile the pybindings, call cmake with
+  The prefix is used to install PROPOSAL on your system (See
+  item 6).  
+  To show further installation options use `cmake ..` and/or
+  visit the [documentation](https://cmake.org/documentation/).
+  Also have a look at the additional cmake options down below.
 
-		cmake ../src -DADD_PYTHON=OFF
+  #### Note
 
-	To specify an installation prefix other than `/usr/local` use
+  * The option `CMAKE_INSTALL_PREFIX` adds the given path also to the
+  include directories. So if you have installed PROPOSAL with
+  `CMAKE_INSTALL_PREFIX` and are modifying the header files, you will have to 
+  to uninstall PROPOSAL before the next build otherwise your local
+  changes won't be used.
 
-		cmake ../src -DCMAKE_INSTALL_PREFIX=/custom/prefix
+  * To ensure, that cmake finds the right python paths use these
+  cmake options and adjust the version number to your python version:
+  ```
+  -DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.dylib
+  -DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python2.7
+  ```
 
-	The prefix is used to install PROPOSAL on your system (See
-	item 6).<br>
-	To show further installation options use `ccmake ../src` and/or
-	visit the [documentation](https://cmake.org/documentation/).
-	Also have a look at the additional cmake option down below.
+1.  Compile the project:
 
-	#### **Note** ####
+    make
 
-	* The option `CMAKE_INSTALL_PREFIX` adds the given path also to the
-	  include directories. So if you have installed PROPOSAL with
-	  `CMAKE_INSTALL_PREFIX` and are modifying the header files, you will make
-	  sure to uninstall PROPOSAL before the next build otherwise your local
-	  changes won't be used.
+  or
 
-	* To ensure, that cmake finds the right python paths use these
-	  cmake options and adjust the version number to your python version:
+    make -j#
 
-			-DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.dylib
-			-DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python2.7
+  with `#` being the number of processors you can choose to compile
+  the project on multiple processes simultaneously.
 
-6.  Compile the project:
+1.  Install the library into `-DCMAKE_INSTALL_PREFIX`, by default `/usr/share`
 
-		make
-
-	or
-
-		make -j#
-
-	with `#` being the number of processors you can choose to compile
-	the project on multiple processors simultaneously.
-
-7.	Install the library on your system
-
-		make install
-
-	or e.g.
-
-		make install DESTDIR=$HOME
-
-	The latter command will install PROPOSAL in `$HOME/<prefix>`, where
-	the `prefix` was defined by `CMAKE_INSTALL_PREFIX` which defaults
-	to `usr/local`.
+  ```
+  make install
+  ```
 
 # Additional Cmake options #
 
@@ -120,7 +129,7 @@ dependencies on your system.
 
 **Examples**
 
-	cmake -DADD_PYTHON=OFF <further options>
+  cmake -DADD_PYTHON=OFF <further options>
 
 # Compiling #
 
@@ -141,7 +150,7 @@ Assuming `PROPOSAL.h` has been included in a file with the name `example.cxx`, t
 
 It is also possible to uninstall PROPOSAL with
 
-	make uninstall
+  make uninstall
 
 This will remove all files listed in `install_mainfest.txt` which should
 have been created in your build directory after the installation.

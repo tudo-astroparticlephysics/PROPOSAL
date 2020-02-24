@@ -59,35 +59,8 @@ OPTION(ADD_CPPEXAMPLE "Choose to compile Cpp example." ON)
 IF(ADD_PYTHON)
     MESSAGE(STATUS "Enabled to build the python wrapper library.")
     FIND_PACKAGE( PythonLibs REQUIRED )
-
-    IF(PYTHONLIBS_FOUND)
-        # TODO(mario): Find a better way to search for pybind11!
-        # Preferably with a FindPybind11.make.
-        # I haven't found a reliable method yet.
-
-        INCLUDE_DIRECTORIES( ${PYTHON_INCLUDE_DIRS} )
-
-        FIND_PACKAGE(pybind11 CONFIG)
-
-        IF(pybind11_FOUND)
-            MESSAGE(STATUS "Found pybind11 v${pybind11_VERSION}: ${pybind11_INCLUDE_DIR}")
-            INCLUDE_DIRECTORIES( ${pybind11_INCLUDE_DIR} )
-        ELSE(pybind11_FOUND)
-            MESSAGE(STATUS "Clone pybind11")
-
-            execute_process(
-                COMMAND git clone https://github.com/pybind/pybind11 --branch v2.2.4 ${CMAKE_CURRENT_SOURCE_DIR}/pybind11
-                OUTPUT_VARIABLE git_output
-                ERROR_VARIABLE git_error
-            )
-
-            add_subdirectory(pybind11)
-
-            SET(pybind11_FOUND TRUE)
-            MESSAGE(STATUS "Clone pybind11: ${git_error}")
-        ENDIF(pybind11_FOUND)
-
-    ENDIF(PYTHONLIBS_FOUND)
+    INCLUDE_DIRECTORIES( ${PYTHON_INCLUDE_DIRS} )
+	add_subdirectory("vendor/pybind/pybind11")
 ELSE(ADD_PYTHON)
     MESSAGE(STATUS "No python wrapper library will be build.")
 ENDIF(ADD_PYTHON)
@@ -122,30 +95,10 @@ ENDIF(ADD_ROOT)
 #################           log4cplus     #######################
 #################################################################
 
-INCLUDE(cmake/FindLog4cplus.cmake)
+add_subdirectory("vendor/log4cplus/log4cplus")
+ADD_DEFINITIONS(-DLOG4CPLUS_SUPPORT=1)
+ADD_DEFINITIONS(-DLOG4CPLUS_CONFIG=\"${PROJECT_SOURCE_DIR}/resources/log4cplus.conf\")
 
-IF(LOG4CPLUS_FOUND)
-    ADD_DEFINITIONS(-DLOG4CPLUS_SUPPORT=1)
-    ADD_DEFINITIONS(-DLOG4CPLUS_CONFIG=\"${PROJECT_SOURCE_DIR}/resources/log4cplus.conf\")
-    SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${LOG4CPLUS_LIBRARIES})
-ELSE(LOG4CPLUS_FOUND)
-    ADD_DEFINITIONS(-DLOG4CPLUS_SUPPORT=0)
-    MESSAGE(STATUS "No logging will be done.")
-ENDIF(LOG4CPLUS_FOUND)
-
-
-#################################################################
-#################           GTest       #########################
-#################################################################
-
-if (ADD_TESTS)
-    MESSAGE(STATUS "Building tests enabled.")
-    INCLUDE(cmake/gtest.cmake)
-    SET(gtest_LIBRARIES libgtest)
-    ENABLE_TESTING()
-else (ADD_TESTS)
-    MESSAGE(STATUS "No tests will be build.")
-endif (ADD_TESTS)
 
 #################################################################
 #################           Libraries    ########################
@@ -154,7 +107,7 @@ endif (ADD_TESTS)
 SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${CMAKE_THREAD_LIBS_INIT})
 SET(PROJECT_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/public/")
 
-INCLUDE_DIRECTORIES(${PROJECT_INCLUDE_DIR} ${LOG4CPLUS_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES(${PROJECT_INCLUDE_DIR})
 MESSAGE(STATUS ${PROJECT_INCLUDE_DIR})
 
 FILE(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*)
@@ -168,7 +121,7 @@ endif()
 # The following warnings are silenced, because they arise in the dependencies:
 # -Wno-c++11-long-long : "long long" only occurs in ROOT 5
 
-TARGET_LINK_LIBRARIES(PROPOSAL ${LIBRARYS_TO_LINK})
+TARGET_LINK_LIBRARIES(PROPOSAL log4cplus ${LIBRARYS_TO_LINK})
 
 IF(IS_SYMLINK ${CMAKE_BINARY_DIR}/resources)
     # Do nothing
@@ -224,112 +177,80 @@ ENDIF(ADD_PERFORMANCE_TEST)
 #################################################################
 
 IF(ADD_TESTS)
+    MESSAGE(STATUS "Building tests enabled.")
+	add_subdirectory("vendor/google/googletest" "extern/googletest" EXCLUDE_FROM_ALL)
+	mark_as_advanced(
+		BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
+		gmock_build_tests gtest_build_samples gtest_build_tests
+		gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
+	)
+
+
+	set_target_properties(gtest PROPERTIES FOLDER extern)
+	set_target_properties(gtest_main PROPERTIES FOLDER extern)
+	set_target_properties(gmock PROPERTIES FOLDER extern)
+	set_target_properties(gmock_main PROPERTIES FOLDER extern)
+
+	macro(package_add_test TESTNAME)
+		add_executable(${TESTNAME} ${ARGN})
+		target_link_libraries(${TESTNAME} gtest gmock gtest_main PROPOSAL)
+		add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
+		set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
+	endmacro()
+
+
+    ENABLE_TESTING()
+
     EXECUTE_PROCESS(COMMAND mkdir -p ${PROPOSAL_BINARY_DIR}/bin/ OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     #create tar directory with "tar -czvf TestFiles.tar.Z TestFiles/" and put it in Test directory
     EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles.tar.gz -C ${PROPOSAL_BINARY_DIR}/bin/
                     OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    ADD_EXECUTABLE(UnitTest_Utility tests/Utility_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Scattering tests/Scattering_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Photonuclear tests/Photonuclear_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Integral tests/Integral_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Interpolant tests/Interpolant_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Bremsstrahlung tests/Bremsstrahlung_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Compton tests/Compton_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Epairproduction tests/Epairproduction_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Mupairproduction tests/Mupairproduction_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_WeakInteraction tests/WeakInteraction_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Annihilation tests/Annihilation_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Ionization tests/Ionization_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_PhotoPair tests/PhotoPair_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Medium tests/Medium_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Particle tests/Particle_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_ParticleDef tests/ParticleDef_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_DecayChannel tests/DecayChannel_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_DecayTable tests/DecayTable_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_EnergyCutSettings tests/EnergyCutSettings_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_ContinuousRandomization tests/ContinuousRandomization_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Geometry tests/Geometry_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Vector3D tests/Vector3D_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Propagation tests/Propagation_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Sector tests/Sector_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_MathMethods tests/MathMethods_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Spline tests/Spline_TEST.cxx)
-    ADD_EXECUTABLE(UnitTest_Density tests/Density_distribution_TEST.cxx)
+    package_add_test(UnitTest_Utility tests/Utility_TEST.cxx)
+    package_add_test(UnitTest_Scattering tests/Scattering_TEST.cxx)
+    package_add_test(UnitTest_Photonuclear tests/Photonuclear_TEST.cxx)
+    package_add_test(UnitTest_Integral tests/Integral_TEST.cxx)
+    package_add_test(UnitTest_Interpolant tests/Interpolant_TEST.cxx)
+    package_add_test(UnitTest_Bremsstrahlung tests/Bremsstrahlung_TEST.cxx)
+    package_add_test(UnitTest_Compton tests/Compton_TEST.cxx)
+    package_add_test(UnitTest_Epairproduction tests/Epairproduction_TEST.cxx)
+    package_add_test(UnitTest_Mupairproduction tests/Mupairproduction_TEST.cxx)
+    package_add_test(UnitTest_WeakInteraction tests/WeakInteraction_TEST.cxx)
+    package_add_test(UnitTest_Annihilation tests/Annihilation_TEST.cxx)
+    package_add_test(UnitTest_Ionization tests/Ionization_TEST.cxx)
+    package_add_test(UnitTest_PhotoPair tests/PhotoPair_TEST.cxx)
+    package_add_test(UnitTest_Medium tests/Medium_TEST.cxx)
+    package_add_test(UnitTest_Particle tests/Particle_TEST.cxx)
+    package_add_test(UnitTest_ParticleDef tests/ParticleDef_TEST.cxx)
+    package_add_test(UnitTest_DecayChannel tests/DecayChannel_TEST.cxx)
+    package_add_test(UnitTest_DecayTable tests/DecayTable_TEST.cxx)
+    package_add_test(UnitTest_EnergyCutSettings tests/EnergyCutSettings_TEST.cxx)
+    package_add_test(UnitTest_ContinuousRandomization tests/ContinuousRandomization_TEST.cxx)
+    package_add_test(UnitTest_Geometry tests/Geometry_TEST.cxx)
+    package_add_test(UnitTest_Vector3D tests/Vector3D_TEST.cxx)
+    package_add_test(UnitTest_Propagation tests/Propagation_TEST.cxx)
+    package_add_test(UnitTest_Sector tests/Sector_TEST.cxx)
+    package_add_test(UnitTest_MathMethods tests/MathMethods_TEST.cxx)
+    package_add_test(UnitTest_Spline tests/Spline_TEST.cxx)
+    package_add_test(UnitTest_Density tests/Density_distribution_TEST.cxx)
 
-    TARGET_LINK_LIBRARIES(UnitTest_Utility PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Scattering PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Integral PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Interpolant PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Ionization PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_PhotoPair PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Bremsstrahlung PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Compton PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Epairproduction PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Mupairproduction PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_WeakInteraction PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Annihilation PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Photonuclear PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Medium PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Particle PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_ParticleDef PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_DecayChannel PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_DecayTable PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_EnergyCutSettings PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_ContinuousRandomization PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Geometry PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Vector3D PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Propagation PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Sector PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_MathMethods PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Spline PROPOSAL ${gtest_LIBRARIES})
-    TARGET_LINK_LIBRARIES(UnitTest_Density PROPOSAL ${gtest_LIBRARIES})
-
-    ADD_TEST(UnitTest_Utility bin/UnitTest_Utility)
-    ADD_TEST(UnitTest_Scattering bin/UnitTest_Scattering)
-    ADD_TEST(UnitTest_ContinuousRandomization bin/UnitTest_ContinuousRandomization)
-    ADD_TEST(UnitTest_Integral bin/UnitTest_Integral)
-    ADD_TEST(UnitTest_Medium bin/UnitTest_Medium)
-    ADD_TEST(UnitTest_Particle bin/UnitTest_Particle)
-    ADD_TEST(UnitTest_ParticleDef bin/UnitTest_ParticleDef)
-    ADD_TEST(UnitTest_DecayChannel bin/UnitTest_DecayChannel)
-    ADD_TEST(UnitTest_DecayTable bin/UnitTest_DecayTable)
-    ADD_TEST(UnitTest_EnergyCutSettings bin/UnitTest_EnergyCutSettings)
-    ADD_TEST(UnitTest_Interpolant bin/UnitTest_Interpolant)
-    ADD_TEST(UnitTest_Epairproduction bin/UnitTest_Epairproduction)
-    ADD_TEST(UnitTest_Mupairproduction bin/UnitTest_Mupairproduction)
-    ADD_TEST(UnitTest_WeakInteraction bin/UnitTest_WeakInteraction)
-    ADD_TEST(UnitTest_Annihilation bin/UnitTest_Annihilation)
-    ADD_TEST(UnitTest_Ionization bin/UnitTest_Ionization)
-    ADD_TEST(UnitTest_PhotoPair bin/UnitTest_PhotoPair)
-    ADD_TEST(UnitTest_Bremsstrahlung bin/UnitTest_Bremsstrahlung)
-    ADD_TEST(UnitTest_Compton bin/UnitTest_Compton)
-    ADD_TEST(UnitTest_Photonuclear bin/UnitTest_Photonuclear)
-    ADD_TEST(UnitTest_Geometry bin/UnitTest_Geometry)
-    ADD_TEST(UnitTest_Vector3D bin/UnitTest_Vector3D)
-    ADD_TEST(UnitTest_Propagation bin/UnitTest_Propagation)
-    ADD_TEST(UnitTest_Sector bin/UnitTest_Sector)
-    ADD_TEST(UnitTest_MathMethods bin/UnitTest_MathMethods)
-    ADD_TEST(UnitTest_Spline bin/UnitTest_Spline)
-    ADD_TEST(UnitTest_Density bin/UnitTest_Density)
-
+else (ADD_TESTS)
+    MESSAGE(STATUS "No tests will be build.")
 ENDIF()
 
 ADD_SUBDIRECTORY( doc )
 
 
 IF(ADD_PYTHON)
-    IF(PYTHONLIBS_FOUND AND pybind11_FOUND)
-        FILE(GLOB_RECURSE PYTHON_SRC_FILES
-            ${PROJECT_SOURCE_DIR}/private/Interface/python/*)
-        INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/public/Interface/python )
-        PYBIND11_ADD_MODULE(pyPROPOSAL SHARED ${PYTHON_SRC_FILES})
-        TARGET_LINK_LIBRARIES(pyPROPOSAL PRIVATE PROPOSAL)
-        SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" SUFFIX ".so"
-            COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-        INSTALL(TARGETS pyPROPOSAL DESTINATION lib)
-    ENDIF(PYTHONLIBS_FOUND AND pybind11_FOUND)
+	FILE(GLOB_RECURSE PYTHON_SRC_FILES
+		${PROJECT_SOURCE_DIR}/private/Interface/python/*)
+	INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/public/Interface/python )
+	PYBIND11_ADD_MODULE(pyPROPOSAL SHARED ${PYTHON_SRC_FILES})
+	TARGET_LINK_LIBRARIES(pyPROPOSAL PRIVATE PROPOSAL)
+	SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" SUFFIX ".so"
+		COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+	INSTALL(TARGETS pyPROPOSAL DESTINATION lib)
 ENDIF(ADD_PYTHON)
 
 # uninstall target

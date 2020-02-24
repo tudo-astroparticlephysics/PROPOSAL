@@ -1,3 +1,4 @@
+cmake-build-debug
 .svn
 .ycm_extra_conf.py
 resources/tables/*
@@ -10,4 +11,3 @@ cmake_uninstall.cmake
 *.png
 *.pdf
 *.swp
-pybind11/
