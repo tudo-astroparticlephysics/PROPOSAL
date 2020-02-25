@@ -115,9 +115,8 @@ Sector::Definition::Definition(const nlohmann::json& config)
     }
 
     std::string medium_name;
-    double density_correction;
     config.at("medium").get_to(medium_name);
-    config.at("medium").at("density_correction").get_to(density_correction);
+    double density_correction = config.value("density_correction", 1.);
     medium_ = CreateMedium(medium_name, density_correction);
 
 
