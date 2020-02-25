@@ -82,7 +82,7 @@ Sector::Definition::Definition(const nlohmann::json& config)
 
     for (const auto& cut : cuts) {
         if(config.contains(cut.first)) {
-            EnergyCutSettings cut_settings(config.at(cut.first));
+            cut_settings = EnergyCutSettings(config.at(cut.first));
             location = cut.second;
             break;
         }
