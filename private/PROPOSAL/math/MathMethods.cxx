@@ -267,8 +267,8 @@ double NewtonRaphson(std::function<double(double)> func,
             xh = rts;
         };
     }
-    log_error("Maximum number of iteration exeeded in NewtonRaphson");
-    return 0.0;
+    log_warn("Maximum number of iteration exeeded in NewtonRaphson");
+    return rts;
 }
 
 std::vector<SplineCoefficients> CalculateSpline(std::vector<double> x,
