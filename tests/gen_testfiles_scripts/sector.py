@@ -3,9 +3,9 @@ import numpy as np
 
 
 particle_defs = [
-        pp.particle.MuMinusDef.get(),
-        pp.particle.TauMinusDef.get(),
-        # pp.particle.EMinusDef.get()
+        pp.particle.MuMinusDef(),
+        pp.particle.TauMinusDef(),
+        # pp.particle.EMinusDef()
         ]
 
 mediums = [
@@ -49,8 +49,7 @@ def create_table_continous(dir_name):
                     sector_def.cut_settings = cut
                     sector_def.medium = medium
 
-                    particle = pp.particle.Particle(particle_def)
-                    sector = pp.Sector(particle, sector_def, interpoldef)
+                    sector = pp.Sector(particle_def, sector_def, interpoldef)
 
                     buf = [""]
                     buf.append(str(particle_def.name))
@@ -60,7 +59,12 @@ def create_table_continous(dir_name):
                     buf.append(str(energy))
 
                     for i in range(statistics):
-                        energy = max(sector.CalculateEnergyTillStochastic(energy))
+                        energy = max(
+                                sector.energy_decay(energy,
+                                    pp.RandomGenerator.get().random_double()),
+                                sector.energy_interaction(energy,
+                                    pp.RandomGenerator.get().random_double())
+                                    )
                         buf.append(str(energy))
 
                     buf.append("\n")
@@ -77,8 +81,7 @@ def create_table_stochastic(dir_name):
                     sector_def.cut_settings = cut
                     sector_def.medium = medium
 
-                    particle = pp.particle.Particle(particle_def)
-                    sector = pp.Sector(particle, sector_def, interpoldef)
+                    sector = pp.Sector(particle_def, sector_def, interpoldef)
 
                     buf = [""]
                     buf.append(str(particle_def.name))
@@ -88,7 +91,7 @@ def create_table_stochastic(dir_name):
                     buf.append(str(initial_energy))
 
                     for i in range(statistics):
-                        loss, interaction_type = sector.MakeStochasticLoss(energy)
+                        loss, interaction_type = sector.make_stochastic_loss(energy)
                         energy -= loss
                         buf.append(str(energy))
                         buf.append(str(interaction_type))
@@ -107,8 +110,7 @@ def create_table_energy_displacement(dir_name):
                     sector_def.cut_settings = cut
                     sector_def.medium = medium
 
-                    particle = pp.particle.Particle(particle_def)
-                    sector = pp.Sector(particle, sector_def, interpoldef)
+                    sector = pp.Sector(particle_def, sector_def, interpoldef)
 
                     for energy in energies:
                         buf = [""]
@@ -136,8 +138,7 @@ def create_table_propagate(dir_name):
                     sector_def.cut_settings = cut
                     sector_def.medium = medium
 
-                    particle = pp.particle.Particle(particle_def)
-                    sector = pp.Sector(particle, sector_def, interpoldef)
+                    sector = pp.Sector(particle_def, sector_def, interpoldef)
 
                     for energy in energies:
                         buf = [""]
@@ -147,16 +148,18 @@ def create_table_propagate(dir_name):
                         buf.append(str(cut.vcut))
                         buf.append(str(energy))
 
-                        sector.particle.position = pp.Vector3D(0,0,0)
-                        sector.particle.direction = pp.Vector3D(0,0,-1)
-                        sector.particle.propagated_distance = 0
-                        sector.particle.energy = energy
-                        sector_border_energy, secondaries = sector.propagate(1000)
+                        p_condition = pp.particle.DynamicData(0)
+                        p_condition.position = pp.Vector3D(0,0,0)
+                        p_condition.direction = pp.Vector3D(0,0,-1)
+                        p_condition.propagated_distance = 0
+                        p_condition.energy = energy
+                        sec = sector.propagate(p_condition, 1000, 0)
 
-                        buf.append(str(secondaries.number_of_particles))
-                        buf.append(str(sector_border_energy))
-
-
+                        buf.append(str(sec.number_of_particles))
+                        if(sec.particles[-1].propagated_distance < 999.99):
+                            buf.append(str(-sec.particles[-1].propagated_distance))
+                        else:
+                            buf.append(str(sec.particles[-1].energy))
                         buf.append("\n")
                         file.write("\t".join(buf))
 
