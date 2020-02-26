@@ -1,8 +1,8 @@
 
 #include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/decay/DecayChannel.h"
-#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 
 #include <memory>
 #include <vector>
@@ -97,10 +97,14 @@ void Secondaries::DoDecay()
 {
     for (auto it = secondaries_.begin(); it != secondaries_.end();) {
         if (it->GetType() == static_cast<int>(InteractionType::Decay)) {
+            DynamicData decaying_particle(primary_def_->particle_type,
+                it->GetPosition(), it->GetDirection(), it->GetEnergy(),
+                it->GetParentParticleEnergy(), it->GetTime(),
+                it->GetPropagatedDistance());
             double random_ch = RandomGenerator::Get().RandomDouble();
             Secondaries products
                 = primary_def_->decay_table.SelectChannel(random_ch).Decay(
-                    *primary_def_, *it);
+                    *primary_def_, decaying_particle);
             it = secondaries_.erase(it); // delete old decay
             for (auto p : products.GetSecondaries()) {
                 // and insert decayparticles inplace of old decay
@@ -161,13 +165,19 @@ std::vector<double> Secondaries::GetPropagatedDistance() const
     return vec;
 }
 
-double Secondaries::GetELost() const { return entry_point_->GetEnergy() - exit_point_->GetEnergy(); }
+double Secondaries::GetELost() const
+{
+    return entry_point_->GetEnergy() - exit_point_->GetEnergy();
+}
 
 DynamicData Secondaries::GetEntryPoint() const { return *entry_point_; }
 
 DynamicData Secondaries::GetExitPoint() const { return *exit_point_; }
 
-DynamicData Secondaries::GetClosestApproachPoint() const { return *closest_approach_point_; }
+DynamicData Secondaries::GetClosestApproachPoint() const
+{
+    return *closest_approach_point_;
+}
 
 void Secondaries::SetEntryPoint(const DynamicData& entry_point)
 {
@@ -181,14 +191,16 @@ void Secondaries::SetExitPoint(const DynamicData& exit_point)
 
 void Secondaries::SetClosestApproachPoint(const DynamicData& closest_approach_point)
 {
-    closest_approach_point_ = std::unique_ptr<DynamicData>(new DynamicData(closest_approach_point));
+    closest_approach_point_
+        = std::unique_ptr<DynamicData>(new DynamicData(closest_approach_point));
 }
 
 Secondaries Secondaries::GetOnlyLostInsideDetector() const
 {
     Secondaries croped_secondaries;
-    for (DynamicData p: secondaries_) {
-        if (p.GetTime() >= entry_point_->GetTime() && p.GetTime() <= exit_point_->GetTime()){
+    for (DynamicData p : secondaries_) {
+        if (p.GetTime() >= entry_point_->GetTime()
+            && p.GetTime() <= exit_point_->GetTime()) {
             croped_secondaries.push_back(p);
         }
     }

@@ -13,7 +13,6 @@
 #include <iomanip>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/methods.h"
 
@@ -76,25 +75,21 @@ Component::Component(std::string name, double nucCharge, double atomicNum, doubl
     , atomInMolecule_(atomInMolecule)
     , logConstant_(0.0)
     , bPrime_(0.0)
-    , M_(0.0)
-    , mN_(0.0)
-    , r0_(0.0)
+    , averageNucleonWeight_(0.0)
+    , wood_saxon_(0.0)
 {
     SetLogConstant();
     SetBPrime();
 
-    M_ = (nucCharge_ * MP + (atomicNum_ - nucCharge_) * MN) / atomicNum_;
+    averageNucleonWeight_ = (nucCharge_ * MP + (atomicNum_ - nucCharge_) * MN) / atomicNum_;
 
     if (nucCharge != 1.0)
     {
-        Integral integral(IROMB, IMAXS, IPREC);
+        // see Butkevich, Mikheyev JETP 95 (2002), 11 eq. 45-47
+        double r0 = std::pow(atomicNum, 1.0 / 3.0);
+        r0 = 1.12 * r0 - 0.86 / r0;
 
-        r0_ = pow(atomicNum, 1.0 / 3.0);
-        r0_ = 1.12 * r0_ - 0.86 / r0_;
-
-        mN_ = 1.0 - 4.0 * PI * 0.17 *
-                        integral.Integrate(r0_, -1.0, std::bind(&Component::FunctionToIntegral, this, std::placeholders::_1), 3, 2.0) /
-                        atomicNum_;
+        wood_saxon_ = 1.0 - 4.0 * PI * 0.17 * WoodSaxonPotential(r0) / atomicNum_;
     }
 }
 
@@ -119,11 +114,9 @@ bool Component::operator==(const Component& component) const
         return false;
     else if (bPrime_ != component.bPrime_)
         return false;
-    else if (M_ != component.M_)
+    else if (averageNucleonWeight_ != component.averageNucleonWeight_)
         return false;
-    else if (mN_ != component.mN_)
-        return false;
-    else if (r0_ != component.r0_)
+    else if (wood_saxon_ != component.wood_saxon_)
         return false;
     else
         return true;
@@ -260,11 +253,18 @@ void Component::SetBPrime()
 }
 
 // ------------------------------------------------------------------------- //
-double Component::FunctionToIntegral(double r)
+double Component::WoodSaxonPotential(double r0)
 {
+    // This is the analytical intergral to
+    // $\int_{r_0}^{\infty} \frac{r^2}{1+\exp((r-r_0)/a)}dr \quad \text{with } a=0.54$
+    // which can be written to
+    // $ar_0^2 \int_0^{\infty} \frac{dx}{1+e^x} \\$
+    // $ + 2a^2r_0 \int_0^{\infty} \frac{x dx}{1+e^x} \\$
+    // $ + a^3 \int_0^{\infty} \frac{x^2 dx}{1+e^x}$
+    // and results in
+    // $ar_0^2\log(2) + 2a^2r_0\pi^2/12 + 3/2a^3\zeta(3)$
     const double a = 0.54;
-
-    return r * r / (1 + exp((r - r0_) / a));
+    return a*(r0*r0*std::log(2) + a*r0*PI*PI/6 + a*a*1.5*ZETA3);
 }
 
 /******************************************************************************

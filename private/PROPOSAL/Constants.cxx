@@ -7,6 +7,7 @@ const double PROPOSAL::LOG10            = 2.302585092994046;                    
 const double PROPOSAL::SQRT2            = 1.414213562373095;                      // sqrt(2)
 const double PROPOSAL::SQRT3            = 1.732050807568877;                      // sqrt(3)
 const double PROPOSAL::SQRTE            = 1.648721270700128;                      // sqrt(e)
+const double PROPOSAL::ZETA3            = 1.202056903159594;                      // rieman zeta(3)
 const double PROPOSAL::EULER_MASCHERONI = 0.577215664901532860606512090082402431; // Euler-Mascheroni constant
 
 // integration parameters

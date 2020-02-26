@@ -67,9 +67,8 @@ public:
     double GetAtomInMolecule() const { return atomInMolecule_; }
     double GetLogConstant() const { return logConstant_; }
     double GetBPrime() const { return bPrime_; }
-    double GetAverageNucleonWeight() const { return M_; }
-    double GetMN() const { return mN_; }
-    double GetR0() const { return r0_; }
+    double GetAverageNucleonWeight() const { return averageNucleonWeight_; }
+    double GetWoodSaxon() const { return wood_saxon_; }
 
 protected:
     /*!
@@ -96,6 +95,18 @@ protected:
      */
     double FunctionToIntegral(double r);
 
+    /*!
+     * Woods-Saxon potential calculation
+     *
+     * \param   r
+     * \return  value of the Woods-Saxon potential
+     *
+     * Calculation of the integral defined in
+     * Butkevich Mikheyev JETP 95 (2002), 11 eq. 46
+     * This can be integrated analytically.
+     */
+    double WoodSaxonPotential(double r0);
+
     // Passed to constructor
     std::string name_;
     double nucCharge_;      ///< nucleus charge
@@ -105,9 +116,8 @@ protected:
     // Calculated in constructor
     double logConstant_; ///< radiation logarithm constant B
     double bPrime_;      ///< radiation logarithm constant bPrime
-    double M_;           ///< average nucleon weight in a nucleus [MeV]
-    double mN_;          ///< Woods-Saxon potential factor
-    double r0_;          // //TODO(mario): Must really be stored? Thu 2017/08/03
+    double averageNucleonWeight_; ///< average nucleon weight in a nucleus [MeV]
+    double wood_saxon_;  ///< Woods-Saxon potential factor
 };
 
 COMPONENT_DEC(Hydrogen, 2.0)

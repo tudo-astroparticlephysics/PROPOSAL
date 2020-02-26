@@ -76,6 +76,24 @@ double inverseErrorFunction(double x);
 // ----------------------------------------------------------------------------
 double dilog(double x);
 
+// ----------------------------------------------------------------------------
+/// @brief Calculate the trilogarithm
+///
+/// @param x real argument
+///
+/// Algorithm created by Alexander Sandrock.
+///
+/// Using definitions of polylogarithm for 0, 1, -1
+/// and to reduce the calculation for values |x| > 1
+/// to a calculation of the trilogarithm between |x| < 1.
+///
+/// For values |x| < 1 an advanced method converging faster
+/// than the primitive power series is used.
+///
+/// @return trilog(x)
+// ----------------------------------------------------------------------------
+// double trilog(double x);
+
 
 /// @brief Netwon-Raphson method and bisection to find the root of the function f
 /// @param f    Function to find the root. Root must exist and be inside the interval [x1, x2]
