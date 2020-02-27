@@ -25,16 +25,16 @@ Utility::Definition::Definition(std::shared_ptr<Crosssections> corsssection,
                  "approximate by interpolants. Performance will be poor.");
 
         displacement_calculator.reset(
-            new UtilityIntegralDisplacement(crossection));
+            new UtilityIntegralDisplacement(crosssection));
         interaction_calculator.reset(
-            new UtilityIntegralInteraction(crossection));
-        decay_calculator.reset(new UtilityIntegralDecay(crossection))
+            new UtilityIntegralInteraction(crosssection));
+        decay_calculator.reset(new UtilityIntegralDecay(crosssection))
     } else {
         displacement_calculator.reset(
-            new UtilityInterpolantDisplacement(crossection));
+            new UtilityInterpolantDisplacement(crosssection, inter_def));
         interaction_calculator.reset(
-            new UtilityInterpolantInteraction(crossection));
-        decay_calculator.reset(new UtilityInterpolantDecay(crossection))
+            new UtilityInterpolantInteraction(crosssection, inter_def));
+        decay_calculator.reset(new UtilityInterpolantDecay(crosssection, inter_def))
     }
 
     if (!scattering) {
@@ -46,9 +46,9 @@ Utility::Definition::Definition(std::shared_ptr<Crosssections> corsssection,
         log_debug("No continous randomization used.");
     } else {
         if (!inter_def) {
-            cont_rand.reset(new UtilityIntegralContRand(crossection))
+            cont_rand.reset(new UtilityIntegralContRand(crosssection))
         } else {
-            cont_rand.reset(new UtilityInterpolantContRand(crossection))
+            cont_rand.reset(new UtilityInterpolantContRand(crosssection, inter_def))
         }
     }
 
@@ -57,9 +57,9 @@ Utility::Definition::Definition(std::shared_ptr<Crosssections> corsssection,
     }
     } else {
         if (!inter_def) {
-            cont_rand.reset(new UtilityIntegralTime(crossection))
+            cont_rand.reset(new UtilityIntegralTime(crosssection))
         } else {
-            cont_rand.reset(new UtilityInterpolantTime(crossection))
+            cont_rand.reset(new UtilityInterpolantTime(crosssection, inter_def))
         }
     }
 }
@@ -71,19 +71,19 @@ std::ostream& PROPOSAL::operator<<(
     ss << " Utility Definition (" << &util_definition << ") ";
     os << Helper::Centered(60, ss.str()) << '\n';
 
-    for (const auto& corsssection : util_definition->crosssection) {
+    for (const auto& crosssection : util_definition->crosssection) {
         os << crosssection << std::endl;
     }
-    if (!scattering) {
+    if (scattering) {
         os << scattering << std::endl;
     };
-    if (!inter_def) {
+    if (inter_def) {
         os << inter_def << std::endl;
     }
-    if (!cont_rand) {
+    if (cont_rand) {
         os << cont_rand << std::endl;
     }
-    if (!exact_time) {
+    if (exact_time) {
         os << exact_time << std::endl;
     } ;
     os << Helper::Centered(60, "");

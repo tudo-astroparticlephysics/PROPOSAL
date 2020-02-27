@@ -26,7 +26,7 @@ UtilityIntegral::UtilityIntegral(Crosssections cross)
 {
 }
 
-double UtilityIntegralInteraction::Calculate(double ei, double ef, double rnd)
+double UtilityIntegral::Calculate(double ei, double ef, double rnd)
 {
     return integral_.IntegrateWithRandomRatio(ei, ef,
         std::bind(&this->FunctionToIntegral, this, std::placeholders::_1), 4,

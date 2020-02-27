@@ -36,8 +36,6 @@ class UtilityIntegral : public UtilityDecorator {
 public:
     UtilityIntegral(Crosssections);
 
-    // Methods
-    virtual double FunctionToIntegral(double energy) = 0;
     virtual double Calculate(double ei, double ef, double rnd);
     virtual double GetUpperLimit(double ei, double rnd);
 
