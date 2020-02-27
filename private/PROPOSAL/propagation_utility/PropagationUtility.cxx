@@ -19,6 +19,10 @@ Utility::Definition::Definition(std::shared_ptr<Crosssections> corsssection,
     : crosssection(crosssection)
     , scattering(scattering)
     , inter_def(inter_def)
+    , mass(crosssection.first()
+               .GetParticleDef()
+               .mass); // if particle energy would be kinetic energy, this copy
+                       // is redundant
 {
     if (!inter_def) {
         log_warn("No interpolation definition defined. Integral will not be "
@@ -34,12 +38,13 @@ Utility::Definition::Definition(std::shared_ptr<Crosssections> corsssection,
             new UtilityInterpolantDisplacement(crosssection, inter_def));
         interaction_calculator.reset(
             new UtilityInterpolantInteraction(crosssection, inter_def));
-        decay_calculator.reset(new UtilityInterpolantDecay(crosssection, inter_def))
+        decay_calculator.reset(
+            new UtilityInterpolantDecay(crosssection, inter_def))
     }
 
     if (!scattering) {
         log_debug("No scattering defined. Partilce will only be deflected if a "
-                 "stochastic deflection is in the crosssection implemented.");
+                  "stochastic deflection is in the crosssection implemented.");
     }
 
     if (!cont_rand) {
@@ -48,20 +53,23 @@ Utility::Definition::Definition(std::shared_ptr<Crosssections> corsssection,
         if (!inter_def) {
             cont_rand.reset(new UtilityIntegralContRand(crosssection))
         } else {
-            cont_rand.reset(new UtilityInterpolantContRand(crosssection, inter_def))
+            cont_rand.reset(
+                new UtilityInterpolantContRand(crosssection, inter_def))
         }
     }
 
     if (!exact_time) {
         log_debug("No exact time calculator used.");
     }
+}
+else
+{
+    if (!inter_def) {
+        cont_rand.reset(new UtilityIntegralTime(crosssection))
     } else {
-        if (!inter_def) {
-            cont_rand.reset(new UtilityIntegralTime(crosssection))
-        } else {
-            cont_rand.reset(new UtilityInterpolantTime(crosssection, inter_def))
-        }
+        cont_rand.reset(new UtilityInterpolantTime(crosssection, inter_def))
     }
+}
 }
 
 std::ostream& PROPOSAL::operator<<(
@@ -85,7 +93,7 @@ std::ostream& PROPOSAL::operator<<(
     }
     if (exact_time) {
         os << exact_time << std::endl;
-    } ;
+    };
     os << Helper::Centered(60, "");
     return os;
 }
@@ -99,41 +107,75 @@ Utility::Utility(std::unique_ptr<Utility::Definition> utility_def)
 {
 }
 
-std::pair<double, int> Utility::StochasticLoss(
-    double particle_energy, double rnd1, double rnd2, double rnd3)
+int Utility::StochasticInteraction(
+    const double energy, const double rnd1, const double rnd2)
 {
-    double total_rate = 0;
-    double total_rate_weighted = 0;
-    double rates_sum = 0;
-    std::vector<double> rates;
-    rates.resize(crosssections_.size());
+    std::array<double, crosssections_.size()> rates;
+    for (const auto& cross : crosssections)
+        rates = crosssections->CalculatedNdx(energy, rnd2);
 
-    // return 0 and unknown, if there is no interaction
-    std::pair<double, int> energy_loss;
-    energy_loss.first = 0.;
-    energy_loss.second = 0;
-
-    for (unsigned int i = 0; i < crosssections_.size(); i++) {
-        rates[i] = crosssections_[i]->CalculatedNdx(particle_energy, rnd2);
-        total_rate += rates[i];
-    }
-
-    total_rate_weighted = total_rate * rnd1;
-
+    double total_rate{ std::accumulate(rates.begin(), rates.end(), 0) };
     log_debug("Total rate = %f, total rate weighted = %f", total_rate,
-        total_rate_weighted);
+        total_rate * rnd1);
 
-    for (unsigned int i = 0; i < rates.size(); i++) {
+    double rates_sum = 0;
+    for (size_t i = 0; i < rates.size(); i++) {
         rates_sum += rates[i];
-
-        if (rates_sum >= total_rate_weighted) {
-            energy_loss.first = crosssections_[i]->CalculateStochasticLoss(
-                particle_energy, rnd2, rnd3);
-            energy_loss.second = crosssections_[i]->GetTypeId();
-
-            break;
-        }
+        if (rates_sum >= total_rate * rnd1)
+            return crosssection[i]->GetType();
     }
 
-    return energy_loss;
+    throw std::logic_error("Something get wrong in total rate calculation.");
+}
+
+double Utility::StochasticLoss(
+    const int type, const double energy, const double rnd2, const double rnd3)
+{
+    for (const auto& cross : crosssections) {
+        if (cross->GetType() == type)
+            return cross->CalculateStochasticLoss(energy, rnd2, rnd3);
+    }
+    throw std::logic_error(
+        "Something get wrong with stochastic loss calculation.");
+}
+
+int Utility::StochasticLoss(double energy, double rnd1, double rnd2)
+{
+    assert(!decay_calculator) throw std::logic_error(
+        "stable particle cannot decay.");
+
+    double rndd = -std::log(rnd);
+    double rnddMin = 0;
+
+    rnddMin = decay_calculator_->Calculate(energy, mass, rndd);
+
+    // evaluating the energy loss
+    if (rndd >= rnddMin || rnddMin <= 0)
+        return mass;
+
+    return decay_calculator->GetUpperLimit(energy, rndd);
+}
+
+double Utility::EnergyInteraction(const double energy, const double rnd)
+{
+    double rndi = -std::log(rnd);
+    double rndiMin = 0;
+
+    // solving the tracking integral
+    rndiMin = interaction_calculator_->Calculate(energy, mass, rndi);
+
+    if (rndi >= rndiMin || rndiMin <= 0)
+        return mass;
+
+    return interaction_calculator_->GetUpperLimit(energy, rndi);
+}
+
+double Utility::ElapsedTime(
+    double initial_energy, double final_energy, double distance)
+{
+    if (exact_time) {
+        return exact_time->Calculate(initial_energy, final_energy, distance);
+    } else {
+        return displacement / SPEED;
+    }
 }

@@ -71,6 +71,8 @@ private:
     std::unique_ptr<UtilityDecorator> decay_calculator = nullptr;
     std::unique_ptr<UtilityDecorator> cont_rand = nullptr;
     std::unique_ptr<UtilityDecorator> exact_time = nullptr;
+
+    double mass;
 };
 } // namespace PROPOSAL
 
