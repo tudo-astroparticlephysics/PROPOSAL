@@ -61,7 +61,6 @@ matrix:
         - CXX=clang++-8
 
 before_install:
-  - pwd
   - pyenv global system 3.7
 
 install:
@@ -76,8 +75,8 @@ script:
 - travis_wait 60 ctest -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
 after_success:
 - git clean -fdx
-- cd $HOME/tudo-astroparticlephysics
-- tar czf PROPOSAL-$TRAVIS_BRANCH.tar.gz --exclude-vcs PROPOSAL
+- cd $TRAVIS_BUILD_DIR/..
+- tar czf PROPOSAL-$TRAVIS_TAG.tar.gz --exclude-vcs PROPOSAL
 notifications:
   email: false
 deploy:
