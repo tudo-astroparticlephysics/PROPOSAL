@@ -21,8 +21,8 @@ using namespace PROPOSAL;
  ******************************************************************************/
 
 UtilityInterpolant::UtilityInterpolant(
-    const Utility& utility, InterpolationDef def)
-    : UtilityDecorator(utility)
+    Crosssections cross, InterpolationDef def)
+    : UtilityDecorator(cross)
     , stored_result_(0)
     , interpolant_(NULL)
     , interpolant_diff_(NULL)
@@ -30,48 +30,10 @@ UtilityInterpolant::UtilityInterpolant(
 {
 }
 
-UtilityInterpolant::UtilityInterpolant(
-    const Utility& utility, const UtilityInterpolant& collection)
-    : UtilityDecorator(utility)
-    , stored_result_(collection.stored_result_)
-    , interpolant_(new Interpolant(*collection.interpolant_))
-    , interpolant_diff_(new Interpolant(*collection.interpolant_diff_))
-    , interpolation_def_(collection.interpolation_def_)
-{
-    if (utility != collection.GetUtility()) {
-        log_fatal("Utilities of the decorators should have same values!");
-    }
-}
-
-UtilityInterpolant::UtilityInterpolant(const UtilityInterpolant& collection)
-    : UtilityDecorator(collection)
-    , stored_result_(collection.stored_result_)
-    , interpolant_(new Interpolant(*collection.interpolant_))
-    , interpolant_diff_(new Interpolant(*collection.interpolant_diff_))
-    , interpolation_def_(collection.interpolation_def_)
-{
-}
-
 UtilityInterpolant::~UtilityInterpolant()
 {
     delete interpolant_;
     delete interpolant_diff_;
-}
-
-bool UtilityInterpolant::compare(
-    const UtilityDecorator& utility_decorator) const
-{
-    const UtilityInterpolant* utility_interpolant
-        = static_cast<const UtilityInterpolant*>(&utility_decorator);
-
-    if (stored_result_ != utility_interpolant->stored_result_)
-        return false;
-    else if (*interpolant_ != *utility_interpolant->interpolant_)
-        return false;
-    else if (*interpolant_diff_ != *utility_interpolant->interpolant_diff_)
-        return false;
-    else
-        return true;
 }
 
 // ------------------------------------------------------------------------- //
@@ -100,7 +62,7 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
         std::bind(&UtilityInterpolant::BuildInterpolant, this,
             std::placeholders::_1, std::ref(utility), std::ref(integral))));
     interpolants.push_back(std::make_pair(&interpolant_diff_,
-        std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+        std::bind(&UtilityIntegralDisplacementDisplacement::FunctionToIntegral, &utility,
             std::placeholders::_1)));
 
     unsigned int number_of_interpolants = interpolants.size();
@@ -140,28 +102,18 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
         name, builder_container, params, interpolation_def_);
 }
 
+
+
 /******************************************************************************
  *                            Utility Displacement                            *
  ******************************************************************************/
 
 UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(
-    const Utility& utility, InterpolationDef def)
-    : UtilityInterpolant(utility, def)
+    Crosssections cross, InterpolationDef def)
+    : UtilityInterpolant(cross, def)
 {
     UtilityIntegralDisplacement utility_disp(utility_);
     InitInterpolation("displacement", utility_disp, def.nodes_propagate);
-}
-
-UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(
-    const Utility& utility, const UtilityInterpolantDisplacement& collection)
-    : UtilityInterpolant(utility, collection)
-{
-}
-
-UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(
-    const UtilityInterpolantDisplacement& collection)
-    : UtilityInterpolant(collection)
-{
 }
 
 UtilityInterpolantDisplacement::~UtilityInterpolantDisplacement() {}
@@ -189,52 +141,26 @@ double UtilityInterpolantDisplacement::Calculate(
         (interpolant_diff_->Interpolate((ei + ef) / 2)) * (ef - ei), 0.0);
 }
 
-double UtilityInterpolantDisplacement::Calculate(double ei, double ef,
-    double distance_to_border, const Vector3D& xi, const Vector3D& direction)
+double UtilityInterpolantDisplacement::GetUpperLimit(double ei, double rnd)
 {
-    /* (void) rnd; */
-
-    if (std::abs(ei - ef) > std::abs(ei) * HALF_PRECISION) {
-        double aux;
-        double displacement;
-
-        stored_result_ = interpolant_->Interpolate(ei);
-        aux = stored_result_ - interpolant_->Interpolate(ef);
-
-        displacement = utility_.GetMedium().GetDensityDistribution().Correct(
-            xi, direction, aux, distance_to_border);
-
-        if (std::abs(aux) > std::abs(stored_result_) * HALF_PRECISION
-            && aux >= 0) {
-            return std::max(displacement, 0.0);
-        }
-    }
-
-    stored_result_ = 0;
-
-    return std::max(
-        (interpolant_diff_->Interpolate((ei + ef) / 2)) * (ef - ei), 0.0);
-}
-
-double UtilityInterpolantDisplacement::GetUpperLimit(double ei, double rnd) {
-    f = [&](double ef) { return Calculate(ei, ef, rnd) - rnd; };
-    df = [&](double ef) { return interpolant_diff_->Interpolate(ef); };
+    <double(double)>f = [&](double ef) { return Calculate(ei, ef, rnd) - rnd; };
+    std::functioon<double(double)> df = [&](double ef) { return interpolant_diff_->Interpolate(ef); };
 
     int MaxSteps = 200;
-    try{
+    try {
         return std::max(NewtonRaphson(f, df, 0, ei, ei, MaxSteps,
-                                      PARTICLE_POSITION_RESOLUTION), utility_.GetParticleDef().mass);
-    } catch (MathException& e){
+                            PARTICLE_POSITION_RESOLUTION),
+            utility_.GetParticleDef().mass);
+    } catch (MathException& e) {
         return utility_.GetParticleDef().mass;
     }
-
 }
 
 double UtilityInterpolantDisplacement::BuildInterpolant(
     double energy, UtilityIntegral& utility, Integral& integral)
 {
     return integral.Integrate(energy, utility_.GetParticleDef().low,
-        std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+        std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
             std::placeholders::_1),
         4);
 }
@@ -252,8 +178,8 @@ void UtilityInterpolantDisplacement::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantInteraction::UtilityInterpolantInteraction(
-    const Utility& utility, InterpolationDef def)
-    : UtilityInterpolant(utility, def)
+    Crosssections cross, InterpolationDef def)
+    : UtilityInterpolant(cross, def)
     , big_low_(0)
     , up_(0)
 {
@@ -261,37 +187,7 @@ UtilityInterpolantInteraction::UtilityInterpolantInteraction(
     InitInterpolation("interaction", utility_int, def.nodes_propagate);
 }
 
-UtilityInterpolantInteraction::UtilityInterpolantInteraction(
-    const Utility& utility, const UtilityInterpolantInteraction& collection)
-    : UtilityInterpolant(utility, collection)
-    , big_low_(collection.big_low_)
-    , up_(collection.up_)
-{
-}
-
-UtilityInterpolantInteraction::UtilityInterpolantInteraction(
-    const UtilityInterpolantInteraction& collection)
-    : UtilityInterpolant(collection)
-    , big_low_(collection.big_low_)
-    , up_(collection.up_)
-{
-}
-
 UtilityInterpolantInteraction::~UtilityInterpolantInteraction() {}
-
-bool UtilityInterpolantInteraction::compare(
-    const UtilityDecorator& utility_decorator) const
-{
-    const UtilityInterpolantInteraction* utility_interpolant
-        = static_cast<const UtilityInterpolantInteraction*>(&utility_decorator);
-
-    if (big_low_ != utility_interpolant->big_low_)
-        return false;
-    if (up_ != utility_interpolant->up_)
-        return false;
-    else
-        return UtilityInterpolant::compare(utility_decorator);
-}
 
 double UtilityInterpolantInteraction::Calculate(
     double ei, double ef, double rnd)
@@ -332,12 +228,12 @@ double UtilityInterpolantInteraction::BuildInterpolant(
 {
     if (up_) {
         return integral.Integrate(energy, utility_.GetParticleDef().low,
-            std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+            std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
                 std::placeholders::_1),
             4);
     } else {
         return -integral.Integrate(energy, interpolation_def_.max_node_energy,
-            std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+            std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
                 std::placeholders::_1),
             4);
     }
@@ -352,12 +248,12 @@ void UtilityInterpolantInteraction::InitInterpolation(const std::string& name,
 
     double a
         = std::abs(-integral.Integrate(particle_def.low, particle_def.low * 10,
-            std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+            std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
                 std::placeholders::_1),
             4));
     double b = std::abs(-integral.Integrate(interpolation_def_.max_node_energy,
         interpolation_def_.max_node_energy / 10,
-        std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+        std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
             std::placeholders::_1),
         4));
 
@@ -378,8 +274,8 @@ void UtilityInterpolantInteraction::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantDecay::UtilityInterpolantDecay(
-    const Utility& utility, InterpolationDef def)
-    : UtilityInterpolant(utility, def)
+    Crosssections cross, InterpolationDef def)
+    : UtilityInterpolant(cross, def)
     , big_low_(0)
     , up_(0)
 {
@@ -387,37 +283,7 @@ UtilityInterpolantDecay::UtilityInterpolantDecay(
     InitInterpolation("decay", utility_decay, def.nodes_propagate);
 }
 
-UtilityInterpolantDecay::UtilityInterpolantDecay(
-    const Utility& utility, const UtilityInterpolantDecay& collection)
-    : UtilityInterpolant(utility, collection)
-    , big_low_(collection.big_low_)
-    , up_(collection.up_)
-{
-}
-
-UtilityInterpolantDecay::UtilityInterpolantDecay(
-    const UtilityInterpolantDecay& collection)
-    : UtilityInterpolant(collection)
-    , big_low_(collection.big_low_)
-    , up_(collection.up_)
-{
-}
-
 UtilityInterpolantDecay::~UtilityInterpolantDecay() {}
-
-bool UtilityInterpolantDecay::compare(
-    const UtilityDecorator& utility_decorator) const
-{
-    const UtilityInterpolantDecay* utility_interpolant
-        = static_cast<const UtilityInterpolantDecay*>(&utility_decorator);
-
-    if (big_low_ != utility_interpolant->big_low_)
-        return false;
-    if (up_ != utility_interpolant->up_)
-        return false;
-    else
-        return UtilityInterpolant::compare(utility_decorator);
-}
 
 double UtilityInterpolantDecay::Calculate(double ei, double ef, double rnd)
 {
@@ -452,7 +318,7 @@ double UtilityInterpolantDecay::BuildInterpolant(
     double energy, UtilityIntegral& utility, Integral& integral)
 {
     return -integral.Integrate(energy, interpolation_def_.max_node_energy,
-        std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+        std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
             std::placeholders::_1),
         4);
 }
@@ -466,12 +332,12 @@ void UtilityInterpolantDecay::InitInterpolation(const std::string& name,
 
     double a
         = std::abs(-integral.Integrate(particle_def.low, particle_def.low * 10,
-            std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+            std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
                 std::placeholders::_1),
             4));
     double b = std::abs(-integral.Integrate(interpolation_def_.max_node_energy,
         interpolation_def_.max_node_energy / 10,
-        std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+        std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
             std::placeholders::_1),
         4));
 
@@ -492,23 +358,11 @@ void UtilityInterpolantDecay::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantTime::UtilityInterpolantTime(
-    const Utility& utility, InterpolationDef def)
-    : UtilityInterpolant(utility, def)
+    Crosssections cross, InterpolationDef def)
+    : UtilityInterpolant(cross, def)
 {
     UtilityIntegralTime utility_time(utility_);
     InitInterpolation("time", utility_time, def.nodes_propagate);
-}
-
-UtilityInterpolantTime::UtilityInterpolantTime(
-    const Utility& utility, const UtilityInterpolantTime& collection)
-    : UtilityInterpolant(utility, collection)
-{
-}
-
-UtilityInterpolantTime::UtilityInterpolantTime(
-    const UtilityInterpolantTime& collection)
-    : UtilityInterpolant(collection)
-{
 }
 
 UtilityInterpolantTime::~UtilityInterpolantTime() {}
@@ -542,7 +396,7 @@ double UtilityInterpolantTime::BuildInterpolant(
     double energy, UtilityIntegral& utility, Integral& integral)
 {
     return integral.Integrate(energy, utility_.GetParticleDef().low,
-        std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+        std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
             std::placeholders::_1),
         4);
 }
@@ -560,24 +414,12 @@ void UtilityInterpolantTime::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantContRand::UtilityInterpolantContRand(
-    const Utility& utility, InterpolationDef def)
-    : UtilityInterpolant(utility, def)
+    Crosssections cross, InterpolationDef def)
+    : UtilityInterpolant(cross, def)
 {
     UtilityIntegralContRand utility_contrand(utility_);
     InitInterpolation(
         "contrand", utility_contrand, def.nodes_continous_randomization);
-}
-
-UtilityInterpolantContRand::UtilityInterpolantContRand(
-    const Utility& utility, const UtilityInterpolantContRand& collection)
-    : UtilityInterpolant(utility, collection)
-{
-}
-
-UtilityInterpolantContRand::UtilityInterpolantContRand(
-    const UtilityInterpolantContRand& collection)
-    : UtilityInterpolant(collection)
-{
 }
 
 UtilityInterpolantContRand::~UtilityInterpolantContRand() {}
@@ -613,7 +455,7 @@ double UtilityInterpolantContRand::BuildInterpolant(
     double energy, UtilityIntegral& utility, Integral& integral)
 {
     return integral.Integrate(energy, utility_.GetParticleDef().low,
-        std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+        std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
             std::placeholders::_1),
         4);
 }
@@ -631,24 +473,12 @@ void UtilityInterpolantContRand::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantScattering::UtilityInterpolantScattering(
-    const Utility& utility, InterpolationDef def)
-    : UtilityInterpolant(utility, def)
+    Crosssections cross, InterpolationDef def)
+    : UtilityInterpolant(cross, def)
 {
     UtilityIntegralScattering utility_scattering(utility_);
     InitInterpolation(
         "scattering", utility_scattering, def.nodes_continous_randomization);
-}
-
-UtilityInterpolantScattering::UtilityInterpolantScattering(
-    const Utility& utility, const UtilityInterpolantScattering& collection)
-    : UtilityInterpolant(utility, collection)
-{
-}
-
-UtilityInterpolantScattering::UtilityInterpolantScattering(
-    const UtilityInterpolantScattering& collection)
-    : UtilityInterpolant(collection)
-{
 }
 
 UtilityInterpolantScattering::~UtilityInterpolantScattering() {}
@@ -684,7 +514,7 @@ double UtilityInterpolantScattering::BuildInterpolant(
     double energy, UtilityIntegral& utility, Integral& integral)
 {
     return integral.Integrate(energy, interpolation_def_.max_node_energy,
-        std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+        std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
             std::placeholders::_1),
         4);
 }
