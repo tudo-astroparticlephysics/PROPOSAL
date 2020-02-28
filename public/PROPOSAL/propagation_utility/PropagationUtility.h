@@ -39,6 +39,9 @@ class CrossSection;
 struct InterpolationDef;
 
 typedef std::vector<std::shared_ptr<CrossSection>> Crosssections;
+typedef const double random_number;
+typedef const double energy;
+typedef const double distance;
 
 class Utility {
 public:
@@ -56,12 +59,20 @@ public:
     Utility(std::unique_ptr<Definition> utility_def)
         : utility_def(std::move(utility_def)){};
 
-    DynamicData StochasticLoss(
-        double particle_energy, std::array<double, 3> rnd);
-    DynamicData AdvanceParticle(const DynamicData& p_condition,
-        double final_energy, double sector_border);
-    double DecayLength(const double initial_energy, const double rnd);
-    double DecayEnergy(const double initial_energy, const double rnd);
+    double TypeInteraction(const double, const std::array<double, 2> );
+    double EnergyStochasticloss(const int, const double, const std::array<double, 2>);
+    double EnergyDecay(const double, const double);
+    double EnergyInteraction(const double, const double);
+    double EnergyRandomize(const double, const double, const double);
+    double LengthContinuous(const double, const double, const double);
+    double ElapsedTime(const double, const double, const double);
+
+    // TODO: return value doesn't tell what it include. Maybe it would be better
+    // to give a tuple of two directions back. One is the mean over the
+    // displacement and the other is the actual direction. With a get methode
+    // there could be a possible access with the position of the object stored
+    // in an enum.
+    Directions ScatterDirection(const double, const double, const double, Vector3D&, Vector3D&);
 
 private:
     Definition utility_def;
@@ -80,8 +91,9 @@ namespace PROPOSAL {
 class UtilityDecorator {
     Crosssections crossections;
 
-    public:
-    UtilityDecorator(Crosssections cross) : crosssections(crosssections){};
+public:
+    UtilityDecorator(Crosssections cross)
+        : crosssections(crosssections){};
 
     virtual double FunctionToIntegral(double energy) = 0;
     virtual double Calculate(double ei, double ef, double rnd) = 0;

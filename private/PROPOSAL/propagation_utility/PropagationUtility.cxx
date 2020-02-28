@@ -107,43 +107,40 @@ Utility::Utility(std::unique_ptr<Utility::Definition> utility_def)
 {
 }
 
-int Utility::StochasticInteraction(
-    const double energy, const double rnd1, const double rnd2)
+int Utility::TypeInteraction(
+    const double energy, const std::array<double, 2> rnd)
 {
     std::array<double, crosssections_.size()> rates;
     for (const auto& cross : crosssections)
-        rates = crosssections->CalculatedNdx(energy, rnd2);
+        rates = crosssections->CalculatedNdx(energy, rnd[1]);
 
     double total_rate{ std::accumulate(rates.begin(), rates.end(), 0) };
     log_debug("Total rate = %f, total rate weighted = %f", total_rate,
-        total_rate * rnd1);
+        total_rate * rnd[0]);
 
     double rates_sum = 0;
     for (size_t i = 0; i < rates.size(); i++) {
         rates_sum += rates[i];
-        if (rates_sum >= total_rate * rnd1)
+        if (rates_sum >= total_rate * rnd[0])
             return crosssection[i]->GetType();
     }
 
     throw std::logic_error("Something get wrong in total rate calculation.");
 }
 
-double Utility::StochasticLoss(
-    const int type, const double energy, const double rnd2, const double rnd3)
+double Utility::EnergyStochasticloss(
+    const int type, const double energy, const std::array<double, 2> rnd)
 {
     for (const auto& cross : crosssections) {
         if (cross->GetType() == type)
-            return cross->CalculateStochasticLoss(energy, rnd2, rnd3);
+            return cross->CalculateStochasticLoss(energy, rnd[0], rnd[1]);
     }
     throw std::logic_error(
         "Something get wrong with stochastic loss calculation.");
 }
 
-int Utility::StochasticLoss(double energy, double rnd1, double rnd2)
+int Utility::EnergyDecay(const double energy, const double rnd)
 {
-    assert(!decay_calculator) throw std::logic_error(
-        "stable particle cannot decay.");
-
     double rndd = -std::log(rnd);
     double rnddMin = 0;
 
@@ -170,12 +167,33 @@ double Utility::EnergyInteraction(const double energy, const double rnd)
     return interaction_calculator_->GetUpperLimit(energy, rndi);
 }
 
-double Utility::ElapsedTime(
-    double initial_energy, double final_energy, double distance)
+double EnergyRandomize(const double initial_energy, const double final_energy, const double rnd)
+{
+    if (cont_rand) {
+        return cont_rand->Randomize(initial_energy, final_energy, distance, rnd);
+    } else {
+        return final_energy;
+    }
+}
+
+double Utility::ElapsedTime(const double initial_energy,
+    const double final_energy, const double distance)
 {
     if (exact_time) {
         return exact_time->Calculate(initial_energy, final_energy, distance);
     } else {
         return displacement / SPEED;
     }
+}
+
+Directions ScatterDirection(const double displacement, const double initial_energy,
+    const double final_energy, Vector3D& position, Vector3D& direction)
+{
+    return scattering->Scatter(
+        displacement, initial_energy, final_energy, position, direction);
+}
+
+double LengthContinuous(const double initial_energy, const double final_energy, const double border_length)
+{
+    displacement_calculator_->Calculate(initial_energy, final_energy, border_length);
 }
