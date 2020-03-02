@@ -27,7 +27,8 @@
 #include <array>
 #include <memory>
 #include <utility>
-using namespace PROPOSAL;
+
+namespace PROPOSAL {
 
 /******************************************************************************
  *                                 Sector                                 *
@@ -133,7 +134,7 @@ Sector::Definition& Sector::Definition::operator=(const Definition& definition)
     return *this;
 }
 
-std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::Sector::Definition const& sec_definition)
+std::ostream& operator<<(std::ostream& os, Sector::Definition const& sec_definition)
 {
     std::stringstream ss;
     ss << " Sector Definition (" << &sec_definition << ") ";
@@ -277,7 +278,7 @@ bool Sector::operator!=(const Sector& sector) const
     return !(*this == sector);
 }
 
-std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::Sector const& sector)
+std::ostream& operator<<(std::ostream& os, Sector const& sector)
 {
     std::stringstream ss;
     ss << " Sector (" << &sector << ") ";
@@ -576,4 +577,5 @@ Secondaries Sector::Propagate(
     secondaries.push_back(*p_condition);
 
     return secondaries;
+} 
 }

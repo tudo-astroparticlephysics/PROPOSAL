@@ -8,7 +8,7 @@
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
-using namespace PROPOSAL;
+namespace PROPOSAL {
 
 /******************************************************************************
  *                            Propagation utility                              *
@@ -59,7 +59,7 @@ bool Utility::Definition::operator!=(
     return !(*this == utility_def);
 }
 
-std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::Utility::Definition const& util_definition)
+std::ostream& operator<<(std::ostream& os, Utility::Definition const& util_definition)
 {
     std::stringstream ss;
     ss << " Utility Definition (" << &util_definition << ") ";
@@ -288,7 +288,7 @@ bool Utility::operator!=(const Utility& utility) const {
     return !(*this == utility);
 }
 
-std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::Utility const& utility)
+std::ostream& operator<<(std::ostream& os, Utility const& utility)
 {
     std::stringstream ss;
     ss << " Propagation Utility (" << &utility << ") ";
@@ -405,4 +405,6 @@ double UtilityDecorator::Calculate(double ei,
     (void)direction;
 
     return this->Calculate(ei, ef, rnd);
+}
+
 }

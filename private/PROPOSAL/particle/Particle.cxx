@@ -14,7 +14,7 @@
 #include <iostream>
 #include <string>
 
-using namespace PROPOSAL;
+namespace PROPOSAL {
 
 
 /******************************************************************************
@@ -122,7 +122,7 @@ bool DynamicData::operator!=(const DynamicData& dynamic_data) const
 }
 
 // ------------------------------------------------------------------------- //
-std::ostream& PROPOSAL::operator<<(std::ostream& os, DynamicData const& data)
+std::ostream& operator<<(std::ostream& os, DynamicData const& data)
 {
     std::stringstream ss;
     ss << " DynamicData (" << &data << ") ";
@@ -226,4 +226,6 @@ void DynamicData::DeflectDirection(double cosphi_deflect, double theta_deflect) 
 
     direction_ = new_direction;
     direction_.CalculateSphericalCoordinates();
+}
+
 }
