@@ -48,6 +48,7 @@ public:
     Vector3D& operator=(const Vector3D& vector_3d);
     bool operator==(const Vector3D& vector_3d) const;
     bool operator!=(const Vector3D& vector_3d) const;
+    Vector3D operator+=(const Vector3D&);
     void swap(Vector3D& vector_3d);
     friend std::ostream& operator<<(std::ostream& os, Vector3D const& vector_3d);
 

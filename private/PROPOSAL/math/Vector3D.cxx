@@ -106,6 +106,11 @@ void Vector3D::swap(Vector3D& vector_3d)
     // swap(cylindric_height_,  vector_3d.cylindric_height_);
 }
 
+Vector3D Vector3D::operator+=(const Vector3D& rhs)
+{
+    return *this + rhs;
+}
+
 namespace PROPOSAL {
 std::ostream& operator<<(std::ostream& os, Vector3D const& vector_3d)
 {
