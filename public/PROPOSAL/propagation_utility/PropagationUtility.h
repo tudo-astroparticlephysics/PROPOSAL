@@ -33,6 +33,7 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
+using namespace std::tuple;
 namespace PROPOSAL {
 
 class CrossSection;
@@ -59,27 +60,30 @@ public:
     Utility(std::unique_ptr<Definition> utility_def)
         : utility_def(std::move(utility_def)){};
 
-    double TypeInteraction(const double, const std::array<double, 2> );
-    double EnergyStochasticloss(const int, const double, const std::array<double, 2>);
-    double EnergyDecay(const double, const double);
-    double EnergyInteraction(const double, const double);
-    double EnergyRandomize(const double, const double, const double);
-    double LengthContinuous(const double, const double, const double);
-    double ElapsedTime(const double, const double, const double);
+    std::shared_ptr<Crosssection> TypeInteraction(
+        double, const std::array<double, 2>&);
+    double EnergyStochasticloss(
+        const Crosssection&, double, const std::array<double, 2>&);
+    double EnergyDecay(double, double);
+    double EnergyInteraction(double, double);
+    double EnergyRandomize(double, double, double);
+    double LengthContinuous(double, double, double);
+    double ElapsedTime(double, double, double);
 
     // TODO: return value doesn't tell what it include. Maybe it would be better
     // to give a tuple of two directions back. One is the mean over the
     // displacement and the other is the actual direction. With a get methode
     // there could be a possible access with the position of the object stored
     // in an enum.
-    Directions ScatterDirection(const double, const double, const double, Vector3D&, Vector3D&);
+    tuple<Vector3D, Vector3D> DirectionsScatter(double, double, double, const Vector3D&, const Vector3D&, const std::array<double, 4>&);
+    Vector3D DirectionDeflect(double, double, double, const Vector3D&, const Vector3D&);
 
 private:
     Definition utility_def;
 
-    std::unique_ptr<UtilityDecorator> displacement_calculator = nullptr;
-    std::unique_ptr<UtilityDecorator> interaction_calculator = nullptr;
-    std::unique_ptr<UtilityDecorator> decay_calculator = nullptr;
+    std::unique_ptr<UtilityDecorator> displacement_calc = nullptr;
+    std::unique_ptr<UtilityDecorator> interaction_calc = nullptr;
+    std::unique_ptr<UtilityDecorator> decay_calc = nullptr;
     std::unique_ptr<UtilityDecorator> cont_rand = nullptr;
     std::unique_ptr<UtilityDecorator> exact_time = nullptr;
 

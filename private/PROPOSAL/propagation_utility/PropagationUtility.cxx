@@ -8,6 +8,7 @@
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 using namespace PROPOSAL;
+using namespace std::tuple;
 
 /******************************************************************************
  *                            Propagation utility                              *
@@ -28,18 +29,15 @@ Utility::Definition::Definition(std::shared_ptr<Crosssections> corsssection,
         log_warn("No interpolation definition defined. Integral will not be "
                  "approximate by interpolants. Performance will be poor.");
 
-        displacement_calculator.reset(
-            new UtilityIntegralDisplacement(crosssection));
-        interaction_calculator.reset(
-            new UtilityIntegralInteraction(crosssection));
-        decay_calculator.reset(new UtilityIntegralDecay(crosssection))
+        displacement_calc.reset(new UtilityIntegralDisplacement(crosssection));
+        interaction_calc.reset(new UtilityIntegralInteraction(crosssection));
+        decay_calc.reset(new UtilityIntegralDecay(crosssection))
     } else {
-        displacement_calculator.reset(
+        displacement_calc.reset(
             new UtilityInterpolantDisplacement(crosssection, inter_def));
-        interaction_calculator.reset(
+        interaction_calc.reset(
             new UtilityInterpolantInteraction(crosssection, inter_def));
-        decay_calculator.reset(
-            new UtilityInterpolantDecay(crosssection, inter_def))
+        decay_calc.reset(new UtilityInterpolantDecay(crosssection, inter_def))
     }
 
     if (!scattering) {
@@ -107,8 +105,8 @@ Utility::Utility(std::unique_ptr<Utility::Definition> utility_def)
 {
 }
 
-int Utility::TypeInteraction(
-    const double energy, const std::array<double, 2> rnd)
+std::shared_ptr<Crosssection> Utility::TypeInteraction(
+    double energy, const std::array<double, 2>& rnd)
 {
     std::array<double, crosssections_.size()> rates;
     for (const auto& cross : crosssections)
@@ -122,62 +120,58 @@ int Utility::TypeInteraction(
     for (size_t i = 0; i < rates.size(); i++) {
         rates_sum += rates[i];
         if (rates_sum >= total_rate * rnd[0])
-            return crosssection[i]->GetType();
+            return crosssection;
     }
 
     throw std::logic_error("Something get wrong in total rate calculation.");
 }
 
 double Utility::EnergyStochasticloss(
-    const int type, const double energy, const std::array<double, 2> rnd)
+    const Crosssection& corss, double energy, const std::array<double, 2>& rnd)
 {
-    for (const auto& cross : crosssections) {
-        if (cross->GetType() == type)
-            return cross->CalculateStochasticLoss(energy, rnd[0], rnd[1]);
-    }
-    throw std::logic_error(
-        "Something get wrong with stochastic loss calculation.");
+    return cross.CalculateStochasticLoss(energy, rnd[0], rnd[1]);
 }
 
-int Utility::EnergyDecay(const double energy, const double rnd)
+int Utility::EnergyDecay(double energy, double rnd)
 {
-    double rndd = -std::log(rnd);
-    double rnddMin = 0;
+    auto rndd = -std::log(rnd);
+    auto rnddMin = 0;
 
-    rnddMin = decay_calculator_->Calculate(energy, mass, rndd);
+    rnddMin = decay_calc->Calculate(energy, mass, rndd);
 
     // evaluating the energy loss
     if (rndd >= rnddMin || rnddMin <= 0)
         return mass;
 
-    return decay_calculator->GetUpperLimit(energy, rndd);
+    return decay_calc->GetUpperLimit(energy, rndd);
 }
 
-double Utility::EnergyInteraction(const double energy, const double rnd)
+double Utility::EnergyInteraction(double energy, double rnd)
 {
-    double rndi = -std::log(rnd);
-    double rndiMin = 0;
+    auto rndi = -std::log(rnd);
+    auto rndiMin = 0.;
 
     // solving the tracking integral
-    rndiMin = interaction_calculator_->Calculate(energy, mass, rndi);
+    rndiMin = interaction_calc->Calculate(energy, mass, rndi);
 
     if (rndi >= rndiMin || rndiMin <= 0)
         return mass;
 
-    return interaction_calculator_->GetUpperLimit(energy, rndi);
+    return interaction_calc->GetUpperLimit(energy, rndi);
 }
 
-double EnergyRandomize(const double initial_energy, const double final_energy, const double rnd)
+double EnergyRandomize(double initial_energy, double final_energy, double rnd)
 {
     if (cont_rand) {
-        return cont_rand->Randomize(initial_energy, final_energy, distance, rnd);
+        return cont_rand->Randomize(
+            initial_energy, final_energy, distance, rnd);
     } else {
         return final_energy;
     }
 }
 
-double Utility::ElapsedTime(const double initial_energy,
-    const double final_energy, const double distance)
+double Utility::TimeElapsed(
+    double initial_energy, double final_energy, double distance)
 {
     if (exact_time) {
         return exact_time->Calculate(initial_energy, final_energy, distance);
@@ -186,14 +180,22 @@ double Utility::ElapsedTime(const double initial_energy,
     }
 }
 
-Directions ScatterDirection(const double displacement, const double initial_energy,
-    const double final_energy, Vector3D& position, Vector3D& direction)
+tuple<Vector3D, Vector3D> DirectionsScatter(double displacement,
+    double initial_energy, double final_energy, const Vector3D& position,
+    const Vector3D& direction, const std::array<double, 4>& rnd)
 {
     return scattering->Scatter(
-        displacement, initial_energy, final_energy, position, direction);
+        displacement, initial_energy, final_energy, position, direction, rnd);
 }
 
-double LengthContinuous(const double initial_energy, const double final_energy, const double border_length)
+Vector3D DirectionDeflect(
+    const Crosssection& cross, double particle_energy, double loss_energy)
 {
-    displacement_calculator_->Calculate(initial_energy, final_energy, border_length);
+    return crosss.StochasticDeflection(particle_energy, loss_energy);
+}
+
+double LengthContinuous(
+    double initial_energy, double final_energy, double border_length)
+{
+    displacement_calc->Calculate(initial_energy, final_energy, border_length);
 }
