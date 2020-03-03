@@ -105,7 +105,7 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/math/Spline.h"
 #include "PROPOSAL/math/TableWriter.h"
-#include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/math/Vector3D.hpp"
 
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
