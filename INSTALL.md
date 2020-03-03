@@ -113,6 +113,13 @@ $ brew install cmake \
   make install
   ```
 
+# Build types
+
+CMake uses `CMAKE_BUILD_TYPE` when building with make, the default
+is set to `Debug` when in a git checkout and to `Release` otherwise.
+Two other options exist: `RelWithDebInfo` and `MinSizeRel`.
+See https://cmake.org/cmake/help/v3.17/variable/CMAKE_BUILD_TYPE.html
+
 # Additional Cmake options #
 
 | Option | Default value | Description |
