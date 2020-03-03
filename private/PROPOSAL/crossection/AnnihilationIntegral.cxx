@@ -12,7 +12,7 @@
 using namespace PROPOSAL;
 
 AnnihilationIntegral::AnnihilationIntegral(const Annihilation& param)
-        : CrossSectionIntegral(InteractionType::Particle, param), rndc_(-1.)
+        : CrossSectionIntegral(param, nullptr), rndc_(-1.)
 {
     gamma_def_ = &GammaDef::Get();
 }

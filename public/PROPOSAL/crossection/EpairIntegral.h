@@ -38,7 +38,7 @@ class EpairProduction;
 class EpairIntegral : public CrossSectionIntegral
 {
 public:
-    EpairIntegral(const EpairProduction&);
+    EpairIntegral(const EpairProduction&, std::shared_ptr<EnergyCutSettings>);
     EpairIntegral(const EpairIntegral&);
     virtual ~EpairIntegral();
 

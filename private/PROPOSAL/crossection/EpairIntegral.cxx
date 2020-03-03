@@ -8,8 +8,8 @@
 
 using namespace PROPOSAL;
 
-EpairIntegral::EpairIntegral(const EpairProduction& param)
-    : CrossSectionIntegral(InteractionType::Epair, param)
+EpairIntegral::EpairIntegral(const EpairProduction& param, std::shared_ptr<EnergyCutSettings> cuts)
+    : CrossSectionIntegral(param, cuts)
 {
 }
 
@@ -37,14 +37,17 @@ double EpairIntegral::CalculatedEdx(double energy)
 double EpairIntegral::CalculatedEdxWithoutMultiplier(double energy)
 {
     double sum = 0;
+    double vUp;
 
     for (int i = 0; i < parametrization_->GetMedium().GetNumComponents(); i++)
     {
         parametrization_->SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
 
+        vUp = cuts_.GetCut(energy);
+
         double r1  = 0.8;
-        double rUp = limits.vUp * (1 - HALF_PRECISION);
+        double rUp = vUp * (1 - HALF_PRECISION);
         bool rflag = false;
 
         if (r1 < rUp)
@@ -58,9 +61,9 @@ double EpairIntegral::CalculatedEdxWithoutMultiplier(double energy)
 
         if (rflag)
         {
-            if (r1 > limits.vUp)
+            if (r1 > vUp)
             {
-                r1 = limits.vUp;
+                r1 = vUp;
             }
 
             if (r1 < limits.vMin)
@@ -73,7 +76,7 @@ double EpairIntegral::CalculatedEdxWithoutMultiplier(double energy)
                 r1,
                 std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
                 4);
-            double r2 = std::max(1 - limits.vUp, COMPUTER_PRECISION);
+            double r2 = std::max(1 - vUp, COMPUTER_PRECISION);
 
             if (r2 > 1 - r1)
             {
@@ -81,7 +84,7 @@ double EpairIntegral::CalculatedEdxWithoutMultiplier(double energy)
             }
 
             sum +=
-                dedx_integral_.Integrate(1 - limits.vUp,
+                dedx_integral_.Integrate(1 - vUp,
                                          r2,
                                          std::bind(&EpairIntegral::FunctionToDEdxIntegralReverse, this, energy, std::placeholders::_1),
                                          2) +
@@ -94,7 +97,7 @@ double EpairIntegral::CalculatedEdxWithoutMultiplier(double energy)
         {
             sum += dedx_integral_.Integrate(
                 limits.vMin,
-                limits.vUp,
+                vUp,
                 std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
                 4);
         }

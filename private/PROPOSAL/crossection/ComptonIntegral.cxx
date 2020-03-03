@@ -11,8 +11,8 @@
 
 using namespace PROPOSAL;
 
-ComptonIntegral::ComptonIntegral(const Compton& param)
-        : CrossSectionIntegral(InteractionType::Compton, param)
+ComptonIntegral::ComptonIntegral(const Compton& param, std::shared_ptr<EnergyCutSettings> cuts)
+        : CrossSectionIntegral(param, cuts)
 {
 }
 
@@ -28,18 +28,21 @@ ComptonIntegral::~ComptonIntegral() {}
 // ----------------------------------------------------------------- //
 double ComptonIntegral::CalculatedEdxWithoutMultiplier(double energy){
     double sum = 0;
+    double vUp;
 
     for (int i = 0; i < (parametrization_->GetMedium().GetNumComponents()); i++)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
+
+        vUp = cuts_.GetCut(energy);
 
         // Integrate with the substitution t = ln(1-v) to avoid numerical problems
         auto integrand_substitution = [&](double energy, double t){
             return std::exp(t) * parametrization_->FunctionToDEdxIntegral(energy, 1 - std::exp(t));
         };
 
-        double t_min = std::log(1. - limits.vUp);
+        double t_min = std::log(1. - vUp);
         double t_max = std::log(1. - limits.vMin);
 
         sum += dedx_integral_.Integrate(
@@ -65,18 +68,21 @@ double ComptonIntegral::CalculatedEdx(double energy)
 double ComptonIntegral::CalculatedE2dxWithoutMultiplier(double energy)
 {
     double sum = 0;
+    double vUp;
 
     for (size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
+
+        vUp = cuts_.GetCut(energy);
 
         // Integrate with the substitution t = ln(1-v) to avoid numerical problems
         auto integrand_substitution = [&](double energy, double t){
             return std::exp(t) * parametrization_->FunctionToDE2dxIntegral(energy, 1 - std::exp(t));
         };
 
-        double t_min = std::log(1. - limits.vUp);
+        double t_min = std::log(1. - vUp);
         double t_max = std::log(1. - limits.vMin);
 
         sum += de2dx_integral_.Integrate(
@@ -98,11 +104,14 @@ double ComptonIntegral::CalculatedNdx(double energy)
     }
 
     sum_of_rates_ = 0;
+    double vUp;
 
     for (size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
+
+        vUp = cuts_.GetCut(energy);
 
         // Integrate with the substitution t = ln(1-v) to avoid numerical problems
         auto integrand_substitution = [&](double energy, double t){
@@ -110,7 +119,7 @@ double ComptonIntegral::CalculatedNdx(double energy)
         };
 
         double t_min = std::log(1. - limits.vMax);
-        double t_max = std::log(1. - limits.vUp);
+        double t_max = std::log(1. - vUp);
 
         prob_for_component_[i] = dndx_integral_[i].Integrate(
                 t_min,
@@ -138,10 +147,14 @@ double ComptonIntegral::CalculatedNdx(double energy, double rnd)
 
     sum_of_rates_ = 0;
 
+    double vUp;
+
     for (size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
+
+        vUp = cuts_.GetCut(energy);
 
         // Integrate with the substitution t = ln(1-v) to avoid numerical problems
         // Has to be considered when evaluating the UpperLimit of the integral!
@@ -151,7 +164,7 @@ double ComptonIntegral::CalculatedNdx(double energy, double rnd)
         };
 
         double t_min = std::log(1. - limits.vMax);
-        double t_max = std::log(1. - limits.vUp);
+        double t_max = std::log(1. - vUp);
 
         // Switch limits to be able to evaluate the UpperLimit with the given substitution
         prob_for_component_[i] = -dndx_integral_[i].IntegrateWithRandomRatio(
@@ -170,14 +183,16 @@ double ComptonIntegral::CalculatedNdx(double energy, double rnd)
 double ComptonIntegral::CalculateCumulativeCrossSection(double energy, int i, double v)
 {
     parametrization_->SetCurrentComponent(i);
-    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
+
+    double vUp = cuts_.GetCut(energy);
 
     auto integrand_substitution = [&](double energy, double t){
         return std::exp(t) * parametrization_->FunctionToDNdxIntegral(energy, 1 - std::exp(t));
     };
 
     double t_min = std::log(1. - v);
-    double t_max = std::log(1. - limits.vUp);
+    double t_max = std::log(1. - vUp);
 
     return dndx_integral_.at(i).Integrate(
             t_min,
@@ -202,6 +217,7 @@ double ComptonIntegral::CalculateStochasticLoss(double energy, double rnd1)
 
     double rnd;
     double rsum;
+    double vUp;
 
     rnd  = rnd1 * sum_of_rates_;
     rsum = 0;
@@ -224,9 +240,11 @@ double ComptonIntegral::CalculateStochasticLoss(double energy, double rnd1)
     for (size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        if (limits.vUp != limits.vMax)
+        vUp = cuts_.GetCut(energy);
+
+        if (vUp != limits.vMax)
             prob_for_all_comp_is_zero = false;
     }
 

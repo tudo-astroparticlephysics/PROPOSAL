@@ -13,10 +13,10 @@
 
 using namespace PROPOSAL;
 
-PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef def)
-    : CrossSectionInterpolant(InteractionType::NuclInt, param)
+PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, std::shared_ptr<EnergyCutSettings> cuts, InterpolationDef def)
+    : CrossSectionInterpolant(param, cuts)
 {
-    // Use parent CrossSecition dNdx interpolation
+    // Use parent CrossSection dNdx interpolation
     InitdNdxInterpolation(def);
 
     // --------------------------------------------------------------------- //
@@ -27,7 +27,7 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef d
     Helper::InterpolantBuilderContainer builder_container;
 
     // Needed for CalculatedEdx integration
-    PhotoIntegral photo(param);
+    PhotoIntegral photo(param, cuts);
 
     builder1d.SetMax(def.nodes_cross_section)
         .SetXMin(param.GetParticleDef().mass)

@@ -11,7 +11,7 @@ using namespace PROPOSAL;
 // CrossSection
 // ------------------------------------------------------------------------- //
 
-CrossSection::CrossSection(const Parametrization& param, std::shared_ptr<EnergyCutSettings> cuts = nullptr, std::shared_ptr<InterpolationDef> interpol_def = nullptr)
+CrossSection::CrossSection(const Parametrization& param, std::shared_ptr<EnergyCutSettings> cuts)
     : parametrization_(param.clone())
     , prob_for_component_(param.GetMedium().GetNumComponents(), 0)
     , sum_of_rates_(0)
@@ -48,6 +48,8 @@ bool CrossSection::operator==(const CrossSection& cross_section) const
     else if (sum_of_rates_ != cross_section.sum_of_rates_)
         return false;
     else if (rnd_ != cross_section.rnd_)
+        return false;
+    else if(cuts_ != cross_section.cuts_)
         return false;
     else
         return this->compare(cross_section);

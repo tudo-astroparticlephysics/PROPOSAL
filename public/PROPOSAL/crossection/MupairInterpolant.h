@@ -38,7 +38,7 @@ class MupairProduction;
 class MupairInterpolant : public CrossSectionInterpolant
 {
 public:
-    MupairInterpolant(const MupairProduction&, InterpolationDef);
+    MupairInterpolant(const MupairProduction&, std::shared_ptr<EnergyCutSettings>, InterpolationDef);
     MupairInterpolant(const MupairInterpolant&);
     virtual ~MupairInterpolant();
 
@@ -52,7 +52,6 @@ public:
     std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction);
 
 private:
-    InteractionType GetType(const MupairProduction& param);
     ParticleDef const* muminus_def_;
     ParticleDef const* muplus_def_;
 };

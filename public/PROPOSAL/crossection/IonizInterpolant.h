@@ -38,7 +38,7 @@ class Ionization;
 class IonizInterpolant : public CrossSectionInterpolant
 {
 public:
-    IonizInterpolant(const Ionization&, InterpolationDef);
+    IonizInterpolant(const Ionization&, std::shared_ptr<EnergyCutSettings>, InterpolationDef);
     IonizInterpolant(const IonizInterpolant&);
     virtual ~IonizInterpolant();
 

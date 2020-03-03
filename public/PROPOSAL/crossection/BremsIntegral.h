@@ -38,7 +38,7 @@ class Bremsstrahlung;
 class BremsIntegral : public CrossSectionIntegral
 {
 public:
-    BremsIntegral(const Bremsstrahlung&);
+    BremsIntegral(const Bremsstrahlung&, std::shared_ptr<EnergyCutSettings>);
     BremsIntegral(const BremsIntegral&);
     virtual ~BremsIntegral();
 

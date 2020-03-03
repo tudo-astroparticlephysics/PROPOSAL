@@ -16,8 +16,8 @@
 
 using namespace PROPOSAL;
 
-MupairInterpolant::MupairInterpolant(const MupairProduction& param, InterpolationDef def)
-    : CrossSectionInterpolant(GetType(param), param)
+MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_ptr<EnergyCutSettings> cuts, InterpolationDef def)
+    : CrossSectionInterpolant(param, cuts)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInterpolation(def);
@@ -30,7 +30,7 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, Interpolatio
     Helper::InterpolantBuilderContainer builder_container;
 
     // Needed for CalculatedEdx integration
-    MupairIntegral mupair(param);
+    MupairIntegral mupair(param, cuts);
 
     builder1d.SetMax(def.nodes_cross_section)
         .SetXMin(param.GetParticleDef().mass)
@@ -104,10 +104,6 @@ double MupairInterpolant::CalculatedEdx(double energy)
 std::pair<std::vector<DynamicData>, bool> MupairInterpolant::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
     std::vector<DynamicData> mupair;
 
-    if(parametrization_->IsParticleOutputEnabled() == false){
-        return std::make_pair(mupair, false);
-    }
-
     //Create MuPair particles
     mupair.push_back(DynamicData(muminus_def_->particle_type));
     mupair.push_back(DynamicData(muplus_def_->particle_type));
@@ -125,13 +121,4 @@ std::pair<std::vector<DynamicData>, bool> MupairInterpolant::CalculateProducedPa
     mupair[1].SetDirection(initial_direction);
     return std::make_pair(mupair, false);
 
-}
-
-InteractionType MupairInterpolant::GetType(const MupairProduction& param){
-    if(param.IsParticleOutputEnabled()){
-        return InteractionType::Particle;
-    }
-    else{
-        return InteractionType::MuPair;
-    }
 }

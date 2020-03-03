@@ -19,8 +19,8 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-CrossSectionInterpolant::CrossSectionInterpolant(const InteractionType& type, const Parametrization& param)
-    : CrossSection(type, param)
+CrossSectionInterpolant::CrossSectionInterpolant(const Parametrization& param, std::shared_ptr<EnergyCutSettings> cuts)
+    : CrossSection(param, cuts)
     , dedx_interpolant_(NULL)
     , de2dx_interpolant_(NULL)
     , dndx_interpolant_1d_(param.GetMedium().GetNumComponents(), NULL)
@@ -263,6 +263,7 @@ double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rn
 
     double rnd;
     double rsum;
+    double vUp;
 
     rnd  = rnd1 * sum_of_rates_;
     rsum = 0;
@@ -274,16 +275,18 @@ double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rn
         if (rsum > rnd)
         {
             parametrization_->SetCurrentComponent(i);
-            Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+            Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-            if (limits.vUp == limits.vMax)
+            vUp = cuts_.GetCut(energy);
+
+            if (vUp == limits.vMax)
             {
-                return energy * limits.vUp;
+                return energy * vUp;
             }
 
             return energy *
-                   (limits.vUp * std::exp(dndx_interpolant_2d_.at(i)->FindLimit(energy, rnd_ * prob_for_component_[i]) *
-                                     std::log(limits.vMax / limits.vUp)));
+                   (vUp * std::exp(dndx_interpolant_2d_.at(i)->FindLimit(energy, rnd_ * prob_for_component_[i]) *
+                                     std::log(limits.vMax / vUp)));
         }
     }
 
@@ -292,9 +295,11 @@ double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rn
     for (size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        if (limits.vUp != limits.vMax)
+        vUp = cuts_.GetCut(energy);
+
+        if (vUp != limits.vMax)
             prob_for_all_comp_is_zero = false;
     }
 
@@ -318,9 +323,11 @@ double CrossSectionInterpolant::FunctionToBuildDNdxInterpolant(double energy, in
 double CrossSectionInterpolant::CalculateCumulativeCrossSection(double energy, int component, double v)
 {
     parametrization_->SetCurrentComponent(component);
-    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-    v = std::log(v / limits.vUp) / std::log(limits.vMax / limits.vUp);
+    double vUp = cuts_.GetCut(energy);
+
+    v = std::log(v / vUp) / std::log(limits.vMax / vUp);
 
     return dndx_interpolant_2d_.at(component)->Interpolate(energy, v);
 }
@@ -332,15 +339,17 @@ double CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D(double energy,
                                                                  int component)
 {
     parametrization_->SetCurrentComponent(component);
-    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-    if (limits.vUp == limits.vMax)
+    double vUp = cuts_.GetCut(energy);
+
+    if (vUp == limits.vMax)
     {
         return 0;
     }
 
-    v = limits.vUp * std::exp(v * std::log(limits.vMax / limits.vUp));
+    v = vUp * std::exp(v * std::log(limits.vMax / vUp));
 
     return integral.Integrate(
-        limits.vUp, v, std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1), 4);
+        vUp, v, std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1), 4);
 }

@@ -20,8 +20,8 @@
 
 using namespace PROPOSAL;
 
-IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def)
-    : CrossSectionInterpolant(InteractionType::DeltaE, param)
+IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<EnergyCutSettings> cuts, InterpolationDef def)
+    : CrossSectionInterpolant(param, cuts)
 {
     // Use overwritten dNdx interpolation
     InitdNdxInterpolation(def);
@@ -33,7 +33,7 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def
     Interpolant1DBuilder builder1d;
     Helper::InterpolantBuilderContainer builder_container;
 
-    IonizIntegral ioniz(param);
+    IonizIntegral ioniz(param, cuts);
 
     builder1d.SetMax(def.nodes_cross_section)
         .SetXMin(param.GetParticleDef().mass)
@@ -209,18 +209,19 @@ double IonizInterpolant::FunctionToBuildDNdxInterpolant2D(double energy, double 
 {
     (void)component;
 
-    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
+    double vUp = cuts_.GetCut(energy);
 
-    if (limits.vUp == limits.vMax)
+    if (vUp == limits.vMax)
     {
         return 0;
     }
 
-    v = limits.vUp * std::exp(v * std::log(limits.vMax / limits.vUp));
+    v = vUp * std::exp(v * std::log(limits.vMax / vUp));
 
     return integral.Integrate(
-        limits.vUp, v, std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1), 3, 1);
+        vUp, v, std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1), 3, 1);
 }
 
 // ------------------------------------------------------------------------- //
@@ -232,20 +233,24 @@ double IonizInterpolant::CalculateStochasticLoss(double energy, double rnd1)
     rnd  = medium.GetSumCharge() * rnd1;
     rsum = 0;
 
+    double vUp;
+
     for (unsigned int i = 0; i < components_.size(); i++)
     {
         rsum += components_[i]->GetAtomInMolecule() * components_[i]->GetNucCharge();
 
         if (rsum > rnd)
         {
-            Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+            Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-            if (limits.vUp == limits.vMax)
+            vUp = cuts_.GetCut(energy);
+
+            if (vUp == limits.vMax)
             {
-                return energy * limits.vUp;
+                return energy * vUp;
             }
-            return energy * (limits.vUp * std::exp(dndx_interpolant_2d_[0]->FindLimit(energy, rnd1 * sum_of_rates_) *
-                                              std::log(limits.vMax / limits.vUp)));
+            return energy * (vUp * std::exp(dndx_interpolant_2d_[0]->FindLimit(energy, rnd1 * sum_of_rates_) *
+                                              std::log(limits.vMax / vUp)));
         }
     }
 

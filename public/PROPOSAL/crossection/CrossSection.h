@@ -33,7 +33,6 @@
 #include <utility>
 
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -46,15 +45,7 @@ class Parametrization;
 class CrossSection
 {
 public:
-    CrossSection(nlohmann::json);
-    CrossSection(nlohmann::json,
-            std::shared_ptr<ParticleDef>,
-            std::shared_ptr<Medium>,
-            std::shared_ptr<EnergyCutSettings> = nullptr,
-            std::shared_ptr<InterpolationDef> = nullptr);
-    CrossSection(const Parametrization&,
-            std::shared_ptr<EnergyCutSettings> = nullptr,
-            std::shared_ptr<InterpolationDef> = nullptr);
+    CrossSection(const Parametrization&, std::shared_ptr<EnergyCutSettings>);
     CrossSection(const CrossSection&);
     virtual ~CrossSection();
 
@@ -125,8 +116,6 @@ protected:
                  //! ClaculateSochasticLoss when it is already done
 
     EnergyCutSettings cuts_;
-
-    InterpolationDef
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::CrossSection const&);

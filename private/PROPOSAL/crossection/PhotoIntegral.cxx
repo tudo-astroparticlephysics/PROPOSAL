@@ -8,8 +8,8 @@
 
 using namespace PROPOSAL;
 
-PhotoIntegral::PhotoIntegral(const Photonuclear& param)
-    : CrossSectionIntegral(InteractionType::NuclInt, param)
+PhotoIntegral::PhotoIntegral(const Photonuclear& param, std::shared_ptr<EnergyCutSettings> cuts)
+    : CrossSectionIntegral(param, cuts)
 {
 }
 
@@ -41,11 +41,11 @@ double PhotoIntegral::CalculatedEdxWithoutMultiplier(double energy)
     for (int i = 0; i < parametrization_->GetMedium().GetNumComponents(); i++)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
         sum += dedx_integral_.Integrate(
             limits.vMin,
-            limits.vUp,
+            cuts_.GetCut(energy),
             std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
             4);
     }

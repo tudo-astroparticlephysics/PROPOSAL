@@ -14,8 +14,8 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-CrossSectionIntegral::CrossSectionIntegral(const InteractionType& type, const Parametrization& param)
-    : CrossSection(type, param)
+CrossSectionIntegral::CrossSectionIntegral(const Parametrization& param, std::shared_ptr<EnergyCutSettings> cuts)
+    : CrossSection(param, cuts)
     , dedx_integral_(IROMB, IMAXS, IPREC)
     , de2dx_integral_(IROMB, IMAXS, IPREC)
     , dndx_integral_(param.GetMedium().GetNumComponents(), Integral(IROMB, IMAXS, IPREC))
@@ -72,11 +72,11 @@ double CrossSectionIntegral::CalculatedE2dxWithoutMultiplier(double energy)
     for (size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
         sum += de2dx_integral_.Integrate(
             limits.vMin,
-            limits.vUp,
+            cuts_.GetCut(energy),
             std::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy, std::placeholders::_1),
             2);
     }
@@ -97,10 +97,10 @@ double CrossSectionIntegral::CalculatedNdx(double energy)
     for (size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
         prob_for_component_[i] = dndx_integral_[i].Integrate(
-            limits.vUp,
+            cuts_.GetCut(energy),
             limits.vMax,
             std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
             4);
@@ -127,10 +127,10 @@ double CrossSectionIntegral::CalculatedNdx(double energy, double rnd)
     for (size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
         prob_for_component_[i] = dndx_integral_[i].IntegrateWithRandomRatio(
-            limits.vUp,
+            cuts_.GetCut(energy),
             limits.vMax,
             std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
             4,
@@ -155,10 +155,10 @@ double CrossSectionIntegral::CalculateStochasticLoss(double energy, double rnd1,
 double CrossSectionIntegral::CalculateCumulativeCrossSection(double energy, int i, double v)
 {
     parametrization_->SetCurrentComponent(i);
-    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
     return dndx_integral_.at(i).Integrate(
-            limits.vUp,
+            cuts_.GetCut(energy),
             v,
             std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
             4);
@@ -195,9 +195,9 @@ double CrossSectionIntegral::CalculateStochasticLoss(double energy, double rnd1)
     for (size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        if (limits.vUp != limits.vMax)
+        if (cuts_.GetCut(energy) != limits.vMax)
             prob_for_all_comp_is_zero = false;
     }
 

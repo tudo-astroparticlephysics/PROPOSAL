@@ -11,8 +11,8 @@
 
 using namespace PROPOSAL;
 
-MupairIntegral::MupairIntegral(const MupairProduction& param)
-    : CrossSectionIntegral(GetType(param), param)
+MupairIntegral::MupairIntegral(const MupairProduction& param, std::shared_ptr<EnergyCutSettings> cuts)
+    : CrossSectionIntegral(param, cuts)
 {
     muminus_def_ = &MuMinusDef::Get();
     muplus_def_ = &MuPlusDef::Get();
@@ -48,11 +48,11 @@ double MupairIntegral::CalculatedEdxWithoutMultiplier(double energy)
     for (int i = 0; i < parametrization_->GetMedium().GetNumComponents(); i++)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
         sum += dedx_integral_.Integrate(
             limits.vMin,
-            limits.vUp,
+            cuts_.GetCut(energy),
             std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
             4);
     }
@@ -62,10 +62,6 @@ double MupairIntegral::CalculatedEdxWithoutMultiplier(double energy)
 
 std::pair<std::vector<DynamicData>, bool> MupairIntegral::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){
     std::vector<DynamicData> mupair;
-
-    if(parametrization_->IsParticleOutputEnabled() == false){
-        return std::make_pair(mupair, false);
-    }
 
     //Create MuPair particles
     mupair.push_back(DynamicData(muminus_def_->particle_type));
@@ -86,11 +82,3 @@ std::pair<std::vector<DynamicData>, bool> MupairIntegral::CalculateProducedParti
 
 }
 
-InteractionType MupairIntegral::GetType(const MupairProduction& param){
-    if(param.IsParticleOutputEnabled()){
-        return InteractionType::Particle;
-    }
-    else{
-        return InteractionType::MuPair;
-    }
-}

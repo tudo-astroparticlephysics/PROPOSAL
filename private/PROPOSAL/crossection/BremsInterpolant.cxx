@@ -13,8 +13,8 @@
 
 using namespace PROPOSAL;
 
-BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef def)
-    : CrossSectionInterpolant(InteractionType::Brems, param)
+BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, std::shared_ptr<EnergyCutSettings> cuts, InterpolationDef def)
+    : CrossSectionInterpolant(param, cuts)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInterpolation(def);
@@ -27,7 +27,7 @@ BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef
     Helper::InterpolantBuilderContainer builder_container;
 
     // Needed for CalculatedEdx integration
-    BremsIntegral brems(param);
+    BremsIntegral brems(param, cuts);
 
     builder1d.SetMax(def.nodes_cross_section)
         .SetXMin(param.GetParticleDef().mass)

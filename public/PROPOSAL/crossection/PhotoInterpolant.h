@@ -38,7 +38,7 @@ class Photonuclear;
 class PhotoInterpolant : public CrossSectionInterpolant
 {
 public:
-    PhotoInterpolant(const Photonuclear&, InterpolationDef);
+    PhotoInterpolant(const Photonuclear&, std::shared_ptr<EnergyCutSettings>, InterpolationDef);
     PhotoInterpolant(const PhotoInterpolant&);
     virtual ~PhotoInterpolant();
 

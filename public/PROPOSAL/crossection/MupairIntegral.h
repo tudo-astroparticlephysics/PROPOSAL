@@ -38,7 +38,7 @@ class MupairProduction;
 class MupairIntegral : public CrossSectionIntegral
 {
 public:
-    MupairIntegral(const MupairProduction&);
+    MupairIntegral(const MupairProduction&, std::shared_ptr<EnergyCutSettings>);
     MupairIntegral(const MupairIntegral&);
     virtual ~MupairIntegral();
 
@@ -53,7 +53,6 @@ public:
     std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction);
 
 private:
-    InteractionType GetType(const MupairProduction& param);
     ParticleDef const* muminus_def_;
     ParticleDef const* muplus_def_;
 };

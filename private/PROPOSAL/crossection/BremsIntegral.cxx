@@ -7,8 +7,8 @@
 
 using namespace PROPOSAL;
 
-BremsIntegral::BremsIntegral(const Bremsstrahlung& param)
-    : CrossSectionIntegral(InteractionType::Brems, param)
+BremsIntegral::BremsIntegral(const Bremsstrahlung& param, std::shared_ptr<EnergyCutSettings> cuts)
+    : CrossSectionIntegral(param, cuts)
 {
 }
 
@@ -24,15 +24,17 @@ BremsIntegral::~BremsIntegral() {}
 // ----------------------------------------------------------------- //
 double BremsIntegral::CalculatedEdxWithoutMultiplier(double energy){
     double sum = 0;
+    double vUp;
 
     for (int i = 0; i < (parametrization_->GetMedium().GetNumComponents()); i++)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
+        vUp = cuts_.GetCut(energy);
 
         sum += dedx_integral_.Integrate(
             limits.vMin,
-            limits.vUp,
+            vUp,
             std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
             2);
     }

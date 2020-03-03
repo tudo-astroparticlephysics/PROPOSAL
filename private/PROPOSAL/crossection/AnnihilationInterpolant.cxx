@@ -17,7 +17,7 @@
 using namespace PROPOSAL;
 
 AnnihilationInterpolant::AnnihilationInterpolant(const Annihilation& param, InterpolationDef def)
-        : CrossSectionInterpolant(InteractionType::Particle, param), rndc_(-1.) {
+        : CrossSectionInterpolant(param, nullptr), rndc_(-1.) {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInterpolation(def);
     gamma_def_ = &GammaDef::Get();
@@ -90,9 +90,9 @@ std::pair<std::vector<DynamicData>, bool> AnnihilationInterpolant::CalculateProd
         if (rsum > rnd)
         {
             parametrization_->SetCurrentComponent(i);
-            Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
-            rho = (limits.vUp * std::exp(dndx_interpolant_2d_.at(i)->FindLimit(energy, rnd_ * prob_for_component_[i]) *
-                                         std::log(limits.vMax / limits.vUp)));
+            Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
+            rho = (limits.vMin * std::exp(dndx_interpolant_2d_.at(i)->FindLimit(energy, rnd_ * prob_for_component_[i]) *
+                                         std::log(limits.vMax / limits.vMin)));
 
             // The available energy is the positron energy plus the mass of the electron
             particle_list[0].SetEnergy((energy + ME) * (1-rho));

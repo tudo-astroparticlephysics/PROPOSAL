@@ -12,7 +12,7 @@
 using namespace PROPOSAL;
 
 PhotoPairIntegral::PhotoPairIntegral(const PhotoPairProduction& param, const PhotoAngleDistribution& photoangle)
-        : CrossSectionIntegral(InteractionType::Particle, param), photoangle_(photoangle.clone()), rndc_(-1)
+        : CrossSectionIntegral(param, nullptr), photoangle_(photoangle.clone()), rndc_(-1)
 {
     eminus_def_ = &EMinusDef::Get();
     eplus_def_ = &EPlusDef::Get();

@@ -15,8 +15,8 @@
 
 using namespace PROPOSAL;
 
-IonizIntegral::IonizIntegral(const Ionization& param)
-    : CrossSectionIntegral(InteractionType::DeltaE, param)
+IonizIntegral::IonizIntegral(const Ionization& param, std::shared_ptr<EnergyCutSettings> cuts)
+    : CrossSectionIntegral(param, cuts)
 {
 }
 
@@ -33,12 +33,12 @@ IonizIntegral::~IonizIntegral() {}
 
 double IonizIntegral::CalculatedEdxWithoutMultiplier(double energy)
 {
-    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
     if(parametrization_->GetName() != "IonizBergerSeltzerBhabha" && parametrization_->GetName() != "IonizBergerSeltzerMoller"){
         return energy * dedx_integral_.Integrate(
                 limits.vMin,
-                limits.vUp,
+                cuts_.GetCut(energy),
                 std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
                 4);
     }
@@ -71,11 +71,11 @@ double IonizIntegral::CalculatedE2dx(double energy)
 
 double IonizIntegral::CalculatedE2dxWithoutMultiplier(double energy)
 {
-    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
     return de2dx_integral_.Integrate(
         limits.vMin,
-        limits.vUp,
+        cuts_.GetCut(energy),
         std::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy, std::placeholders::_1),
         2);
 }
@@ -88,10 +88,10 @@ double IonizIntegral::CalculatedNdx(double energy)
         return 0;
     }
 
-    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
     ;
     sum_of_rates_ =
-        dndx_integral_[0].Integrate(limits.vUp,
+        dndx_integral_[0].Integrate(cuts_.GetCut(energy),
                                     limits.vMax,
                                     std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
                                     3,
@@ -110,10 +110,10 @@ double IonizIntegral::CalculatedNdx(double energy, double rnd)
 
     rnd_ = rnd;
 
-    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
     ;
     sum_of_rates_ = dndx_integral_[0].IntegrateWithRandomRatio(
-        limits.vUp,
+        cuts_.GetCut(energy),
         limits.vMax,
         std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
         3,

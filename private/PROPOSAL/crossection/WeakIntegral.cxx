@@ -11,7 +11,7 @@
 using namespace PROPOSAL;
 
 WeakIntegral::WeakIntegral(const WeakInteraction& param)
-        : CrossSectionIntegral(InteractionType::WeakInt, param)
+        : CrossSectionIntegral(param, nullptr)
 {
 }
 

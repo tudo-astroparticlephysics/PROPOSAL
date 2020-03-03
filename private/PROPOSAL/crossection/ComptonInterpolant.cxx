@@ -16,8 +16,8 @@
 
 using namespace PROPOSAL;
 
-ComptonInterpolant::ComptonInterpolant(const Compton& param, InterpolationDef def)
-        : CrossSectionInterpolant(InteractionType::Compton, param)
+ComptonInterpolant::ComptonInterpolant(const Compton& param, std::shared_ptr<EnergyCutSettings> cuts, InterpolationDef def)
+        : CrossSectionInterpolant(param, cuts)
 {
     // Use own CrossSecition dNdx interpolation
     ComptonInterpolant::InitdNdxInterpolation(def);
@@ -30,7 +30,7 @@ ComptonInterpolant::ComptonInterpolant(const Compton& param, InterpolationDef de
     Helper::InterpolantBuilderContainer builder_container;
 
     // Needed for CalculatedEdx integration
-    ComptonIntegral compton(param);
+    ComptonIntegral compton(param, cuts);
 
     builder1d.SetMax(def.nodes_cross_section)
             .SetXMin(param.GetParticleDef().low)
@@ -103,14 +103,16 @@ double ComptonInterpolant::FunctionToBuildDNdxInterpolant2D(double energy,
                                                                  int component)
 {
     parametrization_->SetCurrentComponent(component);
-    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-    if (limits.vUp == limits.vMax)
+    double vUp = cuts_.GetCut(energy);
+
+    if (vUp == limits.vMax)
     {
         return 0;
     }
 
-    v = limits.vUp + (limits.vMax - limits.vUp) * v;
+    v = vUp + (limits.vMax - vUp) * v;
 
     // Integrate with the substitution t = ln(1-v) to avoid numerical problems
     auto integrand_substitution = [&](double energy, double t){
@@ -118,7 +120,7 @@ double ComptonInterpolant::FunctionToBuildDNdxInterpolant2D(double energy,
     };
 
     double t_min = std::log(1. - v);
-    double t_max = std::log(1. - limits.vUp);
+    double t_max = std::log(1. - vUp);
 
 
     return integral.Integrate(
@@ -131,9 +133,11 @@ double ComptonInterpolant::FunctionToBuildDNdxInterpolant2D(double energy,
 double ComptonInterpolant::CalculateCumulativeCrossSection(double energy, int component, double v)
 {
     parametrization_->SetCurrentComponent(component);
-    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-    v = (v - limits.vUp) / (limits.vMax - limits.vUp);
+    double vUp = cuts_.GetCut(energy);
+
+    v = (v - vUp) / (limits.vMax - vUp);
 
     return dndx_interpolant_2d_.at(component)->Interpolate(energy, v);
 }
@@ -155,6 +159,7 @@ double ComptonInterpolant::CalculateStochasticLoss(double energy, double rnd1)
 
     double rnd;
     double rsum;
+    double vUp;
 
     rnd  = rnd1 * sum_of_rates_;
     rsum = 0;
@@ -166,15 +171,17 @@ double ComptonInterpolant::CalculateStochasticLoss(double energy, double rnd1)
         if (rsum > rnd)
         {
             parametrization_->SetCurrentComponent(i);
-            Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+            Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-            if (limits.vUp == limits.vMax)
+            vUp = cuts_.GetCut(energy);
+
+            if (vUp == limits.vMax)
             {
-                return energy * limits.vUp;
+                return energy * vUp;
             }
 
             // Linear interpolation in v
-            return energy * ( limits.vUp + (limits.vMax - limits.vMin) * dndx_interpolant_2d_.at(i)->FindLimit(energy, rnd_ * prob_for_component_[i]) );
+            return energy * ( vUp + (limits.vMax - limits.vMin) * dndx_interpolant_2d_.at(i)->FindLimit(energy, rnd_ * prob_for_component_[i]) );
         }
     }
 
@@ -183,9 +190,11 @@ double ComptonInterpolant::CalculateStochasticLoss(double energy, double rnd1)
     for (size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        if (limits.vUp != limits.vMax)
+        vUp = cuts_.GetCut(energy);
+
+        if (vUp != limits.vMax)
             prob_for_all_comp_is_zero = false;
     }
 

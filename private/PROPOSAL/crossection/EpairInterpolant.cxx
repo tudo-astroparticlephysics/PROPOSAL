@@ -13,8 +13,8 @@
 
 using namespace PROPOSAL;
 
-EpairInterpolant::EpairInterpolant(const EpairProduction& param, InterpolationDef def)
-    : CrossSectionInterpolant(InteractionType::Epair, param)
+EpairInterpolant::EpairInterpolant(const EpairProduction& param, std::shared_ptr<EnergyCutSettings> cuts, InterpolationDef def)
+    : CrossSectionInterpolant(param, cuts)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInterpolation(def);
@@ -27,7 +27,7 @@ EpairInterpolant::EpairInterpolant(const EpairProduction& param, InterpolationDe
     Helper::InterpolantBuilderContainer builder_container;
 
     // Needed for CalculatedEdx integration
-    EpairIntegral epair(param);
+    EpairIntegral epair(param, cuts);
 
     builder1d.SetMax(def.nodes_cross_section)
         .SetXMin(param.GetParticleDef().mass)

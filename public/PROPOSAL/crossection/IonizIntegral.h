@@ -38,7 +38,7 @@ class Ionization;
 class IonizIntegral : public CrossSectionIntegral
 {
 public:
-    IonizIntegral(const Ionization&);
+    IonizIntegral(const Ionization&, std::shared_ptr<EnergyCutSettings>);
     IonizIntegral(const IonizIntegral&);
     virtual ~IonizIntegral();
 

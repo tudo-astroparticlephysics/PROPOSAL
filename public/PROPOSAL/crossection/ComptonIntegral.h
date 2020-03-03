@@ -38,7 +38,7 @@ namespace PROPOSAL {
     class ComptonIntegral : public CrossSectionIntegral
     {
     public:
-        ComptonIntegral(const Compton&);
+        ComptonIntegral(const Compton&, std::shared_ptr<EnergyCutSettings>);
         ComptonIntegral(const ComptonIntegral&);
         virtual ~ComptonIntegral();
 
