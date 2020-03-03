@@ -211,7 +211,7 @@ double IonizInterpolant::FunctionToBuildDNdxInterpolant2D(double energy, double 
 
     Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-    double vUp = cuts_.GetCut(energy);
+    double vUp = cuts_->GetCut(energy);
 
     if (vUp == limits.vMax)
     {
@@ -243,7 +243,7 @@ double IonizInterpolant::CalculateStochasticLoss(double energy, double rnd1)
         {
             Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-            vUp = cuts_.GetCut(energy);
+            vUp = cuts_->GetCut(energy);
 
             if (vUp == limits.vMax)
             {

@@ -33,6 +33,7 @@
 #include <utility>
 
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/EnergyCutSettings.h"
 
 namespace PROPOSAL {
 
@@ -115,7 +116,7 @@ protected:
     double rnd_; //!< This random number will be stored in CalculateDNdx to avoid calculate dNdx a second time in
                  //! ClaculateSochasticLoss when it is already done
 
-    EnergyCutSettings cuts_;
+    std::shared_ptr<EnergyCutSettings> cuts_;
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::CrossSection const&);

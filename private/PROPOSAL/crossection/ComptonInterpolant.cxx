@@ -105,7 +105,7 @@ double ComptonInterpolant::FunctionToBuildDNdxInterpolant2D(double energy,
     parametrization_->SetCurrentComponent(component);
     Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-    double vUp = cuts_.GetCut(energy);
+    double vUp = cuts_->GetCut(energy);
 
     if (vUp == limits.vMax)
     {
@@ -135,7 +135,7 @@ double ComptonInterpolant::CalculateCumulativeCrossSection(double energy, int co
     parametrization_->SetCurrentComponent(component);
     Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-    double vUp = cuts_.GetCut(energy);
+    double vUp = cuts_->GetCut(energy);
 
     v = (v - vUp) / (limits.vMax - vUp);
 
@@ -173,7 +173,7 @@ double ComptonInterpolant::CalculateStochasticLoss(double energy, double rnd1)
             parametrization_->SetCurrentComponent(i);
             Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-            vUp = cuts_.GetCut(energy);
+            vUp = cuts_->GetCut(energy);
 
             if (vUp == limits.vMax)
             {
@@ -192,7 +192,7 @@ double ComptonInterpolant::CalculateStochasticLoss(double energy, double rnd1)
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        vUp = cuts_.GetCut(energy);
+        vUp = cuts_->GetCut(energy);
 
         if (vUp != limits.vMax)
             prob_for_all_comp_is_zero = false;

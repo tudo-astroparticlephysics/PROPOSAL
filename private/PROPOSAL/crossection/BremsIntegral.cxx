@@ -30,7 +30,7 @@ double BremsIntegral::CalculatedEdxWithoutMultiplier(double energy){
     {
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
-        vUp = cuts_.GetCut(energy);
+        vUp = cuts_->GetCut(energy);
 
         sum += dedx_integral_.Integrate(
             limits.vMin,

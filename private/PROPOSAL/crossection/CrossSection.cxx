@@ -78,7 +78,7 @@ double CrossSection::GetEnergyCut(double energy){
 
     if(cuts_ == nullptr) throw std::logic_error("CrossSection is only stochastic, therefore there is no energy cut defined.");
 
-    double energy_cut = std::min(physical_limits.vMax, cuts_.GetCut(energy));
+    double energy_cut = std::min(physical_limits.vMax, cuts_->GetCut(energy));
 
     if (energy_cut < physical_limits.vMin)
     {

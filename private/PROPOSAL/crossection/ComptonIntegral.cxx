@@ -35,7 +35,7 @@ double ComptonIntegral::CalculatedEdxWithoutMultiplier(double energy){
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        vUp = cuts_.GetCut(energy);
+        vUp = cuts_->GetCut(energy);
 
         // Integrate with the substitution t = ln(1-v) to avoid numerical problems
         auto integrand_substitution = [&](double energy, double t){
@@ -75,7 +75,7 @@ double ComptonIntegral::CalculatedE2dxWithoutMultiplier(double energy)
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        vUp = cuts_.GetCut(energy);
+        vUp = cuts_->GetCut(energy);
 
         // Integrate with the substitution t = ln(1-v) to avoid numerical problems
         auto integrand_substitution = [&](double energy, double t){
@@ -111,7 +111,7 @@ double ComptonIntegral::CalculatedNdx(double energy)
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        vUp = cuts_.GetCut(energy);
+        vUp = cuts_->GetCut(energy);
 
         // Integrate with the substitution t = ln(1-v) to avoid numerical problems
         auto integrand_substitution = [&](double energy, double t){
@@ -154,7 +154,7 @@ double ComptonIntegral::CalculatedNdx(double energy, double rnd)
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        vUp = cuts_.GetCut(energy);
+        vUp = cuts_->GetCut(energy);
 
         // Integrate with the substitution t = ln(1-v) to avoid numerical problems
         // Has to be considered when evaluating the UpperLimit of the integral!
@@ -185,7 +185,7 @@ double ComptonIntegral::CalculateCumulativeCrossSection(double energy, int i, do
     parametrization_->SetCurrentComponent(i);
     Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-    double vUp = cuts_.GetCut(energy);
+    double vUp = cuts_->GetCut(energy);
 
     auto integrand_substitution = [&](double energy, double t){
         return std::exp(t) * parametrization_->FunctionToDNdxIntegral(energy, 1 - std::exp(t));
@@ -242,7 +242,7 @@ double ComptonIntegral::CalculateStochasticLoss(double energy, double rnd1)
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        vUp = cuts_.GetCut(energy);
+        vUp = cuts_->GetCut(energy);
 
         if (vUp != limits.vMax)
             prob_for_all_comp_is_zero = false;

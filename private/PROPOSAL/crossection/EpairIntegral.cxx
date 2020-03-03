@@ -42,9 +42,9 @@ double EpairIntegral::CalculatedEdxWithoutMultiplier(double energy)
     for (int i = 0; i < parametrization_->GetMedium().GetNumComponents(); i++)
     {
         parametrization_->SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        vUp = cuts_.GetCut(energy);
+        vUp = cuts_->GetCut(energy);
 
         double r1  = 0.8;
         double rUp = vUp * (1 - HALF_PRECISION);

@@ -76,7 +76,7 @@ double CrossSectionIntegral::CalculatedE2dxWithoutMultiplier(double energy)
 
         sum += de2dx_integral_.Integrate(
             limits.vMin,
-            cuts_.GetCut(energy),
+            cuts_->GetCut(energy),
             std::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy, std::placeholders::_1),
             2);
     }
@@ -100,7 +100,7 @@ double CrossSectionIntegral::CalculatedNdx(double energy)
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
         prob_for_component_[i] = dndx_integral_[i].Integrate(
-            cuts_.GetCut(energy),
+            cuts_->GetCut(energy),
             limits.vMax,
             std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
             4);
@@ -130,7 +130,7 @@ double CrossSectionIntegral::CalculatedNdx(double energy, double rnd)
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
         prob_for_component_[i] = dndx_integral_[i].IntegrateWithRandomRatio(
-            cuts_.GetCut(energy),
+            cuts_->GetCut(energy),
             limits.vMax,
             std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
             4,
@@ -158,7 +158,7 @@ double CrossSectionIntegral::CalculateCumulativeCrossSection(double energy, int 
     Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
     return dndx_integral_.at(i).Integrate(
-            cuts_.GetCut(energy),
+            cuts_->GetCut(energy),
             v,
             std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
             4);
@@ -197,7 +197,7 @@ double CrossSectionIntegral::CalculateStochasticLoss(double energy, double rnd1)
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        if (cuts_.GetCut(energy) != limits.vMax)
+        if (cuts_->GetCut(energy) != limits.vMax)
             prob_for_all_comp_is_zero = false;
     }
 

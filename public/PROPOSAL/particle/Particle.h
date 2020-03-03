@@ -57,15 +57,17 @@ namespace PROPOSAL {
 static const std::map<const int, std::string> Type_Interaction_Name_Map {
     {static_cast<int>(InteractionType::Particle), "Particle"},
     {static_cast<int>(InteractionType::Brems), "Brems"},
-    {static_cast<int>(InteractionType::DeltaE), "DeltaE"},
+    {static_cast<int>(InteractionType::Ioniz), "Ioniz"},
     {static_cast<int>(InteractionType::Epair), "Epair"},
-    {static_cast<int>(InteractionType::NuclInt), "NuclInt"},
+    {static_cast<int>(InteractionType::Photonuclear), "Photonuclear"},
     {static_cast<int>(InteractionType::MuPair), "MuPair"},
     {static_cast<int>(InteractionType::Hadrons), "Hadrons"},
     {static_cast<int>(InteractionType::ContinuousEnergyLoss), "ContinousEnergyLoss"},
     {static_cast<int>(InteractionType::WeakInt), "WeakInt"},
     {static_cast<int>(InteractionType::Compton), "Compton"},
     {static_cast<int>(InteractionType::Decay), "Decay"},
+    {static_cast<int>(InteractionType::Annihilation), "Annihilation"},
+    {static_cast<int>(InteractionType::Photopair), "Photopair"},
 };
 } // namespace PROPOSAL
 

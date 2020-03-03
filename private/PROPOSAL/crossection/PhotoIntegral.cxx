@@ -45,7 +45,7 @@ double PhotoIntegral::CalculatedEdxWithoutMultiplier(double energy)
 
         sum += dedx_integral_.Integrate(
             limits.vMin,
-            cuts_.GetCut(energy),
+            cuts_->GetCut(energy),
             std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
             4);
     }
