@@ -45,18 +45,17 @@
     class Epair##param : public EpairProductionRhoIntegral                                                             \
     {                                                                                                                  \
     public:                                                                                                            \
-        Epair##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);        \
+        Epair##param(const ParticleDef&, const Medium&, double multiplier, bool lpm);        \
         Epair##param(const Epair##param&);                                                                             \
         virtual ~Epair##param();                                                                                       \
                                                                                                                        \
         virtual Parametrization* clone() const { return new Epair##param(*this); }                                     \
         static EpairProduction* create(const ParticleDef& particle_def,                                                \
                                        const Medium& medium,                                                           \
-                                       const EnergyCutSettings& cuts,                                                  \
                                        double multiplier,                                                              \
                                        bool lpm)                                                                       \
         {                                                                                                              \
-            return new Epair##param(particle_def, medium, cuts, multiplier, lpm);                                      \
+            return new Epair##param(particle_def, medium, multiplier, lpm);                                      \
         }                                                                                                              \
                                                                                                                        \
         double FunctionToIntegral(double energy, double v, double lpm);                                              \
@@ -75,7 +74,7 @@ class Interpolant;
 class EpairProduction : public Parametrization
 {
 public:
-    EpairProduction(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);
+    EpairProduction(const ParticleDef&, const Medium&, double multiplier, bool lpm);
     EpairProduction(const EpairProduction&);
     virtual ~EpairProduction();
 
@@ -94,9 +93,10 @@ public:
     /// \sqrt{1-\frac{4m_e}{E_p v}}\Big(1-\frac{6m_p^2}{E_p^2(1-v)}\Big)\f$
     ///
     // ----------------------------------------------------------------------------
+    virtual const InteractionType GetInteractionType() const final {return InteractionType::Epair;}
     virtual double DifferentialCrossSection(double energy, double v) = 0;
 
-    virtual IntegralLimits GetIntegralLimits(double energy);
+    virtual KinematicLimits GetKinematicLimits(double energy);
 
 
 protected:
@@ -127,7 +127,6 @@ class EpairProductionRhoIntegral : public EpairProduction
 public:
     EpairProductionRhoIntegral(const ParticleDef&,
                                const Medium&,
-                               const EnergyCutSettings&,
                                double multiplier,
                                bool lpm);
     EpairProductionRhoIntegral(const EpairProductionRhoIntegral&);
@@ -175,7 +174,6 @@ public:
 public:
     EpairProductionRhoInterpolant(const ParticleDef&,
                        const Medium&,
-                       const EnergyCutSettings&,
                        double multiplier,
                        bool lpm,
                        InterpolationDef def = InterpolationDef());
@@ -185,12 +183,11 @@ public:
     Parametrization* clone() const { return new EpairProductionRhoInterpolant<Param>(*this); }
     static EpairProduction* create(const ParticleDef& particle_def,
                                 const Medium& medium,
-                                const EnergyCutSettings& cuts,
                                 double multiplier,
                                 bool lpm,
                                 InterpolationDef def = InterpolationDef())
     {
-        return new EpairProductionRhoInterpolant<Param>(particle_def, medium, cuts, multiplier, lpm, def);
+        return new EpairProductionRhoInterpolant<Param>(particle_def, medium, multiplier, lpm, def);
     }
 
     double DifferentialCrossSection(double energy, double v);
@@ -205,11 +202,10 @@ protected:
 template<class Param>
 EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const ParticleDef& particle_def,
                                               const Medium& medium,
-                                              const EnergyCutSettings& cuts,
                                               double multiplier,
                                               bool lpm,
                                               InterpolationDef def)
-    : Param(particle_def, medium, cuts, multiplier, lpm)
+    : Param(particle_def, medium, multiplier, lpm)
     , interpolant_(this->medium_->GetNumComponents(), NULL)
 {
     std::vector<Interpolant2DBuilder> builder2d(this->components_.size());
@@ -289,12 +285,12 @@ bool EpairProductionRhoInterpolant<Param>::compare(const Parametrization& parame
 template<class Param>
 double EpairProductionRhoInterpolant<Param>::DifferentialCrossSection(double energy, double v)
 {
-    Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
 
-    if (v >= limits.vUp)
+    if (v > limits.vMin && v < limits.vMax)
     {
         return std::max(
-            interpolant_.at(this->component_index_)->Interpolate(energy, std::log(v / limits.vUp) / std::log(limits.vMax / limits.vUp)),
+            interpolant_.at(this->component_index_)->Interpolate(energy, std::log(v / limits.vMin) / std::log(limits.vMax / limits.vMin)),
             0.0);
     } else
     {
@@ -306,14 +302,10 @@ template<class Param>
 double EpairProductionRhoInterpolant<Param>::FunctionToBuildPhotoInterpolant(double energy, double v, int component)
 {
     this->component_index_                 = component;
-    Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
 
-    if (limits.vUp == limits.vMax)
-    {
-        return 0;
-    }
-
-    v = limits.vUp * std::exp(v * std::log(limits.vMax / limits.vUp));
+    // TODO: This substitution results in interpolated values that deviate more than IPREC from the integrated values and way more for v close to 1 (jean-marco)
+    v = limits.vMin * std::exp(v * std::log(limits.vMax / limits.vMin));
 
     return Param::DifferentialCrossSection(energy, v);
 }

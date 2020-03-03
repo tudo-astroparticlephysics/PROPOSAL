@@ -20,7 +20,7 @@ using namespace PROPOSAL;
 WeakInteraction::WeakInteraction(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  double multiplier)
-        : Parametrization(particle_def, medium, EnergyCutSettings(), multiplier)
+        : Parametrization(particle_def, medium, multiplier)
 {
 }
 
@@ -40,7 +40,7 @@ bool WeakInteraction::compare(const Parametrization& parametrization) const
 // Public methods
 // ------------------------------------------------------------------------- //
 
-Parametrization::IntegralLimits WeakInteraction::GetIntegralLimits(double energy)
+Parametrization::KinematicLimits WeakInteraction::GetKinematicLimits(double energy)
 {
     IntegralLimits limits;
 
@@ -48,7 +48,6 @@ Parametrization::IntegralLimits WeakInteraction::GetIntegralLimits(double energy
     aux = 2 * energy * aux + pow(aux, 2);
 
     limits.vMin = 1e6 / (aux ); //q^2_min = 1e6 MeV for experimental reasons
-    limits.vUp = limits.vMin; //treat interaction as fully stochastic
     limits.vMax = 1;
 
     return limits;

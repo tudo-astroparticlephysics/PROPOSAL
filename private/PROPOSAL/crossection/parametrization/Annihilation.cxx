@@ -18,7 +18,7 @@ using namespace PROPOSAL;
 Annihilation::Annihilation(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  double multiplier)
-        : Parametrization(particle_def, medium, EnergyCutSettings(), multiplier)
+        : Parametrization(particle_def, medium, multiplier)
 {
 }
 
@@ -38,17 +38,15 @@ bool Annihilation::compare(const Parametrization& parametrization) const
 // Public methods
 // ------------------------------------------------------------------------- //
 
-Parametrization::IntegralLimits Annihilation::GetIntegralLimits(double energy)
+Parametrization::KinematicLimits Annihilation::GetKinematicLimits(double energy)
 {
     // Limits according to simple 2->2 body interactions
-    IntegralLimits limits;
+    KinematicLimits limits;
 
     double gamma    = energy / particle_def_.mass;
 
     limits.vMin     = 0.5 * (1. - std::sqrt( std::max(0., (gamma - 1.)/(gamma + 1.) ) ));
     limits.vMax     = 0.5 * (1. + std::sqrt( std::max(0., (gamma - 1.)/(gamma + 1.) ) ));
-
-    limits.vUp = limits.vMin; //treat interaction as fully stochastic
 
     return limits;
 }

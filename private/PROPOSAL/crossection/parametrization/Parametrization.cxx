@@ -13,11 +13,9 @@ using namespace PROPOSAL;
 
 Parametrization::Parametrization(const ParticleDef& particle_def,
                                  const Medium& medium,
-                                 const EnergyCutSettings& cuts,
                                  double multiplier)
     : particle_def_(particle_def),
       medium_(medium.clone()),
-      cut_settings_(cuts),
       components_(medium_->GetComponents()),
       component_index_(0),
       multiplier_(multiplier) {}
@@ -25,7 +23,6 @@ Parametrization::Parametrization(const ParticleDef& particle_def,
 Parametrization::Parametrization(const Parametrization& param)
     : particle_def_(param.particle_def_),
       medium_(param.medium_->clone()),
-      cut_settings_(param.cut_settings_),
       components_(medium_->GetComponents()),
       component_index_(param.component_index_)  // //TODO(mario): Check better
                                                 // way Mon 2017/09/04
@@ -52,8 +49,6 @@ bool Parametrization::compare(const Parametrization& parametrization) const {
         return false;
     if (*medium_ != *parametrization.medium_)
         return false;
-    else if (cut_settings_ != parametrization.cut_settings_)
-        return false;
     else if (component_index_ != parametrization.component_index_)
         return false;
     else if (multiplier_ != parametrization.multiplier_)
@@ -76,7 +71,6 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os,
     os << "current component index: " << param.component_index_ << '\n';
     os << param.particle_def_ << '\n';
     os << *param.medium_ << '\n';
-    os << param.cut_settings_ << '\n';
     os << Helper::Centered(80, "");
     return os;
 }
@@ -108,8 +102,7 @@ double Parametrization::FunctionToDE2dxIntegral(double energy,
 size_t Parametrization::GetHash() const {
     std::size_t seed = 0;
     hash_combine(seed, GetName(), std::abs(particle_def_.charge),
-                 particle_def_.mass, medium_->GetName(),
-                 cut_settings_.GetEcut(), cut_settings_.GetVcut());
+                 particle_def_.mass, medium_->GetName());
 
     return seed;
 }

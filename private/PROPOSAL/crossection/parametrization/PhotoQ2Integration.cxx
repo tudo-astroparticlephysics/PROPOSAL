@@ -14,10 +14,9 @@ using namespace PROPOSAL;
 #define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                                                            \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
                                const Medium& medium,                                                                   \
-                               const EnergyCutSettings& cuts,                                                          \
                                double multiplier,                                                                      \
                                const ShadowEffect& shadow_effect)                                                      \
-        : PhotoQ2Integral(particle_def, medium, cuts, multiplier, shadow_effect)                                       \
+        : PhotoQ2Integral(particle_def, medium, multiplier, shadow_effect)                                       \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -36,10 +35,9 @@ using namespace PROPOSAL;
 
 PhotoQ2Integral::PhotoQ2Integral(const ParticleDef& particle_def,
                                  const Medium& medium,
-                                 const EnergyCutSettings& cuts,
                                  double multiplier,
                                  const ShadowEffect& shadow_effect)
-    : Photonuclear(particle_def, medium, cuts, multiplier)
+    : Photonuclear(particle_def, medium, multiplier)
     , shadow_effect_(shadow_effect.clone())
     , integral_(IROMB, IMAXS, IPREC)
 {
@@ -72,7 +70,7 @@ bool PhotoQ2Integral::compare(const Parametrization& parametrization) const
 // ------------------------------------------------------------------------- //
 double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
 {
-    IntegralLimits limits = GetIntegralLimits(energy);
+    KinematicLimits limits = GetKinematicLimits(energy);
 
     double aux, q2_min, q2_max;
 

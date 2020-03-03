@@ -37,7 +37,6 @@
     public:                                                                                                            \
         Photo##param(const ParticleDef&,                                                                               \
                      const Medium&,                                                                                    \
-                     const EnergyCutSettings&,                                                                         \
                      double multiplier,                                                                                \
                      bool hard_component);                                                                             \
         Photo##param(const Photo##param&);                                                                             \
@@ -46,11 +45,10 @@
         Parametrization* clone() const { return new Photo##param(*this); }                                             \
         static Photonuclear* create(const ParticleDef& particle_def,                                                   \
                                     const Medium& medium,                                                              \
-                                    const EnergyCutSettings& cuts,                                                     \
                                     double multiplier,                                                                 \
                                     bool hard_component)                                                               \
         {                                                                                                              \
-            return new Photo##param(particle_def, medium, cuts, multiplier, hard_component);                           \
+            return new Photo##param(particle_def, medium, multiplier, hard_component);                           \
         }                                                                                                              \
                                                                                                                        \
         virtual double CalculateParametrization(double nu);                                                            \
@@ -72,7 +70,6 @@ class PhotoRealPhotonAssumption : public Photonuclear
 public:
     PhotoRealPhotonAssumption(const ParticleDef&,
                               const Medium&,
-                              const EnergyCutSettings&,
                               double multiplier,
                               bool hard_component);
     PhotoRealPhotonAssumption(const PhotoRealPhotonAssumption&);
@@ -118,14 +115,13 @@ PHOTO_PARAM_REAL_DEC(Kokoulin, BezrukovBugaev) // Kokoulin derives from Bezrukov
 class PhotoRhode : public PhotoRealPhotonAssumption
 {
 public:
-    PhotoRhode(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool hard_component);
+    PhotoRhode(const ParticleDef&, const Medium&, double multiplier, bool hard_component);
     PhotoRhode(const PhotoRhode&);
     virtual ~PhotoRhode();
 
     Parametrization* clone() const { return new PhotoRhode(*this); }
     static Photonuclear* create(const ParticleDef&,
                                 const Medium&,
-                                const EnergyCutSettings&,
                                 double multiplier,
                                 bool hard_component);
 

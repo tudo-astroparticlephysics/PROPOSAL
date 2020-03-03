@@ -32,6 +32,8 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -44,7 +46,8 @@ class Medium;
 class Parametrization
 {
 public:
-    Parametrization(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    Parametrization(const ParticleDef&, const Medium&, nlohmann::json);
+    Parametrization(const ParticleDef&, const Medium&, double multiplier);
     Parametrization(const Parametrization&);
     virtual ~Parametrization();
 
@@ -56,11 +59,10 @@ public:
     friend std::ostream& operator<<(std::ostream&, Parametrization const&);
 
     // bounds of integration
-    struct IntegralLimits
+    struct KinematicLimits
     {
-        double vMax; //!< upper bound of integration
-        double vUp;  //!< lower bound of integration
-        double vMin; //!< lowest physical possible bound of integration
+        double vMin; //!< lower physical, kinematic limit
+        double vMax; //!< upper physical, kinematic limit
     };
 
     // ----------------------------------------------------------------- //
@@ -76,7 +78,7 @@ public:
     virtual double Calculaterho(double energy, double v, double rnd1, double rnd2){
         (void)energy; (void)v; (void)rnd1; (void)rnd2; return 0;}
 
-    virtual IntegralLimits GetIntegralLimits(double energy) = 0;
+    virtual KinematicLimits GetKinematicLimits(double energy) = 0;
 
     // ----------------------------------------------------------------- //
     // Getter
@@ -84,11 +86,10 @@ public:
 
     virtual const std::string& GetName() const = 0; //{ return name_; }
 
+    virtual const InteractionType GetInteractionType() const = 0;
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const Medium& GetMedium() const { return *medium_; }
-    const EnergyCutSettings& GetEnergyCuts() const { return cut_settings_; }
     double GetMultiplier() const { return multiplier_; }
-    virtual bool IsParticleOutputEnabled() const {return false;} // no particle production per default
 
     virtual size_t GetHash() const;
 
@@ -109,7 +110,6 @@ protected:
 
     const ParticleDef particle_def_;
     const Medium* medium_;
-    const EnergyCutSettings cut_settings_;
 
     // const Components::Component* current_component_;
     const ComponentVec& components_;

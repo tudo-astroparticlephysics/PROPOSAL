@@ -39,15 +39,17 @@ namespace PROPOSAL {
 enum class InteractionType {
     Particle               = 1000000001,
     Brems                  = 1000000002,
-    DeltaE                 = 1000000003,
+    Ioniz                  = 1000000003,
     Epair                  = 1000000004,
-    NuclInt                = 1000000005,
+    Photonuclear           = 1000000005,
     MuPair                 = 1000000006,
     Hadrons                = 1000000007,
     ContinuousEnergyLoss   = 1000000008,
     WeakInt                = 1000000009,
     Compton                = 1000000010,
     Decay                  = 1000000011,
+    Annihilation           = 1000000012,
+    Photopair              = 1000000013,
 };
 } // namespace PROPOSAL
 

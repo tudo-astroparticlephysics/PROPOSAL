@@ -36,7 +36,7 @@ namespace PROPOSAL {
     class Compton : public Parametrization
     {
     public:
-        Compton(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+        Compton(const ParticleDef&, const Medium&, double multiplier);
         Compton(const Compton&);
         virtual ~Compton();
 
@@ -46,9 +46,10 @@ namespace PROPOSAL {
         // Public methods
         // ----------------------------------------------------------------- //
 
+        virtual const InteractionType GetInteractionType() const final {return InteractionType::Compton;}
         virtual double DifferentialCrossSection(double energy, double v) = 0;
 
-        virtual IntegralLimits GetIntegralLimits(double energy);
+        virtual KinematicLimits GetKinematicLimits(double energy);
 
         // ----------------------------------------------------------------- //
         // Getter
@@ -69,17 +70,16 @@ namespace PROPOSAL {
     class ComptonKleinNishina : public Compton
     {
     public:
-        ComptonKleinNishina(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+        ComptonKleinNishina(const ParticleDef&, const Medium&, double multiplier);
         ComptonKleinNishina(const ComptonKleinNishina&);
         ~ComptonKleinNishina();
 
         Parametrization* clone() const { return new ComptonKleinNishina(*this); }
         static Compton* create(const ParticleDef& particle_def,
                                       const Medium& medium,
-                                      const EnergyCutSettings& cuts,
                                       double multiplier)
         {
-            return new ComptonKleinNishina(particle_def, medium, cuts, multiplier);
+            return new ComptonKleinNishina(particle_def, medium, multiplier);
         }
 
         double DifferentialCrossSection(double energy, double v);

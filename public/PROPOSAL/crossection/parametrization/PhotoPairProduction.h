@@ -60,10 +60,10 @@ namespace PROPOSAL {
         // ----------------------------------------------------------------- //
         // Public methods
         // ----------------------------------------------------------------- //
-
+        virtual const InteractionType GetInteractionType() const final {return InteractionType::Photopair;}
         virtual double DifferentialCrossSection(double energy, double x) = 0;
 
-        virtual IntegralLimits GetIntegralLimits(double energy);
+        virtual KinematicLimits GetKinematicLimits(double energy);
 
         virtual size_t GetHash() const;
 

@@ -51,9 +51,10 @@ namespace PROPOSAL {
         // Public methods
         // ----------------------------------------------------------------- //
 
+        virtual const InteractionType GetInteractionType() const final {return InteractionType::Annihilation;}
         virtual double DifferentialCrossSection(double energy, double v) = 0;
 
-        virtual IntegralLimits GetIntegralLimits(double energy);
+        virtual KinematicLimits GetKinematicLimits(double energy);
 
         virtual size_t GetHash() const;
 

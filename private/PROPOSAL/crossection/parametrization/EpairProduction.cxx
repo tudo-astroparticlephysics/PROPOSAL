@@ -12,10 +12,9 @@
 #define EPAIR_PARAM_INTEGRAL_IMPL(param)                                                                               \
     Epair##param::Epair##param(const ParticleDef& particle_def,                                                        \
                                const Medium& medium,                                                                   \
-                               const EnergyCutSettings& cuts,                                                          \
                                double multiplier,                                                                      \
                                bool lpm)                                                                               \
-        : EpairProductionRhoIntegral(particle_def, medium, cuts, multiplier, lpm)                                      \
+        : EpairProductionRhoIntegral(particle_def, medium, multiplier, lpm)                                            \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -40,10 +39,9 @@ using namespace PROPOSAL;
 
 EpairProduction::EpairProduction(const ParticleDef& particle_def,
                                  const Medium& medium,
-                                 const EnergyCutSettings& cuts,
                                  double multiplier,
                                  bool lpm)
-    : Parametrization(particle_def, medium, cuts, multiplier)
+    : Parametrization(particle_def, medium, multiplier)
     , init_lpm_effect_(true)
     , lpm_(lpm)
     , eLpm_(0)
@@ -79,9 +77,9 @@ bool EpairProduction::compare(const Parametrization& parametrization) const
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-Parametrization::IntegralLimits EpairProduction::GetIntegralLimits(double energy)
+Parametrization::KinematicLimits EpairProduction::GetKinematicLimits(double energy)
 {
-    IntegralLimits limits;
+    KinematicLimits limits;
 
     double aux = particle_def_.mass / energy;
 
@@ -95,13 +93,6 @@ Parametrization::IntegralLimits EpairProduction::GetIntegralLimits(double energy
     if (limits.vMax < limits.vMin)
     {
         limits.vMax = limits.vMin;
-    }
-
-    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
-
-    if (limits.vUp < limits.vMin)
-    {
-        limits.vUp = limits.vMin;
     }
 
     return limits;
@@ -172,10 +163,9 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
 // ------------------------------------------------------------------------- //
 EpairProductionRhoIntegral::EpairProductionRhoIntegral(const ParticleDef& particle_def,
                                                        const Medium& medium,
-                                                       const EnergyCutSettings& cuts,
                                                        double multiplier,
                                                        bool lpm)
-    : EpairProduction(particle_def, medium, cuts, multiplier, lpm)
+    : EpairProduction(particle_def, medium, multiplier, lpm)
     , integral_(IROMB, IMAXS, IPREC)
 {
 }

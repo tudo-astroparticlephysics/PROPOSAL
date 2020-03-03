@@ -45,9 +45,11 @@ public:
     // Public methods
     // ----------------------------------------------------------------- //
     double Delta(double beta, double gamma);
+    virtual const InteractionType GetInteractionType() const final {return InteractionType::Ioniz;}
     double DifferentialCrossSection(double energy, double v) = 0;
-private:
 
+protected:
+    EnergyCutSettings cuts_;
 };
 
 // ----------------------------------------------------------------- //
@@ -70,7 +72,7 @@ public:
             return new IonizBetheBlochRossi(particle_def, medium, cuts, multiplier);
         }
 
-     IntegralLimits GetIntegralLimits(double energy);
+     KinematicLimits GetKinematicLimits(double energy);
      double DifferentialCrossSection(double energy, double v);
      double FunctionToDEdxIntegral(double energy, double v);
 
@@ -98,7 +100,7 @@ public:
             return new IonizBergerSeltzerBhabha(particle_def, medium, cuts, multiplier);
         }
 
-    IntegralLimits GetIntegralLimits(double energy);
+    KinematicLimits GetKinematicLimits(double energy);
     double DifferentialCrossSection(double energy, double v);
     double FunctionToDEdxIntegral(double energy, double v);
 
@@ -124,7 +126,7 @@ class IonizBergerSeltzerMoller : public Ionization
             return new IonizBergerSeltzerMoller(particle_def, medium, cuts, multiplier);
         }
 
-        IntegralLimits GetIntegralLimits(double energy);
+        KinematicLimits GetKinematicLimits(double energy);
         double DifferentialCrossSection(double energy, double v);
         double FunctionToDEdxIntegral(double energy, double v);
 

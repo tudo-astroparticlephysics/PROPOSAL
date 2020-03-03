@@ -13,10 +13,9 @@
 #define PHOTO_PARAM_REAL_IMPL(param, parent)                                                                           \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
                                const Medium& medium,                                                                   \
-                               const EnergyCutSettings& cuts,                                                          \
                                double multiplier,                                                                      \
                                bool hard_component)                                                                    \
-        : Photo##parent(particle_def, medium, cuts, multiplier, hard_component)                                        \
+        : Photo##parent(particle_def, medium, multiplier, hard_component)                                        \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -37,10 +36,9 @@ using namespace PROPOSAL;
 
 PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(const ParticleDef& particle_def,
                                                      const Medium& medium,
-                                                     const EnergyCutSettings& cuts,
                                                      double multiplier,
                                                      bool hard_component)
-    : Photonuclear(particle_def, medium, cuts, multiplier)
+    : Photonuclear(particle_def, medium, multiplier)
     , hard_component_()
 {
     if (hard_component)
@@ -235,10 +233,9 @@ double PhotoKokoulin::CalculateParametrization(double nu)
 
 PhotoRhode::PhotoRhode(const ParticleDef& particle_def,
                        const Medium& medium,
-                       const EnergyCutSettings& cuts,
                        double multiplier,
                        bool hard_component)
-    : PhotoRealPhotonAssumption(particle_def, medium, cuts, multiplier, hard_component)
+    : PhotoRealPhotonAssumption(particle_def, medium, multiplier, hard_component)
     , interpolant_(NULL)
 {
     std::vector<double> x = { 0,           0.1,         0.144544,   0.20893,     0.301995,    0.436516,    0.630957,
@@ -273,11 +270,10 @@ PhotoRhode::~PhotoRhode()
 
 Photonuclear* PhotoRhode::create(const ParticleDef& particle_def,
                                  const Medium& medium,
-                                 const EnergyCutSettings& cuts,
                                  double multiplier,
                                  bool hard_component)
 {
-    return new PhotoRhode(particle_def, medium, cuts, multiplier, hard_component);
+    return new PhotoRhode(particle_def, medium, multiplier, hard_component);
 }
 
 bool PhotoRhode::compare(const Parametrization& parametrization) const

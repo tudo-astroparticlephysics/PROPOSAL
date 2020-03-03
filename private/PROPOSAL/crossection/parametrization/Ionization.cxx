@@ -21,7 +21,7 @@ Ionization::Ionization(const ParticleDef& particle_def,
                        const Medium& medium,
                        const EnergyCutSettings& cuts,
                        double multiplier)
-    : Parametrization(particle_def, medium, cuts, multiplier)
+    : Parametrization(particle_def, medium, multiplier), cuts_(cuts)
 {
 }
 
@@ -55,9 +55,9 @@ double Ionization::Delta(double beta, double gamma) {
 // Specific Parametrization
 // ------------------------------------------------------------------------- //
 // ------------------------------------------------------------------------- //
-Parametrization::IntegralLimits IonizBetheBlochRossi::GetIntegralLimits(double energy)
+Parametrization::KinematicLimits IonizBetheBlochRossi::GetKinematicLimits(double energy)
 {
-    IntegralLimits limits;
+    KinematicLimits limits;
 
     double mass_ration = ME / particle_def_.mass;
 
@@ -75,13 +75,6 @@ Parametrization::IntegralLimits IonizBetheBlochRossi::GetIntegralLimits(double e
     if (limits.vMax < limits.vMin)
     {
         limits.vMax = limits.vMin;
-    }
-
-    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
-
-    if (limits.vUp < limits.vMin)
-    {
-        limits.vUp = limits.vMin;
     }
 
     return limits;
@@ -112,8 +105,6 @@ double IonizBetheBlochRossi::DifferentialCrossSection(double energy, double v)
 {
     double result;
 
-    IntegralLimits limits = GetIntegralLimits(energy);
-
     // TODO(mario): Better way? Sat 2017/09/02
     double square_momentum   = (energy - particle_def_.mass) * (energy + particle_def_.mass);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
@@ -128,7 +119,7 @@ double IonizBetheBlochRossi::DifferentialCrossSection(double energy, double v)
     // chapter 2, eq. 7
     double spin_1_2_contribution = v / (1 + 1 / gamma);
     spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
-    result = 1 - beta * (v / limits.vMax) + spin_1_2_contribution;
+    result = 1 - beta * (v / GetKinematicLimits(energy).vMax) + spin_1_2_contribution;
     result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * beta * energy * v * v);
 
     return medium_->GetMassDensity() * result * (1 + InelCorrection(energy, v));
@@ -140,7 +131,7 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
 {
     double result, aux;
 
-    Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
     ParticleDef particle_def = this->GetParticleDef();
     const Medium& medium     = this->GetMedium();
 
@@ -152,13 +143,15 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double beta              = particle_momentum / energy;
     double gamma             = energy / particle_def.mass;
+    double v_up              = cuts_.GetCut(energy);
+
 
     aux    = beta * gamma / (1.e-6 * medium.GetI());
-    result = std::log(limits.vUp * (2 * ME * energy)) + 2 * std::log(aux);
-    aux    = limits.vUp / (2 * (1 + 1 / gamma));
+    result = std::log(v_up * (2 * ME * energy)) + 2 * std::log(aux);
+    aux    = v_up / (2 * (1 + 1 / gamma));
     result += aux * aux;
     aux = beta * beta;
-    result -= aux * (1 + limits.vUp / limits.vMax) + Delta(beta, gamma);
+    result -= aux * (1 + v_up / limits.vMax) + Delta(beta, gamma);
 
     if (result > 0)
     {
@@ -168,8 +161,8 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
         result = 0;
     }
 
-    if(limits.vUp != limits.vMin){
-        result *= medium.GetMassDensity()/(limits.vUp - limits.vMin);
+    if(v_up != limits.vMin){
+        result *= medium.GetMassDensity()/(v_up - limits.vMin);
     }
     else{
         return 0;
@@ -194,12 +187,11 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
 double IonizBetheBlochRossi::InelCorrection(double energy, double v)
 {
     double result, a, b, c;
-    IntegralLimits limits = GetIntegralLimits(energy);
 
     double gamma = energy / particle_def_.mass;
 
     a      = std::log(1 + 2 * v * energy / ME);
-    b      = std::log((1 - v / limits.vMax) / (1 - v));
+    b      = std::log((1 - v / GetKinematicLimits(energy).vMax) / (1 - v));
     c      = std::log((2 * gamma * (1 - v) * ME) / (particle_def_.mass * v));
     result = a * (2 * b + c) - b * b;
 
@@ -215,8 +207,6 @@ double IonizBetheBlochRossi::CrossSectionWithoutInelasticCorrection(double energ
 {
     double result;
 
-    IntegralLimits limits = GetIntegralLimits(energy);
-
     // TODO(mario): Better way? Sat 2017/09/02
     double square_momentum   = (energy - particle_def_.mass) * (energy + particle_def_.mass);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
@@ -231,7 +221,7 @@ double IonizBetheBlochRossi::CrossSectionWithoutInelasticCorrection(double energ
     // chapter 2, eq. 7
     double spin_1_2_contribution = v / (1 + 1 / gamma);
     spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
-    result = 1 - beta * (v / limits.vMax) + spin_1_2_contribution;
+    result = 1 - beta * (v / GetKinematicLimits(energy).vMax) + spin_1_2_contribution;
     result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * beta * energy * v * v);
 
     return medium_->GetMassDensity() * result;
@@ -263,9 +253,9 @@ IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(const IonizBergerSeltzerBhabh
 IonizBergerSeltzerBhabha::~IonizBergerSeltzerBhabha() {}
 
 // ------------------------------------------------------------------------- //
-Parametrization::IntegralLimits IonizBergerSeltzerBhabha::GetIntegralLimits(double energy)
+Parametrization::KinematicLimits IonizBergerSeltzerBhabha::GetKinematicLimits(double energy)
 {
-    IntegralLimits limits;
+    KinematicLimits limits;
 
     limits.vMin = 0.;
 
@@ -273,13 +263,6 @@ Parametrization::IntegralLimits IonizBergerSeltzerBhabha::GetIntegralLimits(doub
 
     if (limits.vMax < 0) {
         limits.vMax = 0;
-    }
-
-    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
-
-    if (limits.vUp < limits.vMin)
-    {
-        limits.vUp = limits.vMin;
     }
 
     return limits;
@@ -335,12 +318,14 @@ double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(double energy, double va
 
     double result, aux;
 
-    Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
     ParticleDef particle_def = this->GetParticleDef();
     const Medium& medium     = this->GetMedium();
 
     double fplus; // (2.269)
-    double bigDelta     = std::min(limits.vMax * energy / ME, limits.vUp * energy / ME); // (2.265)
+
+    double v_up         = cuts_.GetCut(energy);
+    double bigDelta     = std::min(limits.vMax * energy / ME, v_up * energy / ME); // (2.265)
     double gamma        = energy / ME; // (2.258)
     double betasquared  = 1. - 1. / (gamma * gamma); // (2.260)
     double tau          = gamma - 1.; // (2.262)
@@ -388,9 +373,9 @@ IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(const IonizBergerSeltzerMolle
 IonizBergerSeltzerMoller::~IonizBergerSeltzerMoller() {}
 
 // ------------------------------------------------------------------------- //
-Parametrization::IntegralLimits IonizBergerSeltzerMoller::GetIntegralLimits(double energy)
+Parametrization::KinematicLimits IonizBergerSeltzerMoller::GetKinematicLimits(double energy)
 {
-    IntegralLimits limits;
+    KinematicLimits limits;
 
     limits.vMin = 0.;
 
@@ -398,13 +383,6 @@ Parametrization::IntegralLimits IonizBergerSeltzerMoller::GetIntegralLimits(doub
 
     if (limits.vMax < 0) {
         limits.vMax = 0;
-    }
-
-    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
-
-    if (limits.vUp < limits.vMin)
-    {
-        limits.vUp = limits.vMin;
     }
 
     return limits;
@@ -457,12 +435,13 @@ double IonizBergerSeltzerMoller::FunctionToDEdxIntegral(double energy, double va
 
     double result, aux;
 
-    Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = this->GetIntegralLimits(energy);
     ParticleDef particle_def = this->GetParticleDef();
     const Medium& medium     = this->GetMedium();
 
     double fminus; // (2.268)
-    double bigDelta     = std::min(limits.vMax * energy / ME, limits.vUp * energy / ME); // (2.265)
+    double v_up         = cuts_.GetCut(energy);
+    double bigDelta     = std::min(limits.vMax * energy / ME, v_up * energy / ME); // (2.265)
     double gamma        = energy / ME; // (2.258)
     double betasquared  = 1. - 1. / (gamma * gamma); // (2.260)
     double tau          = gamma - 1.; // (2.262)

@@ -273,9 +273,8 @@ size_t ShadowButkevichMikhailov::GetHash() const
 
 Photonuclear::Photonuclear(const ParticleDef& particle_def,
                            const Medium& medium,
-                           const EnergyCutSettings& cuts,
                            double multiplier)
-    : Parametrization(particle_def, medium, cuts, multiplier)
+    : Parametrization(particle_def, medium, multiplier)
 {
 }
 
@@ -296,7 +295,7 @@ bool Photonuclear::compare(const Parametrization& parametrization) const
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-Parametrization::IntegralLimits Photonuclear::GetIntegralLimits(double energy)
+Parametrization::KinematicLimits Photonuclear::GetKinematicLimits(double energy)
 {
     double aux;
 
@@ -321,13 +320,6 @@ Parametrization::IntegralLimits Photonuclear::GetIntegralLimits(double energy)
     if (limits.vMax < limits.vMin)
     {
         limits.vMax = limits.vMin;
-    }
-
-    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
-
-    if (limits.vUp < limits.vMin)
-    {
-        limits.vUp = limits.vMin;
     }
 
     return limits;

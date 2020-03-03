@@ -21,7 +21,7 @@ using namespace PROPOSAL;
 PhotoPairProduction::PhotoPairProduction(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  double multiplier)
-        : Parametrization(particle_def, medium, EnergyCutSettings(), multiplier)
+        : Parametrization(particle_def, medium, multiplier)
 {
 }
 
@@ -41,19 +41,17 @@ bool PhotoPairProduction::compare(const Parametrization& parametrization) const
 // Public methods
 // ------------------------------------------------------------------------- //
 
-Parametrization::IntegralLimits PhotoPairProduction::GetIntegralLimits(double energy)
+Parametrization::KinematicLimits PhotoPairProduction::GetKinematicLimits(double energy)
 {
-    IntegralLimits limits;
+    KinematicLimits limits;
 
     // x is the integration variable here
     if(energy <= 2. * ME){
         limits.vMin = 0.5;
-        limits.vUp = limits.vMin;
         limits.vMax = 0.5;
     }
     else {
         limits.vMin = ME / energy;
-        limits.vUp = limits.vMin; //treat interaction as fully stochastic
         limits.vMax = 1. - ME / energy;
     }
 

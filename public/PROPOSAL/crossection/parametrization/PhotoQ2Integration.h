@@ -44,7 +44,6 @@
     public:                                                                                                            \
         Photo##param(const ParticleDef&,                                                                               \
                      const Medium&,                                                                                    \
-                     const EnergyCutSettings&,                                                                         \
                      double multiplier,                                                                                \
                      const ShadowEffect& shadow_effect);                                                               \
         Photo##param(const Photo##param&);                                                                             \
@@ -53,11 +52,10 @@
         virtual Parametrization* clone() const { return new Photo##param(*this); }                                     \
         static Photonuclear* create(const ParticleDef& particle_def,                                                   \
                                     const Medium& medium,                                                              \
-                                    const EnergyCutSettings& cuts,                                                     \
                                     double multiplier,                                                                 \
                                     const ShadowEffect& shadow_effect)                                                 \
         {                                                                                                              \
-            return new Photo##param(particle_def, medium, cuts, multiplier, shadow_effect);                            \
+            return new Photo##param(particle_def, medium, multiplier, shadow_effect);                                  \
         }                                                                                                              \
                                                                                                                        \
         double FunctionToQ2Integral(double energy, double v, double Q2);                                               \
@@ -82,7 +80,6 @@ class PhotoQ2Integral : public Photonuclear
 public:
     PhotoQ2Integral(const ParticleDef&,
                     const Medium&,
-                    const EnergyCutSettings&,
                     double multiplier,
                     const ShadowEffect&);
     PhotoQ2Integral(const PhotoQ2Integral&);
@@ -134,7 +131,6 @@ public:
 public:
     PhotoQ2Interpolant(const ParticleDef&,
                        const Medium&,
-                       const EnergyCutSettings&,
                        double multiplier,
                        const ShadowEffect&,
                        InterpolationDef def = InterpolationDef());
@@ -144,12 +140,11 @@ public:
     Parametrization* clone() const { return new PhotoQ2Interpolant<Param>(*this); }
     static Photonuclear* create(const ParticleDef& particle_def,
                                 const Medium& medium,
-                                const EnergyCutSettings& cuts,
                                 double multiplier,
                                 const ShadowEffect& shadow_effect,
                                 InterpolationDef def = InterpolationDef())
     {
-        return new PhotoQ2Interpolant<Param>(particle_def, medium, cuts, multiplier, shadow_effect, def);
+        return new PhotoQ2Interpolant<Param>(particle_def, medium, multiplier, shadow_effect, def);
     }
 
     double DifferentialCrossSection(double energy, double v);
@@ -164,11 +159,10 @@ protected:
 template<class Param>
 PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
                                               const Medium& medium,
-                                              const EnergyCutSettings& cuts,
                                               double multiplier,
                                               const ShadowEffect& shadow_effect,
                                               InterpolationDef def)
-    : Param(particle_def, medium, cuts, multiplier, shadow_effect)
+    : Param(particle_def, medium, multiplier, shadow_effect)
     , interpolant_(this->medium_->GetNumComponents(), NULL)
 {
     std::vector<Interpolant2DBuilder> builder2d(this->components_.size());
@@ -248,12 +242,12 @@ bool PhotoQ2Interpolant<Param>::compare(const Parametrization& parametrization) 
 template<class Param>
 double PhotoQ2Interpolant<Param>::DifferentialCrossSection(double energy, double v)
 {
-    Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = this->GetIntegralLimits(energy);
 
-    if (v >= limits.vUp)
+    if (v >= limits.vMin)
     {
         return std::max(interpolant_[this->component_index_]->Interpolate(
-                            energy, std::log(v / limits.vUp) / std::log(limits.vMax / limits.vUp)),
+                            energy, std::log(v / limits.vMin) / std::log(limits.vMax / limits.vMin)),
                         0.0);
     }
 
@@ -264,14 +258,10 @@ template<class Param>
 double PhotoQ2Interpolant<Param>::FunctionToBuildPhotoInterpolant(double energy, double v, int component)
 {
     this->component_index_                 = component;
-    Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
 
-    if (limits.vUp == limits.vMax)
-    {
-        return 0;
-    }
-
-    v = limits.vUp * std::exp(v * std::log(limits.vMax / limits.vUp));
+    // TODO: This substitution results in interpolated values that deviate more than IPREC from the integrated values and way more for v close to 1 (jean-marco)
+    v = limits.vMin * std::exp(v * std::log(limits.vMax / limits.vMin));
 
     return Param::DifferentialCrossSection(energy, v);
 }

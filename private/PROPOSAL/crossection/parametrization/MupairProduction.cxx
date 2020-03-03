@@ -12,10 +12,8 @@
 #define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                                                              \
     Mupair##param::Mupair##param(const ParticleDef& particle_def,                                                      \
                                const Medium& medium,                                                                   \
-                               const EnergyCutSettings& cuts,                                                          \
-                               double multiplier,                                                                      \
-                               bool particle_output)                                                                   \
-        : MupairProductionRhoIntegral(particle_def, medium, cuts, multiplier, particle_output)                         \
+                               double multiplier)                                                                      \
+        : MupairProductionRhoIntegral(particle_def, medium, multiplier,)                                               \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -40,15 +38,13 @@ using namespace PROPOSAL;
 
 MupairProduction::MupairProduction(const ParticleDef& particle_def,
                                  const Medium& medium,
-                                 const EnergyCutSettings& cuts,
-                                 double multiplier,
-                                 bool particle_output)
-    : Parametrization(particle_def, medium, cuts, multiplier), drho_integral_(IROMB, IMAXS, IPREC), particle_output_(particle_output)
+                                 double multiplier)
+    : Parametrization(particle_def, medium, multiplier), drho_integral_(IROMB, IMAXS, IPREC)
 {
 }
 
 MupairProduction::MupairProduction(const MupairProduction& mupair)
-    : Parametrization(mupair), drho_integral_(IROMB, IMAXS, IPREC), particle_output_(mupair.particle_output_)
+    : Parametrization(mupair), drho_integral_(IROMB, IMAXS, IPREC)
 {
 }
 
@@ -56,11 +52,6 @@ MupairProduction::~MupairProduction() {}
 
 bool MupairProduction::compare(const Parametrization& parametrization) const
 {
-    const MupairProduction* mupair = static_cast<const MupairProduction*>(&parametrization);
-
-    if (particle_output_ != mupair->particle_output_)
-        return false;
-    else
         return Parametrization::compare(parametrization);
 }
 
@@ -69,9 +60,9 @@ bool MupairProduction::compare(const Parametrization& parametrization) const
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-Parametrization::IntegralLimits MupairProduction::GetIntegralLimits(double energy)
+Parametrization::KinematicLimits MupairProduction::GetKinematicLimits(double energy)
 {
-    IntegralLimits limits;
+    KinematicLimits limits;
 
     limits.vMin = 2 * MMU / energy;
     limits.vMax = 1 - particle_def_.mass / energy;
@@ -79,13 +70,6 @@ Parametrization::IntegralLimits MupairProduction::GetIntegralLimits(double energ
     if (limits.vMax < limits.vMin)
     {
         limits.vMax = limits.vMin;
-    }
-
-    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
-
-    if (limits.vUp < limits.vMin)
-    {
-        limits.vUp = limits.vMin;
     }
 
     return limits;
@@ -124,10 +108,8 @@ double MupairProduction::Calculaterho(double energy, double v, double rnd1, doub
 // ------------------------------------------------------------------------- //
 MupairProductionRhoIntegral::MupairProductionRhoIntegral(const ParticleDef& particle_def,
                                                        const Medium& medium,
-                                                       const EnergyCutSettings& cuts,
-                                                       double multiplier,
-                                                       bool particle_output)
-    : MupairProduction(particle_def, medium, cuts, multiplier, particle_output)
+                                                       double multiplier)
+    : MupairProduction(particle_def, medium, multiplier)
     , integral_(IROMB, IMAXS, IPREC)
 {
 }

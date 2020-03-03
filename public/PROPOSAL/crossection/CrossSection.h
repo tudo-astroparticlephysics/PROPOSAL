@@ -33,6 +33,7 @@
 #include <utility>
 
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -45,7 +46,15 @@ class Parametrization;
 class CrossSection
 {
 public:
-    CrossSection(const InteractionType&, const Parametrization&);
+    CrossSection(nlohmann::json);
+    CrossSection(nlohmann::json,
+            std::shared_ptr<ParticleDef>,
+            std::shared_ptr<Medium>,
+            std::shared_ptr<EnergyCutSettings> = nullptr,
+            std::shared_ptr<InterpolationDef> = nullptr);
+    CrossSection(const Parametrization&,
+            std::shared_ptr<EnergyCutSettings> = nullptr,
+            std::shared_ptr<InterpolationDef> = nullptr);
     CrossSection(const CrossSection&);
     virtual ~CrossSection();
 
@@ -65,6 +74,8 @@ public:
     virtual double CalculatedNdx(double energy)                                     = 0;
     virtual double CalculatedNdx(double energy, double rnd)                         = 0;
     virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2) = 0;
+
+    virtual double GetEnergyCut(double energy);
 
     // CalculateProducedParticles Return values:
     // First Parameter: List of produced particles by stochastic interaction (default: no particles, e.g. empty list)
@@ -112,6 +123,10 @@ protected:
 
     double rnd_; //!< This random number will be stored in CalculateDNdx to avoid calculate dNdx a second time in
                  //! ClaculateSochasticLoss when it is already done
+
+    EnergyCutSettings cuts_;
+
+    InterpolationDef
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::CrossSection const&);

@@ -191,7 +191,7 @@ private:
 class Photonuclear : public Parametrization
 {
 public:
-    Photonuclear(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    Photonuclear(const ParticleDef&, const Medium&, double multiplier);
     Photonuclear(const Photonuclear&);
     virtual ~Photonuclear();
 
@@ -200,10 +200,10 @@ public:
     // ----------------------------------------------------------------- //
     // Public methods
     // ----------------------------------------------------------------- //
-
+    virtual const InteractionType GetInteractionType() const final {return InteractionType::Photonuclear;}
     virtual double DifferentialCrossSection(double energy, double v) = 0;
 
-    virtual IntegralLimits GetIntegralLimits(double energy);
+    virtual KinematicLimits GetKinematicLimits(double energy);
 
 protected:
     virtual bool compare(const Parametrization&) const;

@@ -22,9 +22,8 @@ using namespace PROPOSAL;
 
 Compton::Compton(const ParticleDef& particle_def,
                                const Medium& medium,
-                               const EnergyCutSettings& cuts,
                                double multiplier)
-        : Parametrization(particle_def, medium, cuts, multiplier)
+        : Parametrization(particle_def, medium, multiplier)
 {
 }
 
@@ -46,9 +45,9 @@ bool Compton::compare(const Parametrization& parametrization) const
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-Parametrization::IntegralLimits Compton::GetIntegralLimits(double energy)
+Parametrization::KinematicLimits Compton::GetKinematicLimits(double energy)
 {
-    IntegralLimits limits;
+    KinematicLimits limits;
 
     limits.vMin = 0.;
 
@@ -66,13 +65,6 @@ Parametrization::IntegralLimits Compton::GetIntegralLimits(double energy)
     if (limits.vMax < 0)
     {
         limits.vMax = 0;
-    }
-
-    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
-
-    if (limits.vUp < limits.vMin)
-    {
-        limits.vUp = limits.vMin;
     }
 
     return limits;
@@ -101,9 +93,8 @@ size_t Compton::GetHash() const
 
 ComptonKleinNishina::ComptonKleinNishina(const ParticleDef& particle_def,
                                                const Medium& medium,
-                                               const EnergyCutSettings& cuts,
                                                double multiplier)
-        : Compton(particle_def, medium, cuts, multiplier)
+        : Compton(particle_def, medium, multiplier)
 {
 }
 

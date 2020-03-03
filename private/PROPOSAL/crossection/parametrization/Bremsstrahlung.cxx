@@ -14,10 +14,9 @@
 #define BREMSSTRAHLUNG_IMPL(param)                                                                                     \
     Brems##param::Brems##param(const ParticleDef& particle_def,                                                        \
                                const Medium& medium,                                                                   \
-                               const EnergyCutSettings& cuts,                                                          \
                                double multiplier,                                                                      \
                                bool lpm)                                                                               \
-        : Bremsstrahlung(particle_def, medium, cuts, multiplier, lpm)                                                  \
+        : Bremsstrahlung(particle_def, medium, multiplier, lpm)                                                  \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -42,10 +41,9 @@ using namespace PROPOSAL;
 
 Bremsstrahlung::Bremsstrahlung(const ParticleDef& particle_def,
                                const Medium& medium,
-                               const EnergyCutSettings& cuts,
                                double multiplier,
                                bool lpm)
-    : Parametrization(particle_def, medium, cuts, multiplier)
+    : Parametrization(particle_def, medium, multiplier)
     , lorenz_(false) // TODO(mario): make it use to enable Mon 2017/09/04
     , lorenz_cut_(1e6)
     , init_lpm_effect_(true)
@@ -112,9 +110,9 @@ double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
 }
 
 // ------------------------------------------------------------------------- //
-Parametrization::IntegralLimits Bremsstrahlung::GetIntegralLimits(double energy)
+Parametrization::KinematicLimits Bremsstrahlung::GetKinematicLimits(double energy)
 {
-    IntegralLimits limits;
+    KinematicLimits limits;
 
     limits.vMin = 0.;
 
@@ -134,8 +132,6 @@ Parametrization::IntegralLimits Bremsstrahlung::GetIntegralLimits(double energy)
     // and 0.75*\sqrt{e}*Z^{1/3} > 1
     // so the next line will never be called, or?
     // limits.vMax = std::min(limits.vMax, 1 - particle_def_.mass / energy);
-
-    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
 
     return limits;
 }
@@ -161,12 +157,11 @@ double Bremsstrahlung::lpm(double energy, double v)
         for (unsigned int i = 0; i < components_.size(); ++i)
         {
             component_index_ = i;
-            Parametrization::IntegralLimits limits = GetIntegralLimits(upper_energy);
+            Parametrization::KinematicLimits limits = GetKinematicLimits(upper_energy);
 
+            //TODO: Is it ok to use this integration method for the whole kinematic range here?
             sum += integral_temp.Integrate(
-                limits.vMin, limits.vUp, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, upper_energy, std::placeholders::_1), 2);
-            sum += integral_temp.Integrate(
-                limits.vUp, limits.vMax, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, upper_energy, std::placeholders::_1), 4);
+                limits.vMin, limits.vMax, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, upper_energy, std::placeholders::_1), 2);
         }
 
         eLpm_ = ALPHA * (particle_def_.mass);
@@ -579,10 +574,9 @@ double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, d
 
 BremsElectronScreening::BremsElectronScreening(const ParticleDef& particle_def,
                                const Medium& medium,
-                               const EnergyCutSettings& cuts,
                                double multiplier,
                                bool lpm)
-        : Bremsstrahlung(particle_def, medium, cuts, multiplier, lpm), interpolant_(NULL)
+        : Bremsstrahlung(particle_def, medium, multiplier, lpm), interpolant_(NULL)
     {
         interpolant_ = new Interpolant(A_logZ, A_energies, A_correction, 2, false, false, 2, false, false);
     }
