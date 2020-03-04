@@ -66,8 +66,12 @@ namespace PROPOSAL {
 
         virtual size_t GetHash() const;
 
+        int GetWeakPartner() const {return weak_partner_};
+
     protected:
         bool compare(const Parametrization&) const;
+
+        int weak_partner_;
 
     };
 

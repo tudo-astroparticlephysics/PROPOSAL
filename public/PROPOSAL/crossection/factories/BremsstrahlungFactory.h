@@ -115,7 +115,7 @@ public:
     // --------------------------------------------------------------------- //
 
     typedef std::function<
-        Bremsstrahlung*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm)>
+        Bremsstrahlung*(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier, bool lpm)>
         RegisterFunction;
 
     typedef std::map<std::string, RegisterFunction> BremsstrahlungMapString;
@@ -127,16 +127,14 @@ public:
     // --------------------------------------------------------------------- //
 
     CrossSection* CreateBremsstrahlung(const ParticleDef&,
-                                       const Medium&,
-                                       const EnergyCutSettings&,
-                                       const Definition&) const;
-
-    CrossSection* CreateBremsstrahlung(const ParticleDef&,
-                                       const Medium&,
-                                       const EnergyCutSettings&,
+                                       std::shared_ptr<const Medium>,
+                                       std::shared_ptr<const EnergyCutSettings>,
                                        const Definition&,
                                        InterpolationDef) const;
 
+    CrossSection* CreateBremsstrahlung(const Bremsstrahlung& param,
+                                       std::shared_ptr<const EnergyCutSettings>,
+                                       InterpolationDef) const;
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for photo parametrizations
     // ----------------------------------------------------------------------------

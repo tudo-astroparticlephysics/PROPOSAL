@@ -45,7 +45,7 @@ double MupairIntegral::CalculatedEdxWithoutMultiplier(double energy)
 {
     double sum = 0;
 
-    for (int i = 0; i < parametrization_->GetMedium().GetNumComponents(); i++)
+    for (int i = 0; i < parametrization_->GetMedium()->GetNumComponents(); i++)
     {
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);

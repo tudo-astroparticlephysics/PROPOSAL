@@ -38,7 +38,7 @@ namespace PROPOSAL {
     class ComptonInterpolant : public CrossSectionInterpolant
     {
     public:
-        ComptonInterpolant(const Compton&, std::shared_ptr<EnergyCutSettings>, InterpolationDef);
+        ComptonInterpolant(const Compton&, std::shared_ptr<EnergyCutSettings>, std::shared_ptr<const InterpolationDef>);
         ComptonInterpolant(const ComptonInterpolant&);
         virtual ~ComptonInterpolant();
 

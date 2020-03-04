@@ -13,10 +13,10 @@
 
 #define BREMSSTRAHLUNG_IMPL(param)                                                                                     \
     Brems##param::Brems##param(const ParticleDef& particle_def,                                                        \
-                               std::shared_ptr<const Medium>,                                                                   \
+                               std::shared_ptr<const Medium> medium,                                                   \
                                double multiplier,                                                                      \
                                bool lpm)                                                                               \
-        : Bremsstrahlung(particle_def, medium, multiplier, lpm)                                                  \
+        : Bremsstrahlung(particle_def, medium, multiplier, lpm)                                                        \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -97,7 +97,7 @@ double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
 
     result = CalculateParametrization(energy, v);
 
-    aux = 2 * particle_def_.charge * particle_def_.charge * (ME / particle_mass_) * RE *
+    aux = 2 * particle_charge_ * particle_charge_ * (ME / particle_mass_) * RE *
           components_[component_index_]->GetNucCharge();
     aux *= aux * (ALPHA / v) * result;
 
@@ -573,7 +573,7 @@ double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, d
 // ------------------------------------------------------------------------- //
 
 BremsElectronScreening::BremsElectronScreening(const ParticleDef& particle_def,
-                               std::shared_ptr<Medium> medium,
+                               std::shared_ptr<const Medium> medium,
                                double multiplier,
                                bool lpm)
         : Bremsstrahlung(particle_def, medium, multiplier, lpm), interpolant_(NULL)

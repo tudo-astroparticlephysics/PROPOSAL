@@ -16,11 +16,11 @@
 
 using namespace PROPOSAL;
 
-MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_ptr<EnergyCutSettings> cuts, InterpolationDef def)
+MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_ptr<EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
     : CrossSectionInterpolant(param, cuts)
 {
     // Use parent CrossSecition dNdx interpolation
-    InitdNdxInterpolation(def);
+    InitdNdxInterpolation(*def);
 
     // --------------------------------------------------------------------- //
     // Builder for DEdx
@@ -33,9 +33,9 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
     MupairIntegral mupair(param, cuts);
 
     builder1d.SetMax(def.nodes_cross_section)
-        .SetXMin(param.GetParticleDef().mass)
-        .SetXMax(def.max_node_energy)
-        .SetRomberg(def.order_of_interpolation)
+        .SetXMin(param.GetParticleMass())
+        .SetXMax(def->max_node_energy)
+        .SetRomberg(def->order_of_interpolation)
         .SetRational(true)
         .SetRelative(false)
         .SetIsLog(true)
@@ -54,14 +54,14 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
     Interpolant1DBuilder builder_de2dx;
     Helper::InterpolantBuilderContainer builder_container_de2dx;
 
-    builder_de2dx.SetMax(def.nodes_continous_randomization)
-        .SetXMin(param.GetParticleDef().mass)
-        .SetXMax(def.max_node_energy)
-        .SetRomberg(def.order_of_interpolation)
+    builder_de2dx.SetMax(def->nodes_continous_randomization)
+        .SetXMin(param.GetParticleMass())
+        .SetXMax(def->max_node_energy)
+        .SetRomberg(def->order_of_interpolation)
         .SetRational(false)
         .SetRelative(false)
         .SetIsLog(true)
-        .SetRombergY(def.order_of_interpolation)
+        .SetRombergY(def->order_of_interpolation)
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)
@@ -69,9 +69,9 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 
-    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
+    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), *def);
     Helper::InitializeInterpolation(
-        "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
+        "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), *def);
 
     muminus_def_ = &MuMinusDef::Get();
     muplus_def_ = &MuPlusDef::Get();

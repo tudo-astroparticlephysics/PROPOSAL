@@ -139,6 +139,11 @@ public:
                                         const Definition&,
                                         InterpolationDef) const;
 
+    CrossSection* CreateEpairProduction(const EnergyCutSettings&,
+                                        const EpairProduction&,
+                                        InterpolationDef) const;
+
+
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for photo parametrizations
     // ----------------------------------------------------------------------------

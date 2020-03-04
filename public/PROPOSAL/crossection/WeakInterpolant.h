@@ -38,7 +38,7 @@ namespace PROPOSAL {
     class WeakInterpolant : public CrossSectionInterpolant
     {
     public:
-        WeakInterpolant(const WeakInteraction&, InterpolationDef);
+        WeakInterpolant(const WeakInteraction&, std::shared_ptr<const InterpolationDef>);
         WeakInterpolant(const WeakInterpolant&);
         virtual ~WeakInterpolant();
 

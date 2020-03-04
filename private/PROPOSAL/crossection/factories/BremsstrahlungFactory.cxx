@@ -48,9 +48,10 @@ void BremsstrahlungFactory::Register(const std::string& name, Enum enum_t, Regis
 
 // ------------------------------------------------------------------------- //
 CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& particle_def,
-                                                          const Medium& medium,
-                                                          const EnergyCutSettings& cuts,
-                                                          const Definition& def) const
+                                                          std::shared_ptr<const Medium> medium,
+                                                          std::shared_ptr<const EnergyCutSettings> cuts,
+                                                          const Definition& def,
+                                                          InterpolationDef interpolation_def = nullptr) const
 {
     if(def.parametrization == BremsstrahlungFactory::Enum::None){
         log_fatal("Can't return Bremsstrahlung Crosssection if parametrization is None");
@@ -61,7 +62,13 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
 
     if (it != bremsstrahlung_map_enum_.end())
     {
-        return new BremsIntegral(*it->second(particle_def, medium, cuts, def.multiplier, def.lpm_effect));
+        if(interpolation_def == nullptr){
+            return new BremsIntegral(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts);
+        }
+        else{
+            return new BremsInterpolant(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts,
+                                        interpolation_def);
+        }
     } else
     {
         log_fatal("Bremsstrahlung %s not registered!", typeid(def.parametrization).name());
@@ -85,7 +92,7 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
 
     if (it != bremsstrahlung_map_enum_.end())
     {
-        return new BremsInterpolant(*it->second(particle_def, medium, cuts, def.multiplier, def.lpm_effect),
+        return new BremsInterpolant(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts,
                                     interpolation_def);
     } else
     {

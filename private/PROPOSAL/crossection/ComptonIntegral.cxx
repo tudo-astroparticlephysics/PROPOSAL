@@ -30,7 +30,7 @@ double ComptonIntegral::CalculatedEdxWithoutMultiplier(double energy){
     double sum = 0;
     double vUp;
 
-    for (int i = 0; i < (parametrization_->GetMedium().GetNumComponents()); i++)
+    for (int i = 0; i < (parametrization_->GetMedium()->GetNumComponents()); i++)
     {
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);

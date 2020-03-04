@@ -38,7 +38,7 @@ namespace PROPOSAL {
     class PhotoPairInterpolant : public CrossSectionInterpolant
     {
     public:
-        PhotoPairInterpolant(const PhotoPairProduction&, const PhotoAngleDistribution&, InterpolationDef);
+        PhotoPairInterpolant(const PhotoPairProduction&, const PhotoAngleDistribution&, std::shared_ptr<const InterpolationDef>);
         PhotoPairInterpolant(const PhotoPairInterpolant&);
         virtual ~PhotoPairInterpolant();
 

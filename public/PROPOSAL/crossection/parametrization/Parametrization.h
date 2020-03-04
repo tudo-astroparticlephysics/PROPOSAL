@@ -84,9 +84,10 @@ public:
     // ----------------------------------------------------------------- //
 
     virtual const std::string& GetName() const = 0; //{ return name_; }
+    double GetParticleMass() const { return particle_mass_; }
+    double GetParticleCharge() const {return particle_charge_; }
 
     virtual const InteractionType GetInteractionType() const = 0;
-    const ParticleDef& GetParticleDef() const { return particle_def_; }
     std::shared_ptr<const Medium> GetMedium() const { return medium_; }
     double GetMultiplier() const { return multiplier_; }
 

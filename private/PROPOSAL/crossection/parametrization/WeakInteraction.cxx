@@ -20,12 +20,12 @@ using namespace PROPOSAL;
 WeakInteraction::WeakInteraction(const ParticleDef& particle_def,
                                  std::shared_ptr<const Medium> medium,
                                  double multiplier)
-        : Parametrization(particle_def, medium, multiplier)
+        : Parametrization(particle_def, medium, multiplier), weak_partner_(particle_def.weak_partner)
 {
 }
 
 WeakInteraction::WeakInteraction(const WeakInteraction& param)
-        : Parametrization(param)
+        : Parametrization(param), weak_partner_(param.weak_partner_)
 {
 }
 
@@ -33,7 +33,11 @@ WeakInteraction::~WeakInteraction() {}
 
 bool WeakInteraction::compare(const Parametrization& parametrization) const
 {
-    return Parametrization::compare(parametrization);
+    const WeakInteraction* param_weak = static_cast<const WeakInteraction*>(&parametrization);
+    if(weak_partner_ != param_weak->GetWeakPartner())
+        return false;
+    else
+        return Parametrization::compare(parametrization);
 }
 
 // ------------------------------------------------------------------------- //

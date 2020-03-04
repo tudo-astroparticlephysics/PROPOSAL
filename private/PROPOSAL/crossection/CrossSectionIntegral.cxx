@@ -18,7 +18,7 @@ CrossSectionIntegral::CrossSectionIntegral(const Parametrization& param, std::sh
     : CrossSection(param, cuts)
     , dedx_integral_(IROMB, IMAXS, IPREC)
     , de2dx_integral_(IROMB, IMAXS, IPREC)
-    , dndx_integral_(param.GetMedium().GetNumComponents(), Integral(IROMB, IMAXS, IPREC))
+    , dndx_integral_(param.GetMedium()->GetNumComponents(), Integral(IROMB, IMAXS, IPREC))
 {
 }
 
