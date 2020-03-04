@@ -38,7 +38,7 @@ class MupairProduction;
 class MupairInterpolant : public CrossSectionInterpolant
 {
 public:
-    MupairInterpolant(const MupairProduction&, std::shared_ptr<EnergyCutSettings>, std::shared_ptr<const InterpolationDef>);
+    MupairInterpolant(const MupairProduction&, std::shared_ptr<const EnergyCutSettings>, std::shared_ptr<const InterpolationDef>);
     MupairInterpolant(const MupairInterpolant&);
     virtual ~MupairInterpolant();
 

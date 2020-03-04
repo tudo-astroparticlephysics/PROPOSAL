@@ -41,33 +41,10 @@ void IonizationFactory::Register(const std::string& name, Enum enum_t, RegisterF
 
 // ------------------------------------------------------------------------- //
 CrossSection* IonizationFactory::CreateIonization(const ParticleDef& particle_def,
-                                                  const Medium& medium,
-                                                  const EnergyCutSettings& cuts,
-                                                  const Definition& def) const
-{
-    if(def.parametrization == IonizationFactory::Enum::None){
-        log_fatal("Can't return Ionization Crosssection if parametrization is None");
-        return NULL;
-    }
-
-    IonizMapEnum::const_iterator it = ioniz_map_enum_.find(def.parametrization);
-
-    if (it != ioniz_map_enum_.end())
-    {
-        return new IonizIntegral(*it->second(particle_def, medium, cuts, def.multiplier));
-    } else
-    {
-        log_fatal("Ionization %s not registered!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
-    }
-}
-
-// ------------------------------------------------------------------------- //
-CrossSection* IonizationFactory::CreateIonization(const ParticleDef& particle_def,
-                                                  const Medium& medium,
-                                                  const EnergyCutSettings& cuts,
+                                                  std::shared_ptr<const Medium> medium,
+                                                  std::shared_ptr<const EnergyCutSettings> cuts,
                                                   const Definition& def,
-                                                  InterpolationDef interpolation_def) const
+                                                  std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     if(def.parametrization == IonizationFactory::Enum::None){
         log_fatal("Can't return Ionization Crosssection if parametrization is None");
@@ -78,7 +55,12 @@ CrossSection* IonizationFactory::CreateIonization(const ParticleDef& particle_de
 
     if (it != ioniz_map_enum_.end())
     {
-        return new IonizInterpolant(*it->second(particle_def, medium, cuts, def.multiplier), interpolation_def);
+        if(interpolation_def==nullptr){
+            return new IonizIntegral(*it->second(particle_def, medium, cuts, def.multiplier), cuts);
+        }
+        else{
+            return new IonizInterpolant(*it->second(particle_def, medium, cuts, def.multiplier), cuts, interpolation_def);
+        }
     } else
     {
         log_fatal("Ionization %s not registered!", typeid(def.parametrization).name());

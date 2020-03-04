@@ -38,7 +38,7 @@ class EpairProduction;
 class EpairInterpolant : public CrossSectionInterpolant
 {
 public:
-    EpairInterpolant(const EpairProduction&, std::shared_ptr<EnergyCutSettings>, std::shared_ptr<const InterpolationDef>);
+    EpairInterpolant(const EpairProduction&, std::shared_ptr<const EnergyCutSettings>, std::shared_ptr<const InterpolationDef>);
     EpairInterpolant(const EpairInterpolant&);
     virtual ~EpairInterpolant();
 

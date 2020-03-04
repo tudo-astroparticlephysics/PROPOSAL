@@ -57,34 +57,9 @@ void PhotoPairFactory::Register(const std::string& name, Enum enum_t, RegisterFu
 
 // ------------------------------------------------------------------------- //
 CrossSection* PhotoPairFactory::CreatePhotoPair(const ParticleDef& particle_def,
-                                            const Medium& medium,
-                                            const Definition& def) const
-{
-    if(def.parametrization == PhotoPairFactory::Enum::None){
-        log_fatal("Can't return PhotoPair Crosssection if parametrization is None");
-        return NULL;
-    }
-
-    PhotoPairMapEnum::const_iterator it = photopair_map_enum_.find(def.parametrization);
-
-    if (it != photopair_map_enum_.end())
-    {
-        PhotoAngleDistribution* photoangle = Get().CreatePhotoAngleDistribution(def.photoangle, particle_def, medium);
-        PhotoPairIntegral* photopair = new PhotoPairIntegral(*it->second(particle_def, medium, def.multiplier), *photoangle);
-        delete photoangle;
-        return photopair;
-    } else
-    {
-        log_fatal("PhotoPair %s not registered!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
-    }
-}
-
-// ------------------------------------------------------------------------- //
-CrossSection* PhotoPairFactory::CreatePhotoPair(const ParticleDef& particle_def,
-                                            const Medium& medium,
+                                            std::shared_ptr<const Medium> medium,
                                             const Definition& def,
-                                            InterpolationDef interpolation_def) const
+                                            std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     if(def.parametrization == PhotoPairFactory::Enum::None){
         log_fatal("Can't return PhotoPair Crosssection if parametrization is None");
@@ -95,10 +70,19 @@ CrossSection* PhotoPairFactory::CreatePhotoPair(const ParticleDef& particle_def,
 
     if (it != photopair_map_enum_.end())
     {
-        PhotoAngleDistribution* photoangle = Get().CreatePhotoAngleDistribution(def.photoangle, particle_def, medium);
-        PhotoPairInterpolant* photopair = new PhotoPairInterpolant(*it->second(particle_def, medium, def.multiplier), *photoangle, interpolation_def);
-        delete photoangle;
-        return photopair;
+        if(interpolation_def==nullptr){
+            PhotoAngleDistribution* photoangle = Get().CreatePhotoAngleDistribution(def.photoangle, particle_def, medium);
+            PhotoPairIntegral* photopair = new PhotoPairIntegral(*it->second(particle_def, medium, def.multiplier), *photoangle);
+            delete photoangle;
+            return photopair;
+        }
+        else{
+            PhotoAngleDistribution* photoangle = Get().CreatePhotoAngleDistribution(def.photoangle, particle_def, medium);
+            PhotoPairInterpolant* photopair = new PhotoPairInterpolant(*it->second(particle_def, medium, def.multiplier), *photoangle, interpolation_def);
+            delete photoangle;
+            return photopair;
+        }
+
     } else
     {
         log_fatal("PhotoPair %s not registered!", typeid(def.parametrization).name());
@@ -155,7 +139,7 @@ void PhotoPairFactory::RegisterPhotoAngle(const std::string& name, const PhotoAn
 PhotoAngleDistribution* PhotoPairFactory::CreatePhotoAngleDistribution(
         const std::string& name,
         const ParticleDef& particle_def,
-        const Medium& medium) {
+        std::shared_ptr<const Medium> medium) {
     std::string name_lower = name;
     std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
 
@@ -175,7 +159,7 @@ PhotoAngleDistribution* PhotoPairFactory::CreatePhotoAngleDistribution(
 PhotoAngleDistribution* PhotoPairFactory::CreatePhotoAngleDistribution(
         const PhotoPairFactory::PhotoAngle& photoangle,
         const ParticleDef& particle_def,
-        const Medium& medium) {
+        std::shared_ptr<const Medium> medium) {
 
     PhotoAngleMapEnum::const_iterator it = photo_angle_map_enum_.find(photoangle);
 

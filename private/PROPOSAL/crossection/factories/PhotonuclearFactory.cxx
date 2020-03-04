@@ -129,42 +129,10 @@ ShadowEffect* PhotonuclearFactory::CreateShadowEffect(const Shadow& shadow)
 
 // ------------------------------------------------------------------------- //
 CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particle_def,
-                                                      const Medium& medium,
-                                                      const EnergyCutSettings& cuts,
-                                                      const Definition& def) const
-{
-    if(def.parametrization == PhotonuclearFactory::Enum::None){
-        log_fatal("Can't return Photonuclear Crosssection if parametrization is None");
-        return NULL;
-    }
-
-    PhotoQ2MapEnum::const_iterator it_q2            = photo_q2_map_enum_.find(def.parametrization);
-    PhotoRealPhotonMapEnum::const_iterator it_photo = photo_real_map_enum_.find(def.parametrization);
-
-    if (it_q2 != photo_q2_map_enum_.end())
-    {
-        ShadowEffect* shadow = Get().CreateShadowEffect(def.shadow);
-
-        PhotoIntegral* photo =
-            new PhotoIntegral(*it_q2->second.first(particle_def, medium, cuts, def.multiplier, *shadow));
-        delete shadow;
-        return photo;
-    } else if (it_photo != photo_real_map_enum_.end())
-    {
-        return new PhotoIntegral(*it_photo->second(particle_def, medium, cuts, def.multiplier, def.hard_component));
-    } else
-    {
-        log_fatal("Photonuclear %s not registered!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
-    }
-}
-
-// ------------------------------------------------------------------------- //
-CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particle_def,
-                                                      const Medium& medium,
-                                                      const EnergyCutSettings& cuts,
+                                                      std::shared_ptr<const Medium> medium,
+                                                      std::shared_ptr<const EnergyCutSettings> cuts,
                                                       const Definition& def,
-                                                      InterpolationDef interpolation_def) const
+                                                      std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if(def.parametrization == PhotonuclearFactory::Enum::None){
         log_fatal("Can't return Photonuclear Crosssection if parametrization is None");
@@ -177,16 +145,31 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
     if (it_q2 != photo_q2_map_enum_.end())
     {
         ShadowEffect* shadow = Get().CreateShadowEffect(def.shadow);
+        if(interpolation_def == nullptr)
+        {
+            PhotoIntegral* photo =
+                    new PhotoIntegral(*it_q2->second.first(particle_def, medium, def.multiplier, *shadow), cuts);
+            delete shadow;
+            return photo;
+        }
+        else
+        {
+            PhotoInterpolant* photo = new PhotoInterpolant(
+                    *it_q2->second.second(particle_def, medium, def.multiplier, *shadow, interpolation_def), cuts,
+                    interpolation_def);
+            delete shadow;
+            return photo;
+        }
 
-        PhotoInterpolant* photo = new PhotoInterpolant(
-            *it_q2->second.second(particle_def, medium, cuts, def.multiplier, *shadow, interpolation_def),
-            interpolation_def);
-        delete shadow;
-        return photo;
     } else if (it_photo != photo_real_map_enum_.end())
     {
-        return new PhotoInterpolant(*it_photo->second(particle_def, medium, cuts, def.multiplier, def.hard_component),
-                                    interpolation_def);
+        if(interpolation_def==nullptr){
+            return new PhotoIntegral(*it_photo->second(particle_def, medium, def.multiplier, def.hard_component), cuts);
+        }
+        else{
+            return new PhotoInterpolant(*it_photo->second(particle_def, medium, def.multiplier, def.hard_component), cuts,
+                                        interpolation_def);
+        }
     } else
     {
         log_fatal("Photonuclear %s not registered!", typeid(def.parametrization).name());

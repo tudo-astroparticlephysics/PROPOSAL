@@ -40,7 +40,7 @@ class Interpolant;
 class CrossSectionInterpolant : public CrossSection
 {
 public:
-    CrossSectionInterpolant(const Parametrization&, std::shared_ptr<EnergyCutSettings>);
+    CrossSectionInterpolant(const Parametrization&, std::shared_ptr<const EnergyCutSettings>);
     CrossSectionInterpolant(const CrossSectionInterpolant&);
     virtual ~CrossSectionInterpolant();
 

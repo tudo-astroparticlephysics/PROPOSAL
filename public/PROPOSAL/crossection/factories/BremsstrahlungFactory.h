@@ -130,11 +130,11 @@ public:
                                        std::shared_ptr<const Medium>,
                                        std::shared_ptr<const EnergyCutSettings>,
                                        const Definition&,
-                                       InterpolationDef) const;
+                                       std::shared_ptr<const InterpolationDef>) const;
 
     CrossSection* CreateBremsstrahlung(const Bremsstrahlung& param,
                                        std::shared_ptr<const EnergyCutSettings>,
-                                       InterpolationDef) const;
+                                       std::shared_ptr<const InterpolationDef>) const;
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for photo parametrizations
     // ----------------------------------------------------------------------------

@@ -38,7 +38,7 @@ class Photonuclear;
 class PhotoIntegral : public CrossSectionIntegral
 {
 public:
-    PhotoIntegral(const Photonuclear&, std::shared_ptr<EnergyCutSettings>);
+    PhotoIntegral(const Photonuclear&, std::shared_ptr<const EnergyCutSettings>);
     PhotoIntegral(const PhotoIntegral&);
     virtual ~PhotoIntegral();
 

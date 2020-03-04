@@ -105,7 +105,7 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         typedef std::function<
-                Compton*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier)>
+                Compton*(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier)>
                 RegisterFunction;
 
         typedef std::map<std::string, RegisterFunction> ComptonMapString;
@@ -117,15 +117,10 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         CrossSection* CreateCompton(const ParticleDef&,
-                                           const Medium&,
-                                           const EnergyCutSettings&,
-                                           const Definition&) const;
-
-        CrossSection* CreateCompton(const ParticleDef&,
-                                           const Medium&,
-                                           const EnergyCutSettings&,
+                                           std::shared_ptr<const Medium>,
+                                           std::shared_ptr<const EnergyCutSettings>,
                                            const Definition&,
-                                           InterpolationDef) const;
+                                           std::shared_ptr<const InterpolationDef>) const;
 
         // ----------------------------------------------------------------------------
         /// @brief string to enum conversation for photo parametrizations

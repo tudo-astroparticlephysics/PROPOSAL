@@ -176,7 +176,7 @@ public:
                        std::shared_ptr<const Medium>,
                        double multiplier,
                        bool lpm,
-                       InterpolationDef def = InterpolationDef());
+                       std::shared_ptr<const InterpolationDef> def);
     EpairProductionRhoInterpolant(const EpairProductionRhoInterpolant&);
     virtual ~EpairProductionRhoInterpolant();
 
@@ -185,7 +185,7 @@ public:
                                 std::shared_ptr<const Medium> medium,
                                 double multiplier,
                                 bool lpm,
-                                InterpolationDef def = InterpolationDef())
+                                std::shared_ptr<const InterpolationDef> def)
     {
         return new EpairProductionRhoInterpolant<Param>(particle_def, medium, multiplier, lpm, def);
     }

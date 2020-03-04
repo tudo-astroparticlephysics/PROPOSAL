@@ -19,7 +19,7 @@ using namespace PROPOSAL;
 
 Ionization::Ionization(const ParticleDef& particle_def,
                        std::shared_ptr<const Medium> medium,
-                       const EnergyCutSettings& cuts,
+                       std::shared_ptr<const EnergyCutSettings> cuts,
                        double multiplier)
     : Parametrization(particle_def, medium, multiplier), cuts_(cuts)
 {
@@ -81,7 +81,7 @@ Parametrization::KinematicLimits IonizBetheBlochRossi::GetKinematicLimits(double
 
 IonizBetheBlochRossi::IonizBetheBlochRossi(const ParticleDef& particle_def,
                                            std::shared_ptr<const Medium> medium,
-                                           const EnergyCutSettings& cuts,
+                                           std::shared_ptr<const EnergyCutSettings> cuts,
                                            double multiplier)
     : Ionization(particle_def, medium, cuts, multiplier)
 {
@@ -119,7 +119,7 @@ double IonizBetheBlochRossi::DifferentialCrossSection(double energy, double v)
     double spin_1_2_contribution = v / (1 + 1 / gamma);
     spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
     result = 1 - beta * (v / GetKinematicLimits(energy).vMax) + spin_1_2_contribution;
-    result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * beta * energy * v * v);
+    result *= IONK * particle_charge_ * particle_charge_ * medium_->GetZA() / (2 * beta * energy * v * v);
 
     return medium_->GetMassDensity() * result * (1 + InelCorrection(energy, v));
     ;
@@ -131,17 +131,16 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
     double result, aux;
 
     Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
-    ParticleDef particle_def = this->GetParticleDef();
 
     // TODO(mario): Better way? Sat 2017/09/02
 
     // PDG eq. 33.10
     // with Spin 1/2 correction by Rossi
-    double square_momentum   = (energy - particle_def.mass) * (energy + particle_def.mass);
+    double square_momentum   = (energy - particle_mass_) * (energy + particle_mass_);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double beta              = particle_momentum / energy;
-    double gamma             = energy / particle_def.mass;
-    double v_up              = cuts_.GetCut(energy);
+    double gamma             = energy / particle_mass_;
+    double v_up              = cuts_->GetCut(energy);
 
 
     aux    = beta * gamma / (1.e-6 * medium_->GetI());
@@ -153,7 +152,7 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
 
     if (result > 0)
     {
-        result *= IONK * particle_def.charge * particle_def.charge * medium_->GetZA() / (2 * aux);
+        result *= IONK * particle_charge_ * particle_charge_ * medium_->GetZA() / (2 * aux);
     } else
     {
         result = 0;
@@ -237,7 +236,7 @@ const std::string IonizBetheBlochRossi::name_ = "IonizBetheBlochRossi";
 
 IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(const ParticleDef& particle_def,
                                            std::shared_ptr<const Medium> medium,
-                                           const EnergyCutSettings& cuts,
+                                           std::shared_ptr<const EnergyCutSettings> cuts,
                                            double multiplier)
         : Ionization(particle_def, medium, cuts, multiplier)
 {
@@ -317,11 +316,10 @@ double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(double energy, double va
     double result, aux;
 
     Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
-    ParticleDef particle_def = this->GetParticleDef();
 
     double fplus; // (2.269)
 
-    double v_up         = cuts_.GetCut(energy);
+    double v_up         = cuts_->GetCut(energy);
     double bigDelta     = std::min(limits.vMax * energy / ME, v_up * energy / ME); // (2.265)
     double gamma        = energy / ME; // (2.258)
     double betasquared  = 1. - 1. / (gamma * gamma); // (2.260)
@@ -356,7 +354,7 @@ const std::string IonizBergerSeltzerBhabha::name_ = "IonizBergerSeltzerBhabha";
 
 IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(const ParticleDef& particle_def,
                                                    std::shared_ptr<const Medium> medium,
-                                                   const EnergyCutSettings& cuts,
+                                                   std::shared_ptr<EnergyCutSettings> cuts,
                                                    double multiplier)
         : Ionization(particle_def, medium, cuts, multiplier)
 {
@@ -433,10 +431,9 @@ double IonizBergerSeltzerMoller::FunctionToDEdxIntegral(double energy, double va
     double result, aux;
 
     Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
-    ParticleDef particle_def = this->GetParticleDef();
 
     double fminus; // (2.268)
-    double v_up         = cuts_.GetCut(energy);
+    double v_up         = cuts_->GetCut(energy);
     double bigDelta     = std::min(limits.vMax * energy / ME, v_up * energy / ME); // (2.265)
     double gamma        = energy / ME; // (2.258)
     double betasquared  = 1. - 1. / (gamma * gamma); // (2.260)

@@ -149,7 +149,7 @@ public:
     MupairProductionRhoInterpolant(const ParticleDef&,
                        std::shared_ptr<const Medium>,
                        double multiplier,
-                       InterpolationDef def = InterpolationDef());
+                       std::shared_ptr<const InterpolationDef>);
     MupairProductionRhoInterpolant(const MupairProductionRhoInterpolant&);
     virtual ~MupairProductionRhoInterpolant();
 
@@ -157,7 +157,7 @@ public:
     static MupairProduction* create(const ParticleDef& particle_def,
                                 std::shared_ptr<const Medium> medium,
                                 double multiplier,
-                                InterpolationDef def = InterpolationDef())
+                                std::shared_ptr<const InterpolationDef> def)
     {
         return new MupairProductionRhoInterpolant<Param>(particle_def, medium, multiplier, def);
     }
@@ -175,7 +175,7 @@ template<class Param>
 MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const ParticleDef& particle_def,
                                               std::shared_ptr<const Medium> medium,
                                               double multiplier,
-                                              InterpolationDef def)
+                                              std::shared_ptr<const InterpolationDef> def)
     : Param(particle_def, medium, multiplier)
     , interpolant_(this->medium_->GetNumComponents(), NULL)
 {
@@ -185,21 +185,21 @@ MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const Part
     for (unsigned int i = 0; i < this->components_.size(); ++i)
     {
         builder2d[i]
-            .SetMax1(def.nodes_cross_section)
+            .SetMax1(def->nodes_cross_section)
             .SetX1Min(this->particle_def_.mass)
-            .SetX1Max(def.max_node_energy)
-            .SetMax2(def.nodes_cross_section)
+            .SetX1Max(def->max_node_energy)
+            .SetMax2(def->nodes_cross_section)
             .SetX2Min(0.0)
             .SetX2Max(1.0)
-            .SetRomberg1(def.order_of_interpolation)
+            .SetRomberg1(def->order_of_interpolation)
             .SetRational1(false)
             .SetRelative1(false)
             .SetIsLog1(true)
-            .SetRomberg2(def.order_of_interpolation)
+            .SetRomberg2(def->order_of_interpolation)
             .SetRational2(false)
             .SetRelative2(false)
             .SetIsLog2(false)
-            .SetRombergY(def.order_of_interpolation)
+            .SetRombergY(def->order_of_interpolation)
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)
@@ -209,7 +209,7 @@ MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const Part
         builder_container2d[i].second = &interpolant_[i];
     }
 
-    Helper::InitializeInterpolation("Mupair", builder_container2d, std::vector<Parametrization*>(1, this), def);
+    Helper::InitializeInterpolation("Mupair", builder_container2d, std::vector<Parametrization*>(1, this), *def);
 }
 
 template<class Param>

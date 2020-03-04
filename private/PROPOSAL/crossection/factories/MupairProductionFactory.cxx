@@ -32,9 +32,10 @@ MupairProductionFactory::~MupairProductionFactory()
 
 // ------------------------------------------------------------------------- //
 CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
-                                                            const EnergyCutSettings& cuts,
-                                                            const Definition& def) const
+                                                            std::shared_ptr<const Medium> medium,
+                                                            std::shared_ptr<const EnergyCutSettings> cuts,
+                                                            const Definition& def,
+                                                            std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if(def.parametrization == MupairProductionFactory::Enum::None){
         log_fatal("Can't return MuPairproduction Crosssection if parametrization is None");
@@ -45,34 +46,15 @@ CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef&
 
     if (it != mupair_map_enum_.end())
     {
-        return new MupairIntegral(*it->second.first(particle_def, medium, cuts, def.multiplier, def.particle_output));
+        if(interpolation_def==nullptr){
+            return new MupairIntegral(*it->second.first(particle_def, medium, def.multiplier), cuts);
+        }
+        else{
+            return new MupairInterpolant(*it->second.second(particle_def, medium, def.multiplier, interpolation_def), cuts, interpolation_def);
+        }
     } else
     {
         log_fatal("MupairProduction %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
-    }
-}
-
-// ------------------------------------------------------------------------- //
-CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
-                                                            const EnergyCutSettings& cuts,
-                                                            const Definition& def,
-                                                            InterpolationDef interpolation_def) const
-{
-    if(def.parametrization == MupairProductionFactory::Enum::None){
-        log_fatal("Can't return MuPairproduction Crosssection if parametrization is None");
-        return NULL;
-    }
-
-    MupairMapEnum::const_iterator it = mupair_map_enum_.find(def.parametrization);
-
-    if (it != mupair_map_enum_.end())
-    {
-        return new MupairInterpolant(*it->second.second(particle_def, medium, cuts, def.multiplier, def.particle_output, interpolation_def), interpolation_def);
-    } else
-    {
-        log_fatal("MupairProduction %s not registered!", typeid(def.parametrization).name());
         return NULL; // Just to prevent warnings
     }
 }

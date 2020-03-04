@@ -38,7 +38,7 @@ class MupairProduction;
 class MupairIntegral : public CrossSectionIntegral
 {
 public:
-    MupairIntegral(const MupairProduction&, std::shared_ptr<EnergyCutSettings>);
+    MupairIntegral(const MupairProduction&, std::shared_ptr<const EnergyCutSettings>);
     MupairIntegral(const MupairIntegral&);
     virtual ~MupairIntegral();
 

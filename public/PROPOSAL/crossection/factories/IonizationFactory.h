@@ -102,7 +102,7 @@ public:
     // --------------------------------------------------------------------- //
 
     typedef std::function<
-            Ionization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier)>
+            Ionization*(const ParticleDef&, std::shared_ptr<const Medium>, std::shared_ptr<const EnergyCutSettings>, double multiplier)>
             RegisterFunction;
 
     typedef std::map<std::string, RegisterFunction> IonizMapString;
@@ -114,15 +114,10 @@ public:
     // --------------------------------------------------------------------- //
 
     CrossSection* CreateIonization(const ParticleDef&,
-                                   const Medium&,
-                                   const EnergyCutSettings&,
-                                   const Definition&) const;
-
-    CrossSection* CreateIonization(const ParticleDef&,
-                                   const Medium&,
-                                   const EnergyCutSettings&,
+                                   std::shared_ptr<const Medium>,
+                                   std::shared_ptr<const EnergyCutSettings>,
                                    const Definition&,
-                                   InterpolationDef) const;
+                                   std::shared_ptr<const InterpolationDef>) const;
 
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for ioniz parametrizations

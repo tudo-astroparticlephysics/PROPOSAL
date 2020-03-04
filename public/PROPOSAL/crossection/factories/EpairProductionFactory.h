@@ -105,18 +105,16 @@ public:
     // --------------------------------------------------------------------- //
 
     typedef std::function<EpairProduction*(const ParticleDef&,
-                                          const Medium&,
-                                          const EnergyCutSettings&,
+                                          std::shared_ptr<const Medium>,
                                           double multiplier,
                                           bool lpm)>
         RegisterFunction;
 
     typedef std::function<EpairProduction*(const ParticleDef&,
-                                          const Medium&,
-                                          const EnergyCutSettings&,
+                                          std::shared_ptr<const Medium>,
                                           double multiplier,
                                           bool lpm,
-                                          InterpolationDef)>
+                                          std::shared_ptr<const InterpolationDef>)>
         RegisterFunctionInterpolant;
 
     typedef std::map<std::string, std::pair<RegisterFunction, RegisterFunctionInterpolant> > EpairMapString;
@@ -129,19 +127,11 @@ public:
     // --------------------------------------------------------------------- //
 
     CrossSection* CreateEpairProduction(const ParticleDef&,
-                                        const Medium&,
-                                        const EnergyCutSettings&,
-                                        const Definition&) const;
-
-    CrossSection* CreateEpairProduction(const ParticleDef&,
-                                        const Medium&,
-                                        const EnergyCutSettings&,
+                                        std::shared_ptr<const Medium>,
+                                        std::shared_ptr<const EnergyCutSettings>,
                                         const Definition&,
-                                        InterpolationDef) const;
+                                        std::shared_ptr<const InterpolationDef>) const;
 
-    CrossSection* CreateEpairProduction(const EnergyCutSettings&,
-                                        const EpairProduction&,
-                                        InterpolationDef) const;
 
 
     // ----------------------------------------------------------------------------

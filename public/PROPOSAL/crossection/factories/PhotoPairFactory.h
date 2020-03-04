@@ -118,14 +118,14 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         typedef std::function<
-                PhotoPairProduction*(const ParticleDef&, const Medium&, double multiplier)>
+                PhotoPairProduction*(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier)>
                 RegisterFunction;
 
         typedef std::map<std::string, RegisterFunction> PhotoPairMapString;
         typedef std::map<Enum, RegisterFunction> PhotoPairMapEnum;
         typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
-        typedef std::function<PhotoAngleDistribution*(const ParticleDef&, const Medium&)> RegisterPhotoAngleFunction;
+        typedef std::function<PhotoAngleDistribution*(const ParticleDef&, std::shared_ptr<const Medium>)> RegisterPhotoAngleFunction;
 
         typedef std::map<std::string, RegisterPhotoAngleFunction> PhotoAngleMapString;
         typedef std::map<PhotoAngle, RegisterPhotoAngleFunction> PhotoAngleMapEnum;
@@ -136,13 +136,9 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         CrossSection* CreatePhotoPair(const ParticleDef&,
-                                    const Medium&,
-                                    const Definition&) const;
-
-        CrossSection* CreatePhotoPair(const ParticleDef&,
-                                    const Medium&,
+                                    std::shared_ptr<const Medium>,
                                     const Definition&,
-                                    InterpolationDef) const;
+                                    std::shared_ptr<const InterpolationDef>) const;
 
         // ----------------------------------------------------------------------------
         /// @brief string to enum conversation for photopair parametrizations
@@ -168,8 +164,8 @@ namespace PROPOSAL {
         // PhotoAngle
         // --------------------------------------------------------------------- //
 
-        PhotoAngleDistribution* CreatePhotoAngleDistribution(const std::string&, const ParticleDef&, const Medium& medium);
-        PhotoAngleDistribution* CreatePhotoAngleDistribution(const PhotoAngle&, const ParticleDef&, const Medium& medium);
+        PhotoAngleDistribution* CreatePhotoAngleDistribution(const std::string&, const ParticleDef&, std::shared_ptr<const Medium>);
+        PhotoAngleDistribution* CreatePhotoAngleDistribution(const PhotoAngle&, const ParticleDef&, std::shared_ptr<const Medium>);
 
         PhotoAngle GetPhotoAngleEnumFromString(const std::string&);
         std::string GetStringFromPhotoAngleEnum(const PhotoAngle&);

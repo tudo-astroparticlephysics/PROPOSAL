@@ -32,31 +32,9 @@ WeakInteractionFactory::~WeakInteractionFactory()
 
 // ------------------------------------------------------------------------- //
 CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
-                                                            const Definition& def) const
-{
-    if(def.parametrization == WeakInteractionFactory::Enum::None){
-        log_fatal("Can't return Weakinteraction Crosssection if parametrization is None");
-        return NULL;
-    }
-
-    WeakMapEnum::const_iterator it = weak_map_enum_.find(def.parametrization);
-
-    if (it != weak_map_enum_.end())
-    {
-        return new WeakIntegral(*it->second(particle_def, medium, def.multiplier));
-    } else
-    {
-        log_fatal("WeakInteraction %s not registered!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
-    }
-}
-
-// ------------------------------------------------------------------------- //
-CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
+                                                            std::shared_ptr<const Medium> medium,
                                                             const Definition& def,
-                                                            InterpolationDef interpolation_def) const
+                                                            std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if(def.parametrization == WeakInteractionFactory::Enum::None){
         log_fatal("Can't return Weakinteraction Crosssection if parametrization is None");
@@ -67,7 +45,12 @@ CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& p
 
     if (it != weak_map_enum_.end())
     {
-        return new WeakInterpolant(*it->second(particle_def, medium, def.multiplier), interpolation_def);
+        if(interpolation_def == nullptr){
+            return new WeakIntegral(*it->second(particle_def, medium, def.multiplier));
+        }
+        else{
+            return new WeakInterpolant(*it->second(particle_def, medium, def.multiplier), interpolation_def);
+        }
     } else
     {
         log_fatal("WeakInteraction %s not registered!", typeid(def.parametrization).name());

@@ -40,7 +40,7 @@ public:
     typedef std::vector<Integral> IntegralVec;
 
 public:
-    CrossSectionIntegral(const Parametrization&, std::shared_ptr<EnergyCutSettings>);
+    CrossSectionIntegral(const Parametrization&, std::shared_ptr<const EnergyCutSettings>);
     CrossSectionIntegral(const CrossSectionIntegral&);
     virtual ~CrossSectionIntegral();
 

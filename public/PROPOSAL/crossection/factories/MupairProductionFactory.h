@@ -69,8 +69,6 @@ public:
                 return false;
             else if (multiplier != def.multiplier)
                 return false;
-            else if (particle_output != def.particle_output)
-                return false;
 
             return true;
         }
@@ -104,18 +102,14 @@ public:
     // --------------------------------------------------------------------- //
 
     typedef std::function<MupairProduction*(const ParticleDef&,
-                                          const Medium&,
-                                          const EnergyCutSettings&,
-                                          double multiplier,
-                                          bool particle_output)>
+                                          std::shared_ptr<const Medium>,
+                                          double multiplier)>
         RegisterFunction;
 
     typedef std::function<MupairProduction*(const ParticleDef&,
-                                          const Medium&,
-                                          const EnergyCutSettings&,
+                                          std::shared_ptr<const Medium>,
                                           double multiplier,
-                                          bool particle_output,
-                                          InterpolationDef)>
+                                          std::shared_ptr<const InterpolationDef>)>
         RegisterFunctionInterpolant;
 
     typedef std::map<std::string, std::pair<RegisterFunction, RegisterFunctionInterpolant> > MupairMapString;
@@ -128,15 +122,10 @@ public:
     // --------------------------------------------------------------------- //
 
     CrossSection* CreateMupairProduction(const ParticleDef&,
-                                        const Medium&,
-                                        const EnergyCutSettings&,
-                                        const Definition&) const;
-
-    CrossSection* CreateMupairProduction(const ParticleDef&,
-                                        const Medium&,
-                                        const EnergyCutSettings&,
+                                        std::shared_ptr<const Medium>,
+                                        std::shared_ptr<const EnergyCutSettings>,
                                         const Definition&,
-                                        InterpolationDef) const;
+                                        std::shared_ptr<const InterpolationDef>) const;
 
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for photo parametrizations

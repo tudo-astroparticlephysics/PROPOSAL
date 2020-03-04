@@ -133,25 +133,22 @@ public:
     typedef std::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
 
     typedef std::function<Photonuclear*(const ParticleDef&,
-                                          const Medium&,
-                                          const EnergyCutSettings&,
+                                          std::shared_ptr<const Medium>,
                                           double multiplier,
                                           bool hard_component)>
         RegisterRealPhotonFunction;
 
     typedef std::function<Photonuclear*(const ParticleDef&,
-                                          const Medium&,
-                                          const EnergyCutSettings&,
+                                          std::shared_ptr<const Medium>,
                                           double multiplier,
                                           const ShadowEffect&)>
         RegisterQ2Function;
 
     typedef std::function<Photonuclear*(const ParticleDef&,
-                                          const Medium&,
-                                          const EnergyCutSettings&,
+                                          std::shared_ptr<const Medium>,
                                           double multiplier,
                                           const ShadowEffect&,
-                                          InterpolationDef)>
+                                          std::shared_ptr<const InterpolationDef>)>
         RegisterQ2FunctionInterpolant;
 
     typedef std::map<std::string, RegisterShadowEffectFunction> PhotoShadowEffectMapString;
@@ -178,15 +175,10 @@ public:
     // --------------------------------------------------------------------- //
 
     CrossSection* CreatePhotonuclear(const ParticleDef&,
-                                     const Medium&,
-                                     const EnergyCutSettings&,
-                                     const Definition&) const;
-
-    CrossSection* CreatePhotonuclear(const ParticleDef&,
-                                     const Medium&,
-                                     const EnergyCutSettings&,
+                                     std::shared_ptr<const Medium>,
+                                     std::shared_ptr<const EnergyCutSettings>,
                                      const Definition&,
-                                     InterpolationDef) const;
+                                     std::shared_ptr<const InterpolationDef>) const;
 
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for photo parametrizations

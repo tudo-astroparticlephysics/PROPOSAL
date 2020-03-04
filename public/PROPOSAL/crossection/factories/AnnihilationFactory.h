@@ -100,7 +100,7 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         typedef std::function<Annihilation*(const ParticleDef&,
-                                            const Medium&,
+                                            std::shared_ptr<const Medium>,
                                             double multiplier)>
                 RegisterFunction;
 
@@ -115,14 +115,9 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         CrossSection* CreateAnnihilation(const ParticleDef&,
-                                            const Medium&,
-                                            const Definition&) const;
-
-        CrossSection* CreateAnnihilation(const ParticleDef&,
-                                            const Medium&,
+                                            std::shared_ptr<const Medium>,
                                             const Definition&,
-                                            InterpolationDef) const;
-
+                                            std::shared_ptr<const InterpolationDef>) const;
 
         // ----------------------------------------------------------------------------
         /// @brief string to enum conversation for photo parametrizations

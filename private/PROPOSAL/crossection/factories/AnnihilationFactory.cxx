@@ -32,31 +32,9 @@ AnnihilationFactory::~AnnihilationFactory()
 
 // ------------------------------------------------------------------------- //
 CrossSection* AnnihilationFactory::CreateAnnihilation(const ParticleDef& particle_def,
-                                                            const Medium& medium,
-                                                            const Definition& def) const
-{
-    if(def.parametrization == AnnihilationFactory::Enum::None){
-        log_fatal("Can't return Annihilation Crosssection if parametrization is None");
-        return NULL;
-    }
-
-    AnnihilationMapEnum::const_iterator it = annihilation_map_enum_.find(def.parametrization);
-
-    if (it != annihilation_map_enum_.end())
-    {
-        return new AnnihilationIntegral(*it->second(particle_def, medium, def.multiplier));
-    } else
-    {
-        log_fatal("Annihilation %s not registered!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
-    }
-}
-
-// ------------------------------------------------------------------------- //
-CrossSection* AnnihilationFactory::CreateAnnihilation(const ParticleDef& particle_def,
-                                                            const Medium& medium,
+                                                            std::shared_ptr<const Medium> medium,
                                                             const Definition& def,
-                                                            InterpolationDef interpolation_def) const
+                                                            std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if(def.parametrization == AnnihilationFactory::Enum::None){
         log_fatal("Can't return Annihilation Crosssection if parametrization is None");
@@ -67,7 +45,12 @@ CrossSection* AnnihilationFactory::CreateAnnihilation(const ParticleDef& particl
 
     if (it != annihilation_map_enum_.end())
     {
-        return new AnnihilationInterpolant(*it->second(particle_def, medium, def.multiplier), interpolation_def);
+        if(interpolation_def = nullptr){
+            return new AnnihilationIntegral(*it->second(particle_def, medium, def.multiplier));
+        }
+        else{
+            return new AnnihilationInterpolant(*it->second(particle_def, medium, def.multiplier), interpolation_def);
+        }
     } else
     {
         log_fatal("Annihilation %s not registered!", typeid(def.parametrization).name());

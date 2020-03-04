@@ -133,7 +133,7 @@ public:
                        std::shared_ptr<const Medium>,
                        double multiplier,
                        const ShadowEffect&,
-                       InterpolationDef def = InterpolationDef());
+                       std::shared_ptr<const InterpolationDef>);
     PhotoQ2Interpolant(const PhotoQ2Interpolant&);
     virtual ~PhotoQ2Interpolant();
 
@@ -142,7 +142,7 @@ public:
                                 std::shared_ptr<const Medium> medium,
                                 double multiplier,
                                 const ShadowEffect& shadow_effect,
-                                InterpolationDef def = InterpolationDef())
+                                std::shared_ptr<const InterpolationDef> def)
     {
         return new PhotoQ2Interpolant<Param>(particle_def, medium, multiplier, shadow_effect, def);
     }
@@ -161,7 +161,7 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
                                               std::shared_ptr<const Medium> medium,
                                               double multiplier,
                                               const ShadowEffect& shadow_effect,
-                                              InterpolationDef def)
+                                              std::shared_ptr<const InterpolationDef> def)
     : Param(particle_def, medium, multiplier, shadow_effect)
     , interpolant_(this->medium_->GetNumComponents(), NULL)
 {
@@ -171,21 +171,21 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
     for (unsigned int i = 0; i < this->components_.size(); ++i)
     {
         builder2d[i]
-            .SetMax1(def.nodes_cross_section)
+            .SetMax1(def->nodes_cross_section)
             .SetX1Min(this->particle_def_.mass)
-            .SetX1Max(def.max_node_energy)
-            .SetMax2(def.nodes_cross_section)
+            .SetX1Max(def->max_node_energy)
+            .SetMax2(def->nodes_cross_section)
             .SetX2Min(0.0)
             .SetX2Max(1.0)
-            .SetRomberg1(def.order_of_interpolation)
+            .SetRomberg1(def->order_of_interpolation)
             .SetRational1(false)
             .SetRelative1(false)
             .SetIsLog1(true)
-            .SetRomberg2(def.order_of_interpolation)
+            .SetRomberg2(def->order_of_interpolation)
             .SetRational2(false)
             .SetRelative2(false)
             .SetIsLog2(false)
-            .SetRombergY(def.order_of_interpolation)
+            .SetRombergY(def->order_of_interpolation)
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)
@@ -195,7 +195,7 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
         builder_container2d[i].second = &interpolant_[i];
     }
 
-    Helper::InitializeInterpolation("Photo", builder_container2d, std::vector<Parametrization*>(1, this), def);
+    Helper::InitializeInterpolation("Photo", builder_container2d, std::vector<Parametrization*>(1, this), *def);
 }
 
 template<class Param>
@@ -242,7 +242,7 @@ bool PhotoQ2Interpolant<Param>::compare(const Parametrization& parametrization) 
 template<class Param>
 double PhotoQ2Interpolant<Param>::DifferentialCrossSection(double energy, double v)
 {
-    Parametrization::KinematicLimits limits = this->GetIntegralLimits(energy);
+    Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
 
     if (v >= limits.vMin)
     {

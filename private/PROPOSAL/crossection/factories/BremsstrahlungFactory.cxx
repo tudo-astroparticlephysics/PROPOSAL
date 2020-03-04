@@ -51,7 +51,7 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
                                                           std::shared_ptr<const Medium> medium,
                                                           std::shared_ptr<const EnergyCutSettings> cuts,
                                                           const Definition& def,
-                                                          InterpolationDef interpolation_def = nullptr) const
+                                                          std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if(def.parametrization == BremsstrahlungFactory::Enum::None){
         log_fatal("Can't return Bremsstrahlung Crosssection if parametrization is None");
@@ -69,31 +69,6 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
             return new BremsInterpolant(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts,
                                         interpolation_def);
         }
-    } else
-    {
-        log_fatal("Bremsstrahlung %s not registered!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
-    }
-}
-
-// ------------------------------------------------------------------------- //
-CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& particle_def,
-                                                          const Medium& medium,
-                                                          const EnergyCutSettings& cuts,
-                                                          const Definition& def,
-                                                          InterpolationDef interpolation_def) const
-{
-    if(def.parametrization == BremsstrahlungFactory::Enum::None){
-        log_fatal("Can't return Bremsstrahlung Crosssection if parametrization is None");
-        return NULL;
-    }
-
-    BremsstrahlungMapEnum::const_iterator it = bremsstrahlung_map_enum_.find(def.parametrization);
-
-    if (it != bremsstrahlung_map_enum_.end())
-    {
-        return new BremsInterpolant(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts,
-                                    interpolation_def);
     } else
     {
         log_fatal("Bremsstrahlung %s not registered!", typeid(def.parametrization).name());

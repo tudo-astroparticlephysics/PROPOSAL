@@ -43,33 +43,10 @@ void ComptonFactory::Register(const std::string& name, Enum enum_t, RegisterFunc
 
 // ------------------------------------------------------------------------- //
 CrossSection* ComptonFactory::CreateCompton(const ParticleDef& particle_def,
-                                                          const Medium& medium,
-                                                          const EnergyCutSettings& cuts,
-                                                          const Definition& def) const
-{
-    if(def.parametrization == ComptonFactory::Enum::None){
-        log_fatal("Can't return Compton Crosssection if parametrization is None");
-        return NULL;
-    }
-
-    ComptonMapEnum::const_iterator it = compton_map_enum_.find(def.parametrization);
-
-    if (it != compton_map_enum_.end())
-    {
-        return new ComptonIntegral(*it->second(particle_def, medium, cuts, def.multiplier));
-    } else
-    {
-        log_fatal("Compton %s not registered!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
-    }
-}
-
-// ------------------------------------------------------------------------- //
-CrossSection* ComptonFactory::CreateCompton(const ParticleDef& particle_def,
-                                                          const Medium& medium,
-                                                          const EnergyCutSettings& cuts,
+                                                          std::shared_ptr<const Medium> medium,
+                                                          std::shared_ptr<const EnergyCutSettings> cuts,
                                                           const Definition& def,
-                                                          InterpolationDef interpolation_def) const
+                                                          std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if(def.parametrization == ComptonFactory::Enum::None){
         log_fatal("Can't return Compton Crosssection if parametrization is None");
@@ -80,7 +57,13 @@ CrossSection* ComptonFactory::CreateCompton(const ParticleDef& particle_def,
 
     if (it != compton_map_enum_.end())
     {
-        return new ComptonInterpolant(*it->second(particle_def, medium, cuts, def.multiplier), interpolation_def);
+        if(interpolation_def == nullptr){
+            return new ComptonIntegral(*it->second(particle_def, medium, def.multiplier), cuts);
+        }
+        else
+        {
+            return new ComptonInterpolant(*it->second(particle_def, medium, def.multiplier), cuts, interpolation_def);
+        }
     } else
     {
         log_fatal("Compton %s not registered!", typeid(def.parametrization).name());

@@ -33,33 +33,10 @@ EpairProductionFactory::~EpairProductionFactory()
 
 // ------------------------------------------------------------------------- //
 CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
-                                                            const EnergyCutSettings& cuts,
-                                                            const Definition& def) const
-{
-    if(def.parametrization == EpairProductionFactory::Enum::None){
-        log_fatal("Can't return Epairproduction Crosssection if parametrization is None");
-        return NULL;
-    }
-
-    EpairMapEnum::const_iterator it = epair_map_enum_.find(def.parametrization);
-
-    if (it != epair_map_enum_.end())
-    {
-        return new EpairIntegral(*it->second.first(particle_def, medium, cuts, def.multiplier, def.lpm_effect));
-    } else
-    {
-        log_fatal("EpairProduction %s not registered!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
-    }
-}
-
-// ------------------------------------------------------------------------- //
-CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
-                                                            const EnergyCutSettings& cuts,
+                                                            std::shared_ptr<const Medium> medium,
+                                                            std::shared_ptr<const EnergyCutSettings> cuts,
                                                             const Definition& def,
-                                                            InterpolationDef interpolation_def) const
+                                                            std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if(def.parametrization == EpairProductionFactory::Enum::None){
         log_fatal("Can't return Epairproduction Crosssection if parametrization is None");
@@ -70,7 +47,12 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
 
     if (it != epair_map_enum_.end())
     {
-        return new EpairInterpolant(*it->second.second(particle_def, medium, cuts, def.multiplier, def.lpm_effect, interpolation_def), interpolation_def);
+        if(interpolation_def == nullptr){
+            return new EpairIntegral(*it->second.first(particle_def, medium, def.multiplier, def.lpm_effect), cuts);
+        }
+        else{
+            return new EpairInterpolant(*it->second.second(particle_def, medium, def.multiplier, def.lpm_effect, interpolation_def), cuts, interpolation_def);
+        }
     } else
     {
         log_fatal("EpairProduction %s not registered!", typeid(def.parametrization).name());
