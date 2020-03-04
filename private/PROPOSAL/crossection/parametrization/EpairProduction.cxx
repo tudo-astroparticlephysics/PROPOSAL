@@ -11,7 +11,7 @@
 
 #define EPAIR_PARAM_INTEGRAL_IMPL(param)                                                                               \
     Epair##param::Epair##param(const ParticleDef& particle_def,                                                        \
-                               const Medium& medium,                                                                   \
+                               std::shared_ptr<const Medium> medium,                                                                   \
                                double multiplier,                                                                      \
                                bool lpm)                                                                               \
         : EpairProductionRhoIntegral(particle_def, medium, multiplier, lpm)                                            \
@@ -38,7 +38,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 EpairProduction::EpairProduction(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  double multiplier,
                                  bool lpm)
     : Parametrization(particle_def, medium, multiplier)
@@ -81,7 +81,7 @@ Parametrization::KinematicLimits EpairProduction::GetKinematicLimits(double ener
 {
     KinematicLimits limits;
 
-    double aux = particle_def_.mass / energy;
+    double aux = particle_mass_ / energy;
 
     limits.vMin = 4 * ME / energy;
     limits.vMax = 1 - 0.75 * SQRTE * aux * std::pow(components_[component_index_]->GetNucCharge(), 1. / 3);
@@ -117,9 +117,9 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
         }
 
         // eq. 29
-        eLpm_ = particle_def_.mass / (ME * RE);
-        eLpm_ *= (eLpm_ * eLpm_) * ALPHA * particle_def_.mass /
-                 (2 * PI * medium_->GetMolDensity() * particle_def_.charge * particle_def_.charge * sum);
+        eLpm_ = particle_mass_ / (ME * RE);
+        eLpm_ *= (eLpm_ * eLpm_) * ALPHA * particle_mass_ /
+                 (2 * PI * medium_->GetMolDensity() * particle_charge_ * particle_charge_ * sum);
     }
 
     // Ternovskii functions calculated in appendix (eq. A.2)
@@ -162,7 +162,7 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
 
 // ------------------------------------------------------------------------- //
 EpairProductionRhoIntegral::EpairProductionRhoIntegral(const ParticleDef& particle_def,
-                                                       const Medium& medium,
+                                                       std::shared_ptr<const Medium> medium,
                                                        double multiplier,
                                                        bool lpm)
     : EpairProduction(particle_def, medium, multiplier, lpm)
@@ -197,7 +197,7 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
     double rMax, aux, aux2;
 
     aux  = 1 - (4 * ME) / (energy * v);
-    aux2 = 1 - (6 * particle_def_.mass * particle_def_.mass) / (energy * energy * (1 - v));
+    aux2 = 1 - (6 * particle_mass_ * particle_mass_) / (energy * energy * (1 - v));
 
     if (aux > 0 && aux2 > 0)
     {
@@ -210,7 +210,7 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
     aux = std::max(1 - rMax, COMPUTER_PRECISION);
 
     return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
-           particle_def_.charge * particle_def_.charge *
+           particle_charge_ * particle_charge_ *
            (integral_.Integrate(
                 1 - rMax, aux, std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, std::placeholders::_1), 2) +
             integral_.Integrate(
@@ -265,7 +265,7 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v,
     r           = 1 - r; // only for integral optimization - do not forget to swap integration limits!
     r2          = r * r;
     double Z3   = std::pow(medium_charge, -1. / 3);
-    aux         = (particle_def_.mass * v) / (2 * ME);
+    aux         = (particle_mass_ * v) / (2 * ME);
     double xi   = aux * aux * (1 - r2) / (1 - v);
     double beta = (v * v) / (2 * (1 - v));
 
@@ -274,7 +274,7 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v,
     diagram_mu = (4 + r2 + 3 * beta * (1 + r2)) / ((1 + r2) * (1.5 + 2 * beta) * std::log(3 + xi) + 1 - 1.5 * r2);
 
     // these arae the L_e and L_mu expressions
-    aux        = (1.5 * ME) / (particle_def_.mass * Z3);
+    aux        = (1.5 * ME) / (particle_mass_ * Z3);
     aux1       = (1 + xi) * (1 + diagram_e);
     aux2       = (2 * ME * SQRTE * medium_log_constant * Z3) / (energy * v * (1 - r2));
     diagram_e  = std::log((medium_log_constant * Z3 * std::sqrt(aux1)) / (1 + aux2 * aux1)) - 0.5 * std::log(1 + aux * aux * aux1);
@@ -322,7 +322,7 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v,
         g2 = 5.3e-5;
     }
 
-    aux  = energy / particle_def_.mass;
+    aux  = energy / particle_mass_;
     aux1 = 0.073 * std::log(aux / (1 + g1 * aux / (Z3 * Z3))) - 0.26;
     aux2 = 0.058 * std::log(aux / (1 + g2 * aux / Z3)) - 0.14;
 
@@ -335,10 +335,10 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v,
     }
 
     // combining the results
-    aux = ALPHA * RE * particle_def_.charge;
+    aux = ALPHA * RE * particle_charge_;
     ;
     aux *= aux / (1.5 * PI) * 2 * medium_charge * (medium_charge + atomic_electron_contribution);
-    aux1 = ME / particle_def_.mass * particle_def_.charge;
+    aux1 = ME / particle_mass_ * particle_charge_;
     ;
     aux *= (1 - v) / v * (diagram_e + aux1 * aux1 * diagram_mu);
 
@@ -358,7 +358,7 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v,
 // ------------------------------------------------------------------------- //
 double EpairSandrockSoedingreksoRhode::FunctionToIntegral(double energy, double v, double rho)
 {
-    double m_in = particle_def_.mass;
+    double m_in = particle_mass_;
 
     double nucl_Z = components_[component_index_]->GetNucCharge();
     double nucl_A = components_[component_index_]->GetAtomicNum();

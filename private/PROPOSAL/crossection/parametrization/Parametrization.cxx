@@ -12,17 +12,19 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 Parametrization::Parametrization(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  double multiplier)
-    : particle_def_(particle_def),
-      medium_(medium.clone()),
+    : particle_mass_(particle_def.mass),
+      particle_charge_(particle_def.mass),
+      medium_(medium),
       components_(medium_->GetComponents()),
       component_index_(0),
       multiplier_(multiplier) {}
 
 Parametrization::Parametrization(const Parametrization& param)
-    : particle_def_(param.particle_def_),
-      medium_(param.medium_->clone()),
+    : particle_mass_(param.particle_mass_),
+      particle_charge_(param.particle_charge_),
+      medium_(param.medium_),
       components_(medium_->GetComponents()),
       component_index_(param.component_index_)  // //TODO(mario): Check better
                                                 // way Mon 2017/09/04
@@ -30,7 +32,6 @@ Parametrization::Parametrization(const Parametrization& param)
       multiplier_(param.multiplier_) {}
 
 Parametrization::~Parametrization() {
-    delete medium_;
 }
 
 bool Parametrization::operator==(const Parametrization& parametrization) const {
@@ -45,7 +46,7 @@ bool Parametrization::operator!=(const Parametrization& parametrization) const {
 }
 
 bool Parametrization::compare(const Parametrization& parametrization) const {
-    if (particle_def_ != parametrization.particle_def_)
+    if (particle_charge_ != parametrization.particle_charge_ or particle_mass_ != parametrization.particle_mass_)
         return false;
     if (*medium_ != *parametrization.medium_)
         return false;
@@ -69,7 +70,8 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os,
 
     os << "multiplier: " << param.multiplier_ << '\n';
     os << "current component index: " << param.component_index_ << '\n';
-    os << param.particle_def_ << '\n';
+    os << "particle_mass: "<< param.particle_mass_ << '\n';
+    os << "particle_charge: "<< param.particle_charge_ << '\n';
     os << *param.medium_ << '\n';
     os << Helper::Centered(80, "");
     return os;
@@ -101,8 +103,8 @@ double Parametrization::FunctionToDE2dxIntegral(double energy,
 
 size_t Parametrization::GetHash() const {
     std::size_t seed = 0;
-    hash_combine(seed, GetName(), std::abs(particle_def_.charge),
-                 particle_def_.mass, medium_->GetName());
+    hash_combine(seed, GetName(), std::abs(particle_charge_),
+                 particle_mass_, medium_->GetName());
 
     return seed;
 }

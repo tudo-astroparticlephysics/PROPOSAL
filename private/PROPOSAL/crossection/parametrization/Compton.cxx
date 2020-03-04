@@ -21,7 +21,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 Compton::Compton(const ParticleDef& particle_def,
-                               const Medium& medium,
+                               std::shared_ptr<Medium> medium,
                                double multiplier)
         : Parametrization(particle_def, medium, multiplier)
 {
@@ -92,7 +92,7 @@ size_t Compton::GetHash() const
 // ------------------------------------------------------------------------- //
 
 ComptonKleinNishina::ComptonKleinNishina(const ParticleDef& particle_def,
-                                               const Medium& medium,
+                                               std::shared_ptr<Medium> medium,
                                                double multiplier)
         : Compton(particle_def, medium, multiplier)
 {

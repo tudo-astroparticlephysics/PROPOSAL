@@ -12,7 +12,7 @@
 
 #define PHOTO_PARAM_REAL_IMPL(param, parent)                                                                           \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
-                               const Medium& medium,                                                                   \
+                               std::shared_ptr<const Medium> medium,                                                                   \
                                double multiplier,                                                                      \
                                bool hard_component)                                                                    \
         : Photo##parent(particle_def, medium, multiplier, hard_component)                                        \
@@ -35,7 +35,7 @@ using namespace PROPOSAL;
  ******************************************************************************/
 
 PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(const ParticleDef& particle_def,
-                                                     const Medium& medium,
+                                                     std::shared_ptr<const Medium> medium,
                                                      double multiplier,
                                                      bool hard_component)
     : Photonuclear(particle_def, medium, multiplier)
@@ -105,9 +105,9 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
     // Phys. Rev. D 67 (2003), 034027
     // eq. 4.6
     G *= 3;
-    aux = v * particle_def_.mass * 1.e-3;
+    aux = v * particle_mass_ * 1.e-3;
     t   = aux * aux / (1 - v);
-    aum = particle_def_.mass * 1.e-3;
+    aum = particle_mass_ * 1.e-3;
     aum *= aum;
     aux = 2 * aum / t;
     aux = G * ((kappa + 4 * aum / m1) * std::log(1 + m1 / t) - (kappa * m1) / (m1 + t) - aux) +
@@ -122,7 +122,7 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
     aux += components_[component_index_]->GetAtomicNum() * 1.e-30 * hard_component_->CalculateHardComponent(energy, v);
 
     return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
-           particle_def_.charge * particle_def_.charge * aux;
+           particle_charge_ * particle_charge_ * aux;
 }
 
 // ------------------------------------------------------------------------- //
@@ -232,7 +232,7 @@ double PhotoKokoulin::CalculateParametrization(double nu)
  ******************************************************************************/
 
 PhotoRhode::PhotoRhode(const ParticleDef& particle_def,
-                       const Medium& medium,
+                       std::shared_ptr<const Medium> medium,
                        double multiplier,
                        bool hard_component)
     : PhotoRealPhotonAssumption(particle_def, medium, multiplier, hard_component)
@@ -269,7 +269,7 @@ PhotoRhode::~PhotoRhode()
 }
 
 Photonuclear* PhotoRhode::create(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  double multiplier,
                                  bool hard_component)
 {

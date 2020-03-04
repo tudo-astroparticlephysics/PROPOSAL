@@ -45,13 +45,13 @@
     class Mupair##param : public MupairProductionRhoIntegral                                                           \
     {                                                                                                                  \
     public:                                                                                                            \
-        Mupair##param(const ParticleDef&, const Medium&, double multiplier);                                           \
+        Mupair##param(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);                                           \
         Mupair##param(const Mupair##param&);                                                                           \
         virtual ~Mupair##param();                                                                                      \
                                                                                                                        \
         virtual Parametrization* clone() const { return new Mupair##param(*this); }                                    \
         static MupairProduction* create(const ParticleDef& particle_def,                                               \
-                                       const Medium& medium,                                                           \
+                                       std::shared_ptr<const Medium> medium,                                                           \
                                        double multiplier)                                                              \
         {                                                                                                              \
             return new Mupair##param(particle_def, medium, multiplier);                                                \
@@ -73,7 +73,7 @@ class Interpolant;
 class MupairProduction : public Parametrization
 {
 public:
-    MupairProduction(const ParticleDef&, const Medium&, double multiplier);
+    MupairProduction(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
     MupairProduction(const MupairProduction&);
     virtual ~MupairProduction();
 
@@ -106,7 +106,7 @@ class MupairProductionRhoIntegral : public MupairProduction
 {
 public:
     MupairProductionRhoIntegral(const ParticleDef&,
-                               const Medium&,
+                               std::shared_ptr<const Medium>,
                                double multiplier);
     MupairProductionRhoIntegral(const MupairProductionRhoIntegral&);
     virtual ~MupairProductionRhoIntegral();
@@ -147,7 +147,7 @@ public:
 
 public:
     MupairProductionRhoInterpolant(const ParticleDef&,
-                       const Medium&,
+                       std::shared_ptr<const Medium>,
                        double multiplier,
                        InterpolationDef def = InterpolationDef());
     MupairProductionRhoInterpolant(const MupairProductionRhoInterpolant&);
@@ -155,7 +155,7 @@ public:
 
     Parametrization* clone() const { return new MupairProductionRhoInterpolant<Param>(*this); }
     static MupairProduction* create(const ParticleDef& particle_def,
-                                const Medium& medium,
+                                std::shared_ptr<const Medium> medium,
                                 double multiplier,
                                 InterpolationDef def = InterpolationDef())
     {
@@ -173,7 +173,7 @@ protected:
 
 template<class Param>
 MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const ParticleDef& particle_def,
-                                              const Medium& medium,
+                                              std::shared_ptr<const Medium> medium,
                                               double multiplier,
                                               InterpolationDef def)
     : Param(particle_def, medium, multiplier)

@@ -51,7 +51,7 @@ namespace PROPOSAL {
     class PhotoPairProduction : public Parametrization
     {
     public:
-        PhotoPairProduction(const ParticleDef&, const Medium&, double multiplier);
+        PhotoPairProduction(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
         PhotoPairProduction(const PhotoPairProduction&);
         virtual ~PhotoPairProduction();
 
@@ -78,13 +78,13 @@ namespace PROPOSAL {
     public:
         typedef std::vector<Interpolant*> InterpolantVec;
 
-        PhotoPairTsai(const ParticleDef&, const Medium&, double multiplier);
+        PhotoPairTsai(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
         PhotoPairTsai(const PhotoPairTsai&);
         virtual ~PhotoPairTsai();
 
         virtual Parametrization* clone() const { return new PhotoPairTsai(*this); }
         static PhotoPairProduction* create(const ParticleDef& particle_def,
-                                       const Medium& medium,
+                                       std::shared_ptr<const Medium> medium,
                                        double multiplier)
         {
             return new PhotoPairTsai(particle_def, medium, multiplier);
@@ -103,7 +103,7 @@ namespace PROPOSAL {
     class PhotoAngleDistribution
     {
     public:
-        PhotoAngleDistribution(const ParticleDef&, const Medium&);
+        PhotoAngleDistribution(const ParticleDef&, std::shared_ptr<const Medium>);
         PhotoAngleDistribution(const PhotoAngleDistribution&);
         virtual ~PhotoAngleDistribution();
 
@@ -134,7 +134,7 @@ namespace PROPOSAL {
 
         typedef std::vector<Components::Component*> ComponentVec;
         const ParticleDef particle_def_;
-        const Medium* medium_;
+        std::shared_ptr<const Medium> medium_;
         const ComponentVec& components_;
         int component_index_;
     };
@@ -142,7 +142,7 @@ namespace PROPOSAL {
     class PhotoAngleTsaiIntegral : public PhotoAngleDistribution
     {
     public:
-        PhotoAngleTsaiIntegral(const ParticleDef& particle_def, const Medium& medium)
+        PhotoAngleTsaiIntegral(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium)
         : PhotoAngleDistribution(particle_def, medium)
         , integral_(IROMB, IMAXS, IPREC)
 
@@ -156,7 +156,7 @@ namespace PROPOSAL {
         virtual ~PhotoAngleTsaiIntegral() {}
 
         PhotoAngleDistribution* clone() const {return new PhotoAngleTsaiIntegral(*this); }
-        static PhotoAngleDistribution* create(const ParticleDef& particle_def, const Medium& medium) {
+        static PhotoAngleDistribution* create(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium) {
             return new PhotoAngleTsaiIntegral(particle_def, medium);
         }
 
@@ -179,7 +179,7 @@ namespace PROPOSAL {
     class PhotoAngleNoDeflection : public PhotoAngleDistribution
     {
     public:
-        PhotoAngleNoDeflection(const ParticleDef& particle_def, const Medium& medium)
+        PhotoAngleNoDeflection(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium)
         : PhotoAngleDistribution(particle_def, medium)
         {
         }
@@ -191,7 +191,7 @@ namespace PROPOSAL {
 
         PhotoAngleDistribution* clone() const {return new PhotoAngleNoDeflection(*this); }
 
-        static PhotoAngleDistribution* create(const ParticleDef& particle_def, const Medium& medium) {
+        static PhotoAngleDistribution* create(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium) {
             return new PhotoAngleNoDeflection(particle_def, medium);
         }
 
@@ -210,7 +210,7 @@ namespace PROPOSAL {
     class PhotoAngleEGS : public PhotoAngleDistribution
     {
     public:
-        PhotoAngleEGS(const ParticleDef& particle_def, const Medium& medium)
+        PhotoAngleEGS(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium)
                 : PhotoAngleDistribution(particle_def, medium)
         {
         }
@@ -222,7 +222,7 @@ namespace PROPOSAL {
 
         PhotoAngleDistribution* clone() const {return new PhotoAngleEGS(*this); }
 
-        static PhotoAngleDistribution* create(const ParticleDef& particle_def, const Medium& medium) {
+        static PhotoAngleDistribution* create(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium) {
             return new PhotoAngleEGS(particle_def, medium);
         }
 

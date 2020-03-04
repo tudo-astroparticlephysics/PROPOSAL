@@ -45,13 +45,13 @@
     class Epair##param : public EpairProductionRhoIntegral                                                             \
     {                                                                                                                  \
     public:                                                                                                            \
-        Epair##param(const ParticleDef&, const Medium&, double multiplier, bool lpm);        \
+        Epair##param(const ParticleDef&, std::shared_ptr<Medium>, double multiplier, bool lpm);        \
         Epair##param(const Epair##param&);                                                                             \
         virtual ~Epair##param();                                                                                       \
                                                                                                                        \
         virtual Parametrization* clone() const { return new Epair##param(*this); }                                     \
         static EpairProduction* create(const ParticleDef& particle_def,                                                \
-                                       const Medium& medium,                                                           \
+                                       std::shared_ptr<Medium> medium,                                                           \
                                        double multiplier,                                                              \
                                        bool lpm)                                                                       \
         {                                                                                                              \
@@ -74,7 +74,7 @@ class Interpolant;
 class EpairProduction : public Parametrization
 {
 public:
-    EpairProduction(const ParticleDef&, const Medium&, double multiplier, bool lpm);
+    EpairProduction(const ParticleDef&, std::shared_ptr<Medium>, double multiplier, bool lpm);
     EpairProduction(const EpairProduction&);
     virtual ~EpairProduction();
 
@@ -126,7 +126,7 @@ class EpairProductionRhoIntegral : public EpairProduction
 {
 public:
     EpairProductionRhoIntegral(const ParticleDef&,
-                               const Medium&,
+                               std::shared_ptr<Medium>,
                                double multiplier,
                                bool lpm);
     EpairProductionRhoIntegral(const EpairProductionRhoIntegral&);
@@ -173,7 +173,7 @@ public:
 
 public:
     EpairProductionRhoInterpolant(const ParticleDef&,
-                       const Medium&,
+                       std::shared_ptr<Medium>,
                        double multiplier,
                        bool lpm,
                        InterpolationDef def = InterpolationDef());
@@ -182,7 +182,7 @@ public:
 
     Parametrization* clone() const { return new EpairProductionRhoInterpolant<Param>(*this); }
     static EpairProduction* create(const ParticleDef& particle_def,
-                                const Medium& medium,
+                                std::shared_ptr<Medium> medium,
                                 double multiplier,
                                 bool lpm,
                                 InterpolationDef def = InterpolationDef())
@@ -201,7 +201,7 @@ protected:
 
 template<class Param>
 EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const ParticleDef& particle_def,
-                                              const Medium& medium,
+                                              std::shared_ptr<const Medium> medium,
                                               double multiplier,
                                               bool lpm,
                                               InterpolationDef def)

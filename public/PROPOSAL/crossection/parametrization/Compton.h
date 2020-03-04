@@ -36,7 +36,7 @@ namespace PROPOSAL {
     class Compton : public Parametrization
     {
     public:
-        Compton(const ParticleDef&, const Medium&, double multiplier);
+        Compton(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
         Compton(const Compton&);
         virtual ~Compton();
 
@@ -70,13 +70,13 @@ namespace PROPOSAL {
     class ComptonKleinNishina : public Compton
     {
     public:
-        ComptonKleinNishina(const ParticleDef&, const Medium&, double multiplier);
+        ComptonKleinNishina(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
         ComptonKleinNishina(const ComptonKleinNishina&);
         ~ComptonKleinNishina();
 
         Parametrization* clone() const { return new ComptonKleinNishina(*this); }
         static Compton* create(const ParticleDef& particle_def,
-                                      const Medium& medium,
+                                      std::shared_ptr<const Medium> medium,
                                       double multiplier)
         {
             return new ComptonKleinNishina(particle_def, medium, multiplier);

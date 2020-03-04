@@ -11,7 +11,7 @@
 
 #define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                                                              \
     Mupair##param::Mupair##param(const ParticleDef& particle_def,                                                      \
-                               const Medium& medium,                                                                   \
+                               std::shared_ptr<const Medium> medium,                                                                   \
                                double multiplier)                                                                      \
         : MupairProductionRhoIntegral(particle_def, medium, multiplier,)                                               \
     {                                                                                                                  \
@@ -37,7 +37,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 MupairProduction::MupairProduction(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  double multiplier)
     : Parametrization(particle_def, medium, multiplier), drho_integral_(IROMB, IMAXS, IPREC)
 {
@@ -65,7 +65,7 @@ Parametrization::KinematicLimits MupairProduction::GetKinematicLimits(double ene
     KinematicLimits limits;
 
     limits.vMin = 2 * MMU / energy;
-    limits.vMax = 1 - particle_def_.mass / energy;
+    limits.vMax = 1 - particle_mass_ / energy;
 
     if (limits.vMax < limits.vMin)
     {
@@ -107,7 +107,7 @@ double MupairProduction::Calculaterho(double energy, double v, double rnd1, doub
 
 // ------------------------------------------------------------------------- //
 MupairProductionRhoIntegral::MupairProductionRhoIntegral(const ParticleDef& particle_def,
-                                                       const Medium& medium,
+                                                       std::shared_ptr<const Medium> medium,
                                                        double multiplier)
     : MupairProduction(particle_def, medium, multiplier)
     , integral_(IROMB, IMAXS, IPREC)
@@ -204,7 +204,7 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v
     r2          = r * r;
     rMax        = 1 - 2 * MMU / (v * energy);
     Z3          = std::pow(medium_charge, -1. / 3);
-    aux         = (particle_def_.mass * v) / (2 * MMU);
+    aux         = (particle_mass_ * v) / (2 * MMU);
     xi          = aux * aux * (1 - r2) / (1 - v);
     beta        = (v * v) / (2 * (1 - v));
     A_pow       = std::pow(atomic_weight, -0.27);
@@ -234,7 +234,7 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v
     X       = 1 + U - U_max;
 
     //Combine results
-    aux     = ALPHA * r_mu * particle_def_.charge * medium_charge;
+    aux     = ALPHA * r_mu * particle_charge_ * medium_charge;
     aux     *= 2 * aux * phi * (1 - v) / (1.5 * PI * v); //Factor 2: Similar to factor 2 from EPairProduction, probably from symmetry in Rho
 
     if (X > 0)

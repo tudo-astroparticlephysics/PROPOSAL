@@ -13,7 +13,7 @@ using namespace PROPOSAL;
 
 #define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                                                            \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
-                               const Medium& medium,                                                                   \
+                               std::shared_ptr<const Medium> medium,                                                                   \
                                double multiplier,                                                                      \
                                const ShadowEffect& shadow_effect)                                                      \
         : PhotoQ2Integral(particle_def, medium, multiplier, shadow_effect)                                       \
@@ -34,7 +34,7 @@ using namespace PROPOSAL;
  ******************************************************************************/
 
 PhotoQ2Integral::PhotoQ2Integral(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  double multiplier,
                                  const ShadowEffect& shadow_effect)
     : Photonuclear(particle_def, medium, multiplier)
@@ -74,12 +74,12 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
 
     double aux, q2_min, q2_max;
 
-    q2_min = particle_def_.mass * v;
+    q2_min = particle_mass_ * v;
     q2_min *= q2_min / (1 - v);
 
-    if (particle_def_.mass < MPI)
+    if (particle_mass_ < MPI)
     {
-        aux = particle_def_.mass * particle_def_.mass / energy;
+        aux = particle_mass_ * particle_mass_ / energy;
         q2_min -= (aux * aux) / (2 * (1 - v));
     }
 
@@ -95,7 +95,7 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
         q2_min, q2_max, std::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, energy, v, std::placeholders::_1), 4);
 
     aux *= medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
-           particle_def_.charge * particle_def_.charge;
+           particle_charge_ * particle_charge_;
 
     return aux;
 }
@@ -260,7 +260,7 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v *
               (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
-               (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
+               (1 - 2 * particle_mass_ * particle_mass_ / Q2) * v * v *
                    (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
 
     return result;
@@ -388,7 +388,7 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v *
               (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
-               (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
+               (1 - 2 * particle_mass_ * particle_mass_ / Q2) * v * v *
                    (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
 
     return result;
@@ -477,7 +477,7 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, do
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v *
               (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
-               (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
+               (1 - 2 * particle_mass_ * particle_mass_ / Q2) * v * v *
                    (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
 
     return result;
@@ -608,7 +608,7 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v *
               (1 - v + 0.25 * v * v -
-               (1 + 4 * particle_def_.mass * particle_def_.mass / Q2) * 0.25 * v * v *
+               (1 + 4 * particle_mass_ * particle_mass_ / Q2) * 0.25 * v * v *
                    (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (1 + R));
 
     return result;

@@ -16,7 +16,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 Annihilation::Annihilation(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  double multiplier)
         : Parametrization(particle_def, medium, multiplier)
 {
@@ -43,7 +43,7 @@ Parametrization::KinematicLimits Annihilation::GetKinematicLimits(double energy)
     // Limits according to simple 2->2 body interactions
     KinematicLimits limits;
 
-    double gamma    = energy / particle_def_.mass;
+    double gamma    = energy / particle_mass_;
 
     limits.vMin     = 0.5 * (1. - std::sqrt( std::max(0., (gamma - 1.)/(gamma + 1.) ) ));
     limits.vMax     = 0.5 * (1. + std::sqrt( std::max(0., (gamma - 1.)/(gamma + 1.) ) ));
@@ -63,7 +63,7 @@ size_t Annihilation::GetHash() const
 // Specific implementations
 // ------------------------------------------------------------------------- //
 
-AnnihilationHeitler::AnnihilationHeitler(const ParticleDef& particle_def, const Medium& medium, double multiplier)
+AnnihilationHeitler::AnnihilationHeitler(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium, double multiplier)
         : Annihilation(particle_def, medium, multiplier)
 {}
 
@@ -82,7 +82,7 @@ double AnnihilationHeitler::DifferentialCrossSection(double energy, double v)
     // v = energy of photon1 / total available energy
     // with the total available energy being the sum of the total positron energy and the electron mass
 
-    double gamma    = energy / particle_def_.mass;
+    double gamma    = energy / particle_mass_;
     double aux      = 1. + (2. * gamma) / std::pow(gamma + 1., 2.) - v - 1. / std::pow(gamma + 1., 2.) * 1. / v;
     aux *= medium_->GetMassDensity() * NA * medium_->GetZA() * PI * RE * RE / (gamma - 1.) * 1. / v; // TODO: prefactors
 

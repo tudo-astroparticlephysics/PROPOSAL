@@ -18,7 +18,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 WeakInteraction::WeakInteraction(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  double multiplier)
         : Parametrization(particle_def, medium, multiplier)
 {
@@ -42,7 +42,7 @@ bool WeakInteraction::compare(const Parametrization& parametrization) const
 
 Parametrization::KinematicLimits WeakInteraction::GetKinematicLimits(double energy)
 {
-    IntegralLimits limits;
+    KinematicLimits limits;
 
     double aux = (MP + MN) / 2; //for isoscalar targets
     aux = 2 * energy * aux + pow(aux, 2);
@@ -56,7 +56,7 @@ Parametrization::KinematicLimits WeakInteraction::GetKinematicLimits(double ener
 size_t WeakInteraction::GetHash() const
 {
     size_t seed = Parametrization::GetHash();
-    hash_combine(seed, particle_def_.charge);
+    hash_combine(seed, particle_charge_);
 
     return seed;
 }
@@ -66,7 +66,7 @@ size_t WeakInteraction::GetHash() const
 // ------------------------------------------------------------------------- //
 
 WeakCooperSarkarMertsch::WeakCooperSarkarMertsch(const ParticleDef& particle_def,
-                                                 const Medium& medium,
+                                                 std::shared_ptr<const Medium> medium,
                                                  double multiplier)
         : WeakInteraction(particle_def, medium, multiplier)
         , interpolant_(2, NULL)

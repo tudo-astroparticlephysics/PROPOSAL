@@ -120,13 +120,13 @@ BREMSSTRAHLUNG_DEF(SandrockSoedingreksoRhode)
 class BremsElectronScreening : public Bremsstrahlung
 {
 public:
-    BremsElectronScreening(const ParticleDef&, const Medium&, double multiplier, bool lpm);
+    BremsElectronScreening(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier, bool lpm);
     BremsElectronScreening(const BremsElectronScreening&);
     ~BremsElectronScreening();
 
     Parametrization* clone() const { return new BremsElectronScreening(*this); }
     static Bremsstrahlung* create(const ParticleDef& particle_def,
-                                  const Medium& medium,
+                                  std::shared_ptr<const Medium> medium,
                                   double multiplier,
                                   bool lpm)
     {

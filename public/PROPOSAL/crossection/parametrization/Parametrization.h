@@ -46,8 +46,7 @@ class Medium;
 class Parametrization
 {
 public:
-    Parametrization(const ParticleDef&, const Medium&, nlohmann::json);
-    Parametrization(const ParticleDef&, const Medium&, double multiplier);
+    Parametrization(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
     Parametrization(const Parametrization&);
     virtual ~Parametrization();
 
@@ -88,7 +87,7 @@ public:
 
     virtual const InteractionType GetInteractionType() const = 0;
     const ParticleDef& GetParticleDef() const { return particle_def_; }
-    const Medium& GetMedium() const { return *medium_; }
+    std::shared_ptr<const Medium> GetMedium() const { return medium_; }
     double GetMultiplier() const { return multiplier_; }
 
     virtual size_t GetHash() const;
@@ -108,8 +107,9 @@ protected:
 
     // const std::string name_;
 
-    const ParticleDef particle_def_;
-    const Medium* medium_;
+    double particle_mass_;
+    double particle_charge_;
+    std::shared_ptr<const Medium> medium_;
 
     // const Components::Component* current_component_;
     const ComponentVec& components_;

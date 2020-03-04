@@ -272,7 +272,7 @@ size_t ShadowButkevichMikhailov::GetHash() const
 // ------------------------------------------------------------------------- //
 
 Photonuclear::Photonuclear(const ParticleDef& particle_def,
-                           const Medium& medium,
+                           std::shared_ptr<const Medium> medium,
                            double multiplier)
     : Parametrization(particle_def, medium, multiplier)
 {
@@ -299,13 +299,13 @@ Parametrization::KinematicLimits Photonuclear::GetKinematicLimits(double energy)
 {
     double aux;
 
-    IntegralLimits limits;
+    KinematicLimits limits;
 
     limits.vMin = (MPI + MPI * MPI / (2 * components_[component_index_]->GetAverageNucleonWeight())) / energy;
 
-    if (particle_def_.mass < MPI)
+    if (particle_mass_ < MPI)
     {
-        aux         = particle_def_.mass / components_[component_index_]->GetAverageNucleonWeight();
+        aux         = particle_mass_ / components_[component_index_]->GetAverageNucleonWeight();
         limits.vMax = 1 - components_[component_index_]->GetAverageNucleonWeight() * (1 + aux * aux) / (2 * energy);
     } else
     {
@@ -315,7 +315,7 @@ Parametrization::KinematicLimits Photonuclear::GetKinematicLimits(double energy)
     // vMax calculated above is always smaller than 1-m/E
     // in comparison, the following inequality arise
     // (M-m)^2 >= 0
-    // limits.vMax = std::min(limits.vMax, 1 - particle_def_.mass/energy);
+    // limits.vMax = std::min(limits.vMax, 1 - particle_mass_/energy);
 
     if (limits.vMax < limits.vMin)
     {
