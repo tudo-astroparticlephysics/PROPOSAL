@@ -134,16 +134,12 @@ EXPECT_TRUE(AnniInterpol_A == AnniInterpol_B);
 
 
 
-TEST(Annihilation, Test_of_dNdx)
-{
-std::ifstream in;
-std::string filename = "bin/TestFiles/Anni_dNdx.txt";
-in.open(filename.c_str());
+TEST(Annihilation, Test_of_dNdx) {
 
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::string filename = "bin/TestFiles/Anni_dNdx.txt"; 
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -178,14 +174,9 @@ delete anni;
 
 TEST(Annihilation, Test_of_dNdx_rnd)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/Anni_dNdx_rnd.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -224,14 +215,9 @@ delete anni;
 
 TEST(Annihilation, Test_Stochastic_Loss)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/Anni_e.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -274,14 +260,9 @@ delete anni;
 
 TEST(Annihilation, Test_of_dNdx_Interpolant)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/Anni_dNdx_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -319,14 +300,9 @@ delete anni;
 
 TEST(Annihilation, Test_of_dNdxrnd_interpol)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/Anni_dNdx_rnd_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -367,14 +343,9 @@ delete anni;
 
 TEST(Annihilation, Test_of_e_interpol)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/Anni_e_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);

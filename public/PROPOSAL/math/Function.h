@@ -44,7 +44,7 @@ class Polynom {
     Polynom(const Polynom&);
 
     ~Polynom() {};
-    // Polynom& operator=(const Polynom& poly);
+    Polynom& operator=(const Polynom& poly) = default;
 
     Polynom* clone() const { return new Polynom(*this); };
 

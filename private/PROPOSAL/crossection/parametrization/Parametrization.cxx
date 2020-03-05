@@ -61,8 +61,8 @@ bool Parametrization::compare(const Parametrization& parametrization) const {
         return true;
 }
 
-std::ostream& PROPOSAL::operator<<(std::ostream& os,
-                                   Parametrization const& param) {
+namespace PROPOSAL{
+std::ostream& operator<<(std::ostream& os, Parametrization const& param) {
     std::stringstream ss;
     ss << " Parametrization (" << &param << ") ";
     os << Helper::Centered(80, ss.str()) << '\n';
@@ -79,6 +79,7 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os,
     os << Helper::Centered(80, "");
     return os;
 }
+} // namespace PROPOSAL
 
 // ------------------------------------------------------------------------- //
 // Public methods

@@ -116,14 +116,9 @@ EXPECT_TRUE(Interpol_A == Interpol_B);
 
 TEST(Compton, Test_of_dEdx)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Compton_dEdx.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -165,14 +160,9 @@ delete Compton;
 
 TEST(Compton, Test_of_dNdx)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Compton_dNdx.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -214,14 +204,9 @@ delete Compton;
 
 TEST(Compton, Test_of_dNdx_rnd)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Compton_dNdx_rnd.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -266,14 +251,9 @@ delete Compton;
 
 TEST(Compton, Test_of_e)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Compton_e.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -318,14 +298,9 @@ delete Compton;
 
 TEST(Compton, Test_of_dEdx_Interpolant)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Compton_dEdx_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -368,14 +343,9 @@ delete Compton;
 
 TEST(Compton, Test_of_dNdx_Interpolant)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Compton_dNdx_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 std::string mediumName;
 double ecut;
@@ -414,14 +384,9 @@ delete Compton;
 
 TEST(Compton, Test_of_dNdx_rnd_Interpolant)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Compton_dNdx_rnd_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -466,14 +431,9 @@ delete Compton;
 
 TEST(Compton, Test_of_e_Interpolant)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Compton_e_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);

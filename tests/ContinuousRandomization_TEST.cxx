@@ -95,13 +95,10 @@ TEST_F(Test_Utilities, Copyconstructor2) {
 }
 
 TEST(ContinuousRandomization, Randomize_interpol) {
-    std::ifstream in;
     std::string filename = "bin/TestFiles/continous_randomization.txt";
-    in.open(filename.c_str());
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    if (!in.good()) {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
 
     char firstLine[256];
     in.getline(firstLine, 256);

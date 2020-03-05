@@ -137,14 +137,9 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Ionization, Test_of_dEdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dEdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -182,14 +177,9 @@ TEST(Ionization, Test_of_dEdx)
 
 TEST(Ionization, Test_of_dNdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dNdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -226,14 +216,9 @@ TEST(Ionization, Test_of_dNdx)
 
 TEST(Ionization, Test_of_dNdx_rnd)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dNdx_rnd.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -275,14 +260,9 @@ TEST(Ionization, Test_of_dNdx_rnd)
 
 TEST(Ionization, Test_Stochastic_Loss)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_e.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -324,14 +304,9 @@ TEST(Ionization, Test_Stochastic_Loss)
 
 TEST(Ionization, Test_of_dEdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dEdx_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -372,14 +347,9 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
 
 TEST(Ionization, Test_of_dNdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dNdx_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -419,14 +389,9 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
 
 TEST(Ionization, Test_of_dNdxrnd_interpol)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dNdx_rnd_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -471,14 +436,9 @@ TEST(Ionization, Test_of_dNdxrnd_interpol)
 
 TEST(Ionization, Test_of_e_interpol)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_e_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
