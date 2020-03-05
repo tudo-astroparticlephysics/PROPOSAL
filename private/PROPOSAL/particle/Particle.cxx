@@ -14,8 +14,34 @@
 #include <iostream>
 #include <string>
 
+using namespace PROPOSAL;
+
 namespace PROPOSAL {
 
+// ------------------------------------------------------------------------- //
+std::ostream& operator<<(std::ostream& os, DynamicData const& data)
+{
+    std::stringstream ss;
+    ss << " DynamicData (" << &data << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "type: " << data.GetType() << '\n';
+    os << "position:" << '\n';
+    os << data.position_ << '\n';
+    os << "direction:" << '\n';
+    os << data.direction_ << '\n';
+    os << "energy: " << data.energy_ << '\n';
+    os << "parent_particle_energy: " << data.parent_particle_energy_ << '\n';
+    os << "time: " << data.time_ << '\n';
+    os << "propagated distance: " << data.propagated_distance_ << '\n';
+
+    data.print(os);
+
+    os << Helper::Centered(60, "");
+    return os;
+}
+
+} // namespace PROPOSAL
 
 /******************************************************************************
  *                              Dynamic Particle                              *
@@ -121,29 +147,6 @@ bool DynamicData::operator!=(const DynamicData& dynamic_data) const
     return !(*this == dynamic_data);
 }
 
-// ------------------------------------------------------------------------- //
-std::ostream& operator<<(std::ostream& os, DynamicData const& data)
-{
-    std::stringstream ss;
-    ss << " DynamicData (" << &data << ") ";
-    os << Helper::Centered(60, ss.str()) << '\n';
-
-    os << "type: " << data.GetType() << '\n';
-    os << "position:" << '\n';
-    os << data.position_ << '\n';
-    os << "direction:" << '\n';
-    os << data.direction_ << '\n';
-    os << "energy: " << data.energy_ << '\n';
-    os << "parent_particle_energy: " << data.parent_particle_energy_ << '\n';
-    os << "time: " << data.time_ << '\n';
-    os << "propagated distance: " << data.propagated_distance_ << '\n';
-
-    data.print(os);
-
-    os << Helper::Centered(60, "");
-    return os;
-}
-
 
 // ------------------------------------------------------------------------- //
 std::string DynamicData::GetName() const
@@ -226,6 +229,4 @@ void DynamicData::DeflectDirection(double cosphi_deflect, double theta_deflect) 
 
     direction_ = new_direction;
     direction_.CalculateSphericalCoordinates();
-}
-
 }
