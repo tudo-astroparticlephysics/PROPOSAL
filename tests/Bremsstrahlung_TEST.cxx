@@ -159,14 +159,9 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Bremsstrahlung, Test_of_dEdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dEdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -212,14 +207,9 @@ TEST(Bremsstrahlung, Test_of_dEdx)
 
 TEST(Bremsstrahlung, Test_of_dNdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dNdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -265,14 +255,9 @@ TEST(Bremsstrahlung, Test_of_dNdx)
 
 TEST(Bremsstrahlung, Test_of_dNdx_rnd)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dNdx_rnd.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -321,14 +306,9 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd)
 
 TEST(Bremsstrahlung, Test_of_e)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_e.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -377,14 +357,9 @@ TEST(Bremsstrahlung, Test_of_e)
 
 TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dEdx_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -431,14 +406,10 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 
 TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dNdx_interpol.txt";
-    in.open(filename.c_str());
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
 
     std::string particleName;
     std::string mediumName;
@@ -482,14 +453,10 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 
 TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dNdx_rnd_interpol.txt";
-    in.open(filename.c_str());
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -539,14 +506,10 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
 
 TEST(Bremsstrahlung, Test_of_e_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_e_interpol.txt";
-    in.open(filename.c_str());
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
 
     char firstLine[256];
     in.getline(firstLine, 256);
