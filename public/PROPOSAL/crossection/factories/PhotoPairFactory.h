@@ -37,6 +37,7 @@
 #include <sstream>
 
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -76,6 +77,22 @@ namespace PROPOSAL {
                     , multiplier(1.0)
             {
             }
+
+            Definition(const nlohmann::json& config){
+                if(!config.contains("name")){
+                    throw std::invalid_argument("No parametrization name defined for photopairproduction.");
+                }
+                else{
+                    std::string name;
+                    config.at("name").get_to(name);
+                    parametrization = Get().GetEnumFromString(name);
+                }
+                multiplier = config.value("multiplier", 1.0);
+
+                std::string name_photoangle = config.value("photoangle", "PhotoAngleNoDeflection");
+                photoangle = Get().GetPhotoAngleEnumFromString(name_photoangle);
+            }
+
 
             bool operator==(const PhotoPairFactory::Definition& def) const
             {

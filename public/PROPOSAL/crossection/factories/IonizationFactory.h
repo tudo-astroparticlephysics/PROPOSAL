@@ -37,6 +37,7 @@
 #include <sstream>
 
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -64,6 +65,18 @@ public:
             : parametrization(BetheBlochRossi)
             , multiplier(1.0)
         {
+        }
+
+        Definition(const nlohmann::json& config){
+            if(!config.contains("name")){
+                throw std::invalid_argument("No parametrization name defined for ionization.");
+            }
+            else{
+                std::string name;
+                config.at("name").get_to(name);
+                parametrization = Get().GetEnumFromString(name);
+            }
+            multiplier = config.value("multiplier", 1.0);
         }
 
         bool operator==(const IonizationFactory::Definition& def) const

@@ -34,6 +34,7 @@
 #include <sstream>
 
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -59,8 +60,19 @@ public:
         Definition()
             : parametrization(None)
             , multiplier(1.0)
-            , particle_output(true)
         {
+        }
+
+        Definition(const nlohmann::json& config){
+            if(!config.contains("name")){
+                throw std::invalid_argument("No parametrization name defined for mupairproduction.");
+            }
+            else{
+                std::string name;
+                config.at("name").get_to(name);
+                parametrization = Get().GetEnumFromString(name);
+            }
+            multiplier = config.value("multiplier", 1.0);
         }
 
         bool operator==(const MupairProductionFactory::Definition& def) const
@@ -86,7 +98,6 @@ public:
 
             os << "Parametrization: " << definition.parametrization << std::endl;
             os << "Multiplier: " << definition.multiplier << std::endl;
-            os << "Particle Output: " << definition.particle_output << std::endl;
 
             os << Helper::Centered(60, "");
             return os;
@@ -94,7 +105,6 @@ public:
 
         Enum parametrization;
         double multiplier;
-        bool particle_output;
     };
 
     // --------------------------------------------------------------------- //
