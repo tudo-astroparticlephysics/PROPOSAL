@@ -225,7 +225,6 @@ std::ostream& operator<<(std::ostream& os, Sector const& sector)
 
     os << "Sector Definition:\n" << sector.sector_def_ << std::endl;
     os << "Particle Definition:\n" << sector.particle_def_ << std::endl;
-    os << "Geometry:\n" << *sector.geometry_ << std::endl;
     os << "Propagation Utility:\n" << sector.utility_ << std::endl;
     os << "Scattering:\n" << *sector.scattering_ << std::endl;
 
