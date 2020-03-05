@@ -12,8 +12,7 @@ release tar balls.
 ```
 $ apt install g++ \
   cmake \
-  doxygen \
-  git-lfs
+  doxygen
 ```
 
 ### Arch Linux
@@ -21,8 +20,7 @@ $ apt install g++ \
 ```
 $ pacman -S g++ \
   cmake \
-  doxygen \
-  git-lfs
+  doxygen
 ```
 
 ### RHEL / Centos
@@ -32,7 +30,7 @@ called `cmake3`.
 PROPOSAL needs cmake3.
 
 ```
-$ yum install g++ cmake3 doxygen git-lfs
+$ yum install g++ cmake3 doxygen
 ```
 
 ### MacOS
@@ -40,8 +38,7 @@ $ yum install g++ cmake3 doxygen git-lfs
 ```
 $ xcode-select --install
 $ brew install cmake \
-  doxygen \
-  git-lfs
+  doxygen
 ```
 
 ## Building PROPOSAL
@@ -54,11 +51,9 @@ $ brew install cmake \
 
   To use a specific version of PROPOSAL, use `git checkout vX.Y.Z` after cloning.
 
-  In case you want to perform the unit tests, you need install `git-lfs` first and do an extra pull to get the TestFiles.
-  This is only possible with a git checkout.
-
+  In case you want to perform the unit tests, you need to download the TestFiles.
   ```
-  $ git lfs pull
+  $ curl https://proposal.app.tu-dortmund.de/resources/2020-02-26/TestFiles.tar.gz --output tests/TestFiles.tar.gz
   ```
 
 1.  Move to the build directory and generate the Makefile with cmake:

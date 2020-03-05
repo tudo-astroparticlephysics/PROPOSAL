@@ -115,7 +115,6 @@ std::string ResolvePath(const std::string& pathname, bool checkReadonly) {
     int success = wordexp(pathname.c_str(), &p, WRDE_UNDEF);
 
     if (success != 0) {
-        log_warn("Invalid path given: \"%s\"", pathname.c_str());
         return "";
     }
 
@@ -125,7 +124,6 @@ std::string ResolvePath(const std::string& pathname, bool checkReadonly) {
     wordfree(&p);
 
     if (!resolved) {
-        log_warn("Invalid path given: \"%s\"", pathname.c_str());
         return "";
     }
 
