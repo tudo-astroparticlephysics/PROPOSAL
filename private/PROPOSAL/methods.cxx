@@ -197,9 +197,9 @@ namespace Helper {
         int success = wordexp(pathname.c_str(), &p, WRDE_UNDEF);
 
         if (success != 0) {
-            log_warn("Invalid path given: \"%s\"", pathname.c_str());
             return "";
         }
+
 
         char full_path[PATH_MAX];
         char* resolved = realpath(*p.we_wordv, full_path);
@@ -207,7 +207,6 @@ namespace Helper {
         wordfree(&p);
 
         if (!resolved) {
-            log_warn("Invalid path given: \"%s\"", pathname.c_str());
             return "";
         }
 
