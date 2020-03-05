@@ -60,8 +60,8 @@ bool CrossSection::operator!=(const CrossSection& cross_section) const
     return !(*this == cross_section);
 }
 
-// ------------------------------------------------------------------------- //
-std::ostream& PROPOSAL::operator<<(std::ostream& os, CrossSection const& cross)
+namespace PROPOSAL {
+std::ostream& operator<<(std::ostream& os, CrossSection const& cross)
 {
     std::string name;
     switch (cross.type_id_)
@@ -100,6 +100,7 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, CrossSection const& cross)
     os << Helper::Centered(80, "");
     return os;
 }
+} // namespace PROPOSAL
 
 std::pair<double, double> CrossSection::StochasticDeflection(double energy, double energy_loss){
     // per default the particle is not deflected

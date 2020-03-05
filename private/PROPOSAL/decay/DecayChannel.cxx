@@ -32,8 +32,9 @@ bool DecayChannel::operator!=(const DecayChannel& def) const
     return !(*this == def);
 }
 
-// ------------------------------------------------------------------------- //
-std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayChannel const& channel)
+namespace PROPOSAL {
+
+std::ostream& operator<<(std::ostream& os, DecayChannel const& channel)
 {
     std::stringstream ss;
     ss << " DecayChannel (" << &channel << ") ";
@@ -46,6 +47,8 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayChannel const& channel
     os << Helper::Centered(60, "");
     return os;
 }
+
+} // namespace PROPOSAL
 
 // ------------------------------------------------------------------------- //
 void DecayChannel::Boost(DynamicData& particle, const Vector3D& direction_unnormalized, double gamma, double betagamma)

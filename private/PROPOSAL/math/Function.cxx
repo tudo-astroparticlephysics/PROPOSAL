@@ -33,13 +33,6 @@ bool Polynom::operator!=(const Polynom& polynom) const {
     return !(*this == polynom);
 }
 
-// Polynom& Polynom::operator=(const Polynom& poly)
-// {
-//     // N_ = poly.N_;
-//     // coeff_ = poly.coeff_;
-//     return Polynom(poly);
-// }
-
 double Polynom::evaluate(double x) {
     double aux = coeff_[N_ - 1];
 

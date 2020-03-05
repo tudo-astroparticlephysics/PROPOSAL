@@ -5,6 +5,23 @@
 
 using namespace PROPOSAL;
 
+namespace PROPOSAL {
+
+std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings)
+{
+    std::stringstream ss;
+    ss << " EnergyCutSettings (" << &cut_settings << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "Ecut: " << cut_settings.ecut_ << std::endl;
+    os << "Vcut: " << cut_settings.vcut_ << std::endl;
+
+    os << Helper::Centered(60, "");
+    return os;
+}
+
+} // namespace PROPOSAL
+
 //----------------------------------------------------------------------------//
 //-------------------------public member functions----------------------------//
 //----------------------------------------------------------------------------//
@@ -103,22 +120,6 @@ bool EnergyCutSettings::operator==(const EnergyCutSettings& energyCutSettings) c
 bool EnergyCutSettings::operator!=(const EnergyCutSettings& energyCutSettings) const
 {
     return !(*this == energyCutSettings);
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings)
-{
-    std::stringstream ss;
-    ss << " EnergyCutSettings (" << &cut_settings << ") ";
-    os << Helper::Centered(60, ss.str()) << '\n';
-
-    os << "Ecut: " << cut_settings.ecut_ << std::endl;
-    os << "Vcut: " << cut_settings.vcut_ << std::endl;
-
-    os << Helper::Centered(60, "");
-    return os;
 }
 
 //----------------------------------------------------------------------------//
