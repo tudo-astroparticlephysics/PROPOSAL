@@ -60,6 +60,18 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
     }
 }
 
+CrossSection* EpairProductionFactory::CreateEpairProduction(const EpairProduction& parametrization,
+                                                            std::shared_ptr<const EnergyCutSettings> cuts,
+                                                            std::shared_ptr<const InterpolationDef> interpolation_def=nullptr) const
+{
+    if(interpolation_def==nullptr){
+        return new EpairIntegral(parametrization, cuts);
+    }
+    else{
+        return new EpairInterpolant(parametrization, cuts, interpolation_def);
+    }
+}
+
 // ------------------------------------------------------------------------- //
 void EpairProductionFactory::Register(const std::string& name,
                                      Enum enum_t,

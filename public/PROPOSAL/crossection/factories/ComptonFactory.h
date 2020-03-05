@@ -122,6 +122,10 @@ namespace PROPOSAL {
                                            const Definition&,
                                            std::shared_ptr<const InterpolationDef>) const;
 
+        CrossSection* CreateCompton(const Compton&,
+                                    std::shared_ptr<const EnergyCutSettings>,
+                                    std::shared_ptr<const InterpolationDef>) const;
+
         // ----------------------------------------------------------------------------
         /// @brief string to enum conversation for photo parametrizations
         // ----------------------------------------------------------------------------

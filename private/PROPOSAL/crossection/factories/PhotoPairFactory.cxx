@@ -90,6 +90,18 @@ CrossSection* PhotoPairFactory::CreatePhotoPair(const ParticleDef& particle_def,
     }
 }
 
+CrossSection* PhotoPairFactory::CreatePhotoPair(const PhotoPairProduction& parametrization,
+                                                const PhotoAngleDistribution& photoangle,
+                                                std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+{
+    if(interpolation_def==nullptr){
+        return new PhotoPairIntegral(parametrization, photoangle);
+    }
+    else{
+        return new PhotoPairInterpolant(parametrization, photoangle, interpolation_def);
+    }
+}
+
 // ------------------------------------------------------------------------- //
 PhotoPairFactory::Enum PhotoPairFactory::GetEnumFromString(const std::string& name)
 {

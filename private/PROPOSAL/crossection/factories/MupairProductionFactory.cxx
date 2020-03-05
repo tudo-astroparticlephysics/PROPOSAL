@@ -59,6 +59,18 @@ CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef&
     }
 }
 
+CrossSection* MupairProductionFactory::CreateMupairProduction(const MupairProduction& parametrization,
+                                                              std::shared_ptr<const EnergyCutSettings> cuts,
+                                                              std::shared_ptr<const InterpolationDef> interpolation_def=nullptr) const
+{
+    if(interpolation_def==nullptr){
+        return new MupairIntegral(parametrization, cuts);
+    }
+    else{
+        return new MupairInterpolant(parametrization, cuts, interpolation_def);
+    }
+}
+
 // ------------------------------------------------------------------------- //
 void MupairProductionFactory::Register(const std::string& name,
                                      Enum enum_t,

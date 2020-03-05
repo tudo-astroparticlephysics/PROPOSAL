@@ -71,6 +71,18 @@ CrossSection* ComptonFactory::CreateCompton(const ParticleDef& particle_def,
     }
 }
 
+CrossSection* ComptonFactory::CreateCompton(const Compton& parametrization,
+                                            std::shared_ptr<const EnergyCutSettings> cuts,
+                                            std::shared_ptr<const InterpolationDef> interpolation_def=nullptr) const
+{
+    if(interpolation_def==nullptr){
+        return new ComptonIntegral(parametrization, cuts);
+    }
+    else{
+        return new ComptonInterpolant(parametrization, cuts, interpolation_def);
+    }
+}
+
 // ------------------------------------------------------------------------- //
 ComptonFactory::Enum ComptonFactory::GetEnumFromString(const std::string& name)
 {

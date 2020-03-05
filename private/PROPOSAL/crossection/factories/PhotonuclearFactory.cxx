@@ -177,6 +177,18 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
     }
 }
 
+CrossSection* PhotonuclearFactory::CreatePhotonuclear(const Photonuclear& parametrization,
+                                                      std::shared_ptr<const EnergyCutSettings> cuts,
+                                                      std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+{
+    if(interpolation_def==nullptr){
+        return new PhotoIntegral(parametrization, cuts);
+    }
+    else{
+        return new PhotoInterpolant(parametrization, cuts, interpolation_def);
+    }
+}
+
 // ------------------------------------------------------------------------- //
 PhotonuclearFactory::Enum PhotonuclearFactory::GetEnumFromString(const std::string& name)
 {

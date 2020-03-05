@@ -58,6 +58,17 @@ CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& p
     }
 }
 
+CrossSection* WeakInteractionFactory::CreateWeakInteraction(const WeakInteraction& parametrization,
+                                                            std::shared_ptr<const InterpolationDef> interpolation_def=nullptr) const
+{
+    if(interpolation_def==nullptr){
+        return new WeakIntegral(parametrization);
+    }
+    else{
+        return new WeakInterpolant(parametrization, interpolation_def);
+    }
+}
+
 // ------------------------------------------------------------------------- //
 void WeakInteractionFactory::Register(const std::string& name,
                                       Enum enum_t,

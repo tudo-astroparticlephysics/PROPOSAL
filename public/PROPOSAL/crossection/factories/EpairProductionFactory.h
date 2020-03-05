@@ -132,7 +132,9 @@ public:
                                         const Definition&,
                                         std::shared_ptr<const InterpolationDef>) const;
 
-
+    CrossSection* CreateEpairProduction(const EpairProduction&,
+                                        std::shared_ptr<const EnergyCutSettings>,
+                                        std::shared_ptr<const InterpolationDef>) const;
 
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for photo parametrizations

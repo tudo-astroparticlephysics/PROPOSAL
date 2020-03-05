@@ -68,6 +68,18 @@ CrossSection* IonizationFactory::CreateIonization(const ParticleDef& particle_de
     }
 }
 
+CrossSection* IonizationFactory::CreateIonization(const Ionization& parametrization,
+                                                  std::shared_ptr<const EnergyCutSettings> cuts,
+                                                  std::shared_ptr<const InterpolationDef> interpolation_def=nullptr) const
+{
+    if(interpolation_def==nullptr){
+        return new IonizIntegral(parametrization, cuts);
+    }
+    else{
+        return new IonizInterpolant(parametrization, cuts, interpolation_def);
+    }
+}
+
 // ------------------------------------------------------------------------- //
 IonizationFactory::Enum IonizationFactory::GetEnumFromString(const std::string& name)
 {

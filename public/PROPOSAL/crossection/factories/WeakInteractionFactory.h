@@ -118,6 +118,8 @@ namespace PROPOSAL {
                                             const Definition&,
                                             std::shared_ptr<const InterpolationDef>) const;
 
+        CrossSection* CreateWeakInteraction(const WeakInteraction&,
+                                            std::shared_ptr<const InterpolationDef>) const;
 
         // ----------------------------------------------------------------------------
         /// @brief string to enum conversation for photo parametrizations

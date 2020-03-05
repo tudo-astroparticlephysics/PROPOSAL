@@ -76,6 +76,18 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
     }
 }
 
+CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const Bremsstrahlung& param,
+                                                          std::shared_ptr<const EnergyCutSettings> cuts,
+                                                          std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+{
+    if(interpolation_def==nullptr){
+        return new BremsIntegral(param, cuts);
+    }
+    else{
+        return new BremsInterpolant(param, cuts, interpolation_def);
+    }
+}
+
 // ------------------------------------------------------------------------- //
 BremsstrahlungFactory::Enum BremsstrahlungFactory::GetEnumFromString(const std::string& name)
 {

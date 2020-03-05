@@ -58,6 +58,17 @@ CrossSection* AnnihilationFactory::CreateAnnihilation(const ParticleDef& particl
     }
 }
 
+CrossSection* AnnihilationFactory::CreateAnnihilation(const Annihilation& parametrization,
+                                                      std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+{
+    if(interpolation_def == nullptr){
+        return new AnnihilationIntegral(parametrization);
+    }
+    else{
+        return new AnnihilationInterpolant(parametrization, interpolation_def);
+    }
+}
+
 // ------------------------------------------------------------------------- //
 void AnnihilationFactory::Register(const std::string& name,
                                       Enum enum_t,
