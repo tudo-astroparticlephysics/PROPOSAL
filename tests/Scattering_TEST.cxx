@@ -130,15 +130,9 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Scattering, Scatter)
 {
-    std::ifstream in;
     std::string filename = "bin/TestFiles/Scattering_scatter.txt";
-
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;

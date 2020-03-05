@@ -178,14 +178,9 @@ TEST(Propagation, Test_nan)
 
 TEST(Propagation, particle_type)
 {
-    std::ifstream in;
     std::string filename = "bin/TestFiles/Propagator_propagation.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     // Just skip the header
     char firstLine[256];

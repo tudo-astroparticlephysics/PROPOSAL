@@ -195,14 +195,9 @@ EXPECT_TRUE(PhotoAngle_E == PhotoAngle_F);
 
 TEST(PhotoPair, Test_of_dNdx)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/PhotoPair_dNdx.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -239,14 +234,9 @@ delete photopair;
 
 TEST(PhotoPair, Test_of_dNdx_rnd)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/PhotoPair_dNdx_rnd.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -287,14 +277,9 @@ delete photopair;
 
 TEST(PhotoPair, Test_of_dNdx_Interpolant)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/PhotoPair_dNdx_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -334,14 +319,9 @@ delete photopair;
 
 TEST(PhotoPair, Test_of_dNdxrnd_interpol)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/PhotoPair_dNdx_rnd_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);

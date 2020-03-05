@@ -172,14 +172,9 @@ EXPECT_TRUE(Interpol_A == Interpol_B);
 
 TEST(Mupairproduction, Test_of_dEdx)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Mupair_dEdx.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -218,14 +213,9 @@ delete mupair;
 
 TEST(Mupairproduction, Test_of_dNdx)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Mupair_dNdx.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -264,14 +254,9 @@ delete mupair;
 
 TEST(Mupairproduction, Test_of_dNdx_rnd)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Mupair_dNdx_rnd.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -314,14 +299,9 @@ delete mupair;
 
 TEST(Mupairproduction, Test_Stochastic_Loss)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Mupair_e.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -367,14 +347,9 @@ delete mupair;
 
 TEST(Mupairproduction, Test_Calculate_Rho)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Mupair_rho.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -429,14 +404,9 @@ delete mupair;
 
 TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Mupair_dEdx_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -478,14 +448,9 @@ delete mupair;
 
 TEST(Mupairproduction, Test_of_dNdx_Interpolant)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Mupair_dNdx_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -527,14 +492,9 @@ delete mupair;
 
 TEST(Mupairproduction, Test_of_dNdxrnd_interpol)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Mupair_dNdx_rnd_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -579,14 +539,9 @@ delete mupair;
 
 TEST(Mupairproduction, Test_of_e_interpol)
 {
-std::ifstream in;
 std::string filename = testfile_dir + "Mupair_e_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);

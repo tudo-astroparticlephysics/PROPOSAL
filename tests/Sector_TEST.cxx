@@ -148,13 +148,9 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Sector, Continuous)
 {
-    std::ifstream in;
     std::string filename = "bin/TestFiles/Sector_ContinousLoss.txt";
-    in.open(filename.c_str());
-
-    if (!in.good()) {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
@@ -206,13 +202,9 @@ TEST(Sector, Continuous)
 
 TEST(Sector, Stochastic)
 {
-    std::ifstream in;
     std::string filename = "bin/TestFiles/Sector_StochasticLoss.txt";
-    in.open(filename.c_str());
-
-    if (!in.good()) {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
@@ -264,13 +256,9 @@ TEST(Sector, Stochastic)
 
 TEST(Sector, EnergyDisplacement)
 {
-    std::ifstream in;
     std::string filename = "bin/TestFiles/Sector_Energy_Distance.txt";
-    in.open(filename.c_str());
-
-    if (!in.good()) {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
@@ -317,13 +305,9 @@ TEST(Sector, EnergyDisplacement)
 
 TEST(Sector, Propagate)
 {
-    std::ifstream in;
     std::string filename = "bin/TestFiles/Sector_Propagate.txt";
-    in.open(filename.c_str());
-
-    if (!in.good()) {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);

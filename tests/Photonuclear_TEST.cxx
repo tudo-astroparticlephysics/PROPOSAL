@@ -242,14 +242,9 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Real_dEdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -291,14 +286,9 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
 
 TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Real_dNdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -340,14 +330,9 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
 
 TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Real_dNdx_rnd.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -390,14 +375,9 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd)
 
 TEST(PhotoRealPhotonAssumption, Test_of_e)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Real_e.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -440,14 +420,9 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
 
 TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Real_dEdx_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -491,14 +466,9 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
 
 TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Real_dNdx_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -542,14 +512,9 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
 
 TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Real_dNdx_rnd_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -594,14 +559,9 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd_Interpolant)
 
 TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_e_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -648,14 +608,9 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
 
 TEST(PhotoQ2Integration, Test_of_dEdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Q2_dEdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -697,14 +652,9 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
 
 TEST(PhotoQ2Integration, Test_of_dNdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Q2_dNdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -746,14 +696,9 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
 
 TEST(PhotoQ2Integration, Test_of_dNdx_rnd)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Q2_dNdx_rnd.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -796,14 +741,9 @@ TEST(PhotoQ2Integration, Test_of_dNdx_rnd)
 
 TEST(PhotoQ2Integration, Test_of_e)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Q2_e.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -846,14 +786,9 @@ TEST(PhotoQ2Integration, Test_of_e)
 
 TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Q2_dEdx_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -897,14 +832,9 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
 
 TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Q2_dNdx_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -948,14 +878,9 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
 
 TEST(PhotoQ2Integration, Test_of_dNdx_rnd_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Q2_dNdx_rnd_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
@@ -1000,14 +925,9 @@ TEST(PhotoQ2Integration, Test_of_dNdx_rnd_Interpolant)
 
 TEST(PhotoQ2Integration, Test_of_e_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Photo_Q2_e_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     std::string particleName;
     std::string mediumName;
