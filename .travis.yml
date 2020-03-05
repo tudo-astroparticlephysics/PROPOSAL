@@ -61,12 +61,12 @@ matrix:
         - CXX=clang++-8
 
 before_install:
-  - pwd
   - pyenv global system 3.7
 
 install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade; brew install cmake; fi
 before_script:
+- curl https://proposal.app.tu-dortmund.de/resources/2020-02-26/TestFiles.tar.gz --output tests/TestFiles.tar.gz
 - mkdir build
 - cd build
 - cmake .. -DADD_TESTS=ON -DADD_PYTHON=OFF
@@ -76,8 +76,8 @@ script:
 - travis_wait 60 ctest -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
 after_success:
 - git clean -fdx
-- cd $HOME/tudo-astroparticlephysics
-- tar czf PROPOSAL-$TRAVIS_BRANCH.tar.gz --exclude-vcs PROPOSAL
+- cd $TRAVIS_BUILD_DIR/..
+- tar czf PROPOSAL-$TRAVIS_TAG.tar.gz --exclude-vcs PROPOSAL
 notifications:
   email: false
 deploy:
