@@ -30,120 +30,77 @@
 
 #include <vector>
 
-#include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
-#include "PROPOSAL/crossection/factories/ComptonFactory.h"
-#include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
-#include "PROPOSAL/crossection/factories/IonizationFactory.h"
-#include "PROPOSAL/crossection/factories/MupairProductionFactory.h"
-#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
-#include "PROPOSAL/crossection/factories/WeakInteractionFactory.h"
-#include "PROPOSAL/crossection/factories/PhotoPairFactory.h"
-#include "PROPOSAL/crossection/factories/AnnihilationFactory.h"
-
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
+using namespace std::tuple;
 namespace PROPOSAL {
 
 class CrossSection;
-
 struct InterpolationDef;
 
+typedef std::vector<std::shared_ptr<CrossSection>> Crosssections;
+typedef const double random_number;
+typedef const double energy;
+typedef const double distance;
+
 class Utility {
-   public:
+public:
     struct Definition {
-        BremsstrahlungFactory::Definition brems_def;
-        ComptonFactory::Definition compton_def;
-        PhotonuclearFactory::Definition photo_def;
-        EpairProductionFactory::Definition epair_def;
-        IonizationFactory::Definition ioniz_def;
-        MupairProductionFactory::Definition mupair_def;
-        WeakInteractionFactory::Definition weak_def;
-        PhotoPairFactory::Definition photopair_def;
-        AnnihilationFactory::Definition annihilation_def;
+        std::shared_ptr<InterpolationDef> inter_def;  // integration used
+        std::shared_ptr<Scattering> scattering;       // no scattering
+        std::shared_ptr<Crosssections> crosssections; // copy is expensive
 
-        bool operator==(const Utility::Definition& utility_def) const;
-        bool operator!=(const Utility::Definition& utility_def) const;
-        friend std::ostream& operator<<(std::ostream&, Definition const&);
-
-        Definition();
+        Definition(std::shared_ptr<Crosssections>,
+            std::shared_ptr<Scattering> = nullptr,
+            std::shared_ptr<InterpolationDef> = nullptr);
         ~Definition();
     };
 
-   public:
-    Utility(const ParticleDef&,
-            const Medium&,
-            const EnergyCutSettings&,
-            Definition);
-    Utility(const ParticleDef&,
-            const Medium&,
-            const EnergyCutSettings&,
-            Definition,
-            const InterpolationDef&);
-    Utility(const std::vector<CrossSection*>&);
-    Utility(const Utility&);
-    virtual ~Utility();
+    Utility(std::unique_ptr<Definition> utility_def)
+        : utility_def(std::move(utility_def)){};
 
-    const Utility* clone() const {return new Utility(*this);}
+    std::shared_ptr<Crosssection> TypeInteraction(
+        double, const std::array<double, 2>&);
+    double EnergyStochasticloss(
+        const Crosssection&, double, const std::array<double, 2>&);
+    double EnergyDecay(double, double);
+    double EnergyInteraction(double, double);
+    double EnergyRandomize(double, double, double);
+    double LengthContinuous(double, double, double);
+    double ElapsedTime(double, double, double);
 
-    bool operator==(const Utility& utility) const;
-    bool operator!=(const Utility& utility) const;
-    friend std::ostream& operator<<(std::ostream&, Utility const&);
+    // TODO: return value doesn't tell what it include. Maybe it would be better
+    // to give a tuple of two directions back. One is the mean over the
+    // displacement and the other is the actual direction. With a get methode
+    // there could be a possible access with the position of the object stored
+    // in an enum.
+    tuple<Vector3D, Vector3D> DirectionsScatter(double, double, double, const Vector3D&, const Vector3D&, const std::array<double, 4>&);
+    Vector3D DirectionDeflect(double, double, double, const Vector3D&, const Vector3D&);
 
-    const ParticleDef& GetParticleDef() const { return particle_def_; }
-    const Medium& GetMedium() const { return *medium_; }
-    const std::vector<CrossSection*>& GetCrosssections() const {
-        return crosssections_;
-    }
-    CrossSection* GetCrosssection(int typeId) const;
+private:
+    Definition utility_def;
 
-    std::pair<double, int> StochasticLoss(
-        double particle_energy, double rnd1, double rnd2, double rnd3);
+    std::unique_ptr<UtilityDecorator> displacement_calc = nullptr;
+    std::unique_ptr<UtilityDecorator> interaction_calc = nullptr;
+    std::unique_ptr<UtilityDecorator> decay_calc = nullptr;
+    std::unique_ptr<UtilityDecorator> cont_rand = nullptr;
+    std::unique_ptr<UtilityDecorator> exact_time = nullptr;
 
-   protected:
-    Utility& operator=(const Utility&);  // Undefined & not allowed
-
-    // --------------------------------------------------------------------- //
-    // Protected members
-    // --------------------------------------------------------------------- //
-
-    ParticleDef particle_def_;
-    Medium* medium_;
-    EnergyCutSettings cut_settings_;
-
-    std::vector<CrossSection*> crosssections_;
+    double mass;
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
 class UtilityDecorator {
-   public:
-    UtilityDecorator(const Utility&);
+    Crosssections crossections;
 
-    // Copy constructors
-    UtilityDecorator(const UtilityDecorator&);
-    virtual UtilityDecorator* clone(const Utility&) const = 0;
+public:
+    UtilityDecorator(Crosssections cross)
+        : crosssections(crosssections){};
 
-    virtual ~UtilityDecorator();
-
-    bool operator==(const UtilityDecorator& utility_decorator) const;
-    bool operator!=(const UtilityDecorator& utility_decorator) const;
-
-    // Methods
-    virtual double FunctionToIntegral(double energy);
+    virtual double FunctionToIntegral(double energy) = 0;
     virtual double Calculate(double ei, double ef, double rnd) = 0;
-    virtual double Calculate(double, double, double, const Vector3D&, const Vector3D&);
     virtual double GetUpperLimit(double ei, double rnd) = 0;
-
-    const Utility& GetUtility() const { return utility_; }
-
-   protected:
-    UtilityDecorator& operator=(
-        const UtilityDecorator&);  // Undefined & not allowed
-
-    // Implemented in child classes to be able to use equality operator
-    virtual bool compare(const UtilityDecorator&) const = 0;
-
-    const Utility& utility_;
 };
-
-}  // namespace PROPOSAL
+} // namespace PROPOSAL

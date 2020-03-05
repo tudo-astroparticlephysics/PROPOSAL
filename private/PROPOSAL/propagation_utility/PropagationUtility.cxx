@@ -1,7 +1,6 @@
 
-#include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 #include "PROPOSAL/Logging.h"
-#include "PROPOSAL/medium/Medium.h"
+#include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
@@ -9,400 +8,194 @@
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 using namespace PROPOSAL;
+using namespace std::tuple;
 
 /******************************************************************************
  *                            Propagation utility                              *
  ******************************************************************************/
 
-Utility::Definition::Definition()
-    // : do_interpolation(true)
-    // , interpolation_def()
-    : brems_def()
-    , compton_def()
-    , photo_def()
-    , epair_def()
-    , ioniz_def()
-    , mupair_def()
-    , weak_def()
-    , photopair_def()
-    , annihilation_def()
+Utility::Definition::Definition(std::shared_ptr<Crosssections> corsssection,
+    std::shared_ptr<Scattering> scattering = nullptr,
+    std::shared_ptr<InterpolationDef> inter_def = nullptr)
+    : crosssection(crosssection)
+    , scattering(scattering)
+    , inter_def(inter_def)
+    , mass(crosssection.first()
+               .GetParticleDef()
+               .mass); // if particle energy would be kinetic energy, this copy
+                       // is redundant
 {
+    if (!inter_def) {
+        log_warn("No interpolation definition defined. Integral will not be "
+                 "approximate by interpolants. Performance will be poor.");
+
+        displacement_calc.reset(new UtilityIntegralDisplacement(crosssection));
+        interaction_calc.reset(new UtilityIntegralInteraction(crosssection));
+        decay_calc.reset(new UtilityIntegralDecay(crosssection))
+    } else {
+        displacement_calc.reset(
+            new UtilityInterpolantDisplacement(crosssection, inter_def));
+        interaction_calc.reset(
+            new UtilityInterpolantInteraction(crosssection, inter_def));
+        decay_calc.reset(new UtilityInterpolantDecay(crosssection, inter_def))
+    }
+
+    if (!scattering) {
+        log_debug("No scattering defined. Partilce will only be deflected if a "
+                  "stochastic deflection is in the crosssection implemented.");
+    }
+
+    if (!cont_rand) {
+        log_debug("No continous randomization used.");
+    } else {
+        if (!inter_def) {
+            cont_rand.reset(new UtilityIntegralContRand(crosssection))
+        } else {
+            cont_rand.reset(
+                new UtilityInterpolantContRand(crosssection, inter_def))
+        }
+    }
+
+    if (!exact_time) {
+        log_debug("No exact time calculator used.");
+    }
+}
+else
+{
+    if (!inter_def) {
+        cont_rand.reset(new UtilityIntegralTime(crosssection))
+    } else {
+        cont_rand.reset(new UtilityInterpolantTime(crosssection, inter_def))
+    }
+}
 }
 
-
-bool Utility::Definition::operator==(
-    const Utility::Definition& utility_def) const {
-    if (brems_def != utility_def.brems_def)
-        return false;
-    else if (compton_def != utility_def.compton_def)
-        return false;
-    else if (photo_def != utility_def.photo_def)
-        return false;
-    else if (epair_def != utility_def.epair_def)
-        return false;
-    else if (ioniz_def != utility_def.ioniz_def)
-        return false;
-    else if (mupair_def != utility_def.mupair_def)
-        return false;
-    else if (weak_def != utility_def.weak_def)
-        return false;
-    else if (photopair_def != utility_def.photopair_def)
-        return false;
-    else if (annihilation_def != utility_def.annihilation_def)
-        return false;
-
-    return true;
-}
-
-bool Utility::Definition::operator!=(
-    const Utility::Definition& utility_def) const {
-    return !(*this == utility_def);
-}
-
-std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::Utility::Definition const& util_definition)
+std::ostream& PROPOSAL::operator<<(
+    std::ostream& os, PROPOSAL::Utility::Definition const& util_definition)
 {
     std::stringstream ss;
     ss << " Utility Definition (" << &util_definition << ") ";
     os << Helper::Centered(60, ss.str()) << '\n';
 
-    os << "Annihilation Definition:\n" << util_definition.annihilation_def << std::endl;
-    os << "Bremsstrahlung Definition:\n" << util_definition.brems_def << std::endl;
-    os << "Compton Definition:\n" << util_definition.compton_def << std::endl;
-    os << "EPair Production Definition:\n" << util_definition.epair_def << std::endl;
-    os << "Ionization Definition:\n" << util_definition.ioniz_def << std::endl;
-    os << "MuPair Production Definition:\n" << util_definition.mupair_def << std::endl;
-    os << "Photonuclear Definition:\n" << util_definition.photo_def << std::endl;
-    os << "PhotoPair Production Definition:\n" << util_definition.photopair_def << std::endl;
-    os << "Weak Interaction Definition:\n" << util_definition.weak_def << std::endl;
-
+    for (const auto& crosssection : util_definition->crosssection) {
+        os << crosssection << std::endl;
+    }
+    if (scattering) {
+        os << scattering << std::endl;
+    };
+    if (inter_def) {
+        os << inter_def << std::endl;
+    }
+    if (cont_rand) {
+        os << cont_rand << std::endl;
+    }
+    if (exact_time) {
+        os << exact_time << std::endl;
+    };
     os << Helper::Centered(60, "");
     return os;
 }
 
-Utility::Definition::~Definition() {}
+// -------------------------------------------------------------------------
+// // Constructors
+// -------------------------------------------------------------------------
 
-// ------------------------------------------------------------------------- //
-// Constructors
-// ------------------------------------------------------------------------- //
-
-Utility::Utility(const ParticleDef& particle_def,
-                 const Medium& medium,
-                 const EnergyCutSettings& cut_settings,
-                 Definition utility_def)
-    : particle_def_(particle_def)
-    , medium_(medium.clone())
-    , cut_settings_(cut_settings)
-    , crosssections_()
+Utility::Utility(std::unique_ptr<Utility::Definition> utility_def)
+    : utility_def(std::move(utility_def))
 {
-    if(utility_def.brems_def.parametrization!=BremsstrahlungFactory::Enum::None) {
-        crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
-                particle_def_, *medium_, cut_settings_, utility_def.brems_def));
-    }
-
-    if(utility_def.photo_def.parametrization!=PhotonuclearFactory::Enum::None) {
-        crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(
-                particle_def_, *medium_, cut_settings_,utility_def.photo_def));
-    }
-
-    if(utility_def.epair_def.parametrization!=EpairProductionFactory::Enum::None) {
-        crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(
-                particle_def_, *medium_, cut_settings_, utility_def.epair_def));
-    }
-
-    if(utility_def.ioniz_def.parametrization!=IonizationFactory::Enum::None) {
-        crosssections_.push_back(IonizationFactory::Get().CreateIonization(
-                particle_def_, *medium_, cut_settings_, utility_def.ioniz_def));
-    }
-    else{
-        log_debug("No Ionization cross section chosen. For lepton propagation,Initialization may fail because no cross"
-                  "section for small energies are available. You may have to enable Ionization or set a higher e_low"
-                  "parameter for the particle.");
-    }
-
-    if(utility_def.annihilation_def.parametrization!=AnnihilationFactory::Enum::None) {
-        crosssections_.push_back(AnnihilationFactory::Get().CreateAnnihilation(
-                particle_def_, *medium_, utility_def.annihilation_def));
-        log_debug("Annihilation enabled");
-    }
-
-    if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
-        crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
-            particle_def_, *medium_, cut_settings_, utility_def.mupair_def));
-        log_debug("Mupair Production enabled");
-    }
-
-    if(utility_def.weak_def.parametrization!=WeakInteractionFactory::Enum::None) {
-        crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
-                    particle_def_, *medium_, utility_def.weak_def));
-        log_debug("Weak Interaction enabled");
-    }
-
-    // Photon interactions
-
-    if(utility_def.compton_def.parametrization!=ComptonFactory::Enum::None) {
-        crosssections_.push_back(ComptonFactory::Get().CreateCompton(
-                particle_def_, *medium_, cut_settings_, utility_def.compton_def));
-        log_debug("Compton enabled");
-    }
-
-    if(utility_def.photopair_def.parametrization!=PhotoPairFactory::Enum::None) {
-        crosssections_.push_back(PhotoPairFactory::Get().CreatePhotoPair(
-                particle_def_, *medium_, utility_def.photopair_def));
-        log_debug("PhotoPairProduction enabled");
-    }
 }
 
-Utility::Utility(const ParticleDef& particle_def,
-                 const Medium& medium,
-                 const EnergyCutSettings& cut_settings,
-                 Definition utility_def,
-                 const InterpolationDef& interpolation_def)
-    : particle_def_(particle_def)
-    , medium_(medium.clone())
-    , cut_settings_(cut_settings)
-    , crosssections_()
+std::shared_ptr<Crosssection> Utility::TypeInteraction(
+    double energy, const std::array<double, 2>& rnd)
 {
-    if(utility_def.brems_def.parametrization!=BremsstrahlungFactory::Enum::None) {
-        crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
-                particle_def_, *medium_, cut_settings_, utility_def.brems_def, interpolation_def));
-    }
+    std::array<double, crosssections_.size()> rates;
+    for (const auto& cross : crosssections)
+        rates = crosssections->CalculatedNdx(energy, rnd[1]);
 
-    if(utility_def.photo_def.parametrization!=PhotonuclearFactory::Enum::None) {
-        crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(
-                particle_def_, *medium_, cut_settings_, utility_def.photo_def, interpolation_def));
-    }
-
-    if(utility_def.epair_def.parametrization!=EpairProductionFactory::Enum::None) {
-        crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(
-                particle_def_, *medium_, cut_settings_, utility_def.epair_def, interpolation_def));
-    }
-
-    if(utility_def.ioniz_def.parametrization!=IonizationFactory::Enum::None) {
-        crosssections_.push_back(IonizationFactory::Get().CreateIonization(
-                particle_def_, *medium_, cut_settings_, utility_def.ioniz_def, interpolation_def));
-    }else{
-        log_debug("No Ionization cross section chosen. For lepton propagation,Initialization may fail because no cross"
-                  "section for small energies are available. You may have to enable Ionization or set a higher e_low"
-                  "parameter for the particle.");
-    }
-
-    if(utility_def.annihilation_def.parametrization!=AnnihilationFactory::Enum::None) {
-        crosssections_.push_back(AnnihilationFactory::Get().CreateAnnihilation(
-                particle_def_, *medium_, utility_def.annihilation_def, interpolation_def));
-        log_debug("Annihilation enabled");
-    }
-
-    if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
-        crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
-                    particle_def_, *medium_, cut_settings_, utility_def.mupair_def, interpolation_def));
-        log_debug("Mupair Production enabled");
-    }
-
-    if(utility_def.weak_def.parametrization!=WeakInteractionFactory::Enum::None) {
-        crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
-                    particle_def_, *medium_, utility_def.weak_def, interpolation_def));
-        log_debug("Weak Interaction enabled");
-    }
-
-    // Photon interactions
-
-    if(utility_def.compton_def.parametrization!=ComptonFactory::Enum::None) {
-        crosssections_.push_back(ComptonFactory::Get().CreateCompton(
-                particle_def_, *medium_, cut_settings_, utility_def.compton_def, interpolation_def));
-        log_debug("Compton enabled");
-    }
-
-    if(utility_def.photopair_def.parametrization!=PhotoPairFactory::Enum::None) {
-        crosssections_.push_back(PhotoPairFactory::Get().CreatePhotoPair(
-                particle_def_, *medium_, utility_def.photopair_def, interpolation_def));
-        log_debug("PhotoPairProduction enabled");
-    }
-}
-
-Utility::Utility(const std::vector<CrossSection*>& crosssections) try
-    : particle_def_(crosssections.at(0)->GetParametrization().GetParticleDef()),
-      medium_(crosssections.at(0)->GetParametrization().GetMedium().clone()),
-      cut_settings_(crosssections.at(0)->GetParametrization().GetEnergyCuts()) {
-    for (std::vector<CrossSection*>::const_iterator it = crosssections.begin();
-         it != crosssections.end(); ++it) {
-        if ((*it)->GetParametrization().GetParticleDef() != particle_def_) {
-            log_fatal(
-                "Particle definition of the cross section must be equal!");
-        }
-
-        if ((*it)->GetParametrization().GetMedium() != *medium_) {
-            log_fatal("Medium of the cross section must be equal!");
-        }
-
-        if ((*it)->GetParametrization().GetEnergyCuts() != cut_settings_) {
-            log_fatal("Energy cuts of the cross section must be equal!");
-        }
-
-        crosssections_.push_back((*it)->clone());
-    }
-} catch (const std::out_of_range& e) {
-    log_fatal("At least one cross section is needed for initializing utility.");
-}
-
-Utility::Utility(const Utility& collection)
-    : particle_def_(collection.particle_def_),
-      medium_(collection.medium_->clone()),
-      cut_settings_(collection.cut_settings_),
-      crosssections_(collection.crosssections_.size(), NULL) {
-    for (unsigned int i = 0; i < crosssections_.size(); ++i) {
-        crosssections_[i] = collection.crosssections_[i]->clone();
-    }
-}
-
-Utility::~Utility() {
-    delete medium_;
-
-    for (std::vector<CrossSection*>::const_iterator iter =
-             crosssections_.begin();
-         iter != crosssections_.end(); ++iter) {
-        delete *iter;
-    }
-
-    crosssections_.clear();
-}
-
-bool Utility::operator==(const Utility& utility) const {
-    if (particle_def_ != utility.particle_def_)
-        return false;
-    else if (*medium_ != *utility.medium_)
-        return false;
-    else if (cut_settings_ != utility.cut_settings_)
-        return false;
-    else if (crosssections_.size() != utility.crosssections_.size())
-        return false;
-
-    for (unsigned int i = 0; i < crosssections_.size(); ++i) {
-        if (*crosssections_[i] != *utility.crosssections_[i])
-            return false;
-    }
-
-    return true;
-}
-
-bool Utility::operator!=(const Utility& utility) const {
-    return !(*this == utility);
-}
-
-std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::Utility const& utility)
-{
-    std::stringstream ss;
-    ss << " Propagation Utility (" << &utility << ") ";
-    os << Helper::Centered(60, ss.str()) << '\n';
-
-    os << "Particle Def:\n" << utility.particle_def_ << std::endl;
-    os << "Medium:\n" << *utility.medium_ << std::endl;
-    os << "EnergyCutSettings:\n" << utility.cut_settings_ << std::endl;
-
-    os << Helper::Centered(60, "");
-    return os;
-}
-
-CrossSection* Utility::GetCrosssection(int typeId) const {
-    for (auto& i : crosssections_) {
-        if (i->GetTypeId() == typeId) {
-            return i;
-        }
-    }
-    log_fatal("No CrossSection found");
-    return nullptr;
-}
-
-
-std::pair<double, int> Utility::StochasticLoss(
-    double particle_energy, double rnd1, double rnd2, double rnd3)
-{
-    double total_rate = 0;
-    double total_rate_weighted = 0;
-    double rates_sum = 0;
-    std::vector<double> rates;
-    rates.resize(crosssections_.size());
-
-    // return 0 and unknown, if there is no interaction
-    std::pair<double, int> energy_loss;
-    energy_loss.first = 0.;
-    energy_loss.second = 0;
-
-    for (unsigned int i = 0; i < crosssections_.size(); i++) {
-        rates[i] = crosssections_[i]->CalculatedNdx(particle_energy, rnd2);
-        total_rate += rates[i];
-    }
-
-    total_rate_weighted = total_rate * rnd1;
-
+    double total_rate{ std::accumulate(rates.begin(), rates.end(), 0) };
     log_debug("Total rate = %f, total rate weighted = %f", total_rate,
-              total_rate_weighted);
+        total_rate * rnd[0]);
 
-    for (unsigned int i = 0; i < rates.size(); i++) {
+    double rates_sum = 0;
+    for (size_t i = 0; i < rates.size(); i++) {
         rates_sum += rates[i];
-
-        if (rates_sum >= total_rate_weighted) {
-            energy_loss.first = crosssections_[i]->CalculateStochasticLoss(
-                particle_energy, rnd2, rnd3);
-            energy_loss.second = crosssections_[i]->GetTypeId();
-
-            break;
-        }
+        if (rates_sum >= total_rate * rnd[0])
+            return crosssection;
     }
 
-    return energy_loss;
+    throw std::logic_error("Something get wrong in total rate calculation.");
 }
 
-
-/******************************************************************************
- *                            Utility Decorator                            *
- ******************************************************************************/
-
-UtilityDecorator::UtilityDecorator(const Utility& utility)
-    : utility_(*utility.clone()) {}
-
-UtilityDecorator::UtilityDecorator(const UtilityDecorator& decorator)
-    : utility_(*decorator.utility_.clone()) {}
-
-UtilityDecorator::~UtilityDecorator() {}
-
-bool UtilityDecorator::operator==(
-    const UtilityDecorator& utility_decorator) const {
-    if (typeid(*this) != typeid(utility_decorator))
-        return false;
-    if (utility_ != utility_decorator.utility_)
-        return false;
-    else
-        return this->compare(utility_decorator);
+double Utility::EnergyStochasticloss(
+    const Crosssection& corss, double energy, const std::array<double, 2>& rnd)
+{
+    return cross.CalculateStochasticLoss(energy, rnd[0], rnd[1]);
 }
 
-bool UtilityDecorator::operator!=(
-    const UtilityDecorator& utility_decorator) const {
-    return !(*this == utility_decorator);
+int Utility::EnergyDecay(double energy, double rnd)
+{
+    auto rndd = -std::log(rnd);
+    auto rnddMin = 0;
+
+    rnddMin = decay_calc->Calculate(energy, mass, rndd);
+
+    // evaluating the energy loss
+    if (rndd >= rnddMin || rnddMin <= 0)
+        return mass;
+
+    return decay_calc->GetUpperLimit(energy, rndd);
 }
 
-// ------------------------------------------------------------------------- //
-double UtilityDecorator::FunctionToIntegral(double energy) {
-    double result = 0.0;
+double Utility::EnergyInteraction(double energy, double rnd)
+{
+    auto rndi = -std::log(rnd);
+    auto rndiMin = 0.;
 
-    const std::vector<CrossSection*> crosssections =
-        utility_.GetCrosssections();
+    // solving the tracking integral
+    rndiMin = interaction_calc->Calculate(energy, mass, rndi);
 
-    for (std::vector<CrossSection*>::const_iterator iter =
-             crosssections.begin();
-         iter != crosssections.end(); ++iter) {
-        result += (*iter)->CalculatedEdx(energy);
+    if (rndi >= rndiMin || rndiMin <= 0)
+        return mass;
+
+    return interaction_calc->GetUpperLimit(energy, rndi);
+}
+
+double EnergyRandomize(double initial_energy, double final_energy, double rnd)
+{
+    if (cont_rand) {
+        return cont_rand->Randomize(
+            initial_energy, final_energy, distance, rnd);
+    } else {
+        return final_energy;
     }
-
-    return -1.0 / result;
 }
 
-double UtilityDecorator::Calculate(double ei,
-                                   double ef,
-                                   double rnd,
-                                   const Vector3D& xi,
-                                   const Vector3D& direction) {
-    (void)xi;
-    (void)direction;
+double Utility::TimeElapsed(
+    double initial_energy, double final_energy, double distance)
+{
+    if (exact_time) {
+        return exact_time->Calculate(initial_energy, final_energy, distance);
+    } else {
+        return displacement / SPEED;
+    }
+}
 
-    return this->Calculate(ei, ef, rnd);
+tuple<Vector3D, Vector3D> DirectionsScatter(double displacement,
+    double initial_energy, double final_energy, const Vector3D& position,
+    const Vector3D& direction, const std::array<double, 4>& rnd)
+{
+    return scattering->Scatter(
+        displacement, initial_energy, final_energy, position, direction, rnd);
+}
+
+Vector3D DirectionDeflect(
+    const Crosssection& cross, double particle_energy, double loss_energy)
+{
+    return crosss.StochasticDeflection(particle_energy, loss_energy);
+}
+
+double LengthContinuous(
+    double initial_energy, double final_energy, double border_length)
+{
+    displacement_calc->Calculate(initial_energy, final_energy, border_length);
 }
