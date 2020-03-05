@@ -55,7 +55,7 @@ namespace PROPOSAL {
 
     private:
         virtual double CalculateStochasticLoss(double energy, double rnd1);
-        virtual void InitdNdxInterpolation(const InterpolationDef& def);
+        virtual void InitdNdxInterpolation(const InterpolationDef&);
 
     };
 

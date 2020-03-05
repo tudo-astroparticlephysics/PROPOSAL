@@ -8,7 +8,7 @@
 
 using namespace PROPOSAL;
 
-PhotoIntegral::PhotoIntegral(const Photonuclear& param, std::shared_ptr<EnergyCutSettings> cuts)
+PhotoIntegral::PhotoIntegral(const Photonuclear& param, std::shared_ptr<const EnergyCutSettings> cuts)
     : CrossSectionIntegral(param, cuts)
 {
 }

@@ -45,7 +45,7 @@ public:
     // Public methods
     // ----------------------------------------------------------------- //
     double Delta(double beta, double gamma);
-    virtual const InteractionType GetInteractionType() const final {return InteractionType::Ioniz;}
+    virtual InteractionType GetInteractionType() const final {return InteractionType::Ioniz;}
     double DifferentialCrossSection(double energy, double v) = 0;
 
 protected:

@@ -354,7 +354,7 @@ const std::string IonizBergerSeltzerBhabha::name_ = "IonizBergerSeltzerBhabha";
 
 IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(const ParticleDef& particle_def,
                                                    std::shared_ptr<const Medium> medium,
-                                                   std::shared_ptr<EnergyCutSettings> cuts,
+                                                   std::shared_ptr<const EnergyCutSettings> cuts,
                                                    double multiplier)
         : Ionization(particle_def, medium, cuts, multiplier)
 {

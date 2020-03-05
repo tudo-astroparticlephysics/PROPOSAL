@@ -16,7 +16,7 @@
 
 using namespace PROPOSAL;
 
-ComptonInterpolant::ComptonInterpolant(const Compton& param, std::shared_ptr<EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
+ComptonInterpolant::ComptonInterpolant(const Compton& param, std::shared_ptr<const EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
         : CrossSectionInterpolant(param, cuts)
 {
     // Use own CrossSecition dNdx interpolation
@@ -206,7 +206,7 @@ double ComptonInterpolant::CalculateStochasticLoss(double energy, double rnd1)
 }
 
 // ------------------------------------------------------------------------- //
-void ComptonInterpolant::InitdNdxInterpolation(std::shared_ptr<const InterpolationDef> def)
+void ComptonInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
 {
     // --------------------------------------------------------------------- //
     // Builder for dNdx
@@ -227,21 +227,21 @@ void ComptonInterpolant::InitdNdxInterpolation(std::shared_ptr<const Interpolati
         // Order of builder matter because the functions needed for 1d interpolation
         // needs the already intitialized 2d interpolants.
         builder2d[i]
-                .SetMax1(def->nodes_cross_section)
+                .SetMax1(def.nodes_cross_section)
                 .SetX1Min(ME)
-                .SetX1Max(def->max_node_energy)
-                .SetMax2(def->nodes_cross_section)
-                .SetX2Min(1. / (2. * (1. - def->nodes_cross_section)))
-                .SetX2Max((1. - 2. * def->nodes_cross_section) / (2. * (1. - def->nodes_cross_section)))
-                .SetRomberg1(def->order_of_interpolation)
+                .SetX1Max(def.max_node_energy)
+                .SetMax2(def.nodes_cross_section)
+                .SetX2Min(1. / (2. * (1. - def.nodes_cross_section)))
+                .SetX2Max((1. - 2. * def.nodes_cross_section) / (2. * (1. - def.nodes_cross_section)))
+                .SetRomberg1(def.order_of_interpolation)
                 .SetRational1(false)
                 .SetRelative1(false)
                 .SetIsLog1(true)
-                .SetRomberg2(def->order_of_interpolation)
+                .SetRomberg2(def.order_of_interpolation)
                 .SetRational2(true)
                 .SetRelative2(false)
                 .SetIsLog2(false)
-                .SetRombergY(def->order_of_interpolation)
+                .SetRombergY(def.order_of_interpolation)
                 .SetRationalY(true)
                 .SetRelativeY(false)
                 .SetLogSubst(false)
@@ -257,14 +257,14 @@ void ComptonInterpolant::InitdNdxInterpolation(std::shared_ptr<const Interpolati
         builder_container2d[i].second = &dndx_interpolant_2d_[i];
 
         builder1d[i]
-                .SetMax(def->nodes_cross_section)
+                .SetMax(def.nodes_cross_section)
                 .SetXMin(ME)
-                .SetXMax(def->max_node_energy)
-                .SetRomberg(def->order_of_interpolation)
+                .SetXMax(def.max_node_energy)
+                .SetRomberg(def.order_of_interpolation)
                 .SetRational(false)
                 .SetRelative(false)
                 .SetIsLog(true)
-                .SetRombergY(def->order_of_interpolation)
+                .SetRombergY(def.order_of_interpolation)
                 .SetRationalY(true)
                 .SetRelativeY(false)
                 .SetLogSubst(false)
@@ -278,5 +278,5 @@ void ComptonInterpolant::InitdNdxInterpolation(std::shared_ptr<const Interpolati
     builder_return.insert(builder_return.end(), builder_container1d.begin(), builder_container1d.end());
     // builder2d.insert(builder2d.end(), builder1d.begin(), builder1d.end());
 
-    Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), *def);
+    Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), def);
 }

@@ -11,7 +11,7 @@
 
 using namespace PROPOSAL;
 
-ComptonIntegral::ComptonIntegral(const Compton& param, std::shared_ptr<EnergyCutSettings> cuts)
+ComptonIntegral::ComptonIntegral(const Compton& param, std::shared_ptr<const EnergyCutSettings> cuts)
         : CrossSectionIntegral(param, cuts)
 {
 }
@@ -183,7 +183,6 @@ double ComptonIntegral::CalculatedNdx(double energy, double rnd)
 double ComptonIntegral::CalculateCumulativeCrossSection(double energy, int i, double v)
 {
     parametrization_->SetCurrentComponent(i);
-    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
     double vUp = cuts_->GetCut(energy);
 

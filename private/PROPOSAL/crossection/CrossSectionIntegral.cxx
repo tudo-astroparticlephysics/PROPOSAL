@@ -14,7 +14,7 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-CrossSectionIntegral::CrossSectionIntegral(const Parametrization& param, std::shared_ptr<EnergyCutSettings> cuts)
+CrossSectionIntegral::CrossSectionIntegral(const Parametrization& param, std::shared_ptr<const EnergyCutSettings> cuts)
     : CrossSection(param, cuts)
     , dedx_integral_(IROMB, IMAXS, IPREC)
     , de2dx_integral_(IROMB, IMAXS, IPREC)
@@ -155,7 +155,6 @@ double CrossSectionIntegral::CalculateStochasticLoss(double energy, double rnd1,
 double CrossSectionIntegral::CalculateCumulativeCrossSection(double energy, int i, double v)
 {
     parametrization_->SetCurrentComponent(i);
-    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
     return dndx_integral_.at(i).Integrate(
             cuts_->GetCut(energy),

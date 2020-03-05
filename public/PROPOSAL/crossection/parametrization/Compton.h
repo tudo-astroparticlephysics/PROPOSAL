@@ -46,7 +46,7 @@ namespace PROPOSAL {
         // Public methods
         // ----------------------------------------------------------------- //
 
-        virtual const InteractionType GetInteractionType() const final {return InteractionType::Compton;}
+        virtual InteractionType GetInteractionType() const final {return InteractionType::Compton;}
         virtual double DifferentialCrossSection(double energy, double v) = 0;
 
         virtual KinematicLimits GetKinematicLimits(double energy);

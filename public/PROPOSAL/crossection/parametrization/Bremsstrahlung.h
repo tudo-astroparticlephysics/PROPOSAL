@@ -70,7 +70,7 @@ public:
     // Public methods
     // ----------------------------------------------------------------- //
 
-    virtual const InteractionType GetInteractionType() const final {return InteractionType::Brems;}
+    virtual InteractionType GetInteractionType() const final {return InteractionType::Brems;}
     virtual double DifferentialCrossSection(double energy, double v);
     virtual double CalculateParametrization(double energy, double v) = 0;
 

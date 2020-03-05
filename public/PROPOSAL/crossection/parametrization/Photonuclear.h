@@ -200,7 +200,7 @@ public:
     // ----------------------------------------------------------------- //
     // Public methods
     // ----------------------------------------------------------------- //
-    virtual const InteractionType GetInteractionType() const final {return InteractionType::Photonuclear;}
+    virtual InteractionType GetInteractionType() const final {return InteractionType::Photonuclear;}
     virtual double DifferentialCrossSection(double energy, double v) = 0;
 
     virtual KinematicLimits GetKinematicLimits(double energy);

@@ -45,7 +45,7 @@ CrossSection* AnnihilationFactory::CreateAnnihilation(const ParticleDef& particl
 
     if (it != annihilation_map_enum_.end())
     {
-        if(interpolation_def = nullptr){
+        if(interpolation_def == nullptr){
             return new AnnihilationIntegral(*it->second(particle_def, medium, def.multiplier));
         }
         else{

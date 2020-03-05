@@ -204,7 +204,6 @@ PhotoAngleDistribution::PhotoAngleDistribution(const PhotoAngleDistribution& pho
 }
 
 PhotoAngleDistribution::~PhotoAngleDistribution() {
-    delete medium_;
 }
 
 bool PhotoAngleDistribution::operator==(const PhotoAngleDistribution& photoangle) const {

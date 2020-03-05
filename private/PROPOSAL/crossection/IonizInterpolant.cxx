@@ -20,7 +20,7 @@
 
 using namespace PROPOSAL;
 
-IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
+IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<const EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
     : CrossSectionInterpolant(param, cuts)
 {
     // Use overwritten dNdx interpolation
@@ -228,9 +228,8 @@ double IonizInterpolant::FunctionToBuildDNdxInterpolant2D(double energy, double 
 double IonizInterpolant::CalculateStochasticLoss(double energy, double rnd1)
 {
     double rnd, rsum;
-    const Medium& medium = parametrization_->GetMedium();
 
-    rnd  = medium.GetSumCharge() * rnd1;
+    rnd  = parametrization_->GetMedium()->GetSumCharge() * rnd1;
     rsum = 0;
 
     double vUp;

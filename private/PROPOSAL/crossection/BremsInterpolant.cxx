@@ -13,7 +13,7 @@
 
 using namespace PROPOSAL;
 
-BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, std::shared_ptr<EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
+BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, std::shared_ptr<const EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
     : CrossSectionInterpolant(param, cuts)
 {
     // Use parent CrossSecition dNdx interpolation

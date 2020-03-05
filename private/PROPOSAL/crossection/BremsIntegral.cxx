@@ -7,7 +7,7 @@
 
 using namespace PROPOSAL;
 
-BremsIntegral::BremsIntegral(const Bremsstrahlung& param, std::shared_ptr<EnergyCutSettings> cuts)
+BremsIntegral::BremsIntegral(const Bremsstrahlung& param, std::shared_ptr<const EnergyCutSettings> cuts)
     : CrossSectionIntegral(param, cuts)
 {
 }

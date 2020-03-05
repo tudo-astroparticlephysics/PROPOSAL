@@ -174,11 +174,7 @@ void InitializeInterpolation(
                  parametrizations.begin();
              it != parametrizations.end(); ++it) {
             hash_combine(hash_digest, (*it)->GetHash(), (*it)->GetMultiplier(),
-                         (*it)->GetParticleDef().low);
-        }
-        if (name.compare("decay") == 0) {
-            hash_combine(hash_digest,
-                         parametrizations[0]->GetParticleDef().lifetime);
+                         (*it)->GetParticleLow());
         }
     }
     hash_combine(hash_digest, interpolation_def.GetHash());

@@ -11,7 +11,7 @@
 
 using namespace PROPOSAL;
 
-MupairIntegral::MupairIntegral(const MupairProduction& param, std::shared_ptr<EnergyCutSettings> cuts)
+MupairIntegral::MupairIntegral(const MupairProduction& param, std::shared_ptr<const EnergyCutSettings> cuts)
     : CrossSectionIntegral(param, cuts)
 {
     muminus_def_ = &MuMinusDef::Get();

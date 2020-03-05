@@ -11,11 +11,11 @@ using namespace PROPOSAL;
 // CrossSection
 // ------------------------------------------------------------------------- //
 
-CrossSection::CrossSection(const Parametrization& param, std::shared_ptr<EnergyCutSettings> cuts)
+CrossSection::CrossSection(const Parametrization& param, std::shared_ptr<const EnergyCutSettings> cuts)
     : parametrization_(param.clone())
-    , prob_for_component_(param.GetMedium().GetNumComponents(), 0)
+    , prob_for_component_(param.GetMedium()->GetNumComponents(), 0)
     , sum_of_rates_(0)
-    , components_(parametrization_->GetMedium().GetComponents())
+    , components_(parametrization_->GetMedium()->GetComponents())
     , rnd_(0)
     , cuts_(cuts)
 {
@@ -25,7 +25,7 @@ CrossSection::CrossSection(const CrossSection& cross_section)
     : parametrization_(cross_section.parametrization_->clone())
     , prob_for_component_(cross_section.prob_for_component_)
     , sum_of_rates_(cross_section.sum_of_rates_)
-    , components_(parametrization_->GetMedium().GetComponents())
+    , components_(parametrization_->GetMedium()->GetComponents())
     , rnd_(cross_section.rnd_)
     , cuts_(cross_section.cuts_)
 {

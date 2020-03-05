@@ -13,7 +13,7 @@
 
 using namespace PROPOSAL;
 
-PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, std::shared_ptr<EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
+PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, std::shared_ptr<const EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
     : CrossSectionInterpolant(param, cuts)
 {
     // Use parent CrossSection dNdx interpolation

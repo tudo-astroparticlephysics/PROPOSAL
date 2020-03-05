@@ -86,7 +86,7 @@ public:
     // ----------------------------------------------------------------------------
     /// @brief This is the calculation of the dSigma/dv
     // ----------------------------------------------------------------------------
-    virtual const InteractionType GetInteractionType() const final {return InteractionType::MuPair;}
+    virtual InteractionType GetInteractionType() const final {return InteractionType::MuPair;}
     virtual double DifferentialCrossSection(double energy, double v) = 0;
     virtual double FunctionToIntegral(double energy, double v, double rho) = 0;
     virtual double Calculaterho(double energy, double v, double rnd1, double rnd2);
@@ -186,7 +186,7 @@ MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const Part
     {
         builder2d[i]
             .SetMax1(def->nodes_cross_section)
-            .SetX1Min(this->particle_def_.mass)
+            .SetX1Min(particle_def.mass)
             .SetX1Max(def->max_node_energy)
             .SetMax2(def->nodes_cross_section)
             .SetX2Min(0.0)

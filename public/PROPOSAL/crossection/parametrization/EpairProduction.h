@@ -93,7 +93,7 @@ public:
     /// \sqrt{1-\frac{4m_e}{E_p v}}\Big(1-\frac{6m_p^2}{E_p^2(1-v)}\Big)\f$
     ///
     // ----------------------------------------------------------------------------
-    virtual const InteractionType GetInteractionType() const final {return InteractionType::Epair;}
+    virtual InteractionType GetInteractionType() const final {return InteractionType::Epair;}
     virtual double DifferentialCrossSection(double energy, double v) = 0;
 
     virtual KinematicLimits GetKinematicLimits(double energy);
@@ -204,7 +204,7 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const Partic
                                               std::shared_ptr<const Medium> medium,
                                               double multiplier,
                                               bool lpm,
-                                              InterpolationDef def)
+                                              std::shared_ptr<const InterpolationDef> def)
     : Param(particle_def, medium, multiplier, lpm)
     , interpolant_(this->medium_->GetNumComponents(), NULL)
 {
@@ -214,21 +214,21 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const Partic
     for (unsigned int i = 0; i < this->components_.size(); ++i)
     {
         builder2d[i]
-            .SetMax1(def.nodes_cross_section)
-            .SetX1Min(this->particle_def_.mass)
-            .SetX1Max(def.max_node_energy)
-            .SetMax2(def.nodes_cross_section)
+            .SetMax1(def->nodes_cross_section)
+            .SetX1Min(particle_def.mass)
+            .SetX1Max(def->max_node_energy)
+            .SetMax2(def->nodes_cross_section)
             .SetX2Min(0.0)
             .SetX2Max(1.0)
-            .SetRomberg1(def.order_of_interpolation)
+            .SetRomberg1(def->order_of_interpolation)
             .SetRational1(false)
             .SetRelative1(false)
             .SetIsLog1(true)
-            .SetRomberg2(def.order_of_interpolation)
+            .SetRomberg2(def->order_of_interpolation)
             .SetRational2(false)
             .SetRelative2(false)
             .SetIsLog2(false)
-            .SetRombergY(def.order_of_interpolation)
+            .SetRombergY(def->order_of_interpolation)
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)
@@ -238,7 +238,7 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const Partic
         builder_container2d[i].second = &interpolant_[i];
     }
 
-    Helper::InitializeInterpolation("Epair", builder_container2d, std::vector<Parametrization*>(1, this), def);
+    Helper::InitializeInterpolation("Epair", builder_container2d, std::vector<Parametrization*>(1, this), *def);
 }
 
 template<class Param>

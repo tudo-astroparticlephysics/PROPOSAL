@@ -13,7 +13,7 @@
     Mupair##param::Mupair##param(const ParticleDef& particle_def,                                                      \
                                std::shared_ptr<const Medium> medium,                                                                   \
                                double multiplier)                                                                      \
-        : MupairProductionRhoIntegral(particle_def, medium, multiplier,)                                               \
+        : MupairProductionRhoIntegral(particle_def, medium, multiplier)                                               \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -151,7 +151,7 @@ double MupairProductionRhoIntegral::DifferentialCrossSection(double energy, doub
     }
 
     return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
-           particle_def_.charge * particle_def_.charge *
+           particle_charge_ * particle_charge_ *
            (integral_.Integrate(
                    0, rMax, std::bind(&MupairProductionRhoIntegral::FunctionToIntegral, this, energy, v, std::placeholders::_1), 2));
 

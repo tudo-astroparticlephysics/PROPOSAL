@@ -172,7 +172,7 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
     {
         builder2d[i]
             .SetMax1(def->nodes_cross_section)
-            .SetX1Min(this->particle_def_.mass)
+            .SetX1Min(particle_def.mass)
             .SetX1Max(def->max_node_energy)
             .SetMax2(def->nodes_cross_section)
             .SetX2Min(0.0)

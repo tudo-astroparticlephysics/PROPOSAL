@@ -19,7 +19,7 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-CrossSectionInterpolant::CrossSectionInterpolant(const Parametrization& param, std::shared_ptr<EnergyCutSettings> cuts)
+CrossSectionInterpolant::CrossSectionInterpolant(const Parametrization& param, std::shared_ptr<const EnergyCutSettings> cuts)
     : CrossSection(param, cuts)
     , dedx_interpolant_(NULL)
     , de2dx_interpolant_(NULL)
@@ -78,21 +78,21 @@ void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
         // Order of builder matter because the functions needed for 1d interpolation
         // needs the already intitialized 2d interpolants.
         builder2d[i]
-            .SetMax1(def->nodes_cross_section)
+            .SetMax1(def.nodes_cross_section)
             .SetX1Min(parametrization_->GetParticleMass())
-            .SetX1Max(def->max_node_energy)
-            .SetMax2(def->nodes_cross_section)
+            .SetX1Max(def.max_node_energy)
+            .SetMax2(def.nodes_cross_section)
             .SetX2Min(0.0)
             .SetX2Max(1.0)
-            .SetRomberg1(def->order_of_interpolation)
+            .SetRomberg1(def.order_of_interpolation)
             .SetRational1(false)
             .SetRelative1(false)
             .SetIsLog1(true)
-            .SetRomberg2(def->order_of_interpolation)
+            .SetRomberg2(def.order_of_interpolation)
             .SetRational2(false)
             .SetRelative2(false)
             .SetIsLog2(false)
-            .SetRombergY(def->order_of_interpolation)
+            .SetRombergY(def.order_of_interpolation)
             .SetRationalY(true)
             .SetRelativeY(false)
             .SetLogSubst(false)
@@ -108,14 +108,14 @@ void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
         builder_container2d[i].second = &dndx_interpolant_2d_[i];
 
         builder1d[i]
-            .SetMax(def->nodes_cross_section)
+            .SetMax(def.nodes_cross_section)
             .SetXMin(parametrization_->GetParticleMass())
-            .SetXMax(def->max_node_energy)
-            .SetRomberg(def->order_of_interpolation)
+            .SetXMax(def.max_node_energy)
+            .SetRomberg(def.order_of_interpolation)
             .SetRational(false)
             .SetRelative(false)
             .SetIsLog(true)
-            .SetRombergY(def->order_of_interpolation)
+            .SetRombergY(def.order_of_interpolation)
             .SetRationalY(true)
             .SetRelativeY(false)
             .SetLogSubst(false)
@@ -129,7 +129,7 @@ void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
     builder_return.insert(builder_return.end(), builder_container1d.begin(), builder_container1d.end());
     // builder2d.insert(builder2d.end(), builder1d.begin(), builder1d.end());
 
-    Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), *def);
+    Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
 CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& cross_section)
@@ -151,7 +151,7 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
         de2dx_interpolant_ = NULL;
     }
 
-    int num_components = cross_section.parametrization_->GetMedium().GetNumComponents();
+    int num_components = cross_section.parametrization_->GetMedium()->GetNumComponents();
 
     dndx_interpolant_1d_.reserve(num_components);
     for (auto interpolant: cross_section.dndx_interpolant_1d_)

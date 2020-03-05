@@ -16,7 +16,7 @@
 
 using namespace PROPOSAL;
 
-MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_ptr<EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
+MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_ptr<const EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
     : CrossSectionInterpolant(param, cuts)
 {
     // Use parent CrossSecition dNdx interpolation
@@ -32,14 +32,14 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
     // Needed for CalculatedEdx integration
     MupairIntegral mupair(param, cuts);
 
-    builder1d.SetMax(def.nodes_cross_section)
+    builder1d.SetMax(def->nodes_cross_section)
         .SetXMin(param.GetParticleMass())
         .SetXMax(def->max_node_energy)
         .SetRomberg(def->order_of_interpolation)
         .SetRational(true)
         .SetRelative(false)
         .SetIsLog(true)
-        .SetRombergY(def.order_of_interpolation)
+        .SetRombergY(def->order_of_interpolation)
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(true)

@@ -86,8 +86,9 @@ public:
     virtual const std::string& GetName() const = 0; //{ return name_; }
     double GetParticleMass() const { return particle_mass_; }
     double GetParticleCharge() const {return particle_charge_; }
+    double GetParticleLow() const {return particle_low_; }
 
-    virtual const InteractionType GetInteractionType() const = 0;
+    virtual InteractionType GetInteractionType() const = 0;
     std::shared_ptr<const Medium> GetMedium() const { return medium_; }
     double GetMultiplier() const { return multiplier_; }
 
@@ -110,6 +111,7 @@ protected:
 
     double particle_mass_;
     double particle_charge_;
+    double particle_low_;
     std::shared_ptr<const Medium> medium_;
 
     // const Components::Component* current_component_;

@@ -8,7 +8,7 @@
 
 using namespace PROPOSAL;
 
-EpairIntegral::EpairIntegral(const EpairProduction& param, std::shared_ptr<EnergyCutSettings> cuts)
+EpairIntegral::EpairIntegral(const EpairProduction& param, std::shared_ptr<const EnergyCutSettings> cuts)
     : CrossSectionIntegral(param, cuts)
 {
 }
