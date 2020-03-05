@@ -70,7 +70,7 @@ before_script:
 - curl https://proposal.app.tu-dortmund.de/resources/2020-02-26/TestFiles.tar.gz --output tests/TestFiles.tar.gz
 - mkdir build
 - cd build
-- cmake .. -DADD_TESTS=ON -DADD_PYTHON=OFF
+- cmake .. -DADD_PYTHON=OFF -DCMAKE_BUILD_TYPE=Release
 - make VERBOSE=1 -j2
 - mkdir -p $HOME/.local/share/PROPOSAL/tables
 script:
