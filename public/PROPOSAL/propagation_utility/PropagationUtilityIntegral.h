@@ -34,7 +34,7 @@
 namespace PROPOSAL {
 class UtilityIntegral : public UtilityDecorator {
 public:
-    UtilityIntegral(Crosssections);
+    UtilityIntegral(CrossSectionList);
 
     virtual double Calculate(double ei, double ef, double rnd);
     virtual double GetUpperLimit(double ei, double rnd);
@@ -47,11 +47,12 @@ protected:
 #define UTILITY_INTEGRAL_DEC(cls)                                              \
     class UtilityIntegral##cls : public UtilityIntegral {                      \
     public:                                                                    \
-        UtilityIntegral##cls(Crosssections);                                   \
+        UtilityIntegral##cls(CrossSectionList);                                \
+        double FunctionToIntegral(double energy);                              \
     };
 
 namespace PROPOSAL {
-UTILITY_INTEGRAL_DEC(Displacment)
+UTILITY_INTEGRAL_DEC(Displacement)
 UTILITY_INTEGRAL_DEC(Interaction)
 UTILITY_INTEGRAL_DEC(Decay)
 UTILITY_INTEGRAL_DEC(Time)

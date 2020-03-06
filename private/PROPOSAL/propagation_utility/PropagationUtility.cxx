@@ -8,66 +8,64 @@
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 using namespace PROPOSAL;
-using namespace std::tuple;
+using std::tuple;
 
 /******************************************************************************
  *                            Propagation utility                              *
  ******************************************************************************/
 
-Utility::Definition::Definition(std::shared_ptr<Crosssections> corsssection,
+Utility::Definition::Definition(CrossSectionList cross,
     std::shared_ptr<Scattering> scattering = nullptr,
-    std::shared_ptr<InterpolationDef> inter_def = nullptr)
-    : crosssection(crosssection)
+    std::shared_ptr<InterpolationDef> interpol_def = nullptr)
+    : crosssections(cross)
     , scattering(scattering)
-    , inter_def(inter_def)
-    , mass(crosssection.first()
+    , inter_def(interpol_def)
+    , mass(crosssections.first()
                .GetParticleDef()
-               .mass); // if particle energy would be kinetic energy, this copy
-                       // is redundant
+               .mass) // if particle energy would be kinetic energy, this copy is redundant
 {
-    if (!inter_def) {
+    if (!interpol_def) {
         log_warn("No interpolation definition defined. Integral will not be "
                  "approximate by interpolants. Performance will be poor.");
 
-        displacement_calc.reset(new UtilityIntegralDisplacement(crosssection));
-        interaction_calc.reset(new UtilityIntegralInteraction(crosssection));
-        decay_calc.reset(new UtilityIntegralDecay(crosssection))
+        displacement_calc.reset(new UtilityIntegralDisplacement(cross));
+        interaction_calc.reset(new UtilityIntegralInteraction(cross));
+        decay_calc.reset(new UtilityIntegralDecay(cross))
     } else {
         displacement_calc.reset(
-            new UtilityInterpolantDisplacement(crosssection, inter_def));
+            new UtilityInterpolantDisplacement(cross, interpol_def));
         interaction_calc.reset(
-            new UtilityInterpolantInteraction(crosssection, inter_def));
-        decay_calc.reset(new UtilityInterpolantDecay(crosssection, inter_def))
+            new UtilityInterpolantInteraction(cross, interpol_def));
+        decay_calc.reset(new UtilityInterpolantDecay(cross, interpol_def));
     }
 
     if (!scattering) {
-        log_debug("No scattering defined. Partilce will only be deflected if a "
-                  "stochastic deflection is in the crosssection implemented.");
+        log_debug("No scattering defined. Particle will only be deflected in "
+                  "stochastic interactions");
     }
 
     if (!cont_rand) {
-        log_debug("No continous randomization used.");
+        log_debug("No continuous randomization used.");
     } else {
         if (!inter_def) {
-            cont_rand.reset(new UtilityIntegralContRand(crosssection))
+            cont_rand.reset(new UtilityIntegralContRand(cross));
         } else {
             cont_rand.reset(
-                new UtilityInterpolantContRand(crosssection, inter_def))
+                new UtilityInterpolantContRand(cross, interpol_def));
         }
     }
 
     if (!exact_time) {
-        log_debug("No exact time calculator used.");
+        log_debug("Exact time calculation disabled: Velocity of particles will be approximated as speed of light");
     }
-}
-else
-{
-    if (!inter_def) {
-        cont_rand.reset(new UtilityIntegralTime(crosssection))
-    } else {
-        cont_rand.reset(new UtilityInterpolantTime(crosssection, inter_def))
+    else
+    {
+        if (!inter_def) {
+            cont_rand.reset(new UtilityIntegralTime(cross))
+        } else {
+            cont_rand.reset(new UtilityInterpolantTime(cross, interpol_def))
+        }
     }
-}
 }
 
 std::ostream& PROPOSAL::operator<<(
@@ -109,8 +107,8 @@ std::shared_ptr<Crosssection> Utility::TypeInteraction(
     double energy, const std::array<double, 2>& rnd)
 {
     std::array<double, crosssections_.size()> rates;
-    for (const auto& cross : crosssections)
-        rates = crosssections->CalculatedNdx(energy, rnd[1]);
+    for(size_t i = 0; i < crosssections.size(); i++)
+        rates.at(i) = crosssections.at(i)->CalculatedNdx(energy, rnd[1]);
 
     double total_rate{ std::accumulate(rates.begin(), rates.end(), 0) };
     log_debug("Total rate = %f, total rate weighted = %f", total_rate,
@@ -120,19 +118,19 @@ std::shared_ptr<Crosssection> Utility::TypeInteraction(
     for (size_t i = 0; i < rates.size(); i++) {
         rates_sum += rates[i];
         if (rates_sum >= total_rate * rnd[0])
-            return crosssection;
+            return crosssection.at(i);
     }
 
-    throw std::logic_error("Something get wrong in total rate calculation.");
+    throw std::logic_error("Something went wrong during the total rate calculation.");
 }
 
 double Utility::EnergyStochasticloss(
-    const Crosssection& corss, double energy, const std::array<double, 2>& rnd)
+    const Crosssection& cross, double energy, const std::array<double, 2>& rnd)
 {
     return cross.CalculateStochasticLoss(energy, rnd[0], rnd[1]);
 }
 
-int Utility::EnergyDecay(double energy, double rnd)
+double Utility::EnergyDecay(double energy, double rnd)
 {
     auto rndd = -std::log(rnd);
     auto rnddMin = 0;
@@ -164,7 +162,7 @@ double EnergyRandomize(double initial_energy, double final_energy, double rnd)
 {
     if (cont_rand) {
         return cont_rand->Randomize(
-            initial_energy, final_energy, distance, rnd);
+            initial_energy, final_energy, rnd);
     } else {
         return final_energy;
     }
@@ -176,7 +174,7 @@ double Utility::TimeElapsed(
     if (exact_time) {
         return exact_time->Calculate(initial_energy, final_energy, distance);
     } else {
-        return displacement / SPEED;
+        return distance / SPEED;
     }
 }
 

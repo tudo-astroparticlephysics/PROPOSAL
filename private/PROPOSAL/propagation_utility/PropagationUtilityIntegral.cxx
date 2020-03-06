@@ -9,7 +9,7 @@
 #include "PROPOSAL/Logging.h"
 
 #define UTILITY_INTEGRAL_IMPL(cls)                                             \
-    UtilityIntegral##cls::UtilityIntegral##cls(Crosssections cross)            \
+    UtilityIntegral##cls::UtilityIntegral##cls(CrossSectionList cross)         \
         : UtilityIntegral(cross)                                               \
     {                                                                          \
     }
@@ -20,7 +20,7 @@ using namespace PROPOSAL;
  *                              Utility Integral                              *
  ******************************************************************************/
 
-UtilityIntegral::UtilityIntegral(Crosssections cross)
+UtilityIntegral::UtilityIntegral(CrossSectionList cross)
     : UtilityDecorator(cross)
     , integral_(IROMB, IMAXS, IPREC2)
 {

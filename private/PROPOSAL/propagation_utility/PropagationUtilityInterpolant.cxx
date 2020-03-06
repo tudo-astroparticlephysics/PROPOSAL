@@ -21,7 +21,7 @@ using namespace PROPOSAL;
  ******************************************************************************/
 
 UtilityInterpolant::UtilityInterpolant(
-    Crosssections cross, InterpolationDef def)
+        CrossSectionList cross, InterpolationDef def)
     : UtilityDecorator(cross)
     , stored_result_(0)
     , interpolant_(NULL)
@@ -40,9 +40,7 @@ UtilityInterpolant::~UtilityInterpolant()
 double UtilityInterpolant::GetUpperLimit(double ei, double rnd)
 {
     return std::min(
-        std::max(ei
-                + rnd
-                    / interpolant_diff_->Interpolate(
+        std::max(ei + rnd / interpolant_diff_->Interpolate(
                           ei + rnd / (2 * interpolant_diff_->Interpolate(ei))),
             utility_.GetParticleDef().low),
         ei);
@@ -62,7 +60,7 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
         std::bind(&UtilityInterpolant::BuildInterpolant, this,
             std::placeholders::_1, std::ref(utility), std::ref(integral))));
     interpolants.push_back(std::make_pair(&interpolant_diff_,
-        std::bind(&UtilityIntegralDisplacementDisplacement::FunctionToIntegral, &utility,
+        std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, &utility,
             std::placeholders::_1)));
 
     unsigned int number_of_interpolants = interpolants.size();
@@ -109,10 +107,10 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(
-    Crosssections cross, InterpolationDef def)
+        CrossSectionList cross, InterpolationDef def)
     : UtilityInterpolant(cross, def)
 {
-    UtilityIntegralDisplacement utility_disp(utility_);
+    UtilityIntegralDisplacement utility_disp(cross);
     InitInterpolation("displacement", utility_disp, def.nodes_propagate);
 }
 
@@ -144,7 +142,7 @@ double UtilityInterpolantDisplacement::Calculate(
 double UtilityInterpolantDisplacement::GetUpperLimit(double ei, double rnd)
 {
     <double(double)>f = [&](double ef) { return Calculate(ei, ef, rnd) - rnd; };
-    std::functioon<double(double)> df = [&](double ef) { return interpolant_diff_->Interpolate(ef); };
+    std::function<double(double)> df = [&](double ef) { return interpolant_diff_->Interpolate(ef); };
 
     int MaxSteps = 200;
     try {
@@ -178,12 +176,12 @@ void UtilityInterpolantDisplacement::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantInteraction::UtilityInterpolantInteraction(
-    Crosssections cross, InterpolationDef def)
+        CrossSectionList cross, InterpolationDef def)
     : UtilityInterpolant(cross, def)
     , big_low_(0)
     , up_(0)
 {
-    UtilityIntegralInteraction utility_int(utility_);
+    UtilityIntegralInteraction utility_int(cross);
     InitInterpolation("interaction", utility_int, def.nodes_propagate);
 }
 
@@ -274,12 +272,12 @@ void UtilityInterpolantInteraction::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantDecay::UtilityInterpolantDecay(
-    Crosssections cross, InterpolationDef def)
+        CrossSectionList cross, InterpolationDef def)
     : UtilityInterpolant(cross, def)
     , big_low_(0)
     , up_(0)
 {
-    UtilityIntegralDecay utility_decay(utility_);
+    UtilityIntegralDecay utility_decay(cross);
     InitInterpolation("decay", utility_decay, def.nodes_propagate);
 }
 
@@ -358,10 +356,10 @@ void UtilityInterpolantDecay::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantTime::UtilityInterpolantTime(
-    Crosssections cross, InterpolationDef def)
+        CrossSectionList cross, InterpolationDef def)
     : UtilityInterpolant(cross, def)
 {
-    UtilityIntegralTime utility_time(utility_);
+    UtilityIntegralTime utility_time(cross);
     InitInterpolation("time", utility_time, def.nodes_propagate);
 }
 
@@ -414,10 +412,10 @@ void UtilityInterpolantTime::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantContRand::UtilityInterpolantContRand(
-    Crosssections cross, InterpolationDef def)
+        CrossSectionList cross, InterpolationDef def)
     : UtilityInterpolant(cross, def)
 {
-    UtilityIntegralContRand utility_contrand(utility_);
+    UtilityIntegralContRand utility_contrand(cross);
     InitInterpolation(
         "contrand", utility_contrand, def.nodes_continous_randomization);
 }
@@ -473,10 +471,10 @@ void UtilityInterpolantContRand::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantScattering::UtilityInterpolantScattering(
-    Crosssections cross, InterpolationDef def)
+        CrossSectionList cross, InterpolationDef def)
     : UtilityInterpolant(cross, def)
 {
-    UtilityIntegralScattering utility_scattering(utility_);
+    UtilityIntegralScattering utility_scattering(cross);
     InitInterpolation(
         "scattering", utility_scattering, def.nodes_continous_randomization);
 }
