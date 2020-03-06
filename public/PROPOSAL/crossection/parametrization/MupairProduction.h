@@ -45,13 +45,13 @@
     class Mupair##param : public MupairProductionRhoIntegral                                                           \
     {                                                                                                                  \
     public:                                                                                                            \
-        Mupair##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool particle_output);\
+        Mupair##param(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier, bool particle_output);\
         Mupair##param(const Mupair##param&);                                                                           \
         virtual ~Mupair##param();                                                                                      \
                                                                                                                        \
         virtual Parametrization* clone() const { return new Mupair##param(*this); }                                    \
         static MupairProduction* create(const ParticleDef& particle_def,                                               \
-                                       const Medium& medium,                                                           \
+                                       std::shared_ptr<const Medium> medium,                                                           \
                                        const EnergyCutSettings& cuts,                                                  \
                                        double multiplier,                                                              \
                                        bool particle_output)                                                           \
@@ -75,7 +75,7 @@ class Interpolant;
 class MupairProduction : public Parametrization
 {
 public:
-    MupairProduction(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool particle_output);
+    MupairProduction(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier, bool particle_output);
     MupairProduction(const MupairProduction&);
     virtual ~MupairProduction();
 
@@ -110,7 +110,7 @@ class MupairProductionRhoIntegral : public MupairProduction
 {
 public:
     MupairProductionRhoIntegral(const ParticleDef&,
-                               const Medium&,
+                               std::shared_ptr<const Medium>,
                                const EnergyCutSettings&,
                                double multiplier,
                                bool particle_output);
@@ -153,7 +153,7 @@ public:
 
 public:
     MupairProductionRhoInterpolant(const ParticleDef&,
-                       const Medium&,
+                       std::shared_ptr<const Medium>,
                        const EnergyCutSettings&,
                        double multiplier,
                        bool particle_output,
@@ -163,7 +163,7 @@ public:
 
     Parametrization* clone() const { return new MupairProductionRhoInterpolant<Param>(*this); }
     static MupairProduction* create(const ParticleDef& particle_def,
-                                const Medium& medium,
+                                std::shared_ptr<const Medium> medium,
                                 const EnergyCutSettings& cuts,
                                 double multiplier,
                                 bool particle_output,
@@ -183,7 +183,7 @@ protected:
 
 template<class Param>
 MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const ParticleDef& particle_def,
-                                              const Medium& medium,
+                                              std::shared_ptr<const Medium> medium,
                                               const EnergyCutSettings& cuts,
                                               double multiplier,
                                               bool particle_output,

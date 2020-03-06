@@ -105,9 +105,9 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, const Medium& medium)
+ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium)
     : Scattering(particle_def),
-      medium_(medium.clone()),
+      medium_(medium),
       numComp_(medium_->GetNumComponents()),
       ZSq_A_average_(0.0),
       Zi_(numComp_),
@@ -164,7 +164,7 @@ ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, const Medi
 
 ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)
     : Scattering(scattering),
-      medium_(scattering.medium_->clone()),
+      medium_(scattering.medium_),
       numComp_(scattering.numComp_),
       ZSq_A_average_(scattering.ZSq_A_average_),
       Zi_(scattering.Zi_),
@@ -177,7 +177,7 @@ ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)
 ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def,
                                      const ScatteringMoliere& scattering)
     : Scattering(particle_def),
-      medium_(scattering.medium_->clone()),
+      medium_(scattering.medium_),
       numComp_(scattering.numComp_),
       ZSq_A_average_(scattering.ZSq_A_average_),
       Zi_(scattering.Zi_),
@@ -188,7 +188,6 @@ ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def,
       B_(scattering.B_) {}
 
 ScatteringMoliere::~ScatteringMoliere() {
-    delete medium_;
 }
 
 //----------------------------------------------------------------------------//

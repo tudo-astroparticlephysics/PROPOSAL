@@ -31,12 +31,12 @@ class Test_Utilities : public ::testing::Test {
 };
 
 Utility Test_Utilities::a(MuMinusDef::Get(),
-                          Ice(),
+                          std::make_shared<Medium>(Ice()),
                           EnergyCutSettings(),
                           Utility::Definition(),
                           InterpolationDef());
 Utility Test_Utilities::b(TauMinusDef::Get(),
-                          Ice(),
+                          std::make_shared<Medium>(Ice()),
                           EnergyCutSettings(),
                           Utility::Definition(),
                           InterpolationDef());
@@ -126,11 +126,11 @@ TEST(ContinuousRandomization, Randomize_interpol) {
         first = false;
         energy_old = -1;
 
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings cut_settings(ecut, vcut);
         ParticleDef particle_def = getParticleDef(particleName);
 
-        Utility utility(particle_def, *medium, cut_settings,
+        Utility utility(particle_def, medium, cut_settings,
                         Utility::Definition(), InterpolationDef());
         ContinuousRandomizer cont(utility, InterpolationDef());
 
@@ -146,8 +146,6 @@ TEST(ContinuousRandomization, Randomize_interpol) {
             in >> rnd >> particleName >> mediumName >> ecut >> vcut >>
                 initial_energy >> final_energy >> randomized_energy;
         }
-
-        delete medium;
     }
 }
 

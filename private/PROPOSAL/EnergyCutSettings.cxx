@@ -1,5 +1,6 @@
 
 #include <sstream>
+#include <stdexcept>
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/methods.h"
 
@@ -84,6 +85,22 @@ EnergyCutSettings::EnergyCutSettings(const double ecut, const double vcut)
     : ecut_(ecut)
     , vcut_(vcut)
 {
+}
+
+EnergyCutSettings::EnergyCutSettings(const nlohmann::json& config)
+{
+    if(not config.is_object()) throw std::invalid_argument("No json object found.");
+    if(not config.at("e_cut").is_number()) throw std::invalid_argument("No e_cut found.");
+    if(not config.at("v_cut").is_number()) throw std::invalid_argument("No v_cut found.");
+
+    config.at("e_cut").get_to(ecut_);
+    config.at("v_cut").get_to(vcut_);
+
+   if(not (ecut_ > 0 || ecut_ == -1))
+       throw std::logic_error(
+               "e_cut must be larger than zero or can be disabled by set -1");
+   if(not ((vcut_ >= 0 && vcut_ <= 1) || vcut_ == -1))
+       throw std::logic_error( "v is defined between (0, 1)");
 }
 
 //----------------------------------------------------------------------------//

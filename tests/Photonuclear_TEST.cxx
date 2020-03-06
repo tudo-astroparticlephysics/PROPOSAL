@@ -34,7 +34,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());
     EnergyCutSettings ecuts;
     double multiplier   = 1.;
     bool hard_component = true;
@@ -92,8 +92,8 @@ TEST(Comparison, Comparison_not_equal)
 {
     ParticleDef mu_def  = MuMinusDef::Get();
     ParticleDef tau_def = TauMinusDef::Get();
-    Water medium_1;
-    Ice medium_2;
+    std::shared_ptr<const Medium> medium_1(Water().create());
+    std::shared_ptr<const Medium> medium_2(Ice().create());
     EnergyCutSettings ecuts_1(500, 0.05);
     EnergyCutSettings ecuts_2(-1, 0.05);
     double multiplier_1 = 1.;
@@ -169,7 +169,7 @@ TEST(Comparison, Comparison_not_equal)
 TEST(Assignment, Copyconstructor)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());
     EnergyCutSettings ecuts;
     double multiplier   = 1.;
     bool hard_component = true;
@@ -205,7 +205,7 @@ TEST(Assignment, Copyconstructor)
 TEST(Assignment, Copyconstructor2)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());
     EnergyCutSettings ecuts;
     double multiplier   = 1.;
     bool hard_component = true;
@@ -265,7 +265,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
             hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -273,13 +273,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
         photo_def.parametrization = PhotonuclearFactory::Get().GetEnumFromString(parametrization);
         photo_def.hard_component  = hard_component;
 
-        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def);
+        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def);
 
         dEdx_new = Photo->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -309,7 +308,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
             hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -317,13 +316,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
         photo_def.parametrization = PhotonuclearFactory::Get().GetEnumFromString(parametrization);
         photo_def.hard_component  = hard_component;
 
-        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def);
+        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def);
 
         dNdx_new = Photo->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -354,7 +352,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd)
             parametrization >> hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -362,13 +360,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd)
         photo_def.parametrization = PhotonuclearFactory::Get().GetEnumFromString(parametrization);
         photo_def.hard_component  = hard_component;
 
-        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def);
+        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def);
 
         dNdx_new = Photo->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -399,7 +396,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
             stochastic_loss_stored >> parametrization >> hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -407,13 +404,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
         photo_def.parametrization = PhotonuclearFactory::Get().GetEnumFromString(parametrization);
         photo_def.hard_component  = hard_component;
 
-        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def);
+        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def);
 
         stochastic_loss_new = Photo->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -444,7 +440,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
             hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -453,13 +449,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
         photo_def.hard_component  = hard_component;
 
         CrossSection* Photo =
-            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def, InterpolDef);
+            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def, InterpolDef);
 
         dEdx_new = Photo->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -490,7 +485,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
             hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -499,13 +494,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
         photo_def.hard_component  = hard_component;
 
         CrossSection* Photo =
-            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def, InterpolDef);
+            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def, InterpolDef);
 
         dNdx_new = Photo->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -537,7 +531,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd_Interpolant)
             parametrization >> hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -546,13 +540,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd_Interpolant)
         photo_def.hard_component  = hard_component;
 
         CrossSection* Photo =
-            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def, InterpolDef);
+            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def, InterpolDef);
 
         dNdx_new = Photo->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -584,7 +577,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
             stochastic_loss_stored >> parametrization >> hard_component;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -593,13 +586,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
         photo_def.hard_component  = hard_component;
 
         CrossSection* Photo =
-            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def, InterpolDef);
+            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def, InterpolDef);
 
         stochastic_loss_new = Photo->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -631,7 +623,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
             shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -639,13 +631,12 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
         photo_def.parametrization = PhotonuclearFactory::Get().GetEnumFromString(parametrization);
         photo_def.shadow          = PhotonuclearFactory::Get().GetShadowEnumFromString(shadowing);
 
-        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def);
+        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def);
 
         dEdx_new = Photo->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -675,7 +666,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
             shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -683,13 +674,12 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
         photo_def.parametrization = PhotonuclearFactory::Get().GetEnumFromString(parametrization);
         photo_def.shadow          = PhotonuclearFactory::Get().GetShadowEnumFromString(shadowing);
 
-        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def);
+        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def);
 
         dNdx_new = Photo->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -720,7 +710,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_rnd)
             parametrization >> shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -728,13 +718,12 @@ TEST(PhotoQ2Integration, Test_of_dNdx_rnd)
         photo_def.parametrization = PhotonuclearFactory::Get().GetEnumFromString(parametrization);
         photo_def.shadow          = PhotonuclearFactory::Get().GetShadowEnumFromString(shadowing);
 
-        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def);
+        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def);
 
         dNdx_new = Photo->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -765,7 +754,7 @@ TEST(PhotoQ2Integration, Test_of_e)
             stochastic_loss_stored >> parametrization >> shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -773,13 +762,12 @@ TEST(PhotoQ2Integration, Test_of_e)
         photo_def.parametrization = PhotonuclearFactory::Get().GetEnumFromString(parametrization);
         photo_def.shadow          = PhotonuclearFactory::Get().GetShadowEnumFromString(shadowing);
 
-        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def);
+        CrossSection* Photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def);
 
         stochastic_loss_new = Photo->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -810,7 +798,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
             shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -819,13 +807,12 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
         photo_def.shadow          = PhotonuclearFactory::Get().GetShadowEnumFromString(shadowing);
 
         CrossSection* Photo =
-            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def, InterpolDef);
+            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def, InterpolDef);
 
         dEdx_new = Photo->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -856,7 +843,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
             shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -865,13 +852,12 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
         photo_def.shadow          = PhotonuclearFactory::Get().GetShadowEnumFromString(shadowing);
 
         CrossSection* Photo =
-            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def, InterpolDef);
+            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def, InterpolDef);
 
         dNdx_new = Photo->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -903,7 +889,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_rnd_Interpolant)
             parametrization >> shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -912,13 +898,12 @@ TEST(PhotoQ2Integration, Test_of_dNdx_rnd_Interpolant)
         photo_def.shadow          = PhotonuclearFactory::Get().GetShadowEnumFromString(shadowing);
 
         CrossSection* Photo =
-            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def, InterpolDef);
+            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def, InterpolDef);
 
         dNdx_new = Photo->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Photo;
     }
 }
@@ -950,7 +935,7 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
             stochastic_loss_stored >> parametrization >> shadowing;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         PhotonuclearFactory::Definition photo_def;
@@ -959,13 +944,12 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
         photo_def.shadow          = PhotonuclearFactory::Get().GetShadowEnumFromString(shadowing);
 
         CrossSection* Photo =
-            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, *medium, ecuts, photo_def, InterpolDef);
+            PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, photo_def, InterpolDef);
 
         stochastic_loss_new = Photo->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
 
-        delete medium;
         delete Photo;
     }
 }

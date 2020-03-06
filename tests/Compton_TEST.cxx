@@ -22,7 +22,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 TEST(Comparison, Comparison_equal)
 {
 ParticleDef particle_def = GammaDef::Get();
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 EnergyCutSettings ecuts;
 double multiplier = 1.;
 
@@ -54,8 +54,8 @@ delete Interpol_B;
 TEST(Comparison, Comparison_not_equal)
 {
 ParticleDef gamma_def  = GammaDef::Get();
-Water medium_1;
-Ice medium_2;
+std::shared_ptr<const Medium> medium_1(Water().create());
+std::shared_ptr<const Medium> medium_2(Ice().create());
 EnergyCutSettings ecuts_1(500, -1);
 EnergyCutSettings ecuts_2(-1, 0.05);
 double multiplier_1 = 1.;
@@ -73,7 +73,7 @@ EXPECT_TRUE(Compton_A != Compton_C);
 TEST(Assignment, Copyconstructor)
 {
 ParticleDef particle_def = GammaDef::Get();
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 EnergyCutSettings ecuts;
 double multiplier = 1.;
 
@@ -94,7 +94,7 @@ EXPECT_TRUE(Interpol_A == Interpol_B);
 TEST(Assignment, Copyconstructor2)
 {
 ParticleDef particle_def = GammaDef::Get();
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 EnergyCutSettings ecuts;
 double multiplier = 1.;
 
@@ -140,7 +140,7 @@ in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >>
 parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -148,13 +148,12 @@ compton_def.multiplier      = multiplier;
 compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
 
 CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, *medium, ecuts, compton_def);
+        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def);
 
 dEdx_new = Compton->CalculatedEdx(energy);
 
 ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
 
-delete medium;
 delete Compton;
 }
 }
@@ -185,7 +184,7 @@ in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >>
 parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -193,13 +192,12 @@ compton_def.multiplier      = multiplier;
 compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
 
 CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, *medium, ecuts, compton_def);
+        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def);
 
 dNdx_new = Compton->CalculatedNdx(energy);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-delete medium;
 delete Compton;
 }
 }
@@ -233,7 +231,7 @@ in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_stored >
 parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -241,13 +239,12 @@ compton_def.multiplier      = multiplier;
 compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
 
 CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, *medium, ecuts, compton_def);
+        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def);
 
 dNdx_new = Compton->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-delete medium;
 delete Compton;
 }
 }
@@ -281,7 +278,7 @@ in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >>
 stochastic_loss_stored >> parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -289,13 +286,12 @@ compton_def.multiplier      = multiplier;
 compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
 
 CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, *medium, ecuts, compton_def);
+        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def);
 
 stochastic_loss_new = Compton->CalculateStochasticLoss(energy, rnd1, rnd2);
 
 ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
 
-delete medium;
 delete Compton;
 }
 }
@@ -327,7 +323,7 @@ in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >>
 parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -335,13 +331,12 @@ compton_def.multiplier      = multiplier;
 compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
 
 CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, *medium, ecuts, compton_def, InterpolDef);
+        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def, InterpolDef);
 
 dEdx_new = Compton->CalculatedEdx(energy);
 
 ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
 
-delete medium;
 delete Compton;
 }
 }
@@ -369,7 +364,7 @@ while (in.good())
 in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -377,13 +372,12 @@ compton_def.multiplier      = multiplier;
 compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
 
 CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, *medium, ecuts, compton_def, InterpolDef);
+        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def, InterpolDef);
 
 dNdx_new = Compton->CalculatedNdx(energy);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-delete medium;
 delete Compton;
 }
 }
@@ -417,7 +411,7 @@ while (in.good())
 in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_stored >> parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -425,13 +419,12 @@ compton_def.multiplier      = multiplier;
 compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
 
 CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, *medium, ecuts, compton_def, InterpolDef);
+        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def, InterpolDef);
 
 dNdx_new = Compton->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-delete medium;
 delete Compton;
 }
 }
@@ -465,7 +458,7 @@ while (in.good())
 in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization;
 
 ParticleDef particle_def = GammaDef::Get();
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 ComptonFactory::Definition compton_def;
@@ -473,13 +466,12 @@ compton_def.multiplier      = multiplier;
 compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
 
 CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, *medium, ecuts, compton_def, InterpolDef);
+        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def, InterpolDef);
 
 stochastic_loss_new = Compton->CalculateStochasticLoss(energy, rnd1, rnd2);
 
 ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
 
-delete medium;
 delete Compton;
 }
 }

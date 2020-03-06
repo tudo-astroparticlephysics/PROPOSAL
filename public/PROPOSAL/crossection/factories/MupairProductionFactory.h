@@ -30,7 +30,7 @@
 #pragma once
 
 #include <functional>
-#include <iostream>
+#include <memory>
 #include <sstream>
 
 #include "PROPOSAL/methods.h"
@@ -104,14 +104,14 @@ public:
     // --------------------------------------------------------------------- //
 
     typedef std::function<MupairProduction*(const ParticleDef&,
-                                          const Medium&,
+                                          std::shared_ptr<const Medium>,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           bool particle_output)>
         RegisterFunction;
 
     typedef std::function<MupairProduction*(const ParticleDef&,
-                                          const Medium&,
+                                          std::shared_ptr<const Medium>,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           bool particle_output,
@@ -128,12 +128,12 @@ public:
     // --------------------------------------------------------------------- //
 
     CrossSection* CreateMupairProduction(const ParticleDef&,
-                                        const Medium&,
+                                        std::shared_ptr<const Medium>,
                                         const EnergyCutSettings&,
                                         const Definition&) const;
 
     CrossSection* CreateMupairProduction(const ParticleDef&,
-                                        const Medium&,
+                                        std::shared_ptr<const Medium>,
                                         const EnergyCutSettings&,
                                         const Definition&,
                                         InterpolationDef) const;

@@ -13,7 +13,7 @@
 
 #define BREMSSTRAHLUNG_IMPL(param)                                                                                     \
     Brems##param::Brems##param(const ParticleDef& particle_def,                                                        \
-                               const Medium& medium,                                                                   \
+                               std::shared_ptr<const Medium> medium,                                                                   \
                                const EnergyCutSettings& cuts,                                                          \
                                double multiplier,                                                                      \
                                bool lpm)                                                                               \
@@ -41,7 +41,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 Bremsstrahlung::Bremsstrahlung(const ParticleDef& particle_def,
-                               const Medium& medium,
+                               std::shared_ptr<const Medium> medium,
                                const EnergyCutSettings& cuts,
                                double multiplier,
                                bool lpm)
@@ -150,7 +150,7 @@ double Bremsstrahlung::lpm(double energy, double v)
 
         double sum = 0;
 
-        // high energy for the calculation of the radiation length, which 
+        // high energy for the calculation of the radiation length, which
         // converges for high energie against a fixed value.
         double upper_energy = 1e14;
 
@@ -578,7 +578,7 @@ double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, d
 // ------------------------------------------------------------------------- //
 
 BremsElectronScreening::BremsElectronScreening(const ParticleDef& particle_def,
-                               const Medium& medium,
+                               std::shared_ptr<const Medium> medium,
                                const EnergyCutSettings& cuts,
                                double multiplier,
                                bool lpm)

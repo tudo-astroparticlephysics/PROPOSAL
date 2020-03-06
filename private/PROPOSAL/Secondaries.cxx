@@ -179,17 +179,17 @@ DynamicData Secondaries::GetClosestApproachPoint() const
     return *closest_approach_point_;
 }
 
-void Secondaries::SetEntryPoint(DynamicData& entry_point)
+void Secondaries::SetEntryPoint(const DynamicData& entry_point)
 {
     entry_point_ = std::unique_ptr<DynamicData>(new DynamicData(entry_point));
 }
 
-void Secondaries::SetExitPoint(DynamicData& exit_point)
+void Secondaries::SetExitPoint(const DynamicData& exit_point)
 {
     exit_point_ = std::unique_ptr<DynamicData>(new DynamicData(exit_point));
 }
 
-void Secondaries::SetClosestApproachPoint(DynamicData& closest_approach_point)
+void Secondaries::SetClosestApproachPoint(const DynamicData& closest_approach_point)
 {
     closest_approach_point_
         = std::unique_ptr<DynamicData>(new DynamicData(closest_approach_point));

@@ -23,8 +23,8 @@ ParticleDef getParticleDef(const std::string& name)
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef mu_def = MuMinusDef::Get();
-    Water medium;
-    Sphere sphere;
+    std::shared_ptr<Medium> medium(new Water);
+    auto sphere = Sphere().create();
     EnergyCutSettings ecuts;
 
     Sector::Definition sector_def;
@@ -45,10 +45,10 @@ TEST(Comparison, Comparison_not_equal)
 {
     ParticleDef mu_def = MuMinusDef::Get();
     ParticleDef tau_def = TauMinusDef::Get();
-    Water medium1;
-    Ice medium2;
-    Sphere geometry1;
-    Cylinder geometry2;
+    std::shared_ptr<Medium> medium1(new Water);
+    std::shared_ptr<Medium> medium2(new Ice);
+    auto geometry1 = Sphere().create();
+    auto geometry2 = Cylinder().create();
     EnergyCutSettings ecuts1(500, 0.05);
     EnergyCutSettings ecuts2(400, 0.005);
 
@@ -111,8 +111,8 @@ TEST(Comparison, Comparison_not_equal)
 TEST(Assignment, Copyconstructor)
 {
     ParticleDef mu_def = MuMinusDef::Get();
-    Water water(1.0);
-    Sphere geometry(Vector3D(0, 0, 0), 1000, 0);
+    std::shared_ptr<Medium> water(new Water);
+    auto geometry = Sphere(Vector3D(0, 0, 0), 1000, 0).create();
     EnergyCutSettings ecuts(500, 0.05);
 
     Sector::Definition sector_def;
@@ -130,8 +130,8 @@ TEST(Assignment, Copyconstructor)
 TEST(Assignment, Copyconstructor2)
 {
     ParticleDef mu = MuMinusDef::Get();
-    Water water(1.0);
-    Sphere geometry(Vector3D(), 1000, 0);
+    std::shared_ptr<Medium> water(new Water);
+    auto geometry = Sphere(Vector3D(), 1000, 0).create();
     EnergyCutSettings ecuts(500, 0.05);
 
     Sector::Definition sector_def;
@@ -164,7 +164,7 @@ TEST(Sector, Continuous)
 
     Sector::Definition sector_def;
     ParticleDef* particle = new ParticleDef(MuMinusDef::Get());
-    Medium* medium = new Medium(sector_def.GetMedium());
+    std::shared_ptr<const Medium> medium = sector_def.GetMedium();
     EnergyCutSettings* cuts = new EnergyCutSettings(sector_def.cut_settings);
     Sector* sector = new Sector(*particle, sector_def, inter_def);
 
@@ -178,10 +178,10 @@ TEST(Sector, Continuous)
             delete particle, sector, medium, cuts;
 
             cuts = new EnergyCutSettings(ecut, vcut);
-            medium = MediumFactory::Get().CreateMedium(mediumName);
+            std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
             particle = new ParticleDef(getParticleDef(particleName));
 
-            sector_def.SetMedium(*medium);
+            sector_def.SetMedium(medium);
             sector_def.cut_settings = *cuts;
 
             sector = new Sector(*particle, sector_def, inter_def);
@@ -219,7 +219,7 @@ TEST(Sector, Stochastic)
 
     Sector::Definition sector_def;
     ParticleDef* particle = new ParticleDef(MuMinusDef::Get());
-    Medium* medium = new Medium(sector_def.GetMedium());
+    std::shared_ptr<const Medium> medium=sector_def.GetMedium();
     EnergyCutSettings* cuts = new EnergyCutSettings(sector_def.cut_settings);
     Sector* sector = new Sector(*particle, sector_def, inter_def);
 
@@ -233,10 +233,10 @@ TEST(Sector, Stochastic)
             delete particle, sector, medium, cuts;
 
             cuts = new EnergyCutSettings(ecut, vcut);
-            medium = MediumFactory::Get().CreateMedium(mediumName);
+            std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
             particle = new ParticleDef(getParticleDef(particleName));
 
-            sector_def.SetMedium(*medium);
+            sector_def.SetMedium(medium);
             sector_def.cut_settings = *cuts;
 
             sector = new Sector(*particle, sector_def, inter_def);
@@ -272,7 +272,7 @@ TEST(Sector, EnergyDisplacement)
 
     Sector::Definition sector_def;
     ParticleDef* particle = new ParticleDef(MuMinusDef::Get());
-    Medium* medium = new Medium(sector_def.GetMedium());
+    std::shared_ptr<const Medium> medium(sector_def.GetMedium());
     EnergyCutSettings* cuts = new EnergyCutSettings(sector_def.cut_settings);
     Sector* sector = new Sector(*particle, sector_def, inter_def);
 
@@ -286,10 +286,10 @@ TEST(Sector, EnergyDisplacement)
             delete particle, sector, medium, cuts;
 
             cuts = new EnergyCutSettings(ecut, vcut);
-            medium = MediumFactory::Get().CreateMedium(mediumName);
+            std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
             particle = new ParticleDef(getParticleDef(particleName));
 
-            sector_def.SetMedium(*medium);
+            sector_def.SetMedium(medium);
             sector_def.cut_settings = *cuts;
 
             sector = new Sector(*particle, sector_def, inter_def);
@@ -322,7 +322,7 @@ TEST(Sector, Propagate)
 
     Sector::Definition sector_def;
     ParticleDef* particle = new ParticleDef(MuMinusDef::Get());
-    Medium* medium = new Medium(sector_def.GetMedium());
+    std::shared_ptr<const Medium> medium(sector_def.GetMedium());
     EnergyCutSettings* cuts = new EnergyCutSettings(sector_def.cut_settings);
     Sector* sector = new Sector(*particle, sector_def, inter_def);
 
@@ -336,10 +336,10 @@ TEST(Sector, Propagate)
             delete particle, sector, medium, cuts;
 
             cuts = new EnergyCutSettings(ecut, vcut);
-            medium = MediumFactory::Get().CreateMedium(mediumName);
+            std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
             particle = new ParticleDef(getParticleDef(particleName));
 
-            sector_def.SetMedium(*medium);
+            sector_def.SetMedium(medium);
             sector_def.cut_settings = *cuts;
 
             sector = new Sector(*particle, sector_def, inter_def);
@@ -365,7 +365,6 @@ TEST(Sector, Propagate)
             /* ASSERT_NEAR(energy_calc, energy, std::abs(1e-3 * energy_calc)); */
         }
     }
-    delete medium;
 }
 
 int main(int argc, char** argv)

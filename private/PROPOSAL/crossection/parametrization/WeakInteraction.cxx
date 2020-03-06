@@ -18,7 +18,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 WeakInteraction::WeakInteraction(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  double multiplier)
         : Parametrization(particle_def, medium, EnergyCutSettings(), multiplier)
 {
@@ -67,7 +67,7 @@ size_t WeakInteraction::GetHash() const
 // ------------------------------------------------------------------------- //
 
 WeakCooperSarkarMertsch::WeakCooperSarkarMertsch(const ParticleDef& particle_def,
-                                                 const Medium& medium,
+                                                 std::shared_ptr<const Medium> medium,
                                                  double multiplier)
         : WeakInteraction(particle_def, medium, multiplier)
         , interpolant_(2, NULL)
@@ -138,4 +138,3 @@ double WeakCooperSarkarMertsch::DifferentialCrossSection(double energy, double v
 
 
 const std::string WeakCooperSarkarMertsch::name_ = "WeakCooperSarkarMertsch";
-

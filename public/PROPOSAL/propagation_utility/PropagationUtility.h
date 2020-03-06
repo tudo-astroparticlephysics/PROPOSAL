@@ -43,6 +43,8 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -68,16 +70,17 @@ class Utility {
         friend std::ostream& operator<<(std::ostream&, Definition const&);
 
         Definition();
+        Definition(const nlohmann::json&);
         ~Definition();
     };
 
    public:
     Utility(const ParticleDef&,
-            const Medium&,
+            std::shared_ptr<const Medium>,
             const EnergyCutSettings&,
             Definition);
     Utility(const ParticleDef&,
-            const Medium&,
+            std::shared_ptr<const Medium>,
             const EnergyCutSettings&,
             Definition,
             const InterpolationDef&);
@@ -92,7 +95,7 @@ class Utility {
     friend std::ostream& operator<<(std::ostream&, Utility const&);
 
     const ParticleDef& GetParticleDef() const { return particle_def_; }
-    const Medium& GetMedium() const { return *medium_; }
+    std::shared_ptr<const Medium> GetMedium() const { return medium_; }
     const std::vector<CrossSection*>& GetCrosssections() const {
         return crosssections_;
     }
@@ -109,7 +112,7 @@ class Utility {
     // --------------------------------------------------------------------- //
 
     ParticleDef particle_def_;
-    Medium* medium_;
+    std::shared_ptr<const Medium> medium_;
     EnergyCutSettings cut_settings_;
 
     std::vector<CrossSection*> crosssections_;

@@ -16,7 +16,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 Annihilation::Annihilation(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  double multiplier)
         : Parametrization(particle_def, medium, EnergyCutSettings(), multiplier)
 {
@@ -65,7 +65,7 @@ size_t Annihilation::GetHash() const
 // Specific implementations
 // ------------------------------------------------------------------------- //
 
-AnnihilationHeitler::AnnihilationHeitler(const ParticleDef& particle_def, const Medium& medium, double multiplier)
+AnnihilationHeitler::AnnihilationHeitler(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium, double multiplier)
         : Annihilation(particle_def, medium, multiplier)
 {}
 
@@ -93,4 +93,3 @@ double AnnihilationHeitler::DifferentialCrossSection(double energy, double v)
 
 
 const std::string AnnihilationHeitler::name_ = "AnnihilationHeitler";
-

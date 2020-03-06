@@ -48,7 +48,7 @@ void BremsstrahlungFactory::Register(const std::string& name, Enum enum_t, Regis
 
 // ------------------------------------------------------------------------- //
 CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& particle_def,
-                                                          const Medium& medium,
+                                                          std::shared_ptr<const Medium> medium,
                                                           const EnergyCutSettings& cuts,
                                                           const Definition& def) const
 {
@@ -71,7 +71,7 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
 
 // ------------------------------------------------------------------------- //
 CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& particle_def,
-                                                          const Medium& medium,
+                                                          std::shared_ptr<const Medium> medium,
                                                           const EnergyCutSettings& cuts,
                                                           const Definition& def,
                                                           InterpolationDef interpolation_def) const

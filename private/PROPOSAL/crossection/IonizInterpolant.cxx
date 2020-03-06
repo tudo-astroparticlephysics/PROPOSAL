@@ -227,9 +227,8 @@ double IonizInterpolant::FunctionToBuildDNdxInterpolant2D(double energy, double 
 double IonizInterpolant::CalculateStochasticLoss(double energy, double rnd1)
 {
     double rnd, rsum;
-    const Medium& medium = parametrization_->GetMedium();
 
-    rnd  = medium.GetSumCharge() * rnd1;
+    rnd  = parametrization_->GetMedium()->GetSumCharge() * rnd1;
     rsum = 0;
 
     for (unsigned int i = 0; i < components_.size(); i++)

@@ -33,7 +33,7 @@
 
 #include <map>
 #include <string>
-#include <iostream>
+#include <memory>
 #include <sstream>
 
 #include "PROPOSAL/methods.h"
@@ -115,7 +115,7 @@ public:
     // --------------------------------------------------------------------- //
 
     typedef std::function<
-        Bremsstrahlung*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm)>
+        Bremsstrahlung*(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier, bool lpm)>
         RegisterFunction;
 
     typedef std::map<std::string, RegisterFunction> BremsstrahlungMapString;
@@ -127,12 +127,12 @@ public:
     // --------------------------------------------------------------------- //
 
     CrossSection* CreateBremsstrahlung(const ParticleDef&,
-                                       const Medium&,
+                                       std::shared_ptr<const Medium>,
                                        const EnergyCutSettings&,
                                        const Definition&) const;
 
     CrossSection* CreateBremsstrahlung(const ParticleDef&,
-                                       const Medium&,
+                                       std::shared_ptr<const Medium>,
                                        const EnergyCutSettings&,
                                        const Definition&,
                                        InterpolationDef) const;

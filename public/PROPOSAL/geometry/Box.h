@@ -30,6 +30,8 @@
 #pragma once
 
 #include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/json.hpp"
+
 
 namespace PROPOSAL {
 
@@ -39,9 +41,9 @@ public:
     Box();
     Box(const Vector3D position, double x, double y, double z);
     Box(const Box&);
+    Box(const nlohmann::json& config);
 
-    Geometry* clone() const override { return new Box(*this); };
-    static Geometry* create() { return new Box(); }
+    std::shared_ptr<const Geometry> create() const override { return std::shared_ptr<const Geometry>( new Box(*this) ); };
     void swap(Geometry&) override;
 
     virtual ~Box() {}

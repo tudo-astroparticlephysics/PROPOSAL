@@ -41,7 +41,7 @@ class ScatteringMoliere : public Scattering
 {
 public:
     // constructor
-    ScatteringMoliere(const ParticleDef&, const Medium&);
+    ScatteringMoliere(const ParticleDef&, std::shared_ptr<const Medium>);
     ScatteringMoliere(const ParticleDef&, const ScatteringMoliere&);
     ScatteringMoliere(const ScatteringMoliere&);
     ~ScatteringMoliere();
@@ -61,7 +61,7 @@ private:
 
     RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, double rnd1, double rnd2, double rnd3, double rnd4) override;
 
-    const Medium* medium_;
+    std::shared_ptr<const Medium> medium_;
 
     int numComp_; // number of components in medium
     double ZSq_A_average_;

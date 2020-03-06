@@ -50,7 +50,7 @@ namespace PROPOSAL {
     class WeakInteraction : public Parametrization
     {
     public:
-        WeakInteraction(const ParticleDef&, const Medium&, double multiplier);
+        WeakInteraction(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
         WeakInteraction(const WeakInteraction&);
         virtual ~WeakInteraction();
 
@@ -77,13 +77,13 @@ class WeakCooperSarkarMertsch : public WeakInteraction
 public:
         typedef std::vector<Interpolant*> InterpolantVec;
 
-        WeakCooperSarkarMertsch(const ParticleDef&, const Medium&, double multiplier);
+        WeakCooperSarkarMertsch(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
         WeakCooperSarkarMertsch(const WeakCooperSarkarMertsch&);
         virtual ~WeakCooperSarkarMertsch();
 
         virtual Parametrization* clone() const { return new WeakCooperSarkarMertsch(*this); }
         static WeakInteraction* create(const ParticleDef& particle_def,
-                                       const Medium& medium,
+                                       std::shared_ptr<const Medium> medium,
                                        double multiplier)
         {
             return new WeakCooperSarkarMertsch(particle_def, medium, multiplier);

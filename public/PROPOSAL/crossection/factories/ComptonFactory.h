@@ -33,7 +33,7 @@
 
 #include <map>
 #include <string>
-#include <iostream>
+#include <memory>
 #include <sstream>
 
 #include "PROPOSAL/methods.h"
@@ -105,7 +105,7 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         typedef std::function<
-                Compton*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier)>
+                Compton*(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier)>
                 RegisterFunction;
 
         typedef std::map<std::string, RegisterFunction> ComptonMapString;
@@ -117,12 +117,12 @@ namespace PROPOSAL {
         // --------------------------------------------------------------------- //
 
         CrossSection* CreateCompton(const ParticleDef&,
-                                           const Medium&,
+                                           std::shared_ptr<const Medium>,
                                            const EnergyCutSettings&,
                                            const Definition&) const;
 
         CrossSection* CreateCompton(const ParticleDef&,
-                                           const Medium&,
+                                           std::shared_ptr<const Medium>,
                                            const EnergyCutSettings&,
                                            const Definition&,
                                            InterpolationDef) const;

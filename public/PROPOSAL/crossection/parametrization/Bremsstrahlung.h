@@ -35,13 +35,13 @@
     class Brems##param : public Bremsstrahlung                                                                         \
     {                                                                                                                  \
     public:                                                                                                            \
-        Brems##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);        \
+        Brems##param(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier, bool lpm);        \
         Brems##param(const Brems##param&);                                                                             \
         ~Brems##param();                                                                                               \
                                                                                                                        \
         Parametrization* clone() const { return new Brems##param(*this); }                                             \
         static Bremsstrahlung* create(const ParticleDef& particle_def,                                                 \
-                                      const Medium& medium,                                                            \
+                                      std::shared_ptr<const Medium> medium,                                                            \
                                       const EnergyCutSettings& cuts,                                                   \
                                       double multiplier,                                                               \
                                       bool lpm)                                                                        \
@@ -61,7 +61,7 @@ namespace PROPOSAL {
 class Bremsstrahlung : public Parametrization
 {
 public:
-    Bremsstrahlung(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);
+    Bremsstrahlung(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier, bool lpm);
     Bremsstrahlung(const Bremsstrahlung&);
     virtual ~Bremsstrahlung();
 
@@ -120,13 +120,13 @@ BREMSSTRAHLUNG_DEF(SandrockSoedingreksoRhode)
 class BremsElectronScreening : public Bremsstrahlung
 {
 public:
-    BremsElectronScreening(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);
+    BremsElectronScreening(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier, bool lpm);
     BremsElectronScreening(const BremsElectronScreening&);
     ~BremsElectronScreening();
 
     Parametrization* clone() const { return new BremsElectronScreening(*this); }
     static Bremsstrahlung* create(const ParticleDef& particle_def,
-                                  const Medium& medium,
+                                  std::shared_ptr<const Medium> medium,
                                   const EnergyCutSettings& cuts,
                                   double multiplier,
                                   bool lpm)

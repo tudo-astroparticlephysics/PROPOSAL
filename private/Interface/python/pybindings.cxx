@@ -196,11 +196,11 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     // //
 
     py::class_<Utility, std::shared_ptr<Utility>>(m, "Utility")
-        .def(py::init<const ParticleDef&, const Medium&,
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>,
                  const EnergyCutSettings&, Utility::Definition>(),
             py::arg("partcle_def"), py::arg("medium"), py::arg("cuts"),
             py::arg("definition"))
-        .def(py::init<const ParticleDef&, const Medium&,
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>,
                  const EnergyCutSettings&, Utility::Definition,
                  InterpolationDef>(),
             py::arg("partcle_def"), py::arg("medium"), py::arg("cuts"),
@@ -470,13 +470,12 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     // --------------------------------------------------------------------- //
 
     py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
-        .def(py::init<const ParticleDef&,
-                 const std::vector<Sector::Definition>&, const Geometry&>(),
+        .def(py::init<const ParticleDef&, const std::vector<Sector::Definition>&, std::shared_ptr<const Geometry>>(),
             py::arg("particle_def"), py::arg("sector_defs"),
             py::arg("detector"))
         .def(
             py::init<const ParticleDef&, const std::vector<Sector::Definition>&,
-                const Geometry&, const InterpolationDef&>(),
+                std::shared_ptr<const Geometry>, const InterpolationDef&>(),
             py::arg("particle_def"), py::arg("sector_defs"),
             py::arg("detector"), py::arg("interpolation_def"), R"pbdoc(
                     Function Docstring.
@@ -488,7 +487,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                         interpolation_def (pyPROPOSAL.InterpolationDef): definition of the Interpolation tables like path to store them, etc.
                 )pbdoc")
         .def(py::init<const ParticleDef&,
-                 const std::vector<Sector::Definition>&, const Geometry&>(),
+                 const std::vector<Sector::Definition>&, std::shared_ptr<const Geometry>>(),
             py::arg("particle_def"), py::arg("sector_defs"),
             py::arg("detector"))
         .def(py::init<const ParticleDef&, const std::string&>(),

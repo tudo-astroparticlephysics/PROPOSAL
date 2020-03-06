@@ -57,7 +57,7 @@ void PhotoPairFactory::Register(const std::string& name, Enum enum_t, RegisterFu
 
 // ------------------------------------------------------------------------- //
 CrossSection* PhotoPairFactory::CreatePhotoPair(const ParticleDef& particle_def,
-                                            const Medium& medium,
+                                            std::shared_ptr<const Medium> medium,
                                             const Definition& def) const
 {
     if(def.parametrization == PhotoPairFactory::Enum::None){
@@ -82,7 +82,7 @@ CrossSection* PhotoPairFactory::CreatePhotoPair(const ParticleDef& particle_def,
 
 // ------------------------------------------------------------------------- //
 CrossSection* PhotoPairFactory::CreatePhotoPair(const ParticleDef& particle_def,
-                                            const Medium& medium,
+                                            std::shared_ptr<const Medium> medium,
                                             const Definition& def,
                                             InterpolationDef interpolation_def) const
 {
@@ -155,7 +155,7 @@ void PhotoPairFactory::RegisterPhotoAngle(const std::string& name, const PhotoAn
 PhotoAngleDistribution* PhotoPairFactory::CreatePhotoAngleDistribution(
         const std::string& name,
         const ParticleDef& particle_def,
-        const Medium& medium) {
+        std::shared_ptr<const Medium> medium) {
     std::string name_lower = name;
     std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
 
@@ -175,7 +175,7 @@ PhotoAngleDistribution* PhotoPairFactory::CreatePhotoAngleDistribution(
 PhotoAngleDistribution* PhotoPairFactory::CreatePhotoAngleDistribution(
         const PhotoPairFactory::PhotoAngle& photoangle,
         const ParticleDef& particle_def,
-        const Medium& medium) {
+        std::shared_ptr<const Medium> medium) {
 
     PhotoAngleMapEnum::const_iterator it = photo_angle_map_enum_.find(photoangle);
 
@@ -222,4 +222,3 @@ std::string PhotoPairFactory::GetStringFromPhotoAngleEnum(const PhotoAngle& phot
         return ""; // Just to prevent warnings
     }
 }
-

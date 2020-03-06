@@ -17,28 +17,26 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-ScatteringNoScattering::ScatteringNoScattering(const ParticleDef& particle_def, const Medium& medium)
+ScatteringNoScattering::ScatteringNoScattering(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium)
     : Scattering(particle_def)
-    , medium_(medium.clone())
+    , medium_(medium)
 {
 }
 
 ScatteringNoScattering::ScatteringNoScattering(const ScatteringNoScattering& scattering)
     : Scattering(scattering)
-    , medium_(scattering.medium_->clone())
+    , medium_(scattering.medium_)
 {
 }
 
 ScatteringNoScattering::ScatteringNoScattering(const ParticleDef& particle_def, const ScatteringNoScattering& scattering)
     : Scattering(particle_def)
-    , medium_(scattering.medium_->clone())
+    , medium_(scattering.medium_)
 {
 }
 
 ScatteringNoScattering::~ScatteringNoScattering()
-{
-    delete medium_;
-}
+{ }
 
 bool ScatteringNoScattering::compare(const Scattering& scattering) const
 {

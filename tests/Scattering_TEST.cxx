@@ -35,7 +35,7 @@ ParticleDef getParticleDef(const std::string& name)
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef mu = MuMinusDef::Get();
-    Water water(1.0);
+    std::shared_ptr<const Medium> water(Water(1.0).create());
 
     Scattering* noScat1 = new ScatteringNoScattering(mu, water);
     ScatteringNoScattering noScat2(mu, water);
@@ -66,8 +66,8 @@ TEST(Comparison, Comparison_not_equal)
 {
     ParticleDef mu  = MuMinusDef::Get();
     ParticleDef tau = TauMinusDef::Get();
-    Water water(1.0);
-    Ice ice;
+    std::shared_ptr<const Medium> water(Water(1.0).create());
+    std::shared_ptr<const Medium> ice(Ice().create());
 
     ScatteringNoScattering noScat1(mu, water);
     ScatteringNoScattering noScat2(tau, water);
@@ -111,7 +111,7 @@ TEST(Comparison, Comparison_not_equal)
 TEST(Assignment, Copyconstructor)
 {
     ParticleDef mu = MuMinusDef::Get();
-    Water water(1.0);
+    std::shared_ptr<const Medium> water(Water(1.0).create());
 
     ScatteringMoliere moliere1(mu, water);
     ScatteringMoliere moliere2 = moliere1;
@@ -121,7 +121,7 @@ TEST(Assignment, Copyconstructor)
 TEST(Assignment, Copyconstructor2)
 {
     ParticleDef mu = MuMinusDef::Get();
-    Water water(1.0);
+    std::shared_ptr<const Medium> water(Water(1.0).create());
 
     ScatteringMoliere moliere1(mu, water);
     ScatteringMoliere moliere2(moliere1);
@@ -169,19 +169,19 @@ TEST(Scattering, Scatter)
 
         ParticleDef particle_def = getParticleDef(particleName);
 
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         Scattering* scattering = NULL;
 
         if (parametrization == "HighlandIntegral")
         {
-            Utility utility(particle_def, *medium, ecuts, Utility::Definition(), InterpolationDef());
+            Utility utility(particle_def, medium, ecuts, Utility::Definition(), InterpolationDef());
             scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle_def, utility, InterpolationDef());
         }
         else
         {
-            Utility utility(particle_def, *medium, ecuts, Utility::Definition());
+            Utility utility(particle_def, medium, ecuts, Utility::Definition());
             scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle_def, utility, InterpolationDef());
         }
 
@@ -210,7 +210,6 @@ TEST(Scattering, Scatter)
                 distance >> rnd1 >> rnd2 >> rnd3 >> rnd4 >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
         }
 
-        delete medium;
         delete scattering;
     }
 }

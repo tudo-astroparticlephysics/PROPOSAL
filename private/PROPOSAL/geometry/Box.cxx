@@ -9,7 +9,7 @@
 using namespace PROPOSAL;
 
 Box::Box()
-    : Geometry("Box")
+    : Geometry((std::string)("Box"))
     , x_(0.0)
     , y_(0.0)
     , z_(0.0)
@@ -33,6 +33,25 @@ Box::Box(const Box& box)
     , z_(box.z_)
 {
     // Nothing to do here
+}
+
+Box::Box(const nlohmann::json& config)
+    : Geometry(config)
+{
+    if(not config.at("length").is_number())
+        throw std::invalid_argument("Length is not a number.");
+    if(not config.at("width").is_number())
+        throw std::invalid_argument("Width is not a number.");
+    if(not config.at("height").is_number())
+        throw std::invalid_argument("Height is not a number.");
+
+    x_ = config["length"].get<double>() * 100;
+    y_ = config["width"].get<double>() * 100;
+    z_ = config["height"].get<double>() * 100;
+
+    if(x_ < 0) throw std::logic_error("lenght must be > 0");
+    if(y_ < 0) throw std::logic_error("width must be > 0");
+    if(z_ < 0) throw std::logic_error("height must be > 0");
 }
 
 // ------------------------------------------------------------------------- //

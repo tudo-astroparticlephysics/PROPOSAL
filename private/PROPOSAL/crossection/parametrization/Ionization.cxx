@@ -18,7 +18,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 Ionization::Ionization(const ParticleDef& particle_def,
-                       const Medium& medium,
+                       std::shared_ptr<const Medium> medium,
                        const EnergyCutSettings& cuts,
                        double multiplier)
     : Parametrization(particle_def, medium, cuts, multiplier)
@@ -34,20 +34,20 @@ Ionization::~Ionization() {}
 
 // ------------------------------------------------------------------------- //
 double Ionization::Delta(double beta, double gamma) {
-    const Medium& medium = this->GetMedium();
+    /* std::shared_ptr<const Medium> medium = this->GetMedium(); */
     double X;
 
     X = std::log(beta * gamma) / std::log(10);
 
-    if (X < medium.GetX0())
+    if (X < medium_->GetX0())
     {
-        return medium.GetD0() * std::pow(10, 2 * (X - medium.GetX0()));
-    } else if (X < medium.GetX1())
+        return medium_->GetD0() * std::pow(10, 2 * (X - medium_->GetX0()));
+    } else if (X < medium_->GetX1())
     {
-        return 2 * LOG10 * X + medium.GetC() + medium.GetA() * std::pow(medium.GetX1() - X, medium.GetM());
+        return 2 * LOG10 * X + medium_->GetC() + medium_->GetA() * std::pow(medium_->GetX1() - X, medium_->GetM());
     } else
     {
-        return 2 * LOG10 * X + medium.GetC();
+        return 2 * LOG10 * X + medium_->GetC();
     }
 }
 
@@ -88,7 +88,7 @@ Parametrization::IntegralLimits IonizBetheBlochRossi::GetIntegralLimits(double e
 }
 
 IonizBetheBlochRossi::IonizBetheBlochRossi(const ParticleDef& particle_def,
-                                           const Medium& medium,
+                                           std::shared_ptr<const Medium> medium,
                                            const EnergyCutSettings& cuts,
                                            double multiplier)
     : Ionization(particle_def, medium, cuts, multiplier)
@@ -142,7 +142,7 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
 
     Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
     ParticleDef particle_def = this->GetParticleDef();
-    const Medium& medium     = this->GetMedium();
+    /* std::shared_ptr<const Medium> medium     = this->GetMedium(); */
 
     // TODO(mario): Better way? Sat 2017/09/02
 
@@ -153,7 +153,7 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
     double beta              = particle_momentum / energy;
     double gamma             = energy / particle_def.mass;
 
-    aux    = beta * gamma / (1.e-6 * medium.GetI());
+    aux    = beta * gamma / (1.e-6 * medium_->GetI());
     result = std::log(limits.vUp * (2 * ME * energy)) + 2 * std::log(aux);
     aux    = limits.vUp / (2 * (1 + 1 / gamma));
     result += aux * aux;
@@ -162,14 +162,14 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
 
     if (result > 0)
     {
-        result *= IONK * particle_def.charge * particle_def.charge * medium.GetZA() / (2 * aux);
+        result *= IONK * particle_def.charge * particle_def.charge * medium_->GetZA() / (2 * aux);
     } else
     {
         result = 0;
     }
 
     if(limits.vUp != limits.vMin){
-        result *= medium.GetMassDensity()/(limits.vUp - limits.vMin);
+        result *= medium_->GetMassDensity()/(limits.vUp - limits.vMin);
     }
     else{
         return 0;
@@ -248,7 +248,7 @@ const std::string IonizBetheBlochRossi::name_ = "IonizBetheBlochRossi";
 // ------------------------------------------------------------------------- //
 
 IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(const ParticleDef& particle_def,
-                                           const Medium& medium,
+                                           std::shared_ptr<const Medium> medium,
                                            const EnergyCutSettings& cuts,
                                            double multiplier)
         : Ionization(particle_def, medium, cuts, multiplier)
@@ -337,7 +337,7 @@ double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(double energy, double va
 
     Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
     ParticleDef particle_def = this->GetParticleDef();
-    const Medium& medium     = this->GetMedium();
+    std::shared_ptr<const Medium> medium     = this->GetMedium();
 
     double fplus; // (2.269)
     double bigDelta     = std::min(limits.vMax * energy / ME, limits.vUp * energy / ME); // (2.265)
@@ -352,13 +352,13 @@ double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(double energy, double va
     aux *= betasquared / tau;
     fplus = std::log(tau * bigDelta) - aux;
 
-    result = std::log( 2. * (tau + 2.) / (std::pow(1e-6 * medium.GetI(), 2. ) / ME) );
+    result = std::log( 2. * (tau + 2.) / (std::pow(1e-6 * medium_->GetI(), 2. ) / ME) );
     result += fplus;
     result -= Delta(std::sqrt(betasquared), gamma);
 
     result *= 2. * PI * RE * RE * ME / betasquared;
 
-    result *= NA * medium.GetZA() * medium_->GetMassDensity();
+    result *= NA * medium_->GetZA() * medium_->GetMassDensity();
 
     return std::max(result, 0.);
 }
@@ -373,7 +373,7 @@ const std::string IonizBergerSeltzerBhabha::name_ = "IonizBergerSeltzerBhabha";
 // ------------------------------------------------------------------------- //
 
 IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(const ParticleDef& particle_def,
-                                                   const Medium& medium,
+                                                   std::shared_ptr<const Medium> medium,
                                                    const EnergyCutSettings& cuts,
                                                    double multiplier)
         : Ionization(particle_def, medium, cuts, multiplier)
@@ -459,7 +459,7 @@ double IonizBergerSeltzerMoller::FunctionToDEdxIntegral(double energy, double va
 
     Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
     ParticleDef particle_def = this->GetParticleDef();
-    const Medium& medium     = this->GetMedium();
+    std::shared_ptr<const Medium> medium     = this->GetMedium();
 
     double fminus; // (2.268)
     double bigDelta     = std::min(limits.vMax * energy / ME, limits.vUp * energy / ME); // (2.265)
@@ -472,13 +472,13 @@ double IonizBergerSeltzerMoller::FunctionToDEdxIntegral(double energy, double va
 
     fminus = aux - 1. - betasquared + std::log((tau - bigDelta) * bigDelta) + tau / (tau - bigDelta);
 
-    result = std::log( 2. * (tau + 2.) / (std::pow(1e-6 * medium.GetI(), 2. ) / ME) );
+    result = std::log( 2. * (tau + 2.) / (std::pow(1e-6 * medium->GetI(), 2. ) / ME) );
     result += fminus;
     result -= Delta(std::sqrt(betasquared), gamma);
 
     result *= 2. * PI * RE * RE * ME / betasquared;
 
-    result *= NA * medium.GetZA() * medium_->GetMassDensity();
+    result *= NA * medium->GetZA() * medium_->GetMassDensity();
 
     return std::max(result, 0.);
 }

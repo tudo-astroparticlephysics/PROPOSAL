@@ -39,12 +39,10 @@ namespace Components {
 class Component;
 }
 
-class Medium;
-
 class Parametrization
 {
 public:
-    Parametrization(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    Parametrization(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier);
     Parametrization(const Parametrization&);
     virtual ~Parametrization();
 
@@ -85,7 +83,7 @@ public:
     virtual const std::string& GetName() const = 0; //{ return name_; }
 
     const ParticleDef& GetParticleDef() const { return particle_def_; }
-    const Medium& GetMedium() const { return *medium_; }
+    std::shared_ptr<const Medium> GetMedium() const { return medium_; }
     const EnergyCutSettings& GetEnergyCuts() const { return cut_settings_; }
     double GetMultiplier() const { return multiplier_; }
     virtual bool IsParticleOutputEnabled() const {return false;} // no particle production per default
@@ -108,7 +106,7 @@ protected:
     // const std::string name_;
 
     const ParticleDef particle_def_;
-    const Medium* medium_;
+    std::shared_ptr<const Medium> medium_;
     const EnergyCutSettings cut_settings_;
 
     // const Components::Component* current_component_;

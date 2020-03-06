@@ -43,7 +43,7 @@
     {                                                                                                                  \
     public:                                                                                                            \
         Photo##param(const ParticleDef&,                                                                               \
-                     const Medium&,                                                                                    \
+                     std::shared_ptr<const Medium>,                                                                                    \
                      const EnergyCutSettings&,                                                                         \
                      double multiplier,                                                                                \
                      const ShadowEffect& shadow_effect);                                                               \
@@ -52,7 +52,7 @@
                                                                                                                        \
         virtual Parametrization* clone() const { return new Photo##param(*this); }                                     \
         static Photonuclear* create(const ParticleDef& particle_def,                                                   \
-                                    const Medium& medium,                                                              \
+                                    std::shared_ptr<const Medium> medium,                                                              \
                                     const EnergyCutSettings& cuts,                                                     \
                                     double multiplier,                                                                 \
                                     const ShadowEffect& shadow_effect)                                                 \
@@ -81,7 +81,7 @@ class PhotoQ2Integral : public Photonuclear
 {
 public:
     PhotoQ2Integral(const ParticleDef&,
-                    const Medium&,
+                    std::shared_ptr<const Medium>,
                     const EnergyCutSettings&,
                     double multiplier,
                     const ShadowEffect&);
@@ -133,7 +133,7 @@ public:
 
 public:
     PhotoQ2Interpolant(const ParticleDef&,
-                       const Medium&,
+                       std::shared_ptr<const Medium>,
                        const EnergyCutSettings&,
                        double multiplier,
                        const ShadowEffect&,
@@ -143,7 +143,7 @@ public:
 
     Parametrization* clone() const { return new PhotoQ2Interpolant<Param>(*this); }
     static Photonuclear* create(const ParticleDef& particle_def,
-                                const Medium& medium,
+                                std::shared_ptr<const Medium> medium,
                                 const EnergyCutSettings& cuts,
                                 double multiplier,
                                 const ShadowEffect& shadow_effect,
@@ -163,7 +163,7 @@ protected:
 
 template<class Param>
 PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
-                                              const Medium& medium,
+                                              std::shared_ptr<const Medium> medium,
                                               const EnergyCutSettings& cuts,
                                               double multiplier,
                                               const ShadowEffect& shadow_effect,

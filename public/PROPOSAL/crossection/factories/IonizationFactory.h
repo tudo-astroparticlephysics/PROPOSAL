@@ -30,6 +30,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include <map>
 #include <string>
@@ -102,7 +103,7 @@ public:
     // --------------------------------------------------------------------- //
 
     typedef std::function<
-            Ionization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier)>
+            Ionization*(const ParticleDef&, std::shared_ptr<const Medium>, const EnergyCutSettings&, double multiplier)>
             RegisterFunction;
 
     typedef std::map<std::string, RegisterFunction> IonizMapString;
@@ -114,12 +115,12 @@ public:
     // --------------------------------------------------------------------- //
 
     CrossSection* CreateIonization(const ParticleDef&,
-                                   const Medium&,
+                                   std::shared_ptr<const Medium>,
                                    const EnergyCutSettings&,
                                    const Definition&) const;
 
     CrossSection* CreateIonization(const ParticleDef&,
-                                   const Medium&,
+                                   std::shared_ptr<const Medium>,
                                    const EnergyCutSettings&,
                                    const Definition&,
                                    InterpolationDef) const;

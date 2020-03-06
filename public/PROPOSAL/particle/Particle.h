@@ -31,6 +31,7 @@
 
 #include <string>
 #include <map>
+#include <memory>
 
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/math/Vector3D.h"
@@ -69,6 +70,8 @@ static const std::map<const int, std::string> Type_Interaction_Name_Map {
 
 
 namespace PROPOSAL {
+class UtilityDecorator;
+
 class DynamicData
 {
 public:
@@ -128,5 +131,7 @@ protected:
     double parent_particle_energy_; //!< energy of the parent particle
     double time_;                   //!< age [sec]
     double propagated_distance_;    //!< propagation distance [cm]
+
+    std::shared_ptr<UtilityDecorator> utility_decorator;
 };
 } // namespace PROPOSAL

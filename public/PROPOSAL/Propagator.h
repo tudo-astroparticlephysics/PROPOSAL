@@ -56,9 +56,9 @@ class Propagator
 {
 public:
     // Constructors
-    Propagator(const std::vector<Sector*>&, const Geometry&);
-    Propagator(const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&);
-    Propagator(const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&, const InterpolationDef&);
+    Propagator(const std::vector<Sector*>&, std::shared_ptr<const Geometry>);
+    Propagator(const ParticleDef&, const std::vector<Sector::Definition>&, std::shared_ptr<const Geometry>);
+    Propagator(const ParticleDef&, const std::vector<Sector::Definition>&, std::shared_ptr<const Geometry>, const InterpolationDef&);
     Propagator(const ParticleDef&, const std::string&);
 
     Propagator(const Propagator&);
@@ -74,7 +74,7 @@ public:
     ///
     /// @return Secondary data
     // ----------------------------------------------------------------------------
-    Secondaries Propagate(DynamicData particle_condition,
+    Secondaries Propagate(const DynamicData& particle_condition,
         double max_distance=1e20, double minimal_energy=0.);
 
     // --------------------------------------------------------------------- //
@@ -84,12 +84,12 @@ public:
     const Sector* GetCurrentSector() const { return current_sector_; }
     const std::vector<Sector*> GetSectors() const { return sectors_; }
 
-    Geometry& GetDetector() const { return *detector_; };
+    std::shared_ptr<const Geometry> GetDetector() const { return detector_; };
     ParticleDef& GetParticleDef() { return particle_def_; };
     /* DynamicData& GetEntryCondition() { return entry_condition_; }; */
     /* DynamicData& GetExitCondition() { return exit_condition_; }; */
-    DynamicData& GetClosestApproachCondition() { return closest_approach_condition_; };
-    double GetELost() { return elost_; };
+    /* DynamicData& GetClosestApproachCondition() { return closest_approach_condition_; }; */
+    /* double GetELost() { return elost_; }; */
 
 private:
 
@@ -118,7 +118,6 @@ private:
     //     }
     // }
 
-    InterpolationDef CreateInterpolationDef(const std::string& json_object_str);
     Sector::Definition CreateSectorDefinition(const std::string& json_object_str);
     std::string ParseCutSettings(const std::string& json_object_str,
                                  const std::string& json_key,
@@ -133,7 +132,7 @@ private:
     ///
     /// @return new Geometry
     // ----------------------------------------------------------------------------
-    Geometry* ParseGeometryConifg(const std::string& json_object_str);
+    std::shared_ptr<const Geometry> ParseGeometryConfig(const std::string& json_object_str);
 
     // ----------------------------------------------------------------------------
     /// @brief Choose the current sector the particle is in.
@@ -201,7 +200,7 @@ private:
     Sector* current_sector_;
 
     ParticleDef particle_def_;
-    Geometry* detector_;
+    std::shared_ptr<const Geometry> detector_;
 
     std::pair<double,double> produced_particle_moments_ {100., 10000.};
     unsigned int n_th_call_ {1};

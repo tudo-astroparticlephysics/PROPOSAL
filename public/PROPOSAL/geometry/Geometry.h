@@ -31,11 +31,13 @@
 
 #include <iostream>
 #include <map>
+#include <memory>
 
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/json.hpp"
+
 
 namespace PROPOSAL {
-
 class Geometry
 {
 public:
@@ -47,8 +49,10 @@ public:
     Geometry(const std::string);
     Geometry(const std::string, const Vector3D position);
     Geometry(const Geometry&);
+    Geometry(const nlohmann::json&);
 
-    virtual Geometry* clone() const = 0; // virtual constructor idiom (used for deep copies)
+    /* virtual Geometry* clone() const = 0; // virtual constructor idiom (used for deep copies) */
+    virtual std::shared_ptr<const Geometry> create() const = 0;
     virtual void swap(Geometry&);
 
     virtual ~Geometry(){};
@@ -90,7 +94,7 @@ public:
     /*!
      * Calculates the distance to the closest approch to the geometry center
      */
-    double DistanceToClosestApproach(const Vector3D& position, const Vector3D& direction);
+    double DistanceToClosestApproach(const Vector3D& position, const Vector3D& direction) const;
 
     // void swap(Geometry &geometry);
 
@@ -98,11 +102,12 @@ public:
     // Getter & Setter
     // ----------------------------------------------------------------- //
 
-    ParticleLocation::Enum GetLocation(const Vector3D& position, const Vector3D& direction);
+    ParticleLocation::Enum GetLocation(const Vector3D& position, const Vector3D& direction) const;
 
     Vector3D GetPosition() const { return position_; }
 
     std::string GetName() const { return name_; }
+
     unsigned int GetHierarchy() const { return hierarchy_; }
 
     void SetPosition(const Vector3D& position) { position_ = position; };
@@ -120,5 +125,12 @@ protected:
 
     unsigned int hierarchy_; //!< adds a hierarchy of geometry objects to allow crossing geometries
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+    enum Geometry_Type : int { SPHERE, BOX, CYLINDER };
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+    const std::array<std::string, 3>  Geometry_Name = { "sphere", "box", "cylinder" };
 } // namespace PROPOSAL

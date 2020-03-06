@@ -3,11 +3,10 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/geometry/Sphere.h"
-
 using namespace PROPOSAL;
 
 Sphere::Sphere()
-    : Geometry("Sphere")
+    : Geometry((std::string)("Sphere"))
     , radius_(0.0)
     , inner_radius_(0.0)
 {
@@ -36,6 +35,24 @@ Sphere::Sphere(const Sphere& sphere)
     , inner_radius_(sphere.inner_radius_)
 {
     // Nothing to do here
+}
+
+
+
+Sphere::Sphere(const nlohmann::json& config)
+    : Geometry(config)
+{
+    if(not config.is_object()) throw std::invalid_argument("No json object found.");
+    if(not config.at("outer_radius").is_number())
+        throw std::invalid_argument("Outer radius is not a number.");
+
+    config["outer_radius"].get_to(radius_);
+    radius_ *= 100;
+    inner_radius_ = config.value("inner_radius", 0);
+
+    if(inner_radius_ < 0) throw std::logic_error("inner radius must be >= 0");
+    if(radius_ < inner_radius_)
+       throw std::logic_error("radius must be larger than inner radius");
 }
 
 // ------------------------------------------------------------------------- //

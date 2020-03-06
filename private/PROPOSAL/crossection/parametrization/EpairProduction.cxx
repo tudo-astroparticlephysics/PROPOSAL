@@ -11,7 +11,7 @@
 
 #define EPAIR_PARAM_INTEGRAL_IMPL(param)                                                                               \
     Epair##param::Epair##param(const ParticleDef& particle_def,                                                        \
-                               const Medium& medium,                                                                   \
+                               std::shared_ptr<const Medium> medium,                                                                   \
                                const EnergyCutSettings& cuts,                                                          \
                                double multiplier,                                                                      \
                                bool lpm)                                                                               \
@@ -39,7 +39,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 EpairProduction::EpairProduction(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  const EnergyCutSettings& cuts,
                                  double multiplier,
                                  bool lpm)
@@ -171,7 +171,7 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
 
 // ------------------------------------------------------------------------- //
 EpairProductionRhoIntegral::EpairProductionRhoIntegral(const ParticleDef& particle_def,
-                                                       const Medium& medium,
+                                                       std::shared_ptr<const Medium> medium,
                                                        const EnergyCutSettings& cuts,
                                                        double multiplier,
                                                        bool lpm)

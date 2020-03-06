@@ -32,7 +32,7 @@ MupairProductionFactory::~MupairProductionFactory()
 
 // ------------------------------------------------------------------------- //
 CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
+                                                            std::shared_ptr<const Medium> medium,
                                                             const EnergyCutSettings& cuts,
                                                             const Definition& def) const
 {
@@ -55,7 +55,7 @@ CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef&
 
 // ------------------------------------------------------------------------- //
 CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef& particle_def,
-                                                            const Medium& medium,
+                                                            std::shared_ptr<const Medium> medium,
                                                             const EnergyCutSettings& cuts,
                                                             const Definition& def,
                                                             InterpolationDef interpolation_def) const

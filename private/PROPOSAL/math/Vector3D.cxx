@@ -47,6 +47,23 @@ Vector3D::Vector3D(Vector3D&& other)
 {
 }
 
+Vector3D::Vector3D(const nlohmann::json& config)
+    : spherical_(0,0,0)
+{
+    if(not config.is_array()) throw std::invalid_argument("Vector3D is not a 3 component array.");
+    if(not (config.size() == 3)) throw std::invalid_argument("Vector3D is not 3.");
+    if(not config[0].is_number()) throw std::invalid_argument("x is not a number");
+    if(not config[1].is_number()) throw std::invalid_argument("y is not a number");
+    if(not config[2].is_number()) throw std::invalid_argument("z is not a number");
+
+    config[0].get_to(cartesian_.x_);
+    config[1].get_to(cartesian_.y_);
+    config[2].get_to(cartesian_.z_);
+
+    cartesian_.x_ *= 100; // cm
+    cartesian_.y_ *= 100; // cm
+    cartesian_.z_ *= 100; // cm
+}
 
 // destructor
 Vector3D::~Vector3D() {}

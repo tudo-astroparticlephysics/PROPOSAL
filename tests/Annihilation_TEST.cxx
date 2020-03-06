@@ -43,7 +43,7 @@ ParticleDef getParticleDef(const std::string& name)
 TEST(Comparison, Comparison_equal_particle)
 {
 ParticleDef particle_def = EPlusDef::Get(); //particle
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 double multiplier   = 1.;
 
 Annihilation* Anni_A = new AnnihilationHeitler(particle_def, medium, multiplier);
@@ -76,8 +76,8 @@ TEST(Comparison, Comparison_not_equal)
 ParticleDef mu_def  = MuMinusDef::Get();
 ParticleDef e_minus_def = EMinusDef::Get();
 ParticleDef e_plus_def  = EPlusDef::Get();
-Water medium_1;
-Ice medium_2;
+std::shared_ptr<const Medium> medium_1(Water().create());
+std::shared_ptr<const Medium> medium_2(Ice().create());
 double multiplier_1 = 1.;
 double multiplier_2 = 2.;
 
@@ -114,7 +114,7 @@ EXPECT_TRUE(Integral_A != Integral_B);
 TEST(Assignment, Copyconstructor)
 {
 ParticleDef particle_def = EPlusDef::Get();
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 double multiplier = 1.;
 
 AnnihilationHeitler Anni_A(particle_def, medium, multiplier);
@@ -157,18 +157,17 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;
 annihilation_def.parametrization = AnnihilationFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, *medium, annihilation_def);
+CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, medium, annihilation_def);
 dNdx_new = anni->CalculatedNdx(energy);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
-delete medium;
 delete anni;
 }
 }
@@ -198,19 +197,18 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;
 annihilation_def.parametrization = AnnihilationFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, *medium, annihilation_def);
+CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, medium, annihilation_def);
 
 dNdx_rnd_new = anni->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-delete medium;
 delete anni;
 }
 }
@@ -243,19 +241,18 @@ stochastic_loss_stored;
 
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;
 annihilation_def.parametrization = AnnihilationFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, *medium, annihilation_def);
+CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, medium, annihilation_def);
 
 stochastic_loss_new = anni->CalculateStochasticLoss(energy, rnd1, rnd2);
 
 ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
-delete medium;
 delete anni;
 }
 }
@@ -285,19 +282,18 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;
 annihilation_def.parametrization = AnnihilationFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, *medium, annihilation_def, InterpolDef);
+CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, medium, annihilation_def, InterpolDef);
 
 dNdx_new = anni->CalculatedNdx(energy);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
-delete medium;
 delete anni;
 }
 }
@@ -329,19 +325,18 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;
 annihilation_def.parametrization = AnnihilationFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, *medium, annihilation_def, InterpolDef);
+CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, medium, annihilation_def, InterpolDef);
 
 dNdx_rnd_new = anni->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-delete medium;
 delete anni;
 }
 }
@@ -374,19 +369,18 @@ in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> 
 stochastic_loss_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 AnnihilationFactory::Definition annihilation_def;
 annihilation_def.multiplier      = multiplier;
 annihilation_def.parametrization = AnnihilationFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, *medium, annihilation_def, InterpolDef);
+CrossSection* anni = AnnihilationFactory::Get().CreateAnnihilation(particle_def, medium, annihilation_def, InterpolDef);
 
 stochastic_loss_new = anni->CalculateStochasticLoss(energy, rnd1, rnd2);
 
 ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
-delete medium;
 delete anni;
 }
 }

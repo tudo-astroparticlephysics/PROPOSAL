@@ -11,12 +11,14 @@
 #include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/geometry/GeometryFactory.h"
 #include "PROPOSAL/geometry/Sphere.h"
 
 #include "PROPOSAL/Sector.h"
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
 
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"
@@ -74,8 +76,8 @@ Sector::Definition::Definition()
     , location(Sector::ParticleLocation::InsideDetector)
     , utility_def()
     , cut_settings()
-    , medium_(new Ice())
-    , geometry_(new Sphere(Vector3D(), 1.0e20, 0.0))
+    , medium_(std::make_shared<const Ice>())
+    , geometry_(std::make_shared<const Sphere>(Vector3D(), 1.0e20, 0.0))
 {
 }
 
@@ -91,9 +93,69 @@ Sector::Definition::Definition(const Definition& def)
     , location(def.location)
     , utility_def(def.utility_def)
     , cut_settings(def.cut_settings)
-    , medium_(def.medium_->clone())
-    , geometry_(def.geometry_->clone())
+    , medium_(def.medium_)
+    , geometry_(def.geometry_)
 {
+}
+
+Sector::Definition::Definition(const nlohmann::json& config)
+    : utility_def(config)
+{
+    if(not config.is_object()) throw std::invalid_argument("No json object found.");
+
+    std::array<std::pair<std::string, Sector::ParticleLocation::Enum>, 3> cuts = {
+        std::make_pair("cuts_infront", Sector::ParticleLocation::InfrontDetector),
+        std::make_pair("cuts_inside",Sector::ParticleLocation::InsideDetector),
+        std::make_pair("cuts_behind",Sector::ParticleLocation::BehindDetector),
+    };
+
+    for (const auto& cut : cuts) {
+        if(config.contains(cut.first)) {
+            cut_settings = EnergyCutSettings(config.at(cut.first));
+            location = cut.second;
+            break;
+        }
+    }
+
+    std::string scattering_model_str = config.value("scattering", "highlandintegral");
+    scattering_model = ScatteringFactory::Get().GetEnumFromString(scattering_model_str);
+
+    if(!config.contains("geometry")) {
+        throw std::invalid_argument("A geometry is needed for each sector.");
+    }
+    if(!config.at("geometry").contains("shape")) {
+        throw std::invalid_argument("A shape must be specified.");
+    }
+
+    nlohmann::json config_geometry = config.at("geometry");
+    if (config_geometry.at("shape") == "sphere") {
+        geometry_ = std::make_shared<const Sphere>(config_geometry);
+    } else if (config_geometry.at("shape") == "box") {
+        geometry_ = std::make_shared<const Box>(config_geometry);
+    } else if (config_geometry.at("shape") == "cylinder") {
+        geometry_ = std::make_shared<const Cylinder>(config_geometry);
+    } else {
+        throw std::invalid_argument("Unkown shape.");
+    }
+
+    if(!config.contains("medium"))
+    {
+        throw std::invalid_argument("A medium is needed for each sector.");
+    }
+
+    std::string medium_name;
+    config.at("medium").get_to(medium_name);
+    double density_correction = config.value("density_correction", 1.);
+    medium_ = CreateMedium(medium_name, density_correction);
+
+
+    do_stochastic_loss_weighting = config.value("stochastic_loss_weighting", false);
+    stochastic_loss_weighting = config.value("stochastic_loss_weighting", 0);
+    stopping_decay = config.value("stopping_decay", true);
+    do_continuous_randomization = config.value("cont_rand", true);
+    do_continuous_energy_loss_output = config.value("do_continuous_energy_loss_output", false);
+    do_exact_time_calculation = config.value("exact_time", true);
+    only_loss_inside_detector = config.value("only_loss_inside_detector", false);
 }
 
 bool Sector::Definition::operator==(const Definition& sector_def) const
@@ -134,50 +196,19 @@ bool Sector::Definition::operator!=(const Definition& sector_def) const
     return !(*this == sector_def);
 }
 
-void Sector::Definition::swap(Definition& definition)
-{
-    using std::swap;
-
-    swap(do_stochastic_loss_weighting, definition.do_stochastic_loss_weighting);
-    swap(stochastic_loss_weighting, definition.stochastic_loss_weighting);
-    swap(stopping_decay, definition.stopping_decay);
-    swap(do_continuous_randomization, definition.do_continuous_randomization);
-    swap(do_continuous_energy_loss_output,
-        definition.do_continuous_energy_loss_output);
-    swap(do_exact_time_calculation, definition.do_exact_time_calculation);
-    swap(only_loss_inside_detector, definition.only_loss_inside_detector);
-    swap(scattering_model, definition.scattering_model);
-    swap(location, definition.location);
-    swap(utility_def, definition.utility_def);
-    swap(cut_settings, definition.cut_settings);
-    medium_->swap(*definition.medium_);
-    geometry_->swap(*definition.geometry_);
-}
-Sector::Definition& Sector::Definition::operator=(const Definition& definition)
-{
-    if (this != &definition) {
-        Sector::Definition tmp(definition);
-        swap(tmp);
-    }
-    return *this;
-}
 
 Sector::Definition::~Definition()
 {
-    delete medium_;
-    delete geometry_;
 }
 
-void Sector::Definition::SetMedium(const Medium& medium)
+void Sector::Definition::SetMedium(std::shared_ptr<const Medium> medium)
 {
-    delete medium_;
-    medium_ = medium.clone();
+    medium_ = medium;
 }
 
-void Sector::Definition::SetGeometry(const Geometry& geometry)
+void Sector::Definition::SetGeometry(std::shared_ptr<const Geometry> geometry)
 {
-    delete geometry_;
-    geometry_ = geometry.clone();
+    geometry_ = geometry;
 }
 
 // ------------------------------------------------------------------------- //
@@ -194,7 +225,6 @@ std::ostream& operator<<(std::ostream& os, Sector const& sector)
 
     os << "Sector Definition:\n" << sector.sector_def_ << std::endl;
     os << "Particle Definition:\n" << sector.particle_def_ << std::endl;
-    os << "Geometry:\n" << *sector.geometry_ << std::endl;
     os << "Propagation Utility:\n" << sector.utility_ << std::endl;
     os << "Scattering:\n" << *sector.scattering_ << std::endl;
 
@@ -211,7 +241,6 @@ std::ostream& operator<<(std::ostream& os, Sector const& sector)
 Sector::Sector(const ParticleDef& particle_def, const Definition& sector_def)
     : sector_def_(sector_def)
     , particle_def_(particle_def)
-    , geometry_(sector_def.GetGeometry().clone())
     , utility_(particle_def, sector_def.GetMedium(), sector_def.cut_settings,
           sector_def.utility_def)
     , displacement_calculator_(new UtilityIntegralDisplacement(utility_))
@@ -224,11 +253,11 @@ Sector::Sector(const ParticleDef& particle_def, const Definition& sector_def)
 {
     // These are optional, therfore check NULL
     if (sector_def_.do_exact_time_calculation) {
-        exact_time_calculator_ = new UtilityIntegralTime(utility_);
+        exact_time_calculator_ = std::make_shared<UtilityIntegralTime>(utility_);
     }
 
     if (sector_def_.do_continuous_randomization) {
-        cont_rand_ = new ContinuousRandomizer(utility_);
+        cont_rand_ = std::make_shared<ContinuousRandomizer>(utility_);
     }
 }
 
@@ -236,7 +265,6 @@ Sector::Sector(const ParticleDef& particle_def, const Definition& sector_def,
     const InterpolationDef& interpolation_def)
     : sector_def_(sector_def)
     , particle_def_(particle_def)
-    , geometry_(sector_def.GetGeometry().clone())
     , utility_(particle_def, sector_def.GetMedium(), sector_def.cut_settings,
           sector_def.utility_def, interpolation_def)
     , displacement_calculator_(
@@ -253,35 +281,30 @@ Sector::Sector(const ParticleDef& particle_def, const Definition& sector_def,
 {
     // These are optional, therfore check NULL
     if (sector_def_.do_exact_time_calculation) {
-        exact_time_calculator_
-            = new UtilityInterpolantTime(utility_, interpolation_def);
+        exact_time_calculator_ = std::make_shared<UtilityInterpolantTime>(utility_, interpolation_def);
     }
 
     if (sector_def_.do_continuous_randomization) {
-        cont_rand_ = new ContinuousRandomizer(utility_, interpolation_def);
+        cont_rand_ = std::make_shared<ContinuousRandomizer>(utility_, interpolation_def);
     }
 }
 
 Sector::Sector(const Sector& sector)
     : sector_def_(sector.sector_def_)
     , particle_def_(sector.particle_def_)
-    , geometry_(sector.geometry_->clone())
     , utility_(sector.utility_)
     , displacement_calculator_(sector.displacement_calculator_->clone(utility_))
     , interaction_calculator_(sector.interaction_calculator_->clone(utility_))
     , decay_calculator_(sector.decay_calculator_->clone(utility_))
     , exact_time_calculator_(NULL)
-    , cont_rand_(NULL)
-    , scattering_(sector.scattering_->clone())
+    , cont_rand_(sector.cont_rand_)
+    , scattering_(sector.scattering_)
 {
     // These are optional, therfore check NULL
     if (sector.exact_time_calculator_ != NULL) {
-        exact_time_calculator_ = sector.exact_time_calculator_->clone(utility_);
+        exact_time_calculator_ = sector.exact_time_calculator_;
     }
 
-    if (sector.cont_rand_ != NULL) {
-        cont_rand_ = new ContinuousRandomizer(utility_, *sector.cont_rand_);
-    }
 }
 
 bool Sector::operator==(const Sector& sector) const
@@ -289,8 +312,6 @@ bool Sector::operator==(const Sector& sector) const
     if (sector_def_ != sector.sector_def_)
         return false;
     else if (particle_def_ != sector.particle_def_)
-        return false;
-    else if (*geometry_ != *sector.geometry_)
         return false;
     else if (utility_ != sector.utility_)
         return false;
@@ -308,21 +329,7 @@ bool Sector::operator!=(const Sector& sector) const
 
 Sector::~Sector()
 {
-    delete geometry_;
-    delete scattering_;
 
-    delete displacement_calculator_;
-    delete interaction_calculator_;
-    delete decay_calculator_;
-
-    // These are optional, therfore check NULL
-    if (exact_time_calculator_) {
-        delete exact_time_calculator_;
-    }
-
-    if (cont_rand_) {
-        delete cont_rand_;
-    }
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -338,7 +345,7 @@ double Sector::CalculateTime(const DynamicData& p_condition,
         return p_condition.GetTime()
             + exact_time_calculator_->Calculate(
                   p_condition.GetEnergy(), final_energy, 0.0)
-            / utility_.GetMedium().GetDensityDistribution().Evaluate(
+            / utility_.GetMedium()->GetDensityDistribution().Evaluate(
                   p_condition.GetPosition());
     }
 
@@ -406,7 +413,7 @@ double Sector::BorderLength(const Vector3D& position, const Vector3D& direction)
 {
     // loop ueber alle sektoren hoeherer ordnung die im aktuellen sektor liegen
     // und getroffen werden koennten
-    return geometry_->DistanceToBorder(position, direction).first;
+    return sector_def_.GetGeometry()->DistanceToBorder(position, direction).first;
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

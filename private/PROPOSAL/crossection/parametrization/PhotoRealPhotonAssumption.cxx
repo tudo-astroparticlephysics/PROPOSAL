@@ -12,7 +12,7 @@
 
 #define PHOTO_PARAM_REAL_IMPL(param, parent)                                                                           \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
-                               const Medium& medium,                                                                   \
+                               std::shared_ptr<const Medium> medium,                                                                   \
                                const EnergyCutSettings& cuts,                                                          \
                                double multiplier,                                                                      \
                                bool hard_component)                                                                    \
@@ -36,7 +36,7 @@ using namespace PROPOSAL;
  ******************************************************************************/
 
 PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(const ParticleDef& particle_def,
-                                                     const Medium& medium,
+                                                     std::shared_ptr<const Medium> medium,
                                                      const EnergyCutSettings& cuts,
                                                      double multiplier,
                                                      bool hard_component)
@@ -234,7 +234,7 @@ double PhotoKokoulin::CalculateParametrization(double nu)
  ******************************************************************************/
 
 PhotoRhode::PhotoRhode(const ParticleDef& particle_def,
-                       const Medium& medium,
+                       std::shared_ptr<const Medium> medium,
                        const EnergyCutSettings& cuts,
                        double multiplier,
                        bool hard_component)
@@ -272,7 +272,7 @@ PhotoRhode::~PhotoRhode()
 }
 
 Photonuclear* PhotoRhode::create(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  const EnergyCutSettings& cuts,
                                  double multiplier,
                                  bool hard_component)

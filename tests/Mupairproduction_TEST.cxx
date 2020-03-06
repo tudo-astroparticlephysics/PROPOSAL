@@ -33,7 +33,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 TEST(Comparison, Comparison_equal)
 {
 ParticleDef particle_def = MuMinusDef::Get();
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 EnergyCutSettings ecuts;
 double multiplier   = 1.;
 
@@ -77,8 +77,8 @@ TEST(Comparison, Comparison_not_equal)
 {
 ParticleDef mu_def  = MuMinusDef::Get();
 ParticleDef tau_def = TauMinusDef::Get();
-Water medium_1;
-Ice medium_2;
+std::shared_ptr<const Medium> medium_1(Water().create());
+std::shared_ptr<const Medium> medium_2(Ice().create());
 EnergyCutSettings ecuts_1(500, -1);
 EnergyCutSettings ecuts_2(-1, 0.05);
 double multiplier_1 = 1.;
@@ -121,7 +121,7 @@ EXPECT_TRUE(Interpol_A != Interpol_B);
 TEST(Assignment, Copyconstructor)
 {
 ParticleDef particle_def = MuMinusDef::Get();
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 EnergyCutSettings ecuts;
 double multiplier = 1.;
 
@@ -146,7 +146,7 @@ EXPECT_TRUE(Interpol_A == Interpol_B);
 TEST(Assignment, Copyconstructor2)
 {
 ParticleDef particle_def = MuMinusDef::Get();
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 EnergyCutSettings ecuts;
 double multiplier = 1.;
 
@@ -194,19 +194,18 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dEdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
 mupair_def.multiplier      = multiplier;
 mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
+CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, medium, ecuts, mupair_def);
 dEdx_new = mupair->CalculatedEdx(energy);
 
 ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
 
-delete medium;
 delete mupair;
 }
 }
@@ -235,19 +234,18 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
 mupair_def.multiplier      = multiplier;
 mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
+CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, medium, ecuts, mupair_def);
 dNdx_new = mupair->CalculatedNdx(energy);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
-delete medium;
 delete mupair;
 }
 }
@@ -279,20 +277,19 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
 mupair_def.multiplier      = multiplier;
 mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
+CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, medium, ecuts, mupair_def);
 
 dNdx_rnd_new = mupair->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-delete medium;
 delete mupair;
 }
 }
@@ -327,20 +324,19 @@ stochastic_loss_stored;
 
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
 mupair_def.multiplier      = multiplier;
 mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
+CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, medium, ecuts, mupair_def);
 
 stochastic_loss_new = mupair->CalculateStochasticLoss(energy, rnd1, rnd2);
 
 ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
-delete medium;
 delete mupair;
 }
 }
@@ -381,14 +377,14 @@ rnd2 >> E1_stored >> E2_stored;
 
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
 mupair_def.multiplier      = multiplier;
 mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
+CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, medium, ecuts, mupair_def);
 
 rho = mupair->GetParametrization().Calculaterho(energy, v, rnd1, rnd2);
 E1_new = 0.5 * v * energy * (1 + rho);
@@ -397,7 +393,6 @@ E2_new = 0.5 * v * energy * (1 - rho);
 ASSERT_NEAR(E1_new, E1_stored, 1E-6 * E1_stored);
 ASSERT_NEAR(E2_new, E2_stored, 1E-6 * E2_stored);
 
-delete medium;
 delete mupair;
 }
 }
@@ -428,20 +423,19 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dEdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
 mupair_def.multiplier      = multiplier;
 mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
+CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, medium, ecuts, mupair_def, InterpolDef);
 
 dEdx_new = mupair->CalculatedEdx(energy);
 
 ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
 
-delete medium;
 delete mupair;
 }
 }
@@ -472,20 +466,19 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
 mupair_def.multiplier      = multiplier;
 mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
+CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, medium, ecuts, mupair_def, InterpolDef);
 
 dNdx_new = mupair->CalculatedNdx(energy);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
-delete medium;
 delete mupair;
 }
 }
@@ -519,20 +512,19 @@ while (in.good())
 in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>  energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
 mupair_def.multiplier      = multiplier;
 mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
+CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, medium, ecuts, mupair_def, InterpolDef);
 
 dNdx_rnd_new = mupair->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-delete medium;
 delete mupair;
 }
 }
@@ -567,20 +559,19 @@ in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>  energy >> par
 stochastic_loss_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 EnergyCutSettings ecuts(ecut, vcut);
 
 MupairProductionFactory::Definition mupair_def;
 mupair_def.multiplier      = multiplier;
 mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
+CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, medium, ecuts, mupair_def, InterpolDef);
 
 stochastic_loss_new = mupair->CalculateStochasticLoss(energy, rnd1, rnd2);
 
 ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
-delete medium;
 delete mupair;
 }
 }

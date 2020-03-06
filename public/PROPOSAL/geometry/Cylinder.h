@@ -30,18 +30,18 @@
 #pragma once
 
 #include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
-
 class Cylinder : public Geometry
 {
 public:
     Cylinder();
     Cylinder(const Vector3D position, double radius, double inner_radius, double z);
     Cylinder(const Cylinder&);
+    Cylinder(const nlohmann::json& config);
 
-    Geometry* clone() const override { return new Cylinder(*this); };
-    static Geometry* create() { return new Cylinder(); }
+    std::shared_ptr<const Geometry> create() const override { return std::shared_ptr<const Geometry>( new Cylinder(*this) ); };
     void swap(Geometry&) override;
 
     virtual ~Cylinder() {}

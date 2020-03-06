@@ -22,11 +22,19 @@
 		"photo_multiplier" : 1,
 		"ioniz_multiplier" : 1,
 		"epair_multiplier" : 1,
+        "annihilation": "none",
 		"brems" : "BremsAndreevBezrukovBugaev",
+		"compton" : "none",
 		"photo" : "PhotoButkevichMikhailov",
+        "photopair": "none",
+        "epair": "epairkelnerkokoulinpetrukhin",
+        "ioniz": "ionizbetheblochrossi",
+        "mupair": "none",
+        "weak": "none",
+
+		"photo_shadow" : "ShadowDuttaRenoSarcevicSeckel",
 		"lpm" : false,
 		"photo_hard_component" : true,
-		"photo_shadow" : "ShadowDuttaRenoSarcevicSeckel",
 
 		"cuts_infront":
 		{
@@ -45,7 +53,16 @@
 			"e_cut": -1,
 			"v_cut": -1,
 			"cont_rand": false
-		}
+		},
+	    "medium": "ice",
+        "geometry":
+        {
+            "shape": "sphere",
+            "origin": [0, 0, 0],
+            "outer_radius": 6374134000000,
+            "inner_radius": 0
+        }
+
 	},
 
 	"sectors": [

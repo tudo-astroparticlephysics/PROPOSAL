@@ -19,7 +19,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 PhotoPairProduction::PhotoPairProduction(const ParticleDef& particle_def,
-                                 const Medium& medium,
+                                 std::shared_ptr<const Medium> medium,
                                  double multiplier)
         : Parametrization(particle_def, medium, EnergyCutSettings(), multiplier)
 {
@@ -73,7 +73,7 @@ size_t PhotoPairProduction::GetHash() const
 // ------------------------------------------------------------------------- //
 
 PhotoPairTsai::PhotoPairTsai(const ParticleDef& particle_def,
-                                                 const Medium& medium,
+                                                 std::shared_ptr<const Medium> medium,
                                                  double multiplier)
         : PhotoPairProduction(particle_def, medium, multiplier)
 {
@@ -189,9 +189,9 @@ const std::string PhotoAngleTsaiIntegral::name_ = "PhotoAngleTsaiIntegral";
 const std::string PhotoAngleNoDeflection::name_ = "PhotoAngleNoDeflection";
 const std::string PhotoAngleEGS::name_ = "PhotoAngleEGS";
 
-PhotoAngleDistribution::PhotoAngleDistribution(const ParticleDef& particle_def, const Medium& medium)
+PhotoAngleDistribution::PhotoAngleDistribution(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium)
     : particle_def_(particle_def)
-    , medium_(medium.clone())
+    , medium_(medium)
     , components_(medium_->GetComponents())
     , component_index_(0)
 {
@@ -199,14 +199,13 @@ PhotoAngleDistribution::PhotoAngleDistribution(const ParticleDef& particle_def, 
 
 PhotoAngleDistribution::PhotoAngleDistribution(const PhotoAngleDistribution& photoangle)
     : particle_def_(photoangle.particle_def_)
-    , medium_(photoangle.medium_->clone())
+    , medium_(photoangle.medium_)
     , components_(medium_->GetComponents())
     , component_index_(photoangle.component_index_)
 {
 }
 
 PhotoAngleDistribution::~PhotoAngleDistribution() {
-    delete medium_;
 }
 
 bool PhotoAngleDistribution::operator==(const PhotoAngleDistribution& photoangle) const {

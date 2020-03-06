@@ -33,63 +33,19 @@
 #include <map>
 
 #include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/geometry/Sphere.h"
+#include "PROPOSAL/geometry/Box.h"
+#include "PROPOSAL/geometry/Cylinder.h"
 
 namespace PROPOSAL {
-
-class GeometryFactory
-{
-public:
-    enum Enum
-    {
-        Sphere = 0,
-        Box,
-        Cylinder
-    };
-
-    struct Definition
-    {
-        Definition()
-            : shape(Sphere)
-            , position()
-            , inner_radius(0.0)
-            , radius(0.0)
-            , width(0.0)
-            , height(0.0)
-            , depth(0.0)
-        {
-        }
-
-        Enum shape;
-        Vector3D position;
-        double inner_radius;
-        double radius;
-        double width;
-        double height;
-        double depth;
-    };
-
-    typedef std::function<Geometry*(void)> RegisterFunction;
-    typedef std::map<std::string, RegisterFunction> GeometryMapString;
-    typedef std::map<Enum, RegisterFunction> GeometryMapEnum;
-
-    void Register(const std::string&, const Enum&, RegisterFunction);
-
-    Geometry* CreateGeometry(const std::string&);
-    Geometry* CreateGeometry(const Enum&);
-    Geometry* CreateGeometry(const Definition&);
-
-    static GeometryFactory& Get()
-    {
-        static GeometryFactory instance;
-        return instance;
-    }
-
-private:
-    GeometryFactory();
-    ~GeometryFactory();
-
-    GeometryMapString geometry_map_str;
-    GeometryMapEnum geometry_map_enum;
+static std::map<const Geometry_Type, std::shared_ptr<Geometry>> Geometry_Map{
+    { Geometry_Type::SPHERE, std::shared_ptr<Geometry>(new Sphere) },
+    { Geometry_Type::BOX, std::shared_ptr<Geometry>(new Box) },
+    { Geometry_Type::CYLINDER, std::shared_ptr<Geometry>(new Cylinder) },
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+std::shared_ptr<Geometry> CreateGeometry(std::string name);
+std::shared_ptr<Geometry> CreateGeometry(Geometry_Type type);
 } // namespace PROPOSAL
