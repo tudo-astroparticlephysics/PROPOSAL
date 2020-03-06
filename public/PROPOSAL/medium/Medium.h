@@ -42,6 +42,7 @@
         cls(const Medium& medium) : Medium(medium) {}                          \
                                                                                \
         virtual Medium* clone() const { return new cls(*this); }               \
+        using Medium::create;\
         std::shared_ptr<const Medium> create() {\
             return std::make_shared<const Medium>(cls());    \
         }                                                                      \
@@ -190,6 +191,7 @@ class Air : public Medium {
     virtual ~Air() {}
 
     /* virtual Medium* clone() const { return new Air(*this); } */
+    using Medium::create;
     std::shared_ptr<const Medium> create(double density_correction = 1.0) {
         return std::make_shared<const Medium>(Air(density_correction));
     }
