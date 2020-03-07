@@ -56,7 +56,7 @@ $ brew install cmake \
   $ curl https://proposal.app.tu-dortmund.de/resources/2020-02-26/TestFiles.tar.gz --output tests/TestFiles.tar.gz
   ```
 
-1.  Move to the build directory and generate the Makefile with cmake:
+1. Create a build directory and generate the build configuration:
 
   ```
   mkdir build
@@ -81,7 +81,7 @@ $ brew install cmake \
   visit the [documentation](https://cmake.org/documentation/).
   Also have a look at the additional cmake options down below.
 
-  #### Note
+  **Note**
 
   * The option `CMAKE_INSTALL_PREFIX` adds the given path also to the
   include directories. So if you have installed PROPOSAL with
@@ -96,21 +96,18 @@ $ brew install cmake \
   -DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python2.7
   ```
 
-1.  Compile the project:
 
-    make
-
-  or
-
-    make -j#
-
+1. Compile the project:
+  ```
+  $ cmake --build . [-j#CORES]
+  ```
   with `#` being the number of processors you can choose to compile
   the project on multiple processes simultaneously.
 
 1.  Install the library into `-DCMAKE_INSTALL_PREFIX`, by default `/usr/share`
 
   ```
-  make install
+  cmake --build . --target install
   ```
 
 # Build types
@@ -120,39 +117,58 @@ is set to `Debug` when in a git checkout and to `Release` otherwise.
 Two other options exist: `RelWithDebInfo` and `MinSizeRel`.
 See https://cmake.org/cmake/help/v3.17/variable/CMAKE_BUILD_TYPE.html
 
-# Additional Cmake options #
+# Additional Cmake options
 
 | Option | Default value | Description |
 | --- | --- | --- |
 | `ADD_PYTHON` | ON | Compile the python wrapper |
 | `ADD_PERFORMANCE_TEST` | OFF | Compile the performace test source |
 | `ADD_ROOT` | ON | Compile PROPOSAL with ROOT support |
-| `ADD_TESTS` | OFF | Compile unit tests. This downloads [googletest](https://github.com/google/googletest). |
 
 **Examples**
 
-  cmake -DADD_PYTHON=OFF <further options>
+```
+$ cmake -DADD_PYTHON=OFF <further options> ..
+```
 
-# Compiling #
+# Compiling
 
 After installation PROPOSAL can be used as a C++ library and easily included in any `*.cxx` file with the command
 
-    #include "PROPOSAL/PROPOSAL.h"
+```cpp
+#include "PROPOSAL/PROPOSAL.h"
+```
 
 Assuming `PROPOSAL.h` has been included in a file with the name `example.cxx`, this file can be compiled with
 
-    g++ example.cxx -std=c++11 -lPROPOSAL <further options>
- 
- or
- 
-    gcc -lstdc++ example.cxx -std=c++11 -lPROPOSAL <further options>
+```
+g++ example.cxx -std=c++11 -lPROPOSAL <further options>
+```
 
+# Tests
 
-# Uninstalling #
+We are using `gtest`, which is vendored via a git submodule and which is also
+included in the release tarballs.
+Tests are automatically compiled when building PROPOSAL itself directly rather
+than as dependency in your own CMake project.
+To deactivate the compilation of tests pass `-DBUILD_TESTING=off` to the cmake call.
+
+To run the tests, call `ctest [-V]` in the build directory.
+
+There are several very long running regression tests, disable them by
+invoking `ctest -V -E "(Brems|Photo|Epair|Mupair)"`.
+
+Test resources are not included in the git repository for size reasons and
+are downloaded by cmake from our server <proposal.app.tu-dortmund.de/resources>.
+ 
+
+# Uninstalling
 
 It is also possible to uninstall PROPOSAL with
 
-  make uninstall
+```
+$ make uninstall
+```
 
 This will remove all files listed in `install_mainfest.txt` which should
 have been created in your build directory after the installation.
