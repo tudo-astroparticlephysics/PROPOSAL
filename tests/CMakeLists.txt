@@ -1,3 +1,5 @@
+SET(RESOURCE_URL https://proposal.app.tu-dortmund.de/resources)
+SET(TEST_FILES TestFiles_2020-02-26.tar.gz)
 add_subdirectory("${PROJECT_SOURCE_DIR}/vendor/google/googletest" "extern/googletest" EXCLUDE_FROM_ALL)
 mark_as_advanced(
 	BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
@@ -22,9 +24,18 @@ endmacro()
 ENABLE_TESTING()
 
 EXECUTE_PROCESS(COMMAND mkdir -p ${PROPOSAL_BINARY_DIR}/bin/ OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-#create tar directory with "tar -czvf TestFiles.tar.Z TestFiles/" and put it in Test directory
-EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles.tar.gz -C ${PROPOSAL_BINARY_DIR}/bin/
+IF(NOT EXISTS ${PROJECT_SOURCE_DIR}/tests/${TEST_FILES})
+	MESSAGE(STATUS "Downloading test files from ${RESOURCE_URL}/${TEST_FILES}" )
+	EXECUTE_PROCESS(
+		COMMAND curl -fsSL -o ${PROJECT_SOURCE_DIR}/tests/${TEST_FILES} ${RESOURCE_URL}/${TEST_FILES}
+		RESULT_VARIABLE CURL_RES
+	)
+	IF(NOT ${CURL_RES} EQUAL 0)
+		MESSAGE(FATAL_ERROR "Could not download test files")
+	ENDIF()
+ENDIF()
+	
+EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/${TEST_FILES} -C ${PROPOSAL_BINARY_DIR}/bin/
 				OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 package_add_test(UnitTest_Utility Utility_TEST.cxx)

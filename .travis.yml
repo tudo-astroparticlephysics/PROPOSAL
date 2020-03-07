@@ -73,7 +73,6 @@ before_install:
 install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade; brew install cmake; fi
 before_script:
-- curl https://proposal.app.tu-dortmund.de/resources/2020-02-26/TestFiles.tar.gz --output tests/TestFiles.tar.gz
 - mkdir build
 - cd build
 - cmake .. -DADD_PYTHON=OFF -DCMAKE_BUILD_TYPE=Release

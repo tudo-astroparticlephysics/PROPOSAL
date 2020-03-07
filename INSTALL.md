@@ -12,7 +12,8 @@ release tar balls.
 ```
 $ apt install g++ \
   cmake \
-  doxygen
+  doxygen \
+  curl
 ```
 
 ### Arch Linux
@@ -20,7 +21,8 @@ $ apt install g++ \
 ```
 $ pacman -S g++ \
   cmake \
-  doxygen
+  doxygen \
+  curl
 ```
 
 ### RHEL / Centos
@@ -30,7 +32,7 @@ called `cmake3`.
 PROPOSAL needs cmake3.
 
 ```
-$ yum install g++ cmake3 doxygen
+$ yum install g++ cmake3 doxygen curl
 ```
 
 ### MacOS
@@ -38,7 +40,7 @@ $ yum install g++ cmake3 doxygen
 ```
 $ xcode-select --install
 $ brew install cmake \
-  doxygen
+  doxygen 
 ```
 
 ## Building PROPOSAL
@@ -51,10 +53,6 @@ $ brew install cmake \
 
     To use a specific version of PROPOSAL, use `git checkout vX.Y.Z` after cloning.
 
-    In case you want to perform the unit tests, you need to download the TestFiles.
-    ```sh
-    $ curl https://proposal.app.tu-dortmund.de/resources/2020-02-26/TestFiles.tar.gz --output tests/TestFiles.tar.gz
-    ```
 
 1. Create a build directory and generate the build configuration:
     ```sh
