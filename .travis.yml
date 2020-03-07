@@ -1,7 +1,13 @@
 language: cpp
 sudo: require
+
 git:
   depth: 10
+
+env:
+  global:
+    - GTEST_COLOR=1
+
 matrix:
   include:
     - os: linux
