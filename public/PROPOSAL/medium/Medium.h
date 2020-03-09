@@ -64,7 +64,7 @@ class Medium {
            double X1,
            double d0,
            double massDensity,
-           std::vector<std::shared_ptr<Components::Component>>);
+           std::vector<Components::Component>);
     Medium(const Medium&);
 
     ///@brief Crush this Medium.
@@ -84,7 +84,7 @@ class Medium {
 
     // Getter
     int GetNumComponents() const { return numComponents_; }
-    const std::vector<Components::Component*>& GetComponents() const {
+    const std::vector<Components::Component>& GetComponents() const {
         return components_;
     }
     double GetSumCharge() const { return sumCharge_; }
@@ -123,7 +123,7 @@ class Medium {
     void SetMolDensity(double molDensity);
     void SetAverageNucleonWeight(std::vector<double> M);
     void SetComponents(
-        std::vector<std::shared_ptr<Components::Component>> components);
+        std::vector<Components::Component> components);
     void SetMM(double MM);
     void SetSumNucleons(double sumNucleons);
     void SetDensityDistribution(Density_distr& dens_distr);
@@ -137,7 +137,7 @@ class Medium {
     std::string name_;
 
     int numComponents_;                               ///< number of components
-    std::vector<Components::Component*> components_;  ///< Components of Medium
+    std::vector<Components::Component> components_;  ///< Components of Medium
 
     double sumCharge_;  ///< sum of charges of all nuclei
 

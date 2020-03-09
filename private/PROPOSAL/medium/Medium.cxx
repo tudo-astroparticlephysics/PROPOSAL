@@ -44,10 +44,10 @@ std::ostream& operator<<(std::ostream& os, Medium const& medium) {
        << std::endl;
     os << "radiation Length:\t\t" << medium.radiationLength_ << std::endl;
 
-    for (std::vector<Components::Component*>::const_iterator iter =
+    for (std::vector<Components::Component>::const_iterator iter =
              medium.components_.begin();
          iter != medium.components_.end(); ++iter) {
-        os << **iter << std::endl;
+        os << *iter << std::endl;
     }
 
     os << Helper::Centered(60, "");
@@ -70,7 +70,7 @@ Medium::Medium(std::string name,
                double X1,
                double d0,
                double massDensity,
-               std::vector<std::shared_ptr<Components::Component>> components)
+               std::vector<Components::Component> components)
     : name_(name),
       numComponents_(components.size()),
       sumCharge_(0),
@@ -88,13 +88,8 @@ Medium::Medium(std::string name,
       radiationLength_(0),
       MM_(0),
       sumNucleons_(0),
-      dens_distr_(new Density_homogeneous(rho)) {
-    // components_.reserve(numComponents_);
-    // for (int i = 0; i < numComponents_; ++i)
-    for (auto component : components) {
-        components_.push_back(component->clone());
-    }
-
+      dens_distr_(new Density_homogeneous(rho)),
+      components_(components) {
     init();
 }
 
@@ -116,24 +111,15 @@ Medium::Medium(const Medium& medium)
       radiationLength_(medium.radiationLength_),
       MM_(medium.MM_),
       sumNucleons_(medium.sumNucleons_),
-      dens_distr_(medium.dens_distr_->clone()) {
-    // Deep copy of components
-    components_.resize(numComponents_);
-    for (unsigned int i = 0; i < components_.size(); ++i) {
-        components_[i] = medium.components_[i]->clone();
-    }
+      dens_distr_(medium.dens_distr_->clone()),
+        components_(medium.components_)
+{
 }
 
 // ------------------------------------------------------------------------- //
 Medium::~Medium() {
-    for (std::vector<Components::Component*>::iterator iter =
-             components_.begin();
-         iter != components_.end(); ++iter) {
-        delete (*iter);
-    }
 
     delete dens_distr_;
-    components_.clear();
 }
 
 // ------------------------------------------------------------------------- //
@@ -186,12 +172,7 @@ Medium& Medium::operator=(const Medium& medium) {
         sumNucleons_ = medium.sumNucleons_;
         dens_distr_ = medium.dens_distr_->clone();
 
-        components_.clear();
-        components_.resize(numComponents_);
-
-        for (unsigned int i = 0; i < components_.size(); ++i) {
-            components_[i] = medium.components_[i]->clone();
-        }
+        components_ = medium.components_;
     }
 
     return *this;
@@ -238,7 +219,7 @@ bool Medium::operator==(const Medium& medium) const {
     else {
         bool Return = true;
         for (unsigned int i = 0; i < components_.size(); ++i) {
-            if (*components_[i] != *medium.components_[i]) {
+            if (components_[i] != medium.components_[i]) {
                 Return = false;
             }
         }
@@ -264,13 +245,13 @@ void Medium::init() {
     numComponents_ = components_.size();
     // massDensity_ *= rho_;
 
-    for (std::vector<Components::Component*>::iterator iter =
+    for (std::vector<Components::Component>::iterator iter =
              components_.begin();
          iter != components_.end(); ++iter) {
-        aux1 += (*iter)->GetAtomInMolecule() * (*iter)->GetNucCharge();
-        aux2 += (*iter)->GetAtomInMolecule() * (*iter)->GetAtomicNum();
-        aux3 += (*iter)->GetAtomInMolecule() * (*iter)->GetAtomicNum() *
-                (*iter)->GetAverageNucleonWeight();
+        aux1 += (iter)->GetAtomInMolecule() * (iter)->GetNucCharge();
+        aux2 += (iter)->GetAtomInMolecule() * (iter)->GetAtomicNum();
+        aux3 += (iter)->GetAtomInMolecule() * (iter)->GetAtomicNum() *
+                (iter)->GetAverageNucleonWeight();
     }
 
     sumCharge_ = aux1;
@@ -287,12 +268,12 @@ void Medium::init() {
     aux1 = 0;
     aux2 = 0;
 
-    for (std::vector<Components::Component*>::iterator iter =
+    for (std::vector<Components::Component>::iterator iter =
              components_.begin();
          iter != components_.end(); ++iter) {
-        aux1 += X0_inv((*iter)->GetNucCharge(), (*iter)->GetAtomicNum()) *
-                ((*iter)->GetAtomInMolecule() * (*iter)->GetAtomicNum());
-        aux2 += (*iter)->GetAtomInMolecule() * (*iter)->GetAtomicNum();
+        aux1 += X0_inv((iter)->GetNucCharge(), (iter)->GetAtomicNum()) *
+                ((iter)->GetAtomInMolecule() * (iter)->GetAtomicNum());
+        aux2 += (iter)->GetAtomInMolecule() * (iter)->GetAtomicNum();
     }
 
     radiationLength_ = aux2 / aux1;
@@ -311,17 +292,9 @@ double Medium::GetRadiationLength(const Vector3D& position) const {
 // Setter
 // ------------------------------------------------------------------------- //
 
-void Medium::SetComponents(
-    std::vector<std::shared_ptr<Components::Component>> components) {
-    for (auto component : components_) {
-        delete component;
-    }
+void Medium::SetComponents(std::vector<Components::Component> components) {
 
-    components_.clear();
-
-    for (auto component : components) {
-        components_.push_back(component->clone());
-    }
+    components_ = components ;
 
     init();  // Init further member according to these components
 }
@@ -398,8 +371,8 @@ Water::Water(double rho)
           2.8004,   // X1
           0,        // d0
           1.000,    // massDensitiy
-          {std::shared_ptr<Components::Component>(new Components::Hydrogen(2)),
-           std::shared_ptr<Components::Component>(new Components::Oxygen())}) {}
+          {Components::Hydrogen(2),
+           Components::Oxygen()}) {}
 
 Ice::Ice(double rho)
     : Medium(
@@ -413,8 +386,8 @@ Ice::Ice(double rho)
           2.8004,   // X1
           0,        // d0
           0.917,    // massDensitiy
-          {std::shared_ptr<Components::Component>(new Components::Hydrogen(2)),
-           std::shared_ptr<Components::Component>(new Components::Oxygen())}) {}
+          {Components::Hydrogen(2),
+           Components::Oxygen()}) {}
 
 Salt::Salt(double rho)
     : Medium("salt",
@@ -429,9 +402,7 @@ Salt::Salt(double rho)
              3.0,      // X1
              0,        // d0
              2.323,    // Solid halite density
-             {std::shared_ptr<Components::Component>(new Components::Sodium()),
-              std::shared_ptr<Components::Component>(
-                  new Components::Chlorine())}) {}
+             {Components::Sodium(), Components::Chlorine()}) {}
 
 CalciumCarbonate::CalciumCarbonate(double rho)
     : Medium(
@@ -445,9 +416,9 @@ CalciumCarbonate::CalciumCarbonate(double rho)
           3.0549,   // X1
           0,        // d0
           2.650,    // massDensity
-          {std::shared_ptr<Components::Component>(new Components::Calcium()),
-           std::shared_ptr<Components::Component>(new Components::Carbon()),
-           std::shared_ptr<Components::Component>(new Components::Oxygen(3))}) {
+          {Components::Calcium(),
+           Components::Carbon(),
+           Components::Oxygen(3)}) {
 }
 
 StandardRock::StandardRock(double rho)
@@ -461,8 +432,7 @@ StandardRock::StandardRock(double rho)
              3.0549,   // X1
              0,        // d0
              2.650,    // massDensity
-             {std::shared_ptr<Components::Component>(
-                 new Components::StandardRock())}) {}
+             {Components::StandardRock()}) {}
 
 FrejusRock::FrejusRock(double rho)
     : Medium("frejusrock",
@@ -475,8 +445,7 @@ FrejusRock::FrejusRock(double rho)
              3.196,   // X1
              0,       // d0
              2.740,   // massDensity
-             {std::shared_ptr<Components::Component>(
-                 new Components::FrejusRock())}) {}
+             {Components::FrejusRock()}) {}
 
 Iron::Iron(double rho)
     : Medium("iron",
@@ -489,7 +458,7 @@ Iron::Iron(double rho)
              3.1531,   // X1
              0.12,     // d0
              7.874,    // massDensity
-             {std::shared_ptr<Components::Component>(new Components::Iron())}) {
+             {Components::Iron()}) {
 }
 
 Hydrogen::Hydrogen(double rho)
@@ -503,8 +472,7 @@ Hydrogen::Hydrogen(double rho)
              1.8856,   // X1
              0,        // d0
              0.07080,  // massDensity
-             {std::shared_ptr<Components::Component>(
-                 new Components::Hydrogen())}) {}
+             {Components::Hydrogen()}) {}
 
 Lead::Lead(double rho)
     : Medium("lead",
@@ -517,7 +485,7 @@ Lead::Lead(double rho)
              3.8073,   // X1
              0.14,     // d0
              11.350,   // massDensity
-             {std::shared_ptr<Components::Component>(new Components::Lead())}) {
+             {Components::Lead()}) {
 }
 
 Copper::Copper(double rho)
@@ -532,7 +500,7 @@ Copper::Copper(double rho)
           3.2792,   // X1
           0.08,     // d0
           8.960,    // massDensity
-          {std::shared_ptr<Components::Component>(new Components::Copper())}) {}
+          {Components::Copper()}) {}
 
 Uranium::Uranium(double rho)
     : Medium(
@@ -546,14 +514,8 @@ Uranium::Uranium(double rho)
           3.3721,   // X1
           0.14,     // d0
           18.950,   // massDensity
-          {std::shared_ptr<Components::Component>(new Components::Uranium())}) {
+          {Components::Uranium()}) {
 }
-
-const double Air::fraction_N = 2 * 78.1;
-const double Air::fraction_O = 2 * 21.0;
-const double Air::fraction_Ar = 0.9;
-const double Air::fraction_sum =
-    Air::fraction_N + Air::fraction_O + Air::fraction_Ar;
 
 Air::Air(double rho)
     : Medium("air",
@@ -566,12 +528,9 @@ Air::Air(double rho)
              4.2759,    // X1
              0,         // d0
              1.205e-3,  // dry, 1 atm massDensity
-             {std::shared_ptr<Components::Component>(
-                  new Components::Nitrogen(fraction_N / fraction_sum)),
-              std::shared_ptr<Components::Component>(
-                  new Components::Oxygen(fraction_O / fraction_sum)),
-              std::shared_ptr<Components::Component>(
-                  new Components::Argon(fraction_Ar / fraction_sum))}) {}
+             {Components::Nitrogen(2 * 78.1),
+              Components::Oxygen(2 * 21.0),
+              Components::Argon(0.9)}) {}
 
 Paraffin::Paraffin(double rho)
     : Medium(
@@ -585,9 +544,8 @@ Paraffin::Paraffin(double rho)
           2.5084,   // X1
           0,        // d0
           0.93,     // massDensity
-          {std::shared_ptr<Components::Component>(new Components::Carbon(25.0)),
-           std::shared_ptr<Components::Component>(
-               new Components::Oxygen(52.0))}) {}
+          {Components::Carbon(25.0),
+           Components::Oxygen(52.0)}) {}
 
 AntaresWater::AntaresWater(double rho)
     : Medium("antareswater",
@@ -600,22 +558,14 @@ AntaresWater::AntaresWater(double rho)
              2.8004,   // X1
              0,        // d0
              1.03975,  // massDensity
-             {std::shared_ptr<Components::Component>(
-                  new Components::Hydrogen(2.0)),
-              std::shared_ptr<Components::Component>(
-                  new Components::Oxygen(1.00884)),
-              std::shared_ptr<Components::Component>(
-                  new Components::Sodium(0.00943)),
-              std::shared_ptr<Components::Component>(
-                  new Components::Potassium(0.000209)),
-              std::shared_ptr<Components::Component>(
-                  new Components::Magnesium(0.001087)),
-              std::shared_ptr<Components::Component>(
-                  new Components::Calcium(0.000209)),
-              std::shared_ptr<Components::Component>(
-                  new Components::Chlorine(0.01106)),
-              std::shared_ptr<Components::Component>(
-                  new Components::Sulfur(0.00582))}) {
+             {Components::Hydrogen(2.0),
+              Components::Oxygen(1.00884),
+              Components::Sodium(0.00943),
+              Components::Potassium(0.000209),
+              Components::Magnesium(0.001087),
+              Components::Calcium(0.000209),
+              Components::Chlorine(0.01106),
+              Components::Sulfur(0.00582)}) {
     /*
      * initialize ANTARES water
      * Sea water (Mediterranean Sea, ANTARES place)
@@ -665,14 +615,14 @@ CascadiaBasinWater::CascadiaBasinWater(double rho)
         0.,        // d0
         1.0400322, // massDensity
         {
-            std::make_shared<Components::Component>(Components::Hydrogen(2.0)),
-            std::make_shared<Components::Component>(Components::Oxygen(1.0021)),
-            std::make_shared<Components::Component>(Components::Sodium(8.7174e-3)),
-            std::make_shared<Components::Component>(Components::Magnesium(9.8180e-4)),
-            std::make_shared<Components::Component>(Components::Calcium(1.9113e-4)),
-            std::make_shared<Components::Component>(Components::Potassium(1.8975e-4)),
-            std::make_shared<Components::Component>(Components::Chlorine(1.0147e-2)),
-            std::make_shared<Components::Component>(Components::Sulfur(5.2487e-4))
+            Components::Hydrogen(2.0),
+            Components::Oxygen(1.0021),
+            Components::Sodium(8.7174e-3),
+            Components::Magnesium(9.8180e-4),
+            Components::Calcium(1.9113e-4),
+            Components::Potassium(1.8975e-4),
+            Components::Chlorine(1.0147e-2),
+            Components::Sulfur(5.2487e-4)
         })
 {}
 

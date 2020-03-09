@@ -100,7 +100,7 @@ double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
     result = CalculateParametrization(energy, v);
 
     aux = 2 * particle_def_.charge * particle_def_.charge * (ME / particle_def_.mass) * RE *
-          components_[component_index_]->GetNucCharge();
+          components_[component_index_].GetNucCharge();
     aux *= aux * (ALPHA / v) * result;
 
     if (lpm_)
@@ -108,7 +108,7 @@ double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
         aux *= lpm(energy, v);
     }
 
-    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * aux;
+    return medium_->GetMolDensity() * components_[component_index_].GetAtomInMolecule() * aux;
 }
 
 // ------------------------------------------------------------------------- //
@@ -120,7 +120,7 @@ Parametrization::IntegralLimits Bremsstrahlung::GetIntegralLimits(double energy)
 
     // The limit is taken from the Petrukhin/Shestakov Parametrization
     limits.vMax =
-        1 - 0.75 * SQRTE * (particle_def_.mass / energy) * std::pow(components_[component_index_]->GetNucCharge(), 1. / 3);
+        1 - 0.75 * SQRTE * (particle_def_.mass / energy) * std::pow(components_[component_index_].GetNucCharge(), 1. / 3);
 
     if (limits.vMax < 0)
     {
@@ -182,10 +182,10 @@ double Bremsstrahlung::lpm(double energy, double v)
     const double G1  = 0.710390;
     const double G2  = 0.904912;
 
-    double Z3 = std::pow(components_[component_index_]->GetNucCharge(), -1. / 3);
+    double Z3 = std::pow(components_[component_index_].GetNucCharge(), -1. / 3);
 
-    double Dn = 1.54 * std::pow(components_[component_index_]->GetAtomicNum(), 0.27);
-    s1        = ME * Dn / (particle_def_.mass * Z3 * components_[component_index_]->GetLogConstant());
+    double Dn = 1.54 * std::pow(components_[component_index_].GetAtomicNum(), 0.27);
+    s1        = ME * Dn / (particle_def_.mass * Z3 * components_[component_index_].GetLogConstant());
     s1 *= s1 * SQRT2;
 
     // Calc xi(s') from Stanev, Vankow, Streitmatter, Ellsworth, Bowen
@@ -282,7 +282,7 @@ double BremsPetrukhinShestakov::CalculateParametrization(double energy, double v
     double result = 0;
     double Fd     = 0;
 
-    double Z3 = std::pow(components_[component_index_]->GetNucCharge(), -1. / 3);
+    double Z3 = std::pow(components_[component_index_].GetNucCharge(), -1. / 3);
     // least momentum transferred to the nucleus (eq. 2)
     double delta = particle_def_.mass * particle_def_.mass * v / (2 * energy * (1 - v));
 
@@ -295,7 +295,7 @@ double BremsPetrukhinShestakov::CalculateParametrization(double energy, double v
 
     // for nuclear charge greater 10, a correction for the nuclear form factor
     // is taken into account (eq.11)
-    if (components_[component_index_]->GetNucCharge() > 10)
+    if (components_[component_index_].GetNucCharge() > 10)
     {
         Fd *= (2. / 3) * Z3;
     }
@@ -320,11 +320,11 @@ double BremsKelnerKokoulinPetrukhin::CalculateParametrization(double energy, dou
     // least momentum transferred to the nucleus (eq. 7)
     double delta = particle_def_.mass * particle_def_.mass * v / (2 * energy * (1 - v));
 
-    double Z3 = std::pow(components_[component_index_]->GetNucCharge(), -1. / 3);
-    double Dn = 1.54 * std::pow(components_[component_index_]->GetAtomicNum(), 0.27);
+    double Z3 = std::pow(components_[component_index_].GetNucCharge(), -1. / 3);
+    double Dn = 1.54 * std::pow(components_[component_index_].GetAtomicNum(), 0.27);
     // elastic atomic form factor (eq. 14)
     double formfactor_atomic_elastic =
-        std::log(1 + ME / (delta * SQRTE * components_[component_index_]->GetLogConstant() * Z3));
+        std::log(1 + ME / (delta * SQRTE * components_[component_index_].GetLogConstant() * Z3));
     // elastic nuclear form factor (eq. 18)
     double formfactor_nuclear_elastic = std::log(Dn / (1 + delta * (Dn * SQRTE - 2) / particle_def_.mass));
 
@@ -338,10 +338,10 @@ double BremsKelnerKokoulinPetrukhin::CalculateParametrization(double energy, dou
         // inelastic atomic contribution (eq. 26)
         formfactor_atomic_inelastic =
             std::log(particle_def_.mass / (delta * (delta * particle_def_.mass / (ME * ME) + SQRTE))) -
-            std::log(1 + ME / (delta * SQRTE * components_[component_index_]->GetBPrime() * Z3 * Z3));
+            std::log(1 + ME / (delta * SQRTE * components_[component_index_].GetBPrime() * Z3 * Z3));
     }
 
-    if (components_[component_index_]->GetNucCharge() != 1)
+    if (components_[component_index_].GetNucCharge() != 1)
     {
         // inelastic nuclear contribution (eq. 28)
         formfactor_nuclear_inelastic = formfactor_nuclear_elastic;
@@ -355,7 +355,7 @@ double BremsKelnerKokoulinPetrukhin::CalculateParametrization(double energy, dou
     result = ((4. / 3) * (1 - v) + v * v) * (std::log(particle_def_.mass / delta) - 0.5 // eq.3
                                              - formfactor_atomic_elastic - formfactor_nuclear_elastic +
                                              (formfactor_nuclear_inelastic + formfactor_atomic_inelastic) /
-                                                 components_[component_index_]->GetNucCharge());
+                                                 components_[component_index_].GetNucCharge());
 
     return result;
 }
@@ -374,14 +374,14 @@ double BremsCompleteScreening::CalculateParametrization(double energy, double v)
     double result = 0;
     double Lr, fZ, Lp;
 
-    double Z3 = std::pow(components_[component_index_]->GetNucCharge(), -1. / 3);
+    double Z3 = std::pow(components_[component_index_].GetNucCharge(), -1. / 3);
 
-    aux = ALPHA * components_[component_index_]->GetNucCharge();
+    aux = ALPHA * components_[component_index_].GetNucCharge();
     aux *= aux;
     fZ = aux * (1 / (1 + aux) + 0.20206 + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
 
     // check rounding
-    switch ((int)(components_[component_index_]->GetNucCharge() + 0.5))
+    switch ((int)(components_[component_index_].GetNucCharge() + 0.5))
     {
         case 1:
         {
@@ -418,9 +418,9 @@ double BremsCompleteScreening::CalculateParametrization(double energy, double v)
         }
     }
 
-    result = ((4. / 3 * (1 - v) + v * v) * (components_[component_index_]->GetNucCharge() * (Lr - fZ) + Lp) +
-              1. / 9 * (1 - v) * (components_[component_index_]->GetNucCharge() + 1)) /
-             components_[component_index_]->GetNucCharge();
+    result = ((4. / 3 * (1 - v) + v * v) * (components_[component_index_].GetNucCharge() * (Lr - fZ) + Lp) +
+              1. / 9 * (1 - v) * (components_[component_index_].GetNucCharge() + 1)) /
+             components_[component_index_].GetNucCharge();
 
     return result;
 }
@@ -437,7 +437,7 @@ double BremsAndreevBezrukovBugaev::CalculateParametrization(double energy, doubl
 
     // least momentum transferred to the nucleus (eq. 2.2)
 
-    double nucl_Z = components_[component_index_]->GetNucCharge();
+    double nucl_Z = components_[component_index_].GetNucCharge();
 
     double Z3 = std::pow(nucl_Z, -1. / 3);
 
@@ -504,11 +504,11 @@ double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, d
     static const double d[6] = {2134.19, 581.823, -2708.85, 4767.05, 1.52918, 0.361933};
 
 
-    double Z = components_[component_index_]->GetNucCharge();
+    double Z = components_[component_index_].GetNucCharge();
     double Z13 = std::pow(Z, -1. / 3);
-    double rad_log = components_[component_index_]->GetLogConstant();
-    double rad_log_inel = components_[component_index_]->GetBPrime();
-    double Dn = 1.54 * std::pow(components_[component_index_]->GetAtomicNum(), 0.27);
+    double rad_log = components_[component_index_].GetLogConstant();
+    double rad_log_inel = components_[component_index_].GetBPrime();
+    double Dn = 1.54 * std::pow(components_[component_index_].GetAtomicNum(), 0.27);
 
     double mu_qc = particle_def_.mass / (MMU * std::exp(1.) / Dn);
     double rho = std::sqrt(1.0 + 4.0*mu_qc*mu_qc);
@@ -624,7 +624,7 @@ double BremsElectronScreening::DifferentialCrossSection(double energy, double v)
         aux *= lpm(energy, v);
     }
 
-    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * aux;
+    return medium_->GetMolDensity() * components_[component_index_].GetAtomInMolecule() * aux;
 }
 
 double BremsElectronScreening::CalculateParametrization(double energy, double v)
@@ -633,8 +633,8 @@ double BremsElectronScreening::CalculateParametrization(double energy, double v)
     double aux    = 0;
     double result = 0;
 
-    double Z3 = std::pow(components_[component_index_]->GetNucCharge(), -1. / 3);
-    double logZ = std::log(components_[component_index_]->GetNucCharge());
+    double Z3 = std::pow(components_[component_index_].GetNucCharge(), -1. / 3);
+    double logZ = std::log(components_[component_index_].GetNucCharge());
 
     double delta = particle_def_.mass * particle_def_.mass * v / (2 * energy * (1 - v));
     double x = 136 * Z3 * 2 * delta / ME;
@@ -659,14 +659,14 @@ double BremsElectronScreening::CalculateParametrization(double energy, double v)
     double A_fac = interpolant_->InterpolateArray(logZ, energy);
 
 
-    aux = ALPHA * components_[component_index_]->GetNucCharge();
+    aux = ALPHA * components_[component_index_].GetNucCharge();
     aux *= aux;
     f_c = aux * (1 / (1 + aux) + 0.20206 + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
 
     // bremsstrahlung contribution with atomic electrons as target particles
     double Lr, Lp, xi;
 
-    switch ((int)(components_[component_index_]->GetNucCharge() + 0.5))
+    switch ((int)(components_[component_index_].GetNucCharge() + 0.5))
     {
         case 1:
         {
@@ -709,7 +709,7 @@ double BremsElectronScreening::CalculateParametrization(double energy, double v)
         f_c = 0;
     }
 
-    result = A_fac * components_[component_index_]->GetNucCharge() * (components_[component_index_]->GetNucCharge() + xi);
+    result = A_fac * components_[component_index_].GetNucCharge() * (components_[component_index_].GetNucCharge() + xi);
 
     aux = (2. - 2. * v + v*v) * (phi1 - 4./3 * logZ - 4 * f_c) - 2./3 * (1. - v) * (phi2 - 4./3 * logZ - 4 * f_c);
     result *=aux;

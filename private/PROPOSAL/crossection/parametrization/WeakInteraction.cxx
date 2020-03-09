@@ -129,11 +129,11 @@ bool WeakCooperSarkarMertsch::compare(const Parametrization& parametrization) co
 
 double WeakCooperSarkarMertsch::DifferentialCrossSection(double energy, double v)
 {
-    double proton_contribution = components_[component_index_]->GetNucCharge() * interpolant_.at(0)->InterpolateArray(std::log10(energy), v);
-    double neutron_contribution =  (components_[component_index_]->GetAtomicNum() - components_[component_index_]->GetNucCharge()) * interpolant_.at(1)->InterpolateArray(std::log10(energy), v);
-    double mean_contribution = (proton_contribution + neutron_contribution) / (components_[component_index_]->GetAtomicNum());
+    double proton_contribution = components_[component_index_].GetNucCharge() * interpolant_.at(0)->InterpolateArray(std::log10(energy), v);
+    double neutron_contribution =  (components_[component_index_].GetAtomicNum() - components_[component_index_].GetNucCharge()) * interpolant_.at(1)->InterpolateArray(std::log10(energy), v);
+    double mean_contribution = (proton_contribution + neutron_contribution) / (components_[component_index_].GetAtomicNum());
 
-    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * 1e-36 * std::max(0.0, mean_contribution); //factor 1e-36: conversion from pb to cm^2
+    return medium_->GetMolDensity() * components_[component_index_].GetAtomInMolecule() * 1e-36 * std::max(0.0, mean_contribution); //factor 1e-36: conversion from pb to cm^2
 }
 
 
