@@ -38,21 +38,32 @@ public:
 
     virtual double Calculate(double ei, double ef, double rnd);
     virtual double GetUpperLimit(double ei, double rnd);
+    virtual double FunctionToIntegral(double energy) = 0;
 
 protected:
     Integral integral_;
 };
 } // namespace PROPOSAL
 
+namespace PROPOSAL {
+    class UtilityIntegralDisplacement : public UtilityIntegral {
+    public:
+        UtilityIntegralDisplacement(CrossSectionList);
+
+        double FunctionToIntegral(double energy);
+    };
+}
+
 #define UTILITY_INTEGRAL_DEC(cls)                                              \
     class UtilityIntegral##cls : public UtilityIntegral {                      \
     public:                                                                    \
         UtilityIntegral##cls(CrossSectionList);                                \
         double FunctionToIntegral(double energy);                              \
+    protected:                                                                 \
+        std::unique_ptr<UtilityIntegralDisplacement> displacement_;            \
     };
 
 namespace PROPOSAL {
-UTILITY_INTEGRAL_DEC(Displacement)
 UTILITY_INTEGRAL_DEC(Interaction)
 UTILITY_INTEGRAL_DEC(Decay)
 UTILITY_INTEGRAL_DEC(Time)

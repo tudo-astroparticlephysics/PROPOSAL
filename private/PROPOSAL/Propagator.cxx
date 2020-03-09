@@ -638,10 +638,10 @@ void Propagator::ChooseCurrentSector(
             == sectors_[*iter]->GetGeometry()->GetHierarchy()) {
             // Current Density is smaller -> Set the new sector!
             //
-            if (current_sector_->GetMedium()->GetCorrectedMassDensity(
+            /*if (current_sector_->GetMedium()->GetCorrectedMassDensity(
                     particle_position)
                 < sectors_[*iter]->GetMedium()->GetCorrectedMassDensity(
-                      particle_position))
+                      particle_position))*/
                 current_sector_ = sectors_[*iter];
         }
 

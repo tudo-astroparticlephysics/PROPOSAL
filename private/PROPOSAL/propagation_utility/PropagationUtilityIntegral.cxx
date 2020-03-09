@@ -4,6 +4,7 @@
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
@@ -11,6 +12,7 @@
 #define UTILITY_INTEGRAL_IMPL(cls)                                             \
     UtilityIntegral##cls::UtilityIntegral##cls(CrossSectionList cross)         \
         : UtilityIntegral(cross)                                               \
+        , displacement_(new UtilityIntegralDisplacement(cross))                \
     {                                                                          \
     }
 
@@ -29,7 +31,7 @@ UtilityIntegral::UtilityIntegral(CrossSectionList cross)
 double UtilityIntegral::Calculate(double ei, double ef, double rnd)
 {
     return integral_.IntegrateWithRandomRatio(ei, ef,
-        std::bind(&this->FunctionToIntegral, this, std::placeholders::_1), 4,
+        std::bind(&UtilityIntegral::FunctionToIntegral, this, std::placeholders::_1), 4,
         -rnd);
 }
 
@@ -45,7 +47,11 @@ double UtilityIntegral::GetUpperLimit(double ei, double rnd)
  *                            Utility Displacement                            *
  ******************************************************************************/
 
-UTILITY_INTEGRAL_IMPL(Displacement)
+    UtilityIntegralDisplacement::UtilityIntegralDisplacement(CrossSectionList cross)
+        : UtilityIntegral(cross)
+    {
+    }
+
 double UtilityIntegralDisplacement::FunctionToIntegral(double energy)
 {
     double result = 0.0;
@@ -66,7 +72,7 @@ double UtilityIntegralInteraction::FunctionToIntegral(double energy)
     for (const auto& cross : crosssections)
         total_rate += cross->CalculatedNdx(energy);
 
-    return UtilityIntegralDisplacement::FunctionToIntegral(energy) * total_rate;
+    return displacement_->FunctionToIntegral(energy) * total_rate;
 }
 
 /******************************************************************************
@@ -76,12 +82,12 @@ double UtilityIntegralInteraction::FunctionToIntegral(double energy)
 UTILITY_INTEGRAL_IMPL(Decay)
 double UtilityIntegralDecay::FunctionToIntegral(double energy)
 {
-    double lifetime = crosssections.first().GetParticleDef().lifetime;
+    double lifetime = crosssections.front().GetParticleDef().lifetime;
     if (lifetime < 0) {
         return 0;
     }
 
-    double mass = crosssections.first().GetParticleDef().mass;
+    double mass = crosssections.front()->GetParametrization().GetParticleMass();
     double square_momentum = (energy - mass) * (energy + mass);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
 
@@ -89,7 +95,7 @@ double UtilityIntegralDecay::FunctionToIntegral(double energy)
         / std::max((particle_momentum / mass) * lifetime * SPEED,
               PARTICLE_POSITION_RESOLUTION);
 
-    return UtilityIntegralDisplacement::FunctionToIntegral(energy) * aux;
+    return displacement_->FunctionToIntegral(energy) * aux;
 }
 
 /******************************************************************************
@@ -99,12 +105,12 @@ double UtilityIntegralDecay::FunctionToIntegral(double energy)
 UTILITY_INTEGRAL_IMPL(Time)
 double UtilityIntegralTime::FunctionToIntegral(double energy)
 {
-    double mass{ crosssections.first().GetParticleDef().mass };
+    double mass{ crosssections.front()->GetParametrization().GetParticleMass() };
     double square_momentum{ (energy - mass) * (energy + mass) };
     double particle_momentum{ std::sqrt(std::max(square_momentum, 0.0)) };
 
     return energy / (particle_momentum * SPEED)
-        * UtilityIntegralDisplacement::FunctionToIntegral(energy);
+        * displacement_->FunctionToIntegral(energy);
 }
 
 /******************************************************************************
@@ -118,7 +124,7 @@ double UtilityIntegralContRand::FunctionToIntegral(double energy)
     for (const auto& cross : crosssections)
         sum += cross->CalculatedE2dx(energy);
 
-    return UtilityIntegralDisplacement::FunctionToIntegral(energy) * sum;
+    return displacement_->FunctionToIntegral(energy) * sum;
 }
 
 /******************************************************************************
@@ -130,11 +136,11 @@ UTILITY_INTEGRAL_IMPL(Scattering)
 // ------------------------------------------------------------------------- //
 double UtilityIntegralScattering::FunctionToIntegral(double energy)
 {
-    double mass{ crosssections.first().GetParticleDef().mass };
+    double mass{ crosssections.front()->GetParametrization().GetParticleMass() };
     double square_momentum = (energy - mass) * (energy + mass);
     double aux = energy / square_momentum;
 
-    return UtilityIntegralDisplacement::FunctionToIntegral(energy) * aux * aux;
+    return displacement_->FunctionToIntegral(energy) * aux * aux;
 }
 
 #undef UTILITY_INTEGRAL_DEC
