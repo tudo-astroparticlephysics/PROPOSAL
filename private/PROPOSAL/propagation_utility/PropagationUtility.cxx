@@ -20,15 +20,15 @@ Utility::Definition::Definition(CrossSectionList cross,
     : crosssections(cross)
     , scattering(scattering)
     , inter_def(interpol_def)
-    , mass(crosssections.first()
-               .GetParticleDef()
-               .mass) // if particle energy would be kinetic energy, this copy is redundant
+    , mass(crosssections.front()
+               ->GetParametrization()
+               .GetParticleMass()) // if particle energy would be kinetic energy, this copy is redundant
 {
     if (!interpol_def) {
         log_warn("No interpolation definition defined. Integral will not be "
                  "approximate by interpolants. Performance will be poor.");
 
-        displacement_calc.reset(new UtilityIntegralDisplacement(cross));
+        displacement_calc.reset(new UtilityIntegralDisplacement(crosssections));
         interaction_calc.reset(new UtilityIntegralInteraction(cross));
         decay_calc.reset(new UtilityIntegralDecay(cross))
     } else {
@@ -135,13 +135,13 @@ double Utility::EnergyDecay(double energy, double rnd)
     auto rndd = -std::log(rnd);
     auto rnddMin = 0;
 
-    rnddMin = decay_calc->Calculate(energy, mass, rndd);
+    rnddMin = utility_def.decay_calc->Calculate(energy, utility_def.mass, rndd);
 
     // evaluating the energy loss
     if (rndd >= rnddMin || rnddMin <= 0)
-        return mass;
+        return utility_def.mass;
 
-    return decay_calc->GetUpperLimit(energy, rndd);
+    return utility_def.decay_calc->GetUpperLimit(energy, rndd);
 }
 
 double Utility::EnergyInteraction(double energy, double rnd)
@@ -150,18 +150,18 @@ double Utility::EnergyInteraction(double energy, double rnd)
     auto rndiMin = 0.;
 
     // solving the tracking integral
-    rndiMin = interaction_calc->Calculate(energy, mass, rndi);
+    rndiMin = utility_def.interaction_calc->Calculate(energy, utility_def.mass, rndi);
 
     if (rndi >= rndiMin || rndiMin <= 0)
-        return mass;
+        return utility_def.mass;
 
-    return interaction_calc->GetUpperLimit(energy, rndi);
+    return utility_def.interaction_calc->GetUpperLimit(energy, rndi);
 }
 
-double EnergyRandomize(double initial_energy, double final_energy, double rnd)
+double Utility::EnergyRandomize(double initial_energy, double final_energy, double rnd)
 {
-    if (cont_rand) {
-        return cont_rand->Randomize(
+    if (utility_def.cont_rand) {
+        return utility_def.cont_rand->Randomize(
             initial_energy, final_energy, rnd);
     } else {
         return final_energy;
@@ -171,29 +171,29 @@ double EnergyRandomize(double initial_energy, double final_energy, double rnd)
 double Utility::TimeElapsed(
     double initial_energy, double final_energy, double distance)
 {
-    if (exact_time) {
-        return exact_time->Calculate(initial_energy, final_energy, distance);
+    if (utility_def.exact_time) {
+        return utility_def.exact_time->Calculate(initial_energy, final_energy, distance);
     } else {
         return distance / SPEED;
     }
 }
 
-tuple<Vector3D, Vector3D> DirectionsScatter(double displacement,
+tuple<Vector3D, Vector3D> Utility::DirectionsScatter(double displacement,
     double initial_energy, double final_energy, const Vector3D& position,
     const Vector3D& direction, const std::array<double, 4>& rnd)
 {
-    return scattering->Scatter(
+    return utility_def.scattering->Scatter(
         displacement, initial_energy, final_energy, position, direction, rnd);
 }
 
 Vector3D DirectionDeflect(
     const Crosssection& cross, double particle_energy, double loss_energy)
 {
-    return crosss.StochasticDeflection(particle_energy, loss_energy);
+    return cross.StochasticDeflection(particle_energy, loss_energy);
 }
 
-double LengthContinuous(
+double Utility::LengthContinuous(
     double initial_energy, double final_energy, double border_length)
 {
-    displacement_calc->Calculate(initial_energy, final_energy, border_length);
+    utility_def.displacement_calc->Calculate(initial_energy, final_energy, border_length);
 }

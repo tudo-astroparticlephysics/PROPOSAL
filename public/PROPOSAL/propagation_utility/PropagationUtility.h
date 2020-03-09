@@ -33,8 +33,8 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/scattering/Scattering.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
+//#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+//#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
 using std::tuple;
 namespace PROPOSAL {
@@ -59,10 +59,18 @@ public:
             std::shared_ptr<Scattering>,
             std::shared_ptr<InterpolationDef>);
         ~Definition();
+
+        std::unique_ptr<UtilityDecorator> displacement_calc = nullptr;
+        std::unique_ptr<UtilityDecorator> interaction_calc = nullptr;
+        std::unique_ptr<UtilityDecorator> decay_calc = nullptr;
+        std::unique_ptr<UtilityDecorator> cont_rand = nullptr;
+        std::unique_ptr<UtilityDecorator> exact_time = nullptr;
+
+        double mass;
     };
 
     Utility(std::unique_ptr<Definition> utility_def)
-        : utility_def(std::move(utility_def)){};
+        : utility_def_(std::move(utility_def)){};
 
     std::shared_ptr<CrossSection> TypeInteraction(
         double, const std::array<double, 2>&);
@@ -83,15 +91,7 @@ public:
     Vector3D DirectionDeflect(double, double, double, const Vector3D&, const Vector3D&);
 
 private:
-    Definition utility_def;
-
-    std::unique_ptr<UtilityDecorator> displacement_calc = nullptr;
-    std::unique_ptr<UtilityDecorator> interaction_calc = nullptr;
-    std::unique_ptr<UtilityDecorator> decay_calc = nullptr;
-    std::unique_ptr<UtilityDecorator> cont_rand = nullptr;
-    std::unique_ptr<UtilityDecorator> exact_time = nullptr;
-
-    double mass;
+    std::unique_ptr<Definition> utility_def_;
 };
 } // namespace PROPOSAL
 
