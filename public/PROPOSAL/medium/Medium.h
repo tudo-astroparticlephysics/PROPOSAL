@@ -40,12 +40,6 @@
        public:                                                                 \
         cls(double rho = 1.0);                                                 \
         cls(const Medium& medium) : Medium(medium) {}                          \
-                                                                               \
-        virtual Medium* clone() const { return new cls(*this); }               \
-        using Medium::create;\
-        std::shared_ptr<const Medium> create() {\
-            return std::make_shared<const Medium>(cls());    \
-        }                                                                      \
     };
 
 namespace PROPOSAL {
@@ -72,8 +66,6 @@ class Medium {
            double massDensity,
            std::vector<std::shared_ptr<Components::Component>>);
     Medium(const Medium&);
-    /* virtual Medium* clone() const { return new Medium(*this); }; */
-    virtual std::shared_ptr<const Medium> create() const { return std::shared_ptr<const Medium>(new Medium(*this)) ;};
 
     ///@brief Crush this Medium.
     virtual ~Medium();
@@ -189,12 +181,6 @@ class Air : public Medium {
     Air(double rho = 1.0);
     Air(const Medium& medium) : Medium(medium) {}
     virtual ~Air() {}
-
-    /* virtual Medium* clone() const { return new Air(*this); } */
-    using Medium::create;
-    std::shared_ptr<const Medium> create(double density_correction = 1.0) {
-        return std::make_shared<const Medium>(Air(density_correction));
-    }
 };
 
 // #<{(|

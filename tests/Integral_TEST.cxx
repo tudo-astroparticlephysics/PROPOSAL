@@ -212,7 +212,7 @@ TEST(IntegralValue, IntegrateWithLogSubstitution)
 TEST(QUADPACK, RombergIntegrationFailure)
 {
     double precision = 1e-4;
-    IonizIntegral Ioniz_Int(IonizBetheBlochRossi(MuMinusDef::Get(), Ice().create(), EnergyCutSettings(), 1.0));
+    IonizIntegral Ioniz_Int(IonizBetheBlochRossi(MuMinusDef::Get(), std::make_shared<const Ice>(), EnergyCutSettings(), 1.0));
 
     // --------------------------------------------------------------------- //
     // Problematic energy for romberg integration
