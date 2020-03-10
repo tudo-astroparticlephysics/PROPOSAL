@@ -38,26 +38,77 @@ public:
 
     virtual double Calculate(double ei, double ef, double rnd);
     virtual double GetUpperLimit(double ei, double rnd);
+    virtual double FunctionToIntegral(double energy) = 0;
 
 protected:
     Integral integral_;
 };
 } // namespace PROPOSAL
 
-#define UTILITY_INTEGRAL_DEC(cls)                                              \
-    class UtilityIntegral##cls : public UtilityIntegral {                      \
-    public:                                                                    \
-        UtilityIntegral##cls(CrossSectionList);                                \
-        double FunctionToIntegral(double energy);                              \
-    };
-
 namespace PROPOSAL {
-UTILITY_INTEGRAL_DEC(Displacement)
-UTILITY_INTEGRAL_DEC(Interaction)
-UTILITY_INTEGRAL_DEC(Decay)
-UTILITY_INTEGRAL_DEC(Time)
-UTILITY_INTEGRAL_DEC(ContRand)
-UTILITY_INTEGRAL_DEC(Scattering)
+class UtilityIntegralDisplacement : public UtilityIntegral {
+public:
+    UtilityIntegralDisplacement(CrossSectionList, const ParticleDef&);
+    double FunctionToIntegral(double energy) override;
+};
 } // namespace PROPOSAL
 
-#undef UTILITY_INTEGRAL_DEC
+namespace PROPOSAL {
+class UtilityIntegralInteraction : public UtilityIntegral {
+public:
+    UtilityIntegralInteraction(CrossSectionList, const ParticleDef&);
+    double FunctionToIntegral(double energy) override;
+
+protected:
+    std::unique_ptr<UtilityIntegralDisplacement> displacement_;
+};
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+class UtilityIntegralDecay : public UtilityIntegral {
+public:
+    UtilityIntegralDecay(CrossSectionList, const ParticleDef&);
+    double FunctionToIntegral(double energy) override;
+    double Calculate(double ei, double ef, double rnd) override;
+
+protected:
+    std::unique_ptr<UtilityIntegralDisplacement> displacement_;
+    double mass;
+    double lifetime;
+};
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+class UtilityIntegralTime : public UtilityIntegral {
+public:
+    UtilityIntegralTime(CrossSectionList, const ParticleDef&);
+    double FunctionToIntegral(double energy) override;
+
+protected:
+    std::unique_ptr<UtilityIntegralDisplacement> displacement_;
+    double mass;
+};
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+class UtilityIntegralContRand : public UtilityIntegral {
+public:
+    UtilityIntegralContRand(CrossSectionList, const ParticleDef&);
+    double FunctionToIntegral(double energy) override;
+
+protected:
+    std::unique_ptr<UtilityIntegralDisplacement> displacement_;
+};
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+class UtilityIntegralScattering : public UtilityIntegral {
+public:
+    UtilityIntegralScattering(CrossSectionList, const ParticleDef&);
+    double FunctionToIntegral(double energy) override;
+
+protected:
+    std::unique_ptr<UtilityIntegralDisplacement> displacement_;
+    double mass;
+};
+} // namespace PROPOSAL

@@ -38,6 +38,7 @@
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 
@@ -68,19 +69,20 @@ public:
     public:
         Definition();
         Definition(const Definition&);
+        Definition(const nlohmann::json&);
         ~Definition();
 
         bool operator==(const Definition&) const;
         bool operator!=(const Definition&) const;
-        Definition& operator=(const Definition&);
+        /* Definition& operator=(const Definition&); */
         friend std::ostream& operator<<(std::ostream&, Definition const&);
         void swap(Definition&);
 
-        void SetMedium(const Medium&);
-        const Medium& GetMedium() const { return *medium_; }
+        void SetMedium(std::shared_ptr<const Medium>);
+        std::shared_ptr<const Medium> GetMedium() const { return medium_; }
 
-        void SetGeometry(const Geometry&);
-        const Geometry& GetGeometry() const { return *geometry_; }
+        void SetGeometry(std::shared_ptr<const Geometry>);
+        std::shared_ptr<const Geometry> GetGeometry() const { return geometry_; }
 
         bool do_stochastic_loss_weighting; //!< Do weigthing of stochastic
                                            //!< losses. Set to false in
@@ -104,8 +106,8 @@ public:
         EnergyCutSettings cut_settings;
 
     private:
-        Medium* medium_;
-        Geometry* geometry_;
+        std::shared_ptr<const Medium> medium_;
+        std::shared_ptr<const Geometry> geometry_;
     };
 
 public:
@@ -187,14 +189,14 @@ public:
     // --------------------------------------------------------------------- //
 
     ParticleLocation::Enum GetLocation() const { return sector_def_.location; }
-
-    Scattering* GetScattering() const { return scattering_; }
+    std::shared_ptr<Scattering> GetScattering() const { return scattering_; }
     const ParticleDef GetParticleDef() const { return particle_def_; }
-    Geometry* GetGeometry() const { return geometry_; }
     const Utility& GetUtility() const { return utility_; }
-    const Medium* GetMedium() const { return &utility_.GetMedium(); }
+<<<<<<< HEAD
+    //const Medium* GetMedium() const { return &utility_.GetMedium(); }
+=======
+>>>>>>> 3601c5b06ae43b0f7fdcf50da3bfab1def9a6984
     const Definition& GetSectorDef() const { return sector_def_; }
-    Definition& GetSectorDef() { return sector_def_; }
 
 protected:
     Sector& operator=(const Sector&); // Undefined & not allowed
@@ -206,18 +208,17 @@ protected:
     Definition sector_def_;
 
     ParticleDef particle_def_;
-    Geometry* geometry_;
 
     Utility utility_;
-    UtilityDecorator* displacement_calculator_;
-    UtilityDecorator* interaction_calculator_;
-    UtilityDecorator* decay_calculator_;
-    UtilityDecorator* exact_time_calculator_;
+    std::shared_ptr<UtilityDecorator> displacement_calculator_;
+    std::shared_ptr<UtilityDecorator> interaction_calculator_;
+    std::shared_ptr<UtilityDecorator> decay_calculator_;
+    std::shared_ptr<UtilityDecorator> exact_time_calculator_;
 
-    ContinuousRandomizer* cont_rand_;
-    Scattering* scattering_;
+    std::shared_ptr<ContinuousRandomizer> cont_rand_;
+    std::shared_ptr<Scattering> scattering_;
 
-    std::pair<double, double> produced_particle_moments_{ 100., 10000. };
-    unsigned int n_th_call_{ 1 };
+    /* std::pair<double, double> produced_particle_moments_{ 100., 10000. }; */
+    /* unsigned int n_th_call_{ 1 }; */
 };
 } // namespace PROPOSAL
