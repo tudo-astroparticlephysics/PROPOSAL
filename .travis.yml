@@ -1,5 +1,7 @@
 language: cpp
-sudo: require
+
+notifications:
+  email: false
 
 git:
   depth: 10
@@ -7,6 +9,7 @@ git:
 env:
   global:
     - GTEST_COLOR=1
+    - CMAKE_VERSION=3.8.2
 
 matrix:
   include:
@@ -68,24 +71,27 @@ matrix:
 
 before_install:
   - pyenv global system 3.7
-  - cmake --version
 
 install:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade; brew install cmake; fi
+  - ci/install_cmake.sh
+  - export PATH="$HOME/cmake/bin:$PATH"
+  - cmake --version
+
 before_script:
-- mkdir build
-- cd build
-- cmake .. -DADD_PYTHON=OFF -DCMAKE_BUILD_TYPE=Release
-- make VERBOSE=1 -j2
-- mkdir -p $HOME/.local/share/PROPOSAL/tables
+  - mkdir build
+  - cd build
+  - cmake .. -DADD_PYTHON=OFF -DCMAKE_BUILD_TYPE=Release
+  - make VERBOSE=1 -j2
+  - mkdir -p $HOME/.local/share/PROPOSAL/tables
+
 script:
-- travis_wait 60 ctest -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
-after_success:
-- git clean -fdx
-- cd $TRAVIS_BUILD_DIR/..
-- tar czf PROPOSAL-$TRAVIS_TAG.tar.gz --exclude-vcs PROPOSAL
-notifications:
-  email: false
+  - travis_wait 60 ctest -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
+
+before_deploy:
+  - git clean -fdx
+  - cd $TRAVIS_BUILD_DIR/..
+  - tar czf PROPOSAL-$TRAVIS_TAG.tar.gz --exclude-vcs PROPOSAL
+
 deploy:
   provider: releases
   api_key:
