@@ -5,10 +5,21 @@
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
 
+<<<<<<< HEAD
+=======
+#define UTILITY_INTEGRAL_IMPL(cls)                                             \
+    UtilityIntegral##cls::UtilityIntegral##cls(CrossSectionList cross)         \
+        : UtilityIntegral(cross)                                               \
+        , displacement_(new UtilityIntegralDisplacement(cross))                \
+    {                                                                          \
+    }
+
+>>>>>>> de33d1b04aa7a556135cfbe38d3aa40a7af09f57
 using namespace PROPOSAL;
 
 /******************************************************************************
@@ -40,7 +51,6 @@ double UtilityIntegral::GetUpperLimit(double ei, double rnd)
 /******************************************************************************
  *                            Utility Displacement                            *
  ******************************************************************************/
-
 UtilityIntegralDisplacement::UtilityIntegralDisplacement(
     CrossSectionList cross, const ParticleDef&)
     : UtilityIntegral(cross)
@@ -90,7 +100,6 @@ UtilityIntegralDecay::UtilityIntegralDecay(
 double UtilityIntegralDecay::FunctionToIntegral(double energy)
 {
     if (lifetime < 0)
-        return 0;
 
     double mass = crosssections.front()->GetParametrization().GetParticleMass();
     double square_momentum = (energy - mass) * (energy + mass);
