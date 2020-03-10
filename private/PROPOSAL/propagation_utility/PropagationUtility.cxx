@@ -3,6 +3,8 @@
 #include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
@@ -23,6 +25,7 @@ Utility::Definition::Definition(CrossSectionList cross,
     , mass(crosssections.front()
                ->GetParametrization()
                .GetParticleMass()) // if particle energy would be kinetic energy, this copy is redundant
+    , low(crosssections.front()->GetParametrization().GetParticleLow())
 {
     if (!interpol_def) {
         log_warn("No interpolation definition defined. Integral will not be "
@@ -75,20 +78,20 @@ std::ostream& PROPOSAL::operator<<(
     ss << " Utility Definition (" << &util_definition << ") ";
     os << Helper::Centered(60, ss.str()) << '\n';
 
-    for (const auto& crosssection : util_definition->crosssection) {
+    for (const auto& crosssection : util_definition.crosssections) {
         os << crosssection << std::endl;
     }
-    if (scattering) {
-        os << scattering << std::endl;
+    if (util_definition.scattering) {
+        os << util_definition.scattering << std::endl;
     };
-    if (inter_def) {
-        os << inter_def << std::endl;
+    if (util_definition.inter_def) {
+        os << util_definition.inter_def << std::endl;
     }
-    if (cont_rand) {
-        os << cont_rand << std::endl;
+    if (util_definition.cont_rand) {
+        os << util_definition.cont_rand << std::endl;
     }
-    if (exact_time) {
-        os << exact_time << std::endl;
+    if (util_definition.exact_time) {
+        os << util_definition.exact_time << std::endl;
     };
     os << Helper::Centered(60, "");
     return os;
@@ -103,7 +106,7 @@ Utility::Utility(std::unique_ptr<Utility::Definition> utility_def)
 {
 }
 
-std::shared_ptr<Crosssection> Utility::TypeInteraction(
+std::shared_ptr<CrossSection> Utility::TypeInteraction(
     double energy, const std::array<double, 2>& rnd)
 {
     std::array<double, crosssections_.size()> rates;

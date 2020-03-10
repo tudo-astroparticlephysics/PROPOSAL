@@ -40,7 +40,7 @@ class UtilityIntegral;
     class UtilityInterpolant##cls : public UtilityInterpolant                                                          \
     {                                                                                                                  \
     public:                                                                                                            \
-        UtilityInterpolant##cls(CrossSectionList&, InterpolationDef);                                                     \
+        UtilityInterpolant##cls(CrossSectionList, InterpolationDef);                                                     \
         ~UtilityInterpolant##cls();                                                                                    \
                                                                                                                        \
         double Calculate(double ei, double ef, double rnd);                                                            \
@@ -58,7 +58,7 @@ class Interpolant;
 class UtilityInterpolant : public UtilityDecorator
 {
 public:
-    UtilityInterpolant(CrossSectionList&, InterpolationDef);
+    UtilityInterpolant(CrossSectionList, InterpolationDef);
     virtual ~UtilityInterpolant();
 
     virtual double Calculate(double ei, double ef, double rnd) = 0;
@@ -78,7 +78,7 @@ protected:
 class UtilityInterpolantInteraction : public UtilityInterpolant
 {
 public:
-    UtilityInterpolantInteraction(CrossSectionList&, InterpolationDef);
+    UtilityInterpolantInteraction(CrossSectionList, InterpolationDef);
     virtual ~UtilityInterpolantInteraction();
 
     double Calculate(double ei, double ef, double rnd);
@@ -95,7 +95,7 @@ private:
 class UtilityInterpolantDecay : public UtilityInterpolant
 {
 public:
-    UtilityInterpolantDecay(CrossSectionList&, InterpolationDef);
+    UtilityInterpolantDecay(CrossSectionList, InterpolationDef);
     virtual ~UtilityInterpolantDecay();
 
     double Calculate(double ei, double ef, double rnd);

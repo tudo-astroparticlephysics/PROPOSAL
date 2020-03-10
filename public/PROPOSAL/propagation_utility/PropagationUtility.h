@@ -67,6 +67,7 @@ public:
         std::unique_ptr<UtilityDecorator> exact_time = nullptr;
 
         double mass;
+        double low;
     };
 
     Utility(std::unique_ptr<Definition> utility_def)
@@ -102,7 +103,8 @@ public:
     UtilityDecorator(CrossSectionList cross)
         : crosssections(cross){};
 
-    virtual double FunctionToIntegral(double energy) = 0;
+    virtual ~UtilityDecorator() = default;
+
     virtual double Calculate(double ei, double ef, double rnd) = 0;
     virtual double GetUpperLimit(double ei, double rnd) = 0;
 
