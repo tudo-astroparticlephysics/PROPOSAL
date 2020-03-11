@@ -68,25 +68,12 @@ bool Scattering::operator!=(const Scattering& scattering) const
     return !(*this == scattering);
 }
 
-Directions Scattering::Scatter(double dr, double ei, double ef, const Vector3D& pos, const Vector3D& old_direction)
-{
-    double rnd1 = RandomGenerator::Get().RandomDouble();
-    double rnd2 = RandomGenerator::Get().RandomDouble();
-    double rnd3 = RandomGenerator::Get().RandomDouble();
-    double rnd4 = RandomGenerator::Get().RandomDouble();
-
-    return Scattering::Scatter(dr, ei, ef, pos, old_direction, rnd1, rnd2, rnd3, rnd4);
-}
-
 Directions Scattering::Scatter(double dr,
                                 double ei,
                                 double ef,
                                 const Vector3D& pos,
                                 const Vector3D& old_direction,
-                                double rnd1,
-                                double rnd2,
-                                double rnd3,
-                                double rnd4)
+                                const std::array<double, 4>& rnd)
 {
     Directions directions_;
     // u averaged continous propagation direction
@@ -100,7 +87,7 @@ Directions Scattering::Scatter(double dr,
 
     double sz, tz;
 
-    RandomAngles random_angles = CalculateRandomAngle(dr, ei, ef, pos, rnd1, rnd2, rnd3, rnd4);
+    RandomAngles random_angles = CalculateRandomAngle(dr, ei, ef, pos, rnd);
 
     sz = std::sqrt(std::max(1. - (random_angles.sx * random_angles.sx + random_angles.sy * random_angles.sy), 0.));
     tz = std::sqrt(std::max(1. - (random_angles.tx * random_angles.tx + random_angles.ty * random_angles.ty), 0.));
@@ -128,12 +115,7 @@ Directions Scattering::Scatter(double dr,
     return directions_;
 }
 
-Scattering::RandomAngles Scattering::CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos)
-{
-    double rnd1 = RandomGenerator::Get().RandomDouble();
-    double rnd2 = RandomGenerator::Get().RandomDouble();
-    double rnd3 = RandomGenerator::Get().RandomDouble();
-    double rnd4 = RandomGenerator::Get().RandomDouble();
-
-    return this->CalculateRandomAngle(dr, ei, ef, pos, rnd1, rnd2, rnd3, rnd4);
-}
+/* Scattering::RandomAngles Scattering::CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, std::array<double,4> rnd) */
+/* { */
+/*     return this->CalculateRandomAngle(dr, ei, ef, pos, rnd); */
+/* } */

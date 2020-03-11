@@ -16,8 +16,8 @@ using namespace PROPOSAL;
  *                              Utility Integral                              *
  ******************************************************************************/
 
-UtilityIntegral::UtilityIntegral(CrossSectionList cross)
-    : UtilityDecorator(cross)
+UtilityIntegral::UtilityIntegral(CrossSectionList cross, const ParticleDef& p_def)
+    : UtilityDecorator(cross, p_def)
     , integral_(IROMB, IMAXS, IPREC2)
 {
 }
@@ -42,8 +42,8 @@ double UtilityIntegral::GetUpperLimit(double ei, double rnd)
  *                            Utility Displacement                            *
  ******************************************************************************/
 UtilityIntegralDisplacement::UtilityIntegralDisplacement(
-    CrossSectionList cross, const ParticleDef&)
-    : UtilityIntegral(cross)
+    CrossSectionList cross, const ParticleDef& p_def)
+    : UtilityIntegral(cross, p_def)
 {
 }
 
@@ -54,6 +54,14 @@ double UtilityIntegralDisplacement::FunctionToIntegral(double energy)
         result += cross->CalculatedEdx(energy);
 
     return -1.0 / result;
+}
+
+double UtilityIntegralDisplacment::Calculate(double ei, double ef, double rnd)
+{
+    if(ef > mass)
+        return UtilityIntegral::Calculate(ei, ef, rnd) / lifetime;
+
+    return UtilityIntegral::Calculate(ei, mass, rnd) / lifetime;
 }
 
 /******************************************************************************
@@ -81,7 +89,7 @@ double UtilityIntegralInteraction::FunctionToIntegral(double energy)
 
 UtilityIntegralDecay::UtilityIntegralDecay(
     CrossSectionList cross, const ParticleDef& p_def)
-    : UtilityIntegral(cross)
+    : UtilityIntegral(cross, p_def)
     , lifetime(p_def.lifetime)
     , mass(p_def.mass)
 {
@@ -100,9 +108,12 @@ double UtilityIntegralDecay::FunctionToIntegral(double energy)
     return displacement_->FunctionToIntegral(energy) * aux;
 }
 
-double UtilityIntegralDecay::Calculate(double energy)
+double UtilityIntegralDecay::Calculate(double ei, double ef, double rnd)
 {
-    return UtilityIntegral::Calculate(ei, ef, rnd) / lifetime;
+    if(ef > mass)
+        return UtilityIntegral::Calculate(ei, ef, rnd) / lifetime;
+
+    return UtilityIntegral::Calculate(ei, mass, rnd) / lifetime;
 }
 
 /******************************************************************************
@@ -111,7 +122,7 @@ double UtilityIntegralDecay::Calculate(double energy)
 
 UtilityIntegralTime::UtilityIntegralTime(
     CrossSectionList cross, const ParticleDef& p_def)
-    : UtilityIntegral(cross)
+    : UtilityIntegral(cross, p_def)
     , mass(p_def.mass)
 {
 }
@@ -131,7 +142,7 @@ double UtilityIntegralTime::FunctionToIntegral(double energy)
 
 UtilityIntegralContRand::UtilityIntegralContRand(
     CrossSectionList cross, const ParticleDef&)
-    : UtilityIntegral(cross)
+    : UtilityIntegral(cross, p_def)
 {
 }
 
@@ -150,7 +161,7 @@ double UtilityIntegralContRand::FunctionToIntegral(double energy)
 
 UtilityIntegralScattering::UtilityIntegralScattering(
     CrossSectionList cross, const ParticleDef& p_def)
-    : UtilityIntegral(cross)
+    : UtilityIntegral(cross, p_def)
     , mass(p_def.mass)
 {
 }

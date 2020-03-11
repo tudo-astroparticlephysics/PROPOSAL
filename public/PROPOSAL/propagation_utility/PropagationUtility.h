@@ -44,20 +44,19 @@ class UtilityDecorator;
 struct InterpolationDef;
 
 typedef std::vector<std::shared_ptr<CrossSection>> CrossSectionList;
-//typedef const double random_number;
-//typedef const double energy;
-//typedef const double distance;
+// typedef const double random_number;
+// typedef const double energy;
+// typedef const double distance;
 
 class Utility {
 public:
     struct Definition {
-        std::shared_ptr<InterpolationDef> inter_def;  // integration used
-        std::shared_ptr<Scattering> scattering;       // no scattering
-        CrossSectionList crosssections; // copy is expensive
+        CrossSectionList cross;              // copy is expensive
+        std::shared_ptr<Scattering> scattering;      // no scattering
+        std::shared_ptr<InterpolationDef> inter_def; // integration used
 
-        Definition(CrossSectionList,
-            std::shared_ptr<Scattering>,
-            std::shared_ptr<InterpolationDef>);
+        Definition(CrossSectionList, const ParticleDef&,
+            std::shared_ptr<Scattering>, std::shared_ptr<InterpolationDef>);
         ~Definition();
 
         std::unique_ptr<UtilityDecorator> displacement_calc = nullptr;
@@ -65,34 +64,31 @@ public:
         std::unique_ptr<UtilityDecorator> decay_calc = nullptr;
         std::unique_ptr<UtilityDecorator> cont_rand = nullptr;
         std::unique_ptr<UtilityDecorator> exact_time = nullptr;
-
-        double mass;
-        double low;
     };
 
-    Utility(std::unique_ptr<Definition> utility_def)
-        : utility_def_(std::move(utility_def)){};
+    Utility(std::unique_ptr<Definition> utility_def);
 
     std::shared_ptr<CrossSection> TypeInteraction(
         double, const std::array<double, 2>&);
     double EnergyStochasticloss(
-        const CrossSection&, double, const std::array<double, 2>&);
+         CrossSection&, double, const std::array<double, 2>&);
     double EnergyDecay(double, double);
     double EnergyInteraction(double, double);
     double EnergyRandomize(double, double, double);
     double LengthContinuous(double, double, double);
-    double ElapsedTime(double, double, double);
+    double TimeElapsed(double, double, double);
 
     // TODO: return value doesn't tell what it include. Maybe it would be better
     // to give a tuple of two directions back. One is the mean over the
     // displacement and the other is the actual direction. With a get method
     // there could be a possible access with the position of the object stored
     // in an enum.
-    tuple<Vector3D, Vector3D> DirectionsScatter(double, double, double, const Vector3D&, const Vector3D&, const std::array<double, 4>&);
-    Vector3D DirectionDeflect(double, double, double, const Vector3D&, const Vector3D&);
+    tuple<Vector3D, Vector3D> DirectionsScatter(double, double, double,
+        const Vector3D&, const Vector3D&, const std::array<double, 4>&);
+    std::pair<double, double> DirectionDeflect(CrossSection& , double particle_energy, double loss_energy);
 
 private:
-    std::unique_ptr<Definition> utility_def_;
+    std::unique_ptr<Definition> utility_def;
 };
 } // namespace PROPOSAL
 
@@ -100,15 +96,18 @@ namespace PROPOSAL {
 class UtilityDecorator {
 
 public:
-    UtilityDecorator(CrossSectionList cross)
-        : crosssections(cross){};
+    UtilityDecorator(CrossSectionList cross, const ParticleDef& p_def)
+        : crosss(cross), mass(p_def.mass){};
 
     virtual ~UtilityDecorator() = default;
 
     virtual double Calculate(double ei, double ef, double rnd) = 0;
     virtual double GetUpperLimit(double ei, double rnd) = 0;
 
+    double GetMass() { return mass; }
+
 protected:
-    CrossSectionList crosssections;
+    CrossSectionList crosss;
+    double mass;
 };
 } // namespace PROPOSAL

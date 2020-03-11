@@ -61,16 +61,7 @@ public:
     virtual Scattering* clone(const ParticleDef&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies)
 
 
-    Directions Scatter(double dr, double ei, double ef, const Vector3D& pos, const Vector3D& old_direction);
-    Directions Scatter(double dr,
-                        double ei,
-                        double ef,
-                        const Vector3D& pos,
-                        const Vector3D& old_direction,
-                        double rnd1,
-                        double rnd2,
-                        double rnd3,
-                        double rnd4);
+    std::tuple<Vector3D, Vector3D> Scatter(double dr, double ei, double ef, const Vector3D& pos, const Vector3D& old_direction, const std::array<double, 4>& rnd);
 
     const ParticleDef& GetParticleDef() const { return particle_def_; }
 
@@ -91,10 +82,7 @@ protected:
                                               double ei,
                                               double ef,
                                               const Vector3D& pos,
-                                              double rnd1,
-                                              double rnd2,
-                                              double rnd3,
-                                              double rnd4) = 0;
+                                              const std::array<double, 4>& rnd) = 0;
 
     const ParticleDef& particle_def_;
 };

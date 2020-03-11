@@ -40,7 +40,7 @@ class UtilityIntegral;
     class UtilityInterpolant##cls : public UtilityInterpolant                                                          \
     {                                                                                                                  \
     public:                                                                                                            \
-        UtilityInterpolant##cls(CrossSectionList, InterpolationDef);                                                     \
+        UtilityInterpolant##cls(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);              \
         ~UtilityInterpolant##cls();                                                                                    \
                                                                                                                        \
         double Calculate(double ei, double ef, double rnd);                                                            \
@@ -58,7 +58,7 @@ class Interpolant;
 class UtilityInterpolant : public UtilityDecorator
 {
 public:
-    UtilityInterpolant(CrossSectionList, InterpolationDef);
+    UtilityInterpolant(CrossSectionList, std::shared_ptr<InterpolationDef>);
     virtual ~UtilityInterpolant();
 
     virtual double Calculate(double ei, double ef, double rnd) = 0;
@@ -72,13 +72,13 @@ protected:
     Interpolant* interpolant_;
     Interpolant* interpolant_diff_;
 
-    InterpolationDef interpolation_def_;
+    std::shared_ptr<InterpolationDef> interpolation_def_;
 };
 
 class UtilityInterpolantInteraction : public UtilityInterpolant
 {
 public:
-    UtilityInterpolantInteraction(CrossSectionList, InterpolationDef);
+    UtilityInterpolantInteraction(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);
     virtual ~UtilityInterpolantInteraction();
 
     double Calculate(double ei, double ef, double rnd);
@@ -95,7 +95,7 @@ private:
 class UtilityInterpolantDecay : public UtilityInterpolant
 {
 public:
-    UtilityInterpolantDecay(CrossSectionList, InterpolationDef);
+    UtilityInterpolantDecay(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);
     virtual ~UtilityInterpolantDecay();
 
     double Calculate(double ei, double ef, double rnd);

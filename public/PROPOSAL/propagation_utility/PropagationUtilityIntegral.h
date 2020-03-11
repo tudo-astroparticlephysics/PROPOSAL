@@ -34,7 +34,7 @@
 namespace PROPOSAL {
 class UtilityIntegral : public UtilityDecorator {
 public:
-    UtilityIntegral(CrossSectionList);
+    UtilityIntegral(CrossSectionList, const ParticleDef&);
 
     virtual double Calculate(double ei, double ef, double rnd);
     virtual double GetUpperLimit(double ei, double rnd);
@@ -73,7 +73,6 @@ public:
 
 protected:
     std::unique_ptr<UtilityIntegralDisplacement> displacement_;
-    double mass;
     double lifetime;
 };
 } // namespace PROPOSAL
@@ -86,7 +85,6 @@ public:
 
 protected:
     std::unique_ptr<UtilityIntegralDisplacement> displacement_;
-    double mass;
 };
 } // namespace PROPOSAL
 
@@ -109,6 +107,5 @@ public:
 
 protected:
     std::unique_ptr<UtilityIntegralDisplacement> displacement_;
-    double mass;
 };
 } // namespace PROPOSAL

@@ -107,10 +107,10 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(
-        CrossSectionList cross, InterpolationDef def)
+        CrossSectionList cross, const ParticleDef& p_def, InterpolationDef def)
     : UtilityInterpolant(cross, def)
 {
-    UtilityIntegralDisplacement utility_disp(cross);
+    UtilityIntegralDisplacement utility_disp(cross, p_def);
     InitInterpolation("displacement", utility_disp, def.nodes_propagate);
 }
 
@@ -176,12 +176,12 @@ void UtilityInterpolantDisplacement::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantInteraction::UtilityInterpolantInteraction(
-        CrossSectionList cross, InterpolationDef def)
+        CrossSectionList cross, const ParticleDef& p_def, InterpolationDef def)
     : UtilityInterpolant(cross, def)
     , big_low_(0)
     , up_(0)
 {
-    UtilityIntegralInteraction utility_int(cross);
+    UtilityIntegralInteraction utility_int(cross, p_def);
     InitInterpolation("interaction", utility_int, def.nodes_propagate);
 }
 
@@ -272,12 +272,12 @@ void UtilityInterpolantInteraction::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantDecay::UtilityInterpolantDecay(
-        CrossSectionList cross, InterpolationDef def)
+        CrossSectionList cross, const ParticleDef& p_def, InterpolationDef def)
     : UtilityInterpolant(cross, def)
     , big_low_(0)
     , up_(0)
 {
-    UtilityIntegralDecay utility_decay(cross);
+    UtilityIntegralDecay utility_decay(cross, p_def);
     InitInterpolation("decay", utility_decay, def.nodes_propagate);
 }
 
@@ -356,10 +356,10 @@ void UtilityInterpolantDecay::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantTime::UtilityInterpolantTime(
-        CrossSectionList cross, InterpolationDef def)
+        CrossSectionList cross, const ParticleDef& p_def, InterpolationDef def)
     : UtilityInterpolant(cross, def)
 {
-    UtilityIntegralTime utility_time(cross);
+    UtilityIntegralTime utility_time(cross, p_def);
     InitInterpolation("time", utility_time, def.nodes_propagate);
 }
 
@@ -412,10 +412,10 @@ void UtilityInterpolantTime::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantContRand::UtilityInterpolantContRand(
-        CrossSectionList cross, InterpolationDef def)
+        CrossSectionList cross, const ParticleDef& p_def, InterpolationDef def)
     : UtilityInterpolant(cross, def)
 {
-    UtilityIntegralContRand utility_contrand(cross);
+    UtilityIntegralContRand utility_contrand(cross, p_def);
     InitInterpolation(
         "contrand", utility_contrand, def.nodes_continous_randomization);
 }
@@ -471,10 +471,10 @@ void UtilityInterpolantContRand::InitInterpolation(const std::string& name,
  ******************************************************************************/
 
 UtilityInterpolantScattering::UtilityInterpolantScattering(
-        CrossSectionList cross, InterpolationDef def)
+        CrossSectionList cross, const ParticleDef& p_def, InterpolationDef def)
     : UtilityInterpolant(cross, def)
 {
-    UtilityIntegralScattering utility_scattering(cross);
+    UtilityIntegralScattering utility_scattering(cross, p_def);
     InitInterpolation(
         "scattering", utility_scattering, def.nodes_continous_randomization);
 }
