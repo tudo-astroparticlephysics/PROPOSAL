@@ -80,8 +80,6 @@ void init_medium(py::module& m) {
                                R"pbdoc(Ratio of atomic and mass number.)pbdoc")
         .def_property_readonly("ionization_potential", &Medium::GetI,
                                R"pbdoc(Ionization potential in [eV])pbdoc")
-        .def_property_readonly("refraction_index", &Medium::GetR,
-                               R"pbdoc(Refraction index of the medium.)pbdoc")
         .def_property_readonly(
             "radiation_length",
             (double (Medium::*)() const) & Medium::GetRadiationLength,

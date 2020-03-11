@@ -37,7 +37,6 @@ std::ostream& operator<<(std::ostream& os, Medium const& medium) {
     os << "sum of nucleons of all nuclei:\t\t\t" << medium.sumNucleons_
        << std::endl;
     os << "ionization potential [eV]:\t\t\t" << medium.I_ << std::endl;
-    os << "refraction index:\t\t\t\t" << medium.r_ << std::endl;
     os << "average all-component nucleon weight [MeV]:\t" << medium.MM_
        << std::endl;
     os << "sum of charges of all nuclei:\t\t\t" << medium.sumCharge_
@@ -82,7 +81,6 @@ Medium::Medium(std::string name,
       X0_(X0),
       X1_(X1),
       d0_(d0),
-      r_(0),
       massDensity_(massDensity),
       molDensity_(0),
       radiationLength_(0),
@@ -105,7 +103,6 @@ Medium::Medium(const Medium& medium)
       X0_(medium.X0_),
       X1_(medium.X1_),
       d0_(medium.d0_),
-      r_(medium.r_),
       massDensity_(medium.massDensity_),
       molDensity_(medium.molDensity_),
       radiationLength_(medium.radiationLength_),
@@ -141,7 +138,6 @@ void Medium::swap(Medium& medium) {
     swap(X0_, medium.X0_);
     swap(X1_, medium.X1_);
     swap(d0_, medium.d0_);
-    swap(r_, medium.r_);
     swap(massDensity_, medium.massDensity_);
     swap(molDensity_, medium.molDensity_);
     swap(radiationLength_, medium.radiationLength_);
@@ -202,8 +198,6 @@ bool Medium::operator==(const Medium& medium) const {
         return false;
     else if (d0_ != medium.d0_)
         return false;
-    else if (r_ != medium.r_)
-        return false;
     else if (massDensity_ != medium.massDensity_)
         return false;
     else if (molDensity_ != medium.molDensity_)
@@ -259,9 +253,6 @@ void Medium::init() {
     ZA_ = aux1 / aux2;
     molDensity_ = massDensity_ * NA / aux2;
     MM_ = aux3 / aux2;
-
-    // TODO: this is never used; is that art or deletable
-    r_ = 1.31;  // only for ice - change if needed (sea water: 1.35)
 
     // TODO: Compare to Bremsstrahlung::CalculateScatteringX0; just one (this or
     // the Brems-thing) is needed Calculation of the radiation length
@@ -329,10 +320,6 @@ void Medium::SetX1(double X1) {
 
 void Medium::SetD0(double d0) {
     d0_ = d0;
-}
-
-void Medium::SetR(double r) {
-    r_ = r;
 }
 
 void Medium::SetMassDensity(double massDensity) {
