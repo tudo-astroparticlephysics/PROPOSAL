@@ -9,7 +9,7 @@
 using namespace PROPOSAL;
 
 Cylinder::Cylinder()
-    : Geometry("Cylinder")
+    : Geometry((std::string)("Cylinder"))
     , radius_(0.0)
     , inner_radius_(0.0)
     , z_(0.0)
@@ -41,6 +41,22 @@ Cylinder::Cylinder(const Cylinder& cylinder)
     , z_(cylinder.z_)
 {
     // Nothing to do here
+}
+
+Cylinder::Cylinder(const nlohmann::json& config)
+    : Geometry(config)
+{
+    assert(config["outer_radius"].is_number());
+    assert(config["height"].is_number());
+
+
+    radius_ = config["outer_radius"].get<double>() * 100; // cm
+    inner_radius_ = config.value("inner_radius", 0) * 100; // cm
+    z_ = config["height"].get<double>() * 100; // cm
+
+    assert(inner_radius_>=0);
+    assert(radius_>inner_radius_);
+    assert(z_>0);
 }
 
 // ------------------------------------------------------------------------- //

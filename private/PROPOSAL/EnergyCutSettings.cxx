@@ -1,9 +1,27 @@
 
 #include <sstream>
+#include <stdexcept>
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
+
+namespace PROPOSAL {
+
+std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings)
+{
+    std::stringstream ss;
+    ss << " EnergyCutSettings (" << &cut_settings << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "Ecut: " << cut_settings.ecut_ << std::endl;
+    os << "Vcut: " << cut_settings.vcut_ << std::endl;
+
+    os << Helper::Centered(60, "");
+    return os;
+}
+
+} // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //-------------------------public member functions----------------------------//
@@ -69,6 +87,22 @@ EnergyCutSettings::EnergyCutSettings(const double ecut, const double vcut)
 {
 }
 
+EnergyCutSettings::EnergyCutSettings(const nlohmann::json& config)
+{
+    if(not config.is_object()) throw std::invalid_argument("No json object found.");
+    if(not config.at("e_cut").is_number()) throw std::invalid_argument("No e_cut found.");
+    if(not config.at("v_cut").is_number()) throw std::invalid_argument("No v_cut found.");
+
+    config.at("e_cut").get_to(ecut_);
+    config.at("v_cut").get_to(vcut_);
+
+   if(not (ecut_ > 0 || ecut_ == -1))
+       throw std::logic_error(
+               "e_cut must be larger than zero or can be disabled by set -1");
+   if(not ((vcut_ >= 0 && vcut_ <= 1) || vcut_ == -1))
+       throw std::logic_error( "v is defined between (0, 1)");
+}
+
 //----------------------------------------------------------------------------//
 //-------------------------operators and swap function------------------------//
 //----------------------------------------------------------------------------//
@@ -103,22 +137,6 @@ bool EnergyCutSettings::operator==(const EnergyCutSettings& energyCutSettings) c
 bool EnergyCutSettings::operator!=(const EnergyCutSettings& energyCutSettings) const
 {
     return !(*this == energyCutSettings);
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings)
-{
-    std::stringstream ss;
-    ss << " EnergyCutSettings (" << &cut_settings << ") ";
-    os << Helper::Centered(60, ss.str()) << '\n';
-
-    os << "Ecut: " << cut_settings.ecut_ << std::endl;
-    os << "Vcut: " << cut_settings.vcut_ << std::endl;
-
-    os << Helper::Centered(60, "");
-    return os;
 }
 
 //----------------------------------------------------------------------------//

@@ -33,7 +33,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());;
     EnergyCutSettings ecuts;
     double multiplier = 1.;
 
@@ -65,8 +65,8 @@ TEST(Comparison, Comparison_not_equal)
 {
     ParticleDef mu_def  = MuMinusDef::Get();
     ParticleDef tau_def = TauMinusDef::Get();
-    Water medium_1;
-    Ice medium_2;
+    std::shared_ptr<const Medium> medium_1(Water().create());
+    std::shared_ptr<const Medium> medium_2(Ice().create());
     EnergyCutSettings ecuts_1(500, -1);
     EnergyCutSettings ecuts_2(-1, 0.05);
     double multiplier_1 = 1.;
@@ -95,7 +95,7 @@ TEST(Comparison, Comparison_not_equal)
 TEST(Assignment, Copyconstructor)
 {
     ParticleDef mu_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());;
     EnergyCutSettings ecuts(500, -1);
     double multiplier = 1.;
 
@@ -116,7 +116,7 @@ TEST(Assignment, Copyconstructor2)
 {
 
     ParticleDef mu_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());;
     EnergyCutSettings ecuts(500, -1);
     double multiplier = 1.;
 
@@ -137,14 +137,9 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Ionization, Test_of_dEdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dEdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -164,33 +159,27 @@ TEST(Ionization, Test_of_dEdx)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
         ioniz_def.multiplier        = multiplier;
         ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, *medium, ecuts, ioniz_def);
+        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, medium, ecuts, ioniz_def);
 
         dEdx_new = Ioniz->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
 
-        delete medium;
     }
 }
 
 TEST(Ionization, Test_of_dNdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dNdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -209,34 +198,27 @@ TEST(Ionization, Test_of_dNdx)
     {
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
 
-        ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        ParticleDef particle_def                = getParticleDef(particleName);
+        std::shared_ptr<const Medium> medium    = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
         ioniz_def.multiplier        = multiplier;
         ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, *medium, ecuts, ioniz_def);
+        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, medium, ecuts, ioniz_def);
 
         dNdx_new = Ioniz->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
-
-        delete medium;
     }
 }
 
 TEST(Ionization, Test_of_dNdx_rnd)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dNdx_rnd.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -260,33 +242,27 @@ TEST(Ionization, Test_of_dNdx_rnd)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium    = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
         ioniz_def.multiplier        = multiplier;
         ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, *medium, ecuts, ioniz_def);
+        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, medium, ecuts, ioniz_def);
 
         dNdx_rnd_new = Ioniz->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-        delete medium;
     }
 }
 
 TEST(Ionization, Test_Stochastic_Loss)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_e.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -310,33 +286,27 @@ TEST(Ionization, Test_Stochastic_Loss)
             stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
         ioniz_def.multiplier        = multiplier;
         ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, *medium, ecuts, ioniz_def);
+        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, medium, ecuts, ioniz_def);
 
         stochastic_loss_new = Ioniz->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
-        delete medium;
     }
 }
 
 TEST(Ionization, Test_of_dEdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dEdx_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -358,7 +328,7 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
@@ -366,26 +336,20 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
         ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
-                particle_def, *medium, ecuts, ioniz_def, InterpolDef);
+                particle_def, medium, ecuts, ioniz_def, InterpolDef);
 
         dEdx_new = Ioniz->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
 
-        delete medium;
     }
 }
 
 TEST(Ionization, Test_of_dNdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dNdx_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -407,7 +371,7 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
@@ -415,26 +379,19 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
         ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
-                particle_def, *medium, ecuts, ioniz_def, InterpolDef);
+                particle_def, medium, ecuts, ioniz_def, InterpolDef);
 
         dNdx_new = Ioniz->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
-
-        delete medium;
     }
 }
 
 TEST(Ionization, Test_of_dNdxrnd_interpol)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_dNdx_rnd_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -460,7 +417,7 @@ TEST(Ionization, Test_of_dNdxrnd_interpol)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
@@ -468,26 +425,20 @@ TEST(Ionization, Test_of_dNdxrnd_interpol)
         ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
-                particle_def, *medium, ecuts, ioniz_def, InterpolDef);
+                particle_def, medium, ecuts, ioniz_def, InterpolDef);
 
         dNdx_rnd_new = Ioniz->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-        delete medium;
     }
 }
 
 TEST(Ionization, Test_of_e_interpol)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Ioniz_e_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -513,7 +464,7 @@ TEST(Ionization, Test_of_e_interpol)
             stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         IonizationFactory::Definition ioniz_def;
@@ -521,13 +472,12 @@ TEST(Ionization, Test_of_e_interpol)
         ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
-                particle_def, *medium, ecuts, ioniz_def, InterpolDef);
+                particle_def, medium, ecuts, ioniz_def, InterpolDef);
 
         stochastic_loss_new = Ioniz->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
-        delete medium;
     }
 }
 

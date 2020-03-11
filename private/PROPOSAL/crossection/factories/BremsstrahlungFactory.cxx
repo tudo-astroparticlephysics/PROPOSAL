@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <stdexcept>
 
 #include "PROPOSAL/crossection/BremsIntegral.h"
 #include "PROPOSAL/crossection/BremsInterpolant.h"
@@ -53,39 +54,30 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
                                                           const Definition& def,
                                                           std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
-    if(def.parametrization == BremsstrahlungFactory::Enum::None){
-        log_fatal("Can't return Bremsstrahlung Crosssection if parametrization is None");
-        return NULL;
-    }
 
     BremsstrahlungMapEnum::const_iterator it = bremsstrahlung_map_enum_.find(def.parametrization);
 
     if (it != bremsstrahlung_map_enum_.end())
     {
-        if(interpolation_def == nullptr){
-            return new BremsIntegral(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts);
-        }
-        else{
+        if(interpolation_def)
             return new BremsInterpolant(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts,
                                         interpolation_def);
-        }
-    } else
-    {
-        log_fatal("Bremsstrahlung %s not registered!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
+
+        return new BremsIntegral(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts);
     }
+
+    std::invalid_argument("Bremsstrahlung not registered!");
 }
 
 CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const Bremsstrahlung& param,
                                                           std::shared_ptr<const EnergyCutSettings> cuts,
                                                           std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
-    if(interpolation_def==nullptr){
-        return new BremsIntegral(param, cuts);
-    }
-    else{
+    if(interpolation_def){
         return new BremsInterpolant(param, cuts, interpolation_def);
     }
+
+    return new BremsIntegral(param, cuts);
 }
 
 // ------------------------------------------------------------------------- //

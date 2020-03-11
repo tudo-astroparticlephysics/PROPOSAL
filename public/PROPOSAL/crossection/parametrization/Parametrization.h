@@ -41,8 +41,6 @@ namespace Components {
 class Component;
 }
 
-class Medium;
-
 class Parametrization
 {
 public:

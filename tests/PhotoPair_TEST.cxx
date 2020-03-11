@@ -29,7 +29,7 @@ ParticleDef getParticleDef(const std::string& name)
 TEST(Comparison, Comparison_equal)
 {
 ParticleDef particle_def = GammaDef::Get();
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 double multiplier   = 1.;
 
 PhotoPairProduction* PhotoPair_A = new PhotoPairTsai(particle_def, medium, multiplier);
@@ -62,7 +62,7 @@ delete Interpol_B;
 TEST(Comparison, Comparison_equal_PhotoAngleDistribution)
 {
 ParticleDef particle_def = GammaDef::Get(); //particle
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());;
 
 PhotoAngleDistribution* PhotoAngle_A = new PhotoAngleNoDeflection(particle_def, medium);
 PhotoAngleNoDeflection* PhotoAngle_B = new PhotoAngleNoDeflection(particle_def, medium);
@@ -80,8 +80,8 @@ TEST(Comparison, Comparison_not_equal)
 {
 ParticleDef photon  = GammaDef::Get();
 ParticleDef mu_def  = MuMinusDef::Get(); //makes no physical sense but programmatically possible
-Water medium_1;
-Ice medium_2;
+std::shared_ptr<const Medium> medium_1(Water().create());;
+std::shared_ptr<const Medium> medium_2(Ice().create());;
 double multiplier_1 = 1.;
 double multiplier_2 = 2.;
 PhotoAngleNoDeflection const PhotoAngle_1(photon, medium_1);
@@ -127,8 +127,8 @@ TEST(Comparison, Comparison_not_equal_PhotoAngleDistribution)
 {
 ParticleDef photon  = GammaDef::Get();
 ParticleDef mu_def  = MuMinusDef::Get(); //makes no physical sense but programmatically possible
-Water medium_1;
-Ice medium_2;
+std::shared_ptr<const Medium> medium_1(Water().create());
+std::shared_ptr<const Medium> medium_2(Ice().create());
 
 PhotoAngleNoDeflection PhotoPair_A(photon, medium_1);
 PhotoAngleNoDeflection PhotoPair_B(photon, medium_2);
@@ -156,7 +156,7 @@ EXPECT_TRUE(*PhotoAngle_J != *PhotoAngle_K);
 TEST(Assignment, Copyconstructor)
 {
 ParticleDef particle_def = GammaDef::Get();
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 double multiplier = 1.;
 
 PhotoPairTsai PhotoPair_A(particle_def, medium, multiplier);
@@ -178,7 +178,7 @@ EXPECT_TRUE(PhotoPairInterpol_A == PhotoPairInterpol_B);
 TEST(Assignment, Copyconstructor_PhotoAngleDistribution)
 {
 ParticleDef particle_def = GammaDef::Get();
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());;
 
 PhotoAngleNoDeflection PhotoAngle_A(particle_def, medium);
 PhotoAngleNoDeflection PhotoAngle_B = PhotoAngle_A;
@@ -195,14 +195,9 @@ EXPECT_TRUE(PhotoAngle_E == PhotoAngle_F);
 
 TEST(PhotoPair, Test_of_dNdx)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/PhotoPair_dNdx.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -219,34 +214,28 @@ while (in.good())
 {
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
 
-ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+ParticleDef particle_def             = getParticleDef(particleName);
+std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
 
 PhotoPairFactory::Definition photopair_def;
 photopair_def.multiplier      = multiplier;
 photopair_def.parametrization = PhotoPairFactory::Get().GetEnumFromString(parametrization);
 photopair_def.photoangle = PhotoPairFactory::PhotoAngle::PhotoAngleNoDeflection;
 
-CrossSection* photopair = PhotoPairFactory::Get().CreatePhotoPair(particle_def, *medium, photopair_def);
+CrossSection* photopair = PhotoPairFactory::Get().CreatePhotoPair(particle_def, medium, photopair_def);
 dNdx_new = photopair->CalculatedNdx(energy);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
-delete medium;
 delete photopair;
 }
 }
 
 TEST(PhotoPair, Test_of_dNdx_rnd)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/PhotoPair_dNdx_rnd.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -267,34 +256,28 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
 
 PhotoPairFactory::Definition photopair_def;
 photopair_def.multiplier      = multiplier;
 photopair_def.parametrization = PhotoPairFactory::Get().GetEnumFromString(parametrization);
 photopair_def.photoangle = PhotoPairFactory::PhotoAngle::PhotoAngleNoDeflection;
 
-CrossSection* photopair = PhotoPairFactory::Get().CreatePhotoPair(particle_def, *medium, photopair_def);
+CrossSection* photopair = PhotoPairFactory::Get().CreatePhotoPair(particle_def, medium, photopair_def);
 
 dNdx_rnd_new = photopair->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-delete medium;
 delete photopair;
 }
 }
 
 TEST(PhotoPair, Test_of_dNdx_Interpolant)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/PhotoPair_dNdx_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -314,34 +297,28 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
 
 PhotoPairFactory::Definition photopair_def;
 photopair_def.multiplier      = multiplier;
 photopair_def.parametrization = PhotoPairFactory::Get().GetEnumFromString(parametrization);
 photopair_def.photoangle = PhotoPairFactory::PhotoAngle::PhotoAngleNoDeflection;
 
-CrossSection* photopair = PhotoPairFactory::Get().CreatePhotoPair(particle_def, *medium, photopair_def, InterpolDef);
+CrossSection* photopair = PhotoPairFactory::Get().CreatePhotoPair(particle_def, medium, photopair_def, InterpolDef);
 
 dNdx_new = photopair->CalculatedNdx(energy);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
-delete medium;
 delete photopair;
 }
 }
 
 TEST(PhotoPair, Test_of_dNdxrnd_interpol)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/PhotoPair_dNdx_rnd_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -364,20 +341,19 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
 
 PhotoPairFactory::Definition photopair_def;
 photopair_def.multiplier      = multiplier;
 photopair_def.parametrization = PhotoPairFactory::Get().GetEnumFromString(parametrization);
 photopair_def.photoangle = PhotoPairFactory::PhotoAngle::PhotoAngleNoDeflection;
 
-CrossSection* photopair = PhotoPairFactory::Get().CreatePhotoPair(particle_def, *medium, photopair_def, InterpolDef);
+CrossSection* photopair = PhotoPairFactory::Get().CreatePhotoPair(particle_def, medium, photopair_def, InterpolDef);
 
 dNdx_rnd_new = photopair->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-delete medium;
 delete photopair;
 }
 }

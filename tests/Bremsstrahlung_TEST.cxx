@@ -36,7 +36,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());
     EnergyCutSettings ecuts;
     double multiplier = 1.;
     bool lpm          = true;
@@ -70,8 +70,8 @@ TEST(Comparison, Comparison_not_equal)
 {
     ParticleDef mu_def  = MuMinusDef::Get();
     ParticleDef tau_def = TauMinusDef::Get();
-    Water medium_1;
-    Ice medium_2;
+    std::shared_ptr<const Medium> medium_1(Water().create());
+    std::shared_ptr<const Medium> medium_2(Ice().create());
     EnergyCutSettings ecuts_1(500, -1);
     EnergyCutSettings ecuts_2(-1, 0.05);
     double multiplier_1 = 1.;
@@ -114,7 +114,7 @@ TEST(Comparison, Comparison_not_equal)
 TEST(Assignment, Copyconstructor)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());
     EnergyCutSettings ecuts;
     double multiplier = 1.;
     bool lpm          = true;
@@ -136,7 +136,7 @@ TEST(Assignment, Copyconstructor)
 TEST(Assignment, Copyconstructor2)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());
     EnergyCutSettings ecuts;
     double multiplier = 1.;
     bool lpm          = true;
@@ -159,14 +159,9 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Bremsstrahlung, Test_of_dEdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dEdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -190,7 +185,7 @@ TEST(Bremsstrahlung, Test_of_dEdx)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -199,27 +194,21 @@ TEST(Bremsstrahlung, Test_of_dEdx)
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Brems =
-            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def);
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, medium, ecuts, brems_def);
 
         dEdx_new = Brems->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
 
-        delete medium;
         delete Brems;
     }
 }
 
 TEST(Bremsstrahlung, Test_of_dNdx)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dNdx.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -243,7 +232,7 @@ TEST(Bremsstrahlung, Test_of_dNdx)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -252,27 +241,21 @@ TEST(Bremsstrahlung, Test_of_dNdx)
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Brems =
-            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def);
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, medium, ecuts, brems_def);
 
         dNdx_new = Brems->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Brems;
     }
 }
 
 TEST(Bremsstrahlung, Test_of_dNdx_rnd)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dNdx_rnd.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -299,7 +282,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -308,27 +291,21 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd)
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Brems =
-            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def);
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, medium, ecuts, brems_def);
 
         dNdx_new = Brems->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Brems;
     }
 }
 
 TEST(Bremsstrahlung, Test_of_e)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_e.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -355,7 +332,7 @@ TEST(Bremsstrahlung, Test_of_e)
             stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -364,27 +341,21 @@ TEST(Bremsstrahlung, Test_of_e)
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Brems =
-            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def);
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, medium, ecuts, brems_def);
 
         stochastic_loss_new = Brems->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
 
-        delete medium;
         delete Brems;
     }
 }
 
 TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dEdx_interpol.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -409,7 +380,7 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -418,27 +389,22 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Brems =
-            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def, InterpolDef);
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, medium, ecuts, brems_def, InterpolDef);
 
         dEdx_new = Brems->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
 
-        delete medium;
         delete Brems;
     }
 }
 
 TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dNdx_interpol.txt";
-    in.open(filename.c_str());
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
 
     std::string particleName;
     std::string mediumName;
@@ -460,7 +426,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -469,27 +435,22 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Brems =
-            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def, InterpolDef);
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, medium, ecuts, brems_def, InterpolDef);
 
         dNdx_new = Brems->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Brems;
     }
 }
 
 TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_dNdx_rnd_interpol.txt";
-    in.open(filename.c_str());
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -517,7 +478,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
             parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -526,27 +487,22 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Brems =
-            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def, InterpolDef);
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, medium, ecuts, brems_def, InterpolDef);
 
         dNdx_new = Brems->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
-        delete medium;
         delete Brems;
     }
 }
 
 TEST(Bremsstrahlung, Test_of_e_Interpolant)
 {
-    std::ifstream in;
     std::string filename = testfile_dir + "Brems_e_interpol.txt";
-    in.open(filename.c_str());
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
 
     char firstLine[256];
     in.getline(firstLine, 256);
@@ -574,7 +530,7 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
             stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
@@ -583,13 +539,12 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
         CrossSection* Brems =
-            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def, InterpolDef);
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, medium, ecuts, brems_def, InterpolDef);
 
         stochastic_loss_new = Brems->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
 
-        delete medium;
         delete Brems;
     }
 }

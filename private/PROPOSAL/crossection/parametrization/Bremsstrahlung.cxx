@@ -146,7 +146,7 @@ double Bremsstrahlung::lpm(double energy, double v)
 
         double sum = 0;
 
-        // high energy for the calculation of the radiation length, which 
+        // high energy for the calculation of the radiation length, which
         // converges for high energie against a fixed value.
         double upper_energy = 1e14;
 

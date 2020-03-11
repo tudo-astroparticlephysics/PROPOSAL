@@ -121,7 +121,7 @@ namespace PROPOSAL {
 
         // Getter
         const ParticleDef& GetParticleDef() const { return particle_def_; }
-        const Medium& GetMedium() const { return *medium_; }
+        std::shared_ptr<const Medium> GetMedium() const { return medium_; }
 
         virtual const std::string& GetName() const = 0;
         virtual size_t GetHash() const = 0;

@@ -12,8 +12,8 @@ TEST(Comparison, Comparison_equal)
 {
     Sector::Definition sector_def;
     sector_def.location = Sector::ParticleLocation::InsideDetector;
-    sector_def.SetMedium(Water());
-    sector_def.SetGeometry(Sphere());
+    sector_def.SetMedium(std::make_shared<Medium>(Water()));
+    sector_def.SetGeometry(Sphere().create());
     sector_def.scattering_model            = ScatteringFactory::Moliere;
     sector_def.cut_settings                = EnergyCutSettings();
     sector_def.do_continuous_randomization = true;
@@ -21,8 +21,8 @@ TEST(Comparison, Comparison_equal)
     std::vector<Sector::Definition> sec_defs;
     sec_defs.push_back(sector_def);
 
-    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere());
-    Propagator prop_b(MuMinusDef::Get(), sec_defs, Sphere());
+    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere().create());
+    Propagator prop_b(MuMinusDef::Get(), sec_defs, Sphere().create());
 
     EXPECT_TRUE(prop_a == prop_b);
 }
@@ -31,8 +31,8 @@ TEST(Comparison, Comparison_not_equal)
 {
     Sector::Definition sector_def;
     sector_def.location = Sector::ParticleLocation::InsideDetector;
-    sector_def.SetMedium(Water());
-    sector_def.SetGeometry(Sphere());
+    sector_def.SetMedium(std::make_shared<Medium>(Water()));
+    sector_def.SetGeometry(Sphere().create());
     sector_def.scattering_model            = ScatteringFactory::Moliere;
     sector_def.cut_settings                = EnergyCutSettings();
     sector_def.do_continuous_randomization = true;
@@ -40,13 +40,13 @@ TEST(Comparison, Comparison_not_equal)
     std::vector<Sector::Definition> sec_defs;
     sec_defs.push_back(sector_def);
 
-    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere());
-    Propagator prop_b(TauMinusDef::Get(), sec_defs, Sphere());
+    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere().create());
+    Propagator prop_b(TauMinusDef::Get(), sec_defs, Sphere().create());
 
     EXPECT_TRUE(prop_a != prop_b);
 
-    Propagator prop_c(MuMinusDef::Get(), sec_defs, Sphere());
-    Propagator prop_d(MuMinusDef::Get(), sec_defs, Box());
+    Propagator prop_c(MuMinusDef::Get(), sec_defs, Sphere().create());
+    Propagator prop_d(MuMinusDef::Get(), sec_defs, Box().create());
 
     EXPECT_TRUE(prop_c != prop_d);
 
@@ -54,16 +54,16 @@ TEST(Comparison, Comparison_not_equal)
     sec_defs_diff_1.push_back(sector_def);
     sec_defs_diff_1.push_back(sector_def);
 
-    Propagator prop_e(MuMinusDef::Get(), sec_defs, Sphere());
-    Propagator prop_f(MuMinusDef::Get(), sec_defs_diff_1, Sphere());
+    Propagator prop_e(MuMinusDef::Get(), sec_defs, Sphere().create());
+    Propagator prop_f(MuMinusDef::Get(), sec_defs_diff_1, Sphere().create());
 
     EXPECT_TRUE(prop_e != prop_f);
 
     // Sector defs differ by the medium
     Sector::Definition sector_def_2;
     sector_def_2.location = Sector::ParticleLocation::InsideDetector;
-    sector_def_2.SetMedium(Ice());
-    sector_def_2.SetGeometry(Sphere());
+    sector_def_2.SetMedium(std::make_shared<Medium>(Ice()));
+    sector_def_2.SetGeometry(Sphere().create());
     sector_def_2.scattering_model            = ScatteringFactory::Moliere;
     sector_def_2.cut_settings                = EnergyCutSettings();
     sector_def_2.do_continuous_randomization = true;
@@ -71,8 +71,8 @@ TEST(Comparison, Comparison_not_equal)
     std::vector<Sector::Definition> sec_defs_diff_2;
     sec_defs_diff_2.push_back(sector_def_2);
 
-    Propagator prop_g(MuMinusDef::Get(), sec_defs, Sphere());
-    Propagator prop_h(MuMinusDef::Get(), sec_defs_diff_2, Sphere());
+    Propagator prop_g(MuMinusDef::Get(), sec_defs, Sphere().create());
+    Propagator prop_h(MuMinusDef::Get(), sec_defs_diff_2, Sphere().create());
 
     EXPECT_TRUE(prop_g != prop_h);
 }
@@ -81,8 +81,8 @@ TEST(Assignment, Copyconstructor)
 {
     Sector::Definition sector_def;
     sector_def.location = Sector::ParticleLocation::InsideDetector;
-    sector_def.SetMedium(Water());
-    sector_def.SetGeometry(Sphere());
+    sector_def.SetMedium(std::make_shared<Medium>(Water()));
+    sector_def.SetGeometry(Sphere().create());
     sector_def.scattering_model            = ScatteringFactory::Moliere;
     sector_def.cut_settings                = EnergyCutSettings();
     sector_def.do_continuous_randomization = true;
@@ -90,7 +90,7 @@ TEST(Assignment, Copyconstructor)
     std::vector<Sector::Definition> sec_defs;
     sec_defs.push_back(sector_def);
 
-    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere());
+    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere().create());
     Propagator prop_b = prop_a;
 
     EXPECT_TRUE(prop_a == prop_b);
@@ -100,8 +100,8 @@ TEST(Assignment, Copyconstructor2)
 {
     Sector::Definition sector_def;
     sector_def.location = Sector::ParticleLocation::InsideDetector;
-    sector_def.SetMedium(Water());
-    sector_def.SetGeometry(Sphere());
+    sector_def.SetMedium(std::make_shared<Medium>(Water()));
+    sector_def.SetGeometry(Sphere().create());
     sector_def.scattering_model            = ScatteringFactory::Moliere;
     sector_def.cut_settings                = EnergyCutSettings();
     sector_def.do_continuous_randomization = true;
@@ -109,7 +109,7 @@ TEST(Assignment, Copyconstructor2)
     std::vector<Sector::Definition> sec_defs;
     sec_defs.push_back(sector_def);
 
-    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere());
+    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere().create());
     Propagator prop_b(prop_a);
 
     EXPECT_TRUE(prop_a == prop_b);
@@ -142,7 +142,6 @@ TEST(Propagation, Test_nan)
         // Using propagator service
         // ----------------------------------------------------------------- //
 
-        std::cout << i << std::endl;
         // Set particle properties
         mu.SetEnergy(std::pow(10, EmaxLog10));
         mu.SetPropagatedDistance(0);
@@ -155,9 +154,7 @@ TEST(Propagation, Test_nan)
         tau.SetDirection(Vector3D(0, 0, -1));
 
         // Use service to propagate different particle
-        std::cout << "Muon" << std::endl;
         Secondaries sec_mu  = prop_service.Propagate(mu_def, mu);
-        std::cout << "Tau" << std::endl;
         Secondaries sec_tau = prop_service.Propagate(tau_def, tau);
 
         // ----------------------------------------------------------------- //
@@ -178,14 +175,9 @@ TEST(Propagation, Test_nan)
 
 TEST(Propagation, particle_type)
 {
-    std::ifstream in;
     std::string filename = "bin/TestFiles/Propagator_propagation.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     // Just skip the header
     char firstLine[256];
@@ -227,41 +219,12 @@ TEST(Propagation, particle_type)
 
     for (int i = 0; i < statistic; ++i)
     {
-        mu.SetEnergy(energy);
-        mu.SetPropagatedDistance(0);
-        mu.SetPosition(Vector3D(0, 0, 0));
-        mu.SetDirection(Vector3D(0, 0, -1));
-
         std::vector<DynamicData> sec_mu_direct = prop_mu.Propagate(mu).GetSecondaries();
 
         std::string name_new = "";
 
         for (unsigned int j = 0; j < sec_mu_direct.size(); ++j)
         {
-            // if (sec_mu_direct[j].GetTypeId() == DynamicData::Particle)
-            // {
-            //     Particle* particle = dynamic_cast<Particle*>(sec_mu_direct[j]);
-            //     name_new           = particle->GetName();
-            // } else
-            // {
-            //     switch (sec_mu_direct[j].GetTypeId())
-            //     {
-            //         case DynamicData::Brems:
-            //             name_new = "Brems";
-            //             break;
-            //         case DynamicData::Epair:
-            //             name_new = "Epair";
-            //             break;
-            //         case DynamicData::NuclInt:
-            //             name_new = "NuclInt";
-            //             break;
-            //         case DynamicData::DeltaE:
-            //             name_new = "DeltaE";
-            //             break;
-            //         default:
-            //             break;
-            //     }
-            // }
             name_new = sec_mu_direct[j].GetName();
 
             in >> name >> length >> sec_energy >> x >> y >> z >> dx >> dy >> dz;

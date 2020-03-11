@@ -11,30 +11,25 @@ using namespace PROPOSAL;
 
 TEST(Comparison, Comparison_equal)
 {
-    Medium* A = new AntaresWater(0.3);
-    Medium* B = new AntaresWater(0.3);
+    std::unique_ptr<Medium> A(new AntaresWater(0.3));
+    std::unique_ptr<Medium> B(new AntaresWater(0.3));
     EXPECT_TRUE(*A == *B);
 
     Components::Oxygen a;
     Components::Oxygen b;
     EXPECT_TRUE(a == b);
 
-    Medium* C = new Water();
+    std::unique_ptr<Medium> C(new Water());
     Water D;
     EXPECT_TRUE(D == *C);
 
-    Medium* E = MediumFactory::Get().CreateMedium("IcE");
+    std::shared_ptr<const Medium> E = CreateMedium("IcE");
     Ice F;
     EXPECT_TRUE(F == *E);
 
     Water G;
     Water H;
     EXPECT_TRUE(G == H);
-
-    delete A;
-    delete B;
-    delete C;
-    delete E;
 }
 
 TEST(Comparison, Comparison_not_equal)
@@ -43,39 +38,28 @@ TEST(Comparison, Comparison_not_equal)
     AntaresWater B(0.3);
     EXPECT_TRUE(A != B);
 
-    Medium* C = new AntaresWater(0.3);
-    Medium* D = new Ice(0.3);
+    std::unique_ptr<Medium> C(new AntaresWater(0.3));
+    std::unique_ptr<Medium> D(new Ice(0.3));
     EXPECT_TRUE(*C != *D);
 
-    Medium* E = new Water(0.3);
-    Medium* F = new Water(1.0);
+    std::unique_ptr<Medium> E(new Water(0.3));
+    std::unique_ptr<Medium> F(new Water(1.0));
     EXPECT_TRUE(*E != *F);
 
-    Medium* G = MediumFactory::Get().CreateMedium("WaTeR");
+    std::shared_ptr<const Medium> G = CreateMedium("WaTeR");
     EXPECT_TRUE(*E != *G);
 
     Components::Hydrogen a;
     Components::Oxygen b;
     EXPECT_TRUE(a != b);
 
-    Components::Component* c = new Components::Oxygen();
-    Components::Component* d = new Components::Oxygen(2.0);
-    EXPECT_TRUE(c != d);
+    std::unique_ptr<Components::Component> c(new Components::Oxygen());
+    std::unique_ptr<Components::Component> d(new Components::Oxygen(2.0));
+    EXPECT_TRUE(*c != *d);
 
-    Components::Component* e = new Components::Magnesium();
-    Components::Component* f = new Components::Iron();
-    EXPECT_TRUE(e != f);
-
-    delete c;
-    delete d;
-    delete e;
-    delete f;
-
-    delete C;
-    delete D;
-    delete E;
-    delete F;
-    delete G;
+    std::unique_ptr<Components::Component> e(new Components::Magnesium());
+    std::unique_ptr<Components::Component> f(new Components::Iron());
+    EXPECT_TRUE(*e != *f);
 }
 
 TEST(Assignment, Copyconstructor)
@@ -99,8 +83,8 @@ TEST(Assignment, AssignmentOperator)
 
     EXPECT_TRUE(a == b);
 
-    Components::Component* c = new Components::Hydrogen();
-    Components::Component* d = new Components::Hydrogen(2.0);
+    std::unique_ptr<Components::Component> c(new Components::Hydrogen());
+    std::unique_ptr<Components::Component> d(new Components::Hydrogen(2.0));
     *c                       = *d;
 
     EXPECT_TRUE(*c == *d);
@@ -111,22 +95,17 @@ TEST(Assignment, AssignmentOperator)
 
     EXPECT_TRUE(A == B);
 
-    Medium* C = new Water();
-    Medium* D = new Water(2.0);
+    std::unique_ptr<Medium> C(new Water());
+    std::unique_ptr<Medium> D(new Water(2.0));
     *D        = *C;
 
     EXPECT_TRUE(*D == *C);
 
-    Medium* E = new Water();
-    Medium* F = new Ice();
+    std::unique_ptr<Medium> E(new Water());
+    std::unique_ptr<Medium> F(new Ice());
     *E        = *F;
 
     EXPECT_TRUE(*E != *F);
-
-    delete c;
-    delete d;
-    delete C;
-    delete D;
 }
 
 TEST(Assignment, Copyconstructor2)
@@ -172,7 +151,7 @@ TEST(Density_distr, Evaluate)
     double corr_faktor = 1.0;
     Density_homogeneous dens_hom(corr_faktor);
     A.SetDensityDistribution(dens_hom);
-    B.SetDensityDistribution(dens_hom); 
+    B.SetDensityDistribution(dens_hom);
 
     Vector3D test_point (2,1,0);
 

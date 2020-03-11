@@ -141,4 +141,3 @@ double WeakCooperSarkarMertsch::DifferentialCrossSection(double energy, double v
 
 
 const std::string WeakCooperSarkarMertsch::name_ = "WeakCooperSarkarMertsch";
-

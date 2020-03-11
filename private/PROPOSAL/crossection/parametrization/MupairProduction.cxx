@@ -218,7 +218,7 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v
     aux1    *= std::log(1 + xi);
     aux2    = -1 - 3 * r2 + beta * (1 - 2 * r2);
 
-    phi     = aux + aux1 + aux2; 
+    phi     = aux + aux1 + aux2;
 
     //X Calculation (22)
     Y       = 12 * std::sqrt(MMU / energy); //(21)

@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <stdexcept>
 
 #include "PROPOSAL/crossection/MupairIntegral.h"
 #include "PROPOSAL/crossection/MupairInterpolant.h"
@@ -37,38 +38,26 @@ CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef&
                                                             const Definition& def,
                                                             std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
-    if(def.parametrization == MupairProductionFactory::Enum::None){
-        log_fatal("Can't return MuPairproduction Crosssection if parametrization is None");
-        return NULL;
-    }
-
     MupairMapEnum::const_iterator it = mupair_map_enum_.find(def.parametrization);
 
     if (it != mupair_map_enum_.end())
     {
-        if(interpolation_def==nullptr){
-            return new MupairIntegral(*it->second.first(particle_def, medium, def.multiplier), cuts);
-        }
-        else{
+        if(interpolation_def){
             return new MupairInterpolant(*it->second.second(particle_def, medium, def.multiplier, interpolation_def), cuts, interpolation_def);
         }
-    } else
-    {
-        log_fatal("MupairProduction %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
+            return new MupairIntegral(*it->second.first(particle_def, medium, def.multiplier), cuts);
     }
+    std::invalid_argument("MupairProduction not registerd!");
 }
 
 CrossSection* MupairProductionFactory::CreateMupairProduction(const MupairProduction& parametrization,
                                                               std::shared_ptr<const EnergyCutSettings> cuts,
                                                               std::shared_ptr<const InterpolationDef> interpolation_def=nullptr) const
 {
-    if(interpolation_def==nullptr){
-        return new MupairIntegral(parametrization, cuts);
-    }
-    else{
+    if(interpolation_def){
         return new MupairInterpolant(parametrization, cuts, interpolation_def);
     }
+        return new MupairIntegral(parametrization, cuts);
 }
 
 // ------------------------------------------------------------------------- //

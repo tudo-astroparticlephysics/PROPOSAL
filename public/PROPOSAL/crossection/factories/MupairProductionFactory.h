@@ -30,7 +30,7 @@
 #pragma once
 
 #include <functional>
-#include <iostream>
+#include <memory>
 #include <sstream>
 
 #include "PROPOSAL/methods.h"

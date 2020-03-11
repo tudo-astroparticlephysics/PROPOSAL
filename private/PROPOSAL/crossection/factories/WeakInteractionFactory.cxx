@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <stdexcept>
 
 #include "PROPOSAL/crossection/WeakIntegral.h"
 #include "PROPOSAL/crossection/WeakInterpolant.h"
@@ -11,11 +12,12 @@
 using namespace PROPOSAL;
 
 WeakInteractionFactory::WeakInteractionFactory()
-        : weak_map_str_()
-        , weak_map_enum_()
-        , string_enum_()
+    : weak_map_str_()
+    , weak_map_enum_()
+    , string_enum_()
 {
-    Register("weakcoopersarkarmertsch", CooperSarkarMertsch, &WeakCooperSarkarMertsch::create);
+    Register("weakcoopersarkarmertsch", CooperSarkarMertsch,
+        &WeakCooperSarkarMertsch::create);
     Register("none", None, nullptr);
 }
 
@@ -31,82 +33,70 @@ WeakInteractionFactory::~WeakInteractionFactory()
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& particle_def,
-                                                            std::shared_ptr<const Medium> medium,
-                                                            const Definition& def,
-                                                            std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+CrossSection* WeakInteractionFactory::CreateWeakInteraction(
+    const ParticleDef& particle_def, std::shared_ptr<const Medium> medium,
+    const Definition& def,
+    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
-    if(def.parametrization == WeakInteractionFactory::Enum::None){
-        log_fatal("Can't return Weakinteraction Crosssection if parametrization is None");
-        return NULL;
-    }
-
     WeakMapEnum::const_iterator it = weak_map_enum_.find(def.parametrization);
 
-    if (it != weak_map_enum_.end())
-    {
-        if(interpolation_def == nullptr){
-            return new WeakIntegral(*it->second(particle_def, medium, def.multiplier));
+    if (it != weak_map_enum_.end()) {
+        if (interpolation_def) {
+            return new WeakInterpolant(
+                *it->second(particle_def, medium, def.multiplier),
+                interpolation_def);
         }
-        else{
-            return new WeakInterpolant(*it->second(particle_def, medium, def.multiplier), interpolation_def);
-        }
-    } else
-    {
-        log_fatal("WeakInteraction %s not registered!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warnings
+        return new WeakIntegral(
+            *it->second(particle_def, medium, def.multiplier));
     }
+    std::invalid_argument("WeakInteraction not registered!");
 }
 
-CrossSection* WeakInteractionFactory::CreateWeakInteraction(const WeakInteraction& parametrization,
-                                                            std::shared_ptr<const InterpolationDef> interpolation_def=nullptr) const
+CrossSection* WeakInteractionFactory::CreateWeakInteraction(
+    const WeakInteraction& parametrization,
+    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
-    if(interpolation_def==nullptr){
-        return new WeakIntegral(parametrization);
-    }
-    else{
+    if (interpolation_def) {
         return new WeakInterpolant(parametrization, interpolation_def);
     }
+    return new WeakIntegral(parametrization);
 }
 
 // ------------------------------------------------------------------------- //
-void WeakInteractionFactory::Register(const std::string& name,
-                                      Enum enum_t,
-                                      RegisterFunction create)
+void WeakInteractionFactory::Register(
+    const std::string& name, Enum enum_t, RegisterFunction create)
 {
-    weak_map_str_[name]    = create;
+    weak_map_str_[name] = create;
     weak_map_enum_[enum_t] = create;
     string_enum_.insert(name, enum_t);
 }
 
 // ------------------------------------------------------------------------- //
-WeakInteractionFactory::Enum WeakInteractionFactory::GetEnumFromString(const std::string& name)
+WeakInteractionFactory::Enum WeakInteractionFactory::GetEnumFromString(
+    const std::string& name)
 {
     std::string name_lower = name;
     std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
 
     auto& left = string_enum_.GetLeft();
     auto it = left.find(name_lower);
-    if (it != left.end())
-    {
+    if (it != left.end()) {
         return it->second;
-    } else
-    {
+    } else {
         log_fatal("WeakInteraction %s not registered!", name.c_str());
         return Fail; // Just to prevent warnings
     }
 }
 
 // ------------------------------------------------------------------------- //
-std::string WeakInteractionFactory::GetStringFromEnum(const WeakInteractionFactory::Enum& enum_t)
+std::string WeakInteractionFactory::GetStringFromEnum(
+    const WeakInteractionFactory::Enum& enum_t)
 {
     auto& right = string_enum_.GetRight();
     auto it = right.find(enum_t);
-    if (it != right.end())
-    {
+    if (it != right.end()) {
         return it->second;
-    } else
-    {
+    } else {
         log_fatal("WeakInteraction %s not registered!", typeid(enum_t).name());
         return ""; // Just to prevent warnings
     }

@@ -33,7 +33,7 @@
 
 #include <map>
 #include <string>
-#include <iostream>
+#include <memory>
 #include <sstream>
 
 #include "PROPOSAL/methods.h"

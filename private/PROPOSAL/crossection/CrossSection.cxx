@@ -60,8 +60,8 @@ bool CrossSection::operator!=(const CrossSection& cross_section) const
     return !(*this == cross_section);
 }
 
-// ------------------------------------------------------------------------- //
-std::ostream& PROPOSAL::operator<<(std::ostream& os, CrossSection const& cross)
+namespace PROPOSAL {
+std::ostream& operator<<(std::ostream& os, CrossSection const& cross)
 {
     std::stringstream ss;
     ss << " CrossSection (" << &cross << ") ";
@@ -72,6 +72,7 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, CrossSection const& cross)
     os << Helper::Centered(80, "");
     return os;
 }
+} // namespace PROPOSAL
 
 double CrossSection::GetEnergyCut(double energy){
     Parametrization::KinematicLimits physical_limits = parametrization_->GetKinematicLimits(energy);

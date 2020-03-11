@@ -91,4 +91,3 @@ double AnnihilationHeitler::DifferentialCrossSection(double energy, double v)
 
 
 const std::string AnnihilationHeitler::name_ = "AnnihilationHeitler";
-

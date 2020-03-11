@@ -81,8 +81,8 @@ bool DecayTable::operator!=(const DecayTable& def) const
     return !(*this == def);
 }
 
-// ------------------------------------------------------------------------- //
-std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayTable const& table)
+namespace PROPOSAL {
+std::ostream& operator<<(std::ostream& os, DecayTable const& table)
 {
     std::stringstream ss;
     ss << " DecayTable (" << &table << ") ";
@@ -101,9 +101,8 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayTable const& table)
     os << Helper::Centered(60, "");
     return os;
 }
-// ------------------------------------------------------------------------- //
-// Methods
-// ------------------------------------------------------------------------- //
+
+} // namespace PROPOSAL
 
 // ------------------------------------------------------------------------- //
 DecayChannel& DecayTable::SelectChannel(double rnd) const

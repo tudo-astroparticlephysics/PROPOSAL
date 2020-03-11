@@ -135,14 +135,9 @@ TEST(Assignment, Copyconstructor)
 }
 
 TEST(DecaySpectrum, MuMinus_Rest){
-    std::ifstream in;
     std::string filename = testfile_dir + "Decay_MuMinus_rest.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     int statistic = 1e6;
     int NUM_bins = 50;
@@ -336,14 +331,9 @@ TEST(DecaySpectrum, MuMinus_Rest){
 }
 
 TEST(DecaySpectrum, MuMinus_Energy){
-    std::ifstream in;
     std::string filename = testfile_dir + "Decay_MuMinus_energy.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     int statistic = 1e6;
     int NUM_bins = 50;
@@ -539,14 +529,9 @@ TEST(DecaySpectrum, MuMinus_Energy){
 }
 
 TEST(DecaySpectrum, TauMinus_Rest){
-    std::ifstream in;
     std::string filename = testfile_dir + "Decay_TauMinus_rest.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     int statistic = 1e6;
     int NUM_bins = 50;
@@ -741,14 +726,9 @@ TEST(DecaySpectrum, TauMinus_Rest){
 
 
 TEST(DecaySpectrum, TauMinus_energy){
-    std::ifstream in;
     std::string filename = testfile_dir + "Decay_TauMinus_energy.txt";
-    in.open(filename.c_str());
-
-    if (!in.good())
-    {
-        std::cerr << "File \"" << filename << "\" not found" << std::endl;
-    }
+	std::ifstream in{filename};
+	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
     int statistic = 1e6;
     int NUM_bins = 50;

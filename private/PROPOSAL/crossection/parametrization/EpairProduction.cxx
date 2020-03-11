@@ -11,7 +11,7 @@
 
 #define EPAIR_PARAM_INTEGRAL_IMPL(param)                                                                               \
     Epair##param::Epair##param(const ParticleDef& particle_def,                                                        \
-                               std::shared_ptr<const Medium> medium,                                                                   \
+                               std::shared_ptr<const Medium> medium,                                                   \
                                double multiplier,                                                                      \
                                bool lpm)                                                                               \
         : EpairProductionRhoIntegral(particle_def, medium, multiplier, lpm)                                            \

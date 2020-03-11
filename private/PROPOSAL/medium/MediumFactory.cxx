@@ -1,126 +1,42 @@
 
 #include <algorithm>
+#include <functional>
+#include <cctype>
+#include <string>
+#include <memory>
 
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
 
-using namespace PROPOSAL;
 
-MediumFactory::MediumFactory()
-    : medium_map_str()
-    , medium_map_enum()
-    , string_enum_()
+namespace PROPOSAL {
+std::shared_ptr<Medium> CreateMedium(Medium_Type type, double density_correction)
 {
-    // Register all media in lower case!
-
-    Register("water", Water, &Water::create);
-    Register("ice", Ice, &Ice::create);
-    Register("salt", Salt, &Salt::create);
-    Register("standardrock", StandardRock, &StandardRock::create);
-    Register("frejusrock", FrejusRock, &FrejusRock::create);
-    Register("iron", Iron, &Iron::create);
-    Register("hydrogen", Hydrogen, &Hydrogen::create);
-    Register("lead", Lead, &Lead::create);
-    Register("copper", Copper, &Copper::create);
-    Register("uranium", Uranium, &Uranium::create);
-    Register("air", Air, &Air::create);
-    Register("paraffin", Paraffin, &Paraffin::create);
-    Register("antareswater", AntaresWater, &AntaresWater::create);
-    Register("cascadiabasinwater", CascadiaBasinWater, &CascadiaBasinWater::create);
-}
-
-MediumFactory::~MediumFactory()
-{
-    medium_map_str.clear();
-    medium_map_enum.clear();
-    string_enum_.clear();
-}
-
-void MediumFactory::Register(const std::string& name, const Enum& enum_t, RegisterFunction create)
-{
-    medium_map_str[name]    = create;
-    medium_map_enum[enum_t] = create;
-    string_enum_.insert(name, enum_t);
-}
-
-// ------------------------------------------------------------------------- //
-Medium* MediumFactory::CreateMedium(const std::string& name, double density_correction)
-{
-    std::string name_lower = name;
-    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
-
-    MediumMapString::iterator it = medium_map_str.find(name_lower);
-
-    if (it != medium_map_str.end())
-    {
-        return it->second(density_correction);
-    } else
-    {
-        log_fatal("Medium %s not registerd!", name.c_str());
-        return NULL; // just to prevent warnings
+    std::unique_ptr<Density_distr> density_distr(new Density_homogeneous(density_correction));
+    auto searched_medium = Medium_Map.find(type);
+    if (searched_medium != Medium_Map.end()) {
+        searched_medium->second->SetDensityDistribution(*density_distr);
+    } else {
+        throw std::invalid_argument("Medium not found.");
     }
-}
 
-// ------------------------------------------------------------------------- //
-Medium* MediumFactory::CreateMedium(const Enum& med, double density_correction)
+    return searched_medium->second;
+}
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+std::shared_ptr<Medium> CreateMedium(std::string name, double density_correction)
 {
-    MediumMapEnum::iterator it = medium_map_enum.find(med);
+    std::transform(name.begin(), name.end(), name.begin(),
+        [](unsigned char c){ return std::tolower(c); });
 
-    if (it != medium_map_enum.end())
-    {
-        return it->second(density_correction);
-    } else
-    {
-        log_fatal("Medium %s not registerd!", typeid(med).name());
-        return NULL; // just to prevent warnings
+    for (size_t id = 0; id < Medium_Name.size(); ++id) {
+        if (name ==Medium_Name[id]){
+            return CreateMedium(static_cast<Medium_Type>(id), density_correction);
+        }
     }
+    throw std::invalid_argument("Medium not found.");
 }
-
-// ------------------------------------------------------------------------- //
-Medium* MediumFactory::CreateMedium(Definition def)
-{
-    MediumMapEnum::iterator it = medium_map_enum.find(def.type);
-
-    if (it != medium_map_enum.end())
-    {
-        return it->second(def.density_correction);
-    } else
-    {
-        log_fatal("Medium %s not registerd!", typeid(def.type).name());
-        return NULL; // just to prevent warnings
-    }
-}
-
-// ------------------------------------------------------------------------- //
-MediumFactory::Enum MediumFactory::GetEnumFromString(const std::string& name)
-{
-    std::string name_lower = name;
-    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
-
-    auto& left = string_enum_.GetLeft();
-    auto it = left.find(name_lower);
-    if (it != left.end())
-    {
-        return it->second;
-    } else
-    {
-        log_fatal("Medium %s not registerd!", name.c_str());
-        return MediumFactory::None; // just to prevent warnings
-    }
-}
-
-// ------------------------------------------------------------------------- //
-std::string MediumFactory::GetStringFromEnum(const MediumFactory::Enum& enum_t)
-{
-    auto& right = string_enum_.GetRight();
-    auto it = right.find(enum_t);
-    if (it != right.end())
-    {
-        return it->second;
-    } else
-    {
-        log_fatal("Medium %s not registerd!", typeid(enum_t).name());
-        return ""; // just to prevent warnings
-    }
-}
+} // namespace PROPOSAL

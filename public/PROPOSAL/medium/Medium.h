@@ -35,16 +35,16 @@
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/density_distr/density_distr.h"
 
-#define MEDIUM_DEF(cls)                                          \
-    class cls : public Medium {                                  \
-       public:                                                   \
-        cls(double rho = 1.0);                                   \
-        cls(const Medium& medium) : Medium(medium) {}            \
-                                                                 \
-        virtual Medium* clone() const { return new cls(*this); } \
-        static Medium* create(double density_correction = 1.0) { \
-            return new cls(density_correction);                  \
-        }                                                        \
+#define MEDIUM_DEF(cls)                                                        \
+    class cls : public Medium {                                                \
+       public:                                                                 \
+        cls(double rho = 1.0);                                                 \
+        cls(const Medium& medium) : Medium(medium) {}                          \
+                                                                               \
+        virtual Medium* clone() const { return new cls(*this); }               \
+        std::shared_ptr<const Medium> create() {\
+            return std::make_shared<const Medium>(cls());    \
+        }                                                                      \
     };
 
 namespace PROPOSAL {
@@ -71,7 +71,8 @@ class Medium {
            double massDensity,
            std::vector<std::shared_ptr<Components::Component>>);
     Medium(const Medium&);
-    virtual Medium* clone() const { return new Medium(*this); };
+    /* virtual Medium* clone() const { return new Medium(*this); }; */
+    virtual std::shared_ptr<const Medium> create() const { return std::shared_ptr<const Medium>(new Medium(*this)) ;};
 
     ///@brief Crush this Medium.
     virtual ~Medium();
@@ -188,9 +189,9 @@ class Air : public Medium {
     Air(const Medium& medium) : Medium(medium) {}
     virtual ~Air() {}
 
-    virtual Medium* clone() const { return new Air(*this); }
-    static Medium* create(double density_correction = 1.0) {
-        return new Air(density_correction);
+    /* virtual Medium* clone() const { return new Air(*this); } */
+    std::shared_ptr<const Medium> create(double density_correction = 1.0) {
+        return std::make_shared<const Medium>(Air(density_correction));
     }
 };
 
@@ -229,5 +230,19 @@ MEDIUM_DEF(AntaresWater)
 MEDIUM_DEF(CascadiaBasinWater)
 
 } // namespace PROPOSAL
-
 #undef MEDIUM_DEF
+
+namespace PROPOSAL {
+enum Medium_Type { WATER, ICE, SALT, STANDARDROCK, FREJUSROCK, IRON, HYDROGEN, LEAD,
+    COPPER, URANIUM, AIR, PARAFFIN, ANTARESWATER, CASCADIABASINWATER, };
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+static const std::array<std::string, 14>  Medium_Name = { "water", "ice", "salt", "standardrock",
+    "frejusrock", "iron", "hydrogen", "lead", "copper", "uranium", "air", "paraffin",
+    "antareswater", "cascadiabasinwater", };
+} // namespace PROPOSAL
+
+/* namespace PROPOSAL { */
+/* const std::string GetMediumName( int enumVal ); */
+/* } // namespace PROPOSAL */

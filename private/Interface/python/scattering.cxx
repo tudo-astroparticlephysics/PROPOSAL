@@ -51,7 +51,7 @@ void init_scattering(py::module& m) {
 
     py::class_<ScatteringMoliere, std::shared_ptr<ScatteringMoliere>,
                Scattering>(m_sub, "Moliere")
-        .def(py::init<const ParticleDef&, const Medium&>());
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>>());
 
     py::class_<ScatteringHighlandIntegral,
                std::shared_ptr<ScatteringHighlandIntegral>, Scattering>(
@@ -60,11 +60,11 @@ void init_scattering(py::module& m) {
 
     py::class_<ScatteringHighland, std::shared_ptr<ScatteringHighland>,
                Scattering>(m_sub, "Highland")
-        .def(py::init<const ParticleDef&, const Medium&>());
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>>());
 
     py::class_<ScatteringNoScattering, std::shared_ptr<ScatteringNoScattering>,
                Scattering>(m_sub, "NoScattering")
-        .def(py::init<const ParticleDef&, const Medium&>());
+        .def(py::init<const ParticleDef&, std::shared_ptr<const Medium>>());
 
     py::enum_<ScatteringFactory::Enum>(m_sub, "ScatteringModel")
         .value("HighlandIntegral", ScatteringFactory::HighlandIntegral)

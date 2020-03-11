@@ -33,6 +33,7 @@
 #include <vector>
 #include <functional>
 #include <map>
+#include "PROPOSAL/json.hpp"
 
 #define PROPOSAL_MAKE_HASHABLE(type, ...) \
     namespace std {\
@@ -83,6 +84,8 @@ struct InterpolationDef
         , just_use_readonly_path(false)
     {
     }
+
+    InterpolationDef(const nlohmann::json&);
 
     int order_of_interpolation;
     std::string path_to_tables;

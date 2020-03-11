@@ -43,7 +43,7 @@ ParticleDef getParticleDef(const std::string& name)
 TEST(Comparison, Comparison_equal_particle)
 {
 ParticleDef particle_def = MuMinusDef::Get(); //particle
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 EnergyCutSettings ecuts;
 double multiplier   = 1.;
 
@@ -75,7 +75,7 @@ delete Interpol_B;
 TEST(Comparison, Comparison_equal_antiparticle)
 {
     ParticleDef particle_def = MuPlusDef::Get(); //antiparticle
-    Water medium;
+    std::shared_ptr<const Medium> medium(Water().create());
     double multiplier   = 1.;
 
     WeakInteraction* Weak_A = new WeakCooperSarkarMertsch(particle_def, medium, multiplier);
@@ -108,8 +108,8 @@ TEST(Comparison, Comparison_not_equal)
 ParticleDef mu_def  = MuMinusDef::Get();
 ParticleDef tau_def = TauMinusDef::Get();
 ParticleDef mu_plus_def  = MuPlusDef::Get();
-Water medium_1;
-Ice medium_2;
+std::shared_ptr<const Medium> medium_1(Water().create());
+std::shared_ptr<const Medium> medium_2(Ice().create());
 double multiplier_1 = 1.;
 double multiplier_2 = 2.;
 
@@ -146,7 +146,7 @@ EXPECT_TRUE(Integral_A != Integral_B);
 TEST(Assignment, Copyconstructor)
 {
 ParticleDef particle_def = MuMinusDef::Get();
-Water medium;
+std::shared_ptr<const Medium> medium(Water().create());
 double multiplier = 1.;
 
 WeakCooperSarkarMertsch Weak_A(particle_def, medium, multiplier);
@@ -168,14 +168,9 @@ EXPECT_TRUE(WeakInterpol_A == WeakInterpol_B);
 
 TEST(WeakInteraction, Test_of_dNdx)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/Weak_dNdx.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -193,32 +188,26 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 WeakInteractionFactory::Definition weak_def;
 weak_def.multiplier      = multiplier;
 weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, *medium, weak_def);
+CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, medium, weak_def);
 dNdx_new = weak->CalculatedNdx(energy);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
-delete medium;
 delete weak;
 }
 }
 
 TEST(WeakInteraction, Test_of_dNdx_rnd)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/Weak_dNdx_rnd.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -239,33 +228,27 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 WeakInteractionFactory::Definition weak_def;
 weak_def.multiplier      = multiplier;
 weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, *medium, weak_def);
+CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, medium, weak_def);
 
 dNdx_rnd_new = weak->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-delete medium;
 delete weak;
 }
 }
 
 TEST(WeakInteraction, Test_Stochastic_Loss)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/Weak_e.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -289,19 +272,18 @@ stochastic_loss_stored;
 
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 WeakInteractionFactory::Definition weak_def;
 weak_def.multiplier      = multiplier;
 weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, *medium, weak_def);
+CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, medium, weak_def);
 
 stochastic_loss_new = weak->CalculateStochasticLoss(energy, rnd1, rnd2);
 
 ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
-delete medium;
 delete weak;
 }
 }
@@ -309,14 +291,9 @@ delete weak;
 
 TEST(WeakInteraction, Test_of_dNdx_Interpolant)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/Weak_dNdx_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -336,33 +313,27 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 WeakInteractionFactory::Definition weak_def;
 weak_def.multiplier      = multiplier;
 weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, *medium, weak_def, InterpolDef);
+CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, medium, weak_def, InterpolDef);
 
 dNdx_new = weak->CalculatedNdx(energy);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
-delete medium;
 delete weak;
 }
 }
 
 TEST(WeakInteraction, Test_of_dNdxrnd_interpol)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/Weak_dNdx_rnd_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -385,33 +356,27 @@ while (in.good())
 in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 WeakInteractionFactory::Definition weak_def;
 weak_def.multiplier      = multiplier;
 weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, *medium, weak_def, InterpolDef);
+CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, medium, weak_def, InterpolDef);
 
 dNdx_rnd_new = weak->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-delete medium;
 delete weak;
 }
 }
 
 TEST(WeakInteraction, Test_of_e_interpol)
 {
-std::ifstream in;
 std::string filename = "bin/TestFiles/Weak_e_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
 char firstLine[256];
 in.getline(firstLine, 256);
@@ -435,19 +400,18 @@ in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> 
 stochastic_loss_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 
 WeakInteractionFactory::Definition weak_def;
 weak_def.multiplier      = multiplier;
 weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, *medium, weak_def, InterpolDef);
+CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, medium, weak_def, InterpolDef);
 
 stochastic_loss_new = weak->CalculateStochasticLoss(energy, rnd1, rnd2);
 
 ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
-delete medium;
 delete weak;
 }
 }
