@@ -32,7 +32,6 @@
 #include <iostream>
 #include "PROPOSAL/json.hpp"
 
-
 namespace PROPOSAL {
 
 /**
@@ -52,18 +51,16 @@ class EnergyCutSettings
 private:
     double ecut_;
     double vcut_;
+    bool continuous_randomization_;
 
 public:
     //----------------------------------------------------------------------------//
     // Constructors
 
-    EnergyCutSettings();
-    EnergyCutSettings(const EnergyCutSettings&);
-    EnergyCutSettings& operator=(const EnergyCutSettings& energyCutSettings);
-    EnergyCutSettings(const double ecut, const double vcut);
+    EnergyCutSettings(const double, const double, const bool);
     EnergyCutSettings(const nlohmann::json&);
+
     bool operator==(const EnergyCutSettings& energyCutSettings) const;
-    bool operator!=(const EnergyCutSettings& energyCutSettings) const;
     friend std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings);
 
     //----------------------------------------------------------------------------//
@@ -80,21 +77,12 @@ public:
      */
     double GetCut(double energy) const;
 
-    //----------------------------------------------------------------------------//
-
-    void swap(EnergyCutSettings& energyCutSettings);
 
     //----------------------------------------------------------------------------//
     // Getter
 
     double GetEcut() const { return ecut_; }
     double GetVcut() const { return vcut_; }
-
-    //----------------------------------------------------------------------------//
-    // Setter
-
-    void SetEcut(double ecut) { ecut_ = ecut; }
-    void SetVcut(double vcut) { vcut_ = vcut; }
 };
 
 std::ostream& operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings);
