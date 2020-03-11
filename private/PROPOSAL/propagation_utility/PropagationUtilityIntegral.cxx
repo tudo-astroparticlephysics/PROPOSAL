@@ -5,6 +5,7 @@
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
@@ -40,7 +41,6 @@ double UtilityIntegral::GetUpperLimit(double ei, double rnd)
 /******************************************************************************
  *                            Utility Displacement                            *
  ******************************************************************************/
-
 UtilityIntegralDisplacement::UtilityIntegralDisplacement(
     CrossSectionList cross, const ParticleDef&)
     : UtilityIntegral(cross)
@@ -91,15 +91,12 @@ double UtilityIntegralDecay::FunctionToIntegral(double energy)
 {
     if (lifetime < 0)
         return 0;
-
-    double mass = crosssections.front()->GetParametrization().GetParticleMass();
     double square_momentum = (energy - mass) * (energy + mass);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
 
     double aux = 1.0
         / std::max(
               (particle_momentum / mass) * SPEED, PARTICLE_POSITION_RESOLUTION);
-
     return displacement_->FunctionToIntegral(energy) * aux;
 }
 
