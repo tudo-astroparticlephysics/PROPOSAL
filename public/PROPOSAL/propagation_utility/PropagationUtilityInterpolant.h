@@ -41,7 +41,6 @@ class UtilityIntegral;
     {                                                                                                                  \
     public:                                                                                                            \
         UtilityInterpolant##cls(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);              \
-        ~UtilityInterpolant##cls();                                                                                    \
                                                                                                                        \
         double Calculate(double ei, double ef, double rnd);                                                            \
         double GetUpperLimit(double ei, double rnd);                                                                   \
@@ -58,7 +57,7 @@ class Interpolant;
 class UtilityInterpolant : public UtilityDecorator
 {
 public:
-    UtilityInterpolant(CrossSectionList, std::shared_ptr<InterpolationDef>);
+    UtilityInterpolant(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);
     virtual ~UtilityInterpolant();
 
     virtual double Calculate(double ei, double ef, double rnd) = 0;
@@ -71,6 +70,7 @@ protected:
     double stored_result_;
     Interpolant* interpolant_;
     Interpolant* interpolant_diff_;
+    double low_;
 
     std::shared_ptr<InterpolationDef> interpolation_def_;
 };
@@ -79,7 +79,6 @@ class UtilityInterpolantInteraction : public UtilityInterpolant
 {
 public:
     UtilityInterpolantInteraction(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);
-    virtual ~UtilityInterpolantInteraction();
 
     double Calculate(double ei, double ef, double rnd);
     double GetUpperLimit(double ei, double rnd);
@@ -96,7 +95,6 @@ class UtilityInterpolantDecay : public UtilityInterpolant
 {
 public:
     UtilityInterpolantDecay(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);
-    virtual ~UtilityInterpolantDecay();
 
     double Calculate(double ei, double ef, double rnd);
     double GetUpperLimit(double ei, double rnd);
@@ -109,9 +107,23 @@ private:
     double up_;
 };
 
+class UtilityInterpolantContRand : public UtilityInterpolant
+    {
+    public:
+        UtilityInterpolantContRand(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);
+
+        double Calculate(double ei, double ef, double rnd);
+        double GetUpperLimit(double ei, double rnd);
+
+    private:
+        std::unique_ptr<UtilityIntegralContRand> integral_;
+
+        double BuildInterpolant(double, UtilityIntegral&, Integral&);
+        void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);
+    };
+
 UTILITY_INTERPOLANT_DEC(Displacement)
 UTILITY_INTERPOLANT_DEC(Time)
-UTILITY_INTERPOLANT_DEC(ContRand)
 UTILITY_INTERPOLANT_DEC(Scattering)
 
 } // namespace PROPOSAL
