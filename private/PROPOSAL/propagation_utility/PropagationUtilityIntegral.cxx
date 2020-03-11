@@ -50,18 +50,10 @@ UtilityIntegralDisplacement::UtilityIntegralDisplacement(
 double UtilityIntegralDisplacement::FunctionToIntegral(double energy)
 {
     double result = 0.0;
-    for (const auto& cross : crosssections)
-        result += cross->CalculatedEdx(energy);
+    for (const auto& cr: crosss)
+        result += cr->CalculatedEdx(energy);
 
     return -1.0 / result;
-}
-
-double UtilityIntegralDisplacment::Calculate(double ei, double ef, double rnd)
-{
-    if(ef > mass)
-        return UtilityIntegral::Calculate(ei, ef, rnd) / lifetime;
-
-    return UtilityIntegral::Calculate(ei, mass, rnd) / lifetime;
 }
 
 /******************************************************************************
@@ -69,15 +61,15 @@ double UtilityIntegralDisplacment::Calculate(double ei, double ef, double rnd)
  ******************************************************************************/
 
 UtilityIntegralInteraction::UtilityIntegralInteraction(
-    CrossSectionList cross, const ParticleDef&)
-    : UtilityIntegral(cross)
+    CrossSectionList cross, const ParticleDef& p_def)
+    : UtilityIntegral(cross, p_def)
 {
 }
 
 double UtilityIntegralInteraction::FunctionToIntegral(double energy)
 {
     double total_rate = 0.0;
-    for (const auto& cross : crosssections)
+    for (const auto& cross : crosss)
         total_rate += cross->CalculatedNdx(energy);
 
     return displacement_->FunctionToIntegral(energy) * total_rate;
@@ -91,7 +83,6 @@ UtilityIntegralDecay::UtilityIntegralDecay(
     CrossSectionList cross, const ParticleDef& p_def)
     : UtilityIntegral(cross, p_def)
     , lifetime(p_def.lifetime)
-    , mass(p_def.mass)
 {
 }
 
@@ -123,7 +114,6 @@ double UtilityIntegralDecay::Calculate(double ei, double ef, double rnd)
 UtilityIntegralTime::UtilityIntegralTime(
     CrossSectionList cross, const ParticleDef& p_def)
     : UtilityIntegral(cross, p_def)
-    , mass(p_def.mass)
 {
 }
 
@@ -141,7 +131,7 @@ double UtilityIntegralTime::FunctionToIntegral(double energy)
  ******************************************************************************/
 
 UtilityIntegralContRand::UtilityIntegralContRand(
-    CrossSectionList cross, const ParticleDef&)
+    CrossSectionList cross, const ParticleDef& p_def)
     : UtilityIntegral(cross, p_def)
 {
 }
@@ -149,7 +139,7 @@ UtilityIntegralContRand::UtilityIntegralContRand(
 double UtilityIntegralContRand::FunctionToIntegral(double energy)
 {
     double sum = 0.0;
-    for (const auto& cross : crosssections)
+    for (const auto& cross : crosss)
         sum += cross->CalculatedE2dx(energy);
 
     return displacement_->FunctionToIntegral(energy) * sum;
@@ -162,7 +152,6 @@ double UtilityIntegralContRand::FunctionToIntegral(double energy)
 UtilityIntegralScattering::UtilityIntegralScattering(
     CrossSectionList cross, const ParticleDef& p_def)
     : UtilityIntegral(cross, p_def)
-    , mass(p_def.mass)
 {
 }
 

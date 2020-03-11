@@ -1,5 +1,6 @@
 
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/math/MathMethods.h"
 #include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
@@ -167,8 +168,7 @@ double Utility::EnergyRandomize(
 {
     if (utility_def->cont_rand) {
         auto variance = utility_def->cont_rand->Calculate(initial_energy, final_energy, 0.0);
-        /* return sample_normal(final_nergy, variance, rnd); */
-        return -1;
+        return SampleFromGaussian(final_energy, variance, rnd, utility_def->cont_rand->GetMass(), initial_energy);
     } else {
         return final_energy;
     }
