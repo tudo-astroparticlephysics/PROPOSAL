@@ -161,4 +161,14 @@ std::pair<std::vector<double>, std::vector<double>> ParseSplineCoordinates(const
 
 std::pair<double, double> welfords_online_algorithm(double& newValue, unsigned int& iter, double& mean, double& cov);
 
+/// @brief          Sample a value from a normal distribution with a given mean and a given sigma
+/// @param mean     Mean of the normal distribution
+/// @param sigma    Variance of the normal distribution
+/// @param rnd      Random number used for sampling, needs to be between 0 and 1
+/// @param min      Lower limit where numbers should be sampled. Default is -infty
+/// @param max      Upper limit where numbers should be sampled. Default is +infty
+/// @return         Sampled value
+
+double SampleFromGaussian(double mean, double sigma, double rnd, double min, double max);
+
 } // namespace PROPOSAL
