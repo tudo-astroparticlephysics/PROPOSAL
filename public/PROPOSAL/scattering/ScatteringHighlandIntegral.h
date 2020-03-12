@@ -30,6 +30,10 @@
 #pragma once
 
 #include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/crossection/CrossSection.h"
+#include <array>
+
+using std::array;
 
 namespace PROPOSAL {
 
@@ -44,19 +48,11 @@ struct InterpolationDef;
 class ScatteringHighlandIntegral : public Scattering
 {
 public:
-    ScatteringHighlandIntegral(const ParticleDef&, const Utility&);
-    ScatteringHighlandIntegral(const ParticleDef&, const Utility&, const InterpolationDef&);
+    ScatteringHighlandIntegral(const ParticleDef&, std::shared_ptr<const Medium>, CrossSectionList);
+    ScatteringHighlandIntegral(const ParticleDef&, std::shared_ptr<const Medium>, std::shared_ptr<InterpolationDef>, CrossSectionList);
 
     // Copy constructor
-    ScatteringHighlandIntegral(const ParticleDef&, const Utility&, const ScatteringHighlandIntegral&);
-    ScatteringHighlandIntegral(const ScatteringHighlandIntegral&);
     ~ScatteringHighlandIntegral();
-
-    virtual Scattering* clone() const override { return new ScatteringHighlandIntegral(*this); }
-    virtual Scattering* clone(const ParticleDef& particle_def, const Utility& utility) const override
-    {
-        return new ScatteringHighlandIntegral(particle_def, utility, *this);
-    }
 
 private:
     ScatteringHighlandIntegral& operator=(const ScatteringHighlandIntegral&); // Undefined & not allowed
@@ -64,10 +60,11 @@ private:
     bool compare(const Scattering&) const override;
     void print(std::ostream&) const override;
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, double rnd1, double rnd2, double rnd3, double rnd4) override;
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, const array<double, 4>& rnd) override;
     long double CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos);
 
-    UtilityDecorator* scatter_;
+    std::unique_ptr<UtilityDecorator> scatter_;
+    std::shared_ptr<const Medium> medium;
 };
 
 } // namespace PROPOSAL

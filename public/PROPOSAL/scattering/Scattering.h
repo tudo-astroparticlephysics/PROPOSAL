@@ -31,6 +31,7 @@
 #include <utility>
 #include <memory>
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/medium/Medium.h"
 
 namespace PROPOSAL {
 
@@ -57,8 +58,8 @@ public:
     bool operator!=(const Scattering& scattering) const;
     friend std::ostream& operator<<(std::ostream&, Scattering const&);
 
-    virtual Scattering* clone() const                          = 0; // virtual constructor idiom (used for deep copies)
-    virtual Scattering* clone(const ParticleDef&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies)
+    /* virtual Scattering* clone() const                          = 0; // virtual constructor idiom (used for deep copies) */
+    /* virtual Scattering* clone(const ParticleDef&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies) */
 
 
     std::tuple<Vector3D, Vector3D> Scatter(double dr, double ei, double ef, const Vector3D& pos, const Vector3D& old_direction, const std::array<double, 4>& rnd);
@@ -77,7 +78,6 @@ protected:
         double sx, sy, tx, ty;
     };
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos);
     virtual RandomAngles CalculateRandomAngle(double dr,
                                               double ei,
                                               double ef,

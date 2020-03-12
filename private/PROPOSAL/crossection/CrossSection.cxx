@@ -78,7 +78,7 @@ double CrossSection::GetEnergyCut(double energy)
     auto physical_limits = parametrization_->GetKinematicLimits(energy);
     auto energy_cut = physical_limits.vMin;
 
-    assert(physical_limits.vmin <= physical_limits.vmax);
+    assert(physical_limits.vMin <= physical_limits.vMax);
 
     if (cuts_)
         return std::min(std::max(physical_limits.vMin, cuts_->GetCut(energy)),

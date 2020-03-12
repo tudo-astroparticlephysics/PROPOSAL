@@ -26,15 +26,16 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/scattering/Scattering.h"
 
 namespace PROPOSAL {
 
@@ -42,25 +43,27 @@ class Medium;
 class Utility;
 struct InterpolationDef;
 
-class ScatteringFactory
-{
+typedef std::vector<std::shared_ptr<CrossSection>> CrossSectionList;
+
+class ScatteringFactory {
 public:
-    enum Enum
-    {
-        None = 0,
-        HighlandIntegral,
-        Moliere,
-        Highland,
-        NoScattering
-    };
+    enum Enum { None = 0, HighlandIntegral, Moliere, Highland };
 
     typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
-    Scattering* CreateScattering(const std::string&, const ParticleDef&, const Utility&, const InterpolationDef&);
-    Scattering* CreateScattering(const Enum, const ParticleDef&, const Utility&, const InterpolationDef&);
+    Scattering* CreateScattering(const std::string&, const ParticleDef&,
+        std::shared_ptr<const Medium>, std::shared_ptr<InterpolationDef>,
+        std::unique_ptr<CrossSectionList> = nullptr);
+    Scattering* CreateScattering(const Enum, const ParticleDef&,
+        std::shared_ptr<const Medium>, std::shared_ptr<InterpolationDef>,
+        std::unique_ptr<CrossSectionList> = nullptr);
 
-    Scattering* CreateScattering(const std::string&, const ParticleDef&, const Utility&);
-    Scattering* CreateScattering(const Enum, const ParticleDef&, const Utility&);
+    Scattering* CreateScattering(const std::string&, const ParticleDef&,
+        std::shared_ptr<const Medium>,
+        std::unique_ptr<CrossSectionList> = nullptr);
+    Scattering* CreateScattering(const Enum, const ParticleDef&,
+        std::shared_ptr<const Medium>,
+        std::unique_ptr<CrossSectionList> = nullptr);
 
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for photo parametrizations

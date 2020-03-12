@@ -44,6 +44,7 @@ class Component;
 
 class Parametrization;
 
+
 class CrossSection
 {
 public:
@@ -121,5 +122,6 @@ protected:
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::CrossSection const&);
+typedef std::vector<std::shared_ptr<CrossSection>> CrossSectionList;
 
 } // namespace PROPOSAL

@@ -21,10 +21,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
                                                                  double ei,
                                                                  double ef,
                                                                  const Vector3D& pos,
-                                                                 double rnd1,
-                                                                 double rnd2,
-                                                                 double rnd3,
-                                                                 double rnd4) {
+                                                                 const array<double, 4>& rnd) {
     (void)ef;
 
     double momentum_Sq = (ei - particle_def_.mass) * (ei + particle_def_.mass);
@@ -84,14 +81,14 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
 
     double pre_factor = std::sqrt(chiCSq_ * B_[max_weight_index_]);
 
-    rnd1 = GetRandom(pre_factor, rnd1);
-    rnd2 = GetRandom(pre_factor, rnd2);
+    auto rnd1 = GetRandom(pre_factor, rnd[0]);
+    auto rnd2 = GetRandom(pre_factor, rnd[1]);
 
     random_angles.sx = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.tx = rnd2;
 
-    rnd1 = GetRandom(pre_factor, rnd3);
-    rnd2 = GetRandom(pre_factor, rnd4);
+    rnd1 = GetRandom(pre_factor, rnd[2]);
+    rnd2 = GetRandom(pre_factor, rnd[3]);
 
     random_angles.sy = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.ty = rnd2;

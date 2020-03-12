@@ -108,6 +108,15 @@ bool Vector3D::operator!=(const Vector3D& vector_3d) const
     return !(*this == vector_3d);
 }
 
+Vector3D& Vector3D::operator+=(const Vector3D& vector_3d)
+{
+    cartesian_.x_ += vector_3d.cartesian_.x_;
+    cartesian_.y_ += vector_3d.cartesian_.y_;
+    cartesian_.z_ += vector_3d.cartesian_.z_;
+
+    return *this;
+}
+
 void Vector3D::swap(Vector3D& vector_3d)
 {
     using std::swap;

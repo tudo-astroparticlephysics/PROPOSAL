@@ -30,9 +30,12 @@
 #pragma once
 
 #include <vector>
+#include <array>
+
 
 #include "PROPOSAL/scattering/Scattering.h"
 
+using std::array;
 namespace PROPOSAL {
 
 class Medium;
@@ -46,12 +49,7 @@ public:
     ScatteringMoliere(const ScatteringMoliere&);
     ~ScatteringMoliere();
 
-    Scattering* clone() const override { return new ScatteringMoliere(*this); }
-    virtual Scattering* clone(const ParticleDef& particle_def, const Utility& utility) const override
-    {
-        (void)utility;
-        return new ScatteringMoliere(particle_def, *this);
-    }
+
 
 private:
     ScatteringMoliere& operator=(const ScatteringMoliere&); // Undefined & not allowed
@@ -59,7 +57,7 @@ private:
     bool compare(const Scattering&) const override;
     void print(std::ostream&) const override;
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, double rnd1, double rnd2, double rnd3, double rnd4) override;
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, const array<double, 4>& rnd) override;
 
     std::shared_ptr<const Medium> medium_;
 

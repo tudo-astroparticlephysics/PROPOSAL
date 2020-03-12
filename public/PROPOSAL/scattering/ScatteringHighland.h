@@ -30,6 +30,9 @@
 #pragma once
 
 #include "PROPOSAL/scattering/Scattering.h"
+#include <array>
+
+using std::array;
 
 namespace PROPOSAL {
 
@@ -48,12 +51,12 @@ public:
     ScatteringHighland(const ScatteringHighland&);
     ~ScatteringHighland();
 
-    virtual Scattering* clone() const override { return new ScatteringHighland(*this); }
-    virtual Scattering* clone(const ParticleDef& particle_def, const Utility& utility) const override
-    {
-        (void)utility;
-        return new ScatteringHighland(particle_def, *this);
-    }
+    /* virtual Scattering* clone() const override { return new ScatteringHighland(*this); } */
+    /* virtual Scattering* clone(const ParticleDef& particle_def, const Utility& utility) const override */
+    /* { */
+    /*     (void)utility; */
+    /*     return new ScatteringHighland(particle_def, *this); */
+    /* } */
 
 private:
     ScatteringHighland& operator=(const ScatteringHighland&); // Undefined & not allowed
@@ -61,7 +64,7 @@ private:
     bool compare(const Scattering&) const override;
     void print(std::ostream&) const override;
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, double rnd1, double rnd2, double rnd3, double rnd4) override;
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, const array<double, 4>& rnd) override;
     double CalculateTheta0(double dr, double ei, const Vector3D& pos);
 
     std::shared_ptr<const Medium> medium_;

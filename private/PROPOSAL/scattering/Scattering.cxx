@@ -8,12 +8,14 @@
  **/
 
 #include <cmath>
+#include <tuple>
 
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/scattering/Scattering.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 
+using std::tuple;
 using namespace PROPOSAL;
 
 /******************************************************************************
@@ -68,54 +70,42 @@ bool Scattering::operator!=(const Scattering& scattering) const
     return !(*this == scattering);
 }
 
-Directions Scattering::Scatter(double dr,
+tuple<Vector3D, Vector3D> Scattering::Scatter(double dr,
                                 double ei,
                                 double ef,
                                 const Vector3D& pos,
                                 const Vector3D& old_direction,
                                 const std::array<double, 4>& rnd)
 {
-    Directions directions_;
-    // u averaged continous propagation direction
-    // n_i direction after continous propagation
-    directions_.n_i_ = Vector3D(old_direction);
+    assert(ei>ef);
+    assert(dr>0);
 
-    if(dr<=0)
-    {
-        return directions_;
-    }
-
-    double sz, tz;
+    // mean_direction:      averaged continous propagation direction
+    // final_direction:     direction after continous propagation
 
     RandomAngles random_angles = CalculateRandomAngle(dr, ei, ef, pos, rnd);
 
-    sz = std::sqrt(std::max(1. - (random_angles.sx * random_angles.sx + random_angles.sy * random_angles.sy), 0.));
-    tz = std::sqrt(std::max(1. - (random_angles.tx * random_angles.tx + random_angles.ty * random_angles.ty), 0.));
+    auto sz = std::sqrt(std::max(1. - (random_angles.sx * random_angles.sx + random_angles.sy * random_angles.sy), 0.));
+    auto tz = std::sqrt(std::max(1. - (random_angles.tx * random_angles.tx + random_angles.ty * random_angles.ty), 0.));
 
-    double sinth, costh, sinph, cosph;
-    sinth = std::sin(old_direction.GetTheta());
-    costh = std::cos(old_direction.GetTheta());
-    sinph = std::sin(old_direction.GetPhi());
-    cosph = std::cos(old_direction.GetPhi());
+    auto sinth = std::sin(old_direction.GetTheta());
+    auto costh = std::cos(old_direction.GetTheta());
+    auto sinph = std::sin(old_direction.GetPhi());
+    auto cosph = std::cos(old_direction.GetPhi());
 
-    const Vector3D rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
-    const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
-
-    // Rotation towards all tree axes
-    directions_.u_ = sz * old_direction;
-    directions_.u_ = directions_.u_ + random_angles.sx * rotate_vector_x;
-    directions_.u_ = directions_.u_ + random_angles.sy * rotate_vector_y;
+    const auto& rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
+    const auto& rotate_vector_y = Vector3D(-sinph, cosph, 0.);
 
     // Rotation towards all tree axes
-    directions_.n_i_ = tz * old_direction;
-    directions_.n_i_ = directions_.n_i_ + random_angles.tx * rotate_vector_x;
-    directions_.n_i_ = directions_.n_i_ + random_angles.ty * rotate_vector_y;
-    directions_.n_i_.CalculateSphericalCoordinates();
+    auto mean_direction = sz * old_direction;
+    mean_direction += random_angles.sx * rotate_vector_x;
+    mean_direction += random_angles.sy * rotate_vector_y;
 
-    return directions_;
+    // Rotation towards all tree axes
+    auto final_direction = tz * old_direction;
+    final_direction += random_angles.tx * rotate_vector_x;
+    final_direction += random_angles.ty * rotate_vector_y;
+    final_direction.CalculateSphericalCoordinates();
+
+    return std::make_tuple(mean_direction, final_direction);
 }
-
-/* Scattering::RandomAngles Scattering::CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, std::array<double,4> rnd) */
-/* { */
-/*     return this->CalculateRandomAngle(dr, ei, ef, pos, rnd); */
-/* } */
