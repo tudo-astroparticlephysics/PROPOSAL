@@ -38,6 +38,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     init_scattering(m);
     init_math(m);
 
+	m.attr("__version__") = &PROPOSAL_VERSION;
+
     py::class_<Vector3D, std::shared_ptr<Vector3D>>(m, "Vector3D")
         .def(py::init<>())
         .def(py::init<double, double, double>(), py::arg("x"), py::arg("y"),

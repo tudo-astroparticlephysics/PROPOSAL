@@ -1,0 +1,9 @@
+#ifndef PROPOSAL_VERSION_H
+#define PROPOSAL_VERSION_H
+#include <string>
+
+const std::string PROPOSAL_VERSION = "@PROJECT_VERSION@";
+const unsigned int PROPOSAL_VERSION_MAJOR = @PROJECT_VERSION_MAJOR@;
+const unsigned int PROPOSAL_VERSION_MINOR = @PROJECT_VERSION_MINOR@;
+const unsigned int PROPOSAL_VERSION_PATCH = @PROJECT_VERSION_PATCH@;
+#endif
