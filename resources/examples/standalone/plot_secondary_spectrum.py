@@ -182,7 +182,7 @@ def propagate_muons():
 
     # start_time = time.time()
 
-    mu_def = pp.particle.MuMinusDef.get()
+    mu_def = pp.particle.MuMinusDef()
     geometry = pp.geometry.Sphere(pp.Vector3D(), 1.e20, 0.0)
     ecut = 500
     vcut = 5e-2
@@ -225,27 +225,28 @@ def propagate_muons():
 
     # progress = ProgressBar(statistics, pacman=True)
     # progress.start()
+    mu_prop = pp.particle.DynamicData(mu_def.particle_type)
+    mu_prop.position = pp.Vector3D(0, 0, 0)
+    mu_prop.direction = pp.Vector3D(0, 0, -1)
+    mu_prop.propagated_distance = 0
 
     for mu_energy in tqdm(muon_energies):
         # progress.update()
 
-        prop.particle.position = pp.Vector3D(0, 0, 0)
-        prop.particle.direction = pp.Vector3D(0, 0, -1)
-        prop.particle.propagated_distance = 0
-        prop.particle.energy = mu_energy
+        mu_prop.energy = mu_energy
 
-        secondarys = prop.propagate(propagation_length)
+        secondarys = prop.propagate(mu_prop, propagation_length)
 
         for sec in secondarys.particles:
             log_sec_energy = math.log10(sec.energy)
 
-            if sec.id == int(pp.particle.Interaction_Id.Epair):
+            if sec.type == int(pp.particle.Interaction_Type.Epair):
                 epair_secondary_energy.append(log_sec_energy)
-            if sec.id == int(pp.particle.Interaction_Id.Brems):
+            if sec.type == int(pp.particle.Interaction_Type.Brems):
                 brems_secondary_energy.append(log_sec_energy)
-            if sec.id == int(pp.particle.Interaction_Id.DeltaE):
+            if sec.type == int(pp.particle.Interaction_Type.DeltaE):
                 ioniz_secondary_energy.append(log_sec_energy)
-            if sec.id == int(pp.particle.Interaction_Id.NuclInt):
+            if sec.type == int(pp.particle.Interaction_Type.NuclInt):
                 photo_secondary_energy.append(log_sec_energy)
 
     # =========================================================
@@ -257,7 +258,7 @@ def propagate_muons():
         os.path.join(
             dir_prefix,
             'data_sec_dist_{}_{}_Emin_{}_Emax_{}'.format(
-                prop.particle.particle_def.name,
+                mu_def.name,
                 sector_def.medium.name.lower(),
                 E_min_log,
                 E_max_log,
@@ -272,9 +273,9 @@ def propagate_muons():
         E_min=[E_min_log],
         E_max=[E_max_log],
         spectral_index=[spectral_index],
-        distance=[prop.particle.propagated_distance / 100],
+        distance=[propagation_length / 100],
         medium_name=[sector_def.medium.name.lower()],
-        particle_name=[prop.particle.particle_def.name],
+        particle_name=[mu_def.name],
         ecut=[ecut],
         vcut=[vcut]
     )
@@ -432,7 +433,7 @@ def plot_theory_curve():
     ecut = npzfile['ecut'][0]
     vcut = npzfile['vcut'][0]
 
-    particle_def = pp.particle.MuMinusDef.get()
+    particle_def = pp.particle.MuMinusDef()
     medium = pp.medium.StandardRock(1.0)
     energy_cuts = pp.EnergyCutSettings(500, -1)
     multiplier = 1.

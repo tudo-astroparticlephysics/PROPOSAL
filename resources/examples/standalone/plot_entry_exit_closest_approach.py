@@ -22,7 +22,7 @@ def propagate_particle(propagator,
 
 def main():
     prop = pp.Propagator(
-        particle_def=pp.particle.MuMinusDef.get(),
+        particle_def=pp.particle.MuMinusDef(),
         config_file="resources/config.json"
     )
     # print('losses inside: ', prop.sector_list[0].sector_def.only_loss_inside_detector)

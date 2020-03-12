@@ -1,5 +1,6 @@
 import pyPROPOSAL as pp
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
 if __name__ == "__main__":
@@ -28,24 +29,24 @@ if __name__ == "__main__":
     interpolation_def.path_to_tables_readonly = "~/.local/share/PROPOSAL/tables"
 
     prop = pp.Propagator(
-            particle_def=pp.particle.MuMinusDef.get(),
+            particle_def=pp.particle.MuMinusDef(),
             sector_defs=[sec_def],
             detector=pp.geometry.Sphere(pp.Vector3D(), 1e20, 0),
             interpolation_def=interpolation_def
     )
 
-    mu = prop.particle
+    mu = pp.particle.DynamicData(pp.particle.MuMinusDef().particle_type)
+    mu.position = pp.Vector3D(0, 0, 0)
+    mu.direction = pp.Vector3D(0, 0, -1)
+    mu.energy = energy
+    mu.propagated_distance = 0
 
     mu_length = []
     n_secondarys = []
 
-    for i in range(statistics):
-        mu.position = pp.Vector3D(0, 0, 0)
-        mu.direction = pp.Vector3D(0, 0, -1)
-        mu.energy = energy
-        mu.propagated_distance = 0
+    for i in tqdm(range(statistics)):
 
-        d = prop.propagate().particles
+        d = prop.propagate(mu).particles
 
         mu_length.append(mu.propagated_distance / 100)
         n_secondarys.append(len(d))

@@ -2,9 +2,9 @@ import pyPROPOSAL as pp
 import numpy as np
 
 particle_defs = [
-    pp.particle.MuMinusDef.get(),
-    pp.particle.TauMinusDef.get(),
-    pp.particle.EMinusDef.get()
+    pp.particle.MuMinusDef(),
+    pp.particle.TauMinusDef(),
+    pp.particle.EMinusDef()
 ]
 
 mediums = [

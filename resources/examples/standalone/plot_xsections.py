@@ -10,7 +10,7 @@ import math
 
 if __name__ == "__main__":
 
-    mu = pp.particle.MuMinusDef.get()
+    mu = pp.particle.MuMinusDef()
     medium = pp.medium.Ice(1.0)  # With densitiy correction
     cuts = pp.EnergyCutSettings(-1, -1)  # ecut, vcut
 
