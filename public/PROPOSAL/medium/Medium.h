@@ -40,11 +40,6 @@
        public:                                                                 \
         cls(double rho = 1.0);                                                 \
         cls(const Medium& medium) : Medium(medium) {}                          \
-                                                                               \
-        virtual Medium* clone() const { return new cls(*this); }               \
-        std::shared_ptr<const Medium> create() {\
-            return std::make_shared<const Medium>(cls());    \
-        }                                                                      \
     };
 
 namespace PROPOSAL {
@@ -69,10 +64,8 @@ class Medium {
            double X1,
            double d0,
            double massDensity,
-           std::vector<std::shared_ptr<Components::Component>>);
+           std::vector<Components::Component>);
     Medium(const Medium&);
-    /* virtual Medium* clone() const { return new Medium(*this); }; */
-    virtual std::shared_ptr<const Medium> create() const { return std::shared_ptr<const Medium>(new Medium(*this)) ;};
 
     ///@brief Crush this Medium.
     virtual ~Medium();
@@ -91,7 +84,7 @@ class Medium {
 
     // Getter
     int GetNumComponents() const { return numComponents_; }
-    const std::vector<Components::Component*>& GetComponents() const {
+    const std::vector<Components::Component>& GetComponents() const {
         return components_;
     }
     double GetSumCharge() const { return sumCharge_; }
@@ -103,7 +96,6 @@ class Medium {
     double GetX0() const { return X0_; }
     double GetX1() const { return X1_; }
     double GetD0() const { return d0_; }
-    double GetR() const { return r_; }
     double GetMassDensity() const { return massDensity_; }
     double GetCorrectedMassDensity(const Vector3D& xi) const { return massDensity_ * dens_distr_->Evaluate(xi); }
     double GetRadiationLength() const { return radiationLength_; }
@@ -125,12 +117,11 @@ class Medium {
     void SetX0(double X0);
     void SetX1(double X1);
     void SetD0(double d0);
-    void SetR(double r);
     void SetMassDensity(double massDensity);
     void SetMolDensity(double molDensity);
     void SetAverageNucleonWeight(std::vector<double> M);
     void SetComponents(
-        std::vector<std::shared_ptr<Components::Component>> components);
+        std::vector<Components::Component> components);
     void SetMM(double MM);
     void SetSumNucleons(double sumNucleons);
     void SetDensityDistribution(Density_distr& dens_distr);
@@ -144,7 +135,6 @@ class Medium {
     std::string name_;
 
     int numComponents_;                               ///< number of components
-    std::vector<Components::Component*> components_;  ///< Components of Medium
 
     double sumCharge_;  ///< sum of charges of all nuclei
 
@@ -152,7 +142,6 @@ class Medium {
     double I_;                 ///< ionization potential [eV]
     double C_, a_;             ///< ionization formula constants
     double m_, X0_, X1_, d0_;  ///< ionization formula constants (continued)
-    double r_;                 ///< refraction index
 
     double massDensity_;      ///< mass density [g/cm3]
     double molDensity_;       ///< molecule density [number/cm3]
@@ -162,6 +151,7 @@ class Medium {
     double sumNucleons_;  ///< sum of nucleons of all nuclei
 
     Density_distr* dens_distr_;
+    std::vector<Components::Component> components_;  ///< Components of Medium
 };
 
 MEDIUM_DEF(Water)
@@ -188,11 +178,6 @@ class Air : public Medium {
     Air(double rho = 1.0);
     Air(const Medium& medium) : Medium(medium) {}
     virtual ~Air() {}
-
-    /* virtual Medium* clone() const { return new Air(*this); } */
-    std::shared_ptr<const Medium> create(double density_correction = 1.0) {
-        return std::make_shared<const Medium>(Air(density_correction));
-    }
 };
 
 // #<{(|

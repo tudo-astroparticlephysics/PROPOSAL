@@ -85,7 +85,7 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
         q2_min -= (aux * aux) / (2 * (1 - v));
     }
 
-    q2_max = 2 * components_[component_index_]->GetAverageNucleonWeight() * energy * (v - limits.vMin);
+    q2_max = 2 * components_[component_index_].GetAverageNucleonWeight() * energy * (v - limits.vMin);
 
     //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and Mikheyev
     if (q2_min > q2_max)
@@ -96,7 +96,7 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
     aux = integral_.Integrate(
         q2_min, q2_max, std::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, energy, v, std::placeholders::_1), 4);
 
-    aux *= medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
+    aux *= medium_->GetMolDensity() * components_[component_index_].GetAtomInMolecule() *
            particle_def_.charge * particle_def_.charge;
 
     return aux;
@@ -146,9 +146,9 @@ Q2_PHOTO_PARAM_INTEGRAL_IMPL(RenoSarcevicSu)
 // ------------------------------------------------------------------------- //
 double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, double v, double Q2)
 {
-    Components::Component* component = components_[component_index_];
+    Components::Component component = components_[component_index_];
 
-    double mass_nucleus = component->GetAverageNucleonWeight();
+    double mass_nucleus = component.GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
     double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
@@ -248,8 +248,8 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
     // eq. 3.11
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
     double structure_function_nucleus =
-        structure_function_proton * shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v * energy) *
-        (component->GetNucCharge() + (component->GetAtomicNum() - component->GetNucCharge()) * relation_proton_neutron);
+        structure_function_proton * shadow_effect_->CalculateShadowEffect(component, bjorken_x, v * energy) *
+        (component.GetNucCharge() + (component.GetAtomicNum() - component.GetNucCharge()) * relation_proton_neutron);
 
     // differential cross section from Dutta et al.
     // Phys. Rev. D 63 (2001), 094020
@@ -274,9 +274,9 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
 // ------------------------------------------------------------------------- //
 double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, double v, double Q2)
 {
-    Components::Component* component = components_[component_index_];
+    Components::Component component = components_[component_index_];
 
-    double mass_nucleus = component->GetAverageNucleonWeight();
+    double mass_nucleus = component.GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
     double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
@@ -376,8 +376,8 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
     // eq. 3.11
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
     double structure_function_nucleus =
-        structure_function_proton * shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v * energy) *
-        (component->GetNucCharge() + (component->GetAtomicNum() - component->GetNucCharge()) * relation_proton_neutron);
+        structure_function_proton * shadow_effect_->CalculateShadowEffect(component, bjorken_x, v * energy) *
+        (component.GetNucCharge() + (component.GetAtomicNum() - component.GetNucCharge()) * relation_proton_neutron);
 
     // differential cross section from Dutta et al.
     // Phys. Rev. D 63 (2001), 094020
@@ -405,9 +405,9 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
 // ------------------------------------------------------------------------- //
 double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, double Q2)
 {
-    Components::Component* component = components_[component_index_];
+    Components::Component component = components_[component_index_];
 
-    double mass_nucleus = component->GetAverageNucleonWeight();
+    double mass_nucleus = component.GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
     double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
@@ -464,9 +464,9 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, do
     double structure_function_neutron = F_neutron_singlet + F_neutron_non_singlet;
     // F_{2, nucleus} = G (Z F_{2, Proton} + (A-Z) F_{2, Neutron})
     double structure_function_nucleus =
-        shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v * energy) *
-        (component->GetNucCharge() * structure_function_proton +
-         (component->GetAtomicNum() - component->GetNucCharge()) * structure_function_neutron);
+        shadow_effect_->CalculateShadowEffect(component, bjorken_x, v * energy) *
+        (component.GetNucCharge() * structure_function_proton +
+         (component.GetAtomicNum() - component.GetNucCharge()) * structure_function_neutron);
 
     // differential cross section from Dutta et al.
     // Phys. Rev. D 63 (2001), 094020
@@ -493,9 +493,9 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, do
 // ------------------------------------------------------------------------- //
 double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double Q2)
 {
-    Components::Component* component = components_[component_index_];
+    Components::Component component = components_[component_index_];
 
-    double mass_nucleus = component->GetAverageNucleonWeight();
+    double mass_nucleus = component.GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
     double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
@@ -595,8 +595,8 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
     // eq. 3.11
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
     double structure_function_nucleus =
-        structure_function_proton * shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v * energy) *
-        (component->GetNucCharge() + (component->GetAtomicNum() - component->GetNucCharge()) * relation_proton_neutron);
+        structure_function_proton * shadow_effect_->CalculateShadowEffect(component, bjorken_x, v * energy) *
+        (component.GetNucCharge() + (component.GetAtomicNum() - component.GetNucCharge()) * relation_proton_neutron);
 
     // --------------------------------------------------------------------- //
     // this is the only part, that differs from ALLM parametrization

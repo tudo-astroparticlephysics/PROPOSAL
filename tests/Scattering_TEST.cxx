@@ -35,7 +35,7 @@ ParticleDef getParticleDef(const std::string& name)
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef mu = MuMinusDef::Get();
-    std::shared_ptr<const Medium> water(Water(1.0).create());
+    auto water = std::make_shared<const Water>(1.0);
 
     Scattering* noScat1 = new ScatteringNoScattering(mu, water);
     ScatteringNoScattering noScat2(mu, water);
@@ -66,8 +66,8 @@ TEST(Comparison, Comparison_not_equal)
 {
     ParticleDef mu  = MuMinusDef::Get();
     ParticleDef tau = TauMinusDef::Get();
-    std::shared_ptr<const Medium> water(Water(1.0).create());
-    std::shared_ptr<const Medium> ice(Ice().create());
+    auto water = std::make_shared<const Water>(1.0);
+    auto ice = std::make_shared<const Ice>();
 
     ScatteringNoScattering noScat1(mu, water);
     ScatteringNoScattering noScat2(tau, water);
@@ -111,7 +111,7 @@ TEST(Comparison, Comparison_not_equal)
 TEST(Assignment, Copyconstructor)
 {
     ParticleDef mu = MuMinusDef::Get();
-    std::shared_ptr<const Medium> water(Water(1.0).create());
+    auto water = std::make_shared<const Water>(1.0);
 
     ScatteringMoliere moliere1(mu, water);
     ScatteringMoliere moliere2 = moliere1;
@@ -121,7 +121,7 @@ TEST(Assignment, Copyconstructor)
 TEST(Assignment, Copyconstructor2)
 {
     ParticleDef mu = MuMinusDef::Get();
-    std::shared_ptr<const Medium> water(Water(1.0).create());
+    auto water = std::make_shared<const Water>(1.0);
 
     ScatteringMoliere moliere1(mu, water);
     ScatteringMoliere moliere2(moliere1);

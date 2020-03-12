@@ -23,7 +23,7 @@ ParticleDef getParticleDef(const std::string& name)
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef mu_def = MuMinusDef::Get();
-    std::shared_ptr<Medium> medium(new Water);
+    auto medium  = std::make_shared<Water>();
     auto sphere = Sphere().create();
     EnergyCutSettings ecuts;
 
@@ -45,8 +45,8 @@ TEST(Comparison, Comparison_not_equal)
 {
     ParticleDef mu_def = MuMinusDef::Get();
     ParticleDef tau_def = TauMinusDef::Get();
-    std::shared_ptr<Medium> medium1(new Water);
-    std::shared_ptr<Medium> medium2(new Ice);
+    auto medium1 = std::make_shared<Water>();
+    auto medium2 = std::make_shared<Ice>();
     auto geometry1 = Sphere().create();
     auto geometry2 = Cylinder().create();
     EnergyCutSettings ecuts1(500, 0.05);
@@ -111,7 +111,7 @@ TEST(Comparison, Comparison_not_equal)
 TEST(Assignment, Copyconstructor)
 {
     ParticleDef mu_def = MuMinusDef::Get();
-    std::shared_ptr<Medium> water(new Water);
+    auto water = std::make_shared<Water>();
     auto geometry = Sphere(Vector3D(0, 0, 0), 1000, 0).create();
     EnergyCutSettings ecuts(500, 0.05);
 
@@ -130,7 +130,7 @@ TEST(Assignment, Copyconstructor)
 TEST(Assignment, Copyconstructor2)
 {
     ParticleDef mu = MuMinusDef::Get();
-    std::shared_ptr<Medium> water(new Water);
+    auto water = std::make_shared<Water>();
     auto geometry = Sphere(Vector3D(), 1000, 0).create();
     EnergyCutSettings ecuts(500, 0.05);
 

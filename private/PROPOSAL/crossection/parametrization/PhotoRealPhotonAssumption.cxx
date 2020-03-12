@@ -92,13 +92,13 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
     double kappa = 1 - 2 / v + 2 / (v * v);
 
     // calculate the shadowing factor
-    if (components_[component_index_]->GetNucCharge() == 1)
+    if (components_[component_index_].GetNucCharge() == 1)
     {
         G = 1;
     } else
     {
         // eq. 18
-        double tmp = 0.00282 * std::pow(components_[component_index_]->GetAtomicNum(), 1. / 3) * sgn;
+        double tmp = 0.00282 * std::pow(components_[component_index_].GetAtomicNum(), 1. / 3) * sgn;
         // eq. 3
         G = (3 / tmp) * (0.5 + ((1 + tmp) * std::exp(-tmp) - 1) / (tmp * tmp));
     }
@@ -116,14 +116,14 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
           ((kappa + 2 * aum / m2) * std::log(1 + m2 / t) - aux) +
           aux * (G * (m1 - 4 * t) / (m1 + t) + (m2 / t) * std::log(1 + t / m2));
 
-    aux *= ALPHA / (8 * PI) * components_[component_index_]->GetAtomicNum() * v * sgn * 1.e-30;
+    aux *= ALPHA / (8 * PI) * components_[component_index_].GetAtomicNum() * v * sgn * 1.e-30;
 
     // hard component by Bugaev, Montaruli, Shelpin, Sokalski
     // Astrop. Phys. 21 (2004), 491
     // in the appendix
-    aux += components_[component_index_]->GetAtomicNum() * 1.e-30 * hard_component_->CalculateHardComponent(energy, v);
+    aux += components_[component_index_].GetAtomicNum() * 1.e-30 * hard_component_->CalculateHardComponent(energy, v);
 
-    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
+    return medium_->GetMolDensity() * components_[component_index_].GetAtomInMolecule() *
            particle_def_.charge * particle_def_.charge * aux;
 }
 
@@ -175,7 +175,7 @@ double PhotoZeus::CalculateParametrization(double nu)
 {
     double aux;
 
-    aux = nu * 2.e-3 * this->components_[this->component_index_]->GetAverageNucleonWeight();
+    aux = nu * 2.e-3 * this->components_[this->component_index_].GetAverageNucleonWeight();
     aux = 63.5 * std::pow(aux, 0.097) + 145 * std::pow(aux, -0.5);
 
     return aux;

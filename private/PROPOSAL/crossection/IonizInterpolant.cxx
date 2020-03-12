@@ -233,7 +233,7 @@ double IonizInterpolant::CalculateStochasticLoss(double energy, double rnd1)
 
     for (unsigned int i = 0; i < components_.size(); i++)
     {
-        rsum += components_[i]->GetAtomInMolecule() * components_[i]->GetNucCharge();
+        rsum += components_[i].GetAtomInMolecule() * components_[i].GetNucCharge();
 
         if (rsum > rnd)
         {

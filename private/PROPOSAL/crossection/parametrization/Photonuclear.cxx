@@ -302,12 +302,12 @@ Parametrization::IntegralLimits Photonuclear::GetIntegralLimits(double energy)
 
     IntegralLimits limits;
 
-    limits.vMin = (MPI + MPI * MPI / (2 * components_[component_index_]->GetAverageNucleonWeight())) / energy;
+    limits.vMin = (MPI + MPI * MPI / (2 * components_[component_index_].GetAverageNucleonWeight())) / energy;
 
     if (particle_def_.mass < MPI)
     {
-        aux         = particle_def_.mass / components_[component_index_]->GetAverageNucleonWeight();
-        limits.vMax = 1 - components_[component_index_]->GetAverageNucleonWeight() * (1 + aux * aux) / (2 * energy);
+        aux         = particle_def_.mass / components_[component_index_].GetAverageNucleonWeight();
+        limits.vMax = 1 - components_[component_index_].GetAverageNucleonWeight() * (1 + aux * aux) / (2 * energy);
     } else
     {
         limits.vMax = 1;

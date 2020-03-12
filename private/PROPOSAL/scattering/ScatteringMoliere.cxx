@@ -125,10 +125,10 @@ ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, std::share
     double A_sum = 0.;
 
     for (int i = 0; i < numComp_; i++) {
-        Components::Component* component = medium_->GetComponents().at(i);
-        Zi_[i] = component->GetNucCharge();
-        ki[i] = component->GetAtomInMolecule();
-        Ai[i] = component->GetAtomicNum();
+        Components::Component component = medium_->GetComponents().at(i);
+        Zi_[i] = component.GetNucCharge();
+        ki[i] = component.GetAtomInMolecule();
+        Ai[i] = component.GetAtomicNum();
 
         A_sum += ki[i] * Ai[i];
     }

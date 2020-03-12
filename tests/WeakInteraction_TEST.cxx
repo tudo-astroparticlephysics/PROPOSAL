@@ -43,7 +43,7 @@ ParticleDef getParticleDef(const std::string& name)
 TEST(Comparison, Comparison_equal_particle)
 {
 ParticleDef particle_def = MuMinusDef::Get(); //particle
-std::shared_ptr<const Medium> medium(Water().create());
+auto medium = std::make_shared<const Water>();
 EnergyCutSettings ecuts;
 double multiplier   = 1.;
 
@@ -75,7 +75,7 @@ delete Interpol_B;
 TEST(Comparison, Comparison_equal_antiparticle)
 {
     ParticleDef particle_def = MuPlusDef::Get(); //antiparticle
-    std::shared_ptr<const Medium> medium(Water().create());
+    auto medium = std::make_shared<const Water>();
     double multiplier   = 1.;
 
     WeakInteraction* Weak_A = new WeakCooperSarkarMertsch(particle_def, medium, multiplier);
@@ -108,8 +108,8 @@ TEST(Comparison, Comparison_not_equal)
 ParticleDef mu_def  = MuMinusDef::Get();
 ParticleDef tau_def = TauMinusDef::Get();
 ParticleDef mu_plus_def  = MuPlusDef::Get();
-std::shared_ptr<const Medium> medium_1(Water().create());
-std::shared_ptr<const Medium> medium_2(Ice().create());
+auto medium_1 = std::make_shared<const Water>();
+auto medium_2 = std::make_shared<const Ice>();
 double multiplier_1 = 1.;
 double multiplier_2 = 2.;
 
@@ -146,7 +146,7 @@ EXPECT_TRUE(Integral_A != Integral_B);
 TEST(Assignment, Copyconstructor)
 {
 ParticleDef particle_def = MuMinusDef::Get();
-std::shared_ptr<const Medium> medium(Water().create());
+auto medium = std::make_shared<const Water>();
 double multiplier = 1.;
 
 WeakCooperSarkarMertsch Weak_A(particle_def, medium, multiplier);

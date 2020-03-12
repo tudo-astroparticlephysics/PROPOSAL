@@ -7,7 +7,7 @@
 using namespace PROPOSAL;
 
 TEST(Comparison, Comparison_equal) {
-    auto water = std::make_shared<Medium>(Water(1.0));
+    auto water = std::make_shared<Water>(1.0);
     EnergyCutSettings ecuts;
     ParticleDef pDef(MuMinusDef::Get());
     Utility::Definition utility_defs;
@@ -19,8 +19,8 @@ TEST(Comparison, Comparison_equal) {
 }
 
 TEST(Comparison, Comparison_not_equal) {
-    auto water1 = std::make_shared<Medium>(Water(1.0));
-    auto water2 = std::make_shared<Medium>(Water(0.9));
+    auto water1 = std::make_shared<Water>(1.0);
+    auto water2 = std::make_shared<Water>(0.9);
 
     EnergyCutSettings ecuts1(500, 0.05);
     EnergyCutSettings ecuts2(200, 0.01);
@@ -41,13 +41,13 @@ TEST(Comparison, Comparison_not_equal) {
 }
 
 TEST(Copyconstructor, Copyconstructor) {
-    Utility A(MuMinusDef::Get(), std::make_shared<Medium>(Ice()), EnergyCutSettings(),
+    Utility A(MuMinusDef::Get(), std::make_shared<Ice>(), EnergyCutSettings(),
               Utility::Definition());
     Utility B(A);
 
     EXPECT_TRUE(A == B);
 
-    Utility C(MuMinusDef::Get(), std::make_shared<Medium>(Ice()), EnergyCutSettings(),
+    Utility C(MuMinusDef::Get(), std::make_shared<Ice>(), EnergyCutSettings(),
               Utility::Definition(), InterpolationDef());
     Utility D(C);
 
@@ -55,13 +55,13 @@ TEST(Copyconstructor, Copyconstructor) {
 }
 
 TEST(Copyconstructor, Copyconstructor2) {
-    Utility A(MuMinusDef::Get(), std::make_shared<Medium>(Ice()), EnergyCutSettings(),
+    Utility A(MuMinusDef::Get(), std::make_shared<Ice>(), EnergyCutSettings(),
               Utility::Definition());
     Utility B = A;
 
     EXPECT_TRUE(A == B);
 
-    Utility C(MuMinusDef::Get(), std::make_shared<Medium>(Ice()), EnergyCutSettings(),
+    Utility C(MuMinusDef::Get(), std::make_shared<Ice>(), EnergyCutSettings(),
               Utility::Definition(), InterpolationDef());
     Utility D = C;
 

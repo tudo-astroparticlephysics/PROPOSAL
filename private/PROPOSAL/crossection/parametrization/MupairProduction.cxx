@@ -168,7 +168,7 @@ double MupairProductionRhoIntegral::DifferentialCrossSection(double energy, doub
         return 0;
     }
 
-    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
+    return medium_->GetMolDensity() * components_[component_index_].GetAtomInMolecule() *
            particle_def_.charge * particle_def_.charge *
            (integral_.Integrate(
                    0, rMax, std::bind(&MupairProductionRhoIntegral::FunctionToIntegral, this, energy, v, std::placeholders::_1), 2));
@@ -214,9 +214,9 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v
 
     double aux, aux1, aux2, r2, rMax, Z3, xi, beta, A_pow, r_mu;
     double phi, U, U_max, X, Y;
-    double medium_charge       = components_[component_index_]->GetNucCharge();
-    double atomic_weight       = components_[component_index_]->GetAtomInMolecule();
-    //double medium_log_constant = components_[component_index_]->GetLogConstant();
+    double medium_charge       = components_[component_index_].GetNucCharge();
+    double atomic_weight       = components_[component_index_].GetAtomInMolecule();
+    //double medium_log_constant = components_[component_index_].GetLogConstant();
     double medium_log_constant = 183; // According to the paper, B is set to 183
 
     r2          = r * r;
