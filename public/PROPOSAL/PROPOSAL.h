@@ -120,13 +120,9 @@
 #include "PROPOSAL/scattering/ScatteringHighland.h"
 #include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
-#include "PROPOSAL/scattering/ScatteringNoScattering.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/Propagator.h"
-#include "PROPOSAL/PropagatorService.h"
-#include "PROPOSAL/Sector.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Secondaries.h"
 
