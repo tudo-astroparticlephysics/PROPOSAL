@@ -1,3 +1,4 @@
+#include <cassert>
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
@@ -11,7 +12,8 @@ using namespace PROPOSAL;
 // CrossSection
 // ------------------------------------------------------------------------- //
 
-CrossSection::CrossSection(const Parametrization& param, std::shared_ptr<const EnergyCutSettings> cuts)
+CrossSection::CrossSection(
+    const Parametrization& param, std::shared_ptr<const EnergyCutSettings> cuts)
     : parametrization_(param.clone())
     , prob_for_component_(param.GetMedium()->GetNumComponents(), 0)
     , sum_of_rates_(0)
@@ -31,10 +33,7 @@ CrossSection::CrossSection(const CrossSection& cross_section)
 {
 }
 
-CrossSection::~CrossSection()
-{
-    delete parametrization_;
-}
+CrossSection::~CrossSection() { delete parametrization_; }
 
 bool CrossSection::operator==(const CrossSection& cross_section) const
 {
@@ -49,7 +48,7 @@ bool CrossSection::operator==(const CrossSection& cross_section) const
         return false;
     else if (rnd_ != cross_section.rnd_)
         return false;
-    else if(cuts_ != cross_section.cuts_)
+    else if (cuts_ != cross_section.cuts_)
         return false;
     else
         return this->compare(cross_section);
@@ -74,25 +73,25 @@ std::ostream& operator<<(std::ostream& os, CrossSection const& cross)
 }
 } // namespace PROPOSAL
 
-double CrossSection::GetEnergyCut(double energy){
-    Parametrization::KinematicLimits physical_limits = parametrization_->GetKinematicLimits(energy);
+double CrossSection::GetEnergyCut(double energy)
+{
+    auto physical_limits = parametrization_->GetKinematicLimits(energy);
+    auto energy_cut = physical_limits.vMin;
 
-    if(cuts_ == nullptr) throw std::logic_error("CrossSection is only stochastic, therefore there is no energy cut defined.");
+    assert(physical_limits.vmin <= physical_limits.vmax);
 
-    double energy_cut = std::min(physical_limits.vMax, cuts_->GetCut(energy));
-
-    if (energy_cut < physical_limits.vMin)
-    {
-        energy_cut = physical_limits.vMin;
-    }
-
-    return energy_cut;
+    if (cuts_)
+        return std::min(std::max(physical_limits.vMin, cuts_->GetCut(energy)),
+            physical_limits.vMax);
+    else
+        return physical_limits.vMin;
 }
 
-
-std::pair<double, double> CrossSection::StochasticDeflection(double energy, double energy_loss){
+std::pair<double, double> CrossSection::StochasticDeflection(
+    double energy, double energy_loss)
+{
     // per default the particle is not deflected
-    (void) energy;
-    (void) energy_loss;
+    (void)energy;
+    (void)energy_loss;
     return std::make_pair(1, 0);
 }

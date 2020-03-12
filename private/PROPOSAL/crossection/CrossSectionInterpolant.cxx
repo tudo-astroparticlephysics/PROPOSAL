@@ -277,7 +277,7 @@ double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rn
             parametrization_->SetCurrentComponent(i);
             Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-            vUp = cuts_->GetCut(energy);
+            vUp = GetEnergyCut(energy);
 
             if (vUp == limits.vMax)
             {
@@ -297,7 +297,7 @@ double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rn
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        vUp = cuts_->GetCut(energy);
+        vUp = GetEnergyCut(energy);
 
         if (vUp != limits.vMax)
             prob_for_all_comp_is_zero = false;
@@ -325,7 +325,7 @@ double CrossSectionInterpolant::CalculateCumulativeCrossSection(double energy, i
     parametrization_->SetCurrentComponent(component);
     Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-    double vUp = cuts_->GetCut(energy);
+    double vUp = GetEnergyCut(energy);
 
     v = std::log(v / vUp) / std::log(limits.vMax / vUp);
 
@@ -341,7 +341,7 @@ double CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D(double energy,
     parametrization_->SetCurrentComponent(component);
     Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-    double vUp = cuts_->GetCut(energy);
+    double vUp = GetEnergyCut(energy);
 
     if (vUp == limits.vMax)
     {

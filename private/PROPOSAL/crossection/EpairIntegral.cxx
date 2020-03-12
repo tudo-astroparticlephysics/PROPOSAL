@@ -44,7 +44,7 @@ double EpairIntegral::CalculatedEdxWithoutMultiplier(double energy)
         parametrization_->SetCurrentComponent(i);
         Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
 
-        vUp = cuts_->GetCut(energy);
+        vUp = GetEnergyCut(energy);
 
         double r1  = 0.8;
         double rUp = vUp * (1 - HALF_PRECISION);
