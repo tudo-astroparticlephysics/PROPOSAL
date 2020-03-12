@@ -11,4 +11,4 @@ cmake_uninstall.cmake
 *.png
 *.pdf
 *.swp
-tests/TestFiles.tar.gz
+tests/TestFiles*.tar.gz
