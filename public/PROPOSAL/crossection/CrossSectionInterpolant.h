@@ -42,7 +42,6 @@ class CrossSectionInterpolant : public CrossSection
 public:
     CrossSectionInterpolant(const Parametrization&, std::shared_ptr<const EnergyCutSettings>);
     CrossSectionInterpolant(const CrossSectionInterpolant&);
-    virtual ~CrossSectionInterpolant();
 
     virtual CrossSection* clone() const = 0;
 
@@ -60,13 +59,13 @@ public:
 protected:
     virtual bool compare(const CrossSection&) const;
 
-    typedef std::vector<Interpolant*> InterpolantVec;
+    typedef std::vector<std::shared_ptr<Interpolant>> InterpolantVec;
 
     virtual double CalculateStochasticLoss(double energy, double rnd1);
     virtual void InitdNdxInterpolation(const InterpolationDef& def);
 
-    Interpolant* dedx_interpolant_;
-    Interpolant* de2dx_interpolant_;
+    std::shared_ptr<Interpolant> dedx_interpolant_;
+    std::shared_ptr<Interpolant> de2dx_interpolant_;
     InterpolantVec dndx_interpolant_1d_; // Stochastic dNdx()
     InterpolantVec dndx_interpolant_2d_; // Stochastic dNdx()
 };

@@ -45,7 +45,7 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
         .SetLogSubst(true)
         .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedEdxWithoutMultiplier, &mupair, std::placeholders::_1));
 
-    builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
+    builder_container.push_back(std::make_pair(&builder1d, dedx_interpolant_));
 
     // --------------------------------------------------------------------- //
     // Builder for DE2dx
@@ -67,7 +67,7 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
         .SetLogSubst(false)
         .SetFunction1D(std::bind(&MupairIntegral::CalculatedE2dxWithoutMultiplier, &mupair, std::placeholders::_1));
 
-    builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
+    builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, de2dx_interpolant_));
 
     Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), *def);
     Helper::InitializeInterpolation(

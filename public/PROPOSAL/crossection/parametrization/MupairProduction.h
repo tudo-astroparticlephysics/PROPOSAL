@@ -143,7 +143,7 @@ template<class Param = MupairKelnerKokoulinPetrukhin>
 class MupairProductionRhoInterpolant : public Param
 {
 public:
-    typedef std::vector<Interpolant*> InterpolantVec;
+    typedef std::vector<std::shared_ptr<Interpolant>> InterpolantVec;
 
 public:
     MupairProductionRhoInterpolant(const ParticleDef&,
@@ -151,7 +151,6 @@ public:
                        double multiplier,
                        std::shared_ptr<const InterpolationDef>);
     MupairProductionRhoInterpolant(const MupairProductionRhoInterpolant&);
-    virtual ~MupairProductionRhoInterpolant();
 
     Parametrization* clone() const { return new MupairProductionRhoInterpolant<Param>(*this); }
     static MupairProduction* create(const ParticleDef& particle_def,
@@ -177,7 +176,7 @@ MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const Part
                                               double multiplier,
                                               std::shared_ptr<const InterpolationDef> def)
     : Param(particle_def, medium, multiplier)
-    , interpolant_(this->medium_->GetNumComponents(), NULL)
+    , interpolant_(this->medium_->GetNumComponents(), nullptr)
 {
     std::vector<Interpolant2DBuilder> builder2d(this->components_.size());
     Helper::InterpolantBuilderContainer builder_container2d(this->components_.size());
@@ -206,7 +205,7 @@ MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const Part
             .SetFunction2D(std::bind(&MupairProductionRhoInterpolant::FunctionToBuildPhotoInterpolant, this, std::placeholders::_1, std::placeholders::_2, i));
 
         builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = &interpolant_[i];
+        builder_container2d[i].second = interpolant_[i];
     }
 
     Helper::InitializeInterpolation("Mupair", builder_container2d, std::vector<Parametrization*>(1, this), *def);
@@ -221,19 +220,8 @@ MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const Mupa
 
     for (unsigned int i = 0; i < photo.interpolant_.size(); ++i)
     {
-        interpolant_[i] = new Interpolant(*photo.interpolant_[i]);
+        interpolant_[i] = photo.interpolant_[i];
     }
-}
-
-template<class Param>
-MupairProductionRhoInterpolant<Param>::~MupairProductionRhoInterpolant()
-{
-    for (std::vector<Interpolant*>::const_iterator iter = interpolant_.begin(); iter != interpolant_.end(); ++iter)
-    {
-        delete *iter;
-    }
-
-    interpolant_.clear();
 }
 
 template<class Param>

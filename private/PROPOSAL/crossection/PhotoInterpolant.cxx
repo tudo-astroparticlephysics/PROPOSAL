@@ -42,7 +42,7 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, std::shared_ptr<co
         .SetLogSubst(false)
         .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedEdxWithoutMultiplier, &photo, std::placeholders::_1));
 
-    builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
+    builder_container.push_back(std::make_pair(&builder1d, dedx_interpolant_));
 
     // --------------------------------------------------------------------- //
     // Builder for DE2dx
@@ -64,7 +64,7 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, std::shared_ptr<co
         .SetLogSubst(false)
         .SetFunction1D(std::bind(&PhotoIntegral::CalculatedE2dxWithoutMultiplier, &photo, std::placeholders::_1));
 
-    builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
+    builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, de2dx_interpolant_));
 
     Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), *def);
     Helper::InitializeInterpolation(

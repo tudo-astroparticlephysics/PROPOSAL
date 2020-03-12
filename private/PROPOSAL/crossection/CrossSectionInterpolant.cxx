@@ -21,10 +21,10 @@ using namespace PROPOSAL;
 
 CrossSectionInterpolant::CrossSectionInterpolant(const Parametrization& param, std::shared_ptr<const EnergyCutSettings> cuts)
     : CrossSection(param, cuts)
-    , dedx_interpolant_(NULL)
-    , de2dx_interpolant_(NULL)
-    , dndx_interpolant_1d_(param.GetMedium()->GetNumComponents(), NULL)
-    , dndx_interpolant_2d_(param.GetMedium()->GetNumComponents(), NULL)
+    , dedx_interpolant_(nullptr)
+    , de2dx_interpolant_(nullptr)
+    , dndx_interpolant_1d_(param.GetMedium()->GetNumComponents(), nullptr)
+    , dndx_interpolant_2d_(param.GetMedium()->GetNumComponents(), nullptr)
 {
 }
 
@@ -105,7 +105,7 @@ void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                 i));
 
         builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = &dndx_interpolant_2d_[i];
+        builder_container2d[i].second = dndx_interpolant_2d_[i];
 
         builder1d[i]
             .SetMax(def.nodes_cross_section)
@@ -122,7 +122,7 @@ void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
             .SetFunction1D(std::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, std::placeholders::_1, i));
 
         builder_container1d[i].first  = &builder1d[i];
-        builder_container1d[i].second = &dndx_interpolant_1d_[i];
+        builder_container1d[i].second = std::move(dndx_interpolant_1d_[i]);
     }
 
     builder_return.insert(builder_return.end(), builder_container2d.begin(), builder_container2d.end());
@@ -137,7 +137,7 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
 {
     if (cross_section.dedx_interpolant_ != NULL)
     {
-        dedx_interpolant_ = new Interpolant(*cross_section.dedx_interpolant_);
+        dedx_interpolant_.reset(new Interpolant(*cross_section.dedx_interpolant_));
     }
     else{
         dedx_interpolant_ = NULL;
@@ -145,7 +145,7 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
 
     if (cross_section.de2dx_interpolant_ != NULL)
     {
-        de2dx_interpolant_ = new Interpolant(*cross_section.de2dx_interpolant_);
+        de2dx_interpolant_.reset(new Interpolant(*cross_section.de2dx_interpolant_));
     }
     else{
         de2dx_interpolant_ = NULL;
@@ -156,35 +156,19 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
     dndx_interpolant_1d_.reserve(num_components);
     for (auto interpolant: cross_section.dndx_interpolant_1d_)
     {
-        if (interpolant != NULL)
+        if (interpolant != nullptr)
         {
-            dndx_interpolant_1d_.push_back(new Interpolant(*interpolant));
+            dndx_interpolant_1d_.push_back(interpolant);
         }
     }
 
     dndx_interpolant_2d_.reserve(num_components);
     for (auto interpolant: cross_section.dndx_interpolant_2d_)
     {
-        if (interpolant != NULL)
+        if (interpolant != nullptr)
         {
-            dndx_interpolant_2d_.push_back(new Interpolant(*interpolant));
+            dndx_interpolant_2d_.push_back(interpolant);
         }
-    }
-}
-
-CrossSectionInterpolant::~CrossSectionInterpolant()
-{
-    delete dedx_interpolant_;
-    delete de2dx_interpolant_;
-
-    for (auto interpolant: dndx_interpolant_1d_)
-    {
-        delete interpolant;
-    }
-
-    for (auto interpolant: dndx_interpolant_2d_)
-    {
-        delete interpolant;
     }
 }
 

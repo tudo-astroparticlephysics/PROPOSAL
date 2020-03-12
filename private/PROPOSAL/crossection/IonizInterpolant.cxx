@@ -48,7 +48,7 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
         .SetLogSubst(true)
         .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedEdxWithoutMultiplier, &ioniz, std::placeholders::_1));
 
-    builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
+    builder_container.push_back(std::make_pair(&builder1d, dedx_interpolant_));
 
     // --------------------------------------------------------------------- //
     // Builder for DE2dx
@@ -70,7 +70,7 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
         .SetLogSubst(false)
         .SetFunction1D(std::bind(&IonizIntegral::CalculatedE2dxWithoutMultiplier, &ioniz, std::placeholders::_1));
 
-    builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
+    builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, de2dx_interpolant_));
 
     Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), *def);
     Helper::InitializeInterpolation(
@@ -128,7 +128,7 @@ void IonizInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                 &IonizInterpolant::FunctionToBuildDNdxInterpolant2D, this, std::placeholders::_1, std::placeholders::_2, std::ref(integral), i));
 
         builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = &dndx_interpolant_2d_[i];
+        builder_container2d[i].second = dndx_interpolant_2d_[i];
 
         builder1d[i]
             .SetMax(def.nodes_cross_section)
@@ -145,7 +145,7 @@ void IonizInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
             .SetFunction1D(std::bind(&IonizInterpolant::FunctionToBuildDNdxInterpolant, this, std::placeholders::_1, i));
 
         builder_container1d[i].first  = &builder1d[i];
-        builder_container1d[i].second = &dndx_interpolant_1d_[i];
+        builder_container1d[i].second = dndx_interpolant_1d_[i];
     }
 
     builder_return.insert(builder_return.end(), builder_container2d.begin(), builder_container2d.end());
