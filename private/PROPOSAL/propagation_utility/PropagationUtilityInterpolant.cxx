@@ -31,12 +31,6 @@ UtilityInterpolant::UtilityInterpolant(
 {
 }
 
-UtilityInterpolant::~UtilityInterpolant()
-{
-    delete interpolant_;
-    delete interpolant_diff_;
-}
-
 // ------------------------------------------------------------------------- //
 double UtilityInterpolant::GetUpperLimit(double ei, double rnd)
 {
@@ -52,13 +46,13 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
 {
     Integral integral(IROMB, IMAXS, IPREC2);
 
-    std::vector<std::pair<Interpolant**, std::function<double(double)>>>
+    std::vector<std::pair<std::shared_ptr<Interpolant>, std::function<double(double)>>>
         interpolants;
 
-    interpolants.push_back(std::make_pair(&interpolant_,
+    interpolants.push_back(std::make_pair(interpolant_,
         std::bind(&UtilityInterpolant::BuildInterpolant, this,
             std::placeholders::_1, std::ref(utility), std::ref(integral))));
-    interpolants.push_back(std::make_pair(&interpolant_diff_,
+    interpolants.push_back(std::make_pair(interpolant_diff_,
         std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
             std::placeholders::_1)));
 

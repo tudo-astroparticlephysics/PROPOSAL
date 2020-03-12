@@ -307,8 +307,8 @@ namespace Helper {
                          = builder_container.begin();
                          builder_it != builder_container.end(); ++builder_it) {
                         // TODO(mario): read check Tue 2017/09/05
-                        (*builder_it->second) = new Interpolant();
-                        (*builder_it->second)->Load(input, binary_tables);
+                        builder_it->second.reset(new Interpolant());
+                        builder_it->second->Load(input, binary_tables);
                     }
                     reading_worked = true;
                 }
@@ -380,8 +380,8 @@ namespace Helper {
                          = builder_container.begin();
                          builder_it != builder_container.end(); ++builder_it) {
                         // TODO(mario): read check Tue 2017/09/05
-                        (*builder_it->second) = new Interpolant();
-                        (*builder_it->second)->Load(input, binary_tables);
+                        builder_it->second.reset(new Interpolant());
+                        builder_it->second->Load(input, binary_tables);
                     }
                 }
 
@@ -404,8 +404,8 @@ namespace Helper {
                     for (InterpolantBuilderContainer::iterator builder_it
                          = builder_container.begin();
                          builder_it != builder_container.end(); ++builder_it) {
-                        (*builder_it->second) = builder_it->first->build();
-                        (*builder_it->second)->Save(output, binary_tables);
+                        builder_it->second.reset(builder_it->first->build());
+                        builder_it->second->Save(output, binary_tables);
                     }
                 } else {
                     storing_failed = true;
@@ -424,7 +424,7 @@ namespace Helper {
             for (InterpolantBuilderContainer::iterator builder_it
                  = builder_container.begin();
                  builder_it != builder_container.end(); ++builder_it) {
-                (*builder_it->second) = builder_it->first->build();
+                builder_it->second.reset(builder_it->first->build());
             }
         }
 

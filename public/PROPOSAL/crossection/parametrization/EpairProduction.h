@@ -169,7 +169,7 @@ template<class Param = EpairKelnerKokoulinPetrukhin>
 class EpairProductionRhoInterpolant : public Param
 {
 public:
-    typedef std::vector<Interpolant*> InterpolantVec;
+    typedef std::vector<std::shared_ptr<Interpolant>> InterpolantVec;
 
 public:
     EpairProductionRhoInterpolant(const ParticleDef&,
@@ -178,7 +178,6 @@ public:
                        bool lpm,
                        std::shared_ptr<const InterpolationDef> def);
     EpairProductionRhoInterpolant(const EpairProductionRhoInterpolant&);
-    virtual ~EpairProductionRhoInterpolant();
 
     Parametrization* clone() const { return new EpairProductionRhoInterpolant<Param>(*this); }
     static EpairProduction* create(const ParticleDef& particle_def,
@@ -235,7 +234,7 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const Partic
             .SetFunction2D(std::bind(&EpairProductionRhoInterpolant::FunctionToBuildPhotoInterpolant, this, std::placeholders::_1, std::placeholders::_2, i));
 
         builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = &interpolant_[i];
+        builder_container2d[i].second = interpolant_[i];
     }
 
     Helper::InitializeInterpolation("Epair", builder_container2d, std::vector<Parametrization*>(1, this), *def);
@@ -250,19 +249,8 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const EpairP
 
     for (unsigned int i = 0; i < photo.interpolant_.size(); ++i)
     {
-        interpolant_[i] = new Interpolant(*photo.interpolant_[i]);
+        interpolant_[i] = photo.interpolant_[i];
     }
-}
-
-template<class Param>
-EpairProductionRhoInterpolant<Param>::~EpairProductionRhoInterpolant()
-{
-    for (std::vector<Interpolant*>::const_iterator iter = interpolant_.begin(); iter != interpolant_.end(); ++iter)
-    {
-        delete *iter;
-    }
-
-    interpolant_.clear();
 }
 
 template<class Param>

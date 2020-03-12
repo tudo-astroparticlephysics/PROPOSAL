@@ -190,7 +190,7 @@ void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                         i));
 
         builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = &dndx_interpolant_2d_[i];
+        builder_container2d[i].second = dndx_interpolant_2d_[i];
 
         builder1d[i]
                 .SetMax(def.nodes_cross_section)
@@ -207,7 +207,7 @@ void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                 .SetFunction1D(std::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, std::placeholders::_1, i));
 
         builder_container1d[i].first  = &builder1d[i];
-        builder_container1d[i].second = &dndx_interpolant_1d_[i];
+        builder_container1d[i].second = dndx_interpolant_1d_[i];
     }
 
     builder_return.insert(builder_return.end(), builder_container2d.begin(), builder_container2d.end());

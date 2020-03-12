@@ -46,11 +46,11 @@ EnergyCutSettings::EnergyCutSettings(
 
 EnergyCutSettings::EnergyCutSettings(const nlohmann::json& config)
 {
-    if(!config.contain("e_cut"))
+    if(!config.contains("e_cut"))
         throw std::invalid_argument("A e_cut must be defined. e_cut = [0-inf]");
-    if(!config.contain("v_cut"))
+    if(!config.contains("v_cut"))
         throw std::invalid_argument("A v_cut must be defined. v_cut = [0-1]");
-    if(!config.contain("cont_rand"))
+    if(!config.contains("cont_rand"))
         throw std::invalid_argument("cont_rand must be activated/deactivated. cont_rand = true/false");
 
     double ecut, vcut;

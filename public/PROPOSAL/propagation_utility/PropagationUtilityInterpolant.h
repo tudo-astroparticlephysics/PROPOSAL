@@ -58,7 +58,6 @@ class UtilityInterpolant : public UtilityDecorator
 {
 public:
     UtilityInterpolant(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);
-    virtual ~UtilityInterpolant();
 
     virtual double Calculate(double ei, double ef, double rnd) = 0;
     virtual double GetUpperLimit(double ei, double rnd);
@@ -68,8 +67,8 @@ protected:
     virtual void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points) = 0;
 
     double stored_result_;
-    Interpolant* interpolant_;
-    Interpolant* interpolant_diff_;
+    std::shared_ptr<Interpolant> interpolant_;
+    std::shared_ptr<Interpolant> interpolant_diff_;
     double low_;
 
     std::shared_ptr<InterpolationDef> interpolation_def_;
