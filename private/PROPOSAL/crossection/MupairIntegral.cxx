@@ -52,7 +52,7 @@ double MupairIntegral::CalculatedEdxWithoutMultiplier(double energy)
 
         sum += dedx_integral_.Integrate(
             limits.vMin,
-            cuts_->GetCut(energy),
+            GetEnergyCut(energy),
             std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
             4);
     }
@@ -81,4 +81,3 @@ std::pair<std::vector<DynamicData>, bool> MupairIntegral::CalculateProducedParti
     return std::make_pair(mupair, false);
 
 }
-
