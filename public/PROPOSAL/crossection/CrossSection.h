@@ -86,7 +86,6 @@ public:
     Parametrization& GetParametrization() const { return *parametrization_; }
 
 protected:
-    typedef std::vector<Components::Component*> ComponentVec;
 
     virtual bool compare(const CrossSection&) const = 0;
 
@@ -108,7 +107,7 @@ protected:
                                              //!< interact with the particle (formerly h_)
     double sum_of_rates_;
 
-    const ComponentVec& components_;
+    const std::vector<Components::Component>& components_;
 
     double rnd_; //!< This random number will be stored in CalculateDNdx to avoid calculate dNdx a second time in
                  //! ClaculateSochasticLoss when it is already done

@@ -86,7 +86,7 @@ Parametrization::IntegralLimits EpairProduction::GetIntegralLimits(double energy
     double aux = particle_def_.mass / energy;
 
     limits.vMin = 4 * ME / energy;
-    limits.vMax = 1 - 0.75 * SQRTE * aux * std::pow(components_[component_index_]->GetNucCharge(), 1. / 3);
+    limits.vMax = 1 - 0.75 * SQRTE * aux * std::pow(components_[component_index_].GetNucCharge(), 1. / 3);
 
     aux         = 1 - 6 * aux * aux;
     limits.vMax = std::min(limits.vMax, aux);
@@ -121,8 +121,8 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
 
         for (auto component: medium_->GetComponents())
         {
-            sum += component->GetNucCharge() * component->GetNucCharge() *
-                   std::log(3.25 * component->GetLogConstant() * std::pow(component->GetNucCharge(), -1. / 3));
+            sum += component.GetNucCharge() * component.GetNucCharge() *
+                   std::log(3.25 * component.GetLogConstant() * std::pow(component.GetNucCharge(), -1. / 3));
         }
 
         // eq. 29
@@ -219,7 +219,7 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
 
     aux = std::max(1 - rMax, COMPUTER_PRECISION);
 
-    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
+    return medium_->GetMolDensity() * components_[component_index_].GetAtomInMolecule() *
            particle_def_.charge * particle_def_.charge *
            (integral_.Integrate(
                 1 - rMax, aux, std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, std::placeholders::_1), 2) +
@@ -269,8 +269,8 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v,
     double g1, g2;
     double aux, aux1, aux2, r2;
     double diagram_e, diagram_mu, atomic_electron_contribution;
-    double medium_charge       = components_[component_index_]->GetNucCharge();
-    double medium_log_constant = components_[component_index_]->GetLogConstant();
+    double medium_charge       = components_[component_index_].GetNucCharge();
+    double medium_log_constant = components_[component_index_].GetLogConstant();
 
     r           = 1 - r; // only for integral optimization - do not forget to swap integration limits!
     r2          = r * r;
@@ -370,10 +370,10 @@ double EpairSandrockSoedingreksoRhode::FunctionToIntegral(double energy, double 
 {
     double m_in = particle_def_.mass;
 
-    double nucl_Z = components_[component_index_]->GetNucCharge();
-    double nucl_A = components_[component_index_]->GetAtomicNum();
+    double nucl_Z = components_[component_index_].GetNucCharge();
+    double nucl_A = components_[component_index_].GetAtomicNum();
 
-    double rad_log = components_[component_index_]->GetLogConstant();
+    double rad_log = components_[component_index_].GetLogConstant();
 
     double const_prefactor = 4.0 / (3.0 * PI) * nucl_Z * std::pow(ALPHA * RE, 2.0);
     double Z13             = std::pow(nucl_Z, -1.0 / 3.0);

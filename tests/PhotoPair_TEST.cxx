@@ -29,7 +29,7 @@ ParticleDef getParticleDef(const std::string& name)
 TEST(Comparison, Comparison_equal)
 {
 ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium(Water().create());
+auto medium = std::make_shared<const Water>();
 double multiplier   = 1.;
 
 PhotoPairProduction* PhotoPair_A = new PhotoPairTsai(particle_def, medium, multiplier);
@@ -62,7 +62,7 @@ delete Interpol_B;
 TEST(Comparison, Comparison_equal_PhotoAngleDistribution)
 {
 ParticleDef particle_def = GammaDef::Get(); //particle
-std::shared_ptr<const Medium> medium(Water().create());;
+auto medium = std::make_shared<const Water>();
 
 PhotoAngleDistribution* PhotoAngle_A = new PhotoAngleNoDeflection(particle_def, medium);
 PhotoAngleNoDeflection* PhotoAngle_B = new PhotoAngleNoDeflection(particle_def, medium);
@@ -80,8 +80,8 @@ TEST(Comparison, Comparison_not_equal)
 {
 ParticleDef photon  = GammaDef::Get();
 ParticleDef mu_def  = MuMinusDef::Get(); //makes no physical sense but programmatically possible
-std::shared_ptr<const Medium> medium_1(Water().create());;
-std::shared_ptr<const Medium> medium_2(Ice().create());;
+auto medium_1 = std::make_shared<const Water>();
+auto medium_2 = std::make_shared<const Ice>();
 double multiplier_1 = 1.;
 double multiplier_2 = 2.;
 PhotoAngleNoDeflection const PhotoAngle_1(photon, medium_1);
@@ -127,8 +127,8 @@ TEST(Comparison, Comparison_not_equal_PhotoAngleDistribution)
 {
 ParticleDef photon  = GammaDef::Get();
 ParticleDef mu_def  = MuMinusDef::Get(); //makes no physical sense but programmatically possible
-std::shared_ptr<const Medium> medium_1(Water().create());
-std::shared_ptr<const Medium> medium_2(Ice().create());
+auto medium_1 = std::make_shared<const Water>();
+auto medium_2 = std::make_shared<const Ice>();
 
 PhotoAngleNoDeflection PhotoPair_A(photon, medium_1);
 PhotoAngleNoDeflection PhotoPair_B(photon, medium_2);
@@ -156,7 +156,7 @@ EXPECT_TRUE(*PhotoAngle_J != *PhotoAngle_K);
 TEST(Assignment, Copyconstructor)
 {
 ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium(Water().create());
+auto medium = std::make_shared<const Water>();
 double multiplier = 1.;
 
 PhotoPairTsai PhotoPair_A(particle_def, medium, multiplier);
@@ -178,7 +178,7 @@ EXPECT_TRUE(PhotoPairInterpol_A == PhotoPairInterpol_B);
 TEST(Assignment, Copyconstructor_PhotoAngleDistribution)
 {
 ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium(Water().create());;
+auto medium = std::make_shared<const Water>();
 
 PhotoAngleNoDeflection PhotoAngle_A(particle_def, medium);
 PhotoAngleNoDeflection PhotoAngle_B = PhotoAngle_A;

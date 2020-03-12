@@ -146,5 +146,5 @@ double ComptonKleinNishina::DifferentialCrossSection(double energy, double v)
     aux = aux / energy; // we loose a factor E due to variable transformation from k' to v
 
     aux *= PI * std::pow(RE, 2.) * ME;
-    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * components_[component_index_]->GetNucCharge() * aux;
+    return medium_->GetMolDensity() * components_[component_index_].GetAtomInMolecule() * components_[component_index_].GetNucCharge() * aux;
 }

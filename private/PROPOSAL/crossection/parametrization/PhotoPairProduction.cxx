@@ -104,8 +104,8 @@ double PhotoPairTsai::DifferentialCrossSection(double energy, double x)
     // see formula (3.9)
 
     double Phi1, Phi2, Psi1, Psi2;
-    double Z = components_[component_index_]->GetNucCharge();
-    double logZ = std::log(components_[component_index_]->GetNucCharge());
+    double Z = components_[component_index_].GetNucCharge();
+    double logZ = std::log(components_[component_index_].GetNucCharge());
     double eta;
     double k = energy;
     double delta = std::pow(ME, 2.) / ( 2. * k * x * (1. - x)); // (3.20);
@@ -177,7 +177,7 @@ double PhotoPairTsai::DifferentialCrossSection(double energy, double x)
     double p = std::sqrt( std::pow(x * k, 2.) - std::pow(ME, 2.) ); // electron momentum
     aux *= x * std::pow(k, 2.) / p; // conversion from differential cross section in electron momentum to x
 
-    return std::max(medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * aux, 0.); //TODO what are the real factors here, those are just guesses
+    return std::max(medium_->GetMolDensity() * components_[component_index_].GetAtomInMolecule() * aux, 0.); //TODO what are the real factors here, those are just guesses
 }
 
 
@@ -292,8 +292,8 @@ double PhotoAngleTsaiIntegral::FunctionToIntegral(double energy, double x, doubl
     double aux;
     double E = energy * x; // electron energy
     double l = E * E * theta * theta / (ME * ME);
-    double Z = components_[component_index_]->GetNucCharge();
-    double Z3 = std::pow(components_[component_index_]->GetNucCharge(), -1. / 3);
+    double Z = components_[component_index_].GetNucCharge();
+    double Z3 = std::pow(components_[component_index_].GetNucCharge(), -1. / 3);
     double G2 = Z * Z + Z;
     double tminprimesqrt = ( ME * ME * (1. + l) ) / (2. * energy * x * (1. - x));
 

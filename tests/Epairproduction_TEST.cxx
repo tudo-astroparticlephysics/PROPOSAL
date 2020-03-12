@@ -33,7 +33,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    std::shared_ptr<const Medium> medium(Water().create());
+    auto medium = std::make_shared<const Water>();
     EnergyCutSettings ecuts;
     double multiplier = 1.;
     bool lpm          = true;
@@ -78,8 +78,8 @@ TEST(Comparison, Comparison_not_equal)
 {
     ParticleDef mu_def  = MuMinusDef::Get();
     ParticleDef tau_def = TauMinusDef::Get();
-    std::shared_ptr<const Medium> medium_1(Water().create());
-    std::shared_ptr<const Medium> medium_2(Ice().create());
+    auto medium_1 = std::make_shared<const Water>();
+    auto medium_2 = std::make_shared<const Ice>();
     EnergyCutSettings ecuts_1(500, -1);
     EnergyCutSettings ecuts_2(-1, 0.05);
     double multiplier_1 = 1.;
@@ -124,7 +124,7 @@ TEST(Comparison, Comparison_not_equal)
 TEST(Assignment, Copyconstructor)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    std::shared_ptr<const Medium> medium(Water().create());
+    auto medium = std::make_shared<const Water>();
     EnergyCutSettings ecuts;
     double multiplier = 1.;
     bool lpm          = true;
@@ -150,7 +150,7 @@ TEST(Assignment, Copyconstructor)
 TEST(Assignment, Copyconstructor2)
 {
     ParticleDef particle_def = MuMinusDef::Get();
-    std::shared_ptr<const Medium> medium(Water().create());
+    auto medium = std::make_shared<const Water>();
     EnergyCutSettings ecuts;
     double multiplier = 1.;
     bool lpm          = true;
