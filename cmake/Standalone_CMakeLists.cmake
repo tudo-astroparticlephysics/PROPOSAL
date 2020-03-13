@@ -90,6 +90,14 @@ target_include_directories(PROPOSAL PUBLIC ${PROJECT_INCLUDE_DIR})
 target_compile_options(PROPOSAL PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-format-security)
 target_link_libraries(PROPOSAL log4cplus ${LIBRARIES_TO_LINK})
 
+
+configure_file(
+	"${PROJECT_SOURCE_DIR}/public/PROPOSAL/version.h.in"
+	"${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h"
+)
+install(FILES ${PROJECT_BINARY_DIR}/public/PROPOSAL/version.hpp DESTINATION include/PROPOSAL)
+target_include_directories(PROPOSAL PUBLIC ${PROJECT_BINARY_DIR}/include)
+
 IF(IS_SYMLINK ${CMAKE_BINARY_DIR}/resources)
     # Do nothing
 ELSE()
