@@ -23,10 +23,10 @@ AnnihilationInterpolant::AnnihilationInterpolant(const Annihilation& param, cons
     gamma_def_ = &GammaDef::Get();
 }
 
-/*AnnihilationInterpolant::AnnihilationInterpolant(const AnnihilationInterpolant& annihilation)
+AnnihilationInterpolant::AnnihilationInterpolant(const AnnihilationInterpolant& annihilation)
         : CrossSectionInterpolant(annihilation), rndc_(annihilation.rndc_), gamma_def_(annihilation.gamma_def_)
 {
-}*/
+}
 
 AnnihilationInterpolant::~AnnihilationInterpolant() {}
 

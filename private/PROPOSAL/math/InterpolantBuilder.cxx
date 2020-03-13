@@ -1,7 +1,7 @@
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/math/Interpolant.h"
-#include <iostream>
+
 using namespace PROPOSAL;
 
 // ------------------------------------------------------------------------- //
@@ -62,15 +62,10 @@ Interpolant1DBuilder::Interpolant1DBuilder(const Interpolant1DBuilder& builder)
 {
 }
 
-std::unique_ptr<Interpolant> Interpolant1DBuilder::build()
+Interpolant* Interpolant1DBuilder::build()
 {
-    std::cout << "Das tut weh, Maxi!" << std::endl;
-    std::unique_ptr<Interpolant> ptr (new Interpolant(
-            max, xmin, xmax, function1d, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst));
-
-    std::cout << &ptr << std::endl;
-
-    return ptr;
+    return new Interpolant(
+        max, xmin, xmax, function1d, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
 }
 
 // ------------------------------------------------------------------------- //
@@ -148,9 +143,9 @@ Interpolant2DBuilder_array_as::Interpolant2DBuilder_array_as(const Interpolant2D
 {
 }
 
-std::unique_ptr<Interpolant> Interpolant2DBuilder::build()
+Interpolant* Interpolant2DBuilder::build()
 {
-    return std::unique_ptr<Interpolant>(new Interpolant(max1,
+    return new Interpolant(max1,
                            x1min,
                            x1max,
                            max2,
@@ -168,12 +163,12 @@ std::unique_ptr<Interpolant> Interpolant2DBuilder::build()
                            rombergY,
                            rationalY,
                            relativeY,
-                           logSubst));
+                           logSubst);
 }
 
-std::unique_ptr<Interpolant> Interpolant2DBuilder_array_as::build()
+Interpolant* Interpolant2DBuilder_array_as::build()
 {
-    return std::unique_ptr<Interpolant>(new Interpolant(x1,
+    return new Interpolant(x1,
             x2,
             y,
             romberg1,
@@ -181,6 +176,6 @@ std::unique_ptr<Interpolant> Interpolant2DBuilder_array_as::build()
             relative1,
             romberg2,
             rational2,
-            relative2));
+            relative2);
 }
 

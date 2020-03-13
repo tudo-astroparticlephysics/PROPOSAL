@@ -67,8 +67,8 @@ protected:
     virtual void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points) = 0;
 
     double stored_result_;
-    std::unique_ptr<Interpolant> interpolant_;
-    std::unique_ptr<Interpolant> interpolant_diff_;
+    std::shared_ptr<Interpolant> interpolant_;
+    std::shared_ptr<Interpolant> interpolant_diff_;
     double low_;
 
     std::shared_ptr<InterpolationDef> interpolation_def_;

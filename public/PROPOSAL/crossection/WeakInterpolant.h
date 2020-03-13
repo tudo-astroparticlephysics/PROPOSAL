@@ -39,10 +39,10 @@ namespace PROPOSAL {
     {
     public:
         WeakInterpolant(const WeakInteraction&, const InterpolationDef&);
-        //WeakInterpolant(const WeakInterpolant&);
+        WeakInterpolant(const WeakInterpolant&);
         virtual ~WeakInterpolant();
 
-        //CrossSection* clone() const { return new WeakInterpolant(*this); }
+        CrossSection* clone() const { return new WeakInterpolant(*this); }
 
         // ----------------------------------------------------------------- //
         // Public methods

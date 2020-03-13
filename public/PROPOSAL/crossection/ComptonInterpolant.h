@@ -39,10 +39,10 @@ namespace PROPOSAL {
     {
     public:
         ComptonInterpolant(const Compton&, std::shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-        //ComptonInterpolant(const ComptonInterpolant&);
+        ComptonInterpolant(const ComptonInterpolant&);
         virtual ~ComptonInterpolant();
 
-        //CrossSection* clone() const { return new ComptonInterpolant(*this); }
+        CrossSection* clone() const { return new ComptonInterpolant(*this); }
 
         // ----------------------------------------------------------------- //
         // Public methods

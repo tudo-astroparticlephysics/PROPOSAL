@@ -39,10 +39,10 @@ namespace PROPOSAL {
     {
     public:
         AnnihilationInterpolant(const Annihilation&, const InterpolationDef&);
-        //AnnihilationInterpolant(const AnnihilationInterpolant&);
+        AnnihilationInterpolant(const AnnihilationInterpolant&);
         virtual ~AnnihilationInterpolant();
 
-        //CrossSection* clone() const { return new AnnihilationInterpolant(*this); }
+        CrossSection* clone() const { return new AnnihilationInterpolant(*this); }
 
         // ----------------------------------------------------------------- //
         // Public methods

@@ -42,7 +42,7 @@ EpairInterpolant::EpairInterpolant(const EpairProduction& param, std::shared_ptr
         .SetLogSubst(true)
         .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedEdxWithoutMultiplier, &epair, std::placeholders::_1));
 
-    builder_container.emplace_back(&builder1d, std::move(dedx_interpolant_));
+    builder_container.push_back(std::make_pair(&builder1d, dedx_interpolant_));
 
     // --------------------------------------------------------------------- //
     // Builder for DE2dx
@@ -64,17 +64,17 @@ EpairInterpolant::EpairInterpolant(const EpairProduction& param, std::shared_ptr
         .SetLogSubst(false)
         .SetFunction1D(std::bind(&EpairIntegral::CalculatedE2dxWithoutMultiplier, &epair, std::placeholders::_1));
 
-    builder_container_de2dx.emplace_back(&builder_de2dx, std::move(de2dx_interpolant_));
+    builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, de2dx_interpolant_));
 
     Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
     Helper::InitializeInterpolation(
         "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
-/*EpairInterpolant::EpairInterpolant(const EpairInterpolant& epair)
+EpairInterpolant::EpairInterpolant(const EpairInterpolant& epair)
     : CrossSectionInterpolant(epair)
 {
-}*/
+}
 
 EpairInterpolant::~EpairInterpolant() {}
 

@@ -62,7 +62,7 @@ public:
     InterpolantBuilder() {}
     virtual ~InterpolantBuilder() {}
 
-    virtual std::unique_ptr<Interpolant> build() = 0;
+    virtual Interpolant* build() = 0;
 };
 
 // ----------------------------------------------------------------------------
@@ -154,7 +154,7 @@ public:
     // 	return *this;
     // }
 
-    std::unique_ptr<Interpolant> build();
+    Interpolant* build();
 
 private:
     Function1D function1d;
@@ -296,7 +296,7 @@ public:
     // 	return *this;
     // }
 
-    std::unique_ptr<Interpolant> build();
+    Interpolant* build();
 
 private:
     Function2D function2d;
@@ -381,7 +381,7 @@ private:
         }
 
 
-        std::unique_ptr<Interpolant> build();
+        Interpolant* build();
 
     private:
 

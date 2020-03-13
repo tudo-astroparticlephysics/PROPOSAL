@@ -39,10 +39,10 @@ class MupairInterpolant : public CrossSectionInterpolant
 {
 public:
     MupairInterpolant(const MupairProduction&, std::shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    //MupairInterpolant(const MupairInterpolant&);
+    MupairInterpolant(const MupairInterpolant&);
     virtual ~MupairInterpolant();
 
-    //CrossSection* clone() const { return new MupairInterpolant(*this); }
+    CrossSection* clone() const { return new MupairInterpolant(*this); }
 
     // ----------------------------------------------------------------- //
     // Public methods

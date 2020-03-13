@@ -23,8 +23,8 @@ CrossSectionInterpolant::CrossSectionInterpolant(const Parametrization& param, s
     : CrossSection(param, cuts)
     , dedx_interpolant_(nullptr)
     , de2dx_interpolant_(nullptr)
-    , dndx_interpolant_1d_(param.GetMedium()->GetNumComponents())
-    , dndx_interpolant_2d_(param.GetMedium()->GetNumComponents())
+    , dndx_interpolant_1d_(param.GetMedium()->GetNumComponents(), nullptr)
+    , dndx_interpolant_2d_(param.GetMedium()->GetNumComponents(), nullptr)
 {
 }
 
@@ -105,7 +105,7 @@ void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                 i));
 
         builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = std::move(dndx_interpolant_2d_[i]);
+        builder_container2d[i].second = dndx_interpolant_2d_[i];
 
         builder1d[i]
             .SetMax(def.nodes_cross_section)
@@ -125,17 +125,13 @@ void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
         builder_container1d[i].second = std::move(dndx_interpolant_1d_[i]);
     }
 
-    for(auto& interpolant2d: builder_container2d){
-        builder_return.push_back(std::move(interpolant2d));
-    }
-
-    for(auto& interpolant1d: builder_container1d){
-        builder_return.push_back(std::move(interpolant1d));
-    }
+    builder_return.insert(builder_return.end(), builder_container2d.begin(), builder_container2d.end());
+    builder_return.insert(builder_return.end(), builder_container1d.begin(), builder_container1d.end());
+    // builder2d.insert(builder2d.end(), builder1d.begin(), builder1d.end());
 
     Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), def);
 }
-/*
+
 CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& cross_section)
     : CrossSection(cross_section)
 {
@@ -158,24 +154,24 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
     int num_components = cross_section.parametrization_->GetMedium()->GetNumComponents();
 
     dndx_interpolant_1d_.reserve(num_components);
-    for (auto& interpolant: cross_section.dndx_interpolant_1d_)
+    for (auto interpolant: cross_section.dndx_interpolant_1d_)
     {
         if (interpolant != nullptr)
         {
-            dndx_interpolant_1d_.push_back(std::move(interpolant));
+            dndx_interpolant_1d_.push_back(interpolant);
         }
     }
 
     dndx_interpolant_2d_.reserve(num_components);
-    for (auto& interpolant: cross_section.dndx_interpolant_2d_)
+    for (auto interpolant: cross_section.dndx_interpolant_2d_)
     {
         if (interpolant != nullptr)
         {
-            dndx_interpolant_2d_.push_back(std::move(interpolant));
+            dndx_interpolant_2d_.push_back(interpolant);
         }
     }
 }
-*/
+
 // ------------------------------------------------------------------------- //
 // Pulblic methods
 // ------------------------------------------------------------------------- //

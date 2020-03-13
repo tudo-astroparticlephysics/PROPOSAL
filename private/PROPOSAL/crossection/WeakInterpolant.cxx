@@ -20,10 +20,10 @@ WeakInterpolant::WeakInterpolant(const WeakInteraction& param, const Interpolati
     InitdNdxInterpolation(def);
 }
 
-/*WeakInterpolant::WeakInterpolant(const WeakInterpolant& param)
+WeakInterpolant::WeakInterpolant(const WeakInterpolant& param)
         : CrossSectionInterpolant(param)
 {
-}*/
+}
 
 WeakInterpolant::~WeakInterpolant() {}
 
