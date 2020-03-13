@@ -139,7 +139,7 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(
             PhotoInterpolant* photo = new PhotoInterpolant(
                 *it_q2->second.second(particle_def, medium, def.multiplier,
                     *shadow, interpolation_def),
-                cuts, interpolation_def);
+                cuts, *interpolation_def);
             delete shadow;
             return photo;
         }
@@ -156,7 +156,7 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(
         if (interpolation_def == nullptr) {
             return new PhotoInterpolant(*it_photo->second(particle_def, medium,
                                             def.multiplier, def.hard_component),
-                cuts, interpolation_def);
+                cuts, *interpolation_def);
         }
         return new PhotoIntegral(*it_photo->second(particle_def, medium,
                                      def.multiplier, def.hard_component),
@@ -172,7 +172,7 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(
     std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if (interpolation_def) {
-        return new PhotoInterpolant(parametrization, cuts, interpolation_def);
+        return new PhotoInterpolant(parametrization, cuts, *interpolation_def);
     }
     return new PhotoIntegral(parametrization, cuts);
 }

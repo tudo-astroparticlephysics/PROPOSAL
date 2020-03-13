@@ -20,12 +20,13 @@
 
 using namespace PROPOSAL;
 
-IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<const EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
+IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& def)
     : CrossSectionInterpolant(param, cuts)
 {
     // Use overwritten dNdx interpolation
-    InitdNdxInterpolation(*def);
+    InitdNdxInterpolation(def);
 
+    std::cout << "fuu" << std::endl;
     // --------------------------------------------------------------------- //
     // Builder for DEdx
     // --------------------------------------------------------------------- //
@@ -33,16 +34,17 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
     Interpolant1DBuilder builder1d;
     Helper::InterpolantBuilderContainer builder_container;
 
+    std::cout << "bazz" << std::endl;
     IonizIntegral ioniz(param, cuts);
 
-    builder1d.SetMax(def->nodes_cross_section)
+    builder1d.SetMax(def.nodes_cross_section)
         .SetXMin(param.GetParticleMass())
-        .SetXMax(def->max_node_energy)
-        .SetRomberg(def->order_of_interpolation)
+        .SetXMax(def.max_node_energy)
+        .SetRomberg(def.order_of_interpolation)
         .SetRational(true)
         .SetRelative(false)
         .SetIsLog(true)
-        .SetRombergY(def->order_of_interpolation)
+        .SetRombergY(def.order_of_interpolation)
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(true)
@@ -57,14 +59,14 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
     Interpolant1DBuilder builder_de2dx;
     Helper::InterpolantBuilderContainer builder_container_de2dx;
 
-    builder_de2dx.SetMax(def->nodes_continous_randomization)
+    builder_de2dx.SetMax(def.nodes_continous_randomization)
         .SetXMin(param.GetParticleMass())
-        .SetXMax(def->max_node_energy)
-        .SetRomberg(def->order_of_interpolation)
+        .SetXMax(def.max_node_energy)
+        .SetRomberg(def.order_of_interpolation)
         .SetRational(false)
         .SetRelative(false)
         .SetIsLog(true)
-        .SetRombergY(def->order_of_interpolation)
+        .SetRombergY(def.order_of_interpolation)
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)
@@ -72,9 +74,9 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, de2dx_interpolant_));
 
-    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), *def);
+    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
     Helper::InitializeInterpolation(
-        "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), *def);
+        "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
 IonizInterpolant::IonizInterpolant(const IonizInterpolant& ioniz)
@@ -148,11 +150,15 @@ void IonizInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
         builder_container1d[i].second = dndx_interpolant_1d_[i];
     }
 
+    std::cout << "das" << std::endl;
     builder_return.insert(builder_return.end(), builder_container2d.begin(), builder_container2d.end());
     builder_return.insert(builder_return.end(), builder_container1d.begin(), builder_container1d.end());
     // builder2d.insert(builder2d.end(), builder1d.begin(), builder1d.end());
 
+    std::cout << "tut" << std::endl;
     Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), def);
+    std::cout << "weh" << std::endl;
+    std::cout << "!!!" << std::endl;
 }
 
 // ----------------------------------------------------------------- //

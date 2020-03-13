@@ -56,7 +56,7 @@ CrossSection* ComptonFactory::CreateCompton(const ParticleDef& particle_def,
         if (interpolation_def) {
             return new ComptonInterpolant(
                 *it->second(particle_def, medium, def.multiplier), cuts,
-                interpolation_def);
+                *interpolation_def);
         }
         return new ComptonIntegral(
             *it->second(particle_def, medium, def.multiplier), cuts);
@@ -69,7 +69,7 @@ CrossSection* ComptonFactory::CreateCompton(const Compton& parametrization,
     std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if (interpolation_def) {
-        return new ComptonInterpolant(parametrization, cuts, interpolation_def);
+        return new ComptonInterpolant(parametrization, cuts, *interpolation_def);
     }
     return new ComptonIntegral(parametrization, cuts);
 }

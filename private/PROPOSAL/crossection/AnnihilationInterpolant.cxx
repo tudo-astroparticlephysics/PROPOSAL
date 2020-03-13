@@ -16,10 +16,10 @@
 
 using namespace PROPOSAL;
 
-AnnihilationInterpolant::AnnihilationInterpolant(const Annihilation& param, std::shared_ptr<const InterpolationDef> def)
+AnnihilationInterpolant::AnnihilationInterpolant(const Annihilation& param, const InterpolationDef& def)
         : CrossSectionInterpolant(param, nullptr), rndc_(-1.) {
     // Use parent CrossSecition dNdx interpolation
-    InitdNdxInterpolation(*def);
+    InitdNdxInterpolation(def);
     gamma_def_ = &GammaDef::Get();
 }
 

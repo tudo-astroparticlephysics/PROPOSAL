@@ -43,7 +43,7 @@ CrossSection* AnnihilationFactory::CreateAnnihilation(
         if (interpolation_def)
             return new AnnihilationInterpolant(
                 *it->second(particle_def, medium, def.multiplier),
-                interpolation_def);
+                *interpolation_def);
 
         return new AnnihilationIntegral(
             *it->second(particle_def, medium, def.multiplier));
@@ -57,7 +57,7 @@ CrossSection* AnnihilationFactory::CreateAnnihilation(
     std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if (interpolation_def)
-        return new AnnihilationInterpolant(parametrization, interpolation_def);
+        return new AnnihilationInterpolant(parametrization, *interpolation_def);
 
     return new AnnihilationIntegral(parametrization);
 }

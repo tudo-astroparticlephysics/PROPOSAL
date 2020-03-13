@@ -14,10 +14,10 @@
 
 using namespace PROPOSAL;
 
-WeakInterpolant::WeakInterpolant(const WeakInteraction& param, std::shared_ptr<const InterpolationDef> def)
+WeakInterpolant::WeakInterpolant(const WeakInteraction& param, const InterpolationDef& def)
         : CrossSectionInterpolant(param, nullptr) {
     // Use parent CrossSecition dNdx interpolation
-    InitdNdxInterpolation(*def);
+    InitdNdxInterpolation(def);
 }
 
 WeakInterpolant::WeakInterpolant(const WeakInterpolant& param)

@@ -38,7 +38,7 @@ class Bremsstrahlung;
 class BremsInterpolant : public CrossSectionInterpolant
 {
 public:
-    BremsInterpolant(const Bremsstrahlung&, std::shared_ptr<const EnergyCutSettings>, std::shared_ptr<const InterpolationDef>);
+    BremsInterpolant(const Bremsstrahlung&, std::shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
     BremsInterpolant(const BremsInterpolant&);
     virtual ~BremsInterpolant();
 

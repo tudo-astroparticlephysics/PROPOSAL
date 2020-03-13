@@ -61,7 +61,7 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
     {
         if(interpolation_def)
             return new BremsInterpolant(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts,
-                                        interpolation_def);
+                                        *interpolation_def);
 
         return new BremsIntegral(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts);
     }
@@ -74,7 +74,7 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const Bremsstrahlung& 
                                                           std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if(interpolation_def){
-        return new BremsInterpolant(param, cuts, interpolation_def);
+        return new BremsInterpolant(param, cuts, *interpolation_def);
     }
 
     return new BremsIntegral(param, cuts);

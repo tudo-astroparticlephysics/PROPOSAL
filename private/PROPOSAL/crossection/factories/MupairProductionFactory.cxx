@@ -43,7 +43,7 @@ CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef&
     if (it != mupair_map_enum_.end())
     {
         if(interpolation_def){
-            return new MupairInterpolant(*it->second.second(particle_def, medium, def.multiplier, interpolation_def), cuts, interpolation_def);
+            return new MupairInterpolant(*it->second.second(particle_def, medium, def.multiplier, interpolation_def), cuts, *interpolation_def);
         }
             return new MupairIntegral(*it->second.first(particle_def, medium, def.multiplier), cuts);
     }
@@ -55,7 +55,7 @@ CrossSection* MupairProductionFactory::CreateMupairProduction(const MupairProduc
                                                               std::shared_ptr<const InterpolationDef> interpolation_def=nullptr) const
 {
     if(interpolation_def){
-        return new MupairInterpolant(parametrization, cuts, interpolation_def);
+        return new MupairInterpolant(parametrization, cuts, *interpolation_def);
     }
         return new MupairIntegral(parametrization, cuts);
 }

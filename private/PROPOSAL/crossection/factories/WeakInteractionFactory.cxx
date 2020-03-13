@@ -44,7 +44,7 @@ CrossSection* WeakInteractionFactory::CreateWeakInteraction(
         if (interpolation_def) {
             return new WeakInterpolant(
                 *it->second(particle_def, medium, def.multiplier),
-                interpolation_def);
+                *interpolation_def);
         }
         return new WeakIntegral(
             *it->second(particle_def, medium, def.multiplier));
@@ -57,7 +57,7 @@ CrossSection* WeakInteractionFactory::CreateWeakInteraction(
     std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if (interpolation_def) {
-        return new WeakInterpolant(parametrization, interpolation_def);
+        return new WeakInterpolant(parametrization, *interpolation_def);
     }
     return new WeakIntegral(parametrization);
 }

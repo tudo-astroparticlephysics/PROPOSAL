@@ -16,11 +16,11 @@
 
 using namespace PROPOSAL;
 
-ComptonInterpolant::ComptonInterpolant(const Compton& param, std::shared_ptr<const EnergyCutSettings> cuts, std::shared_ptr<const InterpolationDef> def)
+ComptonInterpolant::ComptonInterpolant(const Compton& param, std::shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& def)
         : CrossSectionInterpolant(param, cuts)
 {
     // Use own CrossSecition dNdx interpolation
-    ComptonInterpolant::InitdNdxInterpolation(*def);
+    ComptonInterpolant::InitdNdxInterpolation(def);
 
     // --------------------------------------------------------------------- //
     // Builder for DEdx
@@ -32,14 +32,14 @@ ComptonInterpolant::ComptonInterpolant(const Compton& param, std::shared_ptr<con
     // Needed for CalculatedEdx integration
     ComptonIntegral compton(param, cuts);
 
-    builder1d.SetMax(def->nodes_cross_section)
+    builder1d.SetMax(def.nodes_cross_section)
             .SetXMin(ME)
-            .SetXMax(def->max_node_energy)
-            .SetRomberg(def->order_of_interpolation)
+            .SetXMax(def.max_node_energy)
+            .SetRomberg(def.order_of_interpolation)
             .SetRational(true)
             .SetRelative(false)
             .SetIsLog(true)
-            .SetRombergY(def->order_of_interpolation)
+            .SetRombergY(def.order_of_interpolation)
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(true)
@@ -54,14 +54,14 @@ ComptonInterpolant::ComptonInterpolant(const Compton& param, std::shared_ptr<con
     Interpolant1DBuilder builder_de2dx;
     Helper::InterpolantBuilderContainer builder_container_de2dx;
 
-    builder_de2dx.SetMax(def->nodes_continous_randomization)
+    builder_de2dx.SetMax(def.nodes_continous_randomization)
             .SetXMin(ME)
-            .SetXMax(def->max_node_energy)
-            .SetRomberg(def->order_of_interpolation)
+            .SetXMax(def.max_node_energy)
+            .SetRomberg(def.order_of_interpolation)
             .SetRational(false)
             .SetRelative(false)
             .SetIsLog(true)
-            .SetRombergY(def->order_of_interpolation)
+            .SetRombergY(def.order_of_interpolation)
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)
@@ -69,9 +69,9 @@ ComptonInterpolant::ComptonInterpolant(const Compton& param, std::shared_ptr<con
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, de2dx_interpolant_));
 
-    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), *def);
+    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
     Helper::InitializeInterpolation(
-            "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), *def);
+            "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
 ComptonInterpolant::ComptonInterpolant(const ComptonInterpolant& compton)

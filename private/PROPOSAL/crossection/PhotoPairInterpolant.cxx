@@ -15,11 +15,11 @@
 
 using namespace PROPOSAL;
 
-PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairProduction& param, const PhotoAngleDistribution& photoangle, std::shared_ptr<const InterpolationDef> def)
+PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairProduction& param, const PhotoAngleDistribution& photoangle, const InterpolationDef& def)
         : CrossSectionInterpolant(param, nullptr)
         , photoangle_(photoangle.clone()), rndc_(-1.){
     // Use own initialization
-    PhotoPairInterpolant::InitdNdxInterpolation(*def);
+    PhotoPairInterpolant::InitdNdxInterpolation(def);
     eminus_def_ = &EMinusDef::Get();
     eplus_def_ = &EPlusDef::Get();
 }

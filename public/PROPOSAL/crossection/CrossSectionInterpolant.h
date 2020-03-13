@@ -64,8 +64,8 @@ protected:
     virtual double CalculateStochasticLoss(double energy, double rnd1);
     virtual void InitdNdxInterpolation(const InterpolationDef& def);
 
-    std::shared_ptr<Interpolant> dedx_interpolant_;
-    std::shared_ptr<Interpolant> de2dx_interpolant_;
+    std::shared_ptr<Interpolant> dedx_interpolant_ = nullptr;
+    std::shared_ptr<Interpolant> de2dx_interpolant_ = nullptr;
     InterpolantVec dndx_interpolant_1d_; // Stochastic dNdx()
     InterpolantVec dndx_interpolant_2d_; // Stochastic dNdx()
 };

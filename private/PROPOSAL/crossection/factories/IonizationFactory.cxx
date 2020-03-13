@@ -57,7 +57,7 @@ CrossSection* IonizationFactory::CreateIonization(
         if (interpolation_def) {
             return new IonizInterpolant(
                 *it->second(particle_def, medium, cuts, def.multiplier), cuts,
-                interpolation_def);
+                *interpolation_def);
         }
         return new IonizIntegral(
             *it->second(particle_def, medium, cuts, def.multiplier), cuts);
@@ -71,7 +71,7 @@ CrossSection* IonizationFactory::CreateIonization(
     std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
 {
     if (interpolation_def) {
-        return new IonizInterpolant(parametrization, cuts, interpolation_def);
+        return new IonizInterpolant(parametrization, cuts, *interpolation_def);
     }
     return new IonizIntegral(parametrization, cuts);
 }

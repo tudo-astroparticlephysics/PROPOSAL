@@ -73,7 +73,7 @@ CrossSection* PhotoPairFactory::CreatePhotoPair(const ParticleDef& particle_def,
         if (interpolation_def) {
             PhotoPairInterpolant* photopair = new PhotoPairInterpolant(
                 *it->second(particle_def, medium, def.multiplier), *photoangle,
-                interpolation_def);
+                *interpolation_def);
             delete photoangle;
             return photopair;
         }
@@ -92,7 +92,7 @@ CrossSection* PhotoPairFactory::CreatePhotoPair(
 {
     if (interpolation_def) {
         return new PhotoPairInterpolant(
-            parametrization, photoangle, interpolation_def);
+            parametrization, photoangle, *interpolation_def);
     }
     return new PhotoPairIntegral(parametrization, photoangle);
 }

@@ -38,7 +38,7 @@ namespace PROPOSAL {
     class AnnihilationInterpolant : public CrossSectionInterpolant
     {
     public:
-        AnnihilationInterpolant(const Annihilation&, std::shared_ptr<const InterpolationDef>);
+        AnnihilationInterpolant(const Annihilation&, const InterpolationDef&);
         AnnihilationInterpolant(const AnnihilationInterpolant&);
         virtual ~AnnihilationInterpolant();
 

@@ -51,7 +51,7 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
             return new EpairIntegral(*it->second.first(particle_def, medium, def.multiplier, def.lpm_effect), cuts);
         }
         else{
-            return new EpairInterpolant(*it->second.second(particle_def, medium, def.multiplier, def.lpm_effect, interpolation_def), cuts, interpolation_def);
+            return new EpairInterpolant(*it->second.second(particle_def, medium, def.multiplier, def.lpm_effect, interpolation_def), cuts, *interpolation_def);
         }
     } else
     {
@@ -68,7 +68,7 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const EpairProductio
         return new EpairIntegral(parametrization, cuts);
     }
     else{
-        return new EpairInterpolant(parametrization, cuts, interpolation_def);
+        return new EpairInterpolant(parametrization, cuts, *interpolation_def);
     }
 }
 
