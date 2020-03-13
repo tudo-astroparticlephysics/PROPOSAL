@@ -169,7 +169,7 @@ template<class Param = EpairKelnerKokoulinPetrukhin>
 class EpairProductionRhoInterpolant : public Param
 {
 public:
-    typedef std::vector<std::shared_ptr<Interpolant>> InterpolantVec;
+    typedef std::vector<std::unique_ptr<Interpolant>> InterpolantVec;
 
 public:
     EpairProductionRhoInterpolant(const ParticleDef&,
@@ -205,7 +205,7 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const Partic
                                               bool lpm,
                                               std::shared_ptr<const InterpolationDef> def)
     : Param(particle_def, medium, multiplier, lpm)
-    , interpolant_(this->medium_->GetNumComponents(), NULL)
+    , interpolant_(this->medium_->GetNumComponents())
 {
     std::vector<Interpolant2DBuilder> builder2d(this->components_.size());
     Helper::InterpolantBuilderContainer builder_container2d(this->components_.size());
@@ -234,7 +234,7 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const Partic
             .SetFunction2D(std::bind(&EpairProductionRhoInterpolant::FunctionToBuildPhotoInterpolant, this, std::placeholders::_1, std::placeholders::_2, i));
 
         builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = interpolant_[i];
+        builder_container2d[i].second = std::move(interpolant_[i]);
     }
 
     Helper::InitializeInterpolation("Epair", builder_container2d, std::vector<Parametrization*>(1, this), *def);
@@ -249,7 +249,7 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const EpairP
 
     for (unsigned int i = 0; i < photo.interpolant_.size(); ++i)
     {
-        interpolant_[i] = photo.interpolant_[i];
+        interpolant_[i] = std::unique_ptr<Interpolant>(new Interpolant(*photo.interpolant_[i]));
     }
 }
 

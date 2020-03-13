@@ -1,7 +1,7 @@
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/math/Interpolant.h"
-
+#include <iostream>
 using namespace PROPOSAL;
 
 // ------------------------------------------------------------------------- //
@@ -62,10 +62,15 @@ Interpolant1DBuilder::Interpolant1DBuilder(const Interpolant1DBuilder& builder)
 {
 }
 
-Interpolant* Interpolant1DBuilder::build()
+std::unique_ptr<Interpolant> Interpolant1DBuilder::build()
 {
-    return new Interpolant(
-        max, xmin, xmax, function1d, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
+    std::cout << "Das tut weh, Maxi!" << std::endl;
+    std::unique_ptr<Interpolant> ptr (new Interpolant(
+            max, xmin, xmax, function1d, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst));
+
+    std::cout << &ptr << std::endl;
+
+    return ptr;
 }
 
 // ------------------------------------------------------------------------- //
@@ -143,9 +148,9 @@ Interpolant2DBuilder_array_as::Interpolant2DBuilder_array_as(const Interpolant2D
 {
 }
 
-Interpolant* Interpolant2DBuilder::build()
+std::unique_ptr<Interpolant> Interpolant2DBuilder::build()
 {
-    return new Interpolant(max1,
+    return std::unique_ptr<Interpolant>(new Interpolant(max1,
                            x1min,
                            x1max,
                            max2,
@@ -163,12 +168,12 @@ Interpolant* Interpolant2DBuilder::build()
                            rombergY,
                            rationalY,
                            relativeY,
-                           logSubst);
+                           logSubst));
 }
 
-Interpolant* Interpolant2DBuilder_array_as::build()
+std::unique_ptr<Interpolant> Interpolant2DBuilder_array_as::build()
 {
-    return new Interpolant(x1,
+    return std::unique_ptr<Interpolant>(new Interpolant(x1,
             x2,
             y,
             romberg1,
@@ -176,6 +181,6 @@ Interpolant* Interpolant2DBuilder_array_as::build()
             relative1,
             romberg2,
             rational2,
-            relative2);
+            relative2));
 }
 
