@@ -45,7 +45,7 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
         .SetLogSubst(true)
         .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedEdxWithoutMultiplier, &mupair, std::placeholders::_1));
 
-    builder_container.push_back(std::make_pair(&builder1d, dedx_interpolant_));
+    builder_container.emplace_back(&builder1d, std::move(dedx_interpolant_));
 
     // --------------------------------------------------------------------- //
     // Builder for DE2dx
@@ -67,7 +67,7 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
         .SetLogSubst(false)
         .SetFunction1D(std::bind(&MupairIntegral::CalculatedE2dxWithoutMultiplier, &mupair, std::placeholders::_1));
 
-    builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, de2dx_interpolant_));
+    builder_container_de2dx.emplace_back(&builder_de2dx, std::move(de2dx_interpolant_));
 
     Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
     Helper::InitializeInterpolation(
@@ -77,12 +77,12 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
     muplus_def_ = &MuPlusDef::Get();
 }
 
-MupairInterpolant::MupairInterpolant(const MupairInterpolant& mupair)
+/*MupairInterpolant::MupairInterpolant(const MupairInterpolant& mupair)
     : CrossSectionInterpolant(mupair)
     , muminus_def_(mupair.muminus_def_)
     , muplus_def_(mupair.muplus_def_)
 {
-}
+}*/
 
 MupairInterpolant::~MupairInterpolant() {}
 

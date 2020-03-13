@@ -55,7 +55,7 @@ public:
     bool operator==(const CrossSection& cross_section) const;
     bool operator!=(const CrossSection& cross_section) const;
 
-    virtual CrossSection* clone() const = 0;
+    //virtual CrossSection* clone() const = 0;
 
     friend std::ostream& operator<<(std::ostream&, CrossSection const&);
 

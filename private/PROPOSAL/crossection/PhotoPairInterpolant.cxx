@@ -25,11 +25,11 @@ PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairProduction& param, con
 }
 
 
-PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairInterpolant& param)
+/*PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairInterpolant& param)
         : CrossSectionInterpolant(param), photoangle_(param.GetPhotoAngleDistribution().clone()), rndc_(param.rndc_)
         , eminus_def_(param.eminus_def_), eplus_def_(param.eplus_def_)
 {
-}
+}*/
 
 PhotoPairInterpolant::~PhotoPairInterpolant() {
         delete photoangle_;
@@ -190,7 +190,7 @@ void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                         i));
 
         builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = dndx_interpolant_2d_[i];
+        builder_container2d[i].second = std::move(dndx_interpolant_2d_[i]);
 
         builder1d[i]
                 .SetMax(def.nodes_cross_section)
@@ -207,12 +207,16 @@ void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                 .SetFunction1D(std::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, std::placeholders::_1, i));
 
         builder_container1d[i].first  = &builder1d[i];
-        builder_container1d[i].second = dndx_interpolant_1d_[i];
+        builder_container1d[i].second = std::move(dndx_interpolant_1d_[i]);
     }
 
-    builder_return.insert(builder_return.end(), builder_container2d.begin(), builder_container2d.end());
-    builder_return.insert(builder_return.end(), builder_container1d.begin(), builder_container1d.end());
-    // builder2d.insert(builder2d.end(), builder1d.begin(), builder1d.end());
+    for(auto& interpolant2d: builder_container2d){
+        builder_return.push_back(std::move(interpolant2d));
+    }
+
+    for(auto& interpolant1d: builder_container1d){
+        builder_return.push_back(std::move(interpolant1d));
+    }
 
     Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), def);
 }

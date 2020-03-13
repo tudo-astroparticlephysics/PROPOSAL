@@ -39,10 +39,10 @@ class EpairInterpolant : public CrossSectionInterpolant
 {
 public:
     EpairInterpolant(const EpairProduction&, std::shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    EpairInterpolant(const EpairInterpolant&);
+    //EpairInterpolant(const EpairInterpolant&);
     virtual ~EpairInterpolant();
 
-    CrossSection* clone() const { return new EpairInterpolant(*this); }
+    //CrossSection* clone() const { return new EpairInterpolant(*this); }
 
     // ----------------------------------------------------------------- //
     // Public methods

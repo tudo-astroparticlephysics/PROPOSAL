@@ -39,10 +39,10 @@ namespace PROPOSAL {
     {
     public:
         PhotoPairInterpolant(const PhotoPairProduction&, const PhotoAngleDistribution&, const InterpolationDef&);
-        PhotoPairInterpolant(const PhotoPairInterpolant&);
+        //PhotoPairInterpolant(const PhotoPairInterpolant&);
         virtual ~PhotoPairInterpolant();
 
-        CrossSection* clone() const { return new PhotoPairInterpolant(*this); }
+        //CrossSection* clone() const { return new PhotoPairInterpolant(*this); }
 
         // ----------------------------------------------------------------- //
         // Public methods

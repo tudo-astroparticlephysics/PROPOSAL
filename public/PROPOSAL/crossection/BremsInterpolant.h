@@ -39,10 +39,10 @@ class BremsInterpolant : public CrossSectionInterpolant
 {
 public:
     BremsInterpolant(const Bremsstrahlung&, std::shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    BremsInterpolant(const BremsInterpolant&);
+    //BremsInterpolant(const BremsInterpolant&);
     virtual ~BremsInterpolant();
 
-    CrossSection* clone() const { return new BremsInterpolant(*this); }
+    //CrossSection* clone() const { return new BremsInterpolant(*this); }
 
     // ----------------------------------------------------------------- //
     // Public methods

@@ -45,7 +45,7 @@ ComptonInterpolant::ComptonInterpolant(const Compton& param, std::shared_ptr<con
             .SetLogSubst(true)
             .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedEdxWithoutMultiplier, &compton, std::placeholders::_1));
 
-    builder_container.push_back(std::make_pair(&builder1d, dedx_interpolant_));
+    builder_container.emplace_back(&builder1d, std::move(dedx_interpolant_));
 
     // --------------------------------------------------------------------- //
     // Builder for DE2dx
@@ -67,17 +67,17 @@ ComptonInterpolant::ComptonInterpolant(const Compton& param, std::shared_ptr<con
             .SetLogSubst(false)
             .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedE2dxWithoutMultiplier, &compton, std::placeholders::_1));
 
-    builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, de2dx_interpolant_));
+    builder_container_de2dx.emplace_back(&builder_de2dx, std::move(de2dx_interpolant_));
 
     Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
     Helper::InitializeInterpolation(
             "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
-ComptonInterpolant::ComptonInterpolant(const ComptonInterpolant& compton)
+/*ComptonInterpolant::ComptonInterpolant(const ComptonInterpolant& compton)
         : CrossSectionInterpolant(compton)
 {
-}
+}*/
 
 ComptonInterpolant::~ComptonInterpolant() {}
 
@@ -254,7 +254,7 @@ void ComptonInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                         i));
 
         builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = dndx_interpolant_2d_[i];
+        builder_container2d[i].second = std::move(dndx_interpolant_2d_[i]);
 
         builder1d[i]
                 .SetMax(def.nodes_cross_section)
@@ -271,12 +271,16 @@ void ComptonInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                 .SetFunction1D(std::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, std::placeholders::_1, i));
 
         builder_container1d[i].first  = &builder1d[i];
-        builder_container1d[i].second = dndx_interpolant_1d_[i];
+        builder_container1d[i].second = std::move(dndx_interpolant_1d_[i]);
     }
 
-    builder_return.insert(builder_return.end(), builder_container2d.begin(), builder_container2d.end());
-    builder_return.insert(builder_return.end(), builder_container1d.begin(), builder_container1d.end());
-    // builder2d.insert(builder2d.end(), builder1d.begin(), builder1d.end());
+    for(auto& interpolant2d: builder_container2d){
+        builder_return.push_back(std::move(interpolant2d));
+    }
+
+    for(auto& interpolant1d: builder_container1d){
+        builder_return.push_back(std::move(interpolant1d));
+    }
 
     Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), def);
 }

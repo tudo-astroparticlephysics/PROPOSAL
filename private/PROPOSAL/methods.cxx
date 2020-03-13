@@ -404,7 +404,7 @@ namespace Helper {
                     for (InterpolantBuilderContainer::iterator builder_it
                          = builder_container.begin();
                          builder_it != builder_container.end(); ++builder_it) {
-                        builder_it->second.reset(builder_it->first->build());
+                        builder_it->second = builder_it->first->build();
                         builder_it->second->Save(output, binary_tables);
                     }
                 } else {
@@ -424,7 +424,7 @@ namespace Helper {
             for (InterpolantBuilderContainer::iterator builder_it
                  = builder_container.begin();
                  builder_it != builder_container.end(); ++builder_it) {
-                builder_it->second.reset(builder_it->first->build());
+                builder_it->second = builder_it->first->build();
             }
         }
 

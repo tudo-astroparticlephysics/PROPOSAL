@@ -46,15 +46,16 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
 {
     Integral integral(IROMB, IMAXS, IPREC2);
 
-    std::vector<std::pair<std::shared_ptr<Interpolant>, std::function<double(double)>>>
+    std::vector<std::pair<std::unique_ptr<Interpolant>, std::function<double(double)>>>
         interpolants;
 
-    interpolants.push_back(std::make_pair(interpolant_,
+    interpolants.emplace_back(std::move(interpolant_),
         std::bind(&UtilityInterpolant::BuildInterpolant, this,
-            std::placeholders::_1, std::ref(utility), std::ref(integral))));
-    interpolants.push_back(std::make_pair(interpolant_diff_,
+            std::placeholders::_1, std::ref(utility), std::ref(integral)));
+
+    interpolants.emplace_back(std::move(interpolant_diff_),
         std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
-            std::placeholders::_1)));
+            std::placeholders::_1));
 
     unsigned int number_of_interpolants = interpolants.size();
 
@@ -79,7 +80,7 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
             .SetFunction1D(interpolants[i].second);
 
         builder_container[i]
-            = std::make_pair(&builder_vec[i], interpolants[i].first);
+            = std::make_pair(&builder_vec[i], std::move(interpolants[i].first));
     }
 
     std::vector<Parametrization*> params(crosss.size(), NULL);
