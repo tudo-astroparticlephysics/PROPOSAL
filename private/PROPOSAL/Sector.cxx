@@ -149,7 +149,7 @@ Sector::Definition::Definition(const nlohmann::json& config)
     medium_ = CreateMedium(medium_name, density_correction);
 
 
-    do_stochastic_loss_weighting = config.value("stochastic_loss_weighting", false);
+    do_stochastic_loss_weighting = config.value("do_stochastic_loss_weighting", false);
     stochastic_loss_weighting = config.value("stochastic_loss_weighting", 0);
     stopping_decay = config.value("stopping_decay", true);
     do_continuous_randomization = config.value("cont_rand", true);
