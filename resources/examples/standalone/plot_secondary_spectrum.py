@@ -238,7 +238,7 @@ def propagate_muons():
         secondarys = prop.propagate(mu_prop, propagation_length)
 
         for sec in secondarys.particles:
-            log_sec_energy = math.log10(sec.energy)
+            log_sec_energy = math.log10(sec.parent_particle_energy - sec.energy)
 
             if sec.type == int(pp.particle.Interaction_Type.Epair):
                 epair_secondary_energy.append(log_sec_energy)

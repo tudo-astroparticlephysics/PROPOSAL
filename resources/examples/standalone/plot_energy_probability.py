@@ -103,7 +103,7 @@ if __name__ == "__main__":
         n_secondarys.append(len(secondarys))
 
         for sec in secondarys:
-            log_sec_energy = math.log10(sec.energy)
+            log_sec_energy = math.log10(sec.parent_particle_energy-sec.energy)
             log_energy = math.log10(sec.parent_particle_energy)
 
             if sec.type == int(pp.particle.Interaction_Type.Epair):

@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
         d = prop.propagate(mu).particles
 
-        mu_length.append(mu.propagated_distance / 100)
+        mu_length.append(d[-1].position.magnitude() / 100)
         n_secondarys.append(len(d))
 
     # =========================================================
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
     ax.set_title("{} {}'s with energy {} TeV".format(
         statistics,
-        prop.particle.particle_def.name,
+        prop.particle_def.name,
         energy / 1e6
     ))
     ax.set_xlabel(r'range / m')
@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
     fig_length.tight_layout()
     fig_length.savefig(
-        "{}_lenghts.pdf".format(prop.particle.particle_def.name)
+        "{}_lenghts.pdf".format(prop.particle_def.name)
     )
 
     # =========================================================
@@ -91,5 +91,5 @@ if __name__ == "__main__":
 
     fig_secondarys.tight_layout()
     fig_secondarys.savefig(
-        "{}_secondaries.pdf".format(prop.particle.particle_def.name)
+        "{}_secondaries.pdf".format(prop.particle_def.name)
     )

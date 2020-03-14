@@ -60,9 +60,10 @@ if __name__ == "__main__":
                 if secondaries[idx-1].type == int(pp.particle.Interaction_Type.ContinuousEnergyLoss) or secondaries[idx+1].type == int(pp.particle.Interaction_Type.ContinuousEnergyLoss):
                     print("2 Continuous Losses in a row")
                     continue
-                energy_diff = secondaries[idx-1].parent_particle_energy - secondaries[idx-1].energy - secondaries[idx+1].parent_particle_energy
-                if abs(energy_diff - sec.energy) > 1e-3:
-                    print("energy loss differs", energy_diff, sec.energy)
+                energy_diff = secondaries[idx-1].energy - secondaries[idx+1].parent_particle_energy
+                continuou_energy_lost = sec.parent_particle_energy - sec.energy
+                if abs(energy_diff - continuou_energy_lost) > 1e-3:
+                    print("energy loss differs", energy_diff, continuou_energy_lost)
                 time_diff = secondaries[idx+1].time - secondaries[idx-1].time
                 if abs(time_diff - sec.time) > 1e-3:
-                    print("time differs", energy_diff, sec.energy)
+                    print("time differs", time_diff, sec.time)
