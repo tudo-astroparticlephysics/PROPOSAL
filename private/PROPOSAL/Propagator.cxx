@@ -155,8 +155,13 @@ Propagator::Propagator(
         json_global = json_config["global"];
 
         global_seed = json_global.value("seed", global_seed_);
-        do_interpolation = json_global.value("do_interpolation", do_interpolation_);
         uniform = json_global.value("uniform", uniform_);
+
+        if (json_global.contains("interpolation")){
+            nlohmann::json json_interpol = json_global["interpolation"];
+            interpolation_def = InterpolationDef(json_interpol);
+            do_interpolation = json_interpol.value("do_interpolation", do_interpolation_);
+        }
 
         sec_def_global.reset(new Sector::Definition(json_global));
     }
