@@ -204,11 +204,10 @@ MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const Part
             .SetLogSubst(false)
             .SetFunction2D(std::bind(&MupairProductionRhoInterpolant::FunctionToBuildPhotoInterpolant, this, std::placeholders::_1, std::placeholders::_2, i));
 
-        builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = std::move(interpolant_[i]);
+        builder_container2d[i]  = &builder2d[i];
     }
 
-    Helper::InitializeInterpolation("Mupair", builder_container2d, std::vector<Parametrization*>(1, this), *def);
+    interpolant_ = Helper::InitializeInterpolation("Mupair", builder_container2d, std::vector<Parametrization*>(1, this), *def);
 }
 
 template<class Param>

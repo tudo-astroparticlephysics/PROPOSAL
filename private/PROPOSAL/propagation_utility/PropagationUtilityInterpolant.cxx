@@ -46,16 +46,18 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
 {
     Integral integral(IROMB, IMAXS, IPREC2);
 
-    std::vector<std::pair<std::unique_ptr<Interpolant>, std::function<double(double)>>>
-        interpolants;
+    std::vector<std::unique_ptr<Interpolant>> interpolants;
 
-    interpolants.emplace_back(std::move(interpolant_),
-        std::bind(&UtilityInterpolant::BuildInterpolant, this,
-            std::placeholders::_1, std::ref(utility), std::ref(integral)));
+    std::vector<std::function<double(double)>> functions;
 
-    interpolants.emplace_back(std::move(interpolant_diff_),
-        std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
-            std::placeholders::_1));
+    interpolants.emplace_back(std::move(interpolant_));
+    functions.emplace_back(std::bind(&UtilityInterpolant::BuildInterpolant, this,
+                                     std::placeholders::_1, std::ref(utility), std::ref(integral)));
+
+    interpolants.emplace_back(std::move(interpolant_diff_));
+
+    functions.emplace_back(std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+                                     std::placeholders::_1));
 
     unsigned int number_of_interpolants = interpolants.size();
 
@@ -77,10 +79,9 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction1D(interpolants[i].second);
+            .SetFunction1D(functions[i]);
 
-        builder_container[i]
-            = std::make_pair(&builder_vec[i], std::move(interpolants[i].first));
+        builder_container[i] = &builder_vec[i];
     }
 
     std::vector<Parametrization*> params(crosss.size(), NULL);
@@ -89,7 +90,7 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
         params[i] = &crosss[i]->GetParametrization();
     }
 
-    Helper::InitializeInterpolation(
+    interpolants = Helper::InitializeInterpolation(
         name, builder_container, params, *interpolation_def_);
 }
 

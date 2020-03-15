@@ -159,7 +159,7 @@ bool FileExist(const std::string path);
 // ----------------------------------------------------------------------------
 std::string Centered(int width, const std::string& str, char fill = '=');
 
-typedef std::vector<std::pair<InterpolantBuilder*, std::unique_ptr<Interpolant>> > InterpolantBuilderContainer;
+typedef std::vector<InterpolantBuilder*> InterpolantBuilderContainer;
 
 // ----------------------------------------------------------------------------
 /// @brief Helper for interpolation initialization
@@ -170,7 +170,7 @@ typedef std::vector<std::pair<InterpolantBuilder*, std::unique_ptr<Interpolant>>
 /// @param std::vector: vector of parametrizations used to create
 ///        the interpolation tables with
 // ----------------------------------------------------------------------------
-void InitializeInterpolation(const std::string name,
+std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(const std::string name,
                              InterpolantBuilderContainer&,
                              const std::vector<Parametrization*>&,
                              const InterpolationDef);

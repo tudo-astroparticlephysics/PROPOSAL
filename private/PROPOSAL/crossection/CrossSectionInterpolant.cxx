@@ -68,7 +68,6 @@ void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
 
     Helper::InterpolantBuilderContainer builder_container1d(components_.size());
     Helper::InterpolantBuilderContainer builder_container2d(components_.size());
-    Helper::InterpolantBuilderContainer builder_return;
 
     Integral integral(IROMB, IMAXS, IPREC);
 
@@ -104,8 +103,7 @@ void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                 std::ref(integral),
                 i));
 
-        builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = std::move(dndx_interpolant_2d_[i]);
+        builder_container2d[i] = &builder2d[i];
 
         builder1d[i]
             .SetMax(def.nodes_cross_section)
@@ -121,19 +119,12 @@ void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
             .SetLogSubst(false)
             .SetFunction1D(std::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, std::placeholders::_1, i));
 
-        builder_container1d[i].first  = &builder1d[i];
-        builder_container1d[i].second = std::move(dndx_interpolant_1d_[i]);
+        builder_container1d[i]  = &builder1d[i];
     }
 
-    for(auto& interpolant2d: builder_container2d){
-        builder_return.push_back(std::move(interpolant2d));
-    }
+    dndx_interpolant_2d_ = Helper::InitializeInterpolation("dNdx", builder_container2d, std::vector<Parametrization*>(1, parametrization_), def);
+    dndx_interpolant_1d_ = Helper::InitializeInterpolation("dNdx", builder_container1d, std::vector<Parametrization*>(1, parametrization_), def);
 
-    for(auto& interpolant1d: builder_container1d){
-        builder_return.push_back(std::move(interpolant1d));
-    }
-
-    Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), def);
 }
 /*
 CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& cross_section)

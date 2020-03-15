@@ -17,8 +17,8 @@ int main(int argc, char* argv[])
 
     IonizBetheBlochRossi ioniz_param(muon, medium, cut, 1.0);
 
-    /*BremsInterpolant brems_integral(brems_param, cut, inter_def); */
-    IonizInterpolant brems_integral(ioniz_param, cut, inter_def);
+    BremsInterpolant brems_interpol(brems_param, cut, inter_def);
+    IonizInterpolant ioniz_interpol(ioniz_param, cut, inter_def);
     /* auto dedx = brems_integral.CalculatedEdx(1.e9); */
     /* std::cout << dedx << std::endl; */
 
