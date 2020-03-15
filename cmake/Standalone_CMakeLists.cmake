@@ -50,8 +50,8 @@ install(TARGETS PROPOSAL LIBRARY DESTINATION lib)
 
 # input version from the project call, so the library knows its own version
 configure_file(
-	"${PROJECT_SOURCE_DIR}/public/PROPOSAL/version.h.in"
-	"${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h"
+    "${PROJECT_SOURCE_DIR}/public/PROPOSAL/version.h.in"
+    "${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h"
 )
 install(FILES ${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h DESTINATION include/PROPOSAL)
 target_include_directories(PROPOSAL PUBLIC ${PROJECT_BINARY_DIR}/include)
@@ -89,14 +89,14 @@ target_compile_definitions(PROPOSAL PRIVATE -DLOG4CPLUS_CONFIG=\"${PROJECT_SOURC
 IF(ADD_CPPEXAMPLE)
     add_executable(example private/test/example.cxx)
     target_compile_options(example PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option)
-	target_link_libraries(example PROPOSAL)
+    target_link_libraries(example PROPOSAL)
 ENDIF(ADD_CPPEXAMPLE)
 
 
 IF(ADD_PERFORMANCE_TEST)
     add_executable(performance_test private/test/performance_test.cxx)
-	target_compile_options(performance_test PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option)
-	target_link_libraries(performance_test PROPOSAL)
+    target_compile_options(performance_test PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option)
+    target_link_libraries(performance_test PROPOSAL)
 ENDIF(ADD_PERFORMANCE_TEST)
 
 #################################################################
@@ -149,9 +149,9 @@ IF(ADD_ROOT)
 
     #if ROOT is found ROOT files with ROOT trees can be written
     if(ROOT_FOUND)
-		target_compile_definitions(PROPOSAL PRIVATE -DROOT_SUPPORT=1)
-		target_include_directories(PROPOSAL PUBLIC ${ROOT_INCLUDE_DIR})
-		target_link_libraries(PROPOSAL ${ROOT_LIBRARIES})
+        target_compile_definitions(PROPOSAL PRIVATE -DROOT_SUPPORT=1)
+        target_include_directories(PROPOSAL PUBLIC ${ROOT_INCLUDE_DIR})
+        target_link_libraries(PROPOSAL ${ROOT_LIBRARIES})
 
     ELSE(ROOT_FOUND)
         message(SEND_ERROR  "ROOT not found...")
