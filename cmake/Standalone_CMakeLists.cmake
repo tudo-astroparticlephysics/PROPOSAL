@@ -95,7 +95,7 @@ configure_file(
 	"${PROJECT_SOURCE_DIR}/public/PROPOSAL/version.h.in"
 	"${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h"
 )
-install(FILES ${PROJECT_BINARY_DIR}/public/PROPOSAL/version.hpp DESTINATION include/PROPOSAL)
+install(FILES ${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h DESTINATION include/PROPOSAL)
 target_include_directories(PROPOSAL PUBLIC ${PROJECT_BINARY_DIR}/include)
 
 IF(IS_SYMLINK ${CMAKE_BINARY_DIR}/resources)
