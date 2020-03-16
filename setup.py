@@ -47,6 +47,8 @@ class build_ext_cmake(build_ext):
 
     def build_cmake(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        if not extdir.endswith(os.path.sep):
+            extdir += os.path.sep
 
         for d in (self.build_temp, extdir):
             os.makedirs(d, exist_ok=True)
@@ -68,6 +70,9 @@ class build_ext_cmake(build_ext):
             '-DADD_CPPEXAMPLE=OFF',
             '-DPYTHON_EXECUTABLE=' + sys.executable,
             '-DPYTHON_LIBRARY=' + str(python_lib),
+            '-DCMAKE_INSTALL_RPATH=$ORIGIN',
+            '-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON',
+            '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF',
             '-DPYTHON_INCLUDE_DIR=' + sysconfig.get_path('include'),
         ]
         sp.run(cmake_call, cwd=self.build_temp, check=True)
