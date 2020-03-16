@@ -56,6 +56,7 @@ class build_ext_cmake(build_ext):
         cfg = 'Debug' if self.debug else 'Release'
         cmake = get_cmake()
 
+        rpath = '@loader_path' if sys.platform == 'darwin' else '$ORIGIN'
         python_lib = pathlib.Path(
             sysconfig.get_config_var('LIBDIR'),
             sysconfig.get_config_var('INSTSONAME')
@@ -70,7 +71,7 @@ class build_ext_cmake(build_ext):
             '-DADD_CPPEXAMPLE=OFF',
             '-DPYTHON_EXECUTABLE=' + sys.executable,
             '-DPYTHON_LIBRARY=' + str(python_lib),
-            '-DCMAKE_INSTALL_RPATH=$ORIGIN',
+            '-DCMAKE_INSTALL_RPATH={}'.format(rpath),
             '-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON',
             '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF',
             '-DPYTHON_INCLUDE_DIR=' + sysconfig.get_path('include'),
