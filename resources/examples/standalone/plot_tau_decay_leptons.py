@@ -2,11 +2,8 @@ import pyPROPOSAL as pp
 import time
 from tqdm import tqdm
 
-try:
-    import matplotlib as mpl
-    import matplotlib.pyplot as plt
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
+from matplotlib.gridspec import GridSpec
+import matplotlib.pyplot as plt
 
 import numpy as np
 
@@ -109,7 +106,7 @@ if __name__ == "__main__":
     # =========================================================
 
     fig = plt.figure()
-    gs = mpl.gridspec.GridSpec(2, 1, height_ratios=[2, 1])
+    gs = GridSpec(2, 1, height_ratios=[2, 1])
 
     ax = fig.add_subplot(gs[0])
 

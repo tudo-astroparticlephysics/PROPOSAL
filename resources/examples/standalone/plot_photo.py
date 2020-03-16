@@ -2,21 +2,8 @@
 import pyPROPOSAL as pp
 import pyPROPOSAL.parametrization as parametrization
 
-try:
-    import matplotlib as mpl
-    # mpl.use('Agg')
-    import matplotlib.pyplot as plt
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
-
-try:
-    import numpy as np
-except ImportError:
-    raise ImportError(
-        "Numpy not installed! Needed to calculate the detector cylinder"
-    )
-
-import math
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 if __name__ == "__main__":
@@ -25,7 +12,6 @@ if __name__ == "__main__":
     medium = pp.medium.Ice(1.0)  # With densitiy correction
     cuts = pp.EnergyCutSettings(-1, -1)  # ecut, vcut
 
-    photo = []
     dEdx_photo = []
     energy = [mu.mass + 10**x for x in np.arange(0, 12, 0.2)]
 

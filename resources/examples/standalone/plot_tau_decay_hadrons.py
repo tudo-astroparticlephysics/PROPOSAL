@@ -2,12 +2,8 @@ import pyPROPOSAL as pp
 import time
 from tqdm import tqdm
 
-try:
-    import matplotlib as mpl
-    import matplotlib.pyplot as plt
-    from matplotlib import colors
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 
 import numpy as np
 
@@ -209,7 +205,7 @@ if __name__ == "__main__":
         s1,
         s2,
         bins=500,
-        norm=colors.LogNorm()
+        norm=LogNorm()
     )
 
     plt.colorbar(hist[3], ax=ax, pad=0.01)
