@@ -126,7 +126,7 @@ template<class Param = PhotoAbramowiczLevinLevyMaor97>
 class PhotoQ2Interpolant : public Param
 {
 public:
-    typedef std::vector<std::shared_ptr<Interpolant>> InterpolantVec;
+    typedef std::vector<std::unique_ptr<Interpolant>> InterpolantVec;
 
 public:
     PhotoQ2Interpolant(const ParticleDef&,
@@ -162,7 +162,7 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
                                               const ShadowEffect& shadow_effect,
                                               std::shared_ptr<const InterpolationDef> def)
     : Param(particle_def, medium, multiplier, shadow_effect)
-    , interpolant_(this->medium_->GetNumComponents(), NULL)
+    , interpolant_(this->medium_->GetNumComponents())
 {
     std::vector<Interpolant2DBuilder> builder2d(this->components_.size());
     Helper::InterpolantBuilderContainer builder_container2d(this->components_.size());
@@ -190,11 +190,10 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
             .SetLogSubst(false)
             .SetFunction2D(std::bind(&PhotoQ2Interpolant::FunctionToBuildPhotoInterpolant, this, std::placeholders::_1, std::placeholders::_2, i));
 
-        builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = interpolant_[i];
+        builder_container2d[i]  = &builder2d[i];
     }
 
-    Helper::InitializeInterpolation("Photo", builder_container2d, std::vector<Parametrization*>(1, this), *def);
+    interpolant_ = Helper::InitializeInterpolation("Photo", builder_container2d, std::vector<Parametrization*>(1, this), *def);
 }
 
 template<class Param>
@@ -206,7 +205,7 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const PhotoQ2Interpolant& photo)
 
     for (unsigned int i = 0; i < photo.interpolant_.size(); ++i)
     {
-        interpolant_[i] = photo.interpolant_[i];
+        interpolant_[i] = std::unique_ptr<Interpolant>(new Interpolant(*photo.interpolant_[i]));
     }
 }
 

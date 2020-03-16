@@ -25,11 +25,11 @@ PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairProduction& param, con
 }
 
 
-PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairInterpolant& param)
+/*PhotoPairInterpolant::PhotoPairInterpolant(const PhotoPairInterpolant& param)
         : CrossSectionInterpolant(param), photoangle_(param.GetPhotoAngleDistribution().clone()), rndc_(param.rndc_)
         , eminus_def_(param.eminus_def_), eplus_def_(param.eplus_def_)
 {
-}
+}*/
 
 PhotoPairInterpolant::~PhotoPairInterpolant() {
         delete photoangle_;
@@ -153,7 +153,6 @@ void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
 
     Helper::InterpolantBuilderContainer builder_container1d(components_.size());
     Helper::InterpolantBuilderContainer builder_container2d(components_.size());
-    Helper::InterpolantBuilderContainer builder_return;
 
     Integral integral(IROMB, IMAXS, IPREC);
 
@@ -189,8 +188,7 @@ void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                         std::ref(integral),
                         i));
 
-        builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = dndx_interpolant_2d_[i];
+        builder_container2d[i] = &builder2d[i];
 
         builder1d[i]
                 .SetMax(def.nodes_cross_section)
@@ -206,13 +204,10 @@ void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
                 .SetLogSubst(false)
                 .SetFunction1D(std::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, std::placeholders::_1, i));
 
-        builder_container1d[i].first  = &builder1d[i];
-        builder_container1d[i].second = dndx_interpolant_1d_[i];
+        builder_container1d[i] = &builder1d[i];
     }
 
-    builder_return.insert(builder_return.end(), builder_container2d.begin(), builder_container2d.end());
-    builder_return.insert(builder_return.end(), builder_container1d.begin(), builder_container1d.end());
-    // builder2d.insert(builder2d.end(), builder1d.begin(), builder1d.end());
 
-    Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), def);
+    dndx_interpolant_2d_ = Helper::InitializeInterpolation("dNdx_diff", builder_container2d, std::vector<Parametrization*>(1, parametrization_), def);
+    dndx_interpolant_1d_ = Helper::InitializeInterpolation("dNdx", builder_container1d, std::vector<Parametrization*>(1, parametrization_), def);
 }

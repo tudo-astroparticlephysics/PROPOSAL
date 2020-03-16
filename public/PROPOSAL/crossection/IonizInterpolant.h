@@ -39,10 +39,10 @@ class IonizInterpolant : public CrossSectionInterpolant
 {
 public:
     IonizInterpolant(const Ionization&, std::shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    IonizInterpolant(const IonizInterpolant&);
+    //IonizInterpolant(const IonizInterpolant&);
     virtual ~IonizInterpolant();
 
-    CrossSection* clone() const { return new IonizInterpolant(*this); }
+    //CrossSection* clone() const { return new IonizInterpolant(*this); }
 
     // ----------------------------------------------------------------- //
     // Public methods

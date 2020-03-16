@@ -39,10 +39,10 @@ class PhotoInterpolant : public CrossSectionInterpolant
 {
 public:
     PhotoInterpolant(const Photonuclear&, std::shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    PhotoInterpolant(const PhotoInterpolant&);
+    //PhotoInterpolant(const PhotoInterpolant&);
     virtual ~PhotoInterpolant();
 
-    CrossSection* clone() const { return new PhotoInterpolant(*this); }
+    //CrossSection* clone() const { return new PhotoInterpolant(*this); }
 
     // ----------------------------------------------------------------- //
     // Public methods

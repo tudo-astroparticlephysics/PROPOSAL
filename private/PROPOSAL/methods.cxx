@@ -239,7 +239,7 @@ namespace Helper {
 
     // -------------------------------------------------------------------------
     // //
-    void InitializeInterpolation(const std::string name,
+    std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(const std::string name,
         InterpolantBuilderContainer& builder_container,
         const std::vector<Parametrization*>& parametrizations,
         const InterpolationDef interpolation_def)
@@ -250,6 +250,8 @@ namespace Helper {
         // // Create hash for the file name
         // ---------------------------------------------------------------------
         // //
+
+        std::vector<std::unique_ptr<Interpolant>> interpolants(builder_container.size());
 
         size_t hash_digest = 0;
         if (parametrizations.size() == 1) {
@@ -303,12 +305,11 @@ namespace Helper {
                     log_debug("%s tables will be read from file: %s",
                         name.c_str(), filename.str().c_str());
 
-                    for (InterpolantBuilderContainer::iterator builder_it
-                         = builder_container.begin();
-                         builder_it != builder_container.end(); ++builder_it) {
+                    for (auto interpolant = interpolants.begin();
+                         interpolant != interpolants.end(); ++interpolant) {
                         // TODO(mario): read check Tue 2017/09/05
-                        builder_it->second.reset(new Interpolant());
-                        builder_it->second->Load(input, binary_tables);
+                        interpolant->reset(new Interpolant());
+                        interpolant->get()->Load(input, binary_tables);
                     }
                     reading_worked = true;
                 }
@@ -329,7 +330,7 @@ namespace Helper {
 
         if (reading_worked) {
             log_debug("Initialize %s interpolation done.", name.c_str());
-            return;
+            return interpolants;
         }
 
         if (just_use_readonly_path) {
@@ -376,12 +377,11 @@ namespace Helper {
                     log_debug("%s tables will be read from file: %s",
                         name.c_str(), filename.str().c_str());
 
-                    for (InterpolantBuilderContainer::iterator builder_it
-                         = builder_container.begin();
-                         builder_it != builder_container.end(); ++builder_it) {
+                    for (auto interpolant = interpolants.begin();
+                         interpolant != interpolants.end(); ++interpolant) {
                         // TODO(mario): read check Tue 2017/09/05
-                        builder_it->second.reset(new Interpolant());
-                        builder_it->second->Load(input, binary_tables);
+                        interpolant->reset(new Interpolant());
+                        interpolant->get()->Load(input, binary_tables);
                     }
                 }
 
@@ -401,11 +401,9 @@ namespace Helper {
                 if (output.good()) {
                     output.precision(16);
 
-                    for (InterpolantBuilderContainer::iterator builder_it
-                         = builder_container.begin();
-                         builder_it != builder_container.end(); ++builder_it) {
-                        builder_it->second.reset(builder_it->first->build());
-                        builder_it->second->Save(output, binary_tables);
+                    for (std::size_t i = 0; i < builder_container.size(); ++i) {
+                        interpolants.at(i) = builder_container.at(i)->build();
+                        interpolants.at(i)->Save(output, binary_tables);
                     }
                 } else {
                     storing_failed = true;
@@ -421,14 +419,13 @@ namespace Helper {
         if (pathname.empty() || storing_failed) {
             log_debug("%s tables will be stored in memomy!", name.c_str());
 
-            for (InterpolantBuilderContainer::iterator builder_it
-                 = builder_container.begin();
-                 builder_it != builder_container.end(); ++builder_it) {
-                builder_it->second.reset(builder_it->first->build());
+            for (std::size_t i = 0; i < builder_container.size(); ++i) {
+                interpolants.at(i) = builder_container.at(i)->build();
             }
         }
 
         log_debug("Initialize %s interpolation done.", name.c_str());
+        return interpolants;
     }
 
 } // namespace Helper

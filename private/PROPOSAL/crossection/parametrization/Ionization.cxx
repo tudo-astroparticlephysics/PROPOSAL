@@ -26,7 +26,7 @@ Ionization::Ionization(const ParticleDef& particle_def,
 }
 
 Ionization::Ionization(const Ionization& ioniz)
-    : Parametrization(ioniz)
+    : Parametrization(ioniz), cuts_(ioniz.cuts_)
 {
 }
 
@@ -133,15 +133,18 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
     Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
 
     // TODO(mario): Better way? Sat 2017/09/02
-
     // PDG eq. 33.10
     // with Spin 1/2 correction by Rossi
     double square_momentum   = (energy - particle_mass_) * (energy + particle_mass_);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double beta              = particle_momentum / energy;
     double gamma             = energy / particle_mass_;
-    double v_up              = cuts_->GetCut(energy);
+    double v_up;
 
+    if(cuts_ == nullptr)
+        v_up = this->GetKinematicLimits(energy).vMax;
+    else
+        v_up = cuts_->GetCut(energy);
 
     aux    = beta * gamma / (1.e-6 * medium_->GetI());
     result = std::log(v_up * (2 * ME * energy)) + 2 * std::log(aux);
@@ -318,8 +321,13 @@ double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(double energy, double va
     Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
 
     double fplus; // (2.269)
+    double v_up;
 
-    double v_up         = cuts_->GetCut(energy);
+    if(cuts_ == nullptr)
+        v_up = this->GetKinematicLimits(energy).vMax;
+    else
+        v_up = cuts_->GetCut(energy);
+
     double bigDelta     = std::min(limits.vMax * energy / ME, v_up * energy / ME); // (2.265)
     double gamma        = energy / ME; // (2.258)
     double betasquared  = 1. - 1. / (gamma * gamma); // (2.260)
@@ -433,7 +441,13 @@ double IonizBergerSeltzerMoller::FunctionToDEdxIntegral(double energy, double va
     Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
 
     double fminus; // (2.268)
-    double v_up         = cuts_->GetCut(energy);
+    double v_up;
+
+    if(cuts_ == nullptr)
+        v_up = this->GetKinematicLimits(energy).vMax;
+    else
+        v_up = cuts_->GetCut(energy);
+
     double bigDelta     = std::min(limits.vMax * energy / ME, v_up * energy / ME); // (2.265)
     double gamma        = energy / ME; // (2.258)
     double betasquared  = 1. - 1. / (gamma * gamma); // (2.260)

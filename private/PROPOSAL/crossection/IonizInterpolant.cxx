@@ -26,7 +26,6 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
     // Use overwritten dNdx interpolation
     InitdNdxInterpolation(def);
 
-    std::cout << "fuu" << std::endl;
     // --------------------------------------------------------------------- //
     // Builder for DEdx
     // --------------------------------------------------------------------- //
@@ -34,7 +33,6 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
     Interpolant1DBuilder builder1d;
     Helper::InterpolantBuilderContainer builder_container;
 
-    std::cout << "bazz" << std::endl;
     IonizIntegral ioniz(param, cuts);
 
     builder1d.SetMax(def.nodes_cross_section)
@@ -50,7 +48,7 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
         .SetLogSubst(true)
         .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedEdxWithoutMultiplier, &ioniz, std::placeholders::_1));
 
-    builder_container.emplace_back(&builder1d, std::move(dedx_interpolant_));
+    builder_container.push_back(&builder1d);
 
     // --------------------------------------------------------------------- //
     // Builder for DE2dx
@@ -72,11 +70,14 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
         .SetLogSubst(false)
         .SetFunction1D(std::bind(&IonizIntegral::CalculatedE2dxWithoutMultiplier, &ioniz, std::placeholders::_1));
 
-    builder_container_de2dx.emplace_back(&builder_de2dx, std::move(de2dx_interpolant_));
+    builder_container_de2dx.push_back(&builder_de2dx);
 
-    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
-    Helper::InitializeInterpolation(
+    auto dedx_interpolant_vec = Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
+    dedx_interpolant_ = std::move(dedx_interpolant_vec.at(0));
+
+    auto de2dx_interpolant_vec = Helper::InitializeInterpolation(
         "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
+    de2dx_interpolant_ = std::move(de2dx_interpolant_vec.at(0));
 }
 
 /*IonizInterpolant::IonizInterpolant(const IonizInterpolant& ioniz)
@@ -98,7 +99,6 @@ void IonizInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
 
     Helper::InterpolantBuilderContainer builder_container1d(components_.size());
     Helper::InterpolantBuilderContainer builder_container2d(components_.size());
-    Helper::InterpolantBuilderContainer builder_return;
 
     Integral integral(IROMB, IMAXS, IPREC);
 
@@ -129,8 +129,7 @@ void IonizInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
             .SetFunction2D(std::bind(
                 &IonizInterpolant::FunctionToBuildDNdxInterpolant2D, this, std::placeholders::_1, std::placeholders::_2, std::ref(integral), i));
 
-        builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = std::move(dndx_interpolant_2d_[i]);
+        builder_container2d[i] = &builder2d[i];
 
         builder1d[i]
             .SetMax(def.nodes_cross_section)
@@ -146,20 +145,11 @@ void IonizInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
             .SetLogSubst(false)
             .SetFunction1D(std::bind(&IonizInterpolant::FunctionToBuildDNdxInterpolant, this, std::placeholders::_1, i));
 
-        builder_container1d[i].first  = &builder1d[i];
-        builder_container1d[i].second = std::move(dndx_interpolant_1d_[i]);
+        builder_container1d[i] = &builder1d[i];
     }
 
-    for(auto& interpolant2d: builder_container2d){
-        builder_return.push_back(std::move(interpolant2d));
-    }
-
-    for(auto& interpolant1d: builder_container1d){
-
-        builder_return.push_back(std::move(interpolant1d));
-    }
-
-    Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), def);
+    dndx_interpolant_2d_ = Helper::InitializeInterpolation("dNdx_diff", builder_container2d, std::vector<Parametrization*>(1, parametrization_), def);
+    dndx_interpolant_1d_ = Helper::InitializeInterpolation("dNdx", builder_container1d, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
 // ----------------------------------------------------------------- //

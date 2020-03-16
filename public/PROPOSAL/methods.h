@@ -159,18 +159,19 @@ bool FileExist(const std::string path);
 // ----------------------------------------------------------------------------
 std::string Centered(int width, const std::string& str, char fill = '=');
 
-typedef std::vector<std::pair<InterpolantBuilder*, std::unique_ptr<Interpolant>> > InterpolantBuilderContainer;
+using InterpolantBuilderContainer = std::vector<InterpolantBuilder*>;
 
 // ----------------------------------------------------------------------------
 /// @brief Helper for interpolation initialization
 ///
 /// @param name: subject of resulting file name
-/// @param InterpolantBuilderContainer:
-///        vector of builder, pointer to Interplant pairs
+/// @param InterpolantBuilderContainer: vector of interpolant builder
 /// @param std::vector: vector of parametrizations used to create
 ///        the interpolation tables with
+///
+/// @return vector of unique_ptr to created interpolants
 // ----------------------------------------------------------------------------
-void InitializeInterpolation(const std::string name,
+std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(const std::string name,
                              InterpolantBuilderContainer&,
                              const std::vector<Parametrization*>&,
                              const InterpolationDef);
