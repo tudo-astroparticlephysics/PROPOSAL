@@ -1,9 +1,12 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
+cmake_minimum_required(VERSION 3.8)
 
 IF(APPLE)
     # In newer version of cmake this will be the default
     SET(CMAKE_MACOSX_RPATH 1)
 ENDIF(APPLE)
+
+# sets standard installtion paths
+include(GNUInstallDirs)
 
 ### full RPATH
 ### copied from https://cmake.org/Wiki/CMake_RPATH_handling
@@ -18,7 +21,7 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # when building, don't use the install RPATH already
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64")
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
@@ -39,29 +42,42 @@ OPTION(ADD_CPPEXAMPLE "Choose to compile Cpp example." ON)
 ####################       PROPOSAL      ########################
 #################################################################
 file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*)
-
 add_library(PROPOSAL SHARED ${SRC_FILES})
 target_compile_features(PROPOSAL PUBLIC cxx_std_11)
 set_target_properties(PROPOSAL PROPERTIES CXX_EXTENSIONS OFF)
-target_include_directories(PROPOSAL PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/public)
+target_include_directories(
+    PROPOSAL PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/public>
+    $<INSTALL_INTERFACE:include>
+)
 target_compile_options(PROPOSAL PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-format-security)
-target_link_libraries(PROPOSAL ${CMAKE_THREAD_LIBS_INIT})
-install(TARGETS PROPOSAL LIBRARY DESTINATION lib)
+install(
+    TARGETS PROPOSAL
+    EXPORT PROPOSALTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
 
 # input version from the project call, so the library knows its own version
 configure_file(
     "${PROJECT_SOURCE_DIR}/public/PROPOSAL/version.h.in"
     "${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h"
 )
-install(FILES ${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h DESTINATION include/PROPOSAL)
-target_include_directories(PROPOSAL PUBLIC ${PROJECT_BINARY_DIR}/include)
+install(
+    FILES ${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/PROPOSAL
+)
+target_include_directories(
+    PROPOSAL PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
 
 # install header files
 file(GLOB_RECURSE INC_FILES ${PROJECT_SOURCE_DIR}/public/PROPOSAL/*)
 foreach(INC_FILE ${INC_FILES})
     file(RELATIVE_PATH REL_FILE ${PROJECT_SOURCE_DIR}/public ${INC_FILE})
     get_filename_component(DIR ${REL_FILE} DIRECTORY)
-    install(FILES "public/${REL_FILE}" DESTINATION include/${DIR})
+    install(FILES "public/${REL_FILE}" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${DIR})
 endforeach()
 
 
@@ -78,7 +94,7 @@ endif()
 
 option(LOG4CPLUS_BUILD_TESTING "Build unit tests for log4cplus" OFF)
 add_subdirectory("vendor/log4cplus/log4cplus")
-target_link_libraries(PROPOSAL log4cplus)
+target_link_libraries(PROPOSAL PRIVATE log4cplus)
 target_compile_definitions(PROPOSAL PRIVATE -DLOG4CPLUS_SUPPORT=1)
 target_compile_definitions(PROPOSAL PRIVATE -DLOG4CPLUS_CONFIG=\"${PROJECT_SOURCE_DIR}/resources/log4cplus.conf\")
 
@@ -89,14 +105,14 @@ target_compile_definitions(PROPOSAL PRIVATE -DLOG4CPLUS_CONFIG=\"${PROJECT_SOURC
 IF(ADD_CPPEXAMPLE)
     add_executable(example private/test/example.cxx)
     target_compile_options(example PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option)
-    target_link_libraries(example PROPOSAL)
+    target_link_libraries(example PRIVATE PROPOSAL)
 ENDIF(ADD_CPPEXAMPLE)
 
 
 IF(ADD_PERFORMANCE_TEST)
     add_executable(performance_test private/test/performance_test.cxx)
     target_compile_options(performance_test PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option)
-    target_link_libraries(performance_test PROPOSAL)
+    target_link_libraries(performance_test PRIVATE PROPOSAL)
 ENDIF(ADD_PERFORMANCE_TEST)
 
 #################################################################
@@ -130,9 +146,9 @@ IF(ADD_PYTHON)
     pybind11_add_module(pyPROPOSAL SHARED ${PYTHON_SRC_FILES})
     target_include_directories(pyPROPOSAL PRIVATE ${PYTHON_INCLUDE_DIRS})
     target_include_directories(pyPROPOSAL PRIVATE ${PROJECT_SOURCE_DIR}/public/Interface/python )
-    target_link_libraries(pyPROPOSAL PUBLIC PROPOSAL)
+    target_link_libraries(pyPROPOSAL PRIVATE PROPOSAL)
     target_compile_options(pyPROPOSAL PRIVATE -fvisibility=hidden)
-    install(TARGETS pyPROPOSAL DESTINATION lib)
+    install(TARGETS pyPROPOSAL EXPORT PROPOSALTargets DESTINATION ${CMAKE_INSTALL_LIBDIR})
 ELSE(ADD_PYTHON)
     MESSAGE(STATUS "No python wrapper library will be build.")
 ENDIF(ADD_PYTHON)
@@ -151,8 +167,7 @@ IF(ADD_ROOT)
     if(ROOT_FOUND)
         target_compile_definitions(PROPOSAL PRIVATE -DROOT_SUPPORT=1)
         target_include_directories(PROPOSAL PUBLIC ${ROOT_INCLUDE_DIR})
-        target_link_libraries(PROPOSAL ${ROOT_LIBRARIES})
-
+        target_link_libraries(PROPOSAL PRIVATE ${ROOT_LIBRARIES})
     ELSE(ROOT_FOUND)
         message(SEND_ERROR  "ROOT not found...")
         message(FATAL_ERROR "Make sure you have ROOT installed and ROOTSYS is set.")
@@ -165,7 +180,29 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY
 )
-
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+)
+
+
+
+#################################################################
+#################         INSTALLATION        ###################
+#################################################################
+install(
+    EXPORT PROPOSALTargets
+    FILE PROPOSALConfig.cmake
+    NAMESPACE PROPOSAL::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/PROPOSAL
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "PROPOSALConfigVersion.cmake"
+    VERSION ${PACKAGE_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/PROPOSALConfigVersion.cmake"
+    DESTINATION lib/cmake/PROPOSAL
 )
