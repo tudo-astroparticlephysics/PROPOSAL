@@ -24,7 +24,7 @@ def muons(energy, statistics, vcut, do_continuous_randomization, dist):
     interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
     interpolation_def.path_to_tables_readonly = "~/.local/share/PROPOSAL/tables"
 
-    mu_def = pp.particle.MuMinusDef.get()
+    mu_def = pp.particle.MuMinusDef()
     prop = pp.Propagator(
             particle_def=mu_def,
             sector_defs=[sec_def],
