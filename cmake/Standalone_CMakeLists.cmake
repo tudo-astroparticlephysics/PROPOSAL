@@ -43,6 +43,7 @@ OPTION(ADD_CPPEXAMPLE "Choose to compile Cpp example." ON)
 #################################################################
 file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*)
 add_library(PROPOSAL SHARED ${SRC_FILES})
+add_library(PROPOSAL::PROPOSAL ALIAS PROPOSAL)
 target_compile_features(PROPOSAL PUBLIC cxx_std_11)
 set_target_properties(PROPOSAL PROPERTIES CXX_EXTENSIONS OFF)
 target_include_directories(
