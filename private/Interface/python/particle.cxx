@@ -269,7 +269,10 @@ void init_particle(py::module& m) {
         .def_property_readonly("parent_particle_energy", &Secondaries::GetParentParticleEnergy)
         .def_property_readonly("energy", &Secondaries::GetEnergy)
         .def_property_readonly("time", &Secondaries::GetTime)
-        .def_property_readonly("propagated_distance", &Secondaries::GetPropagatedDistance);
+        .def_property_readonly("propagated_distance", &Secondaries::GetPropagatedDistance)
+        .def_property_readonly("entry_point", &Secondaries::GetEntryPoint)
+        .def_property_readonly("exit_point", &Secondaries::GetExitPoint)
+        .def_property_readonly("closest_approach_point", &Secondaries::GetClosestApproachPoint);
 
     py::enum_<InteractionType>(m_sub, "Interaction_Type")
         .value("Particle", InteractionType::Particle)

@@ -161,18 +161,14 @@ ENDIF(ADD_PYTHON)
 
 IF(ADD_ROOT)
     message(STATUS "Enabling ROOT support.")
-    # Load some basic macros which are needed later on
-    include(cmake/FindROOT_new.cmake)
 
-    #if ROOT is found ROOT files with ROOT trees can be written
-    if(ROOT_FOUND)
-        target_compile_definitions(PROPOSAL PRIVATE -DROOT_SUPPORT=1)
-        target_include_directories(PROPOSAL PUBLIC ${ROOT_INCLUDE_DIR})
-        target_link_libraries(PROPOSAL PRIVATE ${ROOT_LIBRARIES})
-    ELSE(ROOT_FOUND)
-        message(SEND_ERROR  "ROOT not found...")
-        message(FATAL_ERROR "Make sure you have ROOT installed and ROOTSYS is set.")
-    ENDIF(ROOT_FOUND)
+    # Load some basic macros which are needed later on
+    list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+    find_package(ROOT REQUIRED)
+
+    target_compile_definitions(PROPOSAL PRIVATE -DROOT_SUPPORT=1)
+    target_include_directories(PROPOSAL PRIVATE ${ROOT_INCLUDE_DIR})
+    target_link_libraries(PROPOSAL ${ROOT_LIBRARIES})
 ENDIF(ADD_ROOT)
 
 # uninstall target
