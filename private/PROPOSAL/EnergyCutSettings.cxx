@@ -14,7 +14,7 @@ using namespace PROPOSAL;
 double EnergyCutSettings::GetCut(double energy) const
 {
     // if both ecut and vcut are setted (in their bounds), the minimum is used
-    return std::min(ecut_, vcut_ * energy);
+    return std::min(ecut_ / energy, vcut_);
 }
 
 //----------------------------------------------------------------------------//
