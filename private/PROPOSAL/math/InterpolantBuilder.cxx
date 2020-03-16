@@ -64,13 +64,8 @@ Interpolant1DBuilder::Interpolant1DBuilder(const Interpolant1DBuilder& builder)
 
 std::unique_ptr<Interpolant> Interpolant1DBuilder::build()
 {
-    std::cout << "Das tut weh, Maxi!" << std::endl;
-    std::unique_ptr<Interpolant> ptr (new Interpolant(
+    return std::unique_ptr<Interpolant> (new Interpolant(
             max, xmin, xmax, function1d, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst));
-
-    std::cout << &ptr << std::endl;
-
-    return ptr;
 }
 
 // ------------------------------------------------------------------------- //
