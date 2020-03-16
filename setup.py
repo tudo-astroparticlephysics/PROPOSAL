@@ -35,7 +35,7 @@ class CMakeExtension(Extension):
             self.source_dir = SETUP_DIR
         else:
             self.source_dir = os.path.join(SETUP_DIR, source_dir)
-        self.target = None
+        self.target = target
         # don't invoke the original build_ext for this special extension
         super().__init__(name, sources=[], **kwargs)
 
