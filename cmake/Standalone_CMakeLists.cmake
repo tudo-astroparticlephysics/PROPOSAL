@@ -168,7 +168,7 @@ IF(ADD_ROOT)
 
     target_compile_definitions(PROPOSAL PRIVATE -DROOT_SUPPORT=1)
     target_include_directories(PROPOSAL PRIVATE ${ROOT_INCLUDE_DIR})
-    target_link_libraries(PROPOSAL ${ROOT_LIBRARIES})
+    target_link_libraries(PROPOSAL PRIVATE ${ROOT_LIBRARIES})
 ENDIF(ADD_ROOT)
 
 # uninstall target
