@@ -1,6 +1,5 @@
 #include "PROPOSAL/PROPOSAL.h"
 #include <vector>
-#include <iostream>
 
 using namespace PROPOSAL;
 

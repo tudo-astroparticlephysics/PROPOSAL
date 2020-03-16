@@ -26,7 +26,6 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
     // Use overwritten dNdx interpolation
     InitdNdxInterpolation(def);
 
-    std::cout << "fuu" << std::endl;
     // --------------------------------------------------------------------- //
     // Builder for DEdx
     // --------------------------------------------------------------------- //
@@ -34,7 +33,6 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
     Interpolant1DBuilder builder1d;
     Helper::InterpolantBuilderContainer builder_container;
 
-    std::cout << "bazz" << std::endl;
     IonizIntegral ioniz(param, cuts);
 
     builder1d.SetMax(def.nodes_cross_section)

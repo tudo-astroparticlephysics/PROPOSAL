@@ -330,7 +330,7 @@ namespace Helper {
 
         if (reading_worked) {
             log_debug("Initialize %s interpolation done.", name.c_str());
-            return std::move(interpolants);
+            return interpolants;
         }
 
         if (just_use_readonly_path) {
@@ -425,7 +425,7 @@ namespace Helper {
         }
 
         log_debug("Initialize %s interpolation done.", name.c_str());
-        return std::move(interpolants);
+        return interpolants;
     }
 
 } // namespace Helper

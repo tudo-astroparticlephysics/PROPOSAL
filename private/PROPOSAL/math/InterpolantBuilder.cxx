@@ -1,7 +1,6 @@
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/math/Interpolant.h"
-#include <iostream>
 using namespace PROPOSAL;
 
 // ------------------------------------------------------------------------- //
