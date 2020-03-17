@@ -60,7 +60,7 @@ public:
     double FunctionToIntegral(double energy) override;
 
 protected:
-    std::unique_ptr<UtilityIntegralDisplacement> displacement_;
+    UtilityIntegralDisplacement displacement_;
 };
 } // namespace PROPOSAL
 
@@ -72,7 +72,7 @@ public:
     double Calculate(double ei, double ef, double rnd) override;
 
 protected:
-    std::unique_ptr<UtilityIntegralDisplacement> displacement_;
+    UtilityIntegralDisplacement displacement_;
     double lifetime;
 };
 } // namespace PROPOSAL
@@ -84,7 +84,7 @@ public:
     double FunctionToIntegral(double energy) override;
 
 protected:
-    std::unique_ptr<UtilityIntegralDisplacement> displacement_;
+    UtilityIntegralDisplacement displacement_;
 };
 } // namespace PROPOSAL
 
@@ -95,7 +95,7 @@ public:
     double FunctionToIntegral(double energy) override;
 
 protected:
-    std::unique_ptr<UtilityIntegralDisplacement> displacement_;
+    UtilityIntegralDisplacement displacement_;
 };
 } // namespace PROPOSAL
 
@@ -106,6 +106,6 @@ public:
     double FunctionToIntegral(double energy) override;
 
 protected:
-    std::unique_ptr<UtilityIntegralDisplacement> displacement_;
+    UtilityIntegralDisplacement displacement_;
 };
 } // namespace PROPOSAL
