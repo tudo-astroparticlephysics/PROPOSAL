@@ -176,6 +176,11 @@ std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(const std::str
                              const std::vector<Parametrization*>&,
                              const InterpolationDef);
 
+std::unique_ptr<Interpolant> InitializeInterpolation(const std::string,
+                             InterpolantBuilder&,
+                             const std::vector<Parametrization*>&,
+                             const InterpolationDef);
+
 // ----------------------------------------------------------------------------
 /// @brief Simple map structure where keys and values can be used for indexing
 // ----------------------------------------------------------------------------

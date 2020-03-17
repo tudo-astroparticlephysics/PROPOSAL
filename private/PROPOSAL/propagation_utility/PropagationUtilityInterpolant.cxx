@@ -46,29 +46,9 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
 {
     Integral integral(IROMB, IMAXS, IPREC2);
 
-    std::vector<std::unique_ptr<Interpolant>> interpolants;
+    Interpolant1DBuilder builder1d;
 
-    std::vector<std::function<double(double)>> functions;
-
-    interpolants.emplace_back(std::move(interpolant_));
-    functions.emplace_back(std::bind(&UtilityInterpolant::BuildInterpolant, this,
-                                     std::placeholders::_1, std::ref(utility), std::ref(integral)));
-
-    interpolants.emplace_back(std::move(interpolant_diff_));
-
-    functions.emplace_back(std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
-                                     std::placeholders::_1));
-
-    unsigned int number_of_interpolants = interpolants.size();
-
-    std::vector<Interpolant1DBuilder> builder_vec(number_of_interpolants);
-
-    Helper::InterpolantBuilderContainer builder_container(
-        number_of_interpolants);
-
-    for (unsigned int i = 0; i < number_of_interpolants; ++i) {
-        builder_vec[i]
-            .SetMax(number_of_sampling_points)
+    builder1d.SetMax(number_of_sampling_points)
             .SetXMin(low_)
             .SetXMax(interpolation_def_->max_node_energy)
             .SetRomberg(interpolation_def_->order_of_interpolation)
@@ -79,10 +59,24 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction1D(functions[i]);
+            .SetFunction1D(std::bind(&UtilityInterpolant::BuildInterpolant, this,
+                                     std::placeholders::_1, std::ref(utility), std::ref(integral)));
 
-        builder_container[i] = &builder_vec[i];
-    }
+    Interpolant1DBuilder builder_diff;
+
+    builder_diff.SetMax(number_of_sampling_points)
+            .SetXMin(low_)
+            .SetXMax(interpolation_def_->max_node_energy)
+            .SetRomberg(interpolation_def_->order_of_interpolation)
+            .SetRational(false)
+            .SetRelative(false)
+            .SetIsLog(true)
+            .SetRombergY(interpolation_def_->order_of_interpolation)
+            .SetRationalY(false)
+            .SetRelativeY(false)
+            .SetLogSubst(false)
+            .SetFunction1D(std::bind(&UtilityIntegral::FunctionToIntegral, &utility,
+                                     std::placeholders::_1));
 
     std::vector<Parametrization*> params(crosss.size(), NULL);
 
@@ -90,11 +84,12 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
         params[i] = &crosss[i]->GetParametrization();
     }
 
-    interpolants = Helper::InitializeInterpolation(
-        name, builder_container, params, *interpolation_def_);
+    interpolant_ = Helper::InitializeInterpolation(
+        name, builder1d, params, *interpolation_def_);
+
+    std::string tmp_str = name;
+    interpolant_diff_ = Helper::InitializeInterpolation(tmp_str.append("_diff"), builder_diff, params, *interpolation_def_);
 }
-
-
 
 /******************************************************************************
  *                            Utility Displacement                            *

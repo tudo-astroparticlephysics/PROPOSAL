@@ -27,7 +27,6 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
     // --------------------------------------------------------------------- //
 
     Interpolant1DBuilder builder1d;
-    Helper::InterpolantBuilderContainer builder_container;
 
     // Needed for CalculatedEdx integration
     MupairIntegral mupair(param, cuts);
@@ -45,14 +44,11 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
         .SetLogSubst(true)
         .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedEdxWithoutMultiplier, &mupair, std::placeholders::_1));
 
-    builder_container.push_back(&builder1d);
-
     // --------------------------------------------------------------------- //
     // Builder for DE2dx
     // --------------------------------------------------------------------- //
 
     Interpolant1DBuilder builder_de2dx;
-    Helper::InterpolantBuilderContainer builder_container_de2dx;
 
     builder_de2dx.SetMax(def.nodes_continous_randomization)
         .SetXMin(param.GetParticleMass())
@@ -67,14 +63,9 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
         .SetLogSubst(false)
         .SetFunction1D(std::bind(&MupairIntegral::CalculatedE2dxWithoutMultiplier, &mupair, std::placeholders::_1));
 
-    builder_container_de2dx.push_back(&builder_de2dx);
+    dedx_interpolant_ = Helper::InitializeInterpolation("dEdx", builder1d, std::vector<Parametrization*>(1, parametrization_), def);
 
-    auto dedx_interpolant_vec = Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
-    dedx_interpolant_ = std::move(dedx_interpolant_vec.at(0));
-
-    auto d2edx_interpolant_vec = Helper::InitializeInterpolation(
-            "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
-    de2dx_interpolant_ = std::move(d2edx_interpolant_vec.at(0));
+    de2dx_interpolant_ = Helper::InitializeInterpolation("dE2dx", builder_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
 
     muminus_def_ = &MuMinusDef::Get();
     muplus_def_ = &MuPlusDef::Get();

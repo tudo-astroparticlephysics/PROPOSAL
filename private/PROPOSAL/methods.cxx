@@ -239,6 +239,18 @@ namespace Helper {
 
     // -------------------------------------------------------------------------
     // //
+
+    std::unique_ptr<Interpolant> InitializeInterpolation(const std::string name,
+            InterpolantBuilder& builder,
+            const std::vector<Parametrization*>& parametrizations,
+            const InterpolationDef interpolation_def){
+        //Simple wrapper for inizializing one Interpolant only
+        Helper::InterpolantBuilderContainer builder_container;
+        builder_container.push_back(&builder);
+        auto return_vec = InitializeInterpolation(name, builder_container, parametrizations, interpolation_def);
+        return std::move(return_vec.at(0));
+    }
+
     std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(const std::string name,
         InterpolantBuilderContainer& builder_container,
         const std::vector<Parametrization*>& parametrizations,
