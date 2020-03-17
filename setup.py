@@ -91,6 +91,9 @@ class build_ext_cmake(build_ext):
 setup(
     name='pyPROPOSAL',
     version=version,
+    url='https://github.com/tudo-astroparticlephysics/PROPOSAL',
+    author='PROPOSAL Developement Team',
+    author_email='jan.soedingrekso@tu-dortmund.de',
     ext_modules=[
         CMakeExtension('pyPROPOSAL'),
     ],
