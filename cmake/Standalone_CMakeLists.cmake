@@ -20,12 +20,13 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
 # when building, don't use the install RPATH already
 # (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+OPTION(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib64")
+message(STATUS "${CMAKE_INSTALL_RPATH}")
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+OPTION(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ### end full RPATH
 
 # set a default build type (Debug for git checkout else Release)
