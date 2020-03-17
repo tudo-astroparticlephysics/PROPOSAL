@@ -97,6 +97,5 @@ setup(
     cmdclass={
         'build_ext': build_ext_cmake,
     },
-    package_data={'': ['*.so*']},
     zip_safe=False,
 )

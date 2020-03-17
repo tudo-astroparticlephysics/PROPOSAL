@@ -15,6 +15,24 @@ matrix:
   include:
     - os: linux
       dist: xenial
+      name: Python
+      language: python
+      python: 3.6
+      addons: 
+        apt:
+          packages:
+            - g++-4.8
+      env:
+        - CC=gcc-4.8
+        - CXX=g++-4.8
+      before_script:
+        - pip install . -v
+      script:
+        - cd $HOME
+        - python -c 'import pyPROPOSAL'
+
+    - os: linux
+      dist: xenial
       name: Linux gcc 4.8
       addons:
         apt:
@@ -68,6 +86,7 @@ matrix:
       env:
         - CC=clang-8
         - CXX=clang++-8
+
 
 before_install:
   - pyenv global system 3.7
