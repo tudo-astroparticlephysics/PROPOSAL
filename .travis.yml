@@ -26,10 +26,10 @@ matrix:
         - CC=gcc-4.8
         - CXX=g++-4.8
       before_script:
+        - pip install pytest
         - pip install . -v
       script:
-        - cd $HOME
-        - python -c 'import pyPROPOSAL'
+        - python -m pytest tests/python -v
 
     - os: linux
       dist: xenial
