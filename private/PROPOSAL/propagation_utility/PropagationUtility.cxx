@@ -20,12 +20,11 @@ using std::tuple;
 
 Utility::Definition::Definition(CrossSectionList cross,
     const ParticleDef& p_def, std::shared_ptr<Scattering> scattering = nullptr,
-    std::shared_ptr<InterpolationDef> interpol_def = nullptr)
-    : cross(cross)
-    , scattering(scattering)
-    , inter_def(interpol_def)
+    std::shared_ptr<InterpolationDef> inter_def = nullptr)
+    : scattering(scattering)
+    /* , inter_def(interpol_def) */
 {
-    if (!interpol_def) {
+    if (!inter_def) {
         log_warn("No interpolation definition defined. Integral will not be "
                  "approximate by interpolants. Performance will be poor.");
 
@@ -34,11 +33,11 @@ Utility::Definition::Definition(CrossSectionList cross,
         decay_calc.reset(new UtilityIntegralDecay(cross, p_def));
     } else {
         displacement_calc.reset(
-            new UtilityInterpolantDisplacement(cross, p_def, interpol_def));
+            new UtilityInterpolantDisplacement(cross, p_def, inter_def));
         interaction_calc.reset(
-            new UtilityInterpolantInteraction(cross, p_def, interpol_def));
+            new UtilityInterpolantInteraction(cross, p_def, inter_def));
         decay_calc.reset(
-            new UtilityInterpolantDecay(cross, p_def, interpol_def));
+            new UtilityInterpolantDecay(cross, p_def, inter_def));
     }
 
     if (!scattering) {
@@ -53,7 +52,7 @@ Utility::Definition::Definition(CrossSectionList cross,
             cont_rand.reset(new UtilityIntegralContRand(cross, p_def));
         } else {
             cont_rand.reset(
-                new UtilityInterpolantContRand(cross, p_def, interpol_def));
+                new UtilityInterpolantContRand(cross, p_def, inter_def));
         }
     }
 
@@ -65,7 +64,7 @@ Utility::Definition::Definition(CrossSectionList cross,
             cont_rand.reset(new UtilityIntegralTime(cross, p_def));
         } else {
             cont_rand.reset(
-                new UtilityInterpolantTime(cross, p_def, interpol_def));
+                new UtilityInterpolantTime(cross, p_def, inter_def));
         }
     }
 }
