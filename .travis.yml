@@ -27,7 +27,7 @@ matrix:
         - CXX=g++-4.8
       before_script:
         - pip install pytest
-        - pip install . -v
+        - pip install .
       script:
         - python -m pytest tests/python -v
 
