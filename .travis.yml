@@ -82,7 +82,7 @@ before_script:
   - cd build
   - cmake .. -DADD_PYTHON=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/proposal
   - cmake --build . -- VERBOSE=1 -j2
-  - cmake --install .
+  - cmake --build . --target install
   - mkdir -p $HOME/.local/share/PROPOSAL/tables
 
 script:
