@@ -67,13 +67,14 @@ private:
 #endif
     }
 
-    Logging(Logging const&);         // Don't Implement.
-    void operator=(Logging const&); // Don't implement
 #if LOG4CPLUS_SUPPORT
     log4cplus::Initializer initializer;
 #endif
 
 public:
+    Logging(Logging const&) = delete;
+    void operator=(Logging const&) = delete;
+
 #if LOG4CPLUS_SUPPORT
     log4cplus::Logger logger;
 #endif
