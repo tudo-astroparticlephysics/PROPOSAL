@@ -63,9 +63,8 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, std::shared_
         .SetLogSubst(false)
         .SetFunction1D(std::bind(&MupairIntegral::CalculatedE2dxWithoutMultiplier, &mupair, std::placeholders::_1));
 
-    dedx_interpolant_ = Helper::InitializeInterpolation("dEdx", builder1d, std::vector<Parametrization*>(1, parametrization_), def);
-
-    de2dx_interpolant_ = Helper::InitializeInterpolation("dE2dx", builder_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
+    dedx_interpolant_ = Helper::InitializeInterpolation("dEdx", builder1d, parametrization_->GetHash(), def);
+    de2dx_interpolant_ = Helper::InitializeInterpolation("dE2dx", builder_de2dx, parametrization_->GetHash(), def);
 
     muminus_def_ = &MuMinusDef::Get();
     muplus_def_ = &MuPlusDef::Get();
@@ -87,8 +86,7 @@ MupairInterpolant::~MupairInterpolant() {}
 // ------------------------------------------------------------------------- //
 double MupairInterpolant::CalculatedEdx(double energy)
 {
-    if (parametrization_->GetMultiplier() <= 0)
-    {
+    if (parametrization_->GetMultiplier() <= 0) {
         return 0;
     }
 

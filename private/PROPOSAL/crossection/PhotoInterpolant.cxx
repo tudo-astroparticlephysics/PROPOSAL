@@ -60,9 +60,9 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, std::shared_ptr<co
         .SetLogSubst(false)
         .SetFunction1D(std::bind(&PhotoIntegral::CalculatedE2dxWithoutMultiplier, &photo, std::placeholders::_1));
 
-    dedx_interpolant_ = Helper::InitializeInterpolation("dEdx", builder1d, std::vector<Parametrization*>(1, parametrization_), def);
+    dedx_interpolant_ = Helper::InitializeInterpolation("dEdx", builder1d, parametrization_->GetHash(), def);
 
-    de2dx_interpolant_ = Helper::InitializeInterpolation("dE2dx", builder_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
+    de2dx_interpolant_ = Helper::InitializeInterpolation("dE2dx", builder_de2dx, parametrization_->GetHash(), def);
 }
 
 /*PhotoInterpolant::PhotoInterpolant(const PhotoInterpolant& photo)

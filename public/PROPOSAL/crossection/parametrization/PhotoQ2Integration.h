@@ -193,7 +193,7 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
         builder_container2d[i]  = &builder2d[i];
     }
 
-    interpolant_ = Helper::InitializeInterpolation("Photo", builder_container2d, std::vector<Parametrization*>(1, this), *def);
+    interpolant_ = Helper::InitializeInterpolation("Photo", builder_container2d, this->GetHash(), *def);
 }
 
 template<class Param>

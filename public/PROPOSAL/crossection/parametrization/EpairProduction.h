@@ -236,7 +236,7 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const Partic
         builder_container2d[i]  = &builder2d[i];
     }
 
-    interpolant_ = Helper::InitializeInterpolation("Epair", builder_container2d, std::vector<Parametrization*>(1, this), *def);
+    interpolant_ = Helper::InitializeInterpolation("Epair", builder_container2d, this->GetHash(), *def);
 }
 
 template<class Param>

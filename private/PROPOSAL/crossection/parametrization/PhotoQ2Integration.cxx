@@ -13,10 +13,10 @@ using namespace PROPOSAL;
 
 #define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                                                            \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
-                               std::shared_ptr<const Medium> medium,                                                                   \
+                               std::shared_ptr<const Medium> medium,                                                   \
                                double multiplier,                                                                      \
                                const ShadowEffect& shadow_effect)                                                      \
-        : PhotoQ2Integral(particle_def, medium, multiplier, shadow_effect)                                       \
+        : PhotoQ2Integral(particle_def, medium, multiplier, shadow_effect)                                             \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \

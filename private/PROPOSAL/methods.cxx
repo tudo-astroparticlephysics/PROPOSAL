@@ -80,12 +80,14 @@ InterpolationDef::InterpolationDef(const nlohmann::json& config)
     };
 
     if (not config.contains("path_to_tables_readonly")) {
-        log_warn("No valid writable path to interpolation tables readonly found."
-                 "Save tables in memory, if readonly path is also not working!");
+        log_warn(
+            "No valid writable path to interpolation tables readonly found."
+            "Save tables in memory, if readonly path is also not working!");
     } else {
         std::string path_to_tables = "";
         if (config.at("path_to_tables_readonly").is_string())
-            path_to_tables = Helper::ResolvePath(config.at("path_to_tables_readonly"));
+            path_to_tables
+                = Helper::ResolvePath(config.at("path_to_tables_readonly"));
 
         if (config.at("path_to_tables").is_array()) {
             for (const auto& path : config.at("path_to_tables_readonly")) {
@@ -97,11 +99,10 @@ InterpolationDef::InterpolationDef(const nlohmann::json& config)
             }
         }
         if (path_to_tables == "")
-            std::invalid_argument(
-                "Invalid input for option 'path_to_tables_readonly'. Expected a "
-                "string or a list of strings.");
+            std::invalid_argument("Invalid input for option "
+                                  "'path_to_tables_readonly'. Expected a "
+                                  "string or a list of strings.");
     };
-
 }
 
 // ------------------------------------------------------------------------- //
@@ -200,7 +201,6 @@ namespace Helper {
             return "";
         }
 
-
         char full_path[PATH_MAX];
         char* resolved = realpath(*p.we_wordv, full_path);
 
@@ -236,47 +236,26 @@ namespace Helper {
         }
     }
 
-
     // -------------------------------------------------------------------------
     // //
-
-    std::unique_ptr<Interpolant> InitializeInterpolation(const std::string name,
-            InterpolantBuilder& builder,
-            const std::vector<Parametrization*>& parametrizations,
-            const InterpolationDef interpolation_def){
-        //Simple wrapper for inizializing one Interpolant only
+    std::unique_ptr<Interpolant> InitializeInterpolation(std::string name,
+        InterpolantBuilder& builder, size_t hash_diget,
+        const InterpolationDef& interpolation_def)
+    {
+        // Simple wrapper for inizializing one Interpolant only
         Helper::InterpolantBuilderContainer builder_container;
         builder_container.push_back(&builder);
-        auto return_vec = InitializeInterpolation(name, builder_container, parametrizations, interpolation_def);
+        auto return_vec = InitializeInterpolation(
+            name, builder_container, hash_diget, interpolation_def);
         return std::move(return_vec.at(0));
     }
 
-    std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(const std::string name,
-        InterpolantBuilderContainer& builder_container,
-        const std::vector<Parametrization*>& parametrizations,
-        const InterpolationDef interpolation_def)
+    std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(
+        std::string name, InterpolantBuilderContainer& builder_container,
+        size_t hash_digest, const InterpolationDef& interpolation_def)
     {
-        log_debug("Initialize %s interpolation.", name.c_str());
-
-        // ---------------------------------------------------------------------
-        // // Create hash for the file name
-        // ---------------------------------------------------------------------
-        // //
-
-        std::vector<std::unique_ptr<Interpolant>> interpolants(builder_container.size());
-
-        size_t hash_digest = 0;
-        if (parametrizations.size() == 1) {
-            hash_digest = parametrizations[0]->GetHash();
-        } else {
-            for (std::vector<Parametrization*>::const_iterator it
-                 = parametrizations.begin();
-                 it != parametrizations.end(); ++it) {
-                hash_combine(hash_digest, (*it)->GetHash(),
-                    (*it)->GetMultiplier(), (*it)->GetParticleLow());
-            }
-        }
-        hash_combine(hash_digest, interpolation_def.GetHash());
+        std::vector<std::unique_ptr<Interpolant>> interpolants(
+            builder_container.size());
 
         bool storing_failed = false;
         bool reading_worked = false;
@@ -320,7 +299,7 @@ namespace Helper {
                     for (auto interpolant = interpolants.begin();
                          interpolant != interpolants.end(); ++interpolant) {
                         // TODO(mario): read check Tue 2017/09/05
-                        interpolant->reset(new Interpolant());
+                        /* interpolant->reset(new Interpolant()); */
                         interpolant->get()->Load(input, binary_tables);
                     }
                     reading_worked = true;
