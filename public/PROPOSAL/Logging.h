@@ -53,11 +53,11 @@ private:
     Logging()
     {
 #if LOG4CPLUS_SUPPORT
-		log4cplus::BasicConfigurator basic_config;
-		basic_config.configure();
+        log4cplus::BasicConfigurator basic_config;
+        basic_config.configure();
 
         logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("PROPOSAL"));
-		logger.setLogLevel(log4cplus::INFO_LOG_LEVEL);
+        logger.setLogLevel(log4cplus::INFO_LOG_LEVEL);
 
         // support setting the log4cplus config via an environment variable
         const char* config = std::getenv("PROPOSAL_LOG_CONFIG");
