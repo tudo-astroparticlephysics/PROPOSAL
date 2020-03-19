@@ -26,103 +26,37 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include <functional>
+#include <memory>
+#include <string>
+
+using std::string;
 
 namespace PROPOSAL {
 class Integral;
-class UtilityIntegral;
-} // namespace PROPOSAL
-
-#define UTILITY_INTERPOLANT_DEC(cls)                                                                                   \
-    class UtilityInterpolant##cls : public UtilityInterpolant                                                          \
-    {                                                                                                                  \
-    public:                                                                                                            \
-        UtilityInterpolant##cls(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);              \
-                                                                                                                       \
-        double Calculate(double ei, double ef, double rnd);                                                            \
-        double GetUpperLimit(double ei, double rnd);                                                                   \
-                                                                                                                       \
-    private:                                                                                                           \
-        double BuildInterpolant(double, UtilityIntegral&, Integral&);                                                  \
-        void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);                   \
-    };
-
-namespace PROPOSAL {
-
 class Interpolant;
+struct InterpolationDef;
 
-class UtilityInterpolant : public UtilityDecorator
-{
-public:
-    UtilityInterpolant(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);
-
-    virtual double Calculate(double ei, double ef, double rnd) = 0;
-    virtual double GetUpperLimit(double ei, double rnd);
-
-protected:
-    virtual double BuildInterpolant(double, UtilityIntegral&, Integral&)                                = 0;
-    virtual void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points) = 0;
-
-    double stored_result_;
+class UtilityInterpolant : public UtilityIntegral {
+    Interpolant1DBuilder builder1d;
+    Interpolant1DBuilder builder_diff;
     std::unique_ptr<Interpolant> interpolant_;
     std::unique_ptr<Interpolant> interpolant_diff_;
+    double stored_result_;
     double low_;
 
-    std::shared_ptr<InterpolationDef> interpolation_def_;
-};
-
-class UtilityInterpolantInteraction : public UtilityInterpolant
-{
+    void BuildTables(const string, size_t);
 public:
-    UtilityInterpolantInteraction(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);
+    UtilityInterpolant(std::function<double(double)>);
 
-    double Calculate(double ei, double ef, double rnd);
-    double GetUpperLimit(double ei, double rnd);
+    virtual double Calculate(double ei, double ef, double rnd);
+    virtual double GetUpperLimit(double ei, double rnd);
 
-private:
-    double BuildInterpolant(double, UtilityIntegral&, Integral&);
-    void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);
-
-    double big_low_;
-    double up_;
+    static InterpolationDef utility_interpolation_def;
 };
-
-class UtilityInterpolantDecay : public UtilityInterpolant
-{
-public:
-    UtilityInterpolantDecay(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);
-
-    double Calculate(double ei, double ef, double rnd);
-    double GetUpperLimit(double ei, double rnd);
-
-private:
-    double BuildInterpolant(double, UtilityIntegral&, Integral&);
-    void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);
-
-    double big_low_;
-    double up_;
-};
-
-class UtilityInterpolantContRand : public UtilityInterpolant
-    {
-    public:
-        UtilityInterpolantContRand(CrossSectionList, const ParticleDef&, std::shared_ptr<InterpolationDef>);
-
-        double Calculate(double ei, double ef, double rnd);
-        double GetUpperLimit(double ei, double rnd);
-
-    private:
-        std::unique_ptr<UtilityIntegralContRand> integral_;
-
-        double BuildInterpolant(double, UtilityIntegral&, Integral&);
-        void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);
-    };
-
-UTILITY_INTERPOLANT_DEC(Displacement)
-UTILITY_INTERPOLANT_DEC(Time)
-UTILITY_INTERPOLANT_DEC(Scattering)
-
 } // namespace PROPOSAL

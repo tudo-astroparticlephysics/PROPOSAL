@@ -29,83 +29,17 @@
 #pragma once
 
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 namespace PROPOSAL {
-class UtilityIntegral : public UtilityDecorator {
+class UtilityIntegral {
+protected:
+    Integral integral;
+
 public:
-    UtilityIntegral(CrossSectionList, const ParticleDef&);
+    UtilityIntegral(std::function<double(double)>);
 
     virtual double Calculate(double ei, double ef, double rnd);
     virtual double GetUpperLimit(double ei, double rnd);
-    virtual double FunctionToIntegral(double energy) = 0;
-
-protected:
-    Integral integral_;
-};
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-class UtilityIntegralDisplacement : public UtilityIntegral {
-public:
-    UtilityIntegralDisplacement(CrossSectionList, const ParticleDef&);
-    double FunctionToIntegral(double energy) override;
-};
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-class UtilityIntegralInteraction : public UtilityIntegral {
-public:
-    UtilityIntegralInteraction(CrossSectionList, const ParticleDef&);
-    double FunctionToIntegral(double energy) override;
-
-protected:
-    UtilityIntegralDisplacement displacement_;
-};
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-class UtilityIntegralDecay : public UtilityIntegral {
-public:
-    UtilityIntegralDecay(CrossSectionList, const ParticleDef&);
-    double FunctionToIntegral(double energy) override;
-    double Calculate(double ei, double ef, double rnd) override;
-
-protected:
-    UtilityIntegralDisplacement displacement_;
-    double lifetime;
-};
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-class UtilityIntegralTime : public UtilityIntegral {
-public:
-    UtilityIntegralTime(CrossSectionList, const ParticleDef&);
-    double FunctionToIntegral(double energy) override;
-
-protected:
-    UtilityIntegralDisplacement displacement_;
-};
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-class UtilityIntegralContRand : public UtilityIntegral {
-public:
-    UtilityIntegralContRand(CrossSectionList, const ParticleDef&);
-    double FunctionToIntegral(double energy) override;
-
-protected:
-    UtilityIntegralDisplacement displacement_;
-};
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-class UtilityIntegralScattering : public UtilityIntegral {
-public:
-    UtilityIntegralScattering(CrossSectionList, const ParticleDef&);
-    double FunctionToIntegral(double energy) override;
-
-protected:
-    UtilityIntegralDisplacement displacement_;
+    std::function<double(double)> FunctionToIntegral;
 };
 } // namespace PROPOSAL
