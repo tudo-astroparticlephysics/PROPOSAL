@@ -43,6 +43,14 @@ $ brew install cmake \
   doxygen 
 ```
 
+
+## Installing from PyPI
+
+If you only want to use PROPOSAL from python, go ahead and 
+```
+$ pip install [--user] proposal
+```
+
 ## Building PROPOSAL
 
 1. Download a release tarball from <https://github.com/tudo-astroparticlephysics/PROPOSAL/releases>

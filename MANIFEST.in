@@ -6,4 +6,4 @@ recursive-include private *
 recursive-include tests *
 recursive-include resources *
 recursive-include vendor *
-global-exlude .git*
+global-exclude .git*
