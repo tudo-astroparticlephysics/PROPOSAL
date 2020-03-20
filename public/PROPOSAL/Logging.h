@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <cstdio>
+#include <cstdlib>
 #include <string>
 
 #ifdef ICECUBE_PROJECT
@@ -38,6 +39,7 @@
 #endif // ICECUBE_PROJECT
 
 #if LOG4CPLUS_SUPPORT
+    #include <log4cplus/initializer.h>
     #include <log4cplus/configurator.h>
     #include <log4cplus/logger.h>
     #include <log4cplus/loggingmacros.h>
@@ -51,15 +53,27 @@ private:
     Logging()
     {
 #if LOG4CPLUS_SUPPORT
-        log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(LOG4CPLUS_CONFIG));
+        log4cplus::BasicConfigurator basic_config;
+        basic_config.configure();
+
         logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("PROPOSAL"));
+        logger.setLogLevel(log4cplus::INFO_LOG_LEVEL);
+
+        // support setting the log4cplus config via an environment variable
+        if (const char* config = std::getenv("PROPOSAL_LOG_CONFIG")) {
+            log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(config));
+        }
 #endif
     }
 
-    Logging(Logging const&);         // Don't Implement.
-    void operator=(Logging const&); // Don't implement
+#if LOG4CPLUS_SUPPORT
+    log4cplus::Initializer initializer;
+#endif
 
 public:
+    Logging(Logging const&) = delete;
+    void operator=(Logging const&) = delete;
+
 #if LOG4CPLUS_SUPPORT
     log4cplus::Logger logger;
 #endif
