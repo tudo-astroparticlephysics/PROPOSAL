@@ -1,5 +1,7 @@
 #pragma once
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/propagation_utility/Displacement.h"
+#include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
@@ -54,14 +56,17 @@ class ExactTimeBuilder : public Time {
         CrossSectionList cross;
         T integral;
         double mass;
-        DisplacementBuilder <UtilityIntegral> displacement;
+        DisplacementBuilder<UtilityIntegral> displacement;
     };
 
 class ApproximateTimeBuilder : public Time {
     public:
         ApproximateTimeBuilder() {}
 
-        double ElapsedTime(double inital_energy, double final_energy, double time) override {
+        double ElapsedTime(double initial_energy, double final_energy, double time) override {
+            (void)initial_energy;
+            (void)final_energy;
+            (void)time;
             throw std::logic_error("Appoximated elapsed time can only be calculated using a given distance");
         }
 

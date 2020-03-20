@@ -68,7 +68,7 @@ class InteractionBuilder : public Interaction {
             if (rndi >= rndiMin || rndiMin <= 0)
                 return mass;
 
-            return displacement.GetUpperLimit(initial_energy, rndi);
+            return displacement.UpperLimitTrackIntegral(initial_energy, rndi);
         }
 
     private:

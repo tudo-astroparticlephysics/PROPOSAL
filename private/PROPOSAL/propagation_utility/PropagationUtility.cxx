@@ -22,22 +22,18 @@ Utility::Definition::Definition(CrossSectionList cross,
     const ParticleDef& p_def, std::shared_ptr<Scattering> scattering = nullptr,
     std::shared_ptr<InterpolationDef> inter_def = nullptr)
     : scattering(scattering)
-    /* , inter_def(interpol_def) */
 {
     if (!inter_def) {
         log_warn("No interpolation definition defined. Integral will not be "
                  "approximate by interpolants. Performance will be poor.");
 
-        displacement_calc.reset(new UtilityIntegralDisplacement(cross, p_def));
-        interaction_calc.reset(new UtilityIntegralInteraction(cross, p_def));
-        decay_calc.reset(new UtilityIntegralDecay(cross, p_def));
+        displacement_calc.reset(new DisplacementBuilder<UtilityIntegral>(cross));
+        interaction_calc.reset(new InteractionBuilder<UtilityIntegral>(cross, p_def));
+        decay_calc.reset(new DecayBuilder<UtilityIntegral>(cross, p_def));
     } else {
-        displacement_calc.reset(
-            new UtilityInterpolantDisplacement(cross, p_def, inter_def));
-        interaction_calc.reset(
-            new UtilityInterpolantInteraction(cross, p_def, inter_def));
-        decay_calc.reset(
-            new UtilityInterpolantDecay(cross, p_def, inter_def));
+        displacement_calc.reset(new DisplacementBuilder<UtilityInterpolant>(cross));
+        interaction_calc.reset(new InteractionBuilder<UtilityInterpolant>(cross, p_def));
+        decay_calc.reset(new DecayBuilder<UtilityInterpolant>(cross, p_def));
     }
 
     if (!scattering) {
@@ -49,22 +45,20 @@ Utility::Definition::Definition(CrossSectionList cross,
         log_debug("No continuous randomization used.");
     } else {
         if (!inter_def) {
-            cont_rand.reset(new UtilityIntegralContRand(cross, p_def));
+            cont_rand.reset(new ContRandBuilder<UtilityIntegral>(cross, p_def));
         } else {
-            cont_rand.reset(
-                new UtilityInterpolantContRand(cross, p_def, inter_def));
+            cont_rand.reset(new ContRandBuilder<UtilityInterpolant>(cross, p_def));
         }
     }
 
-    if (!exact_time) {
+    if (!time_calc) {
         log_debug("Exact time calculation disabled: Velocity of particles will "
                   "be approximated as speed of light");
     } else {
         if (!inter_def) {
-            cont_rand.reset(new UtilityIntegralTime(cross, p_def));
+            time_calc.reset(new ExactTimeBuilder<UtilityIntegral>(cross, p_def));
         } else {
-            cont_rand.reset(
-                new UtilityInterpolantTime(cross, p_def, inter_def));
+            time_calc.reset(new ExactTimeBuilder<UtilityInterpolant>(cross, p_def));
         }
     }
 }
@@ -100,31 +94,10 @@ Utility::Definition::Definition(CrossSectionList cross,
 // // Constructors
 // -------------------------------------------------------------------------
 
-Utility::Utility(std::unique_ptr<Utility::Definition> utility_def)
-    : utility_def(std::move(utility_def))
-{
-}
-
 std::shared_ptr<CrossSection> Utility::TypeInteraction(
     double energy, const std::array<double, 2>& rnd)
 {
-    std::vector<double> rates;
-    for (const auto& crosssection : utility_def->cross)
-        rates.push_back(crosssection->CalculatedNdx(energy, rnd[1]));
-
-    double total_rate{ std::accumulate(rates.begin(), rates.end(), 0.0) };
-    log_debug("Total rate = %f, total rate weighted = %f", total_rate,
-        total_rate * rnd[0]);
-
-    double rates_sum = 0;
-    for (size_t i = 0; i < rates.size(); i++) {
-        rates_sum += rates[i];
-        if (rates_sum >= total_rate * rnd[0])
-            return utility_def->cross.at(i);
-    }
-
-    throw std::logic_error(
-        "Something went wrong during the total rate calculation.");
+    return utility_def->interaction_calc->TypeInteraction(energy, rnd);
 }
 
 double Utility::EnergyStochasticloss(
@@ -136,49 +109,26 @@ double Utility::EnergyStochasticloss(
 
 double Utility::EnergyDecay(double energy, double rnd)
 {
-    auto rndd = -std::log(rnd);
-    auto rnddMin = 0;
-
-    rnddMin = utility_def->decay_calc->Calculate(energy, utility_def->decay_calc->GetMass(), rndd);
-
-    // evaluating the energy loss
-    if (rndd >= rnddMin || rnddMin <= 0)
-        return utility_def->decay_calc->GetMass();
-
-    return utility_def->decay_calc->GetUpperLimit(energy, rndd);
+    return utility_def->decay_calc->EnergyDecay(energy, rnd);
 }
 
 double Utility::EnergyInteraction(double energy, double rnd)
 {
-    auto rndi = -std::log(rnd);
-    auto rndiMin = 0.;
-
-    // solving the tracking integral
-    rndiMin = utility_def->interaction_calc->Calculate(energy, utility_def->interaction_calc->GetMass(), rndi);
-
-    if (rndi >= rndiMin || rndiMin <= 0)
-        return utility_def->interaction_calc->GetMass();
-
-    return utility_def->interaction_calc->GetUpperLimit(energy, rndi);
+    return utility_def->interaction_calc->EnergyInteraction(energy, rnd);
 }
 
 double Utility::EnergyRandomize(
     double initial_energy, double final_energy, double rnd)
 {
     if (utility_def->cont_rand) {
-        final_energy = utility_def->cont_rand->RandomizedEnergy(initial_energy, final_energy, 0.0);
+        final_energy = utility_def->cont_rand->EnergyRandomize(initial_energy, final_energy, rnd);
     }
     return final_energy;
 }
 
 double Utility::TimeElapsed(double initial_energy, double final_energy, double distance)
 {
-    if (utility_def->exact_time) {
-        return utility_def->exact_time->Calculate(
-            initial_energy, final_energy, distance);
-    } else {
-        return distance / SPEED;
-    }
+    return utility_def->time_calc->TimeElapsed(initial_energy, final_energy, distance);
 }
 
 tuple<Vector3D, Vector3D> Utility::DirectionsScatter(double displacement,
@@ -197,6 +147,6 @@ std::pair<double, double> DirectionDeflect(CrossSection& crosssection, double pa
 double Utility::LengthContinuous(
     double initial_energy, double final_energy, double border_length)
 {
-    return utility_def->displacement_calc->Calculate(
+    return utility_def->displacement_calc->SolveTrackIntegral(
         initial_energy, final_energy, border_length);
 }

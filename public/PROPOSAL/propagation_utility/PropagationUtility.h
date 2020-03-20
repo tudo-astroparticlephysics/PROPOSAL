@@ -33,20 +33,18 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/scattering/Scattering.h"
-//#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-//#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
+#include "PROPOSAL/propagation_utility/Time.h"
+#include "PROPOSAL/propagation_utility/Decay.h"
+#include "PROPOSAL/propagation_utility/ContRand.h"
+#include "PROPOSAL/propagation_utility/Displacement.h"
+#include "PROPOSAL/propagation_utility/Interaction.h"
 
 using std::tuple;
 namespace PROPOSAL {
 
 class CrossSection;
-class UtilityDecorator;
-struct InterpolationDef;
 
 typedef std::vector<std::shared_ptr<CrossSection>> CrossSectionList;
-// typedef const double random_number;
-// typedef const double energy;
-// typedef const double distance;
 
 class Utility {
 public:
@@ -59,14 +57,12 @@ public:
             std::shared_ptr<Scattering>, std::shared_ptr<InterpolationDef>);
         ~Definition();
 
-        std::unique_ptr<UtilityDecorator> displacement_calc = nullptr;
-        std::unique_ptr<UtilityDecorator> interaction_calc = nullptr;
-        std::unique_ptr<UtilityDecorator> decay_calc = nullptr;
-        std::unique_ptr<UtilityDecorator> cont_rand = nullptr;
-        std::unique_ptr<UtilityDecorator> exact_time = nullptr;
+        std::unique_ptr<Displacement> displacement_calc = nullptr;
+        std::unique_ptr<Interaction> interaction_calc = nullptr;
+        std::unique_ptr<Decay> decay_calc = nullptr;
+        std::unique_ptr<ContRand> cont_rand = nullptr;
+        std::unique_ptr<Time> time_calc = nullptr;
     };
-
-    Utility(std::unique_ptr<Definition> utility_def);
 
     std::shared_ptr<CrossSection> TypeInteraction(
         double, const std::array<double, 2>&);
@@ -78,36 +74,16 @@ public:
     double LengthContinuous(double, double, double);
     double TimeElapsed(double, double, double);
 
-    // TODO: return value doesn't tell what it include. Maybe it would be better
-    // to give a tuple of two directions back. One is the mean over the
-    // displacement and the other is the actual direction. With a get method
-    // there could be a possible access with the position of the object stored
-    // in an enum.
+    /* // TODO: return value doesn't tell what it include. Maybe it would be better */
+    /* // to give a tuple of two directions back. One is the mean over the */
+    /* // displacement and the other is the actual direction. With a get method */
+    /* // there could be a possible access with the position of the object stored */
+    /* // in an enum. */
     tuple<Vector3D, Vector3D> DirectionsScatter(double, double, double,
         const Vector3D&, const Vector3D&, const std::array<double, 4>&);
     std::pair<double, double> DirectionDeflect(CrossSection& , double particle_energy, double loss_energy);
 
 private:
     std::unique_ptr<Definition> utility_def;
-};
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-class UtilityDecorator {
-
-public:
-    UtilityDecorator(CrossSectionList cross, const ParticleDef& p_def)
-        : crosss(cross), mass(p_def.mass){};
-
-    virtual ~UtilityDecorator() = default;
-
-    virtual double Calculate(double ei, double ef, double rnd) = 0;
-    virtual double GetUpperLimit(double ei, double rnd) = 0;
-
-    double GetMass() { return mass; }
-
-protected:
-    CrossSectionList crosss;
-    double mass;
 };
 } // namespace PROPOSAL
