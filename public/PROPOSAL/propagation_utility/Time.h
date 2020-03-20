@@ -63,7 +63,7 @@ class ApproximateTimeBuilder : public Time {
     public:
         ApproximateTimeBuilder() {}
 
-        double TimeElapsed(double inital_energy, double final_energy, double time) override {
+        double TimeElapsed(double initial_energy, double final_energy, double time) override {
             (void)initial_energy;
             (void)final_energy;
             (void)time;

@@ -37,6 +37,7 @@ protected:
 
 public:
     UtilityIntegral(std::function<double(double)>);
+    void BuildTables(const std::string str, size_t hash_digest) { (void)str; (void)hash_digest;};
 
     virtual double Calculate(double ei, double ef, double rnd);
     virtual double GetUpperLimit(double ei, double rnd);

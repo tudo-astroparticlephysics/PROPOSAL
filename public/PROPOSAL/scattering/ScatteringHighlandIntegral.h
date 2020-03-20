@@ -31,7 +31,7 @@
 
 #include "PROPOSAL/scattering/ScatteringHighland.h"
 #include "PROPOSAL/crossection/CrossSection.h"
-#include <array>
+#include "PROPOSAL/propagation_utility/Displacement.h"
 
 namespace PROPOSAL {
 
@@ -41,7 +41,7 @@ class ScatteringHighlandIntegral : public ScatteringHighland
 public:
     ScatteringHighlandIntegral<T>(const ParticleDef& p_def, std::shared_ptr<const Medium> medium, CrossSectionList cross)
         : ScatteringHighland(p_def, medium),
-          displacement(cross),
+          displacement(new DisplacementBuilder<UtilityIntegral>(cross)),
           integral(std::bind(&ScatteringHighlandIntegral::HighlandIntegral, this, std::placeholders::_1)){
         if(typeid(T) == typeid(UtilityInterpolant)){
             size_t hash_digest = 0;
@@ -57,7 +57,7 @@ public:
         double square_momentum = (energy - mass) * (energy + mass);
         double aux = energy / square_momentum;
 
-        return displacement.FunctionToIntegral(energy) * aux * aux;
+        return displacement->FunctionToIntegral(energy) * aux * aux;
     }
 
 private:
@@ -65,13 +65,13 @@ private:
 
     bool compare(const Scattering& scattering) const override{
         throw std::logic_error("This comparison function has not been implemented yet. "
-                               "The developers need to put on the thinking caps to fix it.")
+                               "The developers need to put on the thinking caps to fix it.");
     }
 
     void print(std::ostream&) const override{}
 
     double CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos) override {
-        double aux = integral->Calculate(ei, ef, 0.0) * medium_->GetDensityDistribution().Evaluate(pos);
+        double aux = integral.Calculate(ei, ef, 0.0) * medium_->GetDensityDistribution().Evaluate(pos);
         double cutoff = 1;
         double radiation_length = medium_->GetRadiationLength(pos);
 
@@ -83,7 +83,7 @@ private:
 
     std::string name = "scattering";
     T integral;
-    DisplacementBuilder <UtilityIntegral> displacement;
+    std::unique_ptr<Displacement> displacement;
 
 };
 

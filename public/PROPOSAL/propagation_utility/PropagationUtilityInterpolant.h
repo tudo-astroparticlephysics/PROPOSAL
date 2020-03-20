@@ -50,9 +50,9 @@ class UtilityInterpolant : public UtilityIntegral {
     double stored_result_;
     double low_;
 
-    void BuildTables(const string, size_t);
 public:
     UtilityInterpolant(std::function<double(double)>);
+    void BuildTables(const string, size_t);
 
     virtual double Calculate(double ei, double ef, double rnd);
     virtual double GetUpperLimit(double ei, double rnd);

@@ -12,7 +12,6 @@ using std::string;
 namespace PROPOSAL {
 class Displacement {
     CrossSectionList cross;
-    string name{ "displacement" };
 
 public:
     Displacement(CrossSectionList);
@@ -20,6 +19,8 @@ public:
     virtual double FunctionToIntegral(double energy);
     virtual double SolveTrackIntegral(double, double, double) = 0;
     virtual double UpperLimitTrackIntegral(double, double) = 0;
+
+    string name{ "displacement" };
 };
 
 template <class T> class DisplacementBuilder : public Displacement {
