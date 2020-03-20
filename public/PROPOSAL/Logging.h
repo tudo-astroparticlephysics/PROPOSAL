@@ -60,8 +60,7 @@ private:
         logger.setLogLevel(log4cplus::INFO_LOG_LEVEL);
 
         // support setting the log4cplus config via an environment variable
-        const char* config = std::getenv("PROPOSAL_LOG_CONFIG");
-        if (config != NULL) {
+        if (const char* config = std::getenv("PROPOSAL_LOG_CONFIG")) {
             log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(config));
         }
 #endif
