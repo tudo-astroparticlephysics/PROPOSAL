@@ -8,7 +8,7 @@ namespace PROPOSAL {
 class ContRand {
     public:
         ContRand(CrossSectionList cross, const ParticleDef &def) : cross(cross), mass(def.mass) {}
-        virtual double RandomizeEnergy(double initial_energy, double final_energy, double rnd) = 0;
+        virtual double EnergyRandomize(double initial_energy, double final_energy, double rnd) = 0;
 
     protected:
         CrossSectionList cross;
@@ -41,7 +41,7 @@ class ContRandBuilder : public ContRand {
             return displacement.FunctionToIntegral(energy) * sum;
         }
 
-        double RandomizeEnergy(double initial_energy, double final_energy, double rnd) override {
+        double EnergyRandomize(double initial_energy, double final_energy, double rnd) override {
             double variance = integral.Calculate(initial_energy, final_energy, 0.0);
             return SampleFromGaussian(final_energy, variance, rnd, mass, initial_energy);
         }

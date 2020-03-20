@@ -10,8 +10,8 @@ namespace PROPOSAL {
 class Time {
     public:
         Time() {}
-        virtual double ElapsedTime(double initial_energy, double final_energy, double time) = 0;
-        virtual double ElapsedTime(double distance) = 0;
+        virtual double TimeElapsed(double initial_energy, double final_energy, double time) = 0;
+        virtual double TimeElapsed(double distance) = 0;
 
     protected:
         std::string name = "time";
@@ -40,15 +40,15 @@ class ExactTimeBuilder : public Time {
             return displacement.FunctionToIntegral(energy) * energy / (particle_momentum * SPEED);
         }
 
-        double ElapsedTime(double initial_energy, double final_energy, double time) override {
+        double TimeElapsed(double initial_energy, double final_energy, double time) override {
             return integral.Calculate(initial_energy, final_energy, time);
         }
 
-        double ElapsedTimeUpperLimit(double initial_energy, double time) {
+        double TimeElapsedUpperLimit(double initial_energy, double time) {
             return integral.GetUpperLimit(initial_energy, time);
         }
 
-        double ElapsedTime(double distance) override {
+        double TimeElapsed(double distance) override {
             throw std::logic_error("Exact elapsed time can only be calculated using two energies");
         }
 
@@ -63,14 +63,14 @@ class ApproximateTimeBuilder : public Time {
     public:
         ApproximateTimeBuilder() {}
 
-        double ElapsedTime(double initial_energy, double final_energy, double time) override {
+        double TimeElapsed(double inital_energy, double final_energy, double time) override {
             (void)initial_energy;
             (void)final_energy;
             (void)time;
             throw std::logic_error("Appoximated elapsed time can only be calculated using a given distance");
         }
 
-        double ElapsedTime(double distance) override { return distance / SPEED; }
+        double TimeElapsed(double distance) override { return distance / SPEED; }
     };
 
 }
