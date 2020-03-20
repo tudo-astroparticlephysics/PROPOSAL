@@ -113,6 +113,10 @@
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
+#include "PROPOSAL/propagation_utility/Interaction.h"
+#include "PROPOSAL/propagation_utility/Decay.h"
+#include "PROPOSAL/propagation_utility/ContRand.h"
+#include "PROPOSAL/propagation_utility/Time.h"
 
 #include "PROPOSAL/scattering/Coefficients.h"
 #include "PROPOSAL/scattering/Scattering.h"

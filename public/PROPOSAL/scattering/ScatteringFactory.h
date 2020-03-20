@@ -43,8 +43,6 @@ class Medium;
 class Utility;
 struct InterpolationDef;
 
-typedef std::vector<std::shared_ptr<CrossSection>> CrossSectionList;
-
 class ScatteringFactory {
 public:
     enum Enum { None = 0, HighlandIntegral, Moliere, Highland };

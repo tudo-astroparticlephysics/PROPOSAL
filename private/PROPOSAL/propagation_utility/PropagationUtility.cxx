@@ -166,11 +166,9 @@ double Utility::EnergyRandomize(
     double initial_energy, double final_energy, double rnd)
 {
     if (utility_def->cont_rand) {
-        auto variance = utility_def->cont_rand->Calculate(initial_energy, final_energy, 0.0);
-        return SampleFromGaussian(final_energy, variance, rnd, utility_def->cont_rand->GetMass(), initial_energy);
-    } else {
-        return final_energy;
+        final_energy = utility_def->cont_rand->RandomizedEnergy(initial_energy, final_energy, 0.0);
     }
+    return final_energy;
 }
 
 double Utility::TimeElapsed(double initial_energy, double final_energy, double distance)

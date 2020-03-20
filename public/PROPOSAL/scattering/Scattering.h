@@ -64,7 +64,6 @@ public:
 
     std::tuple<Vector3D, Vector3D> Scatter(double dr, double ei, double ef, const Vector3D& pos, const Vector3D& old_direction, const std::array<double, 4>& rnd);
 
-    const ParticleDef& GetParticleDef() const { return particle_def_; }
 
 protected:
     Scattering& operator=(const Scattering&); // Undefined & not allowed
@@ -84,7 +83,7 @@ protected:
                                               const Vector3D& pos,
                                               const std::array<double, 4>& rnd) = 0;
 
-    const ParticleDef& particle_def_;
+    double mass;
 };
 
 } // namespace PROPOSAL

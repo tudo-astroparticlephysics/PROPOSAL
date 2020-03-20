@@ -45,7 +45,8 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name,
 
     if (iter != registerd_str.end()) {
         if (*iter == "highlandintegral") {
-            return new ScatteringHighlandIntegral(
+            UtilityInterpolant::utility_interpolation_def = interpolation_def;
+            return new ScatteringHighlandIntegral<UtilityInterpolant>(
                 particle_def, medium, interpolation_def, *cross);
         } else if (*iter == "moliere") {
             return new ScatteringMoliere(particle_def, medium);
@@ -72,7 +73,8 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model,
 
     if (iter != registerd_enum.end()) {
         if (*iter == HighlandIntegral) {
-            return new ScatteringHighlandIntegral(
+            UtilityInterpolant::utility_interpolation_def = interpolation_def;
+            return new ScatteringHighlandIntegral<UtilityInterpolant>(
                 particle_def, medium, interpolation_def, *cross);
         } else if (*iter == Moliere) {
             return new ScatteringMoliere(particle_def, medium);
@@ -101,7 +103,7 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name,
 
     if (iter != registerd_str.end()) {
         if (*iter == "highlandintegral") {
-            return new ScatteringHighlandIntegral(particle_def, medium, *cross);
+            return new ScatteringHighlandIntegral<UtilityIntegral>(particle_def, medium, *cross);
         } else if (*iter == "moliere") {
             return new ScatteringMoliere(particle_def, medium);
         } else if (*iter == "highland") {
@@ -126,7 +128,7 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model,
 
     if (iter != registerd_enum.end()) {
         if (*iter == HighlandIntegral) {
-            return new ScatteringHighlandIntegral(particle_def, medium, *cross);
+            return new ScatteringHighlandIntegral<UtilityIntegral>(particle_def, medium, *cross);
         } else if (*iter == Moliere) {
             return new ScatteringMoliere(particle_def, medium);
         } else if (*iter == Highland) {

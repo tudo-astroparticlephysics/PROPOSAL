@@ -29,42 +29,62 @@
 
 #pragma once
 
-#include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/scattering/ScatteringHighland.h"
 #include "PROPOSAL/crossection/CrossSection.h"
 #include <array>
 
-using std::array;
-
 namespace PROPOSAL {
 
-class Utility;
-class UtilityDecorator;
-struct InterpolationDef;
-/**
- * \brief This class provides the scattering routine provided by moliere.
- *
- * More precise scattering angles will be added soon.
- */
-class ScatteringHighlandIntegral : public Scattering
+template<class T>
+class ScatteringHighlandIntegral : public ScatteringHighland
 {
 public:
-    ScatteringHighlandIntegral(const ParticleDef&, std::shared_ptr<const Medium>, CrossSectionList);
-    ScatteringHighlandIntegral(const ParticleDef&, std::shared_ptr<const Medium>, std::shared_ptr<InterpolationDef>, CrossSectionList);
+    ScatteringHighlandIntegral<T>(const ParticleDef& p_def, std::shared_ptr<const Medium> medium, CrossSectionList cross)
+        : ScatteringHighland(p_def, medium),
+          displacement(cross),
+          integral(std::bind(&ScatteringHighlandIntegral::HighlandIntegral, this, std::placeholders::_1)){
+        if(typeid(T) == typeid(UtilityInterpolant)){
+            size_t hash_digest = 0;
+            for (const auto& crosssection: cross){
+                hash_combine(hash_digest, crosssection->GetParametrization().GetHash(),
+                             crosssection->GetParametrization().GetMultiplier());
+            }
+            integral.BuildTables(name, hash_digest);
+        }
+    }
 
-    // Copy constructor
-    ~ScatteringHighlandIntegral();
+    double HighlandIntegral(double energy){
+        double square_momentum = (energy - mass) * (energy + mass);
+        double aux = energy / square_momentum;
+
+        return displacement.FunctionToIntegral(energy) * aux * aux;
+    }
 
 private:
-    ScatteringHighlandIntegral& operator=(const ScatteringHighlandIntegral&); // Undefined & not allowed
+    ScatteringHighlandIntegral& operator=(const ScatteringHighlandIntegral&) = delete;
 
-    bool compare(const Scattering&) const override;
-    void print(std::ostream&) const override;
+    bool compare(const Scattering& scattering) const override{
+        throw std::logic_error("This comparison function has not been implemented yet. "
+                               "The developers need to put on the thinking caps to fix it.")
+    }
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, const array<double, 4>& rnd) override;
-    long double CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos);
+    void print(std::ostream&) const override{}
 
-    std::unique_ptr<UtilityDecorator> scatter_;
-    std::shared_ptr<const Medium> medium;
+    double CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos) override {
+        double aux = integral->Calculate(ei, ef, 0.0) * medium_->GetDensityDistribution().Evaluate(pos);
+        double cutoff = 1;
+        double radiation_length = medium_->GetRadiationLength(pos);
+
+        aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_length) * std::abs(charge);
+        aux *= std::max(1 + 0.038 * std::log(dr / radiation_length), 0.0);
+
+        return std::min(aux, cutoff);
+    }
+
+    std::string name = "scattering";
+    T integral;
+    DisplacementBuilder <UtilityIntegral> displacement;
+
 };
 
 } // namespace PROPOSAL

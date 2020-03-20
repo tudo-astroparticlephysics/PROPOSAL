@@ -24,8 +24,8 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
                                                                  const array<double, 4>& rnd) {
     (void)ef;
 
-    double momentum_Sq = (ei - particle_def_.mass) * (ei + particle_def_.mass);
-    double beta_Sq = 1. / (1. + particle_def_.mass * particle_def_.mass / momentum_Sq);  // beta^2 = (v/c)^2
+    double momentum_Sq = (ei - mass) * (ei + mass);
+    double beta_Sq = 1. / (1. + mass * mass / momentum_Sq);  // beta^2 = (v/c)^2
 
     // beta^2 p^2 with beta^2 = (v/c)^2 = 1/(1+m^2/p^2)
     double beta_p_Sq = momentum_Sq / ei;
@@ -142,7 +142,7 @@ ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, std::share
         // Calculate Z^2_average for Chi_c^2
         // in case of an electron, replace Z^2 by Z(Z+1) to take into account
         // scatterings on atomic electrons in the medium
-        if (particle_def_.mass == ME)
+        if (mass == ME)
             ZSq_average += weight[i] * Zi_[i] * (Zi_[i] + 1.);
         else
             ZSq_average += weight_ZZ_[i];

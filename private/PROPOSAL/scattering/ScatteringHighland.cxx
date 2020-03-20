@@ -29,12 +29,14 @@ ScatteringHighland::ScatteringHighland(
     const ParticleDef& particle_def, std::shared_ptr<const Medium> medium)
     : Scattering(particle_def)
     , medium_(medium)
+    , charge(particle_def.charge)
 {
 }
 
 ScatteringHighland::ScatteringHighland(const ScatteringHighland& scattering)
     : Scattering(scattering)
     , medium_(scattering.medium_)
+    , charge(scattering.charge)
 {
 }
 
@@ -42,10 +44,9 @@ ScatteringHighland::ScatteringHighland(
     const ParticleDef& particle_def, const ScatteringHighland& scattering)
     : Scattering(particle_def)
     , medium_(scattering.medium_)
+    , charge(scattering.charge)
 {
 }
-
-ScatteringHighland::~ScatteringHighland() {}
 
 bool ScatteringHighland::compare(const Scattering& scattering) const
 {
@@ -69,15 +70,16 @@ void ScatteringHighland::print(std::ostream& os) const
 // Private methods
 // ------------------------------------------------------------------------- //
 
-double ScatteringHighland::CalculateTheta0(
-    double dr, double ei, const Vector3D& pos)
+double ScatteringHighland::CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos)
 {
+    (void) ef;
+
     // eq 6 of Lynch, Dahl
     // Nuclear Instruments and Methods in Physics Research Section B 58 (1991)
     double y = dr / medium_->GetRadiationLength(pos);
-    double momentum_Sq = (ei - particle_def_.mass) * (ei + particle_def_.mass);
+    double momentum_Sq = (ei - mass) * (ei + mass);
     double beta_p = momentum_Sq / ei; // beta * p = p^2/sqrt(p^2 + m^2)
-    y = 13.6 * std::abs(particle_def_.charge) / (beta_p)*std::sqrt(y)
+    y = 13.6 * std::abs(charge) / (beta_p)*std::sqrt(y)
         * (1. + 0.088 * std::log10(y));
     return y;
 }
@@ -87,12 +89,10 @@ double ScatteringHighland::CalculateTheta0(
 Scattering::RandomAngles ScatteringHighland::CalculateRandomAngle(double dr,
     double ei, double ef, const Vector3D& pos, const array<double, 4>& rnd)
 {
-    (void)ef;
-
     double Theta0;
     Scattering::RandomAngles random_angles;
 
-    Theta0 = CalculateTheta0(dr, ei, pos);
+    Theta0 = CalculateTheta0(dr, ei, ef, pos);
 
     auto rnd1 = Theta0 * inverseErrorFunction(rnd[0]);
     auto rnd2 = Theta0 * inverseErrorFunction(rnd[1]);

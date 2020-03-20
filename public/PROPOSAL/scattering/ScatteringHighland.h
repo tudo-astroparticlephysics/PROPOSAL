@@ -49,7 +49,6 @@ public:
     ScatteringHighland(const ParticleDef&, std::shared_ptr<const Medium>);
     ScatteringHighland(const ParticleDef&, const ScatteringHighland&);
     ScatteringHighland(const ScatteringHighland&);
-    ~ScatteringHighland();
 
     /* virtual Scattering* clone() const override { return new ScatteringHighland(*this); } */
     /* virtual Scattering* clone(const ParticleDef& particle_def, const Utility& utility) const override */
@@ -58,16 +57,17 @@ public:
     /*     return new ScatteringHighland(particle_def, *this); */
     /* } */
 
-private:
+protected:
     ScatteringHighland& operator=(const ScatteringHighland&); // Undefined & not allowed
 
     bool compare(const Scattering&) const override;
     void print(std::ostream&) const override;
 
     RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, const array<double, 4>& rnd) override;
-    double CalculateTheta0(double dr, double ei, const Vector3D& pos);
+    virtual double CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos);
 
     std::shared_ptr<const Medium> medium_;
+    double charge;
 };
 
 } // namespace PROPOSAL

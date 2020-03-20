@@ -80,7 +80,6 @@ set (PROPOSAL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/scattering/Scattering.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/scattering/ScatteringFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/scattering/ScatteringHighland.cxx
-    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/scattering/ScatteringHighlandIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/scattering/ScatteringMoliere.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/scattering/ScatteringNoScattering.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/sector/Sector.cxx

@@ -30,8 +30,6 @@ std::ostream& operator<<(std::ostream& os, Scattering const& scattering)
     ss << " Scattering (" << &scattering << ") ";
     os << Helper::Centered(60, ss.str()) << '\n';
 
-    os << scattering.particle_def_ << std::endl;
-
     scattering.print(os);
 
     os << Helper::Centered(60, "");
@@ -46,12 +44,12 @@ std::ostream& operator<<(std::ostream& os, Scattering const& scattering)
  ******************************************************************************/
 
 Scattering::Scattering(const ParticleDef& particle_def)
-    : particle_def_(particle_def)
+    : mass(particle_def.mass)
 {
 }
 
 Scattering::Scattering(const Scattering& scattering)
-    : particle_def_(scattering.particle_def_)
+    : mass(scattering.mass)
 {
 }
 
@@ -59,7 +57,7 @@ Scattering::~Scattering() {}
 
 bool Scattering::operator==(const Scattering& scattering) const
 {
-    if (particle_def_ != scattering.particle_def_)
+    if (mass != scattering.mass)
         return false;
     else
         return this->compare(scattering);
