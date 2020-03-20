@@ -66,9 +66,9 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, std::shared_ptr<cons
         .SetLogSubst(false)
         .SetFunction1D(std::bind(&IonizIntegral::CalculatedE2dxWithoutMultiplier, &ioniz, std::placeholders::_1));
 
-    dedx_interpolant_ = Helper::InitializeInterpolation("dEdx", builder1d, std::vector<Parametrization*>(1, parametrization_), def);
+    dedx_interpolant_ = Helper::InitializeInterpolation("dEdx", builder1d, parametrization_->GetHash(), def);
 
-    de2dx_interpolant_ = Helper::InitializeInterpolation("dE2dx", builder_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
+    de2dx_interpolant_ = Helper::InitializeInterpolation("dE2dx", builder_de2dx, parametrization_->GetHash(), def);
 }
 
 /*IonizInterpolant::IonizInterpolant(const IonizInterpolant& ioniz)
@@ -139,8 +139,8 @@ void IonizInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
         builder_container1d[i] = &builder1d[i];
     }
 
-    dndx_interpolant_2d_ = Helper::InitializeInterpolation("dNdx_diff", builder_container2d, std::vector<Parametrization*>(1, parametrization_), def);
-    dndx_interpolant_1d_ = Helper::InitializeInterpolation("dNdx", builder_container1d, std::vector<Parametrization*>(1, parametrization_), def);
+    dndx_interpolant_2d_ = Helper::InitializeInterpolation("dNdx_diff", builder_container2d, parametrization_->GetHash(), def);
+    dndx_interpolant_1d_ = Helper::InitializeInterpolation("dNdx", builder_container1d, parametrization_->GetHash(), def);
 }
 
 // ----------------------------------------------------------------- //

@@ -114,3 +114,10 @@ size_t Parametrization::GetHash() const {
 
     return seed;
 }
+
+size_t GetHash(const std::vector<Parametrization*>& params) {
+    size_t hash_digest = 0;
+    for (auto param : params)
+        hash_combine(hash_digest, param->GetHash());
+    return hash_digest;
+}

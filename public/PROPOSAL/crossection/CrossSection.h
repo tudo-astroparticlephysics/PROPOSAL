@@ -122,6 +122,6 @@ protected:
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::CrossSection const&);
-typedef std::vector<std::shared_ptr<CrossSection>> CrossSectionList;
+using CrossSectionList = std::vector<std::shared_ptr<CrossSection>>;
 
 } // namespace PROPOSAL

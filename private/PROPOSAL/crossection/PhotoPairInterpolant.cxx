@@ -208,6 +208,6 @@ void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
     }
 
 
-    dndx_interpolant_2d_ = Helper::InitializeInterpolation("dNdx_diff", builder_container2d, std::vector<Parametrization*>(1, parametrization_), def);
-    dndx_interpolant_1d_ = Helper::InitializeInterpolation("dNdx", builder_container1d, std::vector<Parametrization*>(1, parametrization_), def);
+    dndx_interpolant_2d_ = Helper::InitializeInterpolation("dNdx_diff", builder_container2d, parametrization_->GetHash(), def);
+    dndx_interpolant_1d_ = Helper::InitializeInterpolation("dNdx", builder_container1d, parametrization_->GetHash(), def);
 }

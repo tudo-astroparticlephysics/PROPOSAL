@@ -121,4 +121,6 @@ protected:
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::Parametrization const&);
 
+size_t GetHash(const std::vector<Parametrization*>& params);
+
 } // namespace PROPOSAL
