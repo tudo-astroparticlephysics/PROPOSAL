@@ -1,70 +1,70 @@
 ******************************
-``pyPROPOSAL.parametrization``
+``proposal.parametrization``
 ******************************
 
-.. currentmodule:: pyPROPOSAL.parametrization
+.. currentmodule:: proposal.parametrization
 
-.. automodule:: pyPROPOSAL.parametrization
+.. automodule:: proposal.parametrization
    :members:
    :undoc-members:
    :show-inheritance:
 
 ---------------------------------------------
-``pyPROPOSAL.parametrization.bremsstrahlung``
+``proposal.parametrization.bremsstrahlung``
 ---------------------------------------------
 
-.. currentmodule:: pyPROPOSAL.parametrization.bremsstrahlung
+.. currentmodule:: proposal.parametrization.bremsstrahlung
 
-.. automodule:: pyPROPOSAL.parametrization.bremsstrahlung
+.. automodule:: proposal.parametrization.bremsstrahlung
    :members: Bremsstrahlung
    :show-inheritance:
 
 ---------------------------------------------
-``pyPROPOSAL.parametrization.pairproduction``
+``proposal.parametrization.pairproduction``
 ---------------------------------------------
 
-.. currentmodule:: pyPROPOSAL.parametrization.pairproduction
+.. currentmodule:: proposal.parametrization.pairproduction
 
-.. automodule:: pyPROPOSAL.parametrization.pairproduction
+.. automodule:: proposal.parametrization.pairproduction
    :members: EpairProduction
    :show-inheritance:
 
 -----------------------------------------------
-``pyPROPOSAL.parametrization.mupairproduction``
+``proposal.parametrization.mupairproduction``
 -----------------------------------------------
 
-.. currentmodule:: pyPROPOSAL.parametrization.mupairproduction
+.. currentmodule:: proposal.parametrization.mupairproduction
 
-.. automodule:: pyPROPOSAL.parametrization.mupairproduction
+.. automodule:: proposal.parametrization.mupairproduction
    :members: MupairProduction
    :show-inheritance:
 
 ----------------------------------------------
-``pyPROPOSAL.parametrization.weakinteraction``
+``proposal.parametrization.weakinteraction``
 ----------------------------------------------
 
-.. currentmodule:: pyPROPOSAL.parametrization.weakinteraction
+.. currentmodule:: proposal.parametrization.weakinteraction
 
-.. automodule:: pyPROPOSAL.parametrization.weakinteraction
+.. automodule:: proposal.parametrization.weakinteraction
    :members: WeakInteraction
    :show-inheritance:
 
 -----------------------------------------
-``pyPROPOSAL.parametrization.ionization``
+``proposal.parametrization.ionization``
 -----------------------------------------
 
-.. currentmodule:: pyPROPOSAL.parametrization.ionization
+.. currentmodule:: proposal.parametrization.ionization
 
-.. automodule:: pyPROPOSAL.parametrization.ionization
+.. automodule:: proposal.parametrization.ionization
    :members: Ionization
    :show-inheritance:
 
 -----------------------------------------
-``pyPROPOSAL.parametrization.photonuclear``
+``proposal.parametrization.photonuclear``
 -----------------------------------------
 
-.. currentmodule:: pyPROPOSAL.parametrization.photonuclear
+.. currentmodule:: proposal.parametrization.photonuclear
 
-.. automodule:: pyPROPOSAL.parametrization.photonuclear
+.. automodule:: proposal.parametrization.photonuclear
    :members: PhotoRealPhotonAssumption, PhotoQ2Integral, ShadowEffect
    :show-inheritance:

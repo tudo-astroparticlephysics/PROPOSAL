@@ -1,4 +1,4 @@
-import pyPROPOSAL as pp
+import proposal as pp
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 

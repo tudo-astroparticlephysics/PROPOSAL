@@ -91,7 +91,7 @@ class build_ext_cmake(build_ext):
 setup(
     version=version,
     ext_modules=[
-        CMakeExtension('pyPROPOSAL'),
+        CMakeExtension('proposal'),
     ],
     cmdclass={
         'build_ext': build_ext_cmake,

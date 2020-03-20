@@ -22,8 +22,9 @@
 # PROPOSAL [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3665606.svg)](https://doi.org/10.5281/zenodo.3665606)
 
 PROPOSAL (Propagator with optimal precision and optimized speed for all
-leptons) is presented as a public tool for muon propagation through transparent
-media. Up-to-date cross sections for ionization, bremsstrahlung, photonuclear
+leptons) is presented as a public tool for propagating leptons and gamma rays
+through media.
+Up-to-date cross sections for ionization, bremsstrahlung, photonuclear
 interactions, electron pair production, Landau–Pomeranchuk–Migdal and
 Ter-Mikaelian effects, muon and tau decay, as well as Molière scattering are
 implemented for different parametrizations.
@@ -31,8 +32,8 @@ The full Paper can be found
 [here](https://doi.org/10.1016/j.cpc.2013.04.001).
 Recent improvements are documented [here](https://doi.org/10.1016/j.cpc.2019.03.021).
 
-PROPOSAL was tested on Mac OS X V. 10.13.6, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
-all these OS are UNIX based it should be fine to run and compile PROPOSAL on a UNIX based OS.
+PROPOSAL is developed and tested on macOS and linux. 
+Continous integration is setup on travis and tests several version of gcc and clang.
 
 PROPOSAL is now a C++11 library using pybind11 Python bindings!
 
@@ -209,7 +210,7 @@ The parameters of the given configuration file are described
 [here](resources/config_docu.md).
 
 ```python
-import pyPROPOSAL as pp
+import proposal as pp
 
 prop = pp.Propagator(
 	particle_def=pp.particle.MuMinusDef.get(),

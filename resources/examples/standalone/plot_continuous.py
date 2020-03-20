@@ -3,7 +3,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pyPROPOSAL as pp
+import proposal as pp
 from tqdm import tqdm
 
 

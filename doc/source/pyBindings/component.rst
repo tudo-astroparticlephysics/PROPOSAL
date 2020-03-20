@@ -1,10 +1,10 @@
 ************************
-``pyPROPOSAL.component``
+``proposal.component``
 ************************
 
-.. currentmodule:: pyPROPOSAL.component
+.. currentmodule:: proposal.component
 
-.. automodule:: pyPROPOSAL.component
+.. automodule:: proposal.component
    :members: Component
    :undoc-members:
    :show-inheritance:

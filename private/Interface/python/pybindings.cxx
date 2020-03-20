@@ -22,10 +22,10 @@ void init_crosssection(py::module& m);
 void init_scattering(py::module& m);
 void init_math(py::module&);
 
-PYBIND11_MODULE(pyPROPOSAL, m)
+PYBIND11_MODULE(proposal, m)
 {
     m.doc() = R"pbdoc(
-        .. currentmodule:: pyPROPOSAL
+        .. currentmodule:: proposal
     )pbdoc";
 
     init_components(m);
@@ -351,12 +351,12 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_property("medium", &Sector::Definition::GetMedium,
             &Sector::Definition::SetMedium,
             R"pbdoc(
-                    Definition of the :meth:`~pyPROPOSAL.medium.Medium`
+                    Definition of the :meth:`~proposal.medium.Medium`
                 )pbdoc")
         .def_property("geometry", &Sector::Definition::GetGeometry,
             &Sector::Definition::SetGeometry,
             R"pbdoc(
-                    Definiton of the :meth:`~pyPROPOSAL.geometry.Geometry`
+                    Definiton of the :meth:`~proposal.geometry.Geometry`
                 )pbdoc")
         .def_readwrite("do_stochastic_loss_weighting",
             &Sector::Definition::do_stochastic_loss_weighting,
@@ -406,14 +406,14 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("scattering_model",
             &Sector::Definition::scattering_model,
             R"pbdoc(
-                    Definition of the scattering modell of type :meth:`~pyPROPOSAL.scattering.ScatteringModel`
+                    Definition of the scattering modell of type :meth:`~proposal.scattering.ScatteringModel`
                     or deactivate scattering.
 
                     Example:
                         Deactivating scattering can be achieved with:
 
-                        >>> sec = pyPROPOSAL.SectorDefinition()
-                        >>> sec.scattering_model = pyPROPOSAL.scattering.ScatteringModel.NoScattering
+                        >>> sec = proposal.SectorDefinition()
+                        >>> sec.scattering_model = proposal.scattering.ScatteringModel.NoScattering
                 )pbdoc")
         .def_readwrite("particle_location", &Sector::Definition::location,
             R"pbdoc(
@@ -422,7 +422,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                 )pbdoc")
         .def_readwrite("crosssection_defs", &Sector::Definition::utility_def,
             R"pbdoc(
-                    Definition of the crosssection of type :meth:`~pyPROPOSAL.UtilityDefinition`
+                    Definition of the crosssection of type :meth:`~proposal.UtilityDefinition`
                 )pbdoc");
 
     // ---------------------------------------------------------------------
@@ -483,10 +483,10 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                     Function Docstring.
 
                     Args:
-                        particle_def (pyPROPOSAL.particle.ParticleDef): definition of the particle to propagate describing the basic properties.
-                        sector_defs (List[pyPROPOSAL.SectorDefinition]): list of the sectors describing the environment around the detector.
-                        detector (pyPROPOSAL.geometry.Geometry): geometry of the detector.
-                        interpolation_def (pyPROPOSAL.InterpolationDef): definition of the Interpolation tables like path to store them, etc.
+                        particle_def (proposal.particle.ParticleDef): definition of the particle to propagate describing the basic properties.
+                        sector_defs (List[proposal.SectorDefinition]): list of the sectors describing the environment around the detector.
+                        detector (proposal.geometry.Geometry): geometry of the detector.
+                        interpolation_def (proposal.InterpolationDef): definition of the Interpolation tables like path to store them, etc.
                 )pbdoc")
         .def(py::init<const ParticleDef&,
                  const std::vector<Sector::Definition>&, std::shared_ptr<const Geometry>>(),

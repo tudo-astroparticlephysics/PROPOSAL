@@ -1,6 +1,6 @@
 
-import pyPROPOSAL as pp
-import pyPROPOSAL.parametrization as parametrization
+import proposal as pp
+import proposal.parametrization as parametrization
 
 import matplotlib.pyplot as plt
 import numpy as np

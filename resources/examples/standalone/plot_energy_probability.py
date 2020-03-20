@@ -1,5 +1,5 @@
 import sys
-import pyPROPOSAL as pp
+import proposal as pp
 import math
 import time
 

@@ -1,7 +1,7 @@
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import pyPROPOSAL as pp
+import proposal as pp
 
 def muons(energy, statistics, vcut, do_continuous_randomization, dist):
 

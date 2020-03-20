@@ -63,7 +63,7 @@ void init_medium(py::module& m) {
 				factor.
 
 				>>> correction_factor = 0.9
-				>>> air = pyPROPOSAL.medium.Air(correction_factor)
+				>>> air = proposal.medium.Air(correction_factor)
 				)pbdoc")
         .def("__str__", &py_print<Medium>)
         .def(py::init<>())
