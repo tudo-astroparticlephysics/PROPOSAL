@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
-import pyPROPOSAL as pp
+import proposal as pp
 
 
 def plot_3D_cylinder(

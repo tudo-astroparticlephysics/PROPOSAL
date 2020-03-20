@@ -19,7 +19,7 @@ void init_components(py::module& m) {
 
         A existing component can be called for example with:
 
-        >>> hydro = pyPROPOSAL.component.Hydrogen()
+        >>> hydro = proposal.component.Hydrogen()
         >>> hydro.atomic_number
         1.00794
 

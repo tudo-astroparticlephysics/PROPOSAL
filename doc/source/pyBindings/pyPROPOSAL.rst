@@ -1,9 +1,9 @@
 **************
-``pyPROPOSAL``
+``proposal``
 **************
 
-.. currentmodule:: pyPROPOSAL.pyPROPOSAL
+.. currentmodule:: proposal.proposal
 
-.. automodule:: pyPROPOSAL
+.. automodule:: proposal
    :members:
    :undoc-members:

@@ -1,4 +1,4 @@
-import pyPROPOSAL as pp
+import proposal as pp
 import os
 from pytest import approx
 

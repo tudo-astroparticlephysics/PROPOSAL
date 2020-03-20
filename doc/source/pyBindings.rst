@@ -1,4 +1,4 @@
-pyPROPOSAL
+proposal
 **********
 
 
