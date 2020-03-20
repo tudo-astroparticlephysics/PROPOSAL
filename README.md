@@ -209,7 +209,7 @@ The parameters of the given configuration file are described
 [here](resources/config_docu.md).
 
 ```python
-import pyPROPOSAL as pp
+import proposal as pp
 
 prop = pp.Propagator(
 	particle_def=pp.particle.MuMinusDef.get(),

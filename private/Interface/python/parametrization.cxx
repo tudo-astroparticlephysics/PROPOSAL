@@ -99,7 +99,7 @@ void init_parametrization(py::module& m) {
                        R"pbdoc(
             Energy cut set by the user via the cut settings. Can be energy dependent. Used to differentiate between continous and stochastic losses.
 
-            See :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cut settings.
+            See :meth:`~proposal.EnergyCutSettings` for more information on the energy cut settings.
             )pbdoc")
         .def_readwrite("v_min", &Parametrization::IntegralLimits::vMin,
                        R"pbdoc(
@@ -109,7 +109,7 @@ void init_parametrization(py::module& m) {
     py::class_<Parametrization, std::shared_ptr<Parametrization>>(
         m_sub, "Parametrization",
         R"pbdoc(
-            Parametrization objects provide the theoretical input for physical cross section used in PROPOSAL, whereas :meth:`~pyPROPOSAL.crosssection.CrossSection`
+            Parametrization objects provide the theoretical input for physical cross section used in PROPOSAL, whereas :meth:`~proposal.crosssection.CrossSection`
             provides the numerical methods to process the parametrization. 
 
             For each physical process in PROPOSAL there are several different parametrizations available, so the user can check how the theoretical input influences
@@ -207,7 +207,7 @@ void init_parametrization(py::module& m) {
              py::arg("energy"),
              R"pbdoc(
             Returns:
-                integral_limits (:meth:`~pyPROPOSAL.parametrization.IntegralLimits`): returns the integral limits for the given energy and the
+                integral_limits (:meth:`~proposal.parametrization.IntegralLimits`): returns the integral limits for the given energy and the
                 current parametrization
                 )pbdoc")
         .def_property_readonly("name", &Parametrization::GetName,
@@ -219,19 +219,19 @@ void init_parametrization(py::module& m) {
         .def_property_readonly("particle_def", &Parametrization::GetParticleDef,
                                R"pbdoc(
 
-            Get :meth:`~pyPROPOSAL.particle.ParticleDef` used by the parametrization
+            Get :meth:`~proposal.particle.ParticleDef` used by the parametrization
 
                 )pbdoc")
         .def_property_readonly("medium", &Parametrization::GetMedium,
                                R"pbdoc( 
 
-            Get :meth:`~pyPROPOSAL.medium` used by the parametrization
+            Get :meth:`~proposal.medium` used by the parametrization
 
                 )pbdoc")
         .def_property_readonly("energy_cuts", &Parametrization::GetEnergyCuts,
                                R"pbdoc( 
 
-            Get :meth:`~pyPROPOSAL.EnergyCutSettings` defined by the user for the parametrization
+            Get :meth:`~proposal.EnergyCutSettings` defined by the user for the parametrization
 
                 )pbdoc")
         .def_property_readonly("multiplier", &Parametrization::GetMultiplier,
@@ -260,9 +260,9 @@ void init_parametrization(py::module& m) {
             Virtual class for the Bremsstrahlung parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:                                                                                                  
-                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
-                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
-                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                particle_def (:meth:`~proposal.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~proposal.EnergyCutSettings`): energy cut setting for the parametrization
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
                 lpm_effect (bool): Enable or disable the corrections due to the Ter-Mikaelian and Landau-Pomeranchuk effect.                                                                                            
 
@@ -281,10 +281,10 @@ void init_parametrization(py::module& m) {
             Example:
                 To create a bremsstrahlung parametrization
 
-                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
-                >>> param = pyPROPOSAL.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
+                >>> mu = proposal.particle.MuMinusDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> cuts = proposal.EnergyCutSettings(-1, -1)
+                >>> param = proposal.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
                 )pbdoc");
 
     BREMS_DEF(m_sub_brems, KelnerKokoulinPetrukhin)
@@ -359,12 +359,12 @@ void init_parametrization(py::module& m) {
             Virtual class for the electron pair production parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:                                                                                                  
-                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
-                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
-                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                particle_def (:meth:`~proposal.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~proposal.EnergyCutSettings`): energy cut setting for the parametrization
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
                 lpm_effect (bool): Enable or disable the corrections due to the Ter-Mikaelian and Landau-Pomeranchuk effect.  
-                interpolation_def (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
+                interpolation_def (:meth:`~proposal.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
                                                                                           
             Since the differential cross section is given in :math:`\rho` as well, an intergration over this parameter is needed.
             When using the interpolation_def parameter, this integration is saved in interpolation tables (improving the performance of the calculation with neglible decline in accuracy).
@@ -382,10 +382,10 @@ void init_parametrization(py::module& m) {
             Example:
                 To create a electron pair production parametrization
 
-                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
-                >>> param = pyPROPOSAL.parametrization.pairproduction.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
+                >>> mu = proposal.particle.MuMinusDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> cuts = proposal.EnergyCutSettings(-1, -1)
+                >>> param = proposal.parametrization.pairproduction.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
                 )pbdoc");
 
     py::class_<EpairProductionRhoIntegral,
@@ -457,8 +457,8 @@ void init_parametrization(py::module& m) {
             Virtual class for the annihilation parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:
-                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
-                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+                particle_def (:meth:`~proposal.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
 
             The following parametrizations are currently implemented:
@@ -468,9 +468,9 @@ void init_parametrization(py::module& m) {
             Example:
                 To create a annihilation parametrization
 
-                >>> positron = pyPROPOSAL.particle.EPlusDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> param = pyPROPOSAL.parametrization.annihilation.Heitler(positron, medium, 1.0)
+                >>> positron = proposal.particle.EPlusDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> param = proposal.parametrization.annihilation.Heitler(positron, medium, 1.0)
                 )pbdoc");
 
 
@@ -515,11 +515,11 @@ void init_parametrization(py::module& m) {
             Virtual class for the muon pair production parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:                                                                                                  
-                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
-                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
-                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                particle_def (:meth:`~proposal.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~proposal.EnergyCutSettings`): energy cut setting for the parametrization
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies   
-                interpolation_def (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
+                interpolation_def (:meth:`~proposal.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
                 particle_output (bool): If enabled, produced muons are sampled and returned as particles. Otherwise, only a DymamicData object is returned
 
             Since the differential cross section is given in :math:`\rho` as well, an intergration over this parameter is needed.
@@ -534,10 +534,10 @@ void init_parametrization(py::module& m) {
             Example:
                 To create a muon pair production parametrization
 
-                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
-                >>> param = pyPROPOSAL.parametrization.mupairproduction.KelnerKokoulinPetrukhin(mu, medium, cuts, 1.0, True)
+                >>> mu = proposal.particle.MuMinusDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> cuts = proposal.EnergyCutSettings(-1, -1)
+                >>> param = proposal.parametrization.mupairproduction.KelnerKokoulinPetrukhin(mu, medium, cuts, 1.0, True)
                 )pbdoc")
         .def("Calculaterho", &MupairProduction::Calculaterho, py::arg("energy"),
              py::arg("v"), py::arg("rnd1"), py::arg("rnd2"),
@@ -615,8 +615,8 @@ void init_parametrization(py::module& m) {
             Virtual class for the weak interaction parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:                                                                                                  
-                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
-                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                particle_def (:meth:`~proposal.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
 
             The following parametrizations are currently implemented:
@@ -626,9 +626,9 @@ void init_parametrization(py::module& m) {
             Example:
                 To create a weak interaction parametrization
 
-                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> param = pyPROPOSAL.parametrization.weakinteraction.WeakCooperSarkarMertsch(mu, medium, 1.0)
+                >>> mu = proposal.particle.MuMinusDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> param = proposal.parametrization.weakinteraction.WeakCooperSarkarMertsch(mu, medium, 1.0)
                 )pbdoc");
 
     py::class_<WeakCooperSarkarMertsch,
@@ -695,7 +695,7 @@ void init_parametrization(py::module& m) {
             Calculate the shadow effect independently
 
             Args:                                                                                                  
-                Component (:meth:`~pyPROPOSAL.component`): Component to calculate the shadow effect
+                Component (:meth:`~proposal.component`): Component to calculate the shadow effect
                 x (float): Bjorken x                                
                 nu (float): Fraction of energy transfered from the particle via the photon
                                                             
@@ -736,9 +736,9 @@ void init_parametrization(py::module& m) {
             Virtual class for the parametrizations of photonuclear interaction. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:                                                                                                  
-                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
-                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
-                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                particle_def (:meth:`~proposal.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~proposal.EnergyCutSettings`): energy cut setting for the parametrization
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies               
                 hard_component (bool): Enabling or disabling the calculation of the hard component
                                                             
@@ -755,10 +755,10 @@ void init_parametrization(py::module& m) {
             Example:
                 To create a photonuclear parametrization
 
-                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
-                >>> param = pyPROPOSAL.parametrization.photonuclear.Rhode(mu, medium, cuts, 1.0, True)
+                >>> mu = proposal.particle.MuMinusDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> cuts = proposal.EnergyCutSettings(-1, -1)
+                >>> param = proposal.parametrization.photonuclear.Rhode(mu, medium, cuts, 1.0, True)
                 )pbdoc");
     py::class_<PhotoQ2Integral, std::shared_ptr<PhotoQ2Integral>, Photonuclear>(
         m_sub_photo, "PhotoQ2Integral",
@@ -767,12 +767,12 @@ void init_parametrization(py::module& m) {
             Virtual class for the parametrizations of photonuclear interaction. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:                                                                                                  
-                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
-                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
-                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                particle_def (:meth:`~proposal.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~proposal.EnergyCutSettings`): energy cut setting for the parametrization
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies               
-                ShadowEffect (:meth:`~pyPROPOSAL.parametrization.photonuclear.ShadowEffect`): Parametrization of the ShadowEffect to be used    
-                InterpolationDef (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation    
+                ShadowEffect (:meth:`~proposal.parametrization.photonuclear.ShadowEffect`): Parametrization of the ShadowEffect to be used    
+                InterpolationDef (:meth:`~proposal.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation    
  
 
                                                             
@@ -800,12 +800,12 @@ void init_parametrization(py::module& m) {
             Example:
                 To create a photonuclear parametrization
 
-                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
-                >>> shadow = pyPROPOSAL.parametrization.photonuclear.ShadowButkevichMikhailov()
-                >>> interpol = pyPROPOSAL.InterpolationDef
-                >>> param = pyPROPOSAL.parametrization.photonuclear.RenoSarcevicSuInterpolant(mu, medium, cuts, 1.0, shadow, interpol)
+                >>> mu = proposal.particle.MuMinusDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> cuts = proposal.EnergyCutSettings(-1, -1)
+                >>> shadow = proposal.parametrization.photonuclear.ShadowButkevichMikhailov()
+                >>> interpol = proposal.InterpolationDef
+                >>> param = proposal.parametrization.photonuclear.RenoSarcevicSuInterpolant(mu, medium, cuts, 1.0, shadow, interpol)
                 )pbdoc");
 
     PHOTO_REAL_DEF(m_sub_photo, Zeus, RealPhotonAssumption)
@@ -893,9 +893,9 @@ void init_parametrization(py::module& m) {
             Virtual class for the Ionization parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:                                                                                                  
-                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
-                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
-                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization                                                                                           
+                particle_def (:meth:`~proposal.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~proposal.EnergyCutSettings`): energy cut setting for the parametrization                                                                                           
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
 
             The following parametrizations are currently implemented:
@@ -909,10 +909,10 @@ void init_parametrization(py::module& m) {
             Example:
                 To create a ionization parametrization
 
-                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
-                >>> param = pyPROPOSAL.parametrization.ionization.BetheBlochRossi(mu, medium, cuts, multiplier)
+                >>> mu = proposal.particle.MuMinusDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> cuts = proposal.EnergyCutSettings(-1, -1)
+                >>> param = proposal.parametrization.ionization.BetheBlochRossi(mu, medium, cuts, multiplier)
                 )pbdoc");
 
     py::class_<IonizBetheBlochRossi, std::shared_ptr<IonizBetheBlochRossi>, Ionization>(m_sub_ioniz, "BetheBlochRossi")
@@ -971,9 +971,9 @@ void init_parametrization(py::module& m) {
             Virtual class for the Compton scattering parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:
-                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
-                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
-                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                particle_def (:meth:`~proposal.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+                energy_cuts (:meth:`~proposal.EnergyCutSettings`): energy cut setting for the parametrization
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
 
             The following parametrizations are currently implemented:
@@ -983,10 +983,10 @@ void init_parametrization(py::module& m) {
             Example:
                 To create a compton scattering parametrization
 
-                >>> gamma = pyPROPOSAL.particle.GammaDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
-                >>> param = pyPROPOSAL.parametrization.compton.KleinNishina(gamma, medium, cuts, multiplier)
+                >>> gamma = proposal.particle.GammaDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> cuts = proposal.EnergyCutSettings(-1, -1)
+                >>> param = proposal.parametrization.compton.KleinNishina(gamma, medium, cuts, multiplier)
                 )pbdoc");
 
     py::class_<ComptonKleinNishina, std::shared_ptr<ComptonKleinNishina>, Compton>(m_sub_compton, "KleinNishina")
@@ -1027,8 +1027,8 @@ void init_parametrization(py::module& m) {
             Virtual class for the PhotoPairProduction parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:
-                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
-                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+                particle_def (:meth:`~proposal.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
 
             The following parametrizations are currently implemented:
@@ -1038,9 +1038,9 @@ void init_parametrization(py::module& m) {
             Example:
                 To create a photopair parametrization
 
-                >>> gamma = pyPROPOSAL.particle.GammaDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> param = pyPROPOSAL.parametrization.PhotoPair.Tsai(gamma, medium, multiplier)
+                >>> gamma = proposal.particle.GammaDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> param = proposal.parametrization.PhotoPair.Tsai(gamma, medium, multiplier)
                 )pbdoc");
 
     py::class_<PhotoPairTsai, std::shared_ptr<PhotoPairTsai>, PhotoPairProduction>(m_sub_photopair, "Tsai")
@@ -1075,8 +1075,8 @@ void init_parametrization(py::module& m) {
             Virtual class for the PhotoAngleDistribution parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:
-                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
-                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+                particle_def (:meth:`~proposal.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges
 
             The following parametrizations are currently implemented:
 
@@ -1089,9 +1089,9 @@ void init_parametrization(py::module& m) {
             Example:
                 To create a PhotoAngleDistribution parametrization
 
-                >>> gamma = pyPROPOSAL.particle.GammaDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> param = pyPROPOSAL.parametrization.PhotoAngleDistribution.TsaiIntegral(gamma, medium)
+                >>> gamma = proposal.particle.GammaDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> param = proposal.parametrization.PhotoAngleDistribution.TsaiIntegral(gamma, medium)
                 )pbdoc")
             .def("SetCurrentComponent", &PhotoAngleDistribution::SetCurrentComponent,
                  py::arg("component_index"))

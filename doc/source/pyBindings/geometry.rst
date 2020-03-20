@@ -1,10 +1,10 @@
 ***********************
-``pyPROPOSAL.geometry``
+``proposal.geometry``
 ***********************
 
-.. currentmodule:: pyPROPOSAL.geometry
+.. currentmodule:: proposal.geometry
 
-.. automodule:: pyPROPOSAL.geometry
+.. automodule:: proposal.geometry
    :members: Geometry, Sphere, Box, Cylinder
    :undoc-members:
    :show-inheritance:

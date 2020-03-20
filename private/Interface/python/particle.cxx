@@ -39,7 +39,7 @@ void init_particle(py::module& m) {
 
         A predefined particle can be initialize for example with
 
-        >>> muon = pyPROPOSAL.particle.MuMinusDef.get()
+        >>> muon = proposal.particle.MuMinusDef.get()
 
         The :meth:`Particle` class is a container for partilce related data.
         There can be for example initial energy set and losses read out.

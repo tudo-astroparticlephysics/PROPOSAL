@@ -1,10 +1,10 @@
 *************************
-``pyPROPOSAL.scattering``
+``proposal.scattering``
 *************************
 
-.. currentmodule:: pyPROPOSAL.scattering
+.. currentmodule:: proposal.scattering
 
-.. automodule:: pyPROPOSAL.scattering
+.. automodule:: proposal.scattering
    :members:
    :undoc-members:
    :show-inheritance:

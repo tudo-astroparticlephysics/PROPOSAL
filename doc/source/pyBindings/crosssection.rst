@@ -1,10 +1,10 @@
 ***************************
-``pyPROPOSAL.crosssection``
+``proposal.crosssection``
 ***************************
 
-.. currentmodule:: pyPROPOSAL.crosssection
+.. currentmodule:: proposal.crosssection
 
-.. automodule:: pyPROPOSAL.crosssection
+.. automodule:: proposal.crosssection
    :members: CrossSection
    :undoc-members:
    :show-inheritance:

@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import gridspec
-import pyPROPOSAL as pp
+import proposal as pp
 
 def propagate_particle(propagator,
                        position=[-1e5, 0, 1e4],
