@@ -142,22 +142,21 @@ The parameters of the configuration file are described
 using namespace PROPOSAL;
 
 int main(){
-    Propagator prop(MuMinusDef::Get(), "resources/configuration/config.json");
-    Particle& mu = prop.GetParticle();
-    Particle mu_backup(mu);
+    ParticleDef mu_def = MuMinusDef::Get();
+    Propagator prop(mu_def, "resources/configuration/config.json");
+    DynamicData mu(mu_def.particle_type);
 
-    mu_backup.SetEnergy(9e6);
-    mu_backup.SetDirection(Vector3D(0, 0, -1));
+    mu.SetEnergy(9e6);
+    mu.SetPosition(Vector3D(0, 0, 0))
+    mu.SetDirection(Vector3D(0, 0, -1));
 
     std::vector<double> ranges;
 
     for (int i = 0; i < 10; i++)
     {
-    mu.InjectState(mu_backup);
-    
-    prop.Propagate();
-    
-    ranges.push_back(mu.GetPropagatedDistance());
+        Secondaries sec = prop.Propagate(mu);
+
+        ranges.push_back(sec.GetPosition().back().magnitude());
     }
     
 // ... Do stuff with ranges, e.g. plot histogram
@@ -213,26 +212,25 @@ The parameters of the given configuration file are described
 ```python
 import proposal as pp
 
+mu_def = pp.particle.MuMinusDef()
 prop = pp.Propagator(
-	particle_def=pp.particle.MuMinusDef.get(),
-	config_file="path/to/config.json"
+	  particle_def=mu_def,
+	  config_file="path/to/config.json"
 )
 
-mu = prop.particle
-mu_backup = pp.particle.Particle(mu)
+mu = pp.particle.DynamicData(mu_def.particle_type)
 
-mu_backup.energy = 9e6
-mu_backup.direction = pp.Vector3D(0, 0, -1)
+mu.energy = 9e6
+mu.direction = pp.Vector3D(0, 0, -1)
 
 mu_length = []
 mu_secondaries = []
 
 for i in range(1000):
-    mu.inject_state(mu_backup)
-    secondaries = prop.propagate()
+    sec = prop.propagate(mu)
 
-    mu_length.append(prop.particle.propagated_distance / 100)
-    mu_secondaries.append(len(secondaries))
+    mu_length.append(sec.position[-1].magnitude() / 100)
+    mu_secondaries.append(sec.number_of_particles)
 ```
 
 ## Documentation ##
