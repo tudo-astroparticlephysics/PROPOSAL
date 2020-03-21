@@ -33,7 +33,7 @@ The full Paper can be found
 Recent improvements are documented [here](https://doi.org/10.1016/j.cpc.2019.03.021).
 
 PROPOSAL is developed and tested on macOS and linux. 
-Continous integration is setup on travis and tests several version of gcc and clang.
+Continuous integration is setup on travis and tests several version of gcc and clang.
 
 PROPOSAL is now a C++11 library using pybind11 Python bindings!
 
@@ -107,7 +107,7 @@ and if you want to cite the latest improvements
 
 ## Requirements
 
-- CMake 2.8 or higher
+- CMake 3.8 or higher
 - C++11 compatible compiler
 
 ## Recommended
@@ -178,7 +178,7 @@ following minimal code structure
 the `CMakeLists.txt` could look like
 
 ```
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.8)
 set (CMAKE_CXX_STANDARD 11)
 
 add_executable(foo source/foo.cxx)
@@ -253,7 +253,7 @@ When you encounter any errors or misunderstandings don't hesitate and write a ma
 This software may be modified and distributed under the terms of
 a modified LGPL License. See the LICENSE for details of the LGPL License.
 
-Modifcations of the LGPL [License](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/LICENSE.md):
+Modifications of the LGPL [License](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/LICENSE.md):
 
 1. The user shall acknowledge the use of PROPOSAL by citing the following reference:
 
@@ -271,7 +271,7 @@ Modifcations of the LGPL [License](https://github.com/tudo-astroparticlephysics/
 
 *Jan-Hendrik Koehne*, *Tomasz Fuchs*, *Mario Dunsch*
 
-## Acknowledgement ##
+## Acknowledgment ##
 
 ![SFB876](https://raw.githubusercontent.com/wiki/tudo-astroparticlephysics/Cor-PlusPlus/images/sfb876.png)
 This work was created as part of the project [C3](http://sfb876.tu-dortmund.de/SPP/sfb876-c3.html) of the [SFB876](http://sfb876.tu-dortmund.de/index.html).
