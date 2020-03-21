@@ -122,7 +122,7 @@ and if you want to cite the latest improvements
 ## Installation
 
 Install and compiling instructions for the standalone installation
-are found in [install](INSTALL.md).
+are found in [install](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/INSTALL.md).
 
 
 ## Usage
@@ -131,10 +131,10 @@ are found in [install](INSTALL.md).
 
 PROPOSAL is built as library. So you can include this project in your own
 c++ project by including the header files. The following snippet uses the
-[configuration](resources/config.json) to propagate muons and
+[configuration](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config.json) to propagate muons and
 store the muon ranges for further proceeds.
 The parameters of the configuration file are described
-**[here](resources/config_docu.md)**.
+**[here](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config_docu.md)**.
 
 ```c++
 #include "PROPOSAL/PROPOSAL.h"
@@ -203,12 +203,12 @@ and
 
 How to use PROPOSAL within Python is demonstrated with some example
 scripts you can find in
-[resources/examples/standalone](resources/examples/standalone).
+[resources/examples/standalone](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/examples/standalone).
 
 For a short demonstration the following snippet will create data you can use to
 show the distribution of muon ranges and the number of interactions in ice.
 The parameters of the given configuration file are described
-[here](resources/config_docu.md).
+[here](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config_docu.md).
 
 ```python
 import proposal as pp
@@ -242,7 +242,7 @@ The C++ API can be built using
 	make doc
 
 A documentation of the configuration file can be found
-[here](resources/config_docu.md).
+[here](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config_docu.md).
 
 ## Issues ##
 
@@ -255,7 +255,7 @@ When you encounter any errors or misunderstandings don't hesitate and write a ma
 This software may be modified and distributed under the terms of
 a modified LGPL License. See the LICENSE for details of the LGPL License.
 
-Modifcations of the LGPL [License](LICENSE.md):
+Modifcations of the LGPL [License](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/LICENSE.md):
 
 1. The user shall acknowledge the use of PROPOSAL by citing the following reference:
 
