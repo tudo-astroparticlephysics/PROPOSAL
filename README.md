@@ -19,7 +19,7 @@
 ```
 
 
-# PROPOSAL [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3665606.svg)](https://doi.org/10.5281/zenodo.3665606)
+# PROPOSAL [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1484180.svg)](https://doi.org/10.5281/zenodo.1484180)
 
 PROPOSAL (Propagator with optimal precision and optimized speed for all
 leptons) is presented as a public tool for propagating leptons and gamma rays
@@ -62,13 +62,14 @@ If you use PROPOSAL, please cite the PROPOSAL paper
 ```
 and our zenodo entry of the version you use
 ```bibtex
-@misc{mario_dunsch_2019_2598747,
+@misc{dunsch_2020_1484180,
   author = {Dunsch, Mario and
             Soedingrekso, Jan and
             Koehne, Jan-Hendrik and
             Fuchs, Tomasz and
             Alameddine, Jean-Marco and
             Sackel, Maximilian and
+            Noethe, Maximilian and
             van Santen, Jacob and
             Menne, Thorben and
             Sandrock, Alexander and
@@ -76,10 +77,10 @@ and our zenodo entry of the version you use
             Krings, Kai and
             Olivas, Alex},
   title  = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
-  month  = may,
-  year   = 2019,
-  doi    = {10.5281/zenodo.3665606},
-  url    = {https://doi.org/10.5281/zenodo.3665606}
+  month  = mar,
+  year   = 2020,
+  doi    = {10.5281/zenodo.1484180},
+  url    = {https://doi.org/10.5281/zenodo.1484180}
 }
 ```
 and if you want to cite the latest improvements
