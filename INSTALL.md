@@ -118,12 +118,12 @@ is set to `Debug` when in a git checkout and to `Release` otherwise.
 Two other options exist: `RelWithDebInfo` and `MinSizeRel`.
 See https://cmake.org/cmake/help/v3.17/variable/CMAKE_BUILD_TYPE.html
 
-# Additional Cmake options
+# Additional cmake options
 
 | Option | Default value | Description |
 | --- | --- | --- |
 | `ADD_PYTHON` | ON | Compile the python wrapper |
-| `ADD_PERFORMANCE_TEST` | OFF | Compile the performace test source |
+| `ADD_PERFORMANCE_TEST` | OFF | Compile the performance test source |
 | `ADD_ROOT` | ON | Compile PROPOSAL with ROOT support |
 
 
