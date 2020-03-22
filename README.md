@@ -183,20 +183,19 @@ set (CMAKE_CXX_STANDARD 11)
 
 add_executable(foo source/foo.cxx)
 
-find_library(PROPOSAL_LIBRARIES REQUIRED NAMES PROPOSAL)
-
-if (PROPOSAL_LIBRARIES)
-  target_link_libraries (foo ${PROPOSAL_LIBRARIES})
-endif ()
+find_package(PROPOSAL REQUIRED)
+target_link_libraries(example PRIVATE PROPOSAL::PROPOSAL)  # or PUBLIC
 ```
 
-The file can then be compiled with
-    
-    cmake . 
-    
-and
+In case you did install PROPOSAL in a custom prefix, use `PROPOSAL_DIR` to tell
+cmake where to find PROPOSAL:
 
-    make
+```
+$ mkdir build && cd build
+$ PROPOSAL_DIR=/path/to/proposal/prefix cmake .. [CMAKE options]
+$ cmake --build .
+```
+
 
 ### Python ###
 
