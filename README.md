@@ -177,14 +177,13 @@ following minimal code structure
 
 the `CMakeLists.txt` could look like
 
-```
+```cmake
 cmake_minimum_required(VERSION 3.8)
-set (CMAKE_CXX_STANDARD 11)
 
 add_executable(foo source/foo.cxx)
 
 find_package(PROPOSAL REQUIRED)
-target_link_libraries(example PRIVATE PROPOSAL::PROPOSAL)  # or PUBLIC
+target_link_libraries(foo PRIVATE PROPOSAL::PROPOSAL)  # or PUBLIC
 ```
 
 In case you did install PROPOSAL in a custom prefix, use `PROPOSAL_DIR` to tell
