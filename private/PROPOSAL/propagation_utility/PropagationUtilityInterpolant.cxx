@@ -73,3 +73,5 @@ double UtilityInterpolant::GetUpperLimit(double ei, double rnd)
             low_),
         ei);
 }
+
+InterpolationDef UtilityInterpolant::utility_interpolation_def;
