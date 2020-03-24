@@ -132,10 +132,9 @@ namespace PROPOSAL {
     protected:
         virtual bool compare(const PhotoAngleDistribution&) const;
 
-        typedef std::vector<Components::Component*> ComponentVec;
         const ParticleDef particle_def_;
         std::shared_ptr<const Medium> medium_;
-        const ComponentVec& components_;
+        const std::vector<Components::Component>& components_;
         int component_index_;
     };
 

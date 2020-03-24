@@ -82,12 +82,12 @@ public:
     // ----------------------------------------------------------------- //
 
     virtual const std::string& GetName() const = 0; //{ return name_; }
+    std::shared_ptr<const Medium> GetMedium() const { return medium_; }
     double GetParticleMass() const { return particle_mass_; }
     double GetParticleCharge() const {return particle_charge_; }
     double GetParticleLow() const {return particle_low_; }
 
     virtual InteractionType GetInteractionType() const = 0;
-    std::shared_ptr<const Medium> GetMedium() const { return medium_; }
     double GetMultiplier() const { return multiplier_; }
 
     virtual size_t GetHash() const;
@@ -100,7 +100,6 @@ public:
     void SetCurrentComponent(int index) { component_index_ = index; }
 
 protected:
-    typedef std::vector<Components::Component*> ComponentVec;
 
     virtual bool compare(const Parametrization&) const;
     virtual void print(std::ostream&) const {};
@@ -113,7 +112,7 @@ protected:
     std::shared_ptr<const Medium> medium_;
 
     // const Components::Component* current_component_;
-    const ComponentVec& components_;
+    const std::vector<Components::Component>& components_;
     int component_index_;
 
     double multiplier_;

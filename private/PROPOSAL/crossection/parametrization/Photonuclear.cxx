@@ -301,12 +301,12 @@ Parametrization::KinematicLimits Photonuclear::GetKinematicLimits(double energy)
 
     KinematicLimits limits;
 
-    limits.vMin = (MPI + MPI * MPI / (2 * components_[component_index_]->GetAverageNucleonWeight())) / energy;
+    limits.vMin = (MPI + MPI * MPI / (2 * components_[component_index_].GetAverageNucleonWeight())) / energy;
 
     if (particle_mass_ < MPI)
     {
-        aux         = particle_mass_ / components_[component_index_]->GetAverageNucleonWeight();
-        limits.vMax = 1 - components_[component_index_]->GetAverageNucleonWeight() * (1 + aux * aux) / (2 * energy);
+        aux         = particle_mass_ / components_[component_index_].GetAverageNucleonWeight();
+        limits.vMax = 1 - components_[component_index_].GetAverageNucleonWeight() * (1 + aux * aux) / (2 * energy);
     } else
     {
         limits.vMax = 1;
