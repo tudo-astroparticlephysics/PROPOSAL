@@ -33,6 +33,16 @@ CrossSection::CrossSection(const CrossSection& cross_section)
 {
 }
 
+CrossSection::CrossSection()
+        : parametrization_(nullptr)
+        , prob_for_component_(0, 0)
+        , sum_of_rates_(0)
+        , components_(components_empty_)
+        , rnd_(0)
+        , cuts_(nullptr)
+{
+}
+
 CrossSection::~CrossSection() { delete parametrization_; }
 
 bool CrossSection::operator==(const CrossSection& cross_section) const
@@ -95,6 +105,8 @@ std::pair<double, double> CrossSection::StochasticDeflection(
     (void)energy_loss;
     return std::make_pair(1, 0);
 }
+
+const std::vector<Components::Component> CrossSection::components_empty_{};
 
 bool CrossSectionBuilder::compare(const CrossSection& cross) const{
     const CrossSectionBuilder* cross_compare = static_cast<const CrossSectionBuilder*>(&cross);

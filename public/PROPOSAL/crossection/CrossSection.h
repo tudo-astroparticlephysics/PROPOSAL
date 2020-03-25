@@ -52,6 +52,7 @@ class CrossSection
 public:
     CrossSection(const Parametrization&, std::shared_ptr<const EnergyCutSettings>);
     CrossSection(const CrossSection&);
+    CrossSection();
     virtual ~CrossSection();
 
     bool operator==(const CrossSection& cross_section) const;
@@ -116,6 +117,8 @@ protected:
 
     const std::vector<Components::Component>& components_;
 
+    static const std::vector<Components::Component> components_empty_;
+
     double rnd_; //!< This random number will be stored in CalculateDNdx to avoid calculate dNdx a second time in
                  //! ClaculateSochasticLoss when it is already done
 
@@ -125,7 +128,7 @@ protected:
 class CrossSectionBuilder final : public CrossSection
 {
 public:
-    CrossSectionBuilder() : CrossSection(*param, nullptr){
+    CrossSectionBuilder() : CrossSection(){
         // Set zero return functions as default
         dEdx_function = [](double x) { (void)x; return 0;};
         dE2dx_function = [](double x) { (void)x; return 0;};
@@ -150,6 +153,8 @@ public:
     void SetdNdx_rnd_function(std::function<double(double, double)> func);
     void SetStochasticLoss_function(std::function<double(double, double, double)> func);
     void SetCumulativeCrossSection_function(std::function<double(double, double, double)> func);
+
+    Parametrization& GetParametrization() const { throw std::logic_error("No Parametrization for CrossSectionBuilder available");}
 
 protected:
     virtual bool compare(const CrossSection& cross) const override;
