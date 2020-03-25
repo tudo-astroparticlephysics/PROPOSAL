@@ -47,42 +47,21 @@ namespace PROPOSAL {
 
 class EnergyCutSettings
 {
-
-private:
     double ecut_;
     double vcut_;
     bool continuous_randomization_;
 
 public:
-    //----------------------------------------------------------------------------//
-    // Constructors
-
-    EnergyCutSettings(const double, const double, const bool);
+    EnergyCutSettings(double, double, bool);
     EnergyCutSettings(const nlohmann::json&);
 
-    bool operator==(const EnergyCutSettings& energyCutSettings) const;
-    friend std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings);
+    bool operator==(const EnergyCutSettings& energyCutSettings) const noexcept;
 
-    //----------------------------------------------------------------------------//
+    double GetCut(double energy) const noexcept;
 
-    // Memberfunction
-
-    /*!
-     * This function returns the lower from
-     * \f$ E \cdot v_{cut} \f$ and \f$ e_{cut}\f$
-     *
-     *
-     * \param   energy      energy of the particle
-     * \return  cut
-     */
-    double GetCut(double energy) const;
-
-
-    //----------------------------------------------------------------------------//
-    // Getter
-
-    double GetEcut() const { return ecut_; }
-    double GetVcut() const { return vcut_; }
+    double GetEcut() const noexcept { return ecut_; }
+    double GetVcut() const noexcept { return vcut_; }
+    bool GetContRand() const noexcept { return continuous_randomization_; }
 };
 
 std::ostream& operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings);
