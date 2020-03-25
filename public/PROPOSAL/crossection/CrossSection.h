@@ -38,6 +38,8 @@
 
 namespace PROPOSAL {
 
+using Function = std::function<double(double)>;
+
 namespace Components {
 class Component;
 }
@@ -118,6 +120,48 @@ protected:
                  //! ClaculateSochasticLoss when it is already done
 
     std::shared_ptr<const EnergyCutSettings> cuts_;
+};
+
+class CrossSectionBuilder final : public CrossSection
+{
+public:
+    CrossSectionBuilder() : CrossSection(*param, nullptr){
+        // Set zero return functions as default
+        dEdx_function = [](double x) { (void)x; return 0;};
+        dE2dx_function = [](double x) { (void)x; return 0;};
+        dNdx_function = [](double x) { (void)x; return 0;};
+        dNdx_rnd_function = [](double x1, double x2) { (void)x1; (void)x2; return 0;};
+        StochasticLoss_function = [](double x1, double x2, double x3) { (void)x1; (void)x2; (void)x3; return 0;};
+        CumulativeCrossSection_function = [](double x1, double x2, double x3) { (void)x1; (void)x2; (void)x3; return 0;};
+    }
+
+    static Parametrization* param;
+
+    double CalculatedEdx(double energy) override;
+    double CalculatedE2dx(double energy) override;
+    double CalculatedNdx(double energy) override;
+    double CalculatedNdx(double energy, double rnd) override;
+    double CalculateStochasticLoss(double energy, double rnd1, double rnd2) override;
+    double CalculateCumulativeCrossSection(double energy, int component, double v) override;
+
+    void SetdEdx_function(Function func);
+    void SetdE2dx_function(Function func);
+    void SetdNdx_function(Function func);
+    void SetdNdx_rnd_function(std::function<double(double, double)> func);
+    void SetStochasticLoss_function(std::function<double(double, double, double)> func);
+    void SetCumulativeCrossSection_function(std::function<double(double, double, double)> func);
+
+protected:
+    virtual bool compare(const CrossSection& cross) const override;
+    double CalculateStochasticLoss(double energy, double rnd1) override;
+
+private:
+    Function dEdx_function;
+    Function dE2dx_function;
+    Function dNdx_function;
+    std::function<double(double, double)> dNdx_rnd_function;
+    std::function<double(double, double, double)> StochasticLoss_function;
+    std::function<double(double, double, double)> CumulativeCrossSection_function;
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::CrossSection const&);
