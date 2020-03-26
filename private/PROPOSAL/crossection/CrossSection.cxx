@@ -106,7 +106,35 @@ std::pair<double, double> CrossSection::StochasticDeflection(
     return std::make_pair(1, 0);
 }
 
+size_t CrossSection::GetHash() const{
+    std::size_t hash = 0;
+    hash_combine(hash, GetParametrization().GetHash(), GetParametrization().GetMultiplier());
+    return hash;
+}
+
 const std::vector<Components::Component> CrossSection::components_empty_{};
+
+CrossSectionBuilder::CrossSectionBuilder(std::string name) : CrossSection(), name(name){
+    // Set zero return functions as default
+    dEdx_function = [](double x)->double {
+        (void) x; throw std::logic_error("dEdx_function must be set first");
+    };
+    dE2dx_function = [](double x)->double {
+        (void)x; throw std::logic_error("dE2dx_function must be set first");
+    };
+    dNdx_function = [](double x)->double {
+        (void)x; throw std::logic_error("dNdx_function must be set first");
+    };
+    dNdx_rnd_function = [](double x1, double x2)->double {
+        (void)x1; (void)x2; throw std::logic_error("dNdx_rnd_function must be set first");
+    };
+    StochasticLoss_function = [](double x1, double x2, double x3)->double {
+        (void)x1; (void)x2; (void)x3; throw std::logic_error("StochastcLoss_function must be set first");
+    };
+    CumulativeCrossSection_function = [](double x1, double x2, double x3)->double {
+        (void)x1; (void)x2; (void)x3; throw std::logic_error("CumulativeCrossSection_function must be set first");
+    };
+}
 
 bool CrossSectionBuilder::compare(const CrossSection& cross) const{
     const CrossSectionBuilder* cross_compare = static_cast<const CrossSectionBuilder*>(&cross);
@@ -175,6 +203,13 @@ void CrossSectionBuilder::SetCumulativeCrossSection_function(std::function<doubl
 double CrossSectionBuilder::CalculateStochasticLoss(double energy, double rnd1){
     (void) energy; (void) rnd1;
     return 0;
+}
+
+size_t CrossSectionBuilder::GetHash() const{
+    std::size_t seed = 0;
+    hash_combine(seed, name);
+
+    return seed;
 }
 
 Parametrization* CrossSectionBuilder::param;

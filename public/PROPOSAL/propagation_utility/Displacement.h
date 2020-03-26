@@ -15,7 +15,7 @@ class Displacement {
 
 public:
     Displacement(CrossSectionList);
-
+    virtual ~Displacement() = default;
     virtual double FunctionToIntegral(double energy);
     virtual double SolveTrackIntegral(double, double, double) = 0;
     virtual double UpperLimitTrackIntegral(double, double) = 0;

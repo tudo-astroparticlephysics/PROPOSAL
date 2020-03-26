@@ -91,7 +91,9 @@ public:
     // ----------------------------------------------------------------- //
 
     int GetTypeId() const { return static_cast<int>(type_id_); }
-    Parametrization& GetParametrization() const { return *parametrization_; }
+    virtual Parametrization& GetParametrization() const { return *parametrization_; }
+
+    virtual size_t GetHash() const;
 
 protected:
 
@@ -128,15 +130,7 @@ protected:
 class CrossSectionBuilder final : public CrossSection
 {
 public:
-    CrossSectionBuilder() : CrossSection(){
-        // Set zero return functions as default
-        dEdx_function = [](double x) { (void)x; return 0;};
-        dE2dx_function = [](double x) { (void)x; return 0;};
-        dNdx_function = [](double x) { (void)x; return 0;};
-        dNdx_rnd_function = [](double x1, double x2) { (void)x1; (void)x2; return 0;};
-        StochasticLoss_function = [](double x1, double x2, double x3) { (void)x1; (void)x2; (void)x3; return 0;};
-        CumulativeCrossSection_function = [](double x1, double x2, double x3) { (void)x1; (void)x2; (void)x3; return 0;};
-    }
+    CrossSectionBuilder(std::string name);
 
     static Parametrization* param;
 
@@ -154,13 +148,15 @@ public:
     void SetStochasticLoss_function(std::function<double(double, double, double)> func);
     void SetCumulativeCrossSection_function(std::function<double(double, double, double)> func);
 
-    Parametrization& GetParametrization() const { throw std::logic_error("No Parametrization for CrossSectionBuilder available");}
+    Parametrization& GetParametrization() const override { throw std::logic_error("No Parametrization for CrossSectionBuilder available");}
+    size_t GetHash() const override;
 
 protected:
     virtual bool compare(const CrossSection& cross) const override;
     double CalculateStochasticLoss(double energy, double rnd1) override;
 
 private:
+    std::string name;
     Function dEdx_function;
     Function dE2dx_function;
     Function dNdx_function;
