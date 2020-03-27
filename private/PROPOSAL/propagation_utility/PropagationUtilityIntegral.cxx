@@ -16,15 +16,18 @@ UtilityIntegral::UtilityIntegral(std::function<double(double)> func)
 {
 }
 
-double UtilityIntegral::Calculate(double ei, double ef, double rnd)
+double UtilityIntegral::Calculate(double energy_initial, double energy_final, double rnd)
 {
-    return integral.IntegrateWithRandomRatio(ei, ef,FunctionToIntegral, 4, -rnd);
+    last_energy_initial = energy_initial;
+    last_partial_sum = rnd;
+
+    return integral.IntegrateWithRandomRatio(energy_initial, energy_final, FunctionToIntegral, 4, -rnd);
 }
 
-double UtilityIntegral::GetUpperLimit(double ei, double rnd)
+double UtilityIntegral::GetUpperLimit(double energy_initial, double rnd)
 {
-    (void)ei;
-    (void)rnd;
+    if (energy_initial != last_energy_initial || rnd != last_partial_sum)
+        Calculate(energy_initial , 1e-3, rnd);
 
     return integral.GetUpperLimit();
 }
