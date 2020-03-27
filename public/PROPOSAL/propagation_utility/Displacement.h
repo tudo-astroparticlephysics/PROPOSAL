@@ -14,13 +14,11 @@ class Displacement {
     CrossSectionList cross;
 
 public:
-    Displacement(CrossSectionList);
+    Displacement(const CrossSectionList&);
     virtual ~Displacement() = default;
     virtual double FunctionToIntegral(double energy);
     virtual double SolveTrackIntegral(double, double, double) = 0;
     virtual double UpperLimitTrackIntegral(double, double) = 0;
-
-    string name{ "displacement" };
 };
 
 template <class T> class DisplacementBuilder : public Displacement {
@@ -41,9 +39,8 @@ DisplacementBuilder<T>::DisplacementBuilder(const CrossSectionList& cross)
     if (typeid(T) == typeid(UtilityInterpolant)) {
         size_t hash_digest{ 0 };
         for (const auto& c : cross)
-            hash_combine(hash_digest, c->GetParametrization().GetHash(),
-                c->GetParametrization().GetMultiplier());
-        integral.BuildTables(name, hash_digest);
+            hash_combine(hash_digest, c->GetHash());
+        integral.BuildTables("displacement", hash_digest);
     }
 }
 

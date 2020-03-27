@@ -387,6 +387,8 @@ AppenderMap	vendor/log4cplus/log4cplus/include/log4cplus/configurator.h	/^      
 Approx	vendor/log4cplus/log4cplus/catch/include/internal/catch_approx.hpp	/^        Approx( Approx const& other )$/;"	f	class:Catch::Detail::Approx
 Approx	vendor/log4cplus/log4cplus/catch/include/internal/catch_approx.hpp	/^        explicit Approx ( double value )$/;"	f	class:Catch::Detail::Approx
 Approx	vendor/log4cplus/log4cplus/catch/include/internal/catch_approx.hpp	/^    class Approx {$/;"	c	namespace:Catch::Detail
+ApproximateTimeBuilder	public/PROPOSAL/propagation_utility/Time.h	/^        ApproximateTimeBuilder() {}$/;"	f	class:PROPOSAL::ApproximateTimeBuilder
+ApproximateTimeBuilder	public/PROPOSAL/propagation_utility/Time.h	/^class ApproximateTimeBuilder : public Time {$/;"	c	namespace:PROPOSAL
 Arch	vendor/log4cplus/log4cplus/catch/include/internal/catch_tostring.hpp	/^            enum Arch { Big, Little };$/;"	g	struct:Catch::Detail::__anon77::Endianness
 Arg	vendor/log4cplus/log4cplus/catch/include/external/clara.h	/^            Arg( Detail::BoundArgFunction<ConfigT> const& _boundField ) : CommonArgProperties<ConfigT>( _boundField ) {}$/;"	f	struct:Clara::CommandLine::Arg
 Arg	vendor/log4cplus/log4cplus/catch/include/external/clara.h	/^            Arg() {}$/;"	f	struct:Clara::CommandLine::Arg
@@ -603,7 +605,7 @@ BiggestParsable	vendor/google/googletest/googletest/test/googletest-death-test-t
 BiggestParsable	vendor/google/googletest/googletest/test/googletest-death-test-test.cc	/^typedef unsigned long long BiggestParsable;$/;"	t	namespace:__anon26	file:
 BiggestSignedParsable	vendor/google/googletest/googletest/test/googletest-death-test-test.cc	/^typedef signed __int64 BiggestSignedParsable;$/;"	t	namespace:__anon26	file:
 BiggestSignedParsable	vendor/google/googletest/googletest/test/googletest-death-test-test.cc	/^typedef signed long long BiggestSignedParsable;$/;"	t	namespace:__anon26	file:
-Bimap	public/PROPOSAL/methods.h	/^class Bimap$/;"	c	namespace:PROPOSAL::Helper
+Bimap	public/PROPOSAL/methods.h	/^    template <typename K, typename V> class Bimap {$/;"	c	namespace:PROPOSAL::Helper
 BimapStringEnum	public/PROPOSAL/crossection/factories/AnnihilationFactory.h	/^        typedef Helper::Bimap<std::string, Enum> BimapStringEnum;$/;"	t	class:PROPOSAL::AnnihilationFactory
 BimapStringEnum	public/PROPOSAL/crossection/factories/BremsstrahlungFactory.h	/^    typedef Helper::Bimap<std::string, Enum> BimapStringEnum;$/;"	t	class:PROPOSAL::BremsstrahlungFactory
 BimapStringEnum	public/PROPOSAL/crossection/factories/ComptonFactory.h	/^        typedef Helper::Bimap<std::string, Enum> BimapStringEnum;$/;"	t	class:PROPOSAL::ComptonFactory
@@ -691,12 +693,8 @@ BrightRed	vendor/log4cplus/log4cplus/catch/include/internal/catch_console_colour
 BrightWhite	vendor/log4cplus/log4cplus/catch/include/internal/catch_console_colour.hpp	/^            BrightWhite = Bright | White,$/;"	e	enum:Catch::Colour::Code
 BrokenTF1	vendor/pybind/pybind11/tests/test_factory_constructors.py	/^    class BrokenTF1(m.TestFactory1):$/;"	c	function:test_invalid_self
 BrokenTF6	vendor/pybind/pybind11/tests/test_factory_constructors.py	/^    class BrokenTF6(m.TestFactory6):$/;"	c	function:test_invalid_self
-BuildInterpolant	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantContRand::BuildInterpolant($/;"	f	class:UtilityInterpolantContRand
-BuildInterpolant	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantDecay::BuildInterpolant($/;"	f	class:UtilityInterpolantDecay
-BuildInterpolant	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantDisplacement::BuildInterpolant($/;"	f	class:UtilityInterpolantDisplacement
-BuildInterpolant	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantInteraction::BuildInterpolant($/;"	f	class:UtilityInterpolantInteraction
-BuildInterpolant	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantScattering::BuildInterpolant($/;"	f	class:UtilityInterpolantScattering
-BuildInterpolant	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantTime::BuildInterpolant($/;"	f	class:UtilityInterpolantTime
+BuildTables	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^void UtilityInterpolant::BuildTables(std::string name, size_t hash)$/;"	f	class:UtilityInterpolant
+BuildTables	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    void BuildTables(const std::string str, size_t hash_digest) { (void)str; (void)hash_digest;};$/;"	f	class:PROPOSAL::UtilityIntegral
 Builder	private/PROPOSAL/decay/ManyBodyPhaseSpace.cxx	/^ManyBodyPhaseSpace::Builder::Builder()$/;"	f	class:ManyBodyPhaseSpace::Builder
 Builder	private/PROPOSAL/decay/ManyBodyPhaseSpace.cxx	/^ManyBodyPhaseSpace::Builder::Builder(const Builder& builder)$/;"	f	class:ManyBodyPhaseSpace::Builder
 Builder	private/PROPOSAL/particle/ParticleDef.cxx	/^ParticleDef::Builder::Builder()$/;"	f	class:ParticleDef::Builder
@@ -1086,6 +1084,9 @@ CLICHE_TBC_TEXT_FORMAT_OUTER_NAMESPACE	vendor/log4cplus/log4cplus/catch/single_i
 CLICHE_TBC_TEXT_FORMAT_OUTER_NAMESPACE	vendor/log4cplus/log4cplus/catch/single_include/catch.hpp	5303;"	d
 CMAKE_BINARY_DIR	build/Makefile	/^CMAKE_BINARY_DIR = \/home\/maximilian\/PROPOSAL\/build$/;"	m
 CMAKE_BINARY_DIR	build/doc/Makefile	/^CMAKE_BINARY_DIR = \/home\/maximilian\/PROPOSAL\/build$/;"	m
+CMAKE_BINARY_DIR	build/extern/googletest/Makefile	/^CMAKE_BINARY_DIR = \/home\/maximilian\/PROPOSAL\/build$/;"	m
+CMAKE_BINARY_DIR	build/extern/googletest/googlemock/Makefile	/^CMAKE_BINARY_DIR = \/home\/maximilian\/PROPOSAL\/build$/;"	m
+CMAKE_BINARY_DIR	build/extern/googletest/googletest/Makefile	/^CMAKE_BINARY_DIR = \/home\/maximilian\/PROPOSAL\/build$/;"	m
 CMAKE_BINARY_DIR	build/vendor/log4cplus/log4cplus/Makefile	/^CMAKE_BINARY_DIR = \/home\/maximilian\/PROPOSAL\/build$/;"	m
 CMAKE_BINARY_DIR	build/vendor/log4cplus/log4cplus/simpleserver/Makefile	/^CMAKE_BINARY_DIR = \/home\/maximilian\/PROPOSAL\/build$/;"	m
 CMAKE_BINARY_DIR	build/vendor/log4cplus/log4cplus/src/Makefile	/^CMAKE_BINARY_DIR = \/home\/maximilian\/PROPOSAL\/build$/;"	m
@@ -1108,6 +1109,9 @@ CMAKE_BINARY_DIR	build/vendor/log4cplus/log4cplus/tests/timeformat_test/Makefile
 CMAKE_BINARY_DIR	build/vendor/log4cplus/log4cplus/tests/unit_tests/Makefile	/^CMAKE_BINARY_DIR = \/home\/maximilian\/PROPOSAL\/build$/;"	m
 CMAKE_COMMAND	build/Makefile	/^CMAKE_COMMAND = \/usr\/bin\/cmake$/;"	m
 CMAKE_COMMAND	build/doc/Makefile	/^CMAKE_COMMAND = \/usr\/bin\/cmake$/;"	m
+CMAKE_COMMAND	build/extern/googletest/Makefile	/^CMAKE_COMMAND = \/usr\/bin\/cmake$/;"	m
+CMAKE_COMMAND	build/extern/googletest/googlemock/Makefile	/^CMAKE_COMMAND = \/usr\/bin\/cmake$/;"	m
+CMAKE_COMMAND	build/extern/googletest/googletest/Makefile	/^CMAKE_COMMAND = \/usr\/bin\/cmake$/;"	m
 CMAKE_COMMAND	build/vendor/log4cplus/log4cplus/Makefile	/^CMAKE_COMMAND = \/usr\/bin\/cmake$/;"	m
 CMAKE_COMMAND	build/vendor/log4cplus/log4cplus/simpleserver/Makefile	/^CMAKE_COMMAND = \/usr\/bin\/cmake$/;"	m
 CMAKE_COMMAND	build/vendor/log4cplus/log4cplus/src/Makefile	/^CMAKE_COMMAND = \/usr\/bin\/cmake$/;"	m
@@ -1130,6 +1134,9 @@ CMAKE_COMMAND	build/vendor/log4cplus/log4cplus/tests/timeformat_test/Makefile	/^
 CMAKE_COMMAND	build/vendor/log4cplus/log4cplus/tests/unit_tests/Makefile	/^CMAKE_COMMAND = \/usr\/bin\/cmake$/;"	m
 CMAKE_SOURCE_DIR	build/Makefile	/^CMAKE_SOURCE_DIR = \/home\/maximilian\/PROPOSAL$/;"	m
 CMAKE_SOURCE_DIR	build/doc/Makefile	/^CMAKE_SOURCE_DIR = \/home\/maximilian\/PROPOSAL$/;"	m
+CMAKE_SOURCE_DIR	build/extern/googletest/Makefile	/^CMAKE_SOURCE_DIR = \/home\/maximilian\/PROPOSAL$/;"	m
+CMAKE_SOURCE_DIR	build/extern/googletest/googlemock/Makefile	/^CMAKE_SOURCE_DIR = \/home\/maximilian\/PROPOSAL$/;"	m
+CMAKE_SOURCE_DIR	build/extern/googletest/googletest/Makefile	/^CMAKE_SOURCE_DIR = \/home\/maximilian\/PROPOSAL$/;"	m
 CMAKE_SOURCE_DIR	build/vendor/log4cplus/log4cplus/Makefile	/^CMAKE_SOURCE_DIR = \/home\/maximilian\/PROPOSAL$/;"	m
 CMAKE_SOURCE_DIR	build/vendor/log4cplus/log4cplus/simpleserver/Makefile	/^CMAKE_SOURCE_DIR = \/home\/maximilian\/PROPOSAL$/;"	m
 CMAKE_SOURCE_DIR	build/vendor/log4cplus/log4cplus/src/Makefile	/^CMAKE_SOURCE_DIR = \/home\/maximilian\/PROPOSAL$/;"	m
@@ -1439,16 +1446,10 @@ Calculate	private/PROPOSAL/medium/density_distr/density_homogeneous.cxx	/^double
 Calculate	private/PROPOSAL/medium/density_distr/density_polynomial.cxx	/^double Density_polynomial::Calculate(const Vector3D& xi,$/;"	f	class:Density_polynomial
 Calculate	private/PROPOSAL/medium/density_distr/density_splines.cxx	/^double Density_splines::Calculate(const Vector3D& xi,$/;"	f	class:Density_splines
 Calculate	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^double UtilityIntegral::Calculate(double ei, double ef, double rnd)$/;"	f	class:UtilityIntegral
-Calculate	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^double UtilityIntegralDecay::Calculate(double ei, double ef, double rnd)$/;"	f	class:UtilityIntegralDecay
-Calculate	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantContRand::Calculate(double ei, double ef, double rnd)$/;"	f	class:UtilityInterpolantContRand
-Calculate	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantDecay::Calculate(double ei, double ef, double rnd)$/;"	f	class:UtilityInterpolantDecay
-Calculate	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantDisplacement::Calculate($/;"	f	class:UtilityInterpolantDisplacement
-Calculate	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantInteraction::Calculate($/;"	f	class:UtilityInterpolantInteraction
-Calculate	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantScattering::Calculate(double ei, double ef, double rnd)$/;"	f	class:UtilityInterpolantScattering
-Calculate	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantTime::Calculate(double ei, double ef, double rnd)$/;"	f	class:UtilityInterpolantTime
 CalculateCartesianFromSpherical	private/PROPOSAL/math/Vector3D.cxx	/^void Vector3D::CalculateCartesianFromSpherical()$/;"	f	class:Vector3D
 CalculateCumulativeCrossSection	private/PROPOSAL/crossection/ComptonIntegral.cxx	/^double ComptonIntegral::CalculateCumulativeCrossSection(double energy, int i, double v)$/;"	f	class:ComptonIntegral
 CalculateCumulativeCrossSection	private/PROPOSAL/crossection/ComptonInterpolant.cxx	/^double ComptonInterpolant::CalculateCumulativeCrossSection(double energy, int component, double v)$/;"	f	class:ComptonInterpolant
+CalculateCumulativeCrossSection	private/PROPOSAL/crossection/CrossSection.cxx	/^double CrossSectionBuilder::CalculateCumulativeCrossSection(double energy, int component, double v){$/;"	f	class:CrossSectionBuilder
 CalculateCumulativeCrossSection	private/PROPOSAL/crossection/CrossSectionIntegral.cxx	/^double CrossSectionIntegral::CalculateCumulativeCrossSection(double energy, int i, double v)$/;"	f	class:CrossSectionIntegral
 CalculateCumulativeCrossSection	private/PROPOSAL/crossection/CrossSectionInterpolant.cxx	/^double CrossSectionInterpolant::CalculateCumulativeCrossSection(double energy, int component, double v)$/;"	f	class:CrossSectionInterpolant
 CalculateEndIndex	vendor/google/googletest/googletest/include/gtest/internal/gtest-param-util.h	/^  static int CalculateEndIndex(const T& begin,$/;"	f	class:testing::internal::RangeGenerator
@@ -1479,7 +1480,6 @@ CalculateProducedParticles	private/PROPOSAL/crossection/WeakIntegral.cxx	/^std::
 CalculateProducedParticles	private/PROPOSAL/crossection/WeakInterpolant.cxx	/^std::pair<std::vector<DynamicData>, bool> WeakInterpolant::CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction){$/;"	f	class:WeakInterpolant
 CalculateProducedParticles	public/PROPOSAL/crossection/CrossSection.h	/^    virtual std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles($/;"	f	class:PROPOSAL::CrossSection
 CalculateRandomAngle	private/PROPOSAL/scattering/ScatteringHighland.cxx	/^Scattering::RandomAngles ScatteringHighland::CalculateRandomAngle(double dr,$/;"	f	class:ScatteringHighland
-CalculateRandomAngle	private/PROPOSAL/scattering/ScatteringHighlandIntegral.cxx	/^Scattering::RandomAngles ScatteringHighlandIntegral::CalculateRandomAngle($/;"	f	class:ScatteringHighlandIntegral
 CalculateRandomAngle	private/PROPOSAL/scattering/ScatteringMoliere.cxx	/^Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,$/;"	f	class:ScatteringMoliere
 CalculateShadowEffect	private/PROPOSAL/crossection/parametrization/Photonuclear.cxx	/^double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Component& component, double x, double nu)$/;"	f	class:ShadowButkevichMikhailov
 CalculateShadowEffect	private/PROPOSAL/crossection/parametrization/Photonuclear.cxx	/^double ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(const Components::Component& component, double x, double nu)$/;"	f	class:ShadowDuttaRenoSarcevicSeckel
@@ -1489,6 +1489,8 @@ CalculateStochasticLoss	private/PROPOSAL/crossection/AnnihilationIntegral.cxx	/^
 CalculateStochasticLoss	private/PROPOSAL/crossection/AnnihilationInterpolant.cxx	/^double AnnihilationInterpolant::CalculateStochasticLoss(double energy, double rnd1, double rnd2) {$/;"	f	class:AnnihilationInterpolant
 CalculateStochasticLoss	private/PROPOSAL/crossection/ComptonIntegral.cxx	/^double ComptonIntegral::CalculateStochasticLoss(double energy, double rnd1)$/;"	f	class:ComptonIntegral
 CalculateStochasticLoss	private/PROPOSAL/crossection/ComptonInterpolant.cxx	/^double ComptonInterpolant::CalculateStochasticLoss(double energy, double rnd1)$/;"	f	class:ComptonInterpolant
+CalculateStochasticLoss	private/PROPOSAL/crossection/CrossSection.cxx	/^double CrossSectionBuilder::CalculateStochasticLoss(double energy, double rnd1){$/;"	f	class:CrossSectionBuilder
+CalculateStochasticLoss	private/PROPOSAL/crossection/CrossSection.cxx	/^double CrossSectionBuilder::CalculateStochasticLoss(double energy, double rnd1, double rnd2){$/;"	f	class:CrossSectionBuilder
 CalculateStochasticLoss	private/PROPOSAL/crossection/CrossSectionIntegral.cxx	/^double CrossSectionIntegral::CalculateStochasticLoss(double energy, double rnd1)$/;"	f	class:CrossSectionIntegral
 CalculateStochasticLoss	private/PROPOSAL/crossection/CrossSectionIntegral.cxx	/^double CrossSectionIntegral::CalculateStochasticLoss(double energy, double rnd1, double rnd2)$/;"	f	class:CrossSectionIntegral
 CalculateStochasticLoss	private/PROPOSAL/crossection/CrossSectionInterpolant.cxx	/^double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rnd1)$/;"	f	class:CrossSectionInterpolant
@@ -1498,8 +1500,8 @@ CalculateStochasticLoss	private/PROPOSAL/crossection/IonizInterpolant.cxx	/^doub
 CalculateStochasticLoss	private/PROPOSAL/crossection/PhotoPairIntegral.cxx	/^double PhotoPairIntegral::CalculateStochasticLoss(double energy, double rnd1, double rnd2)$/;"	f	class:PhotoPairIntegral
 CalculateStochasticLoss	private/PROPOSAL/crossection/PhotoPairInterpolant.cxx	/^double PhotoPairInterpolant::CalculateStochasticLoss(double energy, double rnd1, double rnd2)$/;"	f	class:PhotoPairInterpolant
 CalculateTestLists	vendor/google/googletest/googletest/test/googletest-shuffle-test.py	/^def CalculateTestLists():$/;"	f
-CalculateTheta0	private/PROPOSAL/scattering/ScatteringHighland.cxx	/^double ScatteringHighland::CalculateTheta0($/;"	f	class:ScatteringHighland
-CalculateTheta0	private/PROPOSAL/scattering/ScatteringHighlandIntegral.cxx	/^long double ScatteringHighlandIntegral::CalculateTheta0($/;"	f	class:ScatteringHighlandIntegral
+CalculateTheta0	private/PROPOSAL/scattering/ScatteringHighland.cxx	/^double ScatteringHighland::CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos)$/;"	f	class:ScatteringHighland
+CalculatedE2dx	private/PROPOSAL/crossection/CrossSection.cxx	/^double CrossSectionBuilder::CalculatedE2dx(double energy){$/;"	f	class:CrossSectionBuilder
 CalculatedE2dx	private/PROPOSAL/crossection/CrossSectionIntegral.cxx	/^double CrossSectionIntegral::CalculatedE2dx(double energy)$/;"	f	class:CrossSectionIntegral
 CalculatedE2dx	private/PROPOSAL/crossection/CrossSectionInterpolant.cxx	/^double CrossSectionInterpolant::CalculatedE2dx(double energy)$/;"	f	class:CrossSectionInterpolant
 CalculatedE2dx	private/PROPOSAL/crossection/IonizIntegral.cxx	/^double IonizIntegral::CalculatedE2dx(double energy)$/;"	f	class:IonizIntegral
@@ -1516,6 +1518,7 @@ CalculatedEdx	private/PROPOSAL/crossection/BremsIntegral.cxx	/^double BremsInteg
 CalculatedEdx	private/PROPOSAL/crossection/BremsInterpolant.cxx	/^double BremsInterpolant::CalculatedEdx(double energy)$/;"	f	class:BremsInterpolant
 CalculatedEdx	private/PROPOSAL/crossection/ComptonIntegral.cxx	/^double ComptonIntegral::CalculatedEdx(double energy)$/;"	f	class:ComptonIntegral
 CalculatedEdx	private/PROPOSAL/crossection/ComptonInterpolant.cxx	/^double ComptonInterpolant::CalculatedEdx(double energy)$/;"	f	class:ComptonInterpolant
+CalculatedEdx	private/PROPOSAL/crossection/CrossSection.cxx	/^double CrossSectionBuilder::CalculatedEdx(double energy){$/;"	f	class:CrossSectionBuilder
 CalculatedEdx	private/PROPOSAL/crossection/EpairIntegral.cxx	/^double EpairIntegral::CalculatedEdx(double energy)$/;"	f	class:EpairIntegral
 CalculatedEdx	private/PROPOSAL/crossection/EpairInterpolant.cxx	/^double EpairInterpolant::CalculatedEdx(double energy)$/;"	f	class:EpairInterpolant
 CalculatedEdx	private/PROPOSAL/crossection/IonizIntegral.cxx	/^double IonizIntegral::CalculatedEdx(double energy)$/;"	f	class:IonizIntegral
@@ -1544,6 +1547,8 @@ CalculatedEdxWithoutMultiplier	public/PROPOSAL/crossection/WeakIntegral.h	/^    
 CalculatedEdxWithoutMultiplier	public/PROPOSAL/crossection/WeakInterpolant.h	/^        double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }$/;"	f	class:PROPOSAL::WeakInterpolant
 CalculatedNdx	private/PROPOSAL/crossection/ComptonIntegral.cxx	/^double ComptonIntegral::CalculatedNdx(double energy)$/;"	f	class:ComptonIntegral
 CalculatedNdx	private/PROPOSAL/crossection/ComptonIntegral.cxx	/^double ComptonIntegral::CalculatedNdx(double energy, double rnd)$/;"	f	class:ComptonIntegral
+CalculatedNdx	private/PROPOSAL/crossection/CrossSection.cxx	/^double CrossSectionBuilder::CalculatedNdx(double energy){$/;"	f	class:CrossSectionBuilder
+CalculatedNdx	private/PROPOSAL/crossection/CrossSection.cxx	/^double CrossSectionBuilder::CalculatedNdx(double energy, double rnd){$/;"	f	class:CrossSectionBuilder
 CalculatedNdx	private/PROPOSAL/crossection/CrossSectionIntegral.cxx	/^double CrossSectionIntegral::CalculatedNdx(double energy)$/;"	f	class:CrossSectionIntegral
 CalculatedNdx	private/PROPOSAL/crossection/CrossSectionIntegral.cxx	/^double CrossSectionIntegral::CalculatedNdx(double energy, double rnd)$/;"	f	class:CrossSectionIntegral
 CalculatedNdx	private/PROPOSAL/crossection/CrossSectionInterpolant.cxx	/^double CrossSectionInterpolant::CalculatedNdx(double energy)$/;"	f	class:CrossSectionInterpolant
@@ -1555,7 +1560,7 @@ CalculatedNdx	private/PROPOSAL/crossection/IonizInterpolant.cxx	/^double IonizIn
 CalculatedNdx	private/PROPOSAL/crossection/PhotoPairInterpolant.cxx	/^double PhotoPairInterpolant::CalculatedNdx(double energy) {$/;"	f	class:PhotoPairInterpolant
 CalculatedNdx	private/PROPOSAL/crossection/PhotoPairInterpolant.cxx	/^double PhotoPairInterpolant::CalculatedNdx(double energy, double rnd) {$/;"	f	class:PhotoPairInterpolant
 Calculaterho	private/PROPOSAL/crossection/parametrization/MupairProduction.cxx	/^double MupairProduction::Calculaterho(double energy, double v, double rnd1, double rnd2) {$/;"	f	class:MupairProduction
-Calculaterho	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    virtual double Calculaterho(double energy, double v, double rnd1, double rnd2){$/;"	f	class:PROPOSAL::Parametrization
+Calculaterho	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    virtual double Calculaterho($/;"	f	class:PROPOSAL::Parametrization
 Call	vendor/google/googletest/googlemock/include/gmock/gmock-spec-builders.h	/^  R Call(Args... args) {$/;"	f	class:testing::MockFunction
 CallReaction	vendor/google/googletest/googlemock/include/gmock/gmock-spec-builders.h	/^enum CallReaction {$/;"	g	namespace:testing::internal
 CallThreadLocalGet	vendor/google/googletest/googletest/test/googletest-port-test.cc	/^void CallThreadLocalGet(ThreadParam thread_local_param) {$/;"	f	namespace:testing::internal
@@ -1834,9 +1839,6 @@ CompletionString	vendor/pybind/pybind11/tools/clang/cindex.py	/^class Completion
 ComplexStruct	vendor/pybind/pybind11/tests/test_numpy_dtypes.cpp	/^struct ComplexStruct {$/;"	s	file:
 Component	private/PROPOSAL/medium/Components.cxx	/^Component::Component(std::string name, double nucCharge, double atomicNum, double atomInMolecule)$/;"	f	class:Component
 Component	public/PROPOSAL/medium/Components.h	/^class Component$/;"	c	namespace:PROPOSAL::Components
-ComponentVec	public/PROPOSAL/crossection/CrossSection.h	/^    typedef std::vector<Components::Component*> ComponentVec;$/;"	t	class:PROPOSAL::CrossSection
-ComponentVec	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    typedef std::vector<Components::Component*> ComponentVec;$/;"	t	class:PROPOSAL::Parametrization
-ComponentVec	public/PROPOSAL/crossection/parametrization/PhotoPairProduction.h	/^        typedef std::vector<Components::Component*> ComponentVec;$/;"	t	class:PROPOSAL::PhotoAngleDistribution
 Components	private/PROPOSAL/medium/Components.cxx	/^namespace Components {$/;"	n	namespace:PROPOSAL	file:
 Components	public/PROPOSAL/crossection/CrossSection.h	/^namespace Components {$/;"	n	namespace:PROPOSAL
 Components	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^namespace Components {$/;"	n	namespace:PROPOSAL
@@ -1929,6 +1931,11 @@ ConstRef	vendor/google/googletest/googletest/include/gtest/internal/gtest-port.h
 ConstReference	vendor/google/googletest/googlemock/include/gmock/internal/gmock-internal-utils.h	/^  static const_reference ConstReference($/;"	f	class:testing::internal::StlContainerView
 ConstReference	vendor/google/googletest/googlemock/include/gmock/internal/gmock-internal-utils.h	/^  static const_reference ConstReference(const RawContainer& container) {$/;"	f	class:testing::internal::StlContainerView
 ConstructorStats	vendor/pybind/pybind11/tests/constructor_stats.h	/^class ConstructorStats {$/;"	c
+ContRand	public/PROPOSAL/propagation_utility/ContRand.h	/^        ContRand(CrossSectionList cross, const ParticleDef &def) : cross(cross), mass(def.mass) {}$/;"	f	class:PROPOSAL::ContRand
+ContRand	public/PROPOSAL/propagation_utility/ContRand.h	/^class ContRand {$/;"	c	namespace:PROPOSAL
+ContRandBuilder	public/PROPOSAL/propagation_utility/ContRand.h	/^        ContRandBuilder<T>(CrossSectionList cross, const ParticleDef &def)$/;"	f	class:PROPOSAL::ContRandBuilder
+ContRandBuilder	public/PROPOSAL/propagation_utility/ContRand.h	/^class ContRandBuilder : public ContRand {$/;"	c	namespace:PROPOSAL
+ContRandIntegrand	public/PROPOSAL/propagation_utility/ContRand.h	/^        double ContRandIntegrand (double energy) {$/;"	f	class:PROPOSAL::ContRandBuilder
 ContainerEq	vendor/google/googletest/googlemock/include/gmock/gmock-matchers.h	/^ContainerEq(const Container& rhs) {$/;"	f	namespace:testing
 ContainerEqMatcher	vendor/google/googletest/googlemock/include/gmock/gmock-matchers.h	/^  explicit ContainerEqMatcher(const Container& expected)$/;"	f	class:testing::internal::ContainerEqMatcher
 ContainerEqMatcher	vendor/google/googletest/googlemock/include/gmock/gmock-matchers.h	/^class ContainerEqMatcher {$/;"	c	namespace:testing::internal
@@ -2055,22 +2062,23 @@ CreateWeakInteraction	private/PROPOSAL/crossection/factories/WeakInteractionFact
 CriticalLogLevelInitializer	vendor/log4cplus/log4cplus/tests/customloglevel_test/customloglevel.cxx	/^    CriticalLogLevelInitializer() {$/;"	f	class:CriticalLogLevelInitializer
 CriticalLogLevelInitializer	vendor/log4cplus/log4cplus/tests/customloglevel_test/customloglevel.cxx	/^class CriticalLogLevelInitializer {$/;"	c	file:
 CrossSection	private/PROPOSAL/crossection/CrossSection.cxx	/^CrossSection::CrossSection($/;"	f	class:CrossSection
+CrossSection	private/PROPOSAL/crossection/CrossSection.cxx	/^CrossSection::CrossSection()$/;"	f	class:CrossSection
 CrossSection	private/PROPOSAL/crossection/CrossSection.cxx	/^CrossSection::CrossSection(const CrossSection& cross_section)$/;"	f	class:CrossSection
 CrossSection	public/PROPOSAL/crossection/CrossSection.h	/^class CrossSection$/;"	c	namespace:PROPOSAL
+CrossSectionBuilder	public/PROPOSAL/crossection/CrossSection.h	/^    CrossSectionBuilder() : CrossSection(){$/;"	f	class:PROPOSAL::final
 CrossSectionIntegral	private/PROPOSAL/crossection/CrossSectionIntegral.cxx	/^CrossSectionIntegral::CrossSectionIntegral(const CrossSectionIntegral& cross_section)$/;"	f	class:CrossSectionIntegral
 CrossSectionIntegral	private/PROPOSAL/crossection/CrossSectionIntegral.cxx	/^CrossSectionIntegral::CrossSectionIntegral(const Parametrization& param, std::shared_ptr<const EnergyCutSettings> cuts)$/;"	f	class:CrossSectionIntegral
 CrossSectionIntegral	public/PROPOSAL/crossection/CrossSectionIntegral.h	/^class CrossSectionIntegral : public CrossSection$/;"	c	namespace:PROPOSAL
 CrossSectionInterpolant	private/PROPOSAL/crossection/CrossSectionInterpolant.cxx	/^CrossSectionInterpolant::CrossSectionInterpolant(const Parametrization& param, std::shared_ptr<const EnergyCutSettings> cuts)$/;"	f	class:CrossSectionInterpolant
 CrossSectionInterpolant	public/PROPOSAL/crossection/CrossSectionInterpolant.h	/^class CrossSectionInterpolant : public CrossSection$/;"	c	namespace:PROPOSAL
-CrossSectionList	public/PROPOSAL/crossection/CrossSection.h	/^typedef std::vector<std::shared_ptr<CrossSection>> CrossSectionList;$/;"	t	namespace:PROPOSAL
 CrossSectionList	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^typedef std::vector<std::shared_ptr<CrossSection>> CrossSectionList;$/;"	t	namespace:PROPOSAL
-CrossSectionList	public/PROPOSAL/scattering/ScatteringFactory.h	/^typedef std::vector<std::shared_ptr<CrossSection>> CrossSectionList;$/;"	t	namespace:PROPOSAL
 CrossSectionWithoutInelasticCorrection	private/PROPOSAL/crossection/parametrization/Ionization.cxx	/^double IonizBetheBlochRossi::CrossSectionWithoutInelasticCorrection(double energy, double v)$/;"	f	class:IonizBetheBlochRossi
 Cubic_Spline	private/PROPOSAL/math/Spline.cxx	/^Cubic_Spline::Cubic_Spline(const Spline& spline) : Spline(spline) {}$/;"	f	class:Cubic_Spline
 Cubic_Spline	private/PROPOSAL/math/Spline.cxx	/^Cubic_Spline::Cubic_Spline(std::string spline_path, bool binary)$/;"	f	class:Cubic_Spline
 Cubic_Spline	private/PROPOSAL/math/Spline.cxx	/^Cubic_Spline::Cubic_Spline(std::vector<Polynom> splines,$/;"	f	class:Cubic_Spline
 Cubic_Spline	private/PROPOSAL/math/Spline.cxx	/^Cubic_Spline::Cubic_Spline(std::vector<double> x, std::vector<double> y)$/;"	f	class:Cubic_Spline
 Cubic_Spline	public/PROPOSAL/math/Spline.h	/^class Cubic_Spline : public Spline {$/;"	c	namespace:PROPOSAL
+CumulativeCrossSection_function	public/PROPOSAL/crossection/CrossSection.h	/^    std::function<double(double, double, double)> CumulativeCrossSection_function;$/;"	m	class:PROPOSAL::final
 CumulativeReporterBase	vendor/log4cplus/log4cplus/catch/include/reporters/catch_reporter_bases.hpp	/^        CumulativeReporterBase( ReporterConfig const& _config )$/;"	f	struct:Catch::CumulativeReporterBase
 CumulativeReporterBase	vendor/log4cplus/log4cplus/catch/include/reporters/catch_reporter_bases.hpp	/^    struct CumulativeReporterBase : SharedImpl<IStreamingReporter> {$/;"	s	namespace:Catch
 CurrentOsStackTraceExceptTop	vendor/google/googletest/googletest/src/gtest.cc	/^std::string UnitTestImpl::CurrentOsStackTraceExceptTop(int skip_count) {$/;"	f	class:testing::internal::UnitTestImpl
@@ -2180,9 +2188,14 @@ Decay	private/PROPOSAL/decay/ManyBodyPhaseSpace.cxx	/^Secondaries ManyBodyPhaseS
 Decay	private/PROPOSAL/decay/StableChannel.cxx	/^Secondaries StableChannel::Decay(const ParticleDef&, const DynamicData&)$/;"	f	class:StableChannel
 Decay	private/PROPOSAL/decay/TwoBodyPhaseSpace.cxx	/^Secondaries TwoBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)$/;"	f	class:TwoBodyPhaseSpace
 Decay	public/PROPOSAL/particle/Particle.h	/^    Decay                  = 1000000011,$/;"	m	class:PROPOSAL::InteractionType
+Decay	public/PROPOSAL/propagation_utility/Decay.h	/^        Decay(CrossSectionList cross, const ParticleDef &def) : cross(cross), mass(def.mass), lifetime(def.lifetime) {};$/;"	f	class:PROPOSAL::Decay
+Decay	public/PROPOSAL/propagation_utility/Decay.h	/^class Decay {$/;"	c	namespace:PROPOSAL
+DecayBuilder	public/PROPOSAL/propagation_utility/Decay.h	/^        DecayBuilder<T>(CrossSectionList cross, const ParticleDef &def)$/;"	f	class:PROPOSAL::DecayBuilder
+DecayBuilder	public/PROPOSAL/propagation_utility/Decay.h	/^class DecayBuilder : public Decay {$/;"	c	namespace:PROPOSAL
 DecayChannel	private/PROPOSAL/decay/DecayChannel.cxx	/^DecayChannel::DecayChannel() {}$/;"	f	class:DecayChannel
 DecayChannel	private/PROPOSAL/decay/DecayChannel.cxx	/^DecayChannel::DecayChannel(const DecayChannel&) {}$/;"	f	class:DecayChannel
 DecayChannel	public/PROPOSAL/decay/DecayChannel.h	/^class DecayChannel$/;"	c	namespace:PROPOSAL
+DecayIntegrand	public/PROPOSAL/propagation_utility/Decay.h	/^        double DecayIntegrand (double energy) {$/;"	f	class:PROPOSAL::DecayBuilder
 DecayMap	public/PROPOSAL/decay/DecayTable.h	/^    typedef std::map<double, DecayChannel*> DecayMap;$/;"	t	class:PROPOSAL::DecayTable
 DecayRate	private/PROPOSAL/decay/LeptonicDecayChannel.cxx	/^double LeptonicDecayChannel::DecayRate(double x, double M, double E_max, double right_side)$/;"	f	class:LeptonicDecayChannel
 DecayRate	private/PROPOSAL/decay/LeptonicDecayChannel.cxx	/^double LeptonicDecayChannelApprox::DecayRate(double x, double parent_mass, double E_max, double right_side)$/;"	f	class:LeptonicDecayChannelApprox
@@ -2423,6 +2436,7 @@ DifferentialCrossSection	private/PROPOSAL/crossection/parametrization/Ionization
 DifferentialCrossSection	private/PROPOSAL/crossection/parametrization/Ionization.cxx	/^double IonizBergerSeltzerMoller::DifferentialCrossSection(double energy, double v)$/;"	f	class:IonizBergerSeltzerMoller
 DifferentialCrossSection	private/PROPOSAL/crossection/parametrization/Ionization.cxx	/^double IonizBetheBlochRossi::DifferentialCrossSection(double energy, double v)$/;"	f	class:IonizBetheBlochRossi
 DifferentialCrossSection	private/PROPOSAL/crossection/parametrization/MupairProduction.cxx	/^double MupairProductionRhoIntegral::DifferentialCrossSection(double energy, double v)$/;"	f	class:MupairProductionRhoIntegral
+DifferentialCrossSection	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^double Parametrization_builder::DifferentialCrossSection($/;"	f	class:Parametrization_builder
 DifferentialCrossSection	private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx	/^double PhotoPairTsai::DifferentialCrossSection(double energy, double x)$/;"	f	class:PhotoPairTsai
 DifferentialCrossSection	private/PROPOSAL/crossection/parametrization/PhotoQ2Integration.cxx	/^double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)$/;"	f	class:PhotoQ2Integral
 DifferentialCrossSection	private/PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.cxx	/^double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double v)$/;"	f	class:PhotoRealPhotonAssumption
@@ -2445,6 +2459,10 @@ DisableSigprofActionAndTimer	vendor/google/googletest/googletest/test/googletest
 DisabledTest	vendor/google/googletest/googletest/test/gtest_xml_output_unittest_.cc	/^class DisabledTest : public Test {$/;"	c	file:
 DisabledTestsTest	vendor/google/googletest/googletest/test/gtest_unittest.cc	/^class DisabledTestsTest : public Test {$/;"	c	namespace:__anon9	file:
 DispatchIssue	vendor/pybind/pybind11/tests/test_virtual_functions.cpp	/^struct DispatchIssue : Base {$/;"	s	file:
+Displacement	private/PROPOSAL/propagation_utility/Displacment.cxx	/^Displacement::Displacement(const CrossSectionList& cross): cross(cross) {$/;"	f	class:Displacement
+Displacement	public/PROPOSAL/propagation_utility/Displacement.h	/^class Displacement {$/;"	c	namespace:PROPOSAL
+DisplacementBuilder	public/PROPOSAL/propagation_utility/Displacement.h	/^DisplacementBuilder<T>::DisplacementBuilder(const CrossSectionList& cross)$/;"	f	class:PROPOSAL::DisplacementBuilder
+DisplacementBuilder	public/PROPOSAL/propagation_utility/Displacement.h	/^template <class T> class DisplacementBuilder : public Displacement {$/;"	c	namespace:PROPOSAL
 DistanceBetweenSignAndMagnitudeNumbers	vendor/google/googletest/googletest/include/gtest/internal/gtest-internal.h	/^  static Bits DistanceBetweenSignAndMagnitudeNumbers(const Bits &sam1,$/;"	f	class:testing::internal::FloatingPoint
 DistanceToBorder	private/PROPOSAL/geometry/Box.cxx	/^std::pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vector3D& direction) const$/;"	f	class:Box
 DistanceToBorder	private/PROPOSAL/geometry/Cylinder.cxx	/^std::pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const Vector3D& direction) const$/;"	f	class:Cylinder
@@ -2540,6 +2558,9 @@ EPlus	public/PROPOSAL/particle/ParticleDef.h	/^    EPlus = -11,$/;"	m	class:PROP
 EPlusDef	private/PROPOSAL/particle/ParticleDef.cxx	/^EPlusDef::EPlusDef()$/;"	f	class:EPlusDef
 EQUALS	build/Makefile	/^EQUALS = =$/;"	m
 EQUALS	build/doc/Makefile	/^EQUALS = =$/;"	m
+EQUALS	build/extern/googletest/Makefile	/^EQUALS = =$/;"	m
+EQUALS	build/extern/googletest/googlemock/Makefile	/^EQUALS = =$/;"	m
+EQUALS	build/extern/googletest/googletest/Makefile	/^EQUALS = =$/;"	m
 EQUALS	build/vendor/log4cplus/log4cplus/Makefile	/^EQUALS = =$/;"	m
 EQUALS	build/vendor/log4cplus/log4cplus/simpleserver/Makefile	/^EQUALS = =$/;"	m
 EQUALS	build/vendor/log4cplus/log4cplus/src/Makefile	/^EQUALS = =$/;"	m
@@ -2859,6 +2880,8 @@ EventRecordingListener2	vendor/google/googletest/googletest/test/googletest-list
 Ex	vendor/log4cplus/log4cplus/catch/projects/SelfTest/ConditionTests.cpp	/^    Ex( T ){}$/;"	f	struct:Ex
 Ex	vendor/log4cplus/log4cplus/catch/projects/SelfTest/ConditionTests.cpp	/^struct Ex$/;"	s	file:
 ExactMatch	vendor/google/googletest/googlemock/include/gmock/gmock-matchers.h	/^    ExactMatch = Superset | Subset,$/;"	e	enum:testing::internal::UnorderedMatcherRequire::Flags
+ExactTimeBuilder	public/PROPOSAL/propagation_utility/Time.h	/^        ExactTimeBuilder<T>(CrossSectionList cross, const ParticleDef &def)$/;"	f	class:PROPOSAL::ExactTimeBuilder
+ExactTimeBuilder	public/PROPOSAL/propagation_utility/Time.h	/^class ExactTimeBuilder : public Time {$/;"	c	namespace:PROPOSAL
 Exactly	vendor/google/googletest/googlemock/src/gmock-cardinalities.cc	/^GTEST_API_ Cardinality Exactly(int n) { return Between(n, n); }$/;"	f	namespace:testing
 ExampleMandA	vendor/pybind/pybind11/tests/test_methods_and_attributes.cpp	/^    ExampleMandA() { print_default_created(this); }$/;"	f	class:ExampleMandA
 ExampleMandA	vendor/pybind/pybind11/tests/test_methods_and_attributes.cpp	/^    ExampleMandA(ExampleMandA &&e) : value(e.value) { print_move_created(this); }$/;"	f	class:ExampleMandA
@@ -3234,23 +3257,19 @@ FunctionToBuildDNdxInterpolant2D	private/PROPOSAL/crossection/IonizInterpolant.c
 FunctionToBuildPhotoInterpolant	public/PROPOSAL/crossection/parametrization/EpairProduction.h	/^double EpairProductionRhoInterpolant<Param>::FunctionToBuildPhotoInterpolant(double energy, double v, int component)$/;"	f	class:PROPOSAL::EpairProductionRhoInterpolant
 FunctionToBuildPhotoInterpolant	public/PROPOSAL/crossection/parametrization/MupairProduction.h	/^double MupairProductionRhoInterpolant<Param>::FunctionToBuildPhotoInterpolant(double energy, double v, int component)$/;"	f	class:PROPOSAL::MupairProductionRhoInterpolant
 FunctionToBuildPhotoInterpolant	public/PROPOSAL/crossection/parametrization/PhotoQ2Integration.h	/^double PhotoQ2Interpolant<Param>::FunctionToBuildPhotoInterpolant(double energy, double v, int component)$/;"	f	class:PROPOSAL::PhotoQ2Interpolant
-FunctionToDE2dxIntegral	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^double Parametrization::FunctionToDE2dxIntegral(double energy,$/;"	f	class:Parametrization
+FunctionToDE2dxIntegral	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^double Parametrization::FunctionToDE2dxIntegral(double energy, double variable)$/;"	f	class:Parametrization
 FunctionToDEdxIntegral	private/PROPOSAL/crossection/parametrization/Ionization.cxx	/^double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(double energy, double variable)$/;"	f	class:IonizBergerSeltzerBhabha
 FunctionToDEdxIntegral	private/PROPOSAL/crossection/parametrization/Ionization.cxx	/^double IonizBergerSeltzerMoller::FunctionToDEdxIntegral(double energy, double variable)$/;"	f	class:IonizBergerSeltzerMoller
 FunctionToDEdxIntegral	private/PROPOSAL/crossection/parametrization/Ionization.cxx	/^double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variable)$/;"	f	class:IonizBetheBlochRossi
-FunctionToDEdxIntegral	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^double Parametrization::FunctionToDEdxIntegral(double energy, double variable) {$/;"	f	class:Parametrization
+FunctionToDEdxIntegral	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^double Parametrization::FunctionToDEdxIntegral(double energy, double variable)$/;"	f	class:Parametrization
 FunctionToDEdxIntegralReverse	private/PROPOSAL/crossection/EpairIntegral.cxx	/^double EpairIntegral::FunctionToDEdxIntegralReverse(double energy, double v)$/;"	f	class:EpairIntegral
-FunctionToDNdxIntegral	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^double Parametrization::FunctionToDNdxIntegral(double energy, double variable) {$/;"	f	class:Parametrization
+FunctionToDNdxIntegral	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^double Parametrization::FunctionToDNdxIntegral(double energy, double variable)$/;"	f	class:Parametrization
 FunctionToIntegral	private/PROPOSAL/crossection/parametrization/EpairProduction.cxx	/^double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v, double r)$/;"	f	class:EpairKelnerKokoulinPetrukhin
 FunctionToIntegral	private/PROPOSAL/crossection/parametrization/EpairProduction.cxx	/^double EpairSandrockSoedingreksoRhode::FunctionToIntegral(double energy, double v, double rho)$/;"	f	class:EpairSandrockSoedingreksoRhode
 FunctionToIntegral	private/PROPOSAL/crossection/parametrization/MupairProduction.cxx	/^double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v, double r)$/;"	f	class:MupairKelnerKokoulinPetrukhin
 FunctionToIntegral	private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx	/^double PhotoAngleTsaiIntegral::FunctionToIntegral(double energy, double x, double theta) {$/;"	f	class:PhotoAngleTsaiIntegral
-FunctionToIntegral	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^double UtilityIntegralContRand::FunctionToIntegral(double energy)$/;"	f	class:UtilityIntegralContRand
-FunctionToIntegral	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^double UtilityIntegralDecay::FunctionToIntegral(double energy)$/;"	f	class:UtilityIntegralDecay
-FunctionToIntegral	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^double UtilityIntegralDisplacement::FunctionToIntegral(double energy)$/;"	f	class:UtilityIntegralDisplacement
-FunctionToIntegral	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^double UtilityIntegralInteraction::FunctionToIntegral(double energy)$/;"	f	class:UtilityIntegralInteraction
-FunctionToIntegral	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^double UtilityIntegralScattering::FunctionToIntegral(double energy)$/;"	f	class:UtilityIntegralScattering
-FunctionToIntegral	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^double UtilityIntegralTime::FunctionToIntegral(double energy)$/;"	f	class:UtilityIntegralTime
+FunctionToIntegral	private/PROPOSAL/propagation_utility/Displacment.cxx	/^double Displacement::FunctionToIntegral(double energy) {$/;"	f	class:Displacement
+FunctionToIntegral	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    std::function<double(double)> FunctionToIntegral;$/;"	m	class:PROPOSAL::UtilityIntegral
 FunctionToQ2Integral	private/PROPOSAL/crossection/parametrization/PhotoQ2Integration.cxx	/^double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, double v, double Q2)$/;"	f	class:PhotoAbramowiczLevinLevyMaor91
 FunctionToQ2Integral	private/PROPOSAL/crossection/parametrization/PhotoQ2Integration.cxx	/^double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, double v, double Q2)$/;"	f	class:PhotoAbramowiczLevinLevyMaor97
 FunctionToQ2Integral	private/PROPOSAL/crossection/parametrization/PhotoQ2Integration.cxx	/^double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, double Q2)$/;"	f	class:PhotoButkevichMikhailov
@@ -4074,7 +4093,7 @@ GetCoefficient	private/PROPOSAL/math/Function.cxx	/^std::vector<double> Polynom:
 GetColorAttribute	vendor/google/googletest/googletest/src/gtest.cc	/^static WORD GetColorAttribute(GTestColor color) {$/;"	f	namespace:testing::internal
 GetCommandOutput	vendor/google/googletest/googletest/scripts/common.py	/^def GetCommandOutput(command):$/;"	f
 GetCommandOutput	vendor/google/googletest/googletest/test/googletest-output-test.py	/^def GetCommandOutput(env_cmd):$/;"	f
-GetComponents	public/PROPOSAL/medium/Medium.h	/^    const std::vector<Components::Component*>& GetComponents() const {$/;"	f	class:PROPOSAL::Medium
+GetComponents	public/PROPOSAL/medium/Medium.h	/^    const std::vector<Components::Component>& GetComponents() const {$/;"	f	class:PROPOSAL::Medium
 GetContentType	vendor/google/googletest/googlemock/scripts/upload.py	/^def GetContentType(filename):$/;"	f
 GetContentType	vendor/google/googletest/googletest/scripts/upload.py	/^def GetContentType(filename):$/;"	f
 GetCorrectedMassDensity	public/PROPOSAL/medium/Medium.h	/^    double GetCorrectedMassDensity(const Vector3D& xi) const { return massDensity_ * dens_distr_->Evaluate(xi); }$/;"	f	class:PROPOSAL::Medium
@@ -4084,7 +4103,6 @@ GetCurrentExecutableName	vendor/google/googletest/googletest/src/gtest.cc	/^File
 GetCurrentOsStackTraceExceptTop	vendor/google/googletest/googletest/src/gtest.cc	/^std::string GetCurrentOsStackTraceExceptTop(UnitTest* \/*unit_test*\/,$/;"	f	namespace:testing::internal
 GetCurrentSector	public/PROPOSAL/Propagator.h	/^    const Sector* GetCurrentSector() const { return current_sector_; }$/;"	f	class:PROPOSAL::Propagator
 GetCurrentUserSID	vendor/log4cplus/log4cplus/src/nteventlogappender.cxx	/^    GetCurrentUserSID(SID** ppSid)$/;"	f	namespace:log4cplus::__anon114
-GetCut	private/PROPOSAL/EnergyCutSettings.cxx	/^double EnergyCutSettings::GetCut(double energy) const$/;"	f	class:EnergyCutSettings
 GetD	public/PROPOSAL/math/Interpolant.h	/^    std::vector<double> GetD() const { return d_; }$/;"	f	class:PROPOSAL::Interpolant
 GetD0	public/PROPOSAL/medium/Medium.h	/^    double GetD0() const { return d0_; }$/;"	f	class:PROPOSAL::Medium
 GetDefaultConfigFile	private/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.cxx	/^std::string I3PropagatorServicePROPOSAL::GetDefaultConfigFile()$/;"	f	class:I3PropagatorServicePROPOSAL
@@ -4102,7 +4120,6 @@ GetDirection	private/PROPOSAL/Secondaries.cxx	/^std::vector<Vector3D> Secondarie
 GetDirection	public/PROPOSAL/particle/Particle.h	/^    Vector3D GetDirection() const { return direction_; }$/;"	f	class:PROPOSAL::DynamicData
 GetDomain	private/PROPOSAL/math/Spline.cxx	/^std::pair<double, double> Spline::GetDomain() {$/;"	f	class:Spline
 GetELost	private/PROPOSAL/Secondaries.cxx	/^double Secondaries::GetELost() const$/;"	f	class:Secondaries
-GetEcut	public/PROPOSAL/EnergyCutSettings.h	/^    double GetEcut() const { return ecut_; }$/;"	f	class:PROPOSAL::EnergyCutSettings
 GetEffectiveDistance	private/PROPOSAL/medium/density_distr/density_distr.cxx	/^double CartesianAxis::GetEffectiveDistance(const Vector3D& xi,$/;"	f	class:CartesianAxis
 GetEffectiveDistance	private/PROPOSAL/medium/density_distr/density_distr.cxx	/^double RadialAxis::GetEffectiveDistance(const Vector3D& xi, const Vector3D& direction) const {$/;"	f	class:RadialAxis
 GetEffectiveDistance	private/PROPOSAL/medium/density_distr/density_exponential.cxx	/^double Density_exponential::GetEffectiveDistance(const Vector3D& xi,$/;"	f	class:Density_exponential
@@ -4153,7 +4170,8 @@ GetHash	private/PROPOSAL/crossection/parametrization/Bremsstrahlung.cxx	/^size_t
 GetHash	private/PROPOSAL/crossection/parametrization/Compton.cxx	/^size_t Compton::GetHash() const$/;"	f	class:Compton
 GetHash	private/PROPOSAL/crossection/parametrization/EpairProduction.cxx	/^size_t EpairProductionRhoIntegral::GetHash() const$/;"	f	class:EpairProductionRhoIntegral
 GetHash	private/PROPOSAL/crossection/parametrization/MupairProduction.cxx	/^size_t MupairProductionRhoIntegral::GetHash() const$/;"	f	class:MupairProductionRhoIntegral
-GetHash	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^size_t Parametrization::GetHash() const {$/;"	f	class:Parametrization
+GetHash	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^size_t GetHash(const std::vector<Parametrization*>& params)$/;"	f
+GetHash	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^size_t Parametrization::GetHash() const$/;"	f	class:Parametrization
 GetHash	private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx	/^size_t PhotoAngleEGS::GetHash() const {$/;"	f	class:PhotoAngleEGS
 GetHash	private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx	/^size_t PhotoAngleNoDeflection::GetHash() const {$/;"	f	class:PhotoAngleNoDeflection
 GetHash	private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx	/^size_t PhotoAngleTsaiIntegral::GetHash() const {$/;"	f	class:PhotoAngleTsaiIntegral
@@ -4187,20 +4205,20 @@ GetKinematicLimits	private/PROPOSAL/crossection/parametrization/Ionization.cxx	/
 GetKinematicLimits	private/PROPOSAL/crossection/parametrization/Ionization.cxx	/^Parametrization::KinematicLimits IonizBergerSeltzerMoller::GetKinematicLimits(double energy)$/;"	f	class:IonizBergerSeltzerMoller
 GetKinematicLimits	private/PROPOSAL/crossection/parametrization/Ionization.cxx	/^Parametrization::KinematicLimits IonizBetheBlochRossi::GetKinematicLimits(double energy)$/;"	f	class:IonizBetheBlochRossi
 GetKinematicLimits	private/PROPOSAL/crossection/parametrization/MupairProduction.cxx	/^Parametrization::KinematicLimits MupairProduction::GetKinematicLimits(double energy)$/;"	f	class:MupairProduction
+GetKinematicLimits	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^Parametrization::KinematicLimits Parametrization_builder::GetKinematicLimits(double energy)$/;"	f	class:Parametrization_builder
 GetKinematicLimits	private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx	/^Parametrization::KinematicLimits PhotoPairProduction::GetKinematicLimits(double energy)$/;"	f	class:PhotoPairProduction
 GetKinematicLimits	private/PROPOSAL/crossection/parametrization/Photonuclear.cxx	/^Parametrization::KinematicLimits Photonuclear::GetKinematicLimits(double energy)$/;"	f	class:Photonuclear
 GetKinematicLimits	private/PROPOSAL/crossection/parametrization/WeakInteraction.cxx	/^Parametrization::KinematicLimits WeakInteraction::GetKinematicLimits(double energy)$/;"	f	class:WeakInteraction
 GetLastErrnoDescription	vendor/google/googletest/googletest/src/gtest-death-test.cc	/^std::string GetLastErrnoDescription() {$/;"	f	namespace:testing::internal
 GetLastLine	vendor/google/googletest/googletest/scripts/pump.py	/^  def GetLastLine(self):$/;"	m	class:Output
 GetLeakyTests	vendor/google/googletest/googlemock/test/gmock_output_test.py	/^def GetLeakyTests(output):$/;"	f
-GetLeft	public/PROPOSAL/methods.h	/^    const left_map_type& GetLeft() const$/;"	f	class:PROPOSAL::Helper::Bimap
+GetLeft	public/PROPOSAL/methods.h	/^        const left_map_type& GetLeft() const { return _left; }$/;"	f	class:PROPOSAL::Helper::Bimap
 GetLocation	private/PROPOSAL/geometry/Geometry.cxx	/^Geometry::ParticleLocation::Enum Geometry::GetLocation(const Vector3D& position, const Vector3D& direction) const {$/;"	f	class:Geometry
 GetLocation	public/PROPOSAL/Sector.h	/^    ParticleLocation::Enum GetLocation() const { return sector_def_.location; }$/;"	f	class:PROPOSAL::Sector
 GetLogConstant	public/PROPOSAL/medium/Components.h	/^    double GetLogConstant() const { return logConstant_; }$/;"	f	class:PROPOSAL::Components::Component
 GetLogSubst	public/PROPOSAL/math/Interpolant.h	/^    bool GetLogSubst() const { return logSubst_; }$/;"	f	class:PROPOSAL::Interpolant
 GetM	public/PROPOSAL/medium/Medium.h	/^    double GetM() const { return m_; }$/;"	f	class:PROPOSAL::Medium
 GetMM	public/PROPOSAL/medium/Medium.h	/^    double GetMM() const { return MM_; }$/;"	f	class:PROPOSAL::Medium
-GetMass	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^    double GetMass() { return mass; }$/;"	f	class:PROPOSAL::UtilityDecorator
 GetMassDensity	public/PROPOSAL/medium/Medium.h	/^    double GetMassDensity() const { return massDensity_; }$/;"	f	class:PROPOSAL::Medium
 GetMax	public/PROPOSAL/math/Integral.h	/^    double GetMax() const { return max_; }$/;"	f	class:PROPOSAL::Integral
 GetMax	public/PROPOSAL/math/Interpolant.h	/^    int GetMax() const { return max_; }$/;"	f	class:PROPOSAL::Interpolant
@@ -4266,14 +4284,14 @@ GetOutputFormat	vendor/google/googletest/googletest/src/gtest.cc	/^std::string U
 GetOutputOfAllCommands	vendor/google/googletest/googletest/test/googletest-output-test.py	/^def GetOutputOfAllCommands():$/;"	f
 GetParam	vendor/google/googletest/googletest/include/gtest/gtest.h	/^  static const ParamType& GetParam() {$/;"	f	class:testing::WithParamInterface
 GetParametrization	public/PROPOSAL/crossection/CrossSection.h	/^    Parametrization& GetParametrization() const { return *parametrization_; }$/;"	f	class:PROPOSAL::CrossSection
+GetParametrization	public/PROPOSAL/crossection/CrossSection.h	/^    Parametrization& GetParametrization() const { throw std::logic_error("No Parametrization for CrossSectionBuilder available");}$/;"	f	class:PROPOSAL::final
 GetParentParticleEnergy	private/PROPOSAL/Secondaries.cxx	/^std::vector<double> Secondaries::GetParentParticleEnergy() const$/;"	f	class:Secondaries
 GetParentParticleEnergy	public/PROPOSAL/particle/Particle.h	/^    double GetParentParticleEnergy() const { return parent_particle_energy_; }$/;"	f	class:PROPOSAL::DynamicData
-GetParticleCharge	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    double GetParticleCharge() const {return particle_charge_; }$/;"	f	class:PROPOSAL::Parametrization
+GetParticleCharge	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    double GetParticleCharge() const { return particle_charge_; }$/;"	f	class:PROPOSAL::Parametrization
 GetParticleDef	public/PROPOSAL/Propagator.h	/^    ParticleDef& GetParticleDef() { return particle_def_; };$/;"	f	class:PROPOSAL::Propagator
 GetParticleDef	public/PROPOSAL/Sector.h	/^    const ParticleDef GetParticleDef() const { return particle_def_; }$/;"	f	class:PROPOSAL::Sector
 GetParticleDef	public/PROPOSAL/crossection/parametrization/PhotoPairProduction.h	/^        const ParticleDef& GetParticleDef() const { return particle_def_; }$/;"	f	class:PROPOSAL::PhotoAngleDistribution
-GetParticleDef	public/PROPOSAL/scattering/Scattering.h	/^    const ParticleDef& GetParticleDef() const { return particle_def_; }$/;"	f	class:PROPOSAL::Scattering
-GetParticleLow	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    double GetParticleLow() const {return particle_low_; }$/;"	f	class:PROPOSAL::Parametrization
+GetParticleLow	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    double GetParticleLow() const { return particle_low_; }$/;"	f	class:PROPOSAL::Parametrization
 GetParticleMass	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    double GetParticleMass() const { return particle_mass_; }$/;"	f	class:PROPOSAL::Parametrization
 GetPhaseSpaceParams	private/PROPOSAL/decay/ManyBodyPhaseSpace.cxx	/^ManyBodyPhaseSpace::PhaseSpaceParameters ManyBodyPhaseSpace::GetPhaseSpaceParams(const ParticleDef& parent_def)$/;"	f	class:ManyBodyPhaseSpace
 GetPhi	public/PROPOSAL/math/Vector3D.h	/^    double GetPhi() const { return spherical_.azimuth_; }$/;"	f	class:PROPOSAL::Vector3D
@@ -4290,7 +4308,6 @@ GetPrecisionY	public/PROPOSAL/math/Interpolant.h	/^    double GetPrecisionY() co
 GetPrefixUntilComma	vendor/google/googletest/googletest/include/gtest/internal/gtest-internal.h	/^inline std::string GetPrefixUntilComma(const char* str) {$/;"	f	namespace:testing::internal
 GetPropagatedDistance	private/PROPOSAL/Secondaries.cxx	/^std::vector<double> Secondaries::GetPropagatedDistance() const$/;"	f	class:Secondaries
 GetPropagatedDistance	public/PROPOSAL/particle/Particle.h	/^    double GetPropagatedDistance() const { return propagated_distance_; }$/;"	f	class:PROPOSAL::DynamicData
-GetR	public/PROPOSAL/medium/Medium.h	/^    double GetR() const { return r_; }$/;"	f	class:PROPOSAL::Medium
 GetRadiationLength	private/PROPOSAL/medium/Medium.cxx	/^double Medium::GetRadiationLength(const Vector3D& position) const {$/;"	f	class:Medium
 GetRadiationLength	public/PROPOSAL/medium/Medium.h	/^    double GetRadiationLength() const { return radiationLength_; }$/;"	f	class:PROPOSAL::Medium
 GetRadius	public/PROPOSAL/geometry/Cylinder.h	/^    double GetRadius() const { return radius_; }$/;"	f	class:PROPOSAL::Cylinder
@@ -4314,7 +4331,7 @@ GetReservedOutputAttributesForElement	vendor/google/googletest/googletest/src/gt
 GetReverse	public/PROPOSAL/math/Integral.h	/^    bool GetReverse() const { return reverse_; }$/;"	f	class:PROPOSAL::Integral
 GetReverse	public/PROPOSAL/math/Interpolant.h	/^    bool GetReverse() const { return reverse_; }$/;"	f	class:PROPOSAL::Interpolant
 GetReverseX	public/PROPOSAL/math/Integral.h	/^    double GetReverseX() const { return reverseX_; }$/;"	f	class:PROPOSAL::Integral
-GetRight	public/PROPOSAL/methods.h	/^    const right_map_type& GetRight() const$/;"	f	class:PROPOSAL::Helper::Bimap
+GetRight	public/PROPOSAL/methods.h	/^        const right_map_type& GetRight() const { return _right; }$/;"	f	class:PROPOSAL::Helper::Bimap
 GetRomberg	public/PROPOSAL/math/Integral.h	/^    int GetRomberg() const { return romberg_; }$/;"	f	class:PROPOSAL::Integral
 GetRomberg	public/PROPOSAL/math/Interpolant.h	/^    int GetRomberg() const { return romberg_; }$/;"	f	class:PROPOSAL::Interpolant
 GetRomberg4refine	public/PROPOSAL/math/Integral.h	/^    int GetRomberg4refine() const { return romberg4refine_; }$/;"	f	class:PROPOSAL::Integral
@@ -4414,12 +4431,6 @@ GetUnknownFiles	vendor/google/googletest/googletest/scripts/upload.py	/^  def Ge
 GetUpperLimit	private/PROPOSAL/math/Integral.cxx	/^double Integral::GetUpperLimit()$/;"	f	class:Integral
 GetUpperLimit	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^double UtilityIntegral::GetUpperLimit(double ei, double rnd)$/;"	f	class:UtilityIntegral
 GetUpperLimit	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolant::GetUpperLimit(double ei, double rnd)$/;"	f	class:UtilityInterpolant
-GetUpperLimit	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantContRand::GetUpperLimit(double ei, double rnd)$/;"	f	class:UtilityInterpolantContRand
-GetUpperLimit	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantDecay::GetUpperLimit(double ei, double rnd)$/;"	f	class:UtilityInterpolantDecay
-GetUpperLimit	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantDisplacement::GetUpperLimit(double ei, double rnd)$/;"	f	class:UtilityInterpolantDisplacement
-GetUpperLimit	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantInteraction::GetUpperLimit(double ei, double rnd)$/;"	f	class:UtilityInterpolantInteraction
-GetUpperLimit	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantScattering::GetUpperLimit(double ei, double rnd)$/;"	f	class:UtilityInterpolantScattering
-GetUpperLimit	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^double UtilityInterpolantTime::GetUpperLimit(double ei, double rnd)$/;"	f	class:UtilityInterpolantTime
 GetUseLog	public/PROPOSAL/math/Integral.h	/^    bool GetUseLog() const { return useLog_; }$/;"	f	class:PROPOSAL::Integral
 GetUserCredentials	vendor/google/googletest/googlemock/scripts/upload.py	/^  def GetUserCredentials():$/;"	f	function:GetRpcServer
 GetUserCredentials	vendor/google/googletest/googletest/scripts/upload.py	/^  def GetUserCredentials():$/;"	f	function:GetRpcServer
@@ -4427,7 +4438,6 @@ GetUtility	public/PROPOSAL/Sector.h	/^    const Utility& GetUtility() const { re
 GetValue	vendor/google/googletest/googletest/scripts/pump.py	/^  def GetValue(self, identifier):$/;"	m	class:Env
 GetValueOnCurrentThread	vendor/google/googletest/googletest/src/gtest-port.cc	/^  static ThreadLocalValueHolderBase* GetValueOnCurrentThread($/;"	f	class:testing::internal::ThreadLocalRegistryImpl
 GetValueOnCurrentThread	vendor/google/googletest/googletest/src/gtest-port.cc	/^ThreadLocalValueHolderBase* ThreadLocalRegistry::GetValueOnCurrentThread($/;"	f	class:testing::internal::ThreadLocalRegistry
-GetVcut	public/PROPOSAL/EnergyCutSettings.h	/^    double GetVcut() const { return vcut_; }$/;"	f	class:PROPOSAL::EnergyCutSettings
 GetWeakPartner	public/PROPOSAL/crossection/parametrization/WeakInteraction.h	/^        int GetWeakPartner() const {return weak_partner_;}$/;"	f	class:PROPOSAL::WeakInteraction
 GetWithoutMatchers	vendor/google/googletest/googlemock/src/gmock-internal-utils.cc	/^GTEST_API_ WithoutMatchers GetWithoutMatchers() { return WithoutMatchers(); }$/;"	f	namespace:testing::internal
 GetWoodSaxon	public/PROPOSAL/medium/Components.h	/^    double GetWoodSaxon() const { return wood_saxon_; }$/;"	f	class:PROPOSAL::Components::Component
@@ -4640,6 +4650,7 @@ HierarchyLocker	vendor/log4cplus/log4cplus/include/log4cplus/hierarchylocker.h	/
 HierarchyLocker	vendor/log4cplus/log4cplus/src/hierarchylocker.cxx	/^HierarchyLocker::HierarchyLocker(Hierarchy& _h)$/;"	f	class:log4cplus::HierarchyLocker
 Highland	public/PROPOSAL/scattering/ScatteringFactory.h	/^    enum Enum { None = 0, HighlandIntegral, Moliere, Highland };$/;"	e	enum:PROPOSAL::ScatteringFactory::Enum
 HighlandIntegral	public/PROPOSAL/scattering/ScatteringFactory.h	/^    enum Enum { None = 0, HighlandIntegral, Moliere, Highland };$/;"	e	enum:PROPOSAL::ScatteringFactory::Enum
+HighlandIntegral	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^    double HighlandIntegral(double energy){$/;"	f	class:PROPOSAL::ScatteringHighlandIntegral
 HostnamePatternConverter	vendor/log4cplus/log4cplus/src/patternlayout.cxx	/^HostnamePatternConverter::HostnamePatternConverter ($/;"	f	class:log4cplus::pattern::HostnamePatternConverter
 HostnamePatternConverter	vendor/log4cplus/log4cplus/src/patternlayout.cxx	/^class HostnamePatternConverter : public PatternConverter {$/;"	c	namespace:log4cplus::pattern	file:
 HttpRpcServer	vendor/google/googletest/googlemock/scripts/upload.py	/^class HttpRpcServer(AbstractRpcServer):$/;"	c
@@ -4884,19 +4895,13 @@ InitIntegralWithLog	private/PROPOSAL/math/Integral.cxx	/^double Integral::InitIn
 InitIntegralWithLogSubstitution	private/PROPOSAL/math/Integral.cxx	/^double Integral::InitIntegralWithLogSubstitution(double min,$/;"	f	class:Integral
 InitIntegralWithSubstitution	private/PROPOSAL/math/Integral.cxx	/^double Integral::InitIntegralWithSubstitution(double min,$/;"	f	class:Integral
 InitInterpolant	private/PROPOSAL/math/Interpolant.cxx	/^void Interpolant::InitInterpolant(int max,$/;"	f	class:Interpolant
-InitInterpolation	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^void UtilityInterpolant::InitInterpolation(const std::string& name,$/;"	f	class:UtilityInterpolant
-InitInterpolation	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^void UtilityInterpolantContRand::InitInterpolation(const std::string& name,$/;"	f	class:UtilityInterpolantContRand
-InitInterpolation	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^void UtilityInterpolantDecay::InitInterpolation(const std::string& name,$/;"	f	class:UtilityInterpolantDecay
-InitInterpolation	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^void UtilityInterpolantDisplacement::InitInterpolation(const std::string& name,$/;"	f	class:UtilityInterpolantDisplacement
-InitInterpolation	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^void UtilityInterpolantInteraction::InitInterpolation(const std::string& name,$/;"	f	class:UtilityInterpolantInteraction
-InitInterpolation	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^void UtilityInterpolantScattering::InitInterpolation(const std::string& name,$/;"	f	class:UtilityInterpolantScattering
-InitInterpolation	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^void UtilityInterpolantTime::InitInterpolation(const std::string& name,$/;"	f	class:UtilityInterpolantTime
 InitRef	vendor/google/googletest/googletest/include/gtest/internal/gtest-internal.h	/^  void InitRef(const Element* array, size_t a_size) {$/;"	f	class:testing::internal::NativeArray
 InitdNdxInterpolation	private/PROPOSAL/crossection/ComptonInterpolant.cxx	/^void ComptonInterpolant::InitdNdxInterpolation(const InterpolationDef& def)$/;"	f	class:ComptonInterpolant
 InitdNdxInterpolation	private/PROPOSAL/crossection/CrossSectionInterpolant.cxx	/^void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)$/;"	f	class:CrossSectionInterpolant
 InitdNdxInterpolation	private/PROPOSAL/crossection/IonizInterpolant.cxx	/^void IonizInterpolant::InitdNdxInterpolation(const InterpolationDef& def)$/;"	f	class:IonizInterpolant
 InitdNdxInterpolation	private/PROPOSAL/crossection/PhotoPairInterpolant.cxx	/^void PhotoPairInterpolant::InitdNdxInterpolation(const InterpolationDef& def)$/;"	f	class:PhotoPairInterpolant
-InitializeInterpolation	private/PROPOSAL/methods.cxx	/^    std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(const std::string name,$/;"	f	namespace:PROPOSAL::Helper
+InitializeInterpolation	private/PROPOSAL/methods.cxx	/^    std::unique_ptr<Interpolant> InitializeInterpolation(std::string name,$/;"	f	namespace:PROPOSAL::Helper
+InitializeInterpolation	private/PROPOSAL/methods.cxx	/^    std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation($/;"	f	namespace:PROPOSAL::Helper
 Initializer	vendor/log4cplus/log4cplus/include/log4cplus/initializer.h	/^class LOG4CPLUS_EXPORT Initializer$/;"	c	namespace:log4cplus
 Initializer	vendor/log4cplus/log4cplus/src/global-init.cxx	/^Initializer::Initializer ()$/;"	f	class:log4cplus::Initializer
 InitializerImpl	vendor/log4cplus/log4cplus/src/global-init.cxx	/^struct InitializerImpl$/;"	s	namespace:log4cplus	file:
@@ -4953,6 +4958,11 @@ IntegrateWithLog	private/PROPOSAL/math/Integral.cxx	/^double Integral::Integrate
 IntegrateWithLogSubstitution	private/PROPOSAL/math/Integral.cxx	/^double Integral::IntegrateWithLogSubstitution(double min,$/;"	f	class:Integral
 IntegrateWithRandomRatio	private/PROPOSAL/math/Integral.cxx	/^double Integral::IntegrateWithRandomRatio(double min,$/;"	f	class:Integral
 IntegrateWithSubstitution	private/PROPOSAL/math/Integral.cxx	/^double Integral::IntegrateWithSubstitution(double min,$/;"	f	class:Integral
+Interaction	public/PROPOSAL/propagation_utility/Interaction.h	/^        Interaction(CrossSectionList cross, const ParticleDef &def) : cross(cross), mass(def.mass) {}$/;"	f	class:PROPOSAL::Interaction
+Interaction	public/PROPOSAL/propagation_utility/Interaction.h	/^class Interaction {$/;"	c	namespace:PROPOSAL
+InteractionBuilder	public/PROPOSAL/propagation_utility/Interaction.h	/^        InteractionBuilder<T>(CrossSectionList cross, const ParticleDef &def)$/;"	f	class:PROPOSAL::InteractionBuilder
+InteractionBuilder	public/PROPOSAL/propagation_utility/Interaction.h	/^class InteractionBuilder : public Interaction {$/;"	c	namespace:PROPOSAL
+InteractionIntegrand	public/PROPOSAL/propagation_utility/Interaction.h	/^        double InteractionIntegrand (double energy) {$/;"	f	class:PROPOSAL::InteractionBuilder
 InteractionType	public/PROPOSAL/particle/Particle.h	/^enum class InteractionType {$/;"	c	namespace:PROPOSAL
 InterceptMode	vendor/google/googletest/googletest/include/gtest/gtest-spi.h	/^  enum InterceptMode {$/;"	g	class:testing::ScopedFakeTestPartResultReporter
 Interface	vendor/google/googletest/googlemock/test/gmock_link_test.h	/^class Interface {$/;"	c
@@ -5001,7 +5011,7 @@ InterpolateArray	private/PROPOSAL/math/Interpolant.cxx	/^double Interpolant::Int
 InterpolateArray	private/PROPOSAL/math/Interpolant.cxx	/^double Interpolant::InterpolateArray(double x1, double x2)$/;"	f	class:Interpolant
 InterpolationDef	private/PROPOSAL/methods.cxx	/^InterpolationDef::InterpolationDef(const nlohmann::json& config)$/;"	f	class:PROPOSAL::InterpolationDef
 InterpolationDef	public/PROPOSAL/methods.h	/^    InterpolationDef()$/;"	f	struct:PROPOSAL::InterpolationDef
-InterpolationDef	public/PROPOSAL/methods.h	/^struct InterpolationDef$/;"	s	namespace:PROPOSAL
+InterpolationDef	public/PROPOSAL/methods.h	/^struct InterpolationDef {$/;"	s	namespace:PROPOSAL
 InterpolationResults	public/PROPOSAL/math/Integral.h	/^    struct InterpolationResults$/;"	s	class:PROPOSAL::Integral
 Invalid	vendor/google/googletest/googlemock/include/gmock/internal/gmock-internal-utils.h	/^inline T Invalid() {$/;"	f	namespace:testing::internal
 Invoke	vendor/google/googletest/googlemock/include/gmock/gmock-actions.h	/^internal::InvokeMethodAction<Class, MethodPtr> Invoke(Class* obj_ptr,$/;"	f	namespace:testing
@@ -5648,7 +5658,7 @@ KilledExitStatus	vendor/google/googletest/googletest/test/googletest-death-test-
 Kind	vendor/pybind/pybind11/tests/test_tagbased_polymorphic.cpp	/^    enum class Kind {$/;"	c	struct:Animal	file:
 Kind	vendor/pybind/pybind11/tools/clang/cindex.py	/^    class Kind:$/;"	c	class:CompletionChunk
 KindOf	vendor/google/googletest/googlemock/include/gmock/internal/gmock-internal-utils.h	/^template <typename T> struct KindOf {$/;"	s	namespace:testing::internal
-KinematicLimits	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    struct KinematicLimits$/;"	s	class:PROPOSAL::Parametrization
+KinematicLimits	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    struct KinematicLimits {$/;"	s	class:PROPOSAL::Parametrization
 KleinNishina	public/PROPOSAL/crossection/factories/ComptonFactory.h	/^            KleinNishina$/;"	e	enum:PROPOSAL::ComptonFactory::Enum
 Kokoulin	public/PROPOSAL/crossection/factories/PhotonuclearFactory.h	/^        Kokoulin,$/;"	e	enum:PROPOSAL::PhotonuclearFactory::Enum
 L4CP_ALL_LOG_LEVEL	vendor/log4cplus/log4cplus/include/log4cplus/clogger.h	57;"	d
@@ -6286,7 +6296,7 @@ ME	private/PROPOSAL/Constants.cxx	/^const double PROPOSAL::ME = 0.5109989461;   
 ME	resources/examples/standalone/plot_tau_decay_hadrons.py	/^    ME = pp.decay.ManyBodyPhaseSpace(products, evaluate)$/;"	v
 ME	tests/gen_testfiles_scripts/resources/examples/standalone/plot_tau_decay_hadrons.py	/^    ME = pp.decay.ManyBodyPhaseSpace(products, evaluate)$/;"	v
 MEDIUM_DEF	private/Interface/python/medium.cxx	10;"	d	file:
-MEDIUM_DEF	public/PROPOSAL/medium/Medium.h	233;"	d
+MEDIUM_DEF	public/PROPOSAL/medium/Medium.h	218;"	d
 MEDIUM_DEF	public/PROPOSAL/medium/Medium.h	38;"	d
 MESSAGE_CONVERTER	vendor/log4cplus/log4cplus/src/patternlayout.cxx	/^                MESSAGE_CONVERTER,$/;"	e	enum:log4cplus::pattern::BasicPatternConverter::Type	file:
 METHOD_AS_TEST_CASE	vendor/log4cplus/log4cplus/catch/include/catch.hpp	170;"	d
@@ -7399,7 +7409,7 @@ PROPERTIES_COMMENT_CHAR	vendor/log4cplus/log4cplus/src/property.cxx	/^const tcha
 PROPOSAL	private/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	private/PROPOSAL-icetray/SimplePropagator.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	private/PROPOSAL/crossection/CrossSection.cxx	/^namespace PROPOSAL {$/;"	n	file:
-PROPOSAL	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^namespace PROPOSAL{$/;"	n	file:
+PROPOSAL	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^namespace PROPOSAL {$/;"	n	file:
 PROPOSAL	private/PROPOSAL/decay/DecayChannel.cxx	/^namespace PROPOSAL {$/;"	n	file:
 PROPOSAL	private/PROPOSAL/decay/DecayTable.cxx	/^namespace PROPOSAL {$/;"	n	file:
 PROPOSAL	private/PROPOSAL/geometry/Geometry.cxx	/^namespace PROPOSAL {$/;"	n	file:
@@ -7495,16 +7505,21 @@ PROPOSAL	public/PROPOSAL/medium/density_distr/density_splines.h	/^namespace PROP
 PROPOSAL	public/PROPOSAL/methods.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	public/PROPOSAL/particle/Particle.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	public/PROPOSAL/particle/ParticleDef.h	/^namespace PROPOSAL {$/;"	n
+PROPOSAL	public/PROPOSAL/propagation_utility/ContRand.h	/^namespace PROPOSAL {$/;"	n
+PROPOSAL	public/PROPOSAL/propagation_utility/Decay.h	/^namespace PROPOSAL {$/;"	n
+PROPOSAL	public/PROPOSAL/propagation_utility/Displacement.h	/^namespace PROPOSAL {$/;"	n
+PROPOSAL	public/PROPOSAL/propagation_utility/Interaction.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^namespace PROPOSAL {$/;"	n
+PROPOSAL	public/PROPOSAL/propagation_utility/Time.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	public/PROPOSAL/scattering/Coefficients.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	public/PROPOSAL/scattering/Scattering.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	public/PROPOSAL/scattering/ScatteringFactory.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	public/PROPOSAL/scattering/ScatteringHighland.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^namespace PROPOSAL {$/;"	n
 PROPOSAL	public/PROPOSAL/scattering/ScatteringMoliere.h	/^namespace PROPOSAL {$/;"	n
-PROPOSAL_MAKE_HASHABLE	public/PROPOSAL/methods.h	38;"	d
+PROPOSAL_MAKE_HASHABLE	public/PROPOSAL/methods.h	37;"	d
 PYBIND11_BASEN	vendor/pybind/pybind11/tests/test_multiple_inheritance.cpp	82;"	d	file:
 PYBIND11_BINARY_OPERATOR	vendor/pybind/pybind11/include/pybind11/operators.h	157;"	d
 PYBIND11_BINARY_OPERATOR	vendor/pybind/pybind11/include/pybind11/operators.h	80;"	d
@@ -7703,7 +7718,9 @@ ParameterizedTestSuiteRegistry	vendor/google/googletest/googletest/include/gtest
 ParameterizedTestSuiteRegistry	vendor/google/googletest/googletest/include/gtest/internal/gtest-param-util.h	/^class ParameterizedTestSuiteRegistry {$/;"	c	namespace:testing::internal
 Parametrization	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^Parametrization::Parametrization(const Parametrization& param)$/;"	f	class:Parametrization
 Parametrization	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^Parametrization::Parametrization(const ParticleDef& particle_def,$/;"	f	class:Parametrization
-Parametrization	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^class Parametrization$/;"	c	namespace:PROPOSAL
+Parametrization	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^class Parametrization {$/;"	c	namespace:PROPOSAL
+Parametrization_builder	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    Parametrization_builder(const ParticleDef& p_def,$/;"	f	class:PROPOSAL::Parametrization_builder
+Parametrization_builder	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^class Parametrization_builder : public Parametrization {$/;"	c	namespace:PROPOSAL
 ParentType	vendor/google/googletest/googlemock/test/gmock-matchers_test.cc	/^  typedef FloatingPointTest<RawType> ParentType;$/;"	t	class:testing::gmock_matchers_test::__anon56::FloatingPointNearTest	file:
 Parse	vendor/google/googletest/googletest/scripts/pump.py	/^  def Parse(pos):$/;"	f	function:ParseExpTokenInParens
 ParseAtomicCodeNode	vendor/google/googletest/googletest/scripts/pump.py	/^def ParseAtomicCodeNode(tokens):$/;"	f
@@ -8211,6 +8228,9 @@ RETURNED	vendor/google/googletest/googletest/src/gtest-death-test.cc	/^enum Deat
 RETest	vendor/google/googletest/googletest/test/googletest-port-test.cc	/^class RETest : public ::testing::Test {};$/;"	c	namespace:testing::internal	file:
 RM	build/Makefile	/^RM = \/usr\/bin\/cmake -E remove -f$/;"	m
 RM	build/doc/Makefile	/^RM = \/usr\/bin\/cmake -E remove -f$/;"	m
+RM	build/extern/googletest/Makefile	/^RM = \/usr\/bin\/cmake -E remove -f$/;"	m
+RM	build/extern/googletest/googlemock/Makefile	/^RM = \/usr\/bin\/cmake -E remove -f$/;"	m
+RM	build/extern/googletest/googletest/Makefile	/^RM = \/usr\/bin\/cmake -E remove -f$/;"	m
 RM	build/vendor/log4cplus/log4cplus/Makefile	/^RM = \/usr\/bin\/cmake -E remove -f$/;"	m
 RM	build/vendor/log4cplus/log4cplus/simpleserver/Makefile	/^RM = \/usr\/bin\/cmake -E remove -f$/;"	m
 RM	build/vendor/log4cplus/log4cplus/src/Makefile	/^RM = \/usr\/bin\/cmake -E remove -f$/;"	m
@@ -8569,6 +8589,9 @@ SHARD_STATUS_FILE_ENV_VAR	vendor/google/googletest/googletest/test/googletest-fi
 SHARD_STATUS_FILE_ENV_VAR	vendor/google/googletest/googletest/test/gtest_xml_output_unittest.py	/^SHARD_STATUS_FILE_ENV_VAR = 'GTEST_SHARD_STATUS_FILE'$/;"	v
 SHELL	build/Makefile	/^SHELL = \/bin\/sh$/;"	m
 SHELL	build/doc/Makefile	/^SHELL = \/bin\/sh$/;"	m
+SHELL	build/extern/googletest/Makefile	/^SHELL = \/bin\/sh$/;"	m
+SHELL	build/extern/googletest/googlemock/Makefile	/^SHELL = \/bin\/sh$/;"	m
+SHELL	build/extern/googletest/googletest/Makefile	/^SHELL = \/bin\/sh$/;"	m
 SHELL	build/vendor/log4cplus/log4cplus/Makefile	/^SHELL = \/bin\/sh$/;"	m
 SHELL	build/vendor/log4cplus/log4cplus/simpleserver/Makefile	/^SHELL = \/bin\/sh$/;"	m
 SHELL	build/vendor/log4cplus/log4cplus/src/Makefile	/^SHELL = \/bin\/sh$/;"	m
@@ -8662,6 +8685,9 @@ SUCCEED	vendor/log4cplus/log4cplus/catch/include/catch.hpp	174;"	d
 SUCCEED	vendor/log4cplus/log4cplus/catch/include/catch.hpp	182;"	d
 SUFFIXES	build/Makefile	/^SUFFIXES =$/;"	m
 SUFFIXES	build/doc/Makefile	/^SUFFIXES =$/;"	m
+SUFFIXES	build/extern/googletest/Makefile	/^SUFFIXES =$/;"	m
+SUFFIXES	build/extern/googletest/googlemock/Makefile	/^SUFFIXES =$/;"	m
+SUFFIXES	build/extern/googletest/googletest/Makefile	/^SUFFIXES =$/;"	m
 SUFFIXES	build/vendor/log4cplus/log4cplus/Makefile	/^SUFFIXES =$/;"	m
 SUFFIXES	build/vendor/log4cplus/log4cplus/simpleserver/Makefile	/^SUFFIXES =$/;"	m
 SUFFIXES	build/vendor/log4cplus/log4cplus/src/Makefile	/^SUFFIXES =$/;"	m
@@ -8729,8 +8755,8 @@ ScatteringFactory	public/PROPOSAL/scattering/ScatteringFactory.h	/^class Scatter
 ScatteringHighland	private/PROPOSAL/scattering/ScatteringHighland.cxx	/^ScatteringHighland::ScatteringHighland($/;"	f	class:ScatteringHighland
 ScatteringHighland	private/PROPOSAL/scattering/ScatteringHighland.cxx	/^ScatteringHighland::ScatteringHighland(const ScatteringHighland& scattering)$/;"	f	class:ScatteringHighland
 ScatteringHighland	public/PROPOSAL/scattering/ScatteringHighland.h	/^class ScatteringHighland : public Scattering$/;"	c	namespace:PROPOSAL
-ScatteringHighlandIntegral	private/PROPOSAL/scattering/ScatteringHighlandIntegral.cxx	/^ScatteringHighlandIntegral::ScatteringHighlandIntegral(const ParticleDef& p_def,$/;"	f	class:ScatteringHighlandIntegral
-ScatteringHighlandIntegral	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^class ScatteringHighlandIntegral : public Scattering$/;"	c	namespace:PROPOSAL
+ScatteringHighlandIntegral	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^    ScatteringHighlandIntegral<T>(const ParticleDef& p_def, std::shared_ptr<const Medium> medium, CrossSectionList cross)$/;"	f	class:PROPOSAL::ScatteringHighlandIntegral
+ScatteringHighlandIntegral	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^class ScatteringHighlandIntegral : public ScatteringHighland$/;"	c	namespace:PROPOSAL
 ScatteringMoliere	private/PROPOSAL/scattering/ScatteringMoliere.cxx	/^ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium)$/;"	f	class:ScatteringMoliere
 ScatteringMoliere	private/PROPOSAL/scattering/ScatteringMoliere.cxx	/^ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def,$/;"	f	class:ScatteringMoliere
 ScatteringMoliere	private/PROPOSAL/scattering/ScatteringMoliere.cxx	/^ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)$/;"	f	class:ScatteringMoliere
@@ -8813,7 +8839,8 @@ SetCallCount	vendor/google/googletest/googlemock/test/gmock-spec-builders_test.c
 SetCartesianCoordinates	public/PROPOSAL/math/Vector3D.h	/^    void SetCartesianCoordinates(const double x, const double y, const double z)$/;"	f	class:PROPOSAL::Vector3D
 SetCharge	public/PROPOSAL/particle/ParticleDef.h	/^    Builder& SetCharge(const double var)$/;"	f	class:PROPOSAL::ParticleDef::Builder
 SetClosestApproachPoint	private/PROPOSAL/Secondaries.cxx	/^void Secondaries::SetClosestApproachPoint(const DynamicData& closest_approach_point)$/;"	f	class:Secondaries
-SetComponents	private/PROPOSAL/medium/Medium.cxx	/^void Medium::SetComponents($/;"	f	class:Medium
+SetComponents	private/PROPOSAL/medium/Medium.cxx	/^void Medium::SetComponents(std::vector<Components::Component> components) {$/;"	f	class:Medium
+SetCumulativeCrossSection_function	private/PROPOSAL/crossection/CrossSection.cxx	/^void CrossSectionBuilder::SetCumulativeCrossSection_function(std::function<double(double, double, double)> func){$/;"	f	class:CrossSectionBuilder
 SetCurrentComponent	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    void SetCurrentComponent(int index) { component_index_ = index; }$/;"	f	class:PROPOSAL::Parametrization
 SetCurrentComponent	public/PROPOSAL/crossection/parametrization/PhotoPairProduction.h	/^        void SetCurrentComponent(int index) { component_index_ = index; }$/;"	f	class:PROPOSAL::PhotoAngleDistribution
 SetD	private/PROPOSAL/math/Interpolant.cxx	/^void Interpolant::SetD(const std::vector<double>& d)$/;"	f	class:Interpolant
@@ -8901,7 +8928,6 @@ SetPrecision	private/PROPOSAL/math/Interpolant.cxx	/^void Interpolant::SetPrecis
 SetPrecisionY	private/PROPOSAL/math/Interpolant.cxx	/^void Interpolant::SetPrecisionY(double precisionY)$/;"	f	class:Interpolant
 SetPropagatedDistance	public/PROPOSAL/particle/Particle.h	/^    void SetPropagatedDistance(double prop_dist) { propagated_distance_ = prop_dist; }$/;"	f	class:PROPOSAL::DynamicData
 SetPthreadFlag	vendor/google/googletest/googletest/test/googletest-death-test-test.cc	/^void SetPthreadFlag() {$/;"	f	namespace:__anon26
-SetR	private/PROPOSAL/medium/Medium.cxx	/^void Medium::SetR(double r) {$/;"	f	class:Medium
 SetRadius	public/PROPOSAL/geometry/Cylinder.h	/^    void SetRadius(double radius) { radius_ = radius; };$/;"	f	class:PROPOSAL::Cylinder
 SetRadius	public/PROPOSAL/geometry/Sphere.h	/^    void SetRadius(double radius) { radius_ = radius; };$/;"	f	class:PROPOSAL::Sphere
 SetRandomDo	private/PROPOSAL/math/Integral.cxx	/^void Integral::SetRandomDo(bool randomDo)$/;"	f	class:Integral
@@ -8952,6 +8978,7 @@ SetSphericalCoordinates	public/PROPOSAL/math/Vector3D.h	/^    void SetSphericalC
 SetStable	private/PROPOSAL/decay/DecayTable.cxx	/^void DecayTable::SetStable()$/;"	f	class:DecayTable
 SetStarti	private/PROPOSAL/math/Interpolant.cxx	/^void Interpolant::SetStarti(int starti)$/;"	f	class:Interpolant
 SetStep	private/PROPOSAL/math/Interpolant.cxx	/^void Interpolant::SetStep(double step)$/;"	f	class:Interpolant
+SetStochasticLoss_function	private/PROPOSAL/crossection/CrossSection.cxx	/^void CrossSectionBuilder::SetStochasticLoss_function(std::function<double(double, double, double)> func){$/;"	f	class:CrossSectionBuilder
 SetSumNucleons	private/PROPOSAL/medium/Medium.cxx	/^void Medium::SetSumNucleons(double sumNucleons) {$/;"	f	class:Medium
 SetTestPartResultReporterForCurrentThread	vendor/google/googletest/googletest/src/gtest.cc	/^void UnitTestImpl::SetTestPartResultReporterForCurrentThread($/;"	f	class:testing::internal::UnitTestImpl
 SetTime	public/PROPOSAL/particle/Particle.h	/^    void SetTime(double time) { time_ = time; }$/;"	f	class:PROPOSAL::DynamicData
@@ -9008,6 +9035,10 @@ SetZ	public/PROPOSAL/geometry/Box.h	/^    void SetZ(double z) { z_ = z; };$/;"	f
 SetZ	public/PROPOSAL/geometry/Cylinder.h	/^    void SetZ(double z) { z_ = z; };$/;"	f	class:PROPOSAL::Cylinder
 SetZA	private/PROPOSAL/medium/Medium.cxx	/^void Medium::SetZA(double ZA) {$/;"	f	class:Medium
 Set_Function	public/PROPOSAL/math/Integral.h	/^    void Set_Function(std::function<double(double)> integrand)$/;"	f	class:PROPOSAL::Integral
+SetdE2dx_function	private/PROPOSAL/crossection/CrossSection.cxx	/^void CrossSectionBuilder::SetdE2dx_function(Function func){$/;"	f	class:CrossSectionBuilder
+SetdEdx_function	private/PROPOSAL/crossection/CrossSection.cxx	/^void CrossSectionBuilder::SetdEdx_function(Function func){$/;"	f	class:CrossSectionBuilder
+SetdNdx_function	private/PROPOSAL/crossection/CrossSection.cxx	/^void CrossSectionBuilder::SetdNdx_function(Function func){$/;"	f	class:CrossSectionBuilder
+SetdNdx_rnd_function	private/PROPOSAL/crossection/CrossSection.cxx	/^void CrossSectionBuilder::SetdNdx_rnd_function(std::function<double(double, double)> func){$/;"	f	class:CrossSectionBuilder
 Setup	vendor/google/googletest/googletest/include/gtest/gtest.h	/^  virtual Setup_should_be_spelled_SetUp* Setup() { return nullptr; }$/;"	f	class:testing::Environment
 Setup	vendor/google/googletest/googletest/include/gtest/gtest.h	/^  virtual Setup_should_be_spelled_SetUp* Setup() { return nullptr; }$/;"	f	class:testing::Test
 SetupEnvironment	vendor/google/googletest/googletest/test/gtest_skip_in_environment_setup_test.cc	/^class SetupEnvironment : public testing::Environment {$/;"	c	file:
@@ -9121,6 +9152,7 @@ SocketWriter	vendor/google/googletest/googletest/src/gtest-internal-inl.h	/^  cl
 SoftComponent	private/PROPOSAL/crossection/parametrization/Photonuclear.cxx	/^SoftComponent::SoftComponent() {}$/;"	f	class:SoftComponent
 SoftComponent	private/PROPOSAL/crossection/parametrization/Photonuclear.cxx	/^SoftComponent::SoftComponent(const SoftComponent& hard_component)$/;"	f	class:SoftComponent
 SoftComponent	public/PROPOSAL/crossection/parametrization/Photonuclear.h	/^class SoftComponent : public RealPhoton$/;"	c	namespace:PROPOSAL
+SolveTrackIntegral	public/PROPOSAL/propagation_utility/Displacement.h	/^double DisplacementBuilder<T>::SolveTrackIntegral($/;"	f	class:PROPOSAL::DisplacementBuilder
 SomeOfArrayMatcher	vendor/google/googletest/googlemock/include/gmock/gmock-matchers.h	/^  SomeOfArrayMatcher(Iter first, Iter last) : matchers_(first, last) {}$/;"	f	class:testing::internal::SomeOfArrayMatcher
 SomeOfArrayMatcher	vendor/google/googletest/googlemock/include/gmock/gmock-matchers.h	/^class SomeOfArrayMatcher {$/;"	c	namespace:testing::internal
 SourceLineInfo	vendor/log4cplus/log4cplus/catch/include/internal/catch_common.h	/^    struct SourceLineInfo {$/;"	s	namespace:Catch
@@ -9226,6 +9258,7 @@ StlContainerView	vendor/google/googletest/googlemock/include/gmock/internal/gmoc
 StochasticDeflection	private/PROPOSAL/crossection/ComptonIntegral.cxx	/^std::pair<double, double> ComptonIntegral::StochasticDeflection(double energy, double energy_loss) {$/;"	f	class:ComptonIntegral
 StochasticDeflection	private/PROPOSAL/crossection/ComptonInterpolant.cxx	/^std::pair<double, double> ComptonInterpolant::StochasticDeflection(double energy, double energy_loss) {$/;"	f	class:ComptonInterpolant
 StochasticDeflection	private/PROPOSAL/crossection/CrossSection.cxx	/^std::pair<double, double> CrossSection::StochasticDeflection($/;"	f	class:CrossSection
+StochasticLoss_function	public/PROPOSAL/crossection/CrossSection.h	/^    std::function<double(double, double, double)> StochasticLoss_function;$/;"	m	class:PROPOSAL::final
 StorageClass	vendor/pybind/pybind11/tools/clang/cindex.py	/^class StorageClass(object):$/;"	c
 StorageIndex	vendor/pybind/pybind11/include/pybind11/eigen.h	/^    typedef remove_reference_t<decltype(*std::declval<Type>().outerIndexPtr())> StorageIndex;$/;"	t	struct:type_caster
 StorageType	vendor/google/googletest/googlemock/include/gmock/gmock-matchers.h	/^  typedef Functor StorageType;$/;"	t	struct:testing::internal::CallableTraits
@@ -9432,12 +9465,17 @@ TEST	tests/DecayTable_TEST.cxx	/^TEST(SelectChannel, Tau)$/;"	f
 TEST	tests/Density_distribution_TEST.cxx	/^TEST(Assignment, Copyconstructor)$/;"	f
 TEST	tests/Density_distribution_TEST.cxx	/^TEST(Comparison, Comparison_equal)$/;"	f
 TEST	tests/Density_distribution_TEST.cxx	/^TEST(Comparison, Comparison_not_equal)$/;"	f
-TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(Assignment, Copyconstructor)$/;"	f
-TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(Assignment, Copyconstructor2)$/;"	f
-TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(Assignment, Operator)$/;"	f
-TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(Assignment, Swap)$/;"	f
-TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(Comparison, Comparison_equal)$/;"	f
-TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(Comparison, Comparison_not_equal)$/;"	f
+TEST	tests/Displacement.cxx	/^TEST(UtilityIntegral, FunctionToIntegral)$/;"	f
+TEST	tests/Displacement.cxx	/^TEST(constructor, error){$/;"	f
+TEST	tests/Displacement.cxx	/^TEST(constructor, integral)$/;"	f
+TEST	tests/Displacement.cxx	/^TEST(constructor, interpolant)$/;"	f
+TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(constructor, copy)$/;"	f
+TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(constructor, exceptions)$/;"	f
+TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(constructor, json)$/;"	f
+TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(constructor, parameters)$/;"	f
+TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(cut, absolut)$/;"	f
+TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(cut, relative)$/;"	f
+TEST	tests/EnergyCutSettings_TEST.cxx	/^TEST(operator, comparison)$/;"	f
 TEST	tests/Epairproduction_TEST.cxx	/^TEST(Assignment, Copyconstructor)$/;"	f
 TEST	tests/Epairproduction_TEST.cxx	/^TEST(Assignment, Copyconstructor2)$/;"	f
 TEST	tests/Epairproduction_TEST.cxx	/^TEST(Comparison, Comparison_equal)$/;"	f
@@ -12930,12 +12968,16 @@ ThrowNothing	vendor/google/googletest/googletest/test/gtest_unittest.cc	/^void T
 ThrowOnFailure	vendor/google/googletest/googletest/test/gtest_unittest.cc	/^  static Flags ThrowOnFailure(bool throw_on_failure) {$/;"	f	struct:testing::Flags
 ThrowOnFailureTest	vendor/google/googletest/googletest/test/googletest-throw-on-failure-test.py	/^class ThrowOnFailureTest(gtest_test_utils.TestCase):$/;"	c
 Throws	vendor/log4cplus/log4cplus/catch/include/internal/catch_test_case_info.h	/^            Throws = 1 << 4,$/;"	e	enum:Catch::TestCaseInfo::SpecialProperties
+Time	public/PROPOSAL/propagation_utility/Time.h	/^        Time() {}$/;"	f	class:PROPOSAL::Time
+Time	public/PROPOSAL/propagation_utility/Time.h	/^class Time {$/;"	c	namespace:PROPOSAL
 Time	vendor/log4cplus/log4cplus/include/log4cplus/helpers/timehelper.h	/^typedef chrono::time_point<Clock, Duration> Time;$/;"	t	namespace:log4cplus::helpers
 TimeBasedRollingFileAppender	vendor/log4cplus/log4cplus/include/log4cplus/fileappender.h	/^    class LOG4CPLUS_EXPORT TimeBasedRollingFileAppender : public FileAppenderBase {$/;"	c	namespace:log4cplus
 TimeBasedRollingFileAppender	vendor/log4cplus/log4cplus/src/fileappender.cxx	/^TimeBasedRollingFileAppender::TimeBasedRollingFileAppender($/;"	f	class:log4cplus::TimeBasedRollingFileAppender
 TimeElapsed	private/PROPOSAL/propagation_utility/PropagationUtility.cxx	/^double Utility::TimeElapsed(double initial_energy, double final_energy, double distance)$/;"	f	class:Utility
+TimeElapsedUpperLimit	public/PROPOSAL/propagation_utility/Time.h	/^        double TimeElapsedUpperLimit(double initial_energy, double time) {$/;"	f	class:PROPOSAL::ExactTimeBuilder
 TimeInMillis	vendor/google/googletest/googletest/include/gtest/gtest.h	/^typedef internal::TimeInMillis TimeInMillis;$/;"	t	namespace:testing
 TimeInMillis	vendor/google/googletest/googletest/include/gtest/internal/gtest-port.h	/^typedef TypeWithSize<8>::Int TimeInMillis;  \/\/ Represents time in milliseconds.$/;"	t	namespace:testing::internal
+TimeIntegrand	public/PROPOSAL/propagation_utility/Time.h	/^        double TimeIntegrand(double energy) {$/;"	f	class:PROPOSAL::ExactTimeBuilder
 Timer	vendor/log4cplus/log4cplus/catch/include/internal/catch_timer.h	/^        Timer() : m_ticks( 0 ) {}$/;"	f	class:Catch::Timer
 Timer	vendor/log4cplus/log4cplus/catch/include/internal/catch_timer.h	/^    class Timer {$/;"	c	namespace:Catch
 Times	vendor/google/googletest/googlemock/include/gmock/gmock-spec-builders.h	/^  TypedExpectation& Times(const Cardinality& a_cardinality) {$/;"	f	class:testing::internal::TypedExpectation
@@ -13017,6 +13059,7 @@ TypeConverter	vendor/google/googletest/googlemock/scripts/generator/cpp/ast.py	/
 TypeId	vendor/google/googletest/googletest/include/gtest/internal/gtest-internal.h	/^typedef const void* TypeId;$/;"	t	namespace:testing::internal
 TypeIdHelper	vendor/google/googletest/googletest/include/gtest/internal/gtest-internal.h	/^class TypeIdHelper {$/;"	c	namespace:testing::internal
 TypeInteraction	private/PROPOSAL/propagation_utility/PropagationUtility.cxx	/^std::shared_ptr<CrossSection> Utility::TypeInteraction($/;"	f	class:Utility
+TypeInteraction	public/PROPOSAL/propagation_utility/Interaction.h	/^        std::shared_ptr<CrossSection> TypeInteraction(double energy, const std::array<double, 2>& rnd){$/;"	f	class:PROPOSAL::Interaction
 TypeKind	vendor/google/googletest/googlemock/include/gmock/internal/gmock-internal-utils.h	/^enum TypeKind {$/;"	g	namespace:testing::internal
 TypeKind	vendor/google/googletest/googletest/include/gtest/gtest-printers.h	/^enum TypeKind {$/;"	g	namespace:testing::internal2
 TypeKind	vendor/pybind/pybind11/tools/clang/cindex.py	/^class TypeKind(BaseEnumeration):$/;"	c
@@ -13150,7 +13193,6 @@ URANIUM	public/PROPOSAL/medium/Medium.h	/^    COPPER, URANIUM, AIR, PARAFFIN, AN
 UTF8_ACCEPT	public/PROPOSAL/json.hpp	/^    static constexpr std::uint8_t UTF8_ACCEPT = 0;$/;"	m	class:nlohmann::detail::serializer
 UTF8_REJECT	public/PROPOSAL/json.hpp	/^    static constexpr std::uint8_t UTF8_REJECT = 1;$/;"	m	class:nlohmann::detail::serializer
 UTF_N	vendor/pybind/pybind11/include/pybind11/cast.h	/^    static constexpr size_t UTF_N = 8 * sizeof(CharT);$/;"	m	struct:string_caster
-UTILITY_INTERPOLANT_DEC	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	39;"	d
 Unary	vendor/google/googletest/googlemock/test/gmock-actions_test.cc	/^bool Unary(int x) { return x < 0; }$/;"	f	namespace:__anon59
 Unary	vendor/google/googletest/googlemock/test/gmock-more-actions_test.cc	/^  short Unary(long x) { return static_cast<short>(value_ + x); }  \/\/ NOLINT$/;"	f	class:testing::gmock_more_actions_test::Foo
 Unary	vendor/google/googletest/googlemock/test/gmock-more-actions_test.cc	/^bool Unary(int x) { return x < 0; }$/;"	f	namespace:testing::gmock_more_actions_test
@@ -13265,6 +13307,7 @@ UploadFile	vendor/google/googletest/googlemock/scripts/upload.py	/^    def Uploa
 UploadFile	vendor/google/googletest/googletest/scripts/upload.py	/^    def UploadFile(filename, file_id, content, is_binary, status, is_base):$/;"	f	function:VersionControlSystem.UploadBaseFiles
 UploadSeparatePatches	vendor/google/googletest/googlemock/scripts/upload.py	/^def UploadSeparatePatches(issue, rpc_server, patchset, data, options):$/;"	f
 UploadSeparatePatches	vendor/google/googletest/googletest/scripts/upload.py	/^def UploadSeparatePatches(issue, rpc_server, patchset, data, options):$/;"	f
+UpperLimitTrackIntegral	public/PROPOSAL/propagation_utility/Displacement.h	/^double DisplacementBuilder<T>::UpperLimitTrackIntegral($/;"	f	class:PROPOSAL::DisplacementBuilder
 Uranium	private/PROPOSAL/medium/Medium.cxx	/^Uranium::Uranium(double rho)$/;"	f	class:Uranium
 UrlEncode	vendor/google/googletest/googletest/src/gtest.cc	/^std::string StreamingListener::UrlEncode(const char* str) {$/;"	f	class:testing::internal::StreamingListener
 UseColour	vendor/log4cplus/log4cplus/catch/include/internal/catch_interfaces_config.h	/^    struct UseColour { enum YesOrNo {$/;"	s	namespace:Catch
@@ -13276,35 +13319,11 @@ UserType	vendor/pybind/pybind11/tests/pybind11_tests.h	/^class UserType {$/;"	c
 UsesColor	vendor/google/googletest/googletest/test/googletest-color-test.py	/^def UsesColor(term, color_env_var, color_flag):$/;"	f
 Using	vendor/google/googletest/googlemock/scripts/generator/cpp/ast.py	/^class Using(Node):$/;"	c
 Utf16ToAnsi	vendor/google/googletest/googletest/src/gtest.cc	/^const char* String::Utf16ToAnsi(LPCWSTR utf16_str)  {$/;"	f	class:testing::internal::String
-Utility	private/PROPOSAL/propagation_utility/PropagationUtility.cxx	/^Utility::Utility(std::unique_ptr<Utility::Definition> utility_def)$/;"	f	class:Utility
 Utility	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^class Utility {$/;"	c	namespace:PROPOSAL
-UtilityDecorator	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^    UtilityDecorator(CrossSectionList cross, const ParticleDef& p_def)$/;"	f	class:PROPOSAL::UtilityDecorator
-UtilityDecorator	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^class UtilityDecorator {$/;"	c	namespace:PROPOSAL
-UtilityIntegral	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^UtilityIntegral::UtilityIntegral(CrossSectionList cross, const ParticleDef& p_def)$/;"	f	class:UtilityIntegral
-UtilityIntegral	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^class UtilityIntegral : public UtilityDecorator {$/;"	c	namespace:PROPOSAL
-UtilityIntegralContRand	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^UtilityIntegralContRand::UtilityIntegralContRand($/;"	f	class:UtilityIntegralContRand
-UtilityIntegralContRand	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^class UtilityIntegralContRand : public UtilityIntegral {$/;"	c	namespace:PROPOSAL
-UtilityIntegralDecay	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^UtilityIntegralDecay::UtilityIntegralDecay($/;"	f	class:UtilityIntegralDecay
-UtilityIntegralDecay	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^class UtilityIntegralDecay : public UtilityIntegral {$/;"	c	namespace:PROPOSAL
-UtilityIntegralDisplacement	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^UtilityIntegralDisplacement::UtilityIntegralDisplacement($/;"	f	class:UtilityIntegralDisplacement
-UtilityIntegralDisplacement	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^class UtilityIntegralDisplacement : public UtilityIntegral {$/;"	c	namespace:PROPOSAL
-UtilityIntegralInteraction	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^UtilityIntegralInteraction::UtilityIntegralInteraction($/;"	f	class:UtilityIntegralInteraction
-UtilityIntegralInteraction	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^class UtilityIntegralInteraction : public UtilityIntegral {$/;"	c	namespace:PROPOSAL
-UtilityIntegralScattering	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^UtilityIntegralScattering::UtilityIntegralScattering($/;"	f	class:UtilityIntegralScattering
-UtilityIntegralScattering	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^class UtilityIntegralScattering : public UtilityIntegral {$/;"	c	namespace:PROPOSAL
-UtilityIntegralTime	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^UtilityIntegralTime::UtilityIntegralTime($/;"	f	class:UtilityIntegralTime
-UtilityIntegralTime	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^class UtilityIntegralTime : public UtilityIntegral {$/;"	c	namespace:PROPOSAL
-UtilityInterpolant	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^UtilityInterpolant::UtilityInterpolant($/;"	f	class:UtilityInterpolant
-UtilityInterpolant	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^class UtilityInterpolant : public UtilityDecorator$/;"	c	namespace:PROPOSAL
-UtilityInterpolantContRand	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^UtilityInterpolantContRand::UtilityInterpolantContRand($/;"	f	class:UtilityInterpolantContRand
-UtilityInterpolantContRand	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^class UtilityInterpolantContRand : public UtilityInterpolant$/;"	c	namespace:PROPOSAL
-UtilityInterpolantDecay	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^UtilityInterpolantDecay::UtilityInterpolantDecay($/;"	f	class:UtilityInterpolantDecay
-UtilityInterpolantDecay	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^class UtilityInterpolantDecay : public UtilityInterpolant$/;"	c	namespace:PROPOSAL
-UtilityInterpolantDisplacement	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^UtilityInterpolantDisplacement::UtilityInterpolantDisplacement($/;"	f	class:UtilityInterpolantDisplacement
-UtilityInterpolantInteraction	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^UtilityInterpolantInteraction::UtilityInterpolantInteraction($/;"	f	class:UtilityInterpolantInteraction
-UtilityInterpolantInteraction	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^class UtilityInterpolantInteraction : public UtilityInterpolant$/;"	c	namespace:PROPOSAL
-UtilityInterpolantScattering	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^UtilityInterpolantScattering::UtilityInterpolantScattering($/;"	f	class:UtilityInterpolantScattering
-UtilityInterpolantTime	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^UtilityInterpolantTime::UtilityInterpolantTime($/;"	f	class:UtilityInterpolantTime
+UtilityIntegral	private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx	/^UtilityIntegral::UtilityIntegral(std::function<double(double)> func)$/;"	f	class:UtilityIntegral
+UtilityIntegral	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^class UtilityIntegral {$/;"	c	namespace:PROPOSAL
+UtilityInterpolant	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^UtilityInterpolant::UtilityInterpolant(std::function<double(double)> func)$/;"	f	class:UtilityInterpolant
+UtilityInterpolant	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^class UtilityInterpolant : public UtilityIntegral {$/;"	c	namespace:PROPOSAL
 VALID_IDENTIFIER_CHARS	vendor/google/googletest/googlemock/scripts/generator/cpp/tokenize.py	/^VALID_IDENTIFIER_CHARS = set(_letters + _letters.upper() + '_0123456789$')$/;"	v
 VERIFY_CODE_LOCATION	vendor/google/googletest/googletest/test/gtest_unittest.cc	5321;"	d	file:
 VERIFY_CODE_LOCATION	vendor/google/googletest/googletest/test/gtest_unittest.cc	5372;"	d	file:
@@ -13918,7 +13937,7 @@ _kinds	vendor/pybind/pybind11/tools/clang/cindex.py	/^    _kinds = []$/;"	v	clas
 _kinds	vendor/pybind/pybind11/tools/clang/cindex.py	/^    _kinds = []$/;"	v	class:StorageClass
 _kinds	vendor/pybind/pybind11/tools/clang/cindex.py	/^    _kinds = []$/;"	v	class:TemplateArgumentKind
 _kinds	vendor/pybind/pybind11/tools/clang/cindex.py	/^    _kinds = []$/;"	v	class:TypeKind
-_left	public/PROPOSAL/methods.h	/^    left_map_type _left;$/;"	m	class:PROPOSAL::Helper::Bimap
+_left	public/PROPOSAL/methods.h	/^        left_map_type _left;$/;"	m	class:PROPOSAL::Helper::Bimap
 _letters	vendor/google/googletest/googlemock/scripts/generator/cpp/tokenize.py	/^_letters = 'abcdefghijklmnopqrstuvwxyz'$/;"	v
 _long_marker	vendor/pybind/pybind11/tests/conftest.py	/^_long_marker = re.compile(r'([0-9])L')$/;"	v
 _make_explanation	vendor/pybind/pybind11/tests/conftest.py	/^def _make_explanation(a, b):$/;"	f
@@ -13931,7 +13950,7 @@ _name_map	vendor/pybind/pybind11/tools/clang/cindex.py	/^    _name_map = None$/;
 _normalize	vendor/google/googletest/googletest/test/gtest_json_test_utils.py	/^  def _normalize(key, value):$/;"	f	function:normalize
 _python_to_cpp_to_python	vendor/pybind/pybind11/tests/test_gil_scoped.py	/^def _python_to_cpp_to_python():$/;"	f
 _python_to_cpp_to_python_from_threads	vendor/pybind/pybind11/tests/test_gil_scoped.py	/^def _python_to_cpp_to_python_from_threads(num_threads, parallel=False):$/;"	f
-_right	public/PROPOSAL/methods.h	/^    right_map_type _right;$/;"	m	class:PROPOSAL::Helper::Bimap
+_right	public/PROPOSAL/methods.h	/^        right_map_type _right;$/;"	m	class:PROPOSAL::Helper::Bimap
 _rmdir	vendor/google/googletest/googletest/test/googletest-filepath-test.cc	/^int _rmdir(const char* path) {$/;"	f	namespace:testing::internal::__anon19
 _run_in_process	vendor/pybind/pybind11/tests/test_gil_scoped.py	/^def _run_in_process(target, *args, **kwargs):$/;"	f
 _s	vendor/pybind/pybind11/include/pybind11/pytypes.h	/^inline str operator"" _s(const char *s, size_t size) { return {s, size}; }$/;"	f	namespace:literals
@@ -14485,8 +14504,6 @@ best_so_far_	vendor/google/googletest/googlemock/test/gmock-matchers_test.cc	/^ 
 between	vendor/log4cplus/log4cplus/catch/include/internal/catch_generators.hpp	/^    CompositeGenerator<T> between( T from, T to ) {$/;"	f	namespace:Catch::Generators
 bigNumber_	private/PROPOSAL/math/Interpolant.cxx	/^const double Interpolant::bigNumber_  = -300;$/;"	m	class:Interpolant	file:
 bigNumber_	public/PROPOSAL/math/Interpolant.h	/^    const static double bigNumber_;$/;"	m	class:PROPOSAL::Interpolant
-big_low_	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^    double big_low_;$/;"	m	class:PROPOSAL::UtilityInterpolantDecay
-big_low_	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^    double big_low_;$/;"	m	class:PROPOSAL::UtilityInterpolantInteraction
 binary_	public/PROPOSAL/math/TableWriter.h	/^    bool binary_;$/;"	m	class:Table_read
 binary_	public/PROPOSAL/math/TableWriter.h	/^    bool binary_;$/;"	m	class:Table_write
 binary_name	vendor/google/googletest/googletest/test/googletest-param-test-invalid-name1-test.py	/^binary_name = 'googletest-param-test-invalid-name1-test_'$/;"	v
@@ -14621,6 +14638,8 @@ build	vendor/log4cplus/log4cplus/catch/include/internal/catch_result_builder.hpp
 buildNumber	vendor/log4cplus/log4cplus/catch/include/internal/catch_version.h	/^        unsigned int const buildNumber;$/;"	m	struct:Catch::Version
 build_q_value	vendor/log4cplus/log4cplus/src/timehelper.cxx	/^build_q_value (log4cplus::tstring & q_str, long tv_usec)$/;"	f	namespace:log4cplus::helpers::__anon106
 build_uc_q_value	vendor/log4cplus/log4cplus/src/timehelper.cxx	/^build_uc_q_value (log4cplus::tstring & uc_q_str, long tv_usec,$/;"	f	namespace:log4cplus::helpers::__anon106
+builder1d	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^    Interpolant1DBuilder builder1d;$/;"	m	class:PROPOSAL::UtilityInterpolant
+builder_diff	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^    Interpolant1DBuilder builder_diff;$/;"	m	class:PROPOSAL::UtilityInterpolant
 builtin_exception	vendor/pybind/pybind11/include/pybind11/detail/common.h	/^class builtin_exception : public std::runtime_error {$/;"	c
 byte	public/PROPOSAL/json.hpp	/^    const std::size_t byte;$/;"	m	class:nlohmann::detail::parse_error
 byte_offset_unsafe	vendor/pybind/pybind11/include/pybind11/numpy.h	/^ssize_t byte_offset_unsafe(const Strides &strides, ssize_t i, Ix... index) {$/;"	f
@@ -14797,6 +14816,7 @@ channels_	public/PROPOSAL/decay/DecayTable.h	/^    DecayMap channels_;$/;"	m	cla
 char_	vendor/google/googletest/googletest/test/gtest_unittest.cc	/^  char char_;$/;"	m	class:__anon11::UnprintableChar	file:
 charge	public/PROPOSAL/particle/ParticleDef.h	/^    const double charge;$/;"	m	struct:PROPOSAL::ParticleDef
 charge	public/PROPOSAL/particle/ParticleDef.h	/^    double charge;$/;"	m	class:PROPOSAL::ParticleDef::Builder
+charge	public/PROPOSAL/scattering/ScatteringHighland.h	/^    double charge;$/;"	m	class:PROPOSAL::ScatteringHighland
 chars_read	public/PROPOSAL/json.hpp	/^    std::size_t chars_read = 0;$/;"	m	class:nlohmann::detail::binary_reader
 chars_read_current_line	public/PROPOSAL/json.hpp	/^    std::size_t chars_read_current_line = 0;$/;"	m	struct:nlohmann::detail::position_t
 chars_read_total	public/PROPOSAL/json.hpp	/^    std::size_t chars_read_total = 0;$/;"	m	struct:nlohmann::detail::position_t
@@ -14832,7 +14852,7 @@ cleanUp	vendor/log4cplus/log4cplus/catch/include/internal/catch_registry_hub.hpp
 cleanUpContext	vendor/log4cplus/log4cplus/catch/include/internal/catch_context_impl.hpp	/^    void cleanUpContext() {$/;"	f	namespace:Catch
 clean_type_id	vendor/pybind/pybind11/include/pybind11/detail/typeid.h	/^PYBIND11_NOINLINE inline void clean_type_id(std::string &name) {$/;"	f
 clear	public/PROPOSAL/Secondaries.h	/^    void clear() { secondaries_.clear(); };$/;"	f	class:PROPOSAL::Secondaries
-clear	public/PROPOSAL/methods.h	/^    void clear()$/;"	f	class:PROPOSAL::Helper::Bimap
+clear	public/PROPOSAL/methods.h	/^        void clear()$/;"	f	class:PROPOSAL::Helper::Bimap
 clear	vendor/log4cplus/log4cplus/src/hierarchy.cxx	/^Hierarchy::clear()$/;"	f	class:log4cplus::Hierarchy
 clear	vendor/log4cplus/log4cplus/src/mdc.cxx	/^MDC::clear()$/;"	f	class:log4cplus::MDC
 clear	vendor/log4cplus/log4cplus/src/ndc.cxx	/^NDC::clear()$/;"	f	class:log4cplus::NDC
@@ -14864,6 +14884,7 @@ clone	public/PROPOSAL/crossection/parametrization/Ionization.h	/^    Parametriza
 clone	public/PROPOSAL/crossection/parametrization/Ionization.h	/^    Parametrization* clone() const { return new IonizBergerSeltzerMoller(*this); }$/;"	f	class:PROPOSAL::IonizBergerSeltzerMoller
 clone	public/PROPOSAL/crossection/parametrization/Ionization.h	/^    Parametrization* clone() const { return new IonizBetheBlochRossi(*this); }$/;"	f	class:PROPOSAL::IonizBetheBlochRossi
 clone	public/PROPOSAL/crossection/parametrization/MupairProduction.h	/^    Parametrization* clone() const { return new MupairProductionRhoInterpolant<Param>(*this); }$/;"	f	class:PROPOSAL::MupairProductionRhoInterpolant
+clone	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    virtual Parametrization* clone() const {};$/;"	f	class:PROPOSAL::Parametrization
 clone	public/PROPOSAL/crossection/parametrization/PhotoPairProduction.h	/^        PhotoAngleDistribution* clone() const {return new PhotoAngleEGS(*this); }$/;"	f	class:PROPOSAL::PhotoAngleEGS
 clone	public/PROPOSAL/crossection/parametrization/PhotoPairProduction.h	/^        PhotoAngleDistribution* clone() const {return new PhotoAngleNoDeflection(*this); }$/;"	f	class:PROPOSAL::PhotoAngleNoDeflection
 clone	public/PROPOSAL/crossection/parametrization/PhotoPairProduction.h	/^        PhotoAngleDistribution* clone() const {return new PhotoAngleTsaiIntegral(*this); }$/;"	f	class:PROPOSAL::PhotoAngleTsaiIntegral
@@ -14969,6 +14990,7 @@ common_	vendor/google/googletest/googletest/src/gtest.cc	/^  size_t adds_, remov
 comparator_	vendor/google/googletest/googlemock/include/gmock/gmock-matchers.h	/^    const Comparator comparator_;$/;"	m	class:testing::internal::WhenSortedByMatcher::Impl
 comparator_	vendor/google/googletest/googlemock/include/gmock/gmock-matchers.h	/^  const Comparator comparator_;$/;"	m	class:testing::internal::WhenSortedByMatcher
 compare	private/PROPOSAL/crossection/AnnihilationInterpolant.cxx	/^bool AnnihilationInterpolant::compare(const CrossSection& cross_section) const$/;"	f	class:AnnihilationInterpolant
+compare	private/PROPOSAL/crossection/CrossSection.cxx	/^bool CrossSectionBuilder::compare(const CrossSection& cross) const{$/;"	f	class:CrossSectionBuilder
 compare	private/PROPOSAL/crossection/CrossSectionIntegral.cxx	/^bool CrossSectionIntegral::compare(const CrossSection& cross_section) const$/;"	f	class:CrossSectionIntegral
 compare	private/PROPOSAL/crossection/CrossSectionInterpolant.cxx	/^bool CrossSectionInterpolant::compare(const CrossSection& cross_section) const$/;"	f	class:CrossSectionInterpolant
 compare	private/PROPOSAL/crossection/PhotoPairIntegral.cxx	/^bool PhotoPairIntegral::compare(const CrossSection& cross_section) const {$/;"	f	class:PhotoPairIntegral
@@ -14983,7 +15005,7 @@ compare	private/PROPOSAL/crossection/parametrization/EpairProduction.cxx	/^bool 
 compare	private/PROPOSAL/crossection/parametrization/EpairProduction.cxx	/^bool EpairProductionRhoIntegral::compare(const Parametrization& parametrization) const$/;"	f	class:EpairProductionRhoIntegral
 compare	private/PROPOSAL/crossection/parametrization/MupairProduction.cxx	/^bool MupairProduction::compare(const Parametrization& parametrization) const$/;"	f	class:MupairProduction
 compare	private/PROPOSAL/crossection/parametrization/MupairProduction.cxx	/^bool MupairProductionRhoIntegral::compare(const Parametrization& parametrization) const$/;"	f	class:MupairProductionRhoIntegral
-compare	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^bool Parametrization::compare(const Parametrization& parametrization) const {$/;"	f	class:Parametrization
+compare	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^bool Parametrization::compare(const Parametrization& parametrization) const$/;"	f	class:Parametrization
 compare	private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx	/^bool PhotoAngleDistribution::compare(const PhotoAngleDistribution& photoangle) const {$/;"	f	class:PhotoAngleDistribution
 compare	private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx	/^bool PhotoPairProduction::compare(const Parametrization& parametrization) const$/;"	f	class:PhotoPairProduction
 compare	private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx	/^bool PhotoPairTsai::compare(const Parametrization& parametrization) const$/;"	f	class:PhotoPairTsai
@@ -15007,7 +15029,6 @@ compare	private/PROPOSAL/medium/density_distr/density_homogeneous.cxx	/^bool Den
 compare	private/PROPOSAL/medium/density_distr/density_polynomial.cxx	/^bool Density_polynomial::compare(const Density_distr& dens_distr) const {$/;"	f	class:Density_polynomial
 compare	private/PROPOSAL/medium/density_distr/density_splines.cxx	/^bool Density_splines::compare(const Density_distr& dens_distr) const {$/;"	f	class:Density_splines
 compare	private/PROPOSAL/scattering/ScatteringHighland.cxx	/^bool ScatteringHighland::compare(const Scattering& scattering) const$/;"	f	class:ScatteringHighland
-compare	private/PROPOSAL/scattering/ScatteringHighlandIntegral.cxx	/^bool ScatteringHighlandIntegral::compare(const Scattering& scattering) const$/;"	f	class:ScatteringHighlandIntegral
 compare	private/PROPOSAL/scattering/ScatteringMoliere.cxx	/^bool ScatteringMoliere::compare(const Scattering& scattering) const {$/;"	f	class:ScatteringMoliere
 compare	public/PROPOSAL/crossection/parametrization/EpairProduction.h	/^bool EpairProductionRhoInterpolant<Param>::compare(const Parametrization& parametrization) const$/;"	f	class:PROPOSAL::EpairProductionRhoInterpolant
 compare	public/PROPOSAL/crossection/parametrization/MupairProduction.h	/^bool MupairProductionRhoInterpolant<Param>::compare(const Parametrization& parametrization) const$/;"	f	class:PROPOSAL::MupairProductionRhoInterpolant
@@ -15079,10 +15100,11 @@ completedCycle	vendor/log4cplus/log4cplus/catch/include/internal/catch_test_case
 completionChunkKindMap	vendor/pybind/pybind11/tools/clang/cindex.py	/^completionChunkKindMap = {$/;"	v
 component_index_	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    int component_index_;$/;"	m	class:PROPOSAL::Parametrization
 component_index_	public/PROPOSAL/crossection/parametrization/PhotoPairProduction.h	/^        int component_index_;$/;"	m	class:PROPOSAL::PhotoAngleDistribution
-components_	public/PROPOSAL/crossection/CrossSection.h	/^    const ComponentVec& components_;$/;"	m	class:PROPOSAL::CrossSection
-components_	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    const ComponentVec& components_;$/;"	m	class:PROPOSAL::Parametrization
-components_	public/PROPOSAL/crossection/parametrization/PhotoPairProduction.h	/^        const ComponentVec& components_;$/;"	m	class:PROPOSAL::PhotoAngleDistribution
-components_	public/PROPOSAL/medium/Medium.h	/^    std::vector<Components::Component*> components_;  \/\/\/< Components of Medium$/;"	m	class:PROPOSAL::Medium
+components_	public/PROPOSAL/crossection/CrossSection.h	/^    const std::vector<Components::Component>& components_;$/;"	m	class:PROPOSAL::CrossSection
+components_	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    const std::vector<Components::Component>& components_;$/;"	m	class:PROPOSAL::Parametrization
+components_	public/PROPOSAL/crossection/parametrization/PhotoPairProduction.h	/^        const std::vector<Components::Component>& components_;$/;"	m	class:PROPOSAL::PhotoAngleDistribution
+components_	public/PROPOSAL/medium/Medium.h	/^    std::vector<Components::Component> components_;  \/\/\/< Components of Medium$/;"	m	class:PROPOSAL::Medium
+components_empty_	public/PROPOSAL/crossection/CrossSection.h	/^    static const std::vector<Components::Component> components_empty_;$/;"	m	class:PROPOSAL::CrossSection
 compton_map_enum_	public/PROPOSAL/crossection/factories/ComptonFactory.h	/^        ComptonMapEnum compton_map_enum_;$/;"	m	class:PROPOSAL::ComptonFactory
 compton_map_str_	public/PROPOSAL/crossection/factories/ComptonFactory.h	/^        ComptonMapString compton_map_str_;$/;"	m	class:PROPOSAL::ComptonFactory
 compute	vendor/pybind/pybind11/include/pybind11/pytypes.h	/^    bool compute(size_t length, size_t *start, size_t *stop, size_t *step,$/;"	f	class:slice
@@ -15185,7 +15207,7 @@ construct_alias_from_cpp	vendor/pybind/pybind11/include/pybind11/detail/init.h	/
 construct_or_initialize	vendor/pybind/pybind11/include/pybind11/detail/init.h	/^inline Class *construct_or_initialize(Args &&...args) { return new Class(std::forward<Args>(args)...); }$/;"	f
 construct_or_initialize	vendor/pybind/pybind11/include/pybind11/detail/init.h	/^inline Class *construct_or_initialize(Args &&...args) { return new Class{std::forward<Args>(args)...}; }$/;"	f
 constructor	vendor/pybind/pybind11/include/pybind11/detail/init.h	/^struct constructor {$/;"	s
-cont_rand	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::unique_ptr<UtilityDecorator> cont_rand = nullptr;$/;"	m	struct:PROPOSAL::Utility::Definition
+cont_rand	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::unique_ptr<ContRand> cont_rand = nullptr;$/;"	m	struct:PROPOSAL::Utility::Definition
 cont_rand_	public/PROPOSAL/Sector.h	/^    std::shared_ptr<ContinuousRandomizer> cont_rand_;$/;"	m	class:PROPOSAL::Sector
 container	public/PROPOSAL/json.hpp	/^        : container(cont) {}$/;"	f	class:nlohmann::detail::iteration_proxy
 container	public/PROPOSAL/json.hpp	/^    typename IteratorType::reference container;$/;"	m	class:nlohmann::detail::iteration_proxy
@@ -15305,8 +15327,6 @@ create	public/PROPOSAL/json.hpp	/^    static out_of_range create(int id_, const 
 create	public/PROPOSAL/json.hpp	/^    static parse_error create(int id_, const position_t& pos, const std::string& what_arg)$/;"	f	class:nlohmann::detail::parse_error
 create	public/PROPOSAL/json.hpp	/^    static parse_error create(int id_, std::size_t byte_, const std::string& what_arg)$/;"	f	class:nlohmann::detail::parse_error
 create	public/PROPOSAL/json.hpp	/^    static type_error create(int id_, const std::string& what_arg)$/;"	f	class:nlohmann::detail::type_error
-create	public/PROPOSAL/medium/Medium.h	/^    std::shared_ptr<const Medium> create(double density_correction = 1.0) {$/;"	f	class:PROPOSAL::Air
-create	public/PROPOSAL/medium/Medium.h	/^    virtual std::shared_ptr<const Medium> create() const { return std::shared_ptr<const Medium>(new Medium(*this)) ;};$/;"	f	class:PROPOSAL::Medium
 create	vendor/log4cplus/log4cplus/catch/include/internal/catch_reporter_registrars.hpp	/^            virtual IStreamingReporter* create( ReporterConfig const& config ) const {$/;"	f	class:Catch::LegacyReporterRegistrar::ReporterFactory
 create	vendor/log4cplus/log4cplus/catch/include/internal/catch_reporter_registrars.hpp	/^            virtual IStreamingReporter* create( ReporterConfig const& config ) const {$/;"	f	class:Catch::ListenerRegistrar::ListenerFactory
 create	vendor/log4cplus/log4cplus/catch/include/internal/catch_reporter_registrars.hpp	/^            virtual IStreamingReporter* create( ReporterConfig const& config ) const {$/;"	f	class:Catch::ReporterRegistrar::ReporterFactory
@@ -15366,8 +15386,12 @@ criticalLogLevelInitializer_	vendor/log4cplus/log4cplus/tests/customloglevel_tes
 criticalToStringMethod	vendor/log4cplus/log4cplus/tests/customloglevel_test/customloglevel.cxx	/^criticalToStringMethod(LogLevel ll)$/;"	f	file:
 critical_section_	vendor/google/googletest/googletest/include/gtest/internal/gtest-port.h	/^  GTEST_CRITICAL_SECTION* critical_section_;$/;"	m	class:testing::internal::Mutex
 critical_section_init_phase_	vendor/google/googletest/googletest/include/gtest/internal/gtest-port.h	/^  long critical_section_init_phase_;  \/\/ NOLINT$/;"	m	class:testing::internal::Mutex
+cross	public/PROPOSAL/propagation_utility/ContRand.h	/^        CrossSectionList cross;$/;"	m	class:PROPOSAL::ContRand
+cross	public/PROPOSAL/propagation_utility/Decay.h	/^        CrossSectionList cross;$/;"	m	class:PROPOSAL::Decay
+cross	public/PROPOSAL/propagation_utility/Displacement.h	/^    CrossSectionList cross;$/;"	m	class:PROPOSAL::Displacement
+cross	public/PROPOSAL/propagation_utility/Interaction.h	/^        CrossSectionList cross;$/;"	m	class:PROPOSAL::Interaction
 cross	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        CrossSectionList cross;              \/\/ copy is expensive$/;"	m	struct:PROPOSAL::Utility::Definition
-crosss	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^    CrossSectionList crosss;$/;"	m	class:PROPOSAL::UtilityDecorator
+cross	public/PROPOSAL/propagation_utility/Time.h	/^        CrossSectionList cross;$/;"	m	class:PROPOSAL::ExactTimeBuilder
 crosssections	build/resources/examples/standalone/plot_brems.py	/^    crosssections = []$/;"	v
 crosssections	build/resources/examples/standalone/plot_epair.py	/^    crosssections = []$/;"	v
 crosssections	build/resources/examples/standalone/plot_photo.py	/^    crosssections = []$/;"	v
@@ -15461,6 +15485,7 @@ d	vendor/pybind/pybind11/tests/test_numpy_dtypes.cpp	/^    std::array<float, 2> 
 d	vendor/pybind/pybind11/tests/test_pytypes.py	/^        d = {"operator[object]": 1, "operator[char *]": 2}$/;"	v	class:test_accessors.TestObject
 d	vendor/pybind/pybind11/tools/mkdoc.py	/^def d(s):$/;"	f
 d0_	public/PROPOSAL/medium/Medium.h	/^    double m_, X0_, X1_, d0_;  \/\/\/< ionization formula constants (continued)$/;"	m	class:PROPOSAL::Medium
+dE2dx_function	public/PROPOSAL/crossection/CrossSection.h	/^    Function dE2dx_function;$/;"	m	class:PROPOSAL::final
 dEdx	build/resources/examples/standalone/plot_brems.py	/^        dEdx = []$/;"	v
 dEdx	build/resources/examples/standalone/plot_epair.py	/^        dEdx = []$/;"	v
 dEdx	build/resources/examples/standalone/plot_photo.py	/^        dEdx = []$/;"	v
@@ -15479,6 +15504,7 @@ dEdx_brems	tests/gen_testfiles_scripts/resources/examples/standalone/plot_xsecti
 dEdx_epair	build/resources/examples/standalone/plot_xsections.py	/^    dEdx_epair = []$/;"	v
 dEdx_epair	resources/examples/standalone/plot_xsections.py	/^    dEdx_epair = []$/;"	v
 dEdx_epair	tests/gen_testfiles_scripts/resources/examples/standalone/plot_xsections.py	/^    dEdx_epair = []$/;"	v
+dEdx_function	public/PROPOSAL/crossection/CrossSection.h	/^    Function dEdx_function;$/;"	m	class:PROPOSAL::final
 dEdx_ioniz	build/resources/examples/standalone/plot_xsections.py	/^    dEdx_ioniz = []$/;"	v
 dEdx_ioniz	resources/examples/standalone/plot_xsections.py	/^    dEdx_ioniz = []$/;"	v
 dEdx_ioniz	tests/gen_testfiles_scripts/resources/examples/standalone/plot_xsections.py	/^    dEdx_ioniz = []$/;"	v
@@ -15497,6 +15523,8 @@ dEdx_photo	tests/gen_testfiles_scripts/resources/examples/standalone/plot_xsecti
 dEdx_sum	build/resources/examples/standalone/plot_xsections.py	/^    dEdx_sum = []$/;"	v
 dEdx_sum	resources/examples/standalone/plot_xsections.py	/^    dEdx_sum = []$/;"	v
 dEdx_sum	tests/gen_testfiles_scripts/resources/examples/standalone/plot_xsections.py	/^    dEdx_sum = []$/;"	v
+dNdx_function	public/PROPOSAL/crossection/CrossSection.h	/^    Function dNdx_function;$/;"	m	class:PROPOSAL::final
+dNdx_rnd_function	public/PROPOSAL/crossection/CrossSection.h	/^    std::function<double(double, double)> dNdx_rnd_function;$/;"	m	class:PROPOSAL::final
 d_	public/PROPOSAL/math/Integral.h	/^    std::vector<double> d_;$/;"	m	class:PROPOSAL::Integral
 d_	public/PROPOSAL/math/Interpolant.h	/^    std::vector<double> d_;$/;"	m	class:PROPOSAL::Interpolant
 d_	vendor/log4cplus/log4cplus/catch/projects/SelfTest/ApproxTests.cpp	/^  double d_ = 0.0;$/;"	m	class:StrongDoubleTypedef	file:
@@ -15560,7 +15588,7 @@ debugEnabled	vendor/log4cplus/log4cplus/include/log4cplus/helpers/loglog.h	/^   
 decRef	vendor/pybind/pybind11/tests/object.h	/^    void decRef(bool dealloc = true) const {$/;"	f	class:Object
 dec_ref	vendor/pybind/pybind11/include/pybind11/pybind11.h	/^    PYBIND11_NOINLINE void dec_ref() {$/;"	f	class:gil_scoped_acquire
 dec_ref	vendor/pybind/pybind11/include/pybind11/pytypes.h	/^    const handle& dec_ref() const & { Py_XDECREF(m_ptr); return *this; }$/;"	f	class:handle
-decay_calc	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::unique_ptr<UtilityDecorator> decay_calc = nullptr;$/;"	m	struct:PROPOSAL::Utility::Definition
+decay_calc	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::unique_ptr<Decay> decay_calc = nullptr;$/;"	m	struct:PROPOSAL::Utility::Definition
 decay_calculator_	public/PROPOSAL/Sector.h	/^    std::shared_ptr<UtilityDecorator> decay_calculator_;$/;"	m	class:PROPOSAL::Sector
 decay_table	public/PROPOSAL/particle/ParticleDef.h	/^    DecayTable decay_table;$/;"	m	class:PROPOSAL::ParticleDef::Builder
 decay_table	public/PROPOSAL/particle/ParticleDef.h	/^    const DecayTable decay_table;$/;"	m	struct:PROPOSAL::ParticleDef
@@ -15756,6 +15784,7 @@ diff	public/PROPOSAL/json.hpp	/^    static basic_json diff(const basic_json& sou
 diff	resources/examples/standalone/plot_tau_decay_leptons.py	/^    diff = hist_ME[0] \/ hist[0]$/;"	v
 diff	tests/gen_testfiles_scripts/resources/examples/standalone/plot_tau_decay_leptons.py	/^    diff = hist_ME[0] \/ hist[0]$/;"	v
 diffFiles	vendor/log4cplus/log4cplus/catch/scripts/approvalTests.py	/^def diffFiles(fileA, fileB):$/;"	f
+diff_cross	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    std::function<double(const Parametrization&, double, double)> diff_cross;$/;"	m	class:PROPOSAL::Parametrization_builder
 difference_type	vendor/google/googletest/googletest/include/gtest/internal/gtest-param-util.h	/^  typedef ptrdiff_t difference_type;$/;"	t	class:testing::internal::ParamIterator
 digits	vendor/pybind/pybind11/include/pybind11/detail/descr.h	/^    static constexpr auto digits = descr<sizeof...(Digits)>(('0' + Digits)...);$/;"	m	struct:int_to_str
 dilog	private/PROPOSAL/math/MathMethods.cxx	/^double dilog(double x) {$/;"	f	namespace:PROPOSAL
@@ -15787,12 +15816,12 @@ dispatch	vendor/pybind/pybind11/tests/test_virtual_functions.cpp	/^    virtual s
 dispatch	vendor/pybind/pybind11/tests/test_virtual_functions.py	/^        def dispatch(self):$/;"	m	class:test_dispatch_issue.PyClass1
 dispatch	vendor/pybind/pybind11/tests/test_virtual_functions.py	/^        def dispatch(self):$/;"	m	class:test_dispatch_issue.PyClass2
 dispatcher	vendor/pybind/pybind11/include/pybind11/pybind11.h	/^    static PyObject *dispatcher(PyObject *self, PyObject *args_in, PyObject *kwargs_in) {$/;"	f	class:cpp_function
-displacement_	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    std::unique_ptr<UtilityIntegralDisplacement> displacement_;$/;"	m	class:PROPOSAL::UtilityIntegralContRand
-displacement_	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    std::unique_ptr<UtilityIntegralDisplacement> displacement_;$/;"	m	class:PROPOSAL::UtilityIntegralDecay
-displacement_	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    std::unique_ptr<UtilityIntegralDisplacement> displacement_;$/;"	m	class:PROPOSAL::UtilityIntegralInteraction
-displacement_	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    std::unique_ptr<UtilityIntegralDisplacement> displacement_;$/;"	m	class:PROPOSAL::UtilityIntegralScattering
-displacement_	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    std::unique_ptr<UtilityIntegralDisplacement> displacement_;$/;"	m	class:PROPOSAL::UtilityIntegralTime
-displacement_calc	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::unique_ptr<UtilityDecorator> displacement_calc = nullptr;$/;"	m	struct:PROPOSAL::Utility::Definition
+displacement	public/PROPOSAL/propagation_utility/ContRand.h	/^        DisplacementBuilder <UtilityIntegral> displacement;$/;"	m	class:PROPOSAL::ContRandBuilder
+displacement	public/PROPOSAL/propagation_utility/Decay.h	/^        DisplacementBuilder <UtilityIntegral> displacement;$/;"	m	class:PROPOSAL::DecayBuilder
+displacement	public/PROPOSAL/propagation_utility/Interaction.h	/^        DisplacementBuilder <UtilityIntegral> displacement;$/;"	m	class:PROPOSAL::InteractionBuilder
+displacement	public/PROPOSAL/propagation_utility/Time.h	/^        DisplacementBuilder<UtilityIntegral> displacement;$/;"	m	class:PROPOSAL::ExactTimeBuilder
+displacement	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^    std::unique_ptr<Displacement> displacement;$/;"	m	class:PROPOSAL::ScatteringHighlandIntegral
+displacement_calc	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::unique_ptr<Displacement> displacement_calc = nullptr;$/;"	m	struct:PROPOSAL::Utility::Definition
 displacement_calculator_	public/PROPOSAL/Sector.h	/^    std::shared_ptr<UtilityDecorator> displacement_calculator_;$/;"	m	class:PROPOSAL::Sector
 displayname	vendor/pybind/pybind11/tools/clang/cindex.py	/^    def displayname(self):$/;"	m	class:Cursor
 dist	build/resources/examples/standalone/plot_continuous.py	/^    dist = 300$/;"	v
@@ -16120,7 +16149,6 @@ evaluate	vendor/log4cplus/log4cplus/catch/single_include/catch.hpp	/^        sta
 event_	vendor/google/googletest/googletest/include/gtest/internal/gtest-port.h	/^  AutoHandle event_;$/;"	m	class:testing::internal::Notification
 event_handle_	vendor/google/googletest/googletest/src/gtest-death-test.cc	/^  AutoHandle event_handle_;$/;"	m	class:testing::internal::WindowsDeathTest	file:
 event_loop	vendor/pybind/pybind11/tests/test_async.py	/^def event_loop():$/;"	f
-exact_time	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::unique_ptr<UtilityDecorator> exact_time = nullptr;$/;"	m	struct:PROPOSAL::Utility::Definition
 exact_time_calculator_	public/PROPOSAL/Sector.h	/^    std::shared_ptr<UtilityDecorator> exact_time_calculator_;$/;"	m	class:PROPOSAL::Sector
 exactly_one	vendor/pybind/pybind11/include/pybind11/detail/common.h	/^struct exactly_one {$/;"	s
 exactly_one	vendor/pybind/pybind11/include/pybind11/detail/common.h	/^struct exactly_one<P, Default> { using type = Default; };$/;"	s
@@ -16386,6 +16414,7 @@ filter_particle	resources/examples/standalone/plot_tau_decay_hadrons.py	/^def fi
 filter_particle	resources/examples/standalone/plot_tau_decay_leptons.py	/^def filter_particle(secondarys, particle_type):$/;"	f
 filter_particle	tests/gen_testfiles_scripts/resources/examples/standalone/plot_tau_decay_hadrons.py	/^def filter_particle(secondarys, particle):$/;"	f
 filter_particle	tests/gen_testfiles_scripts/resources/examples/standalone/plot_tau_decay_leptons.py	/^def filter_particle(secondarys, particle_type):$/;"	f
+final	public/PROPOSAL/crossection/CrossSection.h	/^class CrossSectionBuilder final : public CrossSection$/;"	c	namespace:PROPOSAL
 final	vendor/google/googletest/googlemock/include/gmock/gmock-spec-builders.h	/^class FunctionMocker<R(Args...)> final : public UntypedFunctionMockerBase {$/;"	c	namespace:testing::internal
 final	vendor/pybind/pybind11/tests/test_embed/test_interpreter.cpp	/^class PyWidget final : public Widget {$/;"	c	file:
 final_stochastic_loss_	private/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h	/^    I3Particle::ParticleType final_stochastic_loss_;$/;"	m	class:PROPOSAL::I3PropagatorServicePROPOSAL
@@ -16520,14 +16549,10 @@ forwarding_enabled_	vendor/google/googletest/googletest/src/gtest.cc	/^  bool fo
 found	vendor/pybind/pybind11/include/pybind11/detail/common.h	/^    static constexpr auto found = constexpr_sum(Predicate<Ts>::value...);$/;"	m	struct:exactly_one
 fp0_	public/PROPOSAL/medium/density_distr/density_distr.h	/^    Vector3D fp0_;$/;"	m	class:PROPOSAL::Axis
 fpToString	vendor/log4cplus/log4cplus/catch/include/internal/catch_tostring.hpp	/^std::string fpToString( T value, int precision ) {$/;"	f	namespace:Catch
-fraction_Ar	private/PROPOSAL/medium/Medium.cxx	/^const double Air::fraction_Ar = 0.9;$/;"	m	class:Air	file:
 fraction_Ar	public/PROPOSAL/medium/Medium.h	/^    static const double fraction_Ar;$/;"	m	class:PROPOSAL::Air
-fraction_N	private/PROPOSAL/medium/Medium.cxx	/^const double Air::fraction_N = 2 * 78.1;$/;"	m	class:Air	file:
 fraction_N	public/PROPOSAL/medium/Medium.h	/^    static const double fraction_N;$/;"	m	class:PROPOSAL::Air
-fraction_O	private/PROPOSAL/medium/Medium.cxx	/^const double Air::fraction_O = 2 * 21.0;$/;"	m	class:Air	file:
 fraction_O	public/PROPOSAL/medium/Medium.h	/^    static const double fraction_O;$/;"	m	class:PROPOSAL::Air
 fraction_bits	vendor/google/googletest/googletest/include/gtest/internal/gtest-internal.h	/^  Bits fraction_bits() const { return kFractionBitMask & u_.bits_; }$/;"	f	class:testing::internal::FloatingPoint
-fraction_sum	private/PROPOSAL/medium/Medium.cxx	/^const double Air::fraction_sum =$/;"	m	class:Air	file:
 fraction_sum	public/PROPOSAL/medium/Medium.h	/^    static const double fraction_sum;$/;"	m	class:PROPOSAL::Air
 freeTLSSlot	vendor/log4cplus/log4cplus/src/global-init.cxx	/^freeTLSSlot ()$/;"	f	namespace:log4cplus
 free_data	vendor/pybind/pybind11/include/pybind11/attr.h	/^    void (*free_data) (function_record *ptr) = nullptr;$/;"	m	struct:function_record
@@ -17425,8 +17450,8 @@ hash	vendor/pybind/pybind11/include/pybind11/pytypes.h	/^inline ssize_t hash(han
 hash	vendor/pybind/pybind11/tests/test_operator_overloading.cpp	/^    struct hash<Vector2> {$/;"	s	namespace:std	file:
 hash	vendor/pybind/pybind11/tests/test_stl.cpp	/^    struct hash<TplCtorClass> { size_t operator()(const TplCtorClass &) const { return 0; } };$/;"	s	namespace:std	file:
 hash	vendor/pybind/pybind11/tools/clang/cindex.py	/^    def hash(self):$/;"	m	class:Cursor
-hash_combine	public/PROPOSAL/methods.h	/^inline void hash_combine(std::size_t& seed) { (void) seed; }$/;"	f	namespace:PROPOSAL
-hash_combine	public/PROPOSAL/methods.h	/^inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {$/;"	f	namespace:PROPOSAL
+hash_combine	public/PROPOSAL/methods.h	/^inline void hash_combine(std::size_t& seed) { (void)seed; }$/;"	f	namespace:PROPOSAL
+hash_combine	public/PROPOSAL/methods.h	/^inline void hash_combine(std::size_t& seed, const T& v, Rest... rest)$/;"	f	namespace:PROPOSAL
 hasher	vendor/google/googletest/googletest/test/gtest_unittest.cc	/^  typedef void hasher;$/;"	t	struct:AHashTable	file:
 hasher	vendor/google/googletest/googletest/test/gtest_unittest.cc	/^  typedef void hasher;$/;"	t	struct:NotReallyAHashTable	file:
 hashes	vendor/log4cplus/log4cplus/catch/scripts/releaseNotes.py	/^hashes = runAndCapture( ['git', 'log', '-2', '--format="%H"', versionPath] )$/;"	v
@@ -17800,7 +17825,7 @@ insert	public/PROPOSAL/json.hpp	/^    iterator insert(const_iterator pos, const_
 insert	public/PROPOSAL/json.hpp	/^    iterator insert(const_iterator pos, initializer_list_t ilist)$/;"	f	class:nlohmann::basic_json
 insert	public/PROPOSAL/json.hpp	/^    iterator insert(const_iterator pos, size_type cnt, const basic_json& val)$/;"	f	class:nlohmann::basic_json
 insert	public/PROPOSAL/json.hpp	/^    void insert(const_iterator first, const_iterator last)$/;"	f	class:nlohmann::basic_json
-insert	public/PROPOSAL/methods.h	/^    void insert(K key, V value)$/;"	f	class:PROPOSAL::Helper::Bimap
+insert	public/PROPOSAL/methods.h	/^        void insert(K key, V value)$/;"	f	class:PROPOSAL::Helper::Bimap
 insert	vendor/pybind/pybind11/include/pybind11/pytypes.h	/^    template <typename T> void insert(size_t index, T &&val) const {$/;"	f	class:list
 insert_iterator	public/PROPOSAL/json.hpp	/^    iterator insert_iterator(const_iterator pos, Args&& ... args)$/;"	f	class:nlohmann::basic_json
 inst	vendor/pybind/pybind11/include/pybind11/cast.h	/^        instance *inst = nullptr;$/;"	m	struct:values_and_holders::iterator
@@ -17826,16 +17851,21 @@ int_seven	vendor/log4cplus/log4cplus/catch/projects/SelfTest/ConditionTests.cpp	
 int_to_str	vendor/pybind/pybind11/include/pybind11/detail/descr.h	/^template <size_t Rem, size_t... Digits> struct int_to_str : int_to_str<Rem\/10, Rem%10, Digits...> { };$/;"	s
 int_to_str	vendor/pybind/pybind11/include/pybind11/detail/descr.h	/^template <size_t...Digits> struct int_to_str<0, Digits...> {$/;"	s
 int_to_string	public/PROPOSAL/json.hpp	/^void int_to_string( string_type& target, std::size_t value )$/;"	f	namespace:nlohmann::detail
+integral	public/PROPOSAL/propagation_utility/ContRand.h	/^        T integral;$/;"	m	class:PROPOSAL::ContRandBuilder
+integral	public/PROPOSAL/propagation_utility/Decay.h	/^        T integral;$/;"	m	class:PROPOSAL::DecayBuilder
+integral	public/PROPOSAL/propagation_utility/Displacement.h	/^    T integral;$/;"	m	class:PROPOSAL::DisplacementBuilder
+integral	public/PROPOSAL/propagation_utility/Interaction.h	/^        T integral;$/;"	m	class:PROPOSAL::InteractionBuilder
+integral	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    Integral integral;$/;"	m	class:PROPOSAL::UtilityIntegral
+integral	public/PROPOSAL/propagation_utility/Time.h	/^        T integral;$/;"	m	class:PROPOSAL::ExactTimeBuilder
+integral	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^    T integral;$/;"	m	class:PROPOSAL::ScatteringHighlandIntegral
 integral_	public/PROPOSAL/crossection/parametrization/EpairProduction.h	/^    Integral integral_;$/;"	m	class:PROPOSAL::EpairProductionRhoIntegral
 integral_	public/PROPOSAL/crossection/parametrization/MupairProduction.h	/^    Integral integral_;$/;"	m	class:PROPOSAL::MupairProductionRhoIntegral
 integral_	public/PROPOSAL/crossection/parametrization/PhotoPairProduction.h	/^        Integral integral_;$/;"	m	class:PROPOSAL::PhotoAngleTsaiIntegral
 integral_	public/PROPOSAL/crossection/parametrization/PhotoQ2Integration.h	/^    Integral integral_;$/;"	m	class:PROPOSAL::PhotoQ2Integral
-integral_	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    Integral integral_;$/;"	m	class:PROPOSAL::UtilityIntegral
-integral_	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^        std::unique_ptr<UtilityIntegralContRand> integral_;$/;"	m	class:PROPOSAL::UtilityInterpolantContRand
 integrand_	public/PROPOSAL/math/Integral.h	/^    std::function<double(double)> integrand_;$/;"	m	class:PROPOSAL::Integral
 integrated_spline_	public/PROPOSAL/medium/density_distr/density_splines.h	/^    Spline* integrated_spline_;$/;"	m	class:PROPOSAL::Density_splines
 inter_def	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::shared_ptr<InterpolationDef> inter_def; \/\/ integration used$/;"	m	struct:PROPOSAL::Utility::Definition
-interaction_calc	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::unique_ptr<UtilityDecorator> interaction_calc = nullptr;$/;"	m	struct:PROPOSAL::Utility::Definition
+interaction_calc	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::unique_ptr<Interaction> interaction_calc = nullptr;$/;"	m	struct:PROPOSAL::Utility::Definition
 interaction_calculator_	public/PROPOSAL/Sector.h	/^    std::shared_ptr<UtilityDecorator> interaction_calculator_;$/;"	m	class:PROPOSAL::Sector
 intercept_mode_	vendor/google/googletest/googletest/include/gtest/gtest-spi.h	/^  const InterceptMode intercept_mode_;$/;"	m	class:testing::ScopedFakeTestPartResultReporter
 interlocked_compare_exchange	vendor/log4cplus/log4cplus/src/socket-win32.cxx	/^interlocked_compare_exchange (std::atomic<WSInitStates> & var,$/;"	f	namespace:__anon108
@@ -17932,7 +17962,6 @@ interpolation_def	tests/gen_testfiles_scripts/resources/examples/standalone/plot
 interpolation_def	tests/gen_testfiles_scripts/resources/examples/standalone/plot_xsections.py	/^    interpolation_def = pp.InterpolationDef()$/;"	v
 interpolation_def	tests/gen_testfiles_scripts/resources/examples/standalone/test_continuous_loss_output.py	/^            interpolation_def=interpolation_def$/;"	v
 interpolation_def	tests/gen_testfiles_scripts/resources/examples/standalone/test_continuous_loss_output.py	/^    interpolation_def = pp.InterpolationDef()$/;"	v
-interpolation_def_	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^    std::shared_ptr<InterpolationDef> interpolation_def_;$/;"	m	class:PROPOSAL::UtilityInterpolant
 interpoldef	tests/gen_testfiles_scripts/annihilation.py	/^interpoldef = pp.InterpolationDef()$/;"	v
 interpoldef	tests/gen_testfiles_scripts/bremsstrahlung.py	/^interpoldef = pp.InterpolationDef()$/;"	v
 interpoldef	tests/gen_testfiles_scripts/compton.py	/^interpoldef = pp.InterpolationDef()$/;"	v
@@ -18407,6 +18436,7 @@ kind	vendor/pybind/pybind11/tools/clang/cindex.py	/^    def kind(self):$/;"	m	cl
 kind	vendor/pybind/pybind11/tools/clang/cindex.py	/^    def kind(self):$/;"	m	class:Cursor
 kind	vendor/pybind/pybind11/tools/clang/cindex.py	/^    def kind(self):$/;"	m	class:Token
 kind	vendor/pybind/pybind11/tools/clang/cindex.py	/^    def kind(self):$/;"	m	class:Type
+kinematic_limits	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    std::function<KinematicLimits(const Parametrization&, double)> kinematic_limits;$/;"	m	class:PROPOSAL::Parametrization_builder
 kinfo_proc	vendor/google/googletest/googletest/src/gtest-port.cc	148;"	d	file:
 kwargs	vendor/pybind/pybind11/include/pybind11/pytypes.h	/^class kwargs : public dict { PYBIND11_OBJECT_DEFAULT(kwargs, dict, PyDict_Check)  };$/;"	c
 kwargs_pos	vendor/pybind/pybind11/include/pybind11/cast.h	/^                        kwargs_pos = constexpr_first<argument_is_kwargs, Args...>() - (int) sizeof...(Args);$/;"	m	class:argument_loader
@@ -18499,7 +18529,7 @@ ldbl_	vendor/pybind/pybind11/tests/test_numpy_dtypes.cpp	/^    long double ldbl_
 leakable	vendor/google/googletest/googlemock/src/gmock-spec-builders.cc	/^  bool leakable;  \/\/ true if and only if it's OK to leak the object.$/;"	m	struct:testing::__anon69::MockObjectState	file:
 leftAlign	vendor/log4cplus/log4cplus/src/patternlayout.cxx	/^    bool leftAlign : 1;$/;"	m	struct:log4cplus::pattern::FormattingInfo	file:
 left_	vendor/google/googletest/googlemock/src/gmock-matchers.cc	/^  ::std::vector<size_t> left_;$/;"	m	class:testing::internal::MaxBipartiteMatchState	file:
-left_map_type	public/PROPOSAL/methods.h	/^    typedef std::map<K, V> left_map_type;$/;"	t	class:PROPOSAL::Helper::Bimap
+left_map_type	public/PROPOSAL/methods.h	/^        typedef std::map<K, V> left_map_type;$/;"	t	class:PROPOSAL::Helper::Bimap
 left_start_	vendor/google/googletest/googletest/src/gtest.cc	/^  size_t left_start_, right_start_;$/;"	m	class:testing::internal::edit_distance::__anon42::Hunk	file:
 len	vendor/pybind/pybind11/include/pybind11/numpy.h	/^        int len;$/;"	m	struct:npy_api::__anon4
 len	vendor/pybind/pybind11/include/pybind11/pytypes.h	/^inline size_t len(handle h) {$/;"	f
@@ -18537,7 +18567,7 @@ libtool_validate_options	vendor/log4cplus/log4cplus/ltmain.sh	/^libtool_validate
 license	vendor/pybind/pybind11/setup.py	/^    license='BSD',$/;"	v	class:InstallHeaders
 lifetime	public/PROPOSAL/particle/ParticleDef.h	/^    const double lifetime;$/;"	m	struct:PROPOSAL::ParticleDef
 lifetime	public/PROPOSAL/particle/ParticleDef.h	/^    double lifetime;$/;"	m	class:PROPOSAL::ParticleDef::Builder
-lifetime	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    double lifetime;$/;"	m	class:PROPOSAL::UtilityIntegralDecay
+lifetime	public/PROPOSAL/propagation_utility/Decay.h	/^        double lifetime;$/;"	m	class:PROPOSAL::Decay
 limit	public/PROPOSAL/json.hpp	/^        : cursor(b), limit(b == nullptr ? nullptr : (b + l))$/;"	f	class:nlohmann::detail::input_buffer_adapter
 limit	public/PROPOSAL/json.hpp	/^    const char* const limit;$/;"	m	class:nlohmann::detail::input_buffer_adapter
 line	vendor/google/googletest/googlemock/include/gmock/gmock-spec-builders.h	/^  int line() const { return line_; }$/;"	f	class:testing::internal::ExpectationBase
@@ -19203,6 +19233,7 @@ main	tests/ContinuousRandomization_TEST.cxx	/^int main(int argc, char** argv) {$
 main	tests/DecayChannel_TEST.cxx	/^int main(int argc, char** argv)$/;"	f
 main	tests/DecayTable_TEST.cxx	/^int main(int argc, char** argv)$/;"	f
 main	tests/Density_distribution_TEST.cxx	/^int main(int argc, char** argv)$/;"	f
+main	tests/Displacement.cxx	/^int main(int argc, char** argv)$/;"	f
 main	tests/EnergyCutSettings_TEST.cxx	/^int main(int argc, char** argv)$/;"	f
 main	tests/Epairproduction_TEST.cxx	/^int main(int argc, char** argv)$/;"	f
 main	tests/Geometry_TEST.cxx	/^int main(int argc, char** argv)$/;"	f
@@ -19370,7 +19401,11 @@ mark	vendor/pybind/pybind11/tools/check-style.sh	/^function mark(pattern, string
 mark_parents_nonsimple	vendor/pybind/pybind11/include/pybind11/pybind11.h	/^    void mark_parents_nonsimple(PyTypeObject *value) {$/;"	f	class:generic_type
 mass	public/PROPOSAL/particle/ParticleDef.h	/^    const double mass;$/;"	m	struct:PROPOSAL::ParticleDef
 mass	public/PROPOSAL/particle/ParticleDef.h	/^    double mass;$/;"	m	class:PROPOSAL::ParticleDef::Builder
-mass	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^    double mass;$/;"	m	class:PROPOSAL::UtilityDecorator
+mass	public/PROPOSAL/propagation_utility/ContRand.h	/^        double mass;$/;"	m	class:PROPOSAL::ContRand
+mass	public/PROPOSAL/propagation_utility/Decay.h	/^        double mass;$/;"	m	class:PROPOSAL::Decay
+mass	public/PROPOSAL/propagation_utility/Interaction.h	/^        double mass;$/;"	m	class:PROPOSAL::Interaction
+mass	public/PROPOSAL/propagation_utility/Time.h	/^        double mass;$/;"	m	class:PROPOSAL::ExactTimeBuilder
+mass	public/PROPOSAL/scattering/Scattering.h	/^    double mass;$/;"	m	class:PROPOSAL::Scattering
 massDensity_	public/PROPOSAL/medium/Medium.h	/^    double massDensity_;      \/\/\/< mass density [g\/cm3]$/;"	m	class:PROPOSAL::Medium
 massive_lepton_	public/PROPOSAL/decay/LeptonicDecayChannel.h	/^    ParticleDef massive_lepton_;$/;"	m	class:PROPOSAL::LeptonicDecayChannelApprox
 master_doc	doc/source/conf.py	/^master_doc = 'index'$/;"	v
@@ -19483,7 +19518,6 @@ medium	build/resources/examples/standalone/plot_brems.py	/^    medium = pp.mediu
 medium	build/resources/examples/standalone/plot_epair.py	/^    medium = pp.medium.StandardRock(1.0)  # With densitiy correction$/;"	v
 medium	build/resources/examples/standalone/plot_photo.py	/^    medium = pp.medium.Ice(1.0)  # With densitiy correction$/;"	v
 medium	build/resources/examples/standalone/plot_xsections.py	/^    medium = pp.medium.Ice(1.0)  # With densitiy correction$/;"	v
-medium	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^    std::shared_ptr<const Medium> medium;$/;"	m	class:PROPOSAL::ScatteringHighlandIntegral
 medium	resources/examples/standalone/plot_brems.py	/^    medium = pp.medium.StandardRock(1.0)  # With densitiy correction$/;"	v
 medium	resources/examples/standalone/plot_epair.py	/^    medium = pp.medium.StandardRock(1.0)  # With densitiy correction$/;"	v
 medium	resources/examples/standalone/plot_photo.py	/^    medium = pp.medium.Ice(1.0)  # With densitiy correction$/;"	v
@@ -19765,6 +19799,11 @@ n_subintervalls_	public/PROPOSAL/math/Spline.h	/^    unsigned int n_subintervall
 name	public/PROPOSAL/json.hpp	/^    static std::string name(const std::string& ename, int id_)$/;"	f	class:nlohmann::detail::exception
 name	public/PROPOSAL/particle/ParticleDef.h	/^    const std::string name;$/;"	m	struct:PROPOSAL::ParticleDef
 name	public/PROPOSAL/particle/ParticleDef.h	/^    std::string name;$/;"	m	class:PROPOSAL::ParticleDef::Builder
+name	public/PROPOSAL/propagation_utility/ContRand.h	/^        std::string name = "contrand";$/;"	m	class:PROPOSAL::ContRand
+name	public/PROPOSAL/propagation_utility/Decay.h	/^        std::string name = "decay";$/;"	m	class:PROPOSAL::Decay
+name	public/PROPOSAL/propagation_utility/Interaction.h	/^        std::string name = "interaction";$/;"	m	class:PROPOSAL::Interaction
+name	public/PROPOSAL/propagation_utility/Time.h	/^        std::string name = "time";$/;"	m	class:PROPOSAL::Time
+name	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^    std::string name = "scattering";$/;"	m	class:PROPOSAL::ScatteringHighlandIntegral
 name	vendor/google/googletest/googletest/include/gtest/gtest.h	/^  const char* name() const { return name_.c_str(); }$/;"	f	class:testing::TestInfo
 name	vendor/google/googletest/googletest/include/gtest/gtest.h	/^  const char* name() const { return name_.c_str(); }$/;"	f	class:testing::TestSuite
 name	vendor/google/googletest/googletest/include/gtest/internal/gtest-param-util.h	/^      std::string name;$/;"	m	struct:testing::internal::ParameterizedTestSuiteInfo::InstantiationInfo
@@ -19923,6 +19962,8 @@ nodelete	vendor/pybind/pybind11/include/pybind11/detail/common.h	/^struct nodele
 nodes_continous_randomization	public/PROPOSAL/methods.h	/^    int nodes_continous_randomization;$/;"	m	struct:PROPOSAL::InterpolationDef
 nodes_cross_section	public/PROPOSAL/methods.h	/^    int nodes_cross_section;$/;"	m	struct:PROPOSAL::InterpolationDef
 nodes_propagate	public/PROPOSAL/methods.h	/^    int nodes_propagate;$/;"	m	struct:PROPOSAL::InterpolationDef
+noexcept	public/PROPOSAL/EnergyCutSettings.h	/^    bool operator==(const EnergyCutSettings& energyCutSettings) const noexcept;$/;"	m	class:PROPOSAL::EnergyCutSettings
+noexcept	public/PROPOSAL/EnergyCutSettings.h	/^    double GetCut(double energy) const noexcept;$/;"	m	class:PROPOSAL::EnergyCutSettings
 noexcept	public/PROPOSAL/json.hpp	/^    ValueType & get_to(ValueType& v) const noexcept(noexcept($/;"	f	class:nlohmann::basic_json
 noexcept	public/PROPOSAL/json.hpp	/^    ValueType get() const noexcept(noexcept($/;"	f	class:nlohmann::basic_json
 noexcept	public/PROPOSAL/json.hpp	/^    basic_json& operator=(basic_json other) noexcept ($/;"	f	class:nlohmann::basic_json
@@ -20077,7 +20118,7 @@ operator !	vendor/log4cplus/log4cplus/catch/single_include/catch.hpp	/^        b
 operator !	vendor/log4cplus/log4cplus/catch/single_include/catch.hpp	/^    Generic::Not<ExpressionT> Matcher<ExpressionT>::operator ! () const {$/;"	f	class:Catch::Matchers::Impl::Matcher
 operator !	vendor/log4cplus/log4cplus/include/log4cplus/helpers/pointer.h	/^            bool operator ! () const$/;"	f	class:log4cplus::helpers::SharedObjectPtr
 operator !=	private/PROPOSAL/crossection/CrossSection.cxx	/^bool CrossSection::operator!=(const CrossSection& cross_section) const$/;"	f	class:CrossSection
-operator !=	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^bool Parametrization::operator!=(const Parametrization& parametrization) const {$/;"	f	class:Parametrization
+operator !=	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^bool Parametrization::operator!=(const Parametrization& parametrization) const$/;"	f	class:Parametrization
 operator !=	private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx	/^bool PhotoAngleDistribution::operator!=(const PhotoAngleDistribution& photoangle) const {$/;"	f	class:PhotoAngleDistribution
 operator !=	private/PROPOSAL/crossection/parametrization/Photonuclear.cxx	/^bool RealPhoton::operator!=(const RealPhoton& photon) const$/;"	f	class:RealPhoton
 operator !=	private/PROPOSAL/crossection/parametrization/Photonuclear.cxx	/^bool ShadowEffect::operator!=(const ShadowEffect& shadow) const$/;"	f	class:ShadowEffect
@@ -20362,7 +20403,7 @@ operator <	vendor/pybind/pybind11/include/pybind11/pytypes.h	/^    bool operator
 operator <	vendor/pybind/pybind11/include/pybind11/pytypes.h	/^    friend bool operator< (const It &a, const It &b) { return b - a > 0; }$/;"	f	class:generic_iterator
 operator <<	private/PROPOSAL/EnergyCutSettings.cxx	/^std::ostream& PROPOSAL::operator<<($/;"	f	class:PROPOSAL
 operator <<	private/PROPOSAL/crossection/CrossSection.cxx	/^std::ostream& operator<<(std::ostream& os, CrossSection const& cross)$/;"	f	namespace:PROPOSAL
-operator <<	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^std::ostream& operator<<(std::ostream& os, Parametrization const& param) {$/;"	f	namespace:PROPOSAL
+operator <<	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^std::ostream& operator<<(std::ostream& os, Parametrization const& param)$/;"	f	namespace:PROPOSAL
 operator <<	private/PROPOSAL/decay/DecayChannel.cxx	/^std::ostream& operator<<(std::ostream& os, DecayChannel const& channel)$/;"	f	namespace:PROPOSAL
 operator <<	private/PROPOSAL/decay/DecayTable.cxx	/^std::ostream& operator<<(std::ostream& os, DecayTable const& table)$/;"	f	namespace:PROPOSAL
 operator <<	private/PROPOSAL/geometry/Geometry.cxx	/^std::ostream& operator<<(std::ostream& os, Geometry const& geometry)$/;"	f	namespace:PROPOSAL
@@ -20510,9 +20551,8 @@ operator =	vendor/pybind/pybind11/tests/test_methods_and_attributes.cpp	/^    vo
 operator =	vendor/pybind/pybind11/tests/test_methods_and_attributes.cpp	/^    void operator=(const ExampleMandA &e) { print_copy_assigned(this); value = e.value; }$/;"	f	class:ExampleMandA
 operator =	vendor/pybind/pybind11/tests/test_operator_overloading.cpp	/^    Vector2 &operator=(Vector2 &&v) { x = v.x; y = v.y; v.x = v.y = 0; print_move_assigned(this); return *this; }$/;"	f	class:Vector2
 operator =	vendor/pybind/pybind11/tests/test_operator_overloading.cpp	/^    Vector2 &operator=(const Vector2 &v) { x = v.x; y = v.y; print_copy_assigned(this); return *this; }$/;"	f	class:Vector2
-operator ==	private/PROPOSAL/EnergyCutSettings.cxx	/^bool EnergyCutSettings::operator==($/;"	f	class:EnergyCutSettings
 operator ==	private/PROPOSAL/crossection/CrossSection.cxx	/^bool CrossSection::operator==(const CrossSection& cross_section) const$/;"	f	class:CrossSection
-operator ==	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^bool Parametrization::operator==(const Parametrization& parametrization) const {$/;"	f	class:Parametrization
+operator ==	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^bool Parametrization::operator==(const Parametrization& parametrization) const$/;"	f	class:Parametrization
 operator ==	private/PROPOSAL/crossection/parametrization/PhotoPairProduction.cxx	/^bool PhotoAngleDistribution::operator==(const PhotoAngleDistribution& photoangle) const {$/;"	f	class:PhotoAngleDistribution
 operator ==	private/PROPOSAL/crossection/parametrization/Photonuclear.cxx	/^bool RealPhoton::operator==(const RealPhoton& photon) const$/;"	f	class:RealPhoton
 operator ==	private/PROPOSAL/crossection/parametrization/Photonuclear.cxx	/^bool ShadowEffect::operator==(const ShadowEffect& shadow) const$/;"	f	class:ShadowEffect
@@ -20834,6 +20874,16 @@ overloaded	vendor/pybind/pybind11/tests/test_methods_and_attributes.cpp	/^    py
 overloaded	vendor/pybind/pybind11/tests/test_methods_and_attributes.cpp	/^    py::str overloaded(int, int)     const { return "(int, int) const"; }$/;"	f	class:ExampleMandA
 overloaded	vendor/pybind/pybind11/tests/test_methods_and_attributes.cpp	/^    py::str overloaded(int, int)     { return "(int, int)"; }$/;"	f	class:ExampleMandA
 overloaded	vendor/pybind/pybind11/tests/test_methods_and_attributes.cpp	/^    static py::str overloaded(float) { return "static float"; }$/;"	f	class:ExampleMandA
+override	public/PROPOSAL/crossection/CrossSection.h	/^    double CalculateCumulativeCrossSection(double energy, int component, double v) override;$/;"	m	class:PROPOSAL::final
+override	public/PROPOSAL/crossection/CrossSection.h	/^    double CalculateStochasticLoss(double energy, double rnd1) override;$/;"	m	class:PROPOSAL::final
+override	public/PROPOSAL/crossection/CrossSection.h	/^    double CalculateStochasticLoss(double energy, double rnd1, double rnd2) override;$/;"	m	class:PROPOSAL::final
+override	public/PROPOSAL/crossection/CrossSection.h	/^    double CalculatedE2dx(double energy) override;$/;"	m	class:PROPOSAL::final
+override	public/PROPOSAL/crossection/CrossSection.h	/^    double CalculatedEdx(double energy) override;$/;"	m	class:PROPOSAL::final
+override	public/PROPOSAL/crossection/CrossSection.h	/^    double CalculatedNdx(double energy) override;$/;"	m	class:PROPOSAL::final
+override	public/PROPOSAL/crossection/CrossSection.h	/^    double CalculatedNdx(double energy, double rnd) override;$/;"	m	class:PROPOSAL::final
+override	public/PROPOSAL/crossection/CrossSection.h	/^    virtual bool compare(const CrossSection& cross) const override;$/;"	m	class:PROPOSAL::final
+override	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    KinematicLimits GetKinematicLimits(double energy) override;$/;"	m	class:PROPOSAL::Parametrization_builder
+override	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    double DifferentialCrossSection(double energy, double v) override;$/;"	m	class:PROPOSAL::Parametrization_builder
 override	public/PROPOSAL/geometry/Box.h	/^    Box& operator=(const Geometry&) override;$/;"	m	class:PROPOSAL::Box
 override	public/PROPOSAL/geometry/Box.h	/^    bool compare(const Geometry&) const override;$/;"	m	class:PROPOSAL::Box
 override	public/PROPOSAL/geometry/Box.h	/^    std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction) const override;$/;"	m	class:PROPOSAL::Box
@@ -20877,19 +20927,11 @@ override	public/PROPOSAL/medium/density_distr/density_splines.h	/^              
 override	public/PROPOSAL/medium/density_distr/density_splines.h	/^    bool compare(const Density_distr& dens_distr) const override;$/;"	m	class:PROPOSAL::Density_splines
 override	public/PROPOSAL/medium/density_distr/density_splines.h	/^    double Evaluate(const Vector3D& xi) const override;$/;"	m	class:PROPOSAL::Density_splines
 override	public/PROPOSAL/medium/density_distr/density_splines.h	/^    double Integrate(const Vector3D& xi, const Vector3D& direction, double l) const override;$/;"	m	class:PROPOSAL::Density_splines
-override	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    double Calculate(double ei, double ef, double rnd) override;$/;"	m	class:PROPOSAL::UtilityIntegralDecay
-override	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    double FunctionToIntegral(double energy) override;$/;"	m	class:PROPOSAL::UtilityIntegralContRand
-override	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    double FunctionToIntegral(double energy) override;$/;"	m	class:PROPOSAL::UtilityIntegralDecay
-override	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    double FunctionToIntegral(double energy) override;$/;"	m	class:PROPOSAL::UtilityIntegralDisplacement
-override	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    double FunctionToIntegral(double energy) override;$/;"	m	class:PROPOSAL::UtilityIntegralInteraction
-override	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    double FunctionToIntegral(double energy) override;$/;"	m	class:PROPOSAL::UtilityIntegralScattering
-override	public/PROPOSAL/propagation_utility/PropagationUtilityIntegral.h	/^    double FunctionToIntegral(double energy) override;$/;"	m	class:PROPOSAL::UtilityIntegralTime
+override	public/PROPOSAL/propagation_utility/Displacement.h	/^    double SolveTrackIntegral(double, double, double) override;$/;"	m	class:PROPOSAL::DisplacementBuilder
+override	public/PROPOSAL/propagation_utility/Displacement.h	/^    double UpperLimitTrackIntegral(double, double) override;$/;"	m	class:PROPOSAL::DisplacementBuilder
 override	public/PROPOSAL/scattering/ScatteringHighland.h	/^    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, const array<double, 4>& rnd) override;$/;"	m	class:PROPOSAL::ScatteringHighland
 override	public/PROPOSAL/scattering/ScatteringHighland.h	/^    bool compare(const Scattering&) const override;$/;"	m	class:PROPOSAL::ScatteringHighland
 override	public/PROPOSAL/scattering/ScatteringHighland.h	/^    void print(std::ostream&) const override;$/;"	m	class:PROPOSAL::ScatteringHighland
-override	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, const array<double, 4>& rnd) override;$/;"	m	class:PROPOSAL::ScatteringHighlandIntegral
-override	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^    bool compare(const Scattering&) const override;$/;"	m	class:PROPOSAL::ScatteringHighlandIntegral
-override	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^    void print(std::ostream&) const override;$/;"	m	class:PROPOSAL::ScatteringHighlandIntegral
 override	public/PROPOSAL/scattering/ScatteringMoliere.h	/^    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, const array<double, 4>& rnd) override;$/;"	m	class:PROPOSAL::ScatteringMoliere
 override	public/PROPOSAL/scattering/ScatteringMoliere.h	/^    bool compare(const Scattering&) const override;$/;"	m	class:PROPOSAL::ScatteringMoliere
 override	public/PROPOSAL/scattering/ScatteringMoliere.h	/^    void print(std::ostream&) const override;$/;"	m	class:PROPOSAL::ScatteringMoliere
@@ -20972,6 +21014,8 @@ packed_dtype_fmt	vendor/pybind/pybind11/tests/test_numpy_dtypes.py	/^def packed_
 padding	vendor/pybind/pybind11/tests/test_smart_ptr.cpp	/^    uint64_t padding[10];$/;"	m	class:huge_unique_ptr	file:
 padding_zeros	vendor/log4cplus/log4cplus/src/timehelper.cxx	/^static log4cplus::tstring const padding_zeros[4] =$/;"	m	class:log4cplus::helpers::__anon106::log4cplus	file:
 pair_getters	vendor/google/googletest/googlemock/include/gmock/gmock-matchers.h	/^namespace pair_getters {$/;"	n	namespace:testing::internal
+param	private/PROPOSAL/crossection/CrossSection.cxx	/^Parametrization* CrossSectionBuilder::param;$/;"	m	class:CrossSectionBuilder	file:
+param	public/PROPOSAL/crossection/CrossSection.h	/^    static Parametrization* param;$/;"	m	class:PROPOSAL::final
 param	vendor/google/googletest/googletest/include/gtest/internal/gtest-param-util.h	/^  ParamType param;$/;"	m	struct:testing::TestParamInfo
 param_	vendor/google/googletest/googletest/include/gtest/internal/gtest-port.h	/^    const T param_;$/;"	m	class:testing::internal::ThreadWithParam::RunnableImpl
 param_	vendor/google/googletest/googletest/include/gtest/internal/gtest-port.h	/^  const T param_;  \/\/ User-supplied parameter to the thread function.$/;"	m	class:testing::internal::ThreadWithParam
@@ -21090,7 +21134,6 @@ particle_def	tests/gen_testfiles_scripts/resources/examples/standalone/test_cont
 particle_def_	public/PROPOSAL/Propagator.h	/^    ParticleDef particle_def_;$/;"	m	class:PROPOSAL::Propagator
 particle_def_	public/PROPOSAL/Sector.h	/^    ParticleDef particle_def_;$/;"	m	class:PROPOSAL::Sector
 particle_def_	public/PROPOSAL/crossection/parametrization/PhotoPairProduction.h	/^        const ParticleDef particle_def_;$/;"	m	class:PROPOSAL::PhotoAngleDistribution
-particle_def_	public/PROPOSAL/scattering/Scattering.h	/^    const ParticleDef& particle_def_;$/;"	m	class:PROPOSAL::Scattering
 particle_defs	tests/gen_testfiles_scripts/annihilation.py	/^particle_defs = [$/;"	v
 particle_defs	tests/gen_testfiles_scripts/bremsstrahlung.py	/^particle_defs = [$/;"	v
 particle_defs	tests/gen_testfiles_scripts/epairproduction.py	/^particle_defs = [$/;"	v
@@ -21308,7 +21351,6 @@ print	private/PROPOSAL/geometry/Box.cxx	/^void Box::print(std::ostream& os) cons
 print	private/PROPOSAL/geometry/Cylinder.cxx	/^void Cylinder::print(std::ostream& os) const$/;"	f	class:Cylinder
 print	private/PROPOSAL/geometry/Sphere.cxx	/^void Sphere::print(std::ostream& os) const$/;"	f	class:Sphere
 print	private/PROPOSAL/scattering/ScatteringHighland.cxx	/^void ScatteringHighland::print(std::ostream& os) const$/;"	f	class:ScatteringHighland
-print	private/PROPOSAL/scattering/ScatteringHighlandIntegral.cxx	/^void ScatteringHighlandIntegral::print(std::ostream& os) const {}$/;"	f	class:ScatteringHighlandIntegral
 print	private/PROPOSAL/scattering/ScatteringMoliere.cxx	/^void ScatteringMoliere::print(std::ostream& os) const$/;"	f	class:ScatteringMoliere
 print	public/PROPOSAL/crossection/parametrization/Parametrization.h	/^    virtual void print(std::ostream&) const {};$/;"	f	class:PROPOSAL::Parametrization
 print	public/PROPOSAL/decay/DecayChannel.h	/^    virtual void print(std::ostream&) const {};$/;"	f	class:PROPOSAL::DecayChannel
@@ -21571,7 +21613,6 @@ r2_	vendor/google/googletest/googletest/test/googletest-test-part-test.cc	/^  Te
 r2_	vendor/google/googletest/googletest/test/googletest-test-part-test.cc	/^  const TestPartResult r1_, r2_;$/;"	m	class:__anon22::TestPartResultArrayTest	file:
 r3_	vendor/google/googletest/googletest/test/googletest-test-part-test.cc	/^  TestPartResult r1_, r2_, r3_, r4_;$/;"	m	class:__anon22::TestPartResultTest	file:
 r4_	vendor/google/googletest/googletest/test/googletest-test-part-test.cc	/^  TestPartResult r1_, r2_, r3_, r4_;$/;"	m	class:__anon22::TestPartResultTest	file:
-r_	public/PROPOSAL/medium/Medium.h	/^    double r_;                 \/\/\/< refraction index$/;"	m	class:PROPOSAL::Medium
 radiationLength_	public/PROPOSAL/medium/Medium.h	/^    double radiationLength_;  \/\/\/< radiation length [cm]$/;"	m	class:PROPOSAL::Medium
 radius_	public/PROPOSAL/geometry/Cylinder.h	/^    double radius_;       \/\/!< the radius of the sphere\/ cylinder$/;"	m	class:PROPOSAL::Cylinder
 radius_	public/PROPOSAL/geometry/Sphere.h	/^    double radius_;       \/\/!< the radius of the sphere\/ cylinder$/;"	m	class:PROPOSAL::Sphere
@@ -21728,8 +21769,8 @@ reload	vendor/pybind/pybind11/include/pybind11/pybind11.h	/^    void reload() {$
 remainder_	vendor/google/googletest/googlemock/test/gmock-matchers_test.cc	/^  mutable std::list<value_type> remainder_;  \/\/ modified by iteration$/;"	m	class:testing::gmock_matchers_test::__anon56::Streamlike	file:
 remoteSyslogType	vendor/log4cplus/log4cplus/include/log4cplus/syslogappender.h	/^        RemoteSyslogType remoteSyslogType;$/;"	m	class:log4cplus::SysLogAppender
 remoteTimeFormat	vendor/log4cplus/log4cplus/include/log4cplus/syslogappender.h	/^        static tstring const remoteTimeFormat;$/;"	m	class:log4cplus::SysLogAppender
-remove	public/PROPOSAL/methods.h	/^    void remove(K key)$/;"	f	class:PROPOSAL::Helper::Bimap
-remove	public/PROPOSAL/methods.h	/^    void remove(V value)$/;"	f	class:PROPOSAL::Helper::Bimap
+remove	public/PROPOSAL/methods.h	/^        void remove(K key)$/;"	f	class:PROPOSAL::Helper::Bimap
+remove	public/PROPOSAL/methods.h	/^        void remove(V value)$/;"	f	class:PROPOSAL::Helper::Bimap
 remove	vendor/google/googletest/googletest/test/googletest-filepath-test.cc	/^int remove(const char* path) {$/;"	f	namespace:testing::internal::__anon19
 remove	vendor/log4cplus/log4cplus/src/mdc.cxx	/^MDC::remove (tstring const & key)$/;"	f	class:log4cplus::MDC
 remove	vendor/log4cplus/log4cplus/src/ndc.cxx	/^NDC::remove()$/;"	f	class:log4cplus::NDC
@@ -21849,7 +21890,7 @@ rhs_	vendor/google/googletest/googletest/include/gtest/gtest-matchers.h	/^  Rhs 
 rhs_used_	vendor/google/googletest/googlemock/test/gmock-matchers_test.cc	/^  std::vector<size_t> rhs_used_;$/;"	m	class:testing::gmock_matchers_test::__anon56::__anon57::BacktrackingMaxBPMState	file:
 rich_compare	vendor/pybind/pybind11/include/pybind11/pytypes.h	/^bool object_api<D>::rich_compare(object_api const &other, int value) const {$/;"	f	class:object_api
 right_	vendor/google/googletest/googlemock/src/gmock-matchers.cc	/^  ::std::vector<size_t> right_;$/;"	m	class:testing::internal::MaxBipartiteMatchState	file:
-right_map_type	public/PROPOSAL/methods.h	/^    typedef std::map<V, K> right_map_type;$/;"	t	class:PROPOSAL::Helper::Bimap
+right_map_type	public/PROPOSAL/methods.h	/^        typedef std::map<V, K> right_map_type;$/;"	t	class:PROPOSAL::Helper::Bimap
 right_start_	vendor/google/googletest/googletest/src/gtest.cc	/^  size_t left_start_, right_start_;$/;"	m	class:testing::internal::edit_distance::__anon42::Hunk	file:
 rnd_	public/PROPOSAL/crossection/CrossSection.h	/^    double rnd_; \/\/!< This random number will be stored in CalculateDNdx to avoid calculate dNdx a second time in$/;"	m	class:PROPOSAL::CrossSection
 rndc_	public/PROPOSAL/crossection/AnnihilationIntegral.h	/^        double rndc_;$/;"	m	class:PROPOSAL::AnnihilationIntegral
@@ -21981,7 +22022,6 @@ scan_literal	public/PROPOSAL/json.hpp	/^    token_type scan_literal(const char* 
 scan_number	public/PROPOSAL/json.hpp	/^    token_type scan_number()  \/\/ lgtm [cpp\/use-of-goto]$/;"	f	class:nlohmann::detail::lexer
 scan_string	public/PROPOSAL/json.hpp	/^    token_type scan_string()$/;"	f	class:nlohmann::detail::lexer
 scat_names	tests/gen_testfiles_scripts/scattering.py	/^scat_names = [$/;"	v
-scatter_	public/PROPOSAL/scattering/ScatteringHighlandIntegral.h	/^    std::unique_ptr<UtilityDecorator> scatter_;$/;"	m	class:PROPOSAL::ScatteringHighlandIntegral
 scattering	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::shared_ptr<Scattering> scattering;      \/\/ no scattering$/;"	m	struct:PROPOSAL::Utility::Definition
 scattering_	public/PROPOSAL/Sector.h	/^    std::shared_ptr<Scattering> scattering_;$/;"	m	class:PROPOSAL::Sector
 scattering_model	public/PROPOSAL/Sector.h	/^        ScatteringFactory::Enum scattering_model;$/;"	m	class:PROPOSAL::Sector::Definition
@@ -22282,7 +22322,7 @@ simple_instance_registered	vendor/pybind/pybind11/include/pybind11/detail/common
 simple_layout	vendor/pybind/pybind11/include/pybind11/detail/common.h	/^    bool simple_layout : 1;$/;"	m	struct:instance
 simple_type	vendor/pybind/pybind11/include/pybind11/detail/internals.h	/^    bool simple_type : 1;$/;"	m	struct:type_info
 simple_value_holder	vendor/pybind/pybind11/include/pybind11/detail/common.h	/^        void *simple_value_holder[1 + instance_simple_holder_in_ptrs()];$/;"	m	union:instance::__anon6
-size	public/PROPOSAL/methods.h	/^    size_t size() const$/;"	f	class:PROPOSAL::Helper::Bimap
+size	public/PROPOSAL/methods.h	/^        size_t size() const { return _left.size(); }$/;"	f	class:PROPOSAL::Helper::Bimap
 size	vendor/google/googletest/googlemock/include/gmock/gmock-spec-builders.h	/^  int size() const { return static_cast<int>(expectations_.size()); }$/;"	f	class:testing::ExpectationSet
 size	vendor/google/googletest/googlemock/test/gmock-matchers_test.cc	/^  int size() const { return 1; }$/;"	f	struct:testing::gmock_matchers_test::__anon56::MinimalistCustomType
 size	vendor/google/googletest/googletest/include/gtest/internal/gtest-internal.h	/^  size_t size() const { return size_; }$/;"	f	class:testing::internal::NativeArray
@@ -23387,6 +23427,7 @@ throws_int	vendor/log4cplus/log4cplus/catch/projects/SelfTest/CompilationTests.c
 tifstream	vendor/log4cplus/log4cplus/include/log4cplus/fstreams.h	/^typedef std::basic_ifstream<tchar> tifstream;$/;"	t	namespace:log4cplus
 time	vendor/pybind/pybind11/tools/clang/cindex.py	/^    def time(self):$/;"	m	class:File
 time_	public/PROPOSAL/particle/Particle.h	/^    double time_;                   \/\/!< age [sec]$/;"	m	class:PROPOSAL::DynamicData
+time_calc	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^        std::unique_ptr<Time> time_calc = nullptr;$/;"	m	struct:PROPOSAL::Utility::Definition
 time_cast	vendor/log4cplus/log4cplus/include/log4cplus/helpers/timehelper.h	/^time_cast (chrono::time_point<Clock, FromDuration> const & tp)$/;"	f	namespace:log4cplus::helpers
 time_diff	build/resources/examples/standalone/test_continuous_loss_output.py	/^                time_diff = secondaries[idx+1].time - secondaries[idx-1].time$/;"	v
 time_diff	resources/examples/standalone/test_continuous_loss_output.py	/^                time_diff = secondaries[idx+1].time - secondaries[idx-1].time$/;"	v
@@ -23900,8 +23941,6 @@ untyped_on_call_specs_	vendor/google/googletest/googlemock/include/gmock/gmock-s
 unusedTokens	vendor/log4cplus/log4cplus/catch/include/catch_session.hpp	/^        std::vector<Clara::Parser::Token> const& unusedTokens() const {$/;"	f	class:Catch::Session::std
 unwrap	vendor/log4cplus/log4cplus/include/log4cplus/boost/deviceappender.hxx	/^    unwrap (device_type const & ptr)$/;"	f	struct:log4cplus::device_appender_detail::device_type_traits
 unwrap	vendor/log4cplus/log4cplus/include/log4cplus/boost/deviceappender.hxx	/^    unwrap (device_type x)$/;"	f	struct:log4cplus::device_appender_detail::device_type_traits
-up_	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^    double up_;$/;"	m	class:PROPOSAL::UtilityInterpolantDecay
-up_	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^    double up_;$/;"	m	class:PROPOSAL::UtilityInterpolantInteraction
 update	build/resources/examples/standalone/plot_secondary_spectrum.py	/^    def update(self):$/;"	m	class:ProgressBar
 update	public/PROPOSAL/json.hpp	/^    void update(const_iterator first, const_iterator last)$/;"	f	class:nlohmann::basic_json
 update	public/PROPOSAL/json.hpp	/^    void update(const_reference j)$/;"	f	class:nlohmann::basic_json
@@ -23939,6 +23978,8 @@ utility_	public/PROPOSAL/Sector.h	/^    Utility utility_;$/;"	m	class:PROPOSAL::
 utility_decorator	public/PROPOSAL/particle/Particle.h	/^    std::shared_ptr<UtilityDecorator> utility_decorator;$/;"	m	class:PROPOSAL::DynamicData
 utility_def	public/PROPOSAL/Sector.h	/^        Utility::Definition utility_def;$/;"	m	class:PROPOSAL::Sector::Definition
 utility_def	public/PROPOSAL/propagation_utility/PropagationUtility.h	/^    std::unique_ptr<Definition> utility_def;$/;"	m	class:PROPOSAL::Utility
+utility_interpolation_def	private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx	/^InterpolationDef UtilityInterpolant::utility_interpolation_def;/;"	m	class:UtilityInterpolant	file:
+utility_interpolation_def	public/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h	/^    static InterpolationDef utility_interpolation_def;$/;"	m	class:PROPOSAL::UtilityInterpolant
 v	public/PROPOSAL/json.hpp	/^        : v(vec)$/;"	f	class:nlohmann::detail::output_vector_adapter
 v	public/PROPOSAL/json.hpp	/^    std::vector<CharType>& v;$/;"	m	class:nlohmann::detail::output_vector_adapter
 v	vendor/google/googletest/googlemock/test/gmock-actions_test.cc	/^  std::vector<int> * v;$/;"	m	struct:__anon59::IntegerVectorWrapper	file:
@@ -24615,7 +24656,7 @@ zero_bits_	vendor/google/googletest/googlemock/test/gmock-matchers_test.cc	/^  c
 ~ParamIteratorInterface	vendor/google/googletest/googletest/include/gtest/internal/gtest-param-util.h	/^  virtual ~ParamIteratorInterface() {}$/;"	f	class:testing::internal::ParamIteratorInterface
 ~ParameterizedTestSuiteInfoBase	vendor/google/googletest/googletest/include/gtest/internal/gtest-param-util.h	/^  virtual ~ParameterizedTestSuiteInfoBase() {}$/;"	f	class:testing::internal::ParameterizedTestSuiteInfoBase
 ~ParameterizedTestSuiteRegistry	vendor/google/googletest/googletest/include/gtest/internal/gtest-param-util.h	/^  ~ParameterizedTestSuiteRegistry() {$/;"	f	class:testing::internal::ParameterizedTestSuiteRegistry
-~Parametrization	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^Parametrization::~Parametrization() {$/;"	f	class:Parametrization
+~Parametrization	private/PROPOSAL/crossection/parametrization/Parametrization.cxx	/^Parametrization::~Parametrization() {}$/;"	f	class:Parametrization
 ~ParticleDef	private/PROPOSAL/particle/ParticleDef.cxx	/^ParticleDef::~ParticleDef() {}$/;"	f	class:ParticleDef
 ~Pattern	vendor/log4cplus/log4cplus/catch/include/internal/catch_impl.hpp	/^    TestSpec::Pattern::~Pattern() {}$/;"	f	class:Catch::TestSpec::Pattern
 ~PatternConverter	vendor/log4cplus/log4cplus/src/patternlayout.cxx	/^    virtual ~PatternConverter() {}$/;"	f	class:log4cplus::pattern::PatternConverter
@@ -24665,8 +24706,6 @@ zero_bits_	vendor/google/googletest/googlemock/test/gmock-matchers_test.cc	/^  c
 ~RunningSection	vendor/log4cplus/log4cplus/catch/include/internal/catch_section_info.hpp	/^        ~RunningSection() {$/;"	f	class:Catch::RunningSection
 ~Scattering	private/PROPOSAL/scattering/Scattering.cxx	/^Scattering::~Scattering() {}$/;"	f	class:Scattering
 ~ScatteringFactory	private/PROPOSAL/scattering/ScatteringFactory.cxx	/^ScatteringFactory::~ScatteringFactory() { string_enum_.clear(); }$/;"	f	class:ScatteringFactory
-~ScatteringHighland	private/PROPOSAL/scattering/ScatteringHighland.cxx	/^ScatteringHighland::~ScatteringHighland() {}$/;"	f	class:ScatteringHighland
-~ScatteringHighlandIntegral	private/PROPOSAL/scattering/ScatteringHighlandIntegral.cxx	/^ScatteringHighlandIntegral::~ScatteringHighlandIntegral() {}$/;"	f	class:ScatteringHighlandIntegral
 ~ScatteringMoliere	private/PROPOSAL/scattering/ScatteringMoliere.cxx	/^ScatteringMoliere::~ScatteringMoliere() {$/;"	f	class:ScatteringMoliere
 ~ScopedElement	vendor/log4cplus/log4cplus/catch/include/internal/catch_xmlwriter.hpp	/^            ~ScopedElement() {$/;"	f	class:Catch::XmlWriter::ScopedElement
 ~ScopedFakeTestPartResultReporter	vendor/google/googletest/googletest/src/gtest.cc	/^ScopedFakeTestPartResultReporter::~ScopedFakeTestPartResultReporter() {$/;"	f	class:testing::ScopedFakeTestPartResultReporter

@@ -32,6 +32,9 @@
 
 namespace PROPOSAL {
 class UtilityIntegral {
+    double last_energy_initial;
+    double last_partial_sum;
+
 protected:
     Integral integral;
 
