@@ -234,6 +234,7 @@ IF(ADD_TESTS)
     package_add_test(UnitTest_MathMethods tests/MathMethods_TEST.cxx)
     package_add_test(UnitTest_Spline tests/Spline_TEST.cxx)
     package_add_test(UnitTest_Density tests/Density_distribution_TEST.cxx)
+    package_add_test(UnitTest_Density tests/Displacement_TEST.cxx)
 
 else (ADD_TESTS)
     MESSAGE(STATUS "No tests will be build.")
