@@ -64,6 +64,7 @@ private:
     ScatteringHighlandIntegral& operator=(const ScatteringHighlandIntegral&) = delete;
 
     bool compare(const Scattering& scattering) const override{
+        // TODO: Add ScatteringHighlandIntegral comparison operator
         throw std::logic_error("This comparison function has not been implemented yet. "
                                "The developers need to put on the thinking caps to fix it.");
     }

@@ -53,8 +53,6 @@ Scattering::Scattering(const Scattering& scattering)
 {
 }
 
-Scattering::~Scattering() {}
-
 bool Scattering::operator==(const Scattering& scattering) const
 {
     if (mass != scattering.mass)
@@ -78,8 +76,8 @@ tuple<Vector3D, Vector3D> Scattering::Scatter(double dr,
     assert(ei>ef);
     assert(dr>0);
 
-    // mean_direction:      averaged continous propagation direction
-    // final_direction:     direction after continous propagation
+    // mean_direction:      averaged continuous propagation direction
+    // final_direction:     direction after continuous propagation
 
     RandomAngles random_angles = CalculateRandomAngle(dr, ei, ef, pos, rnd);
 
@@ -98,6 +96,7 @@ tuple<Vector3D, Vector3D> Scattering::Scatter(double dr,
     auto mean_direction = sz * old_direction;
     mean_direction += random_angles.sx * rotate_vector_x;
     mean_direction += random_angles.sy * rotate_vector_y;
+    mean_direction.CalculateSphericalCoordinates();
 
     // Rotation towards all tree axes
     auto final_direction = tz * old_direction;

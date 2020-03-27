@@ -54,7 +54,7 @@ public:
     UtilityInterpolant(std::function<double(double)>);
     void BuildTables(const string, size_t);
 
-    virtual double Calculate(double ei, double ef, double rnd);
+    //virtual double Calculate(double ei, double ef, double rnd);
     virtual double GetUpperLimit(double ei, double rnd);
 
     static InterpolationDef utility_interpolation_def;
