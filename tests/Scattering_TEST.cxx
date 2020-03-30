@@ -209,7 +209,6 @@ TEST(Scattering, BorderCases){
     }
 }
 
-
 TEST(Scattering, FirstMomentum){
     RandomGenerator::Get().SetSeed(24601);
     std::shared_ptr<const Medium> medium = CreateMedium("StandardRock");
@@ -305,8 +304,7 @@ TEST(Scattering, SecondMomentum){
 }
 
 
-/*
-TEST(Scattering, Scatter)
+TEST(Scattering, ScatterReproducibilityTest)
 {
     std::string filename = "bin/TestFiles/Scattering_scatter.txt";
 	std::ifstream in{filename};
@@ -390,7 +388,7 @@ TEST(Scattering, Scatter)
                                                       rnd);
                 position_out = position_init + distance * std::get<0>(directions);
                 direction_out = std::get<1>(directions);
-
+                //std::cout << ecut << ", " << vcut << ", " << particleName << ", " << mediumName << "," << energy_init << ", " << energy_final << std::endl;
                 EXPECT_NEAR(position_out.GetX(), x_f, std::abs(error * x_f));
                 EXPECT_NEAR(position_out.GetY(), y_f, std::abs(error * y_f));
                 EXPECT_NEAR(position_out.GetZ(), z_f, std::abs(error * z_f));
@@ -401,12 +399,21 @@ TEST(Scattering, Scatter)
             }
             in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >>
                 distance >> rnd1 >> rnd2 >> rnd3 >> rnd4 >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
+
+            //reprouce old behaviour
+            if(ecut==-1){
+                ecut = std::numeric_limits<double>::infinity();
+            }
+            if(vcut==-1){
+                vcut = 1;
+            }
+
         }
 
         delete scattering;
     }
 }
-*/
+
 
 int main(int argc, char** argv)
 {

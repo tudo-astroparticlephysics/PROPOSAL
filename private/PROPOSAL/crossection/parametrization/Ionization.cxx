@@ -144,8 +144,7 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variab
     if(cuts_ == nullptr)
         v_up = this->GetKinematicLimits(energy).vMax;
     else
-        v_up = cuts_->GetCut(energy);
-
+        v_up = std::min(cuts_->GetCut(energy), this->GetKinematicLimits(energy).vMax);
     aux    = beta * gamma / (1.e-6 * medium_->GetI());
     result = std::log(v_up * (2 * ME * energy)) + 2 * std::log(aux);
     aux    = v_up / (2 * (1 + 1 / gamma));
@@ -326,7 +325,7 @@ double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(double energy, double va
     if(cuts_ == nullptr)
         v_up = this->GetKinematicLimits(energy).vMax;
     else
-        v_up = cuts_->GetCut(energy);
+        v_up = std::min(cuts_->GetCut(energy), this->GetKinematicLimits(energy).vMax);
 
     double bigDelta     = std::min(limits.vMax * energy / ME, v_up * energy / ME); // (2.265)
     double gamma        = energy / ME; // (2.258)
@@ -446,7 +445,7 @@ double IonizBergerSeltzerMoller::FunctionToDEdxIntegral(double energy, double va
     if(cuts_ == nullptr)
         v_up = this->GetKinematicLimits(energy).vMax;
     else
-        v_up = cuts_->GetCut(energy);
+        v_up = std::min(cuts_->GetCut(energy), this->GetKinematicLimits(energy).vMax);
 
     double bigDelta     = std::min(limits.vMax * energy / ME, v_up * energy / ME); // (2.265)
     double gamma        = energy / ME; // (2.258)
