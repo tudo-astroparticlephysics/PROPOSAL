@@ -209,21 +209,23 @@ TEST(Scattering, BorderCases){
     }
 }
 
+
 TEST(Scattering, FirstMomentum){
     RandomGenerator::Get().SetSeed(24601);
     std::shared_ptr<const Medium> medium = CreateMedium("StandardRock");
     Vector3D position_init  = Vector3D(0, 0, 0);
     Vector3D direction_init = Vector3D(0, 0, 1);
     direction_init.CalculateSphericalCoordinates();
+
     int statistics = 1e7;
 
     auto cross_dummy = std::make_shared<CrossSectionBuilder>("scattering_dummy");
-    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-4 * energy;});
+    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
 
     std::array<Scattering*, 3> scatter_list = {new ScatteringMoliere(getParticleDef("MuMinus"), medium),
                                                new ScatteringHighland(getParticleDef("MuMinus"), medium),
                                                new ScatteringHighlandIntegral<UtilityIntegral>(getParticleDef("MuMinus"), medium, CrossSectionList{cross_dummy})
-                                                 };
+    };
     Vector3D scatter_sum;
     Vector3D offset_sum;
 
@@ -236,7 +238,7 @@ TEST(Scattering, FirstMomentum){
                     1e3, 1e4, 1e3, position_init, direction_init,
                     {RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble(),
                      RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble()}
-                     );
+            );
             offset_sum = offset_sum + ( std::get<0>(sampled_vectors) - offset_sum) * (1./n);
             scatter_sum = scatter_sum + ( std::get<1>(sampled_vectors) - scatter_sum)* (1./n);
         }
@@ -249,6 +251,58 @@ TEST(Scattering, FirstMomentum){
     }
 }
 
+TEST(Scattering, SecondMomentum){
+    RandomGenerator::Get().SetSeed(24601);
+    std::shared_ptr<const Medium> medium = CreateMedium("StandardRock");
+    Vector3D position_init  = Vector3D(0, 0, 0);
+    Vector3D direction_init = Vector3D(0, 0, 1);
+    direction_init.CalculateSphericalCoordinates();
+
+    int statistics = 1e5;
+
+    double E_i = 1e14;
+    std::array<double, 10> final_energies = {1e13, 1e12, 1e11, 1e10, 1e9, 1e8, 1e7, 1e6, 1e5, 1e4};
+    auto cross_dummy = std::make_shared<CrossSectionBuilder>("scattering_dummy");
+    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
+
+    std::array<Scattering*, 3> scatter_list = {new ScatteringMoliere(getParticleDef("MuMinus"), medium),
+                                               new ScatteringHighland(getParticleDef("MuMinus"), medium),
+                                               new ScatteringHighlandIntegral<UtilityIntegral>(getParticleDef("MuMinus"), medium, CrossSectionList{cross_dummy})
+    };
+    double scatter_sum;
+    double offset_sum;
+    double displacement;
+    double old_displacement;
+    auto displacement_calculator = DisplacementBuilder<UtilityIntegral>(CrossSectionList{cross_dummy});
+    std::array<double, 2> variances = {0,0};
+    std::array<double, 2> old_variances;
+
+    for(Scattering* scatter: scatter_list){
+        old_variances = {0, 0};
+        old_displacement = 0;
+        for(double E_f: final_energies) {
+            scatter_sum = 0;
+            offset_sum = 0;
+            displacement = displacement_calculator.SolveTrackIntegral(E_i, E_f, 0.5);
+            ASSERT_TRUE(displacement > old_displacement);
+            for (int n = 1; n <= statistics; ++n) {
+                auto sampled_vectors = scatter->Scatter(
+                        displacement, E_i, E_f, position_init, direction_init,
+                        {RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble(),
+                         RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble()}
+                );
+                offset_sum = offset_sum + ((std::get<0>(sampled_vectors) - direction_init).magnitude() - offset_sum) * (1. / n);
+                scatter_sum = scatter_sum + ((std::get<1>(sampled_vectors) - direction_init).magnitude() - scatter_sum) * (1. / n);
+            }
+
+            variances = {offset_sum, scatter_sum};
+            EXPECT_TRUE(variances > old_variances);
+
+            old_displacement = displacement;
+            old_variances = variances;
+        }
+    }
+}
 
 
 /*
