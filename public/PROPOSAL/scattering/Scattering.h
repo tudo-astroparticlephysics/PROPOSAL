@@ -52,7 +52,7 @@ class Scattering
 public:
     Scattering(const ParticleDef&);
     Scattering(const Scattering&);
-    virtual ~Scattering();
+    virtual ~Scattering() = default;
 
     bool operator==(const Scattering& scattering) const;
     bool operator!=(const Scattering& scattering) const;
