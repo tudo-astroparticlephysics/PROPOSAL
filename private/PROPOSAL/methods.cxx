@@ -254,8 +254,7 @@ namespace Helper {
         std::string name, InterpolantBuilderContainer& builder_container,
         size_t hash_digest, const InterpolationDef& interpolation_def)
     {
-        std::vector<std::unique_ptr<Interpolant>> interpolants(
-            builder_container.size());
+        std::vector<std::unique_ptr<Interpolant>> interpolants;
 
         bool storing_failed = false;
         bool reading_worked = false;
@@ -296,11 +295,10 @@ namespace Helper {
                     log_debug("%s tables will be read from file: %s",
                         name.c_str(), filename.str().c_str());
 
-                    for (auto interpolant = interpolants.begin();
-                         interpolant != interpolants.end(); ++interpolant) {
+                    for (const auto& builder : builder_container) {
                         // TODO(mario): read check Tue 2017/09/05
-                        /* interpolant->reset(new Interpolant()); */
-                        interpolant->get()->Load(input, binary_tables);
+                        interpolants.emplace_back();
+                        interpolants.back()->Load(input, binary_tables);
                     }
                     reading_worked = true;
                 }
@@ -368,11 +366,10 @@ namespace Helper {
                     log_debug("%s tables will be read from file: %s",
                         name.c_str(), filename.str().c_str());
 
-                    for (auto interpolant = interpolants.begin();
-                         interpolant != interpolants.end(); ++interpolant) {
+                    for (const auto& builder : builder_container) {
                         // TODO(mario): read check Tue 2017/09/05
-                        interpolant->reset(new Interpolant());
-                        interpolant->get()->Load(input, binary_tables);
+                        interpolants.emplace_back();
+                        interpolants.back()->Load(input, binary_tables);
                     }
                 }
 
@@ -392,9 +389,9 @@ namespace Helper {
                 if (output.good()) {
                     output.precision(16);
 
-                    for (std::size_t i = 0; i < builder_container.size(); ++i) {
-                        interpolants.at(i) = builder_container.at(i)->build();
-                        interpolants.at(i)->Save(output, binary_tables);
+                    for (const auto& builder : builder_container) {
+                        interpolants.emplace_back(builder->build());
+                        interpolants.back()->Save(output, binary_tables);
                     }
                 } else {
                     storing_failed = true;
@@ -410,9 +407,8 @@ namespace Helper {
         if (pathname.empty() || storing_failed) {
             log_debug("%s tables will be stored in memomy!", name.c_str());
 
-            for (std::size_t i = 0; i < builder_container.size(); ++i) {
-                interpolants.at(i) = builder_container.at(i)->build();
-            }
+            for (const auto& builder : builder_container)
+                interpolants.emplace_back(builder->build());
         }
 
         log_debug("Initialize %s interpolation done.", name.c_str());
