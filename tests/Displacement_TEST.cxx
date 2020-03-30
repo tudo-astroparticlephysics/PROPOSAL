@@ -26,7 +26,6 @@ TEST(constructor, interpolant)
     cross->SetdEdx_function([](double energy) { return 1; });
 
     CrossSectionList crosss{ cross };
-
     DisplacementBuilder<UtilityInterpolant> disp(crosss);
 }
 
@@ -84,7 +83,6 @@ TEST(utility_integral, solve_track_integral)
 
 TEST(utility_integral, upper_limit_track_integral)
 {
-    // dEdx = 1 + E
     auto const_loss = std::make_shared<CrossSectionBuilder>("constant");
     const_loss->SetdEdx_function([](double energy) { return a; });
     auto lin_loss = std::make_shared<CrossSectionBuilder>("lin");
@@ -92,6 +90,54 @@ TEST(utility_integral, upper_limit_track_integral)
 
     CrossSectionList crosss{ const_loss, lin_loss };
     auto disp = std::make_shared<DisplacementBuilder<UtilityIntegral>>(crosss);
+
+    std::function<double(double, double)> upper_limit_analytic
+        = [](double energy_initial, double disp) {
+              return ((a + b * energy_initial) * std::exp(-b * disp) - a) / b;
+          };
+
+    for (const auto& e : energies) {
+        auto energy_calc = disp->UpperLimitTrackIntegral(e, 100);
+        auto energy_analytic = upper_limit_analytic(e, 100);
+
+        EXPECT_NEAR(energy_calc, energy_analytic, energy_calc * PARTICLE_POSITION_RESOLUTION);
+    }
+}
+
+TEST(utility_interpolant, solve_track_integral)
+{
+    auto const_loss = std::make_shared<CrossSectionBuilder>("constant");
+    const_loss->SetdEdx_function([](double energy) { return a; });
+    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin");
+    lin_loss->SetdEdx_function([](double energy) { return b * energy; });
+
+    CrossSectionList crosss{ const_loss, lin_loss };
+    auto disp = std::make_shared<DisplacementBuilder<UtilityInterpolant>>(crosss);
+
+    std::function<double(double, double)> displacement_analytic =
+        [](double energy_initial, double energy_final) {
+            return (std::log((a + b * energy_initial) / (a + b * energy_final)))
+                / b;
+        };
+
+    for (size_t i = 0; i < energies.size() - 1; ++i) {
+        auto disp_calc = disp->SolveTrackIntegral(energies[i + 1], energies[i], 0);
+        auto disp_analytic
+            = displacement_analytic(energies[i + 1], energies[i]);
+
+        EXPECT_NEAR(disp_calc, disp_analytic, disp_calc*PARTICLE_POSITION_RESOLUTION);
+    }
+}
+
+TEST(utility_interpolant, upper_limit_track_integral)
+{
+    auto const_loss = std::make_shared<CrossSectionBuilder>("constant");
+    const_loss->SetdEdx_function([](double energy) { return a; });
+    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin");
+    lin_loss->SetdEdx_function([](double energy) { return b * energy; });
+
+    CrossSectionList crosss{ const_loss, lin_loss };
+    auto disp = std::make_shared<DisplacementBuilder<UtilityInterpolant>>(crosss);
 
     std::function<double(double, double)> upper_limit_analytic
         = [](double energy_initial, double disp) {
