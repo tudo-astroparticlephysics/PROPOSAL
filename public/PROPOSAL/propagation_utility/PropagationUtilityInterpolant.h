@@ -44,18 +44,22 @@ struct InterpolationDef;
 
 class UtilityInterpolant : public UtilityIntegral {
     Interpolant1DBuilder builder1d;
-    Interpolant1DBuilder builder_diff;
     std::unique_ptr<Interpolant> interpolant_;
-    std::unique_ptr<Interpolant> interpolant_diff_;
-    double stored_result_;
+    std::pair<double, double> upper_limit;
     double low_;
+
+    // maybe interpolate function to integral will give a performance boost.
+    // in general this function should be underfrequently called
+
+    // Interpolant1DBuilder builder_diff;
+    // std::unique_ptr<Interpolant> interpolant_diff_;
 
 public:
     UtilityInterpolant(std::function<double(double)>);
     void BuildTables(const string, size_t);
 
-    /* virtual double Calculate(double ei, double ef, double rnd); */
-    virtual double GetUpperLimit(double ei, double rnd);
+    double Calculate(double ei, double ef, double rnd);
+    double GetUpperLimit(double ei, double rnd);
 
     static InterpolationDef utility_interpolation_def;
 };
