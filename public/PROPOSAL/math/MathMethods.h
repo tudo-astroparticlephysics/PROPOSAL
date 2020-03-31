@@ -169,6 +169,8 @@ std::pair<double, double> welfords_online_algorithm(double& newValue, unsigned i
 /// @param max      Upper limit where numbers should be sampled. Default is +infty
 /// @return         Sampled value
 
-double SampleFromGaussian(double mean, double sigma, double rnd, double min, double max);
+double SampleFromGaussian(double mean, double sigma, double rnd,
+                          double min = -std::numeric_limits<double>::infinity(),
+                          double max = std::numeric_limits<double>::infinity());
 
 } // namespace PROPOSAL

@@ -415,9 +415,7 @@ std::pair<double, double> welfords_online_algorithm(double& new_Value, unsigned 
     return std::make_pair (new_mean, new_cov);
 }
 
-double SampleFromGaussian(double mean, double sigma, double rnd,
-        double min = -std::numeric_limits<double>::infinity(),
-        double max = std::numeric_limits<double>::infinity()) {
+double SampleFromGaussian(double mean, double sigma, double rnd, double min, double max) {
 
     auto xlo = 0.5 + std::erf((min - mean) / (SQRT2 * sigma)) / 2;
     auto xhi = 0.5 + std::erf((max - mean) / (SQRT2 * sigma)) / 2;
