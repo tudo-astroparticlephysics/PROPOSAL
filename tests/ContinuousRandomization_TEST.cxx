@@ -6,7 +6,6 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 using namespace PROPOSAL;
@@ -21,79 +20,72 @@ ParticleDef getParticleDef(const std::string& name) {
     }
 }
 
-class Test_Utilities : public ::testing::Test {
-   protected:
-    Test_Utilities() {}
-    virtual ~Test_Utilities() {}
 
-    static Utility a;
-    static Utility b;
+TEST(ContinuousRandomization, Constructor) {
+    auto cross_dummy = std::make_shared<CrossSectionBuilder>("contrand_dummy");
+    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
+    cross_dummy->SetdE2dx_function([](double energy)->double {return std::exp(-14 + 2 * std::log(energy));});
+
+
+    ContRand* dummy1 = new ContRandBuilder<UtilityIntegral>(CrossSectionList{cross_dummy}, getParticleDef("MuMinus"));
+    ContRand* dummy2 = new ContRandBuilder<UtilityInterpolant>(CrossSectionList{cross_dummy}, getParticleDef("MuMinus"));
+
+    auto dummy3 = ContRandBuilder<UtilityIntegral>(CrossSectionList{cross_dummy}, getParticleDef("MuMinus"));
+    auto dummy4 = ContRandBuilder<UtilityInterpolant>(CrossSectionList{cross_dummy}, getParticleDef("MuMinus"));
+
+}
+
+class ContRandDummy : public ContRand{
+public:
+    ContRandDummy(CrossSectionList cross, const ParticleDef &def) : ContRand(cross, def){};
+    double GetMass(){return mass;};
+    double EnergyRandomize(double initial_energy, double final_energy, double rnd){ (void) initial_energy; (void) rnd; return final_energy;}
 };
 
-Utility Test_Utilities::a(MuMinusDef::Get(),
-                          std::make_shared<Medium>(Ice()),
-                          EnergyCutSettings(),
-                          Utility::Definition(),
-                          InterpolationDef());
-Utility Test_Utilities::b(TauMinusDef::Get(),
-                          std::make_shared<Medium>(Ice()),
-                          EnergyCutSettings(),
-                          Utility::Definition(),
-                          InterpolationDef());
+TEST(ContinuousRandomization, mass){
+    auto cross_dummy = std::make_shared<CrossSectionBuilder>("contrand_dummy");
+    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
+    cross_dummy->SetdE2dx_function([](double energy)->double {return std::exp(-14 + 2 * std::log(energy));});
 
-TEST_F(Test_Utilities, Comparison_equal) {
-    ContinuousRandomizer A(a);
-    ContinuousRandomizer B(a);
+    auto dummy1 = ContRandDummy(CrossSectionList{cross_dummy}, getParticleDef("MuMinus"));
+    auto dummy2 = ContRandDummy(CrossSectionList{cross_dummy}, getParticleDef("TauMinus"));
 
-    EXPECT_TRUE(A == B);
-
-    ContinuousRandomizer* C = new ContinuousRandomizer(a);
-    ContinuousRandomizer* D = new ContinuousRandomizer(a);
-
-    EXPECT_TRUE(*C == *D);
-
-    delete C;
-    delete D;
-
-    A.Randomize(0, 1, 0.5);
-    B.Randomize(0, 1, 0.5);
-
-    EXPECT_TRUE(A == B);
+    ASSERT_DOUBLE_EQ(dummy1.GetMass(), MMU);
+    ASSERT_DOUBLE_EQ(dummy2.GetMass(), MTAU);
 }
 
-TEST_F(Test_Utilities, Comparison_not_equal) {
-    ContinuousRandomizer A(a);
-    ContinuousRandomizer B(b);
+TEST(ContinuousRandomization, FirstMomentum){
+    auto cross_dummy = std::make_shared<CrossSectionBuilder>("contrand_dummy");
+    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
+    cross_dummy->SetdE2dx_function([](double energy)->double {return std::exp(-14 + 2 * std::log(energy));});
 
-    // Only check different particle. If test does not fail, it should be good,
-    // because interanlly the utilitys are compared. So the Utility test must
-    // work fine.
-    EXPECT_TRUE(A != B);
+    RandomGenerator::Get().SetSeed(24601);
+    auto contrand = ContRandBuilder<UtilityIntegral>(CrossSectionList{cross_dummy}, getParticleDef("MuMinus"));
+    auto energies = std::array<std::pair<double, double>, 5>{{{5e4, 1e5}, {5e6, 1e7}, {5e8, 1e9}, {5e10, 1e11}, {5e12, 1e13}}};
+    int statistics = 1e4;
+    double average, randomized;
+    for(auto E : energies){
+        average = 0;
+        for(int n=1; n<=statistics; n++){
+            randomized = contrand.EnergyRandomize(E.second, E.first, RandomGenerator::Get().RandomDouble());
+            average = average + (randomized - average) / n;
+        }
+        EXPECT_FALSE(average == E.first);
+        EXPECT_NEAR(average, E.first, E.first * 1e-2);
+    }
 }
 
-TEST_F(Test_Utilities, Copyconstructor) {
-    ContinuousRandomizer A(a);
-    ContinuousRandomizer B = A;
-
-    EXPECT_TRUE(A == B);
+TEST(ContinuousRandomization, IdenticalEnergies){
+    auto cross_dummy = std::make_shared<CrossSectionBuilder>("contrand_dummy");
+    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
+    cross_dummy->SetdE2dx_function([](double energy)->double {return std::exp(-14 + 2 * std::log(energy));});
+    auto contrand = ContRandBuilder<UtilityIntegral>(CrossSectionList{cross_dummy}, getParticleDef("MuMinus"));
+    double energy = 1e5;
+    double energy_randomized = contrand.EnergyRandomize(energy, energy, RandomGenerator::Get().RandomDouble());
+    EXPECT_DOUBLE_EQ(energy_randomized, energy);
 }
 
-TEST_F(Test_Utilities, Copyconstructor2) {
-    ContinuousRandomizer A(a);
-    ContinuousRandomizer B(A);
-
-    EXPECT_TRUE(A == B);
-
-    Utility utility_c(a);
-
-    EXPECT_TRUE(a == utility_c);
-
-    ContinuousRandomizer C(a);
-    ContinuousRandomizer D(utility_c, C);
-
-    EXPECT_TRUE(A == B);
-}
-
+/*
 TEST(ContinuousRandomization, Randomize_interpol) {
     std::string filename = "bin/TestFiles/continous_randomization.txt";
 	std::ifstream in{filename};
@@ -148,6 +140,7 @@ TEST(ContinuousRandomization, Randomize_interpol) {
         }
     }
 }
+*/
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

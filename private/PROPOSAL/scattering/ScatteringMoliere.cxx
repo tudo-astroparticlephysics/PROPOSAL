@@ -390,7 +390,7 @@ double ScatteringMoliere::GetRandom(double pre_factor, double rnd) {
 
     // guessing an initial value by assuming a gaussian distribution
     // only regarding the component with maximum weight
-    double theta_np1 = pre_factor * inverseErrorFunction(rnd) / SQRT2;
+    double theta_np1 = pre_factor * normalppf(rnd) / SQRT2;
 
     // rnd element of ]-0.5,0.5]
     rnd = rnd - 0.5;

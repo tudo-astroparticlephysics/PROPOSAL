@@ -50,16 +50,16 @@ namespace PROPOSAL {
 
 
 // ----------------------------------------------------------------------------
-/// @brief Implementation of inverse error function
+/// @brief Implementation of percent point function (inverse of the cumulative density distribution) of the normal distribution
 ///
-/// This is the implementation of the inverse errot function.
+/// This is the implementation of the percent point function.
 /// Taken from https://web.archive.org/web/20150320023257/http://home.online.no/~pjacklam/notes/invnorm/
 ///
 /// @param x
 ///
-/// @return inverse error function of at x
+/// @return percent point function of a normal distribution at x
 // ----------------------------------------------------------------------------
-double inverseErrorFunction(double x);
+double normalppf(double x);
 
 // ----------------------------------------------------------------------------
 /// @brief Calculate the dilogarithm
