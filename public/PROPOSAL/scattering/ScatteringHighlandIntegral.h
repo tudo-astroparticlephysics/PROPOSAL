@@ -49,8 +49,10 @@ public:
             size_t hash_digest = 0;
             for (const auto& crosssection : cross)
                 hash_combine(hash_digest, crosssection->GetHash());
+            interpol_def.xmin = p_def.mass;
             interpol_def.function1d = [this](double energy) {
-                return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(interpol_def.xmax, energy, 0);
+                return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
+                    interpol_def.xmax, energy, 0);
             };
 
             integral.BuildTables(name, hash_digest, interpol_def);
@@ -101,6 +103,8 @@ private:
     std::unique_ptr<Displacement> displacement;
 };
 
-Interpolant1DBuilder::Definition interpol_def(nullptr, 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+template <class T>
+Interpolant1DBuilder::Definition ScatteringHighlandIntegral<T>::interpol_def(
+    nullptr, 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
 
 } // namespace PROPOSAL
