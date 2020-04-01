@@ -72,6 +72,10 @@ void init_particle(py::module& m) {
                       R"pbdoc(
                 lower stochastic sampling energy limit.
             )pbdoc")
+        .def_readonly("lifetime", &ParticleDef::lifetime,
+                      R"pbdoc(
+                average lifetime of the particle in seconds.
+            )pbdoc")
         .def_readonly("charge", &ParticleDef::charge,
                       R"pbdoc(
                 charge of the particle
