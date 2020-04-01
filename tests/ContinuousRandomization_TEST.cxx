@@ -7,6 +7,12 @@
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/math/MathMethods.h"
+
+#include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crossection/factories/IonizationFactory.h"
+#include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
+#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
 
 using namespace PROPOSAL;
 
@@ -55,6 +61,8 @@ TEST(ContinuousRandomization, mass){
 }
 
 TEST(ContinuousRandomization, FirstMomentum){
+    // The first momentum of the randomized energy is supposed to be equal to the final_energy
+    // when our distribution is neither cut by our upper limit (initial_energy) or our lower limit (mass/low)
     auto cross_dummy = std::make_shared<CrossSectionBuilder>("contrand_dummy");
     cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
     cross_dummy->SetdE2dx_function([](double energy)->double {return std::exp(-14 + 2 * std::log(energy));});
@@ -76,6 +84,8 @@ TEST(ContinuousRandomization, FirstMomentum){
 }
 
 TEST(ContinuousRandomization, IdenticalEnergies){
+    // Expect the randomized energy to be equal to the final energy when the final energy is equal to the
+    // initial energy (e.g. the continuous loss is zero)
     auto cross_dummy = std::make_shared<CrossSectionBuilder>("contrand_dummy");
     cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
     cross_dummy->SetdE2dx_function([](double energy)->double {return std::exp(-14 + 2 * std::log(energy));});
@@ -85,7 +95,53 @@ TEST(ContinuousRandomization, IdenticalEnergies){
     EXPECT_DOUBLE_EQ(energy_randomized, energy);
 }
 
-/*
+TEST(ContinuousRandomization, PhysicalProperties){
+    // Expecting an increasing variance in randomized_energies when the energy
+    // difference between final_energy and an fixed initial energy is increasing
+    auto cross_dummy = std::make_shared<CrossSectionBuilder>("contrand_dummy");
+    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
+    cross_dummy->SetdE2dx_function([](double energy)->double {return std::exp(-14 + 2 * std::log(energy));});
+    auto contrand = ContRandBuilder<UtilityIntegral>(CrossSectionList{cross_dummy}, getParticleDef("MuMinus"));
+
+    double E_i = 1e12;
+    std::array<double, 5> final_energies = {6e11, 5.5e11, 5e11, 4.5e11, 4e11};
+
+    int statistics = 1e4;
+    auto average = std::pair<double, double>{0., 0.};
+    double old_variance = 0;
+    for(auto E_f : final_energies){
+        average = {0., 0.};
+        for(unsigned int n=1; n<=statistics; n++){
+            double sampled = contrand.EnergyRandomize(E_i, E_f, RandomGenerator::Get().RandomDouble());
+            average = welfords_online_algorithm(sampled, n, average.first, average.second);
+        }
+        EXPECT_TRUE(old_variance < average.second);
+        old_variance = average.second;
+    }
+}
+
+TEST(ContinuousRandomization, Constraints){
+    // The randomized energy should never be above the particle mass or above the initial_energy
+    auto cross_dummy = std::make_shared<CrossSectionBuilder>("contrand_dummy");
+    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
+    cross_dummy->SetdE2dx_function([](double energy)->double {return std::exp(-14 + 2 * std::log(energy));});
+    auto contrand = ContRandBuilder<UtilityIntegral>(CrossSectionList{cross_dummy}, getParticleDef("MuMinus"));
+    double energy = 1e5;
+    int statistics = 1e3;
+    double randomized;
+
+    for(int n=1; n<statistics; n++){
+        randomized = contrand.EnergyRandomize(1e4, MMU, RandomGenerator::Get().RandomDouble());
+        EXPECT_TRUE(randomized >= MMU);
+        EXPECT_TRUE(randomized <= 1e4);
+
+        randomized = contrand.EnergyRandomize(110, MMU, RandomGenerator::Get().RandomDouble());
+        EXPECT_TRUE(randomized <= 110);
+        EXPECT_TRUE(randomized > MMU);
+    }
+
+}
+
 TEST(ContinuousRandomization, Randomize_interpol) {
     std::string filename = "bin/TestFiles/continous_randomization.txt";
 	std::ifstream in{filename};
@@ -118,19 +174,32 @@ TEST(ContinuousRandomization, Randomize_interpol) {
         first = false;
         energy_old = -1;
 
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-        EnergyCutSettings cut_settings(ecut, vcut);
+        std::shared_ptr<const Medium> medium  = CreateMedium(mediumName);
         ParticleDef particle_def = getParticleDef(particleName);
 
-        Utility utility(particle_def, medium, cut_settings,
-                        Utility::Definition(), InterpolationDef());
-        ContinuousRandomizer cont(utility, InterpolationDef());
+        //reprouce old behaviour
+        if(ecut==-1){
+            ecut = std::numeric_limits<double>::infinity();
+        }
+        if(vcut==-1){
+            vcut = 1;
+        }
+
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
+
+        auto brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, medium, ecuts, BremsstrahlungFactory::Definition(), std::make_shared<InterpolationDef>());
+        auto ioniz = IonizationFactory::Get().CreateIonization(particle_def, medium, ecuts, IonizationFactory::Definition(), std::make_shared<InterpolationDef>());
+        auto epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, medium, ecuts, EpairProductionFactory::Definition(), std::make_shared<InterpolationDef>());
+        auto photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, PhotonuclearFactory::Definition(), std::make_shared<InterpolationDef>());
+        auto cross = new CrossSectionList{std::shared_ptr<CrossSection>(brems), std::shared_ptr<CrossSection>(ioniz), std::shared_ptr<CrossSection>(epair), std::shared_ptr<CrossSection>(photo)};
+
+        ContRandBuilder<UtilityIntegral> cont(*cross, particle_def);
 
         while (energy_old < initial_energy) {
             energy_old = initial_energy;
 
             randomized_energy_new =
-                cont.Randomize(initial_energy, final_energy, rnd);
+                cont.EnergyRandomize(initial_energy, final_energy, rnd);
 
             ASSERT_NEAR(randomized_energy_new, randomized_energy,
                         1e-1 * randomized_energy);
@@ -140,7 +209,7 @@ TEST(ContinuousRandomization, Randomize_interpol) {
         }
     }
 }
-*/
+
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
