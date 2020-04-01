@@ -23,42 +23,13 @@ using Helper::InitializeInterpolation;
 UtilityInterpolant::UtilityInterpolant(std::function<double(double)> func)
     : UtilityIntegral(func)
     , interpolant_(nullptr)
-    /* , interpolant_diff_(nullptr) */
-    , low_(1e-3)
 {
-    builder1d.SetMax(utility_interpolation_def.nodes_propagate)
-        .SetXMin(low_)
-        .SetXMax(utility_interpolation_def.max_node_energy)
-        .SetRomberg(utility_interpolation_def.order_of_interpolation)
-        .SetRational(false)
-        .SetRelative(false)
-        .SetIsLog(true)
-        .SetRombergY(utility_interpolation_def.order_of_interpolation)
-        .SetRationalY(false)
-        .SetRelativeY(false)
-        .SetLogSubst(false)
-        .SetFunction1D([this](double energy){ return UtilityIntegral::Calculate(energy, low_, 0);});
-
-    /* builder_diff.SetMax(utility_interpolation_def.nodes_propagate) */
-    /*     .SetXMin(low_) */
-    /*     .SetXMax(utility_interpolation_def.max_node_energy) */
-    /*     .SetRomberg(utility_interpolation_def.order_of_interpolation) */
-    /*     .SetRational(false) */
-    /*     .SetRelative(false) */
-    /*     .SetIsLog(true) */
-    /*     .SetRombergY(utility_interpolation_def.order_of_interpolation) */
-    /*     .SetRationalY(false) */
-    /*     .SetRelativeY(false) */
-    /*     .SetLogSubst(false) */
-    /*     .SetFunction1D(FunctionToIntegral); */
 }
 
-void UtilityInterpolant::BuildTables(std::string name, size_t hash)
+void UtilityInterpolant::BuildTables(std::string name, size_t hash, Interpolant1DBuilder::Definition interpol_def)
 {
-    interpolant_ = InitializeInterpolation(name, builder1d, hash, utility_interpolation_def);
-
-    /* interpolant_diff_ = InitializeInterpolation( */
-    /*     name.append("diff"), builder_diff, hash, utility_interpolation_def); */
+    Interpolant1DBuilder interpolant_builder(interpol_def);
+    interpolant_ = InitializeInterpolation(name, interpolant_builder, hash, InterpolationDef());
 }
 
 double UtilityInterpolant::Calculate(double ei, double ef, double rnd)
@@ -89,5 +60,3 @@ double UtilityInterpolant::GetUpperLimit(double ei, double rnd)
     auto initial_step = ei + 0.5 * rnd / FunctionToIntegral(ei);
     return ei + rnd / FunctionToIntegral(initial_step);
 }
-
-InterpolationDef UtilityInterpolant::utility_interpolation_def;

@@ -2,6 +2,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 
 namespace PROPOSAL {
 
@@ -29,7 +30,7 @@ class ContRandBuilder : public ContRand {
                     hash_combine(hash_digest, crosssection->GetParametrization().GetHash(),
                                  crosssection->GetParametrization().GetMultiplier());
                 }
-                integral.BuildTables(name, hash_digest);
+                integral.BuildTables(name, hash_digest, contrand_interpol_def);
             }
         }
 
@@ -46,10 +47,14 @@ class ContRandBuilder : public ContRand {
             return SampleFromGaussian(final_energy, variance, rnd, mass, initial_energy);
         }
 
+        static Interpolant1DBuilder::Definition contrand_interpol_def;
     private:
         T integral;
         DisplacementBuilder <UtilityIntegral> displacement;
 
     };
+
+    template <class T>
+    Interpolant1DBuilder::Definition ContRandBuilder<T>::contrand_interpol_def;
 
 }

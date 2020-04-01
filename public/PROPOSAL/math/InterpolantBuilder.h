@@ -26,12 +26,14 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include <functional>
-#include <vector>
 #include <memory>
+#include <vector>
+
+#include <iostream>
+#include <string>
 
 namespace PROPOSAL {
 
@@ -42,8 +44,7 @@ class Interpolant;
 ///
 /// The Builder is used for initializing the interpolants.
 // ----------------------------------------------------------------------------
-class InterpolantBuilder
-{
+class InterpolantBuilder {
 public:
     // Default values for variables
     static const int default_max;
@@ -69,112 +70,55 @@ public:
 // ----------------------------------------------------------------------------
 /// @brief
 // ----------------------------------------------------------------------------
-class Interpolant1DBuilder : public InterpolantBuilder
-{
-public:
-    typedef std::function<double(double)> Function1D;
-    static const Function1D default_function1d;
 
+using Function1D = std::function<double(double)>;
+class Interpolant1DBuilder : public InterpolantBuilder {
 public:
-    // Constructor
+    struct Definition {
+        Definition() = default;
+        Definition(Function1D, int, double, double, int, bool, bool, bool, int, bool, bool, bool);
+
+        Function1D function1d = nullptr;
+        int max = 1.0;
+        double xmin = 1.0;
+        double xmax = 1.0;
+        int romberg = 1;
+        bool rational = false;
+        bool relative = false;
+        bool isLog = false;
+        int rombergY = 1;
+        bool rationalY = false;
+        bool relativeY = false;
+        bool logSubst = false;
+    };
+
     Interpolant1DBuilder();
-    Interpolant1DBuilder(const Interpolant1DBuilder&);
-
-    // Setter to build the Interpolant
-    Interpolant1DBuilder& SetFunction1D(Function1D val)
-    {
-        function1d = val;
-        return *this;
-    }
-
-    Interpolant1DBuilder& SetMax(const int val)
-    {
-        max = val;
-        return *this;
-    }
-    Interpolant1DBuilder& SetXMin(const double val)
-    {
-        xmin = val;
-        return *this;
-    }
-    Interpolant1DBuilder& SetXMax(const double val)
-    {
-        xmax = val;
-        return *this;
-    }
-
-    Interpolant1DBuilder& SetRomberg(const int val)
-    {
-        romberg = val;
-        return *this;
-    }
-    Interpolant1DBuilder& SetRational(const bool val)
-    {
-        rational = val;
-        return *this;
-    }
-    Interpolant1DBuilder& SetRelative(const bool val)
-    {
-        relative = val;
-        return *this;
-    }
-    Interpolant1DBuilder& SetIsLog(const bool val)
-    {
-        isLog = val;
-        return *this;
-    }
-
-    Interpolant1DBuilder& SetRombergY(const int val)
-    {
-        rombergY = val;
-        return *this;
-    }
-    Interpolant1DBuilder& SetRationalY(const bool val)
-    {
-        rationalY = val;
-        return *this;
-    }
-    Interpolant1DBuilder& SetRelativeY(const bool val)
-    {
-        relativeY = val;
-        return *this;
-    }
-    Interpolant1DBuilder& SetLogSubst(const bool val)
-    {
-        logSubst = val;
-        return *this;
-    }
-
-    // prepare specific frequently desired Product
-    // returns Builder for shorthand inline usage (same way as cout <<)
-    // Builder& setProductP(){
-    // 	this->i = 42;
-    // 	this->f = -1.0f/12.0f;
-    // 	this->c = '@';
-    //
-    // 	return *this;
-    // }
+    Interpolant1DBuilder(const Definition&);
+    ~Interpolant1DBuilder();
 
     std::unique_ptr<Interpolant> build();
 
+    Interpolant1DBuilder& SetFunction1D(Function1D val);
+    Interpolant1DBuilder& SetMax(const int val);
+    Interpolant1DBuilder& SetXMin(const double val);
+    Interpolant1DBuilder& SetXMax(const double val);
+    Interpolant1DBuilder& SetRomberg(const int val);
+    Interpolant1DBuilder& SetRational(const bool val);
+    Interpolant1DBuilder& SetRelative(const bool val);
+    Interpolant1DBuilder& SetIsLog(const bool val);
+    Interpolant1DBuilder& SetRombergY(const int val);
+    Interpolant1DBuilder& SetRationalY(const bool val);
+    Interpolant1DBuilder& SetRelativeY(const bool val);
+    Interpolant1DBuilder& SetLogSubst(const bool val);
+
 private:
-    Function1D function1d;
-
-    int max;
-    double xmin, xmax;
-
-    int romberg;
-    bool rational, relative, isLog;
-
-    int rombergY;
-    bool rationalY, relativeY, logSubst;
+    std::unique_ptr<Definition> builder_def;
 };
 
 // ----------------------------------------------------------------------------
 /// @brief
 // ----------------------------------------------------------------------------
-class Interpolant2DBuilder : public InterpolantBuilder
-{
+class Interpolant2DBuilder : public InterpolantBuilder {
 public:
     typedef std::function<double(double, double)> Function2D;
     static const Function2D default_function2d;
@@ -321,81 +265,75 @@ private:
 // ----------------------------------------------------------------------------
 /// @brief
 // ----------------------------------------------------------------------------
-    class Interpolant2DBuilder_array_as : public InterpolantBuilder
+class Interpolant2DBuilder_array_as : public InterpolantBuilder {
+public:
+    // Constructor
+    Interpolant2DBuilder_array_as();
+    Interpolant2DBuilder_array_as(const Interpolant2DBuilder_array_as&);
+
+    // Setter to build the Interpolant
+    Interpolant2DBuilder_array_as& Setx1(std::vector<double> vec)
     {
-    public:
+        x1 = vec;
+        return *this;
+    }
 
+    Interpolant2DBuilder_array_as& Setx2(std::vector<std::vector<double>> vec)
+    {
+        x2 = vec;
+        return *this;
+    }
 
-        // Constructor
-        Interpolant2DBuilder_array_as();
-        Interpolant2DBuilder_array_as(const Interpolant2DBuilder_array_as&);
+    Interpolant2DBuilder_array_as& Sety(std::vector<std::vector<double>> vec)
+    {
+        y = vec;
+        return *this;
+    }
 
-        // Setter to build the Interpolant
-        Interpolant2DBuilder_array_as& Setx1(std::vector<double> vec)
-        {
-            x1 = vec;
-            return *this;
-        }
+    Interpolant2DBuilder_array_as& SetRomberg1(const int val)
+    {
+        romberg1 = val;
+        return *this;
+    }
+    Interpolant2DBuilder_array_as& SetRational1(const bool val)
+    {
+        rational1 = val;
+        return *this;
+    }
+    Interpolant2DBuilder_array_as& SetRelative1(const bool val)
+    {
+        relative1 = val;
+        return *this;
+    }
 
-        Interpolant2DBuilder_array_as& Setx2(std::vector< std::vector<double> > vec)
-        {
-            x2 = vec;
-            return *this;
-        }
+    Interpolant2DBuilder_array_as& SetRomberg2(const int val)
+    {
+        romberg2 = val;
+        return *this;
+    }
+    Interpolant2DBuilder_array_as& SetRational2(const bool val)
+    {
+        rational2 = val;
+        return *this;
+    }
+    Interpolant2DBuilder_array_as& SetRelative2(const bool val)
+    {
+        relative2 = val;
+        return *this;
+    }
 
-        Interpolant2DBuilder_array_as& Sety(std::vector< std::vector<double> > vec)
-        {
-            y = vec;
-            return *this;
-        }
+    std::unique_ptr<Interpolant> build();
 
-        Interpolant2DBuilder_array_as& SetRomberg1(const int val)
-        {
-            romberg1 = val;
-            return *this;
-        }
-        Interpolant2DBuilder_array_as& SetRational1(const bool val)
-        {
-            rational1 = val;
-            return *this;
-        }
-        Interpolant2DBuilder_array_as& SetRelative1(const bool val)
-        {
-            relative1 = val;
-            return *this;
-        }
+private:
+    std::vector<double> x1;
+    std::vector<std::vector<double>> x2;
+    std::vector<std::vector<double>> y;
 
-        Interpolant2DBuilder_array_as& SetRomberg2(const int val)
-        {
-            romberg2 = val;
-            return *this;
-        }
-        Interpolant2DBuilder_array_as& SetRational2(const bool val)
-        {
-            rational2 = val;
-            return *this;
-        }
-        Interpolant2DBuilder_array_as& SetRelative2(const bool val)
-        {
-            relative2 = val;
-            return *this;
-        }
+    int romberg1;
+    bool rational1, relative1;
 
-
-        std::unique_ptr<Interpolant> build();
-
-    private:
-
-        std::vector<double> x1;
-        std::vector< std::vector<double> > x2;
-        std::vector< std::vector<double> > y;
-
-        int romberg1;
-        bool rational1, relative1;
-
-        int romberg2;
-        bool rational2, relative2;
-
-    };
+    int romberg2;
+    bool rational2, relative2;
+};
 
 } // namespace PROPOSAL

@@ -1,5 +1,6 @@
 
 #include "PROPOSAL/propagation_utility/Displacement.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 
 using namespace PROPOSAL;
 

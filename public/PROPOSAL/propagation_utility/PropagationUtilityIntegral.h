@@ -29,6 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 
 namespace PROPOSAL {
 class UtilityIntegral {
@@ -40,10 +41,10 @@ protected:
 
 public:
     UtilityIntegral(std::function<double(double)>);
-    void BuildTables(const std::string str, size_t hash_digest) { (void)str; (void)hash_digest;};
+    void BuildTables(const std::string, size_t, Interpolant1DBuilder::Definition);
 
-    virtual double Calculate(double ei, double ef, double rnd);
-    virtual double GetUpperLimit(double ei, double rnd);
+    double Calculate(double ei, double ef, double rnd);
+    double GetUpperLimit(double ei, double rnd);
     std::function<double(double)> FunctionToIntegral;
 };
 } // namespace PROPOSAL

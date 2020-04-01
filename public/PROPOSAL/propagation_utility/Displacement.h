@@ -4,12 +4,14 @@
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 #include <string>
 #include <vector>
 
 using std::string;
 
 namespace PROPOSAL {
+
 class Displacement {
     CrossSectionList cross;
 
@@ -19,6 +21,7 @@ public:
     virtual double FunctionToIntegral(double energy);
     virtual double SolveTrackIntegral(double, double, double) = 0;
     virtual double UpperLimitTrackIntegral(double, double) = 0;
+
 };
 
 template <class T> class DisplacementBuilder : public Displacement {
@@ -28,6 +31,8 @@ public:
     DisplacementBuilder(const CrossSectionList&);
     double SolveTrackIntegral(double, double, double) override;
     double UpperLimitTrackIntegral(double, double) override;
+
+    static Interpolant1DBuilder::Definition displacement_interpol_def;
 };
 
 template <class T>
@@ -40,7 +45,7 @@ DisplacementBuilder<T>::DisplacementBuilder(const CrossSectionList& cross)
         size_t hash_digest{ 0 };
         for (const auto& c : cross)
             hash_combine(hash_digest, c->GetHash());
-        integral.BuildTables("displacement", hash_digest);
+        integral.BuildTables("displacement", hash_digest, displacement_interpol_def);
     }
 }
 
@@ -57,4 +62,7 @@ double DisplacementBuilder<T>::UpperLimitTrackIntegral(
 {
     return integral.GetUpperLimit(lower_limit, sum);
 }
+
+template <class T>
+Interpolant1DBuilder::Definition DisplacementBuilder<T>::displacement_interpol_def;
 } // namespace PROPOSAL
