@@ -31,6 +31,7 @@
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 #include <functional>
 #include <memory>
 #include <string>
@@ -43,24 +44,20 @@ class Interpolant;
 struct InterpolationDef;
 
 class UtilityInterpolant : public UtilityIntegral {
-    Interpolant1DBuilder builder1d;
     std::unique_ptr<Interpolant> interpolant_;
     std::pair<double, double> upper_limit;
-    double low_;
 
     // maybe interpolate function to integral will give a performance boost.
     // in general this function should be underfrequently called
-
     // Interpolant1DBuilder builder_diff;
     // std::unique_ptr<Interpolant> interpolant_diff_;
 
 public:
     UtilityInterpolant(std::function<double(double)>);
-    void BuildTables(const string, size_t);
+    void BuildTables(const string, size_t, Interpolant1DBuilder::Definition);
 
     double Calculate(double ei, double ef, double rnd);
     double GetUpperLimit(double ei, double rnd);
 
-    static InterpolationDef utility_interpolation_def;
 };
 } // namespace PROPOSAL

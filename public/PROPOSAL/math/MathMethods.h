@@ -34,6 +34,7 @@
 #include <vector>
 #include <exception>
 #include <string>
+#include <limits>
 
 class MathException: public std::exception {
     public:

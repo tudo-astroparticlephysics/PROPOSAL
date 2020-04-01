@@ -2,6 +2,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/propagation_utility/Displacement.h"
 #include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
@@ -30,7 +31,7 @@ class ExactTimeBuilder : public Time {
                     hash_combine(hash_digest, crosssection->GetParametrization().GetHash(),
                                  crosssection->GetParametrization().GetMultiplier());
                 }
-                integral.BuildTables(name, hash_digest);
+                integral.BuildTables(name, hash_digest, time_interpol_def);
             }
         }
 
@@ -52,6 +53,7 @@ class ExactTimeBuilder : public Time {
             throw std::logic_error("Exact elapsed time can only be calculated using two energies");
         }
 
+        static Interpolant1DBuilder::Definition time_interpol_def;
     private:
         CrossSectionList cross;
         T integral;
@@ -72,5 +74,7 @@ class ApproximateTimeBuilder : public Time {
 
         double TimeElapsed(double distance) override { return distance / SPEED; }
     };
+template <class T>
+Interpolant1DBuilder::Definition ExactTimeBuilder<T>::time_interpol_def;
 
 }

@@ -47,7 +47,7 @@ class InteractionBuilder : public Interaction {
                     hash_combine(hash_digest, crosssection->GetParametrization().GetHash(),
                                  crosssection->GetParametrization().GetMultiplier());
                 }
-                integral.BuildTables(name, hash_digest);
+                integral.BuildTables(name, hash_digest, interaction_interpol_def);
             }
         }
 
@@ -71,9 +71,13 @@ class InteractionBuilder : public Interaction {
             return displacement.UpperLimitTrackIntegral(initial_energy, rndi);
         }
 
+        static Interpolant1DBuilder::Definition interaction_interpol_def;
     private:
         T integral;
-        DisplacementBuilder <UtilityIntegral> displacement;
+        DisplacementBuilder<UtilityIntegral> displacement;
     };
+
+    template <class T>
+    Interpolant1DBuilder::Definition InteractionBuilder<T>::interaction_interpol_def;
 
 }
