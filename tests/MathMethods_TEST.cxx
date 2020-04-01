@@ -6,6 +6,7 @@
 
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 
 using namespace PROPOSAL;
 
@@ -46,6 +47,29 @@ ASSERT_NEAR(aux2, 0, 1.e-6 * aux2);
 
 }
 
+TEST(SampleFromGaussian, Momenta){
+    RandomGenerator::Get().SetSeed(24601);
+    double sigma = 2;
+    double mean = 5;
+    int statistics = 1e6;
+    auto average = std::pair<double, double>{0., 0.};
+
+    for(unsigned int n=1; n<=statistics; n++){
+        double sampled = SampleFromGaussian(mean, sigma, RandomGenerator::Get().RandomDouble());
+        average = welfords_online_algorithm(sampled, n, average.first, average.second);
+    }
+    EXPECT_NEAR(average.first, mean, 1e-3 * mean);
+    EXPECT_NEAR(std::sqrt(average.second), sigma, 1e-3 * sigma);
+
+}
+
+TEST(SampleFromGaussian, Inf){
+    RandomGenerator::Get().SetSeed(24601);
+    double sigma = 0;
+    double mean = 5;
+    double sampled = SampleFromGaussian(mean, sigma, RandomGenerator::Get().RandomDouble());
+    EXPECT_DOUBLE_EQ(mean, sampled);
+}
 
 int main(int argc, char** argv)
 {

@@ -94,14 +94,14 @@ Scattering::RandomAngles ScatteringHighland::CalculateRandomAngle(double dr,
 
     Theta0 = CalculateTheta0(dr, ei, ef, pos);
 
-    auto rnd1 = Theta0 * inverseErrorFunction(rnd[0]);
-    auto rnd2 = Theta0 * inverseErrorFunction(rnd[1]);
+    auto rnd1 = Theta0 * normalppf(rnd[0]);
+    auto rnd2 = Theta0 * normalppf(rnd[1]);
 
     random_angles.sx = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.tx = rnd2;
 
-    rnd1 = Theta0 * inverseErrorFunction(rnd[2]);
-    rnd2 = Theta0 * inverseErrorFunction(rnd[3]);
+    rnd1 = Theta0 * normalppf(rnd[2]);
+    rnd2 = Theta0 * normalppf(rnd[3]);
 
     random_angles.sy = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.ty = rnd2;

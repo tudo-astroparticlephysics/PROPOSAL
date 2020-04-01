@@ -12,10 +12,10 @@
 
 namespace PROPOSAL {
 
-double inverseErrorFunction(double p) {
+double normalppf(double p) {
     if (p <= 0 || p >= 1) {
         log_fatal(
-            "The inverse Error function can just handle values between 0 and "
+            "The percent point function can just handle values between 0 and "
             "1.");
     }
     double a_arr[] = {-3.969683028665376e+01, 2.209460984245205e+02,
@@ -415,15 +415,14 @@ std::pair<double, double> welfords_online_algorithm(double& new_Value, unsigned 
     return std::make_pair (new_mean, new_cov);
 }
 
-double SampleFromGaussian(double mean, double sigma, double rnd,
-        double min = -std::numeric_limits<double>::infinity(),
-        double max = std::numeric_limits<double>::infinity()) {
-
+double SampleFromGaussian(double mean, double sigma, double rnd, double min, double max) {
+    if(sigma == 0){
+        return mean;
+    }
     auto xlo = 0.5 + std::erf((min - mean) / (SQRT2 * sigma)) / 2;
     auto xhi = 0.5 + std::erf((max - mean) / (SQRT2 * sigma)) / 2;
-
     auto rndtmp = xlo + (xhi - xlo) * rnd;
-    return sigma * inverseErrorFunction(rndtmp) + mean;
+    return sigma * normalppf(rndtmp)  + mean;
 }
 
 }  // namespace PROPOSAL
