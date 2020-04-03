@@ -68,7 +68,7 @@ CrossSection* IonizationFactory::CreateIonization(
 CrossSection* IonizationFactory::CreateIonization(
     const Ionization& parametrization,
     std::shared_ptr<const EnergyCutSettings> cuts,
-    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+    std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     if (interpolation_def) {
         return new IonizInterpolant(parametrization, cuts, *interpolation_def);

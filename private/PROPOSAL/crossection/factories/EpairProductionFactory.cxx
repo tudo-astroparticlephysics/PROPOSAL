@@ -36,7 +36,7 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
                                                             std::shared_ptr<const Medium> medium,
                                                             std::shared_ptr<const EnergyCutSettings> cuts,
                                                             const Definition& def,
-                                                            std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+                                                            std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     if(def.parametrization == EpairProductionFactory::Enum::None){
         log_fatal("Can't return Epairproduction Crosssection if parametrization is None");
@@ -51,7 +51,7 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
             return new EpairIntegral(*it->second.first(particle_def, medium, def.multiplier, def.lpm_effect), cuts);
         }
         else{
-            return new EpairInterpolant(*it->second.second(particle_def, medium, def.multiplier, def.lpm_effect, interpolation_def), cuts, *interpolation_def);
+            return new EpairInterpolant(*it->second.first(particle_def, medium, def.multiplier, def.lpm_effect), cuts, *interpolation_def);
         }
     } else
     {
@@ -62,7 +62,7 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
 
 CrossSection* EpairProductionFactory::CreateEpairProduction(const EpairProduction& parametrization,
                                                             std::shared_ptr<const EnergyCutSettings> cuts,
-                                                            std::shared_ptr<const InterpolationDef> interpolation_def=nullptr) const
+                                                            std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     if(interpolation_def==nullptr){
         return new EpairIntegral(parametrization, cuts);

@@ -133,11 +133,11 @@ namespace PROPOSAL {
                                            std::shared_ptr<const Medium>,
                                            std::shared_ptr<const EnergyCutSettings>,
                                            const Definition&,
-                                           std::shared_ptr<const InterpolationDef>) const;
+                                           std::shared_ptr<const InterpolationDef> = nullptr) const;
 
         CrossSection* CreateCompton(const Compton&,
                                     std::shared_ptr<const EnergyCutSettings>,
-                                    std::shared_ptr<const InterpolationDef>) const;
+                                    std::shared_ptr<const InterpolationDef> = nullptr) const;
 
         // ----------------------------------------------------------------------------
         /// @brief string to enum conversation for photo parametrizations

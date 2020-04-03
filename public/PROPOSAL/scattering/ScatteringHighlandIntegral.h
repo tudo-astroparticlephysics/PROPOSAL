@@ -52,7 +52,7 @@ public:
             interpol_def.xmin = p_def.mass;
             interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                    interpol_def.xmax, energy, 0);
+                     energy, interpol_def.xmax, 0);
             };
 
             integral.BuildTables(name, hash_digest, interpol_def);

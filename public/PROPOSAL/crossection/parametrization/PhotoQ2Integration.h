@@ -37,6 +37,7 @@
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Logging.h"
 
 #define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                                                             \
     class Photo##param : public PhotoQ2Integral                                                                        \
@@ -164,6 +165,8 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
     : Param(particle_def, medium, multiplier, shadow_effect)
     , interpolant_(this->medium_->GetNumComponents())
 {
+    log_warn("Using PhotoQ2Interpolant may lead to inaccurate results for specific values. "
+             "Consider using the Integral option");
     std::vector<Interpolant2DBuilder> builder2d(this->components_.size());
     Helper::InterpolantBuilderContainer builder_container2d(this->components_.size());
 

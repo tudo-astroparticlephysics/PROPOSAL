@@ -40,6 +40,7 @@
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Logging.h"
 
 #define MUPAIR_PARAM_INTEGRAL_DEC(param)                                                                               \
     class Mupair##param : public MupairProductionRhoIntegral                                                           \
@@ -178,6 +179,8 @@ MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const Part
     : Param(particle_def, medium, multiplier)
     , interpolant_(this->medium_->GetNumComponents())
 {
+    log_warn("Using MupairProductionRhoInterpolant may lead to inaccurate results for specific values. "
+             "Consider using the Integral option");
     std::vector<Interpolant2DBuilder> builder2d(this->components_.size());
     Helper::InterpolantBuilderContainer builder_container2d(this->components_.size());
 

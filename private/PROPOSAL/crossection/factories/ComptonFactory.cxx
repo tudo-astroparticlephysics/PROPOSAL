@@ -47,7 +47,7 @@ void ComptonFactory::Register(
 CrossSection* ComptonFactory::CreateCompton(const ParticleDef& particle_def,
     std::shared_ptr<const Medium> medium,
     std::shared_ptr<const EnergyCutSettings> cuts, const Definition& def,
-    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+    std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     ComptonMapEnum::const_iterator it
         = compton_map_enum_.find(def.parametrization);
@@ -66,7 +66,7 @@ CrossSection* ComptonFactory::CreateCompton(const ParticleDef& particle_def,
 
 CrossSection* ComptonFactory::CreateCompton(const Compton& parametrization,
     std::shared_ptr<const EnergyCutSettings> cuts,
-    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+    std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     if (interpolation_def) {
         return new ComptonInterpolant(parametrization, cuts, *interpolation_def);

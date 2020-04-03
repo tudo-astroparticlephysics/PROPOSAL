@@ -88,7 +88,7 @@ CrossSection* PhotoPairFactory::CreatePhotoPair(const ParticleDef& particle_def,
 CrossSection* PhotoPairFactory::CreatePhotoPair(
     const PhotoPairProduction& parametrization,
     const PhotoAngleDistribution& photoangle,
-    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+    std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     if (interpolation_def) {
         return new PhotoPairInterpolant(
