@@ -34,7 +34,7 @@ AnnihilationFactory::~AnnihilationFactory()
 CrossSection* AnnihilationFactory::CreateAnnihilation(
     const ParticleDef& particle_def, std::shared_ptr<const Medium> medium,
     const Definition& def,
-    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+    std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     AnnihilationMapEnum::const_iterator it
         = annihilation_map_enum_.find(def.parametrization);
@@ -54,7 +54,7 @@ CrossSection* AnnihilationFactory::CreateAnnihilation(
 
 CrossSection* AnnihilationFactory::CreateAnnihilation(
     const Annihilation& parametrization,
-    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+    std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     if (interpolation_def)
         return new AnnihilationInterpolant(parametrization, *interpolation_def);

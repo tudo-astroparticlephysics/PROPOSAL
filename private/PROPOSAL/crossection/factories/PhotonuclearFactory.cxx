@@ -129,7 +129,7 @@ ShadowEffect* PhotonuclearFactory::CreateShadowEffect(const Shadow& shadow)
 CrossSection* PhotonuclearFactory::CreatePhotonuclear(
     const ParticleDef& particle_def, std::shared_ptr<const Medium> medium,
     std::shared_ptr<const EnergyCutSettings> cuts, const Definition& def,
-    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+    std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     PhotoQ2MapEnum::const_iterator it_q2
         = photo_q2_map_enum_.find(def.parametrization);
@@ -137,8 +137,8 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(
         ShadowEffect* shadow = Get().CreateShadowEffect(def.shadow);
         if (interpolation_def) {
             PhotoInterpolant* photo = new PhotoInterpolant(
-                *it_q2->second.second(particle_def, medium, def.multiplier,
-                    *shadow, interpolation_def),
+                *it_q2->second.first(particle_def, medium, def.multiplier,
+                    *shadow),
                 cuts, *interpolation_def);
             delete shadow;
             return photo;
@@ -169,7 +169,7 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(
 CrossSection* PhotonuclearFactory::CreatePhotonuclear(
     const Photonuclear& parametrization,
     std::shared_ptr<const EnergyCutSettings> cuts,
-    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+    std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     if (interpolation_def) {
         return new PhotoInterpolant(parametrization, cuts, *interpolation_def);

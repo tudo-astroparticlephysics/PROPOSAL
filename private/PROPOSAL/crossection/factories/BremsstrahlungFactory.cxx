@@ -52,7 +52,7 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
                                                           std::shared_ptr<const Medium> medium,
                                                           std::shared_ptr<const EnergyCutSettings> cuts,
                                                           const Definition& def,
-                                                          std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+                                                          std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
 
     BremsstrahlungMapEnum::const_iterator it = bremsstrahlung_map_enum_.find(def.parametrization);
@@ -71,7 +71,7 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
 
 CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const Bremsstrahlung& param,
                                                           std::shared_ptr<const EnergyCutSettings> cuts,
-                                                          std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+                                                          std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     if(interpolation_def){
         return new BremsInterpolant(param, cuts, *interpolation_def);

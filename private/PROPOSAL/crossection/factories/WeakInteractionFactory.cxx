@@ -36,7 +36,7 @@ WeakInteractionFactory::~WeakInteractionFactory()
 CrossSection* WeakInteractionFactory::CreateWeakInteraction(
     const ParticleDef& particle_def, std::shared_ptr<const Medium> medium,
     const Definition& def,
-    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+    std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     WeakMapEnum::const_iterator it = weak_map_enum_.find(def.parametrization);
 
@@ -54,7 +54,7 @@ CrossSection* WeakInteractionFactory::CreateWeakInteraction(
 
 CrossSection* WeakInteractionFactory::CreateWeakInteraction(
     const WeakInteraction& parametrization,
-    std::shared_ptr<const InterpolationDef> interpolation_def = nullptr) const
+    std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
     if (interpolation_def) {
         return new WeakInterpolant(parametrization, *interpolation_def);

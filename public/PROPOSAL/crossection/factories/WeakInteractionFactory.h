@@ -129,10 +129,10 @@ namespace PROPOSAL {
         CrossSection* CreateWeakInteraction(const ParticleDef&,
                                             std::shared_ptr<const Medium>,
                                             const Definition&,
-                                            std::shared_ptr<const InterpolationDef>) const;
+                                            std::shared_ptr<const InterpolationDef> = nullptr) const;
 
         CrossSection* CreateWeakInteraction(const WeakInteraction&,
-                                            std::shared_ptr<const InterpolationDef>) const;
+                                            std::shared_ptr<const InterpolationDef> = nullptr) const;
 
         // ----------------------------------------------------------------------------
         /// @brief string to enum conversation for photo parametrizations

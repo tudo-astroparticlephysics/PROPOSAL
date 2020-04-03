@@ -154,11 +154,11 @@ namespace PROPOSAL {
         CrossSection* CreatePhotoPair(const ParticleDef&,
                                     std::shared_ptr<const Medium>,
                                     const Definition&,
-                                    std::shared_ptr<const InterpolationDef>) const;
+                                    std::shared_ptr<const InterpolationDef> = nullptr) const;
 
         CrossSection* CreatePhotoPair(const PhotoPairProduction&,
                                       const PhotoAngleDistribution&,
-                                      std::shared_ptr<const InterpolationDef>) const;
+                                      std::shared_ptr<const InterpolationDef> = nullptr) const;
 
         // ----------------------------------------------------------------------------
         /// @brief string to enum conversation for photopair parametrizations

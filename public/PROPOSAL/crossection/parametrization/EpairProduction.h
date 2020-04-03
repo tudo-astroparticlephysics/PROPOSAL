@@ -40,6 +40,7 @@
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Logging.h"
 
 #define EPAIR_PARAM_INTEGRAL_DEC(param)                                                                                \
     class Epair##param : public EpairProductionRhoIntegral                                                             \
@@ -207,6 +208,8 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const Partic
     : Param(particle_def, medium, multiplier, lpm)
     , interpolant_(this->medium_->GetNumComponents())
 {
+    log_warn("Using EPairProductionRhoInterpolant may lead to inaccurate result for specific values. "
+             "Consider using the Integral option");
     std::vector<Interpolant2DBuilder> builder2d(this->components_.size());
     Helper::InterpolantBuilderContainer builder_container2d(this->components_.size());
 

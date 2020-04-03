@@ -131,11 +131,11 @@ public:
                                    std::shared_ptr<const Medium>,
                                    std::shared_ptr<const EnergyCutSettings>,
                                    const Definition&,
-                                   std::shared_ptr<const InterpolationDef>) const;
+                                   std::shared_ptr<const InterpolationDef> = nullptr) const;
 
     CrossSection* CreateIonization(const Ionization&,
                                    std::shared_ptr<const EnergyCutSettings>,
-                                   std::shared_ptr<const InterpolationDef>) const;
+                                   std::shared_ptr<const InterpolationDef> = nullptr) const;
 
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for ioniz parametrizations
