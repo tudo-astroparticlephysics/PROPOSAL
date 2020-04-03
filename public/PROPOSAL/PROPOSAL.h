@@ -84,6 +84,8 @@
 #include "PROPOSAL/crossection/WeakIntegral.h"
 #include "PROPOSAL/crossection/WeakInterpolant.h"
 
+#include "PROPOSAL/crossection/ParticleDefaultCrossSectionList.h"
+
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/decay/DecayTable.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
