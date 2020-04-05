@@ -223,6 +223,29 @@ bool ParticleDef::operator!=(const ParticleDef& def) const
     return !(*this == def);
 }
 
+void ParticleDef::AddCrossSections(
+    std::shared_ptr<Medium> medium, std::shared_ptr<EnergyCutSettings> cuts)
+{
+    size_t hash_digest = 0;
+    hash_combine(hash_digest, medium->GetHash(), cuts->GetHash());
+
+    cross_sections[hash_digest] = GetStdCrossSections(medium, cuts, *this);
+}
+
+CrossSectionList ParticleDef::GetCrossSections(
+    std::shared_ptr<Medium> medium, std::shared_ptr<EnergyCutSettings> cuts)
+{
+    size_t hash_digest = 0;
+    hash_combine(hash_digest, medium->GetHash(), cuts->GetHash());
+
+    auto search = cross_sections.find(hash_digest);
+    if (search != cross_sections.end())
+        return search->second;
+
+    AddCrossSections(medium, cuts);
+    return GetCrossSections(medium, cuts);
+}
+
 /******************************************************************************
  *                                  Builder                                    *
  ******************************************************************************/

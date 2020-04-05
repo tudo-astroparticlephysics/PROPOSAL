@@ -275,70 +275,60 @@ void Medium::init() {
 // Getter
 // ------------------------------------------------------------------------- //
 
-double Medium::GetRadiationLength(const Vector3D& position) const {
+double Medium::GetRadiationLength(const Vector3D& position) const
+{
     return radiationLength_ / dens_distr_->Evaluate(position);
+}
+
+size_t Medium::GetHash() const noexcept
+{
+    size_t hash_digest = 0;
+    hash_combine(hash_digest, numComponents_, sumCharge_, ZA_, I_, C_, a_, m_,
+        X0_, X1_, d0_, massDensity_, molDensity_, radiationLength_, MM_,
+        sumNucleons_);
+    for (auto component : components_)
+        hash_combine(hash_digest, component.GetHash());
+    return hash_digest;
 }
 
 // ------------------------------------------------------------------------- //
 // Setter
 // ------------------------------------------------------------------------- //
 
-void Medium::SetComponents(std::vector<Components::Component> components) {
+void Medium::SetComponents(std::vector<Components::Component> components)
+{
 
-    components_ = components ;
+    components_ = components;
 
-    init();  // Init further member according to these components
+    init(); // Init further member according to these components
 }
 
-void Medium::SetZA(double ZA) {
-    ZA_ = ZA;
-}
+void Medium::SetZA(double ZA) { ZA_ = ZA; }
 
-void Medium::SetI(double I) {
-    I_ = I;
-}
+void Medium::SetI(double I) { I_ = I; }
 
-void Medium::SetC(double C) {
-    C_ = C;
-}
+void Medium::SetC(double C) { C_ = C; }
 
-void Medium::SetA(double a) {
-    a_ = a;
-}
+void Medium::SetA(double a) { a_ = a; }
 
-void Medium::SetM(double m) {
-    m_ = m;
-}
+void Medium::SetM(double m) { m_ = m; }
 
-void Medium::SetX0(double X0) {
-    X0_ = X0;
-}
+void Medium::SetX0(double X0) { X0_ = X0; }
 
-void Medium::SetX1(double X1) {
-    X1_ = X1;
-}
+void Medium::SetX1(double X1) { X1_ = X1; }
 
-void Medium::SetD0(double d0) {
-    d0_ = d0;
-}
+void Medium::SetD0(double d0) { d0_ = d0; }
 
-void Medium::SetMassDensity(double massDensity) {
-    massDensity_ = massDensity;
-}
+void Medium::SetMassDensity(double massDensity) { massDensity_ = massDensity; }
 
-void Medium::SetMolDensity(double molDensity) {
-    molDensity_ = molDensity;
-}
+void Medium::SetMolDensity(double molDensity) { molDensity_ = molDensity; }
 
-void Medium::SetMM(double MM) {
-    MM_ = MM;
-}
+void Medium::SetMM(double MM) { MM_ = MM; }
 
-void Medium::SetSumNucleons(double sumNucleons) {
-    sumNucleons_ = sumNucleons;
-}
+void Medium::SetSumNucleons(double sumNucleons) { sumNucleons_ = sumNucleons; }
 
-void Medium::SetDensityDistribution(Density_distr& density_distr) {
+void Medium::SetDensityDistribution(Density_distr& density_distr)
+{
     dens_distr_ = density_distr.clone();
 }
 
