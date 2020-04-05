@@ -32,6 +32,7 @@
 #include <memory>
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/particle/Particle.h"
 
 namespace PROPOSAL {
 

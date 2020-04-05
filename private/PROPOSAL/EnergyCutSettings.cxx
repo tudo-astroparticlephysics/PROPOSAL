@@ -74,6 +74,13 @@ double EnergyCutSettings::GetCut(double energy) const noexcept
     return std::min(ecut_ / energy, vcut_);
 }
 
+
+size_t EnergyCutSettings::GetHash() const noexcept {
+    size_t hash_digest = 0;
+    hash_combine(hash_digest, ecut_, vcut_, continuous_randomization_);
+    return hash_digest;
+}
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 

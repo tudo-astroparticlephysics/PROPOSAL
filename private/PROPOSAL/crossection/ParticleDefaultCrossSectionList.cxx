@@ -19,19 +19,15 @@ InterpolationDef std_interpolation_def;
 
 CrossSectionList BuildEMinusStdCrossSections(std::shared_ptr<Medium> medium,
     std::shared_ptr<EnergyCutSettings> cut,
-    std::shared_ptr<ParticleDef> electron = nullptr) noexcept
+    const ParticleDef& electron ) noexcept
 {
-    if (!electron)
-        electron.reset(new MuMinusDef());
-
-    BremsKelnerKokoulinPetrukhin brems(*electron, medium, 1.0, true);
-    EpairKelnerKokoulinPetrukhin epair(*electron, medium, 1.0, true);
-    IonizBetheBlochRossi ioniz(*electron, medium, cut, 1.0);
+    BremsKelnerKokoulinPetrukhin brems(electron, medium, 1.0, true);
+    EpairKelnerKokoulinPetrukhin epair(electron, medium, 1.0, true);
+    IonizBetheBlochRossi ioniz(electron, medium, cut, 1.0);
     ShadowButkevichMikhailov shadow;
-    PhotoAbramowiczLevinLevyMaor97 photo(*electron, medium, 1.0, shadow);
+    PhotoAbramowiczLevinLevyMaor97 photo(electron, medium, 1.0, shadow);
 
     CrossSectionList crosss;
-
     crosss.emplace_back(
         std::make_shared<BremsInterpolant>(brems, cut, std_interpolation_def));
     crosss.emplace_back(
@@ -46,18 +42,13 @@ CrossSectionList BuildEMinusStdCrossSections(std::shared_ptr<Medium> medium,
 
 CrossSectionList BuildMuMinusStdCrossSections(std::shared_ptr<Medium> medium,
     std::shared_ptr<EnergyCutSettings> cut,
-    std::shared_ptr<ParticleDef> muon = nullptr) noexcept
+    const ParticleDef& muon) noexcept
 {
-    if (!muon)
-        muon.reset(new MuMinusDef());
-
-    std::cout << "tables path: " << std_interpolation_def.path_to_tables << std::endl;
-
-    BremsKelnerKokoulinPetrukhin brems(*muon, medium, 1.0, true);
-    EpairKelnerKokoulinPetrukhin epair(*muon, medium, 1.0, true);
-    IonizBetheBlochRossi ioniz(*muon, medium, cut, 1.0);
+    BremsKelnerKokoulinPetrukhin brems(muon, medium, 1.0, true);
+    EpairKelnerKokoulinPetrukhin epair(muon, medium, 1.0, true);
+    IonizBetheBlochRossi ioniz(muon, medium, cut, 1.0);
     ShadowButkevichMikhailov shadow;
-    PhotoAbramowiczLevinLevyMaor97 photo(*muon, medium, 1.0, shadow);
+    PhotoAbramowiczLevinLevyMaor97 photo(muon, medium, 1.0, shadow);
 
     CrossSectionList crosss;
 
@@ -75,16 +66,13 @@ CrossSectionList BuildMuMinusStdCrossSections(std::shared_ptr<Medium> medium,
 
 CrossSectionList BuildTauMinusStdCrossSections(std::shared_ptr<Medium> medium,
     std::shared_ptr<EnergyCutSettings> cut,
-    std::shared_ptr<ParticleDef> tau = nullptr) noexcept
+    const ParticleDef& tau) noexcept
 {
-    if (!tau)
-        tau.reset(new MuMinusDef());
-
-    BremsKelnerKokoulinPetrukhin brems(*tau, medium, 1.0, true);
-    EpairKelnerKokoulinPetrukhin epair(*tau, medium, 1.0, true);
-    IonizBetheBlochRossi ioniz(*tau, medium, cut, 1.0);
+    BremsKelnerKokoulinPetrukhin brems(tau, medium, 1.0, true);
+    EpairKelnerKokoulinPetrukhin epair(tau, medium, 1.0, true);
+    IonizBetheBlochRossi ioniz(tau, medium, cut, 1.0);
     ShadowButkevichMikhailov shadow;
-    PhotoAbramowiczLevinLevyMaor97 photo(*tau, medium, 1.0, shadow);
+    PhotoAbramowiczLevinLevyMaor97 photo(tau, medium, 1.0, shadow);
 
     CrossSectionList crosss;
 
@@ -102,7 +90,7 @@ CrossSectionList BuildTauMinusStdCrossSections(std::shared_ptr<Medium> medium,
 
 using CrossSectionListBuilder = CrossSectionList (*)(std::shared_ptr<Medium>,
     std::shared_ptr<EnergyCutSettings>,
-    std::shared_ptr<ParticleDef>);
+    const ParticleDef&);
 
 std::unordered_map<ParticleType, CrossSectionListBuilder>
     BuilderStdCrossSections{
@@ -112,10 +100,10 @@ std::unordered_map<ParticleType, CrossSectionListBuilder>
 
 CrossSectionList GetStdCrossSections(std::shared_ptr<Medium> medium,
     std::shared_ptr<EnergyCutSettings> cut,
-    std::shared_ptr<ParticleDef> p_def)
+    const ParticleDef& p_def)
 {
     auto search = BuilderStdCrossSections.find(
-        static_cast<ParticleType>(p_def->particle_type));
+        static_cast<ParticleType>(p_def.particle_type));
     if (search != BuilderStdCrossSections.end())
         return (*search->second)(medium, cut, p_def);
 
