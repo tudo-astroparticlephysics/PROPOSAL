@@ -12,6 +12,8 @@
 #include <string>
 
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/crossection/ParticleDefaultCrossSectionList.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
 #include "PROPOSAL/decay/StableChannel.h"

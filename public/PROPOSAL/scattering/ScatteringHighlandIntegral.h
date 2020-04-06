@@ -43,19 +43,18 @@ public:
         : ScatteringHighland(p_def, medium)
         , displacement(new DisplacementBuilder<UtilityIntegral>(cross))
         , integral(std::bind(&ScatteringHighlandIntegral::HighlandIntegral,
-              this, std::placeholders::_1))
+              this, std::placeholders::_1), p_def.mass)
     {
         if (typeid(T) == typeid(UtilityInterpolant)) {
             size_t hash_digest = 0;
             for (const auto& crosssection : cross)
                 hash_combine(hash_digest, crosssection->GetHash());
-            interpol_def.xmin = p_def.mass;
             interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
                      energy, interpol_def.xmax, 0);
             };
 
-            integral.BuildTables(name, hash_digest, interpol_def);
+            integral.BuildTables("scattering", hash_digest, interpol_def);
         }
     }
 
@@ -98,7 +97,6 @@ private:
         return std::min(aux, cutoff);
     }
 
-    std::string name = "scattering";
     T integral;
     std::unique_ptr<Displacement> displacement;
 };

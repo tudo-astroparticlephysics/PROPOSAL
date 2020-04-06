@@ -55,7 +55,7 @@ class UtilityInterpolant : public UtilityIntegral {
     // std::unique_ptr<Interpolant> interpolant_diff_;
 
 public:
-    UtilityInterpolant(std::function<double(double)>);
+    UtilityInterpolant(std::function<double(double)>, double lower_lim);
     void BuildTables(const string, size_t, Interpolant1DBuilder::Definition);
 
     double Calculate(double ei, double ef, double rnd);

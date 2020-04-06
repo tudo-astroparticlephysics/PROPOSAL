@@ -37,14 +37,15 @@ class UtilityIntegral {
     double last_partial_sum;
 
 protected:
+    double lower_lim;
     Integral integral;
 
 public:
-    UtilityIntegral(std::function<double(double)>);
+    UtilityIntegral(std::function<double(double)>, double lower_lim);
     void BuildTables(const std::string, size_t, Interpolant1DBuilder::Definition);
 
-    double Calculate(double ei, double ef, double rnd);
-    double GetUpperLimit(double ei, double rnd);
+    double Calculate(double energy_initial, double energy_final, double rnd);
+    double GetUpperLimit(double energy_initial, double rnd);
     std::function<double(double)> FunctionToIntegral;
 };
 } // namespace PROPOSAL

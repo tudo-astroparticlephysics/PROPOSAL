@@ -12,9 +12,10 @@
 
 using namespace PROPOSAL;
 
-UtilityIntegral::UtilityIntegral(std::function<double(double)> func)
+UtilityIntegral::UtilityIntegral(std::function<double(double)> func, double lower_lim)
     : integral(IROMB, IMAXS, IPREC2)
     , FunctionToIntegral(func)
+    , lower_lim(lower_lim)
 {
 }
 
@@ -29,6 +30,9 @@ void UtilityIntegral::BuildTables(const std::string str, size_t hash_digest,
 double UtilityIntegral::Calculate(
     double energy_initial, double energy_final, double rnd)
 {
+    assert(energy_initial > energy_final);
+    assert(energy_final > lower_lim);
+
     last_energy_initial = energy_initial;
     last_partial_sum = rnd;
 
@@ -39,7 +43,7 @@ double UtilityIntegral::Calculate(
 double UtilityIntegral::GetUpperLimit(double energy_initial, double rnd)
 {
     if (energy_initial != last_energy_initial || rnd != last_partial_sum)
-        Calculate(energy_initial, 1e-3, rnd);
+        Calculate(energy_initial, lower_lim, rnd);
 
     return integral.GetUpperLimit();
 }

@@ -34,6 +34,7 @@
 
 #include "PROPOSAL/decay/DecayTable.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/crossection/CrossSection.h"
 
 #define PARTICLE_DEF(cls)                                                                                              \
     class cls##Def : public ParticleDef                                                                                \

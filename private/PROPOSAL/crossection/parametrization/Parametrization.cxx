@@ -16,6 +16,7 @@ Parametrization::Parametrization(const ParticleDef& particle_def,
     : particle_mass_(particle_def.mass)
     , particle_charge_(particle_def.charge)
     , particle_low_(particle_def.low)
+    , particle_lifetime_(particle_def.lifetime)
     , medium_(medium)
     , components_(medium_->GetComponents())
     , component_index_(0)

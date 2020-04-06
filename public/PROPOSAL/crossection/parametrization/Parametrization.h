@@ -92,6 +92,7 @@ public:
     double GetParticleMass() const { return particle_mass_; }
     double GetParticleCharge() const { return particle_charge_; }
     double GetParticleLow() const { return particle_low_; }
+    double GetParticleLifetime() const { return particle_lifetime_; }
 
     virtual InteractionType GetInteractionType() const = 0;
     double GetMultiplier() const { return multiplier_; }
@@ -115,6 +116,7 @@ protected:
     double particle_mass_;
     double particle_charge_;
     double particle_low_;
+    double particle_lifetime_;
     std::shared_ptr<const Medium> medium_;
 
     // const Components::Component* current_component_;

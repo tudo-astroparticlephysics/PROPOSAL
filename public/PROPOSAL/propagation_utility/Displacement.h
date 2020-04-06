@@ -2,9 +2,9 @@
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
 #include <string>
 #include <vector>
 
@@ -15,14 +15,18 @@ namespace PROPOSAL {
 class Displacement {
     CrossSectionList cross;
 
+protected:
+    double lower_lim;
+
 public:
     Displacement(const CrossSectionList&);
     virtual ~Displacement() = default;
-    virtual double FunctionToIntegral(double energy);
+    double FunctionToIntegral(double);
     virtual double SolveTrackIntegral(double, double, double) = 0;
     virtual double UpperLimitTrackIntegral(double, double) = 0;
-
 };
+
+extern Interpolant1DBuilder::Definition displacement_interpol_def;
 
 template <class T> class DisplacementBuilder : public Displacement {
     T integral;
@@ -31,21 +35,20 @@ public:
     DisplacementBuilder(const CrossSectionList&);
     double SolveTrackIntegral(double, double, double) override;
     double UpperLimitTrackIntegral(double, double) override;
-
-    static Interpolant1DBuilder::Definition displacement_interpol_def;
 };
 
 template <class T>
 DisplacementBuilder<T>::DisplacementBuilder(const CrossSectionList& cross)
     : Displacement(cross)
-    , integral(std::bind(
-          &Displacement::FunctionToIntegral, this, std::placeholders::_1))
+    , integral(std::bind(&Displacement::FunctionToIntegral, this, std::placeholders::_1), lower_lim)
 {
+
     if (typeid(T) == typeid(UtilityInterpolant)) {
         size_t hash_digest{ 0 };
         for (const auto& c : cross)
             hash_combine(hash_digest, c->GetHash());
-        integral.BuildTables("displacement", hash_digest, displacement_interpol_def);
+        integral.BuildTables(
+            "displacement", hash_digest, displacement_interpol_def);
     }
 }
 
@@ -63,6 +66,4 @@ double DisplacementBuilder<T>::UpperLimitTrackIntegral(
     return integral.GetUpperLimit(lower_limit, sum);
 }
 
-template <class T>
-Interpolant1DBuilder::Definition DisplacementBuilder<T>::displacement_interpol_def;
 } // namespace PROPOSAL

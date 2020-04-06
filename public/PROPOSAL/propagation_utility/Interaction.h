@@ -1,83 +1,67 @@
 #pragma once
-#include "PROPOSAL/propagation_utility/PropagationUtility.h"
-#include "PROPOSAL/math/MathMethods.h"
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/propagation_utility/Displacement.h"
 
 namespace PROPOSAL {
 
 class Interaction {
-    public:
-        Interaction(CrossSectionList cross, const ParticleDef &def) : cross(cross), mass(def.mass) {}
-        virtual double EnergyInteraction(double initial_energy, double rnd) = 0;
-        std::shared_ptr<CrossSection> TypeInteraction(double energy, const std::array<double, 2>& rnd){
-            std::vector<double> rates;
-            for (const auto& crosssection : cross)
-                rates.push_back(crosssection->CalculatedNdx(energy, rnd[1]));
+protected:
+    CrossSectionList cross;
+    double mass;
 
-            double total_rate{ std::accumulate(rates.begin(), rates.end(), 0.0) };
-            log_debug("Total rate = %f, total rate weighted = %f", total_rate, total_rate * rnd[0]);
+public:
+    Interaction(CrossSectionList cross);
+    virtual double EnergyInteraction(double, double) = 0;
+    std::shared_ptr<CrossSection> TypeInteraction(double, const std::array<double, 2>&);
+};
 
-            double rates_sum = 0;
-            for (size_t i = 0; i < rates.size(); i++) {
-                rates_sum += rates[i];
-                if (rates_sum >= total_rate * rnd[0])
-                    return cross.at(i);
-            }
-
-            throw std::logic_error("Something went wrong during the total rate calculation.");
+template <class T> class InteractionBuilder : public Interaction {
+public:
+    InteractionBuilder<T>(CrossSectionList cross)
+        : Interaction(cross)
+        , displacement(cross)
+        , integral(std::bind(&InteractionBuilder::InteractionIntegrand, this,
+                       std::placeholders::_1),
+              mass)
+    {
+        if (typeid(T) == typeid(UtilityInterpolant)) {
+            size_t hash_digest = 0;
+            for (const auto& c : cross)
+                hash_combine(hash_digest, c->GetHash());
+            integral.BuildTables("interaction", hash_digest, interaction_interpol_def);
         }
+    }
 
-    protected:
-        CrossSectionList cross;
-        double mass;
-        std::string name = "interaction";
-    };
+    double InteractionIntegrand(double energy)
+    {
+        double total_rate = 0.0;
+        for (const auto& crosssection : cross)
+            total_rate += crosssection->CalculatedNdx(energy);
 
-    template<class T>
-class InteractionBuilder : public Interaction {
-    public:
-        InteractionBuilder<T>(CrossSectionList cross, const ParticleDef &def)
-            : Interaction(cross, def),
-              displacement(cross),
-              integral(std::bind(&InteractionBuilder::InteractionIntegrand, this, std::placeholders::_1)) {
-            if(typeid(T) == typeid(UtilityInterpolant)){
-                size_t hash_digest = 0;
-                for (const auto& crosssection: cross){
-                    hash_combine(hash_digest, crosssection->GetParametrization().GetHash(),
-                                 crosssection->GetParametrization().GetMultiplier());
-                }
-                integral.BuildTables(name, hash_digest, interaction_interpol_def);
-            }
-        }
+        return displacement.FunctionToIntegral(energy) * total_rate;
+    }
 
-        double InteractionIntegrand (double energy) {
-            double total_rate = 0.0;
-            for (const auto& crosssection : cross)
-                total_rate += crosssection->CalculatedNdx(energy);
+    double EnergyInteraction(double initial_energy, double rnd) override
+    {
+        auto rndi = -std::log(rnd);
+        auto rndiMin = 0.;
 
-            return displacement.FunctionToIntegral(energy) * total_rate;
-        }
+        rndiMin = integral.Calculate(initial_energy, mass, rndi);
 
-        double EnergyInteraction (double initial_energy, double rnd) override {
-            auto rndi = -std::log(rnd);
-            auto rndiMin = 0.;
+        if (rndi >= rndiMin || rndiMin <= 0)
+            return mass;
 
-            rndiMin = integral.Calculate(initial_energy, mass, rndi);
+        return displacement.UpperLimitTrackIntegral(initial_energy, rndi);
+    }
 
-            if (rndi >= rndiMin || rndiMin <= 0)
-                return mass;
+    static Interpolant1DBuilder::Definition interaction_interpol_def;
 
-            return displacement.UpperLimitTrackIntegral(initial_energy, rndi);
-        }
+private:
+    T integral;
+    DisplacementBuilder<UtilityIntegral> displacement;
+};
 
-        static Interpolant1DBuilder::Definition interaction_interpol_def;
-    private:
-        T integral;
-        DisplacementBuilder<UtilityIntegral> displacement;
-    };
-
-    template <class T>
-    Interpolant1DBuilder::Definition InteractionBuilder<T>::interaction_interpol_def;
-
+template <class T>
+Interpolant1DBuilder::Definition
+    InteractionBuilder<T>::interaction_interpol_def;
 }

@@ -8,10 +8,10 @@ namespace PROPOSAL {
 
 class Decay {
 public:
-    Decay(CrossSectionList cross, const ParticleDef& def)
+    Decay(CrossSectionList cross)
         : cross(cross)
-        , mass(def.mass)
-        , lifetime(def.lifetime){};
+        , mass(cross.front()->GetParametrization().GetParticleMass())
+        , lifetime(cross.front()->GetParametrization().GetParticleLifetime()){};
     virtual double EnergyDecay(double initial_energy, double rnd) = 0;
 
 protected:
@@ -23,19 +23,16 @@ protected:
 
 template <class T> class DecayBuilder : public Decay {
 public:
-    DecayBuilder<T>(CrossSectionList cross, const ParticleDef& def)
-        : Decay(cross, def)
+    DecayBuilder<T>(CrossSectionList cross)
+        : Decay(cross)
         , displacement(cross)
         , integral(std::bind(
-              &DecayBuilder::DecayIntegrand, this, std::placeholders::_1))
+              &DecayBuilder::DecayIntegrand, this, std::placeholders::_1), mass)
     {
         if (typeid(T) == typeid(UtilityInterpolant)) {
             size_t hash_digest = 0;
-            for (const auto& crosssection : cross) {
-                hash_combine(hash_digest,
-                    crosssection->GetParametrization().GetHash(),
-                    crosssection->GetParametrization().GetMultiplier());
-            }
+            for (const auto& c: cross)
+                hash_combine(hash_digest, c->GetHash());
             integral.BuildTables(name, hash_digest, decay_interpol_def);
         }
     }

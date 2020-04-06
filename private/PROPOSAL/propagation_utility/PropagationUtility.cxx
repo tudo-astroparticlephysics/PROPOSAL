@@ -28,12 +28,12 @@ Utility::Definition::Definition(CrossSectionList cross,
                  "approximate by interpolants. Performance will be poor.");
 
         displacement_calc.reset(new DisplacementBuilder<UtilityIntegral>(cross));
-        interaction_calc.reset(new InteractionBuilder<UtilityIntegral>(cross, p_def));
-        decay_calc.reset(new DecayBuilder<UtilityIntegral>(cross, p_def));
+        interaction_calc.reset(new InteractionBuilder<UtilityIntegral>(cross));
+        decay_calc.reset(new DecayBuilder<UtilityIntegral>(cross));
     } else {
         displacement_calc.reset(new DisplacementBuilder<UtilityInterpolant>(cross));
-        interaction_calc.reset(new InteractionBuilder<UtilityInterpolant>(cross, p_def));
-        decay_calc.reset(new DecayBuilder<UtilityInterpolant>(cross, p_def));
+        interaction_calc.reset(new InteractionBuilder<UtilityInterpolant>(cross));
+        decay_calc.reset(new DecayBuilder<UtilityInterpolant>(cross));
     }
 
     if (!scattering) {
@@ -45,9 +45,9 @@ Utility::Definition::Definition(CrossSectionList cross,
         log_debug("No continuous randomization used.");
     } else {
         if (!inter_def) {
-            cont_rand.reset(new ContRandBuilder<UtilityIntegral>(cross, p_def));
+            cont_rand.reset(new ContRandBuilder<UtilityIntegral>(cross));
         } else {
-            cont_rand.reset(new ContRandBuilder<UtilityInterpolant>(cross, p_def));
+            cont_rand.reset(new ContRandBuilder<UtilityInterpolant>(cross));
         }
     }
 
