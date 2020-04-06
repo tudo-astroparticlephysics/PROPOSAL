@@ -15,6 +15,8 @@ public:
     std::shared_ptr<CrossSection> TypeInteraction(double, const std::array<double, 2>&);
 };
 
+extern Interpolant1DBuilder::Definition interaction_interpol_def;
+
 template <class T> class InteractionBuilder : public Interaction {
 public:
     InteractionBuilder<T>(CrossSectionList cross)
@@ -54,7 +56,6 @@ public:
         return displacement.UpperLimitTrackIntegral(initial_energy, rndi);
     }
 
-    static Interpolant1DBuilder::Definition interaction_interpol_def;
 
 private:
     T integral;

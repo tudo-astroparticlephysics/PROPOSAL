@@ -2,17 +2,22 @@
 
 using namespace PROPOSAL;
 
+namespace PROPOSAL {
+Interpolant1DBuilder::Definition interaction_interpol_def(
+    nullptr, 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+} // namespace PROPOSAL
+
 Interaction::Interaction(CrossSectionList cross)
-        : cross(cross)
-        , mass(cross.front()->GetParametrization().GetParticleMass())
-    {
-    }
+    : cross(cross)
+    , mass(cross.front()->GetParametrization().GetParticleMass())
+{
+}
 
 std::shared_ptr<CrossSection> Interaction::TypeInteraction(
     double energy, const std::array<double, 2>& rnd)
 {
     std::vector<double> rates;
-    for (const auto& c: cross)
+    for (const auto& c : cross)
         rates.push_back(c->CalculatedNdx(energy, rnd[1]));
 
     auto total_rate = std::accumulate(rates.begin(), rates.end(), 0.0);

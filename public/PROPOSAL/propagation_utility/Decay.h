@@ -21,6 +21,8 @@ protected:
     std::string name = "decay";
 };
 
+extern Interpolant1DBuilder::Definition decay_interpol_def;
+
 template <class T> class DecayBuilder : public Decay {
 public:
     DecayBuilder<T>(CrossSectionList cross)
@@ -61,13 +63,9 @@ public:
         return integral.GetUpperLimit(initial_energy, rndd) / lifetime;
     }
 
-    static Interpolant1DBuilder::Definition decay_interpol_def;
 
 private:
     T integral;
     DisplacementBuilder<UtilityIntegral> displacement;
 };
-
-template <class T>
-Interpolant1DBuilder::Definition DecayBuilder<T>::decay_interpol_def;
 }

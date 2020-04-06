@@ -18,6 +18,8 @@ protected:
     double lower_lim;
 };
 
+extern Interpolant1DBuilder::Definition time_interpol_def;
+
 template <class T> class ExactTimeBuilder : public Time {
 public:
     ExactTimeBuilder<T>(CrossSectionList cross, const ParticleDef& def)
@@ -63,7 +65,6 @@ public:
             "Exact elapsed time can only be calculated using two energies");
     }
 
-    static Interpolant1DBuilder::Definition time_interpol_def;
 
 private:
     double mass;

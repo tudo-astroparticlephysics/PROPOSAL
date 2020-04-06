@@ -2,6 +2,8 @@
 
 using namespace PROPOSAL;
 
-Time::Time()
-{
-}
+namespace PROPOSAL {
+Interpolant1DBuilder::Definition time_interpol_def;
+} // namespace PROPOSAL
+
+Time::Time() {}
