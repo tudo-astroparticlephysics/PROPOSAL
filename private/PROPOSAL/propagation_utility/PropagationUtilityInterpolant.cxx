@@ -32,7 +32,6 @@ void UtilityInterpolant::BuildTables(std::string name, size_t hash,
     Interpolant1DBuilder::Definition interpol_def)
 {
     interpol_def.xmin = lower_lim;
-    interpol_def.function1d = [this](double energy) { return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(lower_lim, energy, 0);};
     Interpolant1DBuilder interpolant_builder(interpol_def);
     interpolant_ = InitializeInterpolation(
         name, interpolant_builder, hash, InterpolationDef());

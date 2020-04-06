@@ -40,13 +40,19 @@ public:
 template <class T>
 DisplacementBuilder<T>::DisplacementBuilder(const CrossSectionList& cross)
     : Displacement(cross)
-    , integral(std::bind(&Displacement::FunctionToIntegral, this, std::placeholders::_1), lower_lim)
+    , integral(std::bind(&Displacement::FunctionToIntegral, this,
+                   std::placeholders::_1),
+          lower_lim)
 {
 
     if (typeid(T) == typeid(UtilityInterpolant)) {
         size_t hash_digest{ 0 };
         for (const auto& c : cross)
             hash_combine(hash_digest, c->GetHash());
+        displacement_interpol_def.function1d = [this](double energy) {
+            return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
+                lower_lim, energy, 0);
+        };
         integral.BuildTables(
             "displacement", hash_digest, displacement_interpol_def);
     }
