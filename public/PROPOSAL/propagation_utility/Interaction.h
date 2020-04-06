@@ -62,7 +62,4 @@ private:
     DisplacementBuilder<UtilityIntegral> displacement;
 };
 
-template <class T>
-Interpolant1DBuilder::Definition
-    InteractionBuilder<T>::interaction_interpol_def;
 }

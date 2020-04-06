@@ -88,6 +88,4 @@ public:
 
     double TimeElapsed(double distance) override { return distance / SPEED; }
 };
-template <class T>
-Interpolant1DBuilder::Definition ExactTimeBuilder<T>::time_interpol_def;
 }

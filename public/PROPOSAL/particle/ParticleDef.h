@@ -118,6 +118,18 @@ enum class ParticleType : int
 };
 } // namespace PROPOSAL
 
+namespace std {
+    template<>
+    struct hash<PROPOSAL::ParticleType> {
+        using argument_type = PROPOSAL::ParticleType;
+        using result_type = std::size_t;
+
+        result_type operator()(argument_type a) const {
+            return static_cast<result_type>(a);
+        }
+    };
+}
+
 // ----------------------------------------------------------------------------
 /// @brief Struct to define Basic Particle Properties
 ///
