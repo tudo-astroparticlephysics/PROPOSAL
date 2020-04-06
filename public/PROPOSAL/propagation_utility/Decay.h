@@ -1,24 +1,23 @@
 #pragma once
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/propagation_utility/Displacement.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
+#include "PROPOSAL/crossection/CrossSection.h"
 
 namespace PROPOSAL {
 
 class Decay {
 public:
-    Decay(CrossSectionList cross)
-        : cross(cross)
-        , mass(cross.front()->GetParametrization().GetParticleMass())
-        , lifetime(cross.front()->GetParametrization().GetParticleLifetime()){};
+    Decay(const CrossSectionList& cross);
+    virtual ~Decay() {};
     virtual double EnergyDecay(double initial_energy, double rnd) = 0;
 
 protected:
     CrossSectionList cross;
     double mass;
     double lifetime;
-    std::string name = "decay";
 };
 
 extern Interpolant1DBuilder::Definition decay_interpol_def;
@@ -35,7 +34,7 @@ public:
             size_t hash_digest = 0;
             for (const auto& c: cross)
                 hash_combine(hash_digest, c->GetHash());
-            integral.BuildTables(name, hash_digest, decay_interpol_def);
+            integral.BuildTables("decay", hash_digest, decay_interpol_def);
         }
     }
 

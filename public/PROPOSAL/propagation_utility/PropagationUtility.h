@@ -42,10 +42,6 @@
 using std::tuple;
 namespace PROPOSAL {
 
-class CrossSection;
-
-typedef std::vector<std::shared_ptr<CrossSection>> CrossSectionList;
-
 class Utility {
 public:
     struct Definition {

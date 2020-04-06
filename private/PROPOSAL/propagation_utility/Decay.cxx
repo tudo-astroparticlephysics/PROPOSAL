@@ -1,4 +1,14 @@
+
 #include "PROPOSAL/propagation_utility/Decay.h"
+
+using namespace PROPOSAL;
+
+Decay::Decay(const CrossSectionList& cross)
+    : cross(cross)
+    , mass(cross.front()->GetParametrization().GetParticleMass())
+    , lifetime(cross.front()->GetParametrization().GetParticleLifetime())
+{
+}
 
 namespace PROPOSAL {
 Interpolant1DBuilder::Definition decay_interpol_def(
