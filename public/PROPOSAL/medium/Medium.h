@@ -105,6 +105,7 @@ class Medium {
     double GetMM() const { return MM_; }
     double GetSumNucleons() const { return sumNucleons_; }
     const Density_distr& GetDensityDistribution() const { return *dens_distr_; }
+    size_t GetHash() const noexcept;
 
     // Setter
     void SetNumComponents(int numComponents);

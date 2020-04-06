@@ -29,6 +29,7 @@
 
 #pragma once
 
+#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 
 namespace PROPOSAL {

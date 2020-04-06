@@ -70,6 +70,8 @@ public:
     double GetAverageNucleonWeight() const { return averageNucleonWeight_; }
     double GetWoodSaxon() const { return wood_saxon_; }
 
+    size_t GetHash() const noexcept;
+
 protected:
     /*!
      * set the value of radiation logarithm constant B

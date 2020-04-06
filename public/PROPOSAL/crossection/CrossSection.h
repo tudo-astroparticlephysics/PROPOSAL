@@ -33,18 +33,21 @@
 #include <memory>
 #include <utility>
 
-#include "PROPOSAL/particle/Particle.h"
+/* #include "PROPOSAL/particle/Particle.h" */
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/math/Vector3D.h"
 
 namespace PROPOSAL {
 
 using Function = std::function<double(double)>;
+class DynamicData;
 
 namespace Components {
 class Component;
 }
 
 class Parametrization;
+enum class InteractionType;
 
 
 class CrossSection

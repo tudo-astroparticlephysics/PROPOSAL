@@ -102,13 +102,13 @@ enum class ParticleType : int
     NuTauBar = -16,
     Gamma = 22,
     Pi0 = 111,
-    PiPlus  = 211,
+    PiPlus = 211,
     PiMinus = -211,
     K0 = 311,
     KPlus = 321,
-    KMinus= -321,
+    KMinus = -321,
     STauMinus = 1000015,
-    STauPlus= -1000015,
+    STauPlus = -1000015,
     PPlus = 2212,
     PMinus = -2212,
     Monopole = 41,
@@ -117,15 +117,16 @@ enum class ParticleType : int
 };
 } // namespace PROPOSAL
 
-
 // ----------------------------------------------------------------------------
 /// @brief Struct to define Basic Particle Properties
 ///
 /// Used to construct Particles
 // ----------------------------------------------------------------------------
 namespace PROPOSAL {
-struct ParticleDef
-{
+class EnergyCutSettings;
+class Medium;
+
+struct ParticleDef {
     class Builder;
 
     const std::string name;
@@ -158,17 +159,22 @@ struct ParticleDef
     bool operator==(const ParticleDef&) const;
     bool operator!=(const ParticleDef&) const;
 
+    void AddCrossSections(
+        std::shared_ptr<Medium>, std::shared_ptr<EnergyCutSettings>);
+    CrossSectionList GetCrossSections(
+        std::shared_ptr<Medium>, std::shared_ptr<EnergyCutSettings>);
+
     friend std::ostream& operator<<(std::ostream&, ParticleDef const&);
 
 private:
     ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
-};
 
+    std::unordered_map<size_t, CrossSectionList> cross_sections;
+};
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::ParticleDef const&);
 
-class ParticleDef::Builder
-{
+class ParticleDef::Builder {
 public:
     Builder();
 

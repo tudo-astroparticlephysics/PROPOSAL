@@ -7,10 +7,10 @@
  *   \author Mario Dunsch
  */
 
-#include <functional>
 #include <cmath>
-#include <sstream>
+#include <functional>
 #include <iomanip>
+#include <sstream>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/medium/Components.h"
@@ -125,6 +125,14 @@ bool Component::operator==(const Component& component) const
 bool Component::operator!=(const Component& component) const
 {
     return !(*this == component);
+}
+
+size_t Component::GetHash() const noexcept
+{
+    size_t hash_digest = 0;
+    hash_combine(hash_digest, nucCharge_, atomicNum_, atomInMolecule_,
+        logConstant_, bPrime_, averageNucleonWeight_, wood_saxon_);
+    return hash_digest;
 }
 
 // ------------------------------------------------------------------------- //

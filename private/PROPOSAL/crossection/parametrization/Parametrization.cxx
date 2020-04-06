@@ -134,7 +134,7 @@ Parametrization::KinematicLimits Parametrization_builder::GetKinematicLimits(dou
 
 size_t Parametrization::GetHash() const
 {
-    std::size_t seed = 0;
+    size_t seed = 0;
     hash_combine(seed, GetName(), std::abs(particle_charge_), particle_mass_,
         medium_->GetName());
 

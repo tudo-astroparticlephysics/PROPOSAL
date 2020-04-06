@@ -297,7 +297,7 @@ namespace Helper {
 
                     for (const auto& builder : builder_container) {
                         // TODO(mario): read check Tue 2017/09/05
-                        interpolants.emplace_back();
+                        interpolants.emplace_back(new Interpolant());
                         interpolants.back()->Load(input, binary_tables);
                     }
                     reading_worked = true;
@@ -368,7 +368,7 @@ namespace Helper {
 
                     for (const auto& builder : builder_container) {
                         // TODO(mario): read check Tue 2017/09/05
-                        interpolants.emplace_back();
+                        interpolants.emplace_back(new Interpolant());
                         interpolants.back()->Load(input, binary_tables);
                     }
                 }
