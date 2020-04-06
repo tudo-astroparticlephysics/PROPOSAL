@@ -116,14 +116,9 @@ public:
                                           double multiplier)>
         RegisterFunction;
 
-    typedef std::function<MupairProduction*(const ParticleDef&,
-                                          std::shared_ptr<const Medium>,
-                                          double multiplier,
-                                          std::shared_ptr<const InterpolationDef>)>
-        RegisterFunctionInterpolant;
 
-    typedef std::map<std::string, std::pair<RegisterFunction, RegisterFunctionInterpolant> > MupairMapString;
-    typedef std::map<Enum, std::pair<RegisterFunction, RegisterFunctionInterpolant> > MupairMapEnum;
+    typedef std::map<std::string, RegisterFunction> MupairMapString;
+    typedef std::map<Enum, RegisterFunction> MupairMapEnum;
 
     typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
@@ -172,7 +167,7 @@ private:
     /// @param Enum
     /// @param RegisterFunction
     // ----------------------------------------------------------------------------
-    void Register(const std::string& name, Enum, std::pair<RegisterFunction, RegisterFunctionInterpolant>);
+    void Register(const std::string& name, Enum, RegisterFunction);
 
     MupairMapString mupair_map_str_;
     MupairMapEnum mupair_map_enum_;
