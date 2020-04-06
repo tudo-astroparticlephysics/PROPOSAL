@@ -16,8 +16,8 @@ MupairProductionFactory::MupairProductionFactory()
     , mupair_map_enum_()
     , string_enum_()
 {
-    Register("mupairkelnerkokoulinpetrukhin", KelnerKokoulinPetrukhin, std::make_pair(&MupairKelnerKokoulinPetrukhin::create, &MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>::create));
-    Register("none", None, std::make_pair(nullptr, nullptr));
+    Register("mupairkelnerkokoulinpetrukhin", KelnerKokoulinPetrukhin, &MupairKelnerKokoulinPetrukhin::create);
+    Register("none", None, nullptr);
 }
 
 MupairProductionFactory::~MupairProductionFactory()
@@ -43,9 +43,9 @@ CrossSection* MupairProductionFactory::CreateMupairProduction(const ParticleDef&
     if (it != mupair_map_enum_.end())
     {
         if(interpolation_def){
-            return new MupairInterpolant(*it->second.first(particle_def, medium, def.multiplier), cuts, *interpolation_def);
+            return new MupairInterpolant(*it->second(particle_def, medium, def.multiplier), cuts, *interpolation_def);
         }
-            return new MupairIntegral(*it->second.first(particle_def, medium, def.multiplier), cuts);
+            return new MupairIntegral(*it->second(particle_def, medium, def.multiplier), cuts);
     }
     std::invalid_argument("MupairProduction not registerd!");
 }
@@ -63,7 +63,7 @@ CrossSection* MupairProductionFactory::CreateMupairProduction(const MupairProduc
 // ------------------------------------------------------------------------- //
 void MupairProductionFactory::Register(const std::string& name,
                                      Enum enum_t,
-                                     std::pair<RegisterFunction, RegisterFunctionInterpolant> create)
+                                     RegisterFunction create)
 {
     mupair_map_str_[name]    = create;
     mupair_map_enum_[enum_t] = create;

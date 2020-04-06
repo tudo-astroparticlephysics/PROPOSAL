@@ -358,7 +358,6 @@ TEST(Scattering, ScatterReproducibilityTest)
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
 
         Scattering* scattering = NULL;
-        std::cout << parametrization << std::endl;
         if (parametrization == "HighlandIntegral")
         {
             auto brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, medium, ecuts, BremsstrahlungFactory::Definition(), std::make_shared<InterpolationDef>());

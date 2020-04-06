@@ -96,7 +96,7 @@ public:
 
     virtual InteractionType GetInteractionType() const = 0;
     double GetMultiplier() const { return multiplier_; }
-
+    double GetCurrentComponent() {return component_index_;}
     virtual size_t GetHash() const;
 
     // ----------------------------------------------------------------- //

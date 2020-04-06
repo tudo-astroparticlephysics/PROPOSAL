@@ -39,17 +39,13 @@ PhotonuclearFactory::PhotonuclearFactory()
     RegisterRealPhoton("none", None, nullptr);
 
     RegisterQ2("photoabramowiczlevinlevymaor91", AbramowiczLevinLevyMaor91,
-        std::make_pair(&PhotoAbramowiczLevinLevyMaor91::create,
-            &PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor91>::create));
+        &PhotoAbramowiczLevinLevyMaor91::create);
     RegisterQ2("photoabramowiczlevinlevymaor97", AbramowiczLevinLevyMaor97,
-        std::make_pair(&PhotoAbramowiczLevinLevyMaor97::create,
-            &PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97>::create));
+        &PhotoAbramowiczLevinLevyMaor97::create);
     RegisterQ2("photobutkevichmikhailov", ButkevichMikhailov,
-        std::make_pair(&PhotoButkevichMikhailov::create,
-            &PhotoQ2Interpolant<PhotoButkevichMikhailov>::create));
+        &PhotoButkevichMikhailov::create);
     RegisterQ2("photorenosarcevicsu", RenoSarcevicSu,
-        std::make_pair(&PhotoRenoSarcevicSu::create,
-            &PhotoQ2Interpolant<PhotoRenoSarcevicSu>::create));
+        &PhotoRenoSarcevicSu::create);
 }
 
 PhotonuclearFactory::~PhotonuclearFactory()
@@ -86,8 +82,7 @@ void PhotonuclearFactory::RegisterRealPhoton(
 }
 
 // ------------------------------------------------------------------------- //
-void PhotonuclearFactory::RegisterQ2(const std::string& name, Enum enum_t,
-    std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> create)
+void PhotonuclearFactory::RegisterQ2(const std::string& name, Enum enum_t, RegisterQ2Function create)
 {
     photo_q2_map_str_[name] = create;
     photo_q2_map_enum_[enum_t] = create;
@@ -137,14 +132,13 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(
         ShadowEffect* shadow = Get().CreateShadowEffect(def.shadow);
         if (interpolation_def) {
             PhotoInterpolant* photo = new PhotoInterpolant(
-                *it_q2->second.first(particle_def, medium, def.multiplier,
-                    *shadow),
+                *it_q2->second(particle_def, medium, def.multiplier, *shadow),
                 cuts, *interpolation_def);
             delete shadow;
             return photo;
         }
         PhotoIntegral* photo = new PhotoIntegral(
-            *it_q2->second.first(particle_def, medium, def.multiplier, *shadow),
+            *it_q2->second(particle_def, medium, def.multiplier, *shadow),
             cuts);
         delete shadow;
         return photo;

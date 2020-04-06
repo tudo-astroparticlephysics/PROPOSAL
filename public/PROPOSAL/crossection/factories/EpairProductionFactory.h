@@ -124,15 +124,9 @@ public:
                                           bool lpm)>
         RegisterFunction;
 
-    typedef std::function<EpairProduction*(const ParticleDef&,
-                                          std::shared_ptr<const Medium>,
-                                          double multiplier,
-                                          bool lpm,
-                                          std::shared_ptr<const InterpolationDef>)>
-        RegisterFunctionInterpolant;
 
-    typedef std::map<std::string, std::pair<RegisterFunction, RegisterFunctionInterpolant> > EpairMapString;
-    typedef std::map<Enum, std::pair<RegisterFunction, RegisterFunctionInterpolant> > EpairMapEnum;
+    typedef std::map<std::string, RegisterFunction> EpairMapString;
+    typedef std::map<Enum, RegisterFunction> EpairMapEnum;
 
     typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
 
@@ -181,7 +175,7 @@ private:
     /// @param Enum
     /// @param RegisterQ2Function
     // ----------------------------------------------------------------------------
-    void Register(const std::string& name, Enum, std::pair<RegisterFunction, RegisterFunctionInterpolant>);
+    void Register(const std::string& name, Enum, RegisterFunction);
 
     EpairMapString epair_map_str_;
     EpairMapEnum epair_map_enum_;

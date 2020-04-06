@@ -162,12 +162,6 @@ public:
                                           const ShadowEffect&)>
         RegisterQ2Function;
 
-    typedef std::function<Photonuclear*(const ParticleDef&,
-                                          std::shared_ptr<const Medium>,
-                                          double multiplier,
-                                          const ShadowEffect&,
-                                          std::shared_ptr<const InterpolationDef>)>
-        RegisterQ2FunctionInterpolant;
 
     typedef std::map<std::string, RegisterShadowEffectFunction> PhotoShadowEffectMapString;
     typedef std::map<Shadow, RegisterShadowEffectFunction> PhotoShadowEffectMapEnum;
@@ -175,8 +169,8 @@ public:
     typedef std::map<std::string, RegisterRealPhotonFunction> PhotoRealPhotonMapString;
     typedef std::map<Enum, RegisterRealPhotonFunction> PhotoRealPhotonMapEnum;
 
-    typedef std::map<std::string, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> > PhotoQ2MapString;
-    typedef std::map<Enum, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> > PhotoQ2MapEnum;
+    typedef std::map<std::string, RegisterQ2Function> PhotoQ2MapString;
+    typedef std::map<Enum, RegisterQ2Function> PhotoQ2MapEnum;
 
     typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
     typedef Helper::Bimap<std::string, Shadow> BimapStringShadowEnum;
@@ -261,7 +255,7 @@ private:
     /// @param Enum
     /// @param RegisterQ2Function
     // ----------------------------------------------------------------------------
-    void RegisterQ2(const std::string& name, Enum, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant>);
+    void RegisterQ2(const std::string& name, Enum, RegisterQ2Function);
 
     PhotoShadowEffectMapString photo_shadow_map_str_;
     PhotoShadowEffectMapEnum photo_shadow_map_enum_;

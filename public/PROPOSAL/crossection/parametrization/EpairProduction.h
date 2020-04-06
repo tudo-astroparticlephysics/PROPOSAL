@@ -46,20 +46,20 @@
     class Epair##param : public EpairProductionRhoIntegral                                                             \
     {                                                                                                                  \
     public:                                                                                                            \
-        Epair##param(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier, bool lpm);        \
+        Epair##param(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier, bool lpm);                  \
         Epair##param(const Epair##param&);                                                                             \
         virtual ~Epair##param();                                                                                       \
                                                                                                                        \
         virtual Parametrization* clone() const { return new Epair##param(*this); }                                     \
         static EpairProduction* create(const ParticleDef& particle_def,                                                \
-                                       std::shared_ptr<const Medium> medium,                                                           \
+                                       std::shared_ptr<const Medium> medium,                                           \
                                        double multiplier,                                                              \
                                        bool lpm)                                                                       \
         {                                                                                                              \
-            return new Epair##param(particle_def, medium, multiplier, lpm);                                      \
+            return new Epair##param(particle_def, medium, multiplier, lpm);                                            \
         }                                                                                                              \
                                                                                                                        \
-        double FunctionToIntegral(double energy, double v, double lpm);                                              \
+        double FunctionToIntegral(double energy, double v, double lpm);                                                \
                                                                                                                        \
         const std::string& GetName() const { return name_; }                                                           \
                                                                                                                        \
@@ -161,144 +161,6 @@ private:
 
 EPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
 EPAIR_PARAM_INTEGRAL_DEC(SandrockSoedingreksoRhode)
-
-/******************************************************************************
- *                    Declare Interpolant Parametrizations                    *
- ******************************************************************************/
-
-template<class Param = EpairKelnerKokoulinPetrukhin>
-class EpairProductionRhoInterpolant : public Param
-{
-public:
-    typedef std::vector<std::unique_ptr<Interpolant>> InterpolantVec;
-
-public:
-    EpairProductionRhoInterpolant(const ParticleDef&,
-                       std::shared_ptr<const Medium>,
-                       double multiplier,
-                       bool lpm,
-                       std::shared_ptr<const InterpolationDef> def);
-    EpairProductionRhoInterpolant(const EpairProductionRhoInterpolant&);
-
-    Parametrization* clone() const { return new EpairProductionRhoInterpolant<Param>(*this); }
-    static EpairProduction* create(const ParticleDef& particle_def,
-                                std::shared_ptr<const Medium> medium,
-                                double multiplier,
-                                bool lpm,
-                                std::shared_ptr<const InterpolationDef> def)
-    {
-        return new EpairProductionRhoInterpolant<Param>(particle_def, medium, multiplier, lpm, def);
-    }
-
-    double DifferentialCrossSection(double energy, double v);
-
-protected:
-    virtual bool compare(const Parametrization&) const;
-    double FunctionToBuildPhotoInterpolant(double energy, double v, int component);
-
-    InterpolantVec interpolant_;
-};
-
-template<class Param>
-EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const ParticleDef& particle_def,
-                                              std::shared_ptr<const Medium> medium,
-                                              double multiplier,
-                                              bool lpm,
-                                              std::shared_ptr<const InterpolationDef> def)
-    : Param(particle_def, medium, multiplier, lpm)
-    , interpolant_(this->medium_->GetNumComponents())
-{
-    log_warn("Using EPairProductionRhoInterpolant may lead to inaccurate result for specific values. "
-             "Consider using the Integral option");
-    std::vector<Interpolant2DBuilder> builder2d(this->components_.size());
-    Helper::InterpolantBuilderContainer builder_container2d(this->components_.size());
-
-    for (unsigned int i = 0; i < this->components_.size(); ++i)
-    {
-        builder2d[i]
-            .SetMax1(def->nodes_cross_section)
-            .SetX1Min(particle_def.mass)
-            .SetX1Max(def->max_node_energy)
-            .SetMax2(def->nodes_cross_section)
-            .SetX2Min(0.0)
-            .SetX2Max(1.0)
-            .SetRomberg1(def->order_of_interpolation)
-            .SetRational1(false)
-            .SetRelative1(false)
-            .SetIsLog1(true)
-            .SetRomberg2(def->order_of_interpolation)
-            .SetRational2(false)
-            .SetRelative2(false)
-            .SetIsLog2(false)
-            .SetRombergY(def->order_of_interpolation)
-            .SetRationalY(false)
-            .SetRelativeY(false)
-            .SetLogSubst(false)
-            .SetFunction2D(std::bind(&EpairProductionRhoInterpolant::FunctionToBuildPhotoInterpolant, this, std::placeholders::_1, std::placeholders::_2, i));
-
-        builder_container2d[i]  = &builder2d[i];
-    }
-
-    interpolant_ = Helper::InitializeInterpolation("Epair", builder_container2d, this->GetHash(), *def);
-}
-
-template<class Param>
-EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const EpairProductionRhoInterpolant& photo)
-    : Param(photo)
-    , interpolant_()
-{
-    interpolant_.resize(photo.interpolant_.size());
-
-    for (unsigned int i = 0; i < photo.interpolant_.size(); ++i)
-    {
-        interpolant_[i] = std::unique_ptr<Interpolant>(new Interpolant(*photo.interpolant_[i]));
-    }
-}
-
-template<class Param>
-bool EpairProductionRhoInterpolant<Param>::compare(const Parametrization& parametrization) const
-{
-    const EpairProductionRhoInterpolant<Param>* epair = static_cast<const EpairProductionRhoInterpolant<Param>*>(&parametrization);
-
-    if (interpolant_.size() != epair->interpolant_.size())
-        return false;
-
-    for (unsigned int i = 0; i < interpolant_.size(); ++i)
-    {
-        if (*interpolant_[i] != *epair->interpolant_[i])
-            return false;
-    }
-
-    return EpairProduction::compare(parametrization);
-}
-
-template<class Param>
-double EpairProductionRhoInterpolant<Param>::DifferentialCrossSection(double energy, double v)
-{
-    Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
-
-    if (v > limits.vMin && v < limits.vMax)
-    {
-        return std::max(
-            interpolant_.at(this->component_index_)->Interpolate(energy, std::log(v / limits.vMin) / std::log(limits.vMax / limits.vMin)),
-            0.0);
-    } else
-    {
-        return Param::DifferentialCrossSection(energy, v);
-    }
-}
-
-template<class Param>
-double EpairProductionRhoInterpolant<Param>::FunctionToBuildPhotoInterpolant(double energy, double v, int component)
-{
-    this->component_index_                 = component;
-    Parametrization::KinematicLimits limits = this->GetKinematicLimits(energy);
-
-    // TODO: This substitution results in interpolated values that deviate more than IPREC from the integrated values and way more for v close to 1 (jean-marco)
-    v = limits.vMin * std::exp(v * std::log(limits.vMax / limits.vMin));
-
-    return Param::DifferentialCrossSection(energy, v);
-}
 
 #undef EPAIR_PARAM_INTEGRAL_DEC
 

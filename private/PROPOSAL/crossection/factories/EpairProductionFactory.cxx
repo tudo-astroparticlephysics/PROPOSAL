@@ -15,9 +15,9 @@ EpairProductionFactory::EpairProductionFactory()
     , epair_map_enum_()
     , string_enum_()
 {
-    Register("epairkelnerkokoulinpetrukhin", KelnerKokoulinPetrukhin, std::make_pair(&EpairKelnerKokoulinPetrukhin::create, &EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin>::create));
-    Register("epairsandrocksoedingreksorhode", SandrockSoedingreksoRhode, std::make_pair(&EpairSandrockSoedingreksoRhode::create, &EpairProductionRhoInterpolant<EpairSandrockSoedingreksoRhode>::create));
-    Register("none", None, std::make_pair(nullptr, nullptr));
+    Register("epairkelnerkokoulinpetrukhin", KelnerKokoulinPetrukhin, &EpairKelnerKokoulinPetrukhin::create);
+    Register("epairsandrocksoedingreksorhode", SandrockSoedingreksoRhode, &EpairSandrockSoedingreksoRhode::create);
+    Register("none", None, nullptr);
 }
 
 EpairProductionFactory::~EpairProductionFactory()
@@ -48,10 +48,10 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
     if (it != epair_map_enum_.end())
     {
         if(interpolation_def == nullptr){
-            return new EpairIntegral(*it->second.first(particle_def, medium, def.multiplier, def.lpm_effect), cuts);
+            return new EpairIntegral(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts);
         }
         else{
-            return new EpairInterpolant(*it->second.first(particle_def, medium, def.multiplier, def.lpm_effect), cuts, *interpolation_def);
+            return new EpairInterpolant(*it->second(particle_def, medium, def.multiplier, def.lpm_effect), cuts, *interpolation_def);
         }
     } else
     {
@@ -75,7 +75,7 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const EpairProductio
 // ------------------------------------------------------------------------- //
 void EpairProductionFactory::Register(const std::string& name,
                                      Enum enum_t,
-                                     std::pair<RegisterFunction, RegisterFunctionInterpolant> create)
+                                     RegisterFunction create)
 {
     epair_map_str_[name]    = create;
     epair_map_enum_[enum_t] = create;
