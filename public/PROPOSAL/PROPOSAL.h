@@ -62,6 +62,7 @@
 #include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crossection/CrossSectionBuilder.h"
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
 

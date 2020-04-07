@@ -129,46 +129,6 @@ protected:
 
     std::shared_ptr<const EnergyCutSettings> cuts_;
 };
-
-class CrossSectionBuilder final : public CrossSection
-{
-public:
-    CrossSectionBuilder(std::string name);
-
-    static Parametrization* param;
-
-    double CalculatedEdx(double energy) override;
-    double CalculatedE2dx(double energy) override;
-    double CalculatedNdx(double energy) override;
-    double CalculatedNdx(double energy, double rnd) override;
-    double CalculateStochasticLoss(double energy, double rnd1, double rnd2) override;
-    double CalculateCumulativeCrossSection(double energy, int component, double v) override;
-
-    void SetdEdx_function(Function func);
-    void SetdE2dx_function(Function func);
-    void SetdNdx_function(Function func);
-    void SetdNdx_rnd_function(std::function<double(double, double)> func);
-    void SetStochasticLoss_function(std::function<double(double, double, double)> func);
-    void SetCumulativeCrossSection_function(std::function<double(double, double, double)> func);
-
-    Parametrization& GetParametrization() const override { throw std::logic_error("No Parametrization for CrossSectionBuilder available");}
-    size_t GetHash() const override;
-
-protected:
-    virtual bool compare(const CrossSection& cross) const override;
-    double CalculateStochasticLoss(double energy, double rnd1) override;
-
-private:
-    std::string name;
-    Function dEdx_function;
-    Function dE2dx_function;
-    Function dNdx_function;
-    std::function<double(double, double)> dNdx_rnd_function;
-    std::function<double(double, double, double)> StochasticLoss_function;
-    std::function<double(double, double, double)> CumulativeCrossSection_function;
-};
-
-std::ostream& operator<<(std::ostream&, PROPOSAL::CrossSection const&);
-using CrossSectionList = std::vector<std::shared_ptr<CrossSection>>;
+    using CrossSectionList = std::vector<std::shared_ptr<CrossSection>>;
 
 } // namespace PROPOSAL

@@ -129,6 +129,7 @@ protected:
 class Parametrization_builder : public Parametrization {
     std::function<double(const Parametrization&, double, double)> diff_cross;
     std::function<KinematicLimits(const Parametrization&, double)> kinematic_limits;
+    const std::string name_ = "parametrization_builder";
 
 public:
     Parametrization_builder(const ParticleDef& p_def,
@@ -139,6 +140,8 @@ public:
 
     double DifferentialCrossSection(double energy, double v) override;
     KinematicLimits GetKinematicLimits(double energy) override;
+    const std::string& GetName() const { return name_; }
+    virtual InteractionType GetInteractionType() const {return static_cast<InteractionType>(0);}
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::Parametrization const&);
