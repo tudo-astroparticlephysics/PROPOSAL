@@ -23,7 +23,7 @@ using namespace PROPOSAL;
 Compton::Compton(const ParticleDef& particle_def,
                                std::shared_ptr<const Medium> medium,
                                double multiplier)
-        : Parametrization(particle_def, medium, multiplier)
+        : Parametrization(particle_def, medium, ME, multiplier)
 {
 }
 

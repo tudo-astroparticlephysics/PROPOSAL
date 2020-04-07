@@ -20,7 +20,7 @@ using namespace PROPOSAL;
 WeakInteraction::WeakInteraction(const ParticleDef& particle_def,
                                  std::shared_ptr<const Medium> medium,
                                  double multiplier)
-        : Parametrization(particle_def, medium, multiplier), weak_partner_(particle_def.weak_partner)
+        : Parametrization(particle_def, medium, particle_def.mass, multiplier), weak_partner_(particle_def.weak_partner)
 {
 }
 

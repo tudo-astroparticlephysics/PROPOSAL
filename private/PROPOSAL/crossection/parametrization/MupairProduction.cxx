@@ -39,7 +39,7 @@ using namespace PROPOSAL;
 MupairProduction::MupairProduction(const ParticleDef& particle_def,
                                  std::shared_ptr<const Medium> medium,
                                  double multiplier)
-    : Parametrization(particle_def, medium, multiplier), drho_integral_(IROMB, IMAXS, IPREC)
+    : Parametrization(particle_def, medium, particle_def.mass + 2*ME, multiplier), drho_integral_(IROMB, IMAXS, IPREC)
 {
 }
 

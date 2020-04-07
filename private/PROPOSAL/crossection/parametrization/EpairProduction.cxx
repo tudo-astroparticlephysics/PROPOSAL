@@ -41,7 +41,7 @@ EpairProduction::EpairProduction(const ParticleDef& particle_def,
                                  std::shared_ptr<const Medium> medium,
                                  double multiplier,
                                  bool lpm)
-    : Parametrization(particle_def, medium, multiplier)
+    : Parametrization(particle_def, medium, particle_def.mass + 2*ME, multiplier)
     , init_lpm_effect_(true)
     , lpm_(lpm)
     , eLpm_(0)
