@@ -21,7 +21,7 @@ Ionization::Ionization(const ParticleDef& particle_def,
                        std::shared_ptr<const Medium> medium,
                        std::shared_ptr<const EnergyCutSettings> cuts,
                        double multiplier)
-    : Parametrization(particle_def, medium, multiplier), cuts_(cuts)
+    : Parametrization(particle_def, medium, particle_def.mass, multiplier), cuts_(cuts)
 {
 }
 

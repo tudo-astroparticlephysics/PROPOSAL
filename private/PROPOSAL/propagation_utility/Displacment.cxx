@@ -12,7 +12,7 @@ Displacement::Displacement(const CrossSectionList& cross)
         throw std::invalid_argument("at least one crosssection is required.");
 
     for (auto c : cross)
-        lower_lim = std::max(lower_lim, c->GetParametrization().GetParticleLow());
+        lower_lim = std::max(lower_lim, c->GetParametrization().GetLowerEnergyLim());
 }
 
 double Displacement::FunctionToIntegral(double energy)

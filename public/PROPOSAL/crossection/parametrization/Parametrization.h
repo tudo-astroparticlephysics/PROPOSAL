@@ -43,8 +43,7 @@ namespace Components {
 
 class Parametrization {
 public:
-    Parametrization(
-        const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
+    Parametrization(const ParticleDef&, std::shared_ptr<const Medium>, double lower_energy_lim, double multiplier);
     Parametrization(const Parametrization&);
     virtual ~Parametrization();
 
@@ -91,9 +90,8 @@ public:
     std::shared_ptr<const Medium> GetMedium() const { return medium_; }
     double GetParticleMass() const { return particle_mass_; }
     double GetParticleCharge() const { return particle_charge_; }
-    double GetParticleLow() const { return particle_low_; }
     double GetParticleLifetime() const { return particle_lifetime_; }
-
+    double GetLowerEnergyLim() const { return lower_energy_lim_; }
     virtual InteractionType GetInteractionType() const = 0;
     double GetMultiplier() const { return multiplier_; }
     double GetCurrentComponent() {return component_index_;}
@@ -115,11 +113,11 @@ protected:
 
     double particle_mass_;
     double particle_charge_;
-    double particle_low_;
     double particle_lifetime_;
-    std::shared_ptr<const Medium> medium_;
 
-    // const Components::Component* current_component_;
+    double lower_energy_lim_;
+
+    std::shared_ptr<const Medium> medium_;
     const std::vector<Components::Component>& components_;
     int component_index_;
 
@@ -133,7 +131,7 @@ class Parametrization_builder : public Parametrization {
 public:
     Parametrization_builder(const ParticleDef& p_def,
         std::shared_ptr<const Medium> medium, double multiplier)
-        : Parametrization(p_def, medium, multiplier)
+        : Parametrization(p_def, medium, 0., multiplier)
         , diff_cross(nullptr)
         , kinematic_limits(nullptr){};
 

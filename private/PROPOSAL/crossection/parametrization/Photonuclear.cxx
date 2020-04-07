@@ -274,7 +274,7 @@ size_t ShadowButkevichMikhailov::GetHash() const
 Photonuclear::Photonuclear(const ParticleDef& particle_def,
                            std::shared_ptr<const Medium> medium,
                            double multiplier)
-    : Parametrization(particle_def, medium, multiplier)
+    : Parametrization(particle_def, medium, particle_def.mass, multiplier)
 {
 }
 

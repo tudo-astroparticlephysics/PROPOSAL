@@ -21,7 +21,7 @@ using namespace PROPOSAL;
 PhotoPairProduction::PhotoPairProduction(const ParticleDef& particle_def,
                                  std::shared_ptr<const Medium> medium,
                                  double multiplier)
-        : Parametrization(particle_def, medium, multiplier)
+        : Parametrization(particle_def, medium, 2*ME, multiplier)
 {
 }
 

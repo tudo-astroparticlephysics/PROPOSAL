@@ -43,7 +43,7 @@ Bremsstrahlung::Bremsstrahlung(const ParticleDef& particle_def,
                                std::shared_ptr<const Medium> medium,
                                double multiplier,
                                bool lpm)
-    : Parametrization(particle_def, medium, multiplier)
+    : Parametrization(particle_def, medium, particle_def.mass, multiplier)
     , lorenz_(false) // TODO(mario): make it use to enable Mon 2017/09/04
     , lorenz_cut_(1e6)
     , init_lpm_effect_(true)

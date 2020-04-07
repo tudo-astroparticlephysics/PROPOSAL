@@ -12,11 +12,11 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 Parametrization::Parametrization(const ParticleDef& particle_def,
-    std::shared_ptr<const Medium> medium, double multiplier)
+    std::shared_ptr<const Medium> medium, double lower_energy_lim, double multiplier)
     : particle_mass_(particle_def.mass)
     , particle_charge_(particle_def.charge)
-    , particle_low_(particle_def.low)
     , particle_lifetime_(particle_def.lifetime)
+    , lower_energy_lim_(lower_energy_lim)
     , medium_(medium)
     , components_(medium_->GetComponents())
     , component_index_(0)
@@ -27,7 +27,7 @@ Parametrization::Parametrization(const ParticleDef& particle_def,
 Parametrization::Parametrization(const Parametrization& param)
     : particle_mass_(param.particle_mass_)
     , particle_charge_(param.particle_charge_)
-    , particle_low_(param.particle_low_)
+    , lower_energy_lim_(param.lower_energy_lim_)
     , medium_(param.medium_)
     , components_(medium_->GetComponents())
     , component_index_(param.component_index_) // //TODO(mario): Check better
@@ -54,8 +54,8 @@ bool Parametrization::operator!=(const Parametrization& parametrization) const
 bool Parametrization::compare(const Parametrization& parametrization) const
 {
     if (particle_charge_ != parametrization.particle_charge_
-        or particle_mass_ != parametrization.particle_mass_
-        or particle_low_ != parametrization.particle_low_)
+        or particle_mass_ != parametrization.particle_mass_)
+    if (lower_energy_lim_ != parametrization.lower_energy_lim_)
         return false;
     if (*medium_ != *parametrization.medium_)
         return false;
@@ -82,7 +82,7 @@ std::ostream& operator<<(std::ostream& os, Parametrization const& param)
     os << "current component index: " << param.component_index_ << '\n';
     os << "particle_mass: " << param.particle_mass_ << '\n';
     os << "particle_charge: " << param.particle_charge_ << '\n';
-    os << "particle_low: " << param.particle_low_ << '\n';
+    os << "lower_energy_lim_: " << param.lower_energy_lim_ << '\n';
     os << *param.medium_ << '\n';
     os << Helper::Centered(80, "");
     return os;
