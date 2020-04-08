@@ -10,7 +10,8 @@ namespace PROPOSAL {
 
 class Decay {
 public:
-    Decay(const CrossSectionList& cross);
+    Decay(const CrossSectionList& cross, const ParticleDef&);
+    Decay(const CrossSectionList& cross, double lifetime, double mass);
     virtual ~Decay() {};
     virtual double EnergyDecay(double initial_energy, double rnd) = 0;
 
@@ -18,17 +19,20 @@ protected:
     CrossSectionList cross;
     double mass;
     double lifetime;
+    double lower_lim;
 };
 
 extern Interpolant1DBuilder::Definition decay_interpol_def;
 
 template <class T> class DecayBuilder : public Decay {
 public:
-    DecayBuilder<T>(CrossSectionList cross)
-        : Decay(cross)
+    DecayBuilder<T>(CrossSectionList cross, const ParticleDef& p_def) : DecayBuilder<T>(cross, p_def.lifetime, p_def.mass){};
+
+    DecayBuilder<T>(CrossSectionList cross, double lifetime, double mass)
+        : Decay(cross, lifetime, mass)
         , displacement(cross)
         , integral(std::bind(
-              &DecayBuilder::DecayIntegrand, this, std::placeholders::_1), mass)
+              &DecayBuilder::DecayIntegrand, this, std::placeholders::_1), lower_lim)
     {
         if (typeid(T) == typeid(UtilityInterpolant)) {
             size_t hash_digest = 0;
@@ -40,24 +44,21 @@ public:
 
     double DecayIntegrand(double energy)
     {
-        if (lifetime < 0)
-            return 0;
+        assert(lifetime < 0);
+        assert(energy <= mass);
+
         double square_momentum = (energy - mass) * (energy + mass);
-        double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
-        double aux = 1.0
-            / std::max(SPEED * particle_momentum / mass,
-                  PARTICLE_POSITION_RESOLUTION);
-        return displacement.FunctionToIntegral(energy) * aux;
+        double aux = SPEED * std::sqrt(square_momentum) / mass;
+        return displacement.FunctionToIntegral(energy) / aux;
     }
 
     double EnergyDecay(double initial_energy, double rnd) override
     {
         auto rndd = -std::log(rnd);
-        auto rnddMin = 0;
-        rnddMin = integral.Calculate(initial_energy, mass, rndd) / lifetime;
+        auto rnddMin = integral.Calculate(initial_energy, lower_lim, rndd) / lifetime;
 
-        if (rndd >= rnddMin || rnddMin <= 0)
-            return mass;
+        if (rndd >= rnddMin)
+            return lower_lim;
 
         return integral.GetUpperLimit(initial_energy, rndd) / lifetime;
     }

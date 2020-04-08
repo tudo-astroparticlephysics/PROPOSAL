@@ -9,8 +9,13 @@ Interpolant1DBuilder::Definition interaction_interpol_def(
 
 Interaction::Interaction(CrossSectionList cross)
     : cross(cross)
-    , mass(cross.front()->GetParametrization().GetParticleMass())
+    , lower_lim(std::numeric_limits<double>::max())
 {
+    if (cross.size() < 1)
+        throw std::invalid_argument("at least one crosssection is required.");
+
+    for (auto c : cross)
+        lower_lim = std::min(lower_lim, c->GetParametrization().GetLowerEnergyLim());
 }
 
 std::shared_ptr<CrossSection> Interaction::TypeInteraction(

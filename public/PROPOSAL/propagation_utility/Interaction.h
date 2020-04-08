@@ -7,7 +7,7 @@ namespace PROPOSAL {
 class Interaction {
 protected:
     CrossSectionList cross;
-    double mass;
+    double lower_lim;
 
 public:
     Interaction(CrossSectionList cross);
@@ -24,7 +24,7 @@ public:
         , displacement(cross)
         , integral(std::bind(&InteractionBuilder::InteractionIntegrand, this,
                        std::placeholders::_1),
-              mass)
+              lower_lim)
     {
         if (typeid(T) == typeid(UtilityInterpolant)) {
             size_t hash_digest = 0;
@@ -46,12 +46,10 @@ public:
     double EnergyInteraction(double initial_energy, double rnd) override
     {
         auto rndi = -std::log(rnd);
-        auto rndiMin = 0.;
+        auto rndiMin = integral.Calculate(initial_energy, lower_lim, rndi);
 
-        rndiMin = integral.Calculate(initial_energy, mass, rndi);
-
-        if (rndi >= rndiMin || rndiMin <= 0)
-            return mass;
+        if (rndi >= rndiMin)
+            return lower_lim;
 
         return displacement.UpperLimitTrackIntegral(initial_energy, rndi);
     }

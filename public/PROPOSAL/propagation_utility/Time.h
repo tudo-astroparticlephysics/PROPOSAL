@@ -8,26 +8,31 @@ namespace PROPOSAL {
 class Time {
 public:
     Time();
-    virtual double TimeElapsed(
-        double initial_energy, double final_energy, double time)
-        = 0;
+    virtual double TimeElapsed(double initial_energy, double final_energy, double time) = 0;
     virtual double TimeElapsed(double distance) = 0;
 
 protected:
     std::string name = "time";
-    double lower_lim;
 };
 
 extern Interpolant1DBuilder::Definition time_interpol_def;
 
 template <class T> class ExactTimeBuilder : public Time {
 public:
-    ExactTimeBuilder<T>(CrossSectionList cross, const ParticleDef& def)
-        : mass(cross.front()->GetParametrization().GetParticleMass())
+    ExactTimeBuilder<T>(CrossSectionList cross, const ParticleDef& p_def) : ExactTimeBuilder<T>(cross, p_def.mass){};
+
+    ExactTimeBuilder<T>(CrossSectionList cross, double mass)
+        : mass(mass)
         , displacement(cross)
+        , lower_lim(InitializeLowerLim(cross))
         , integral(std::bind(
-              &ExactTimeBuilder::TimeIntegrand, this, std::placeholders::_1), mass)
+              &ExactTimeBuilder::TimeIntegrand, this, std::placeholders::_1), lower_lim)
     {
+        if (cross.size() < 1)
+            throw std::invalid_argument("at least one crosssection is required.");
+
+
+
         if (typeid(T) == typeid(UtilityInterpolant)) {
             size_t hash_digest = 0;
             for (const auto& c : cross)
@@ -61,12 +66,20 @@ public:
 
     double TimeElapsed(double distance) override
     {
+        (void) distance;
         throw std::logic_error(
             "Exact elapsed time can only be calculated using two energies");
     }
 
 
-private:
+protected:
+    double InitializeLowerLim(CrossSectionList cross){
+        double lower_lim_tmp = std::numeric_limits<double>::max();
+        for (auto c : cross)
+            lower_lim_tmp = std::min(lower_lim_tmp, c->GetParametrization().GetLowerEnergyLim());
+        return lower_lim_tmp;
+    }
+    double lower_lim;
     double mass;
     DisplacementBuilder<UtilityIntegral> displacement;
     T integral;

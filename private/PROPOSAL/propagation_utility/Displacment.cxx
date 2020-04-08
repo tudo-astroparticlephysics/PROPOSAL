@@ -6,13 +6,13 @@ using namespace PROPOSAL;
 
 Displacement::Displacement(const CrossSectionList& cross)
     : cross(cross)
-    , lower_lim(1e-3)
+    , lower_lim(std::numeric_limits<double>::max())
 {
     if (cross.size() < 1)
         throw std::invalid_argument("at least one crosssection is required.");
 
     for (auto c : cross)
-        lower_lim = std::max(lower_lim, c->GetParametrization().GetLowerEnergyLim());
+        lower_lim = std::min(lower_lim, c->GetParametrization().GetLowerEnergyLim());
 }
 
 double Displacement::FunctionToIntegral(double energy)

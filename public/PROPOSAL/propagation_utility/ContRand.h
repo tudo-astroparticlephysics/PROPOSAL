@@ -14,7 +14,7 @@ public:
 
 protected:
     CrossSectionList cross;
-    double mass;
+    double lower_lim;
 };
 
 extern Interpolant1DBuilder::Definition contrand_interpol_def;
@@ -24,7 +24,7 @@ public:
     ContRandBuilder<T>(CrossSectionList cross)
         : ContRand(cross)
         , displacement(cross)
-        , integral(std::bind(&ContRandBuilder::ContRandIntegrand, this, std::placeholders::_1), mass)
+        , integral(std::bind(&ContRandBuilder::ContRandIntegrand, this, std::placeholders::_1), lower_lim)
     {
         if (typeid(T) == typeid(UtilityInterpolant)) {
             size_t hash_digest = 0;
@@ -51,7 +51,7 @@ public:
         assert(initial_energy >= final_energy);
         double variance = integral.Calculate(initial_energy, final_energy, 0.0);
         return SampleFromGaussian(
-            final_energy, std::sqrt(variance), rnd, mass, initial_energy);
+            final_energy, std::sqrt(variance), rnd, lower_lim, initial_energy);
     }
 
 private:

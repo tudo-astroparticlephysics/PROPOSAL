@@ -29,11 +29,11 @@ Utility::Definition::Definition(CrossSectionList cross,
 
         displacement_calc.reset(new DisplacementBuilder<UtilityIntegral>(cross));
         interaction_calc.reset(new InteractionBuilder<UtilityIntegral>(cross));
-        decay_calc.reset(new DecayBuilder<UtilityIntegral>(cross));
+        decay_calc.reset(new DecayBuilder<UtilityIntegral>(cross, p_def));
     } else {
         displacement_calc.reset(new DisplacementBuilder<UtilityInterpolant>(cross));
         interaction_calc.reset(new InteractionBuilder<UtilityInterpolant>(cross));
-        decay_calc.reset(new DecayBuilder<UtilityInterpolant>(cross));
+        decay_calc.reset(new DecayBuilder<UtilityInterpolant>(cross, p_def));
     }
 
     if (!scattering) {

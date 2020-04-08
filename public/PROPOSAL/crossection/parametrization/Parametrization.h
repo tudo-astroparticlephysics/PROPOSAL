@@ -132,14 +132,14 @@ class Parametrization_builder : public Parametrization {
 public:
     Parametrization_builder(const ParticleDef& p_def,
         std::shared_ptr<const Medium> medium, double multiplier)
-        : Parametrization(p_def, medium, 0., multiplier)
+        : Parametrization(p_def, medium, p_def.mass, multiplier)
         , diff_cross(nullptr)
         , kinematic_limits(nullptr){};
 
     double DifferentialCrossSection(double energy, double v) override;
     KinematicLimits GetKinematicLimits(double energy) override;
-    const std::string& GetName() const { return name_; }
-    virtual InteractionType GetInteractionType() const {return static_cast<InteractionType>(0);}
+    const std::string& GetName() const override { return name_; }
+    virtual InteractionType GetInteractionType() const override {return static_cast<InteractionType>(0);}
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::Parametrization const&);
