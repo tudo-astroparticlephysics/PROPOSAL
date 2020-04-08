@@ -31,6 +31,10 @@ public:
             for (const auto& c : cross) {
                 hash_combine(hash_digest, c->GetHash());
             }
+            contrand_interpol_def.function1d = [this](double energy) {
+                return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
+                        lower_lim, energy, 0);
+            };
             integral.BuildTables("contrand", hash_digest, contrand_interpol_def);
         }
     }

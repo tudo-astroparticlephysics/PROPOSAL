@@ -30,6 +30,10 @@ public:
             size_t hash_digest = 0;
             for (const auto& c : cross)
                 hash_combine(hash_digest, c->GetHash());
+            interaction_interpol_def.function1d = [this](double energy) {
+                return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
+                        lower_lim, energy, 0);
+            };
             integral.BuildTables("interaction", hash_digest, interaction_interpol_def);
         }
     }

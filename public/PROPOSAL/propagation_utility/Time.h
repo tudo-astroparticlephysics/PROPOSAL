@@ -38,6 +38,10 @@ public:
             for (const auto& c : cross)
                 hash_combine(hash_digest, c->GetParametrization().GetHash(),
                     c->GetParametrization().GetMultiplier());
+            time_interpol_def.function1d = [this](double energy) {
+                return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
+                        lower_lim, energy, 0);
+            };
             integral.BuildTables(name, hash_digest, time_interpol_def);
         }
     }
