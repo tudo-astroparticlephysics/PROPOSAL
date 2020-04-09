@@ -31,16 +31,14 @@ public:
         if (cross.size() < 1)
             throw std::invalid_argument("at least one crosssection is required.");
 
-
-
         if (typeid(T) == typeid(UtilityInterpolant)) {
             size_t hash_digest = 0;
-            for (const auto& c : cross)
-                hash_combine(hash_digest, c->GetParametrization().GetHash(),
-                    c->GetParametrization().GetMultiplier());
+            for (const auto& c: cross)
+                hash_combine(hash_digest, c->GetHash());
+
             time_interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                        lower_lim, energy, 0);
+                        energy, lower_lim, 0);
             };
             integral.BuildTables(name, hash_digest, time_interpol_def);
         }
@@ -60,11 +58,14 @@ public:
     double TimeElapsed(
         double initial_energy, double final_energy, double time) override
     {
+        assert(initial_energy >= final_energy);
         return integral.Calculate(initial_energy, final_energy, time);
     }
 
     double TimeElapsedUpperLimit(double initial_energy, double time)
     {
+        assert(time >= 0);
+        assert(initial_energy >= mass);
         return integral.GetUpperLimit(initial_energy, time);
     }
 
@@ -103,6 +104,6 @@ public:
                                "calculated using a given distance");
     }
 
-    double TimeElapsed(double distance) override { return distance / SPEED; }
+    double TimeElapsed(double distance) override { assert(distance>=0); return distance / SPEED; }
 };
 }

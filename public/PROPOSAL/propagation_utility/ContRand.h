@@ -26,6 +26,9 @@ public:
         , displacement(cross)
         , integral(std::bind(&ContRandBuilder::ContRandIntegrand, this, std::placeholders::_1), lower_lim)
     {
+        if (cross.size() < 1)
+            throw std::invalid_argument("at least one crosssection is required.");
+
         if (typeid(T) == typeid(UtilityInterpolant)) {
             size_t hash_digest = 0;
             for (const auto& c : cross) {
@@ -33,7 +36,7 @@ public:
             }
             contrand_interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                        lower_lim, energy, 0);
+                        energy, lower_lim, 0);
             };
             integral.BuildTables("contrand", hash_digest, contrand_interpol_def);
         }

@@ -124,6 +124,24 @@ TEST(ContinuousRandomization, Constraints){
 
 }
 
+TEST(ContinuousRandomization, compare_integral_interpolant) {
+    auto cross_dummy = std::make_shared<CrossSectionBuilder>("contrand_dummy", getParticleDef("MuMinus"));
+    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
+    cross_dummy->SetdE2dx_function([](double energy)->double {return std::exp(-14 + 2 * std::log(energy));});
+
+    auto contrand_integral = ContRandBuilder<UtilityIntegral>(CrossSectionList{cross_dummy});
+    auto contrand_interpol = ContRandBuilder<UtilityInterpolant>(CrossSectionList{cross_dummy});
+
+    auto energies = std::array<double, 5> {1e6, 1e7, 1e8, 1e9, 1e10};
+
+    for(auto E_i : energies){
+        double rnd = RandomGenerator::Get().RandomDouble();
+        double randomized_integral = contrand_integral.EnergyRandomize(E_i, 1e5, rnd);
+        double randomized_interpol = contrand_interpol.EnergyRandomize(E_i, 1e5, rnd);
+        EXPECT_NEAR(randomized_integral, randomized_interpol, 1e-5 * E_i);
+    }
+}
+
 TEST(ContinuousRandomization, Randomize_interpol) {
     std::string filename = "bin/TestFiles/continous_randomization.txt";
 	std::ifstream in{filename};

@@ -42,8 +42,8 @@ double UtilityInterpolant::Calculate(
 {
     (void)rnd;
 
-    assert(energy_initial > energy_final);
-    assert(energy_final > lower_lim);
+    assert(energy_initial >= energy_final);
+    assert(energy_final >= lower_lim);
 
     upper_limit = std::make_pair(
         interpolant_->Interpolate(energy_initial), energy_initial);
