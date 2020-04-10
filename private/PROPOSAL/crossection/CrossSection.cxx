@@ -20,6 +20,7 @@ CrossSection::CrossSection(
     , components_(parametrization_->GetMedium()->GetComponents())
     , rnd_(0)
     , cuts_(cuts)
+    , type_id_(GetParametrization().GetInteractionType())
 {
 }
 
@@ -30,6 +31,7 @@ CrossSection::CrossSection(const CrossSection& cross_section)
     , components_(parametrization_->GetMedium()->GetComponents())
     , rnd_(cross_section.rnd_)
     , cuts_(cross_section.cuts_)
+    , type_id_(cross_section.type_id_)
 {
 }
 
@@ -59,6 +61,8 @@ bool CrossSection::operator==(const CrossSection& cross_section) const
     else if (rnd_ != cross_section.rnd_)
         return false;
     else if (cuts_ != cross_section.cuts_)
+        return false;
+    else if (type_id_ != cross_section.type_id_)
         return false;
     else
         return this->compare(cross_section);

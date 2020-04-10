@@ -236,6 +236,7 @@ IF(ADD_TESTS)
     package_add_test(UnitTest_Density tests/Density_distribution_TEST.cxx)
     package_add_test(UnitTest_Displacement tests/Displacement_TEST.cxx)
     package_add_test(UnitTest_Time tests/Time_TEST.cxx)
+    package_add_test(UnitTest_Interaction tests/Interaction_TEST.cxx)
 
 else (ADD_TESTS)
     MESSAGE(STATUS "No tests will be build.")

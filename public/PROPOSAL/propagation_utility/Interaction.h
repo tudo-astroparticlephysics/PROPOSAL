@@ -32,7 +32,7 @@ public:
                 hash_combine(hash_digest, c->GetHash());
             interaction_interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                        lower_lim, energy, 0);
+                        energy, 1e14, 0);
             };
             integral.BuildTables("interaction", hash_digest, interaction_interpol_def);
         }
@@ -40,6 +40,7 @@ public:
 
     double InteractionIntegrand(double energy)
     {
+        assert(energy >= lower_lim);
         double total_rate = 0.0;
         for (const auto& crosssection : cross)
             total_rate += crosssection->CalculatedNdx(energy);
@@ -49,13 +50,13 @@ public:
 
     double EnergyInteraction(double initial_energy, double rnd) override
     {
+        assert(initial_energy >= lower_lim);
         auto rndi = -std::log(rnd);
         auto rndiMin = integral.Calculate(initial_energy, lower_lim, rndi);
-
         if (rndi >= rndiMin)
             return lower_lim;
 
-        return displacement.UpperLimitTrackIntegral(initial_energy, rndi);
+        return integral.GetUpperLimit(initial_energy, rndi);
     }
 
 

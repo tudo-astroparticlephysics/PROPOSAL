@@ -4,7 +4,7 @@ using namespace PROPOSAL;
 
 namespace PROPOSAL {
 Interpolant1DBuilder::Definition interaction_interpol_def(
-    nullptr, 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+    nullptr, 1000, 0., 1e14, 5, false, false, true, 5, false, false, false);
 } // namespace PROPOSAL
 
 Interaction::Interaction(CrossSectionList cross)
@@ -21,6 +21,7 @@ Interaction::Interaction(CrossSectionList cross)
 std::shared_ptr<CrossSection> Interaction::TypeInteraction(
     double energy, const std::array<double, 2>& rnd)
 {
+    assert(energy >= lower_lim);
     std::vector<double> rates;
     for (const auto& c : cross)
         rates.push_back(c->CalculatedNdx(energy, rnd[1]));

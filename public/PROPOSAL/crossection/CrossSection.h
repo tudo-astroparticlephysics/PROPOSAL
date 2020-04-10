@@ -112,8 +112,6 @@ protected:
     // Protected member
     // ----------------------------------------------------------------- //
 
-    InteractionType type_id_;
-
     Parametrization* parametrization_;
 
     std::vector<double> prob_for_component_; //!< probability for each medium component to
@@ -128,6 +126,8 @@ protected:
                  //! ClaculateSochasticLoss when it is already done
 
     std::shared_ptr<const EnergyCutSettings> cuts_;
+
+    InteractionType type_id_;
 };
     using CrossSectionList = std::vector<std::shared_ptr<CrossSection>>;
 

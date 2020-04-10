@@ -26,5 +26,5 @@ double Displacement::FunctionToIntegral(double energy)
 
 namespace PROPOSAL {
 Interpolant1DBuilder::Definition displacement_interpol_def(
-    nullptr, 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+    nullptr, 1000, 0., 1e14, 5, false, false, true, 5, false, false, false);
 } // namespace PROPOSAL
