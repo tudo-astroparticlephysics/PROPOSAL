@@ -90,7 +90,7 @@ double Integral::IntegrateWithRandomRatio(double min,
         case 4:
             if (min <= 0. || max <= 0.)
             {
-                return 0;
+                throw std::invalid_argument("No negative or zero integral limits possible when using IntegrateWithLog");
             }
             return IntegrateWithLog(min, max, integrand, randomRatio);
         default:
