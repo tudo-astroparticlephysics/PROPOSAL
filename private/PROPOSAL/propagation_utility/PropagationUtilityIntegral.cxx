@@ -30,7 +30,7 @@ void UtilityIntegral::BuildTables(const std::string str, size_t hash_digest,
 double UtilityIntegral::Calculate(
     double energy_initial, double energy_final, double rnd)
 {
-    assert(energy_final >= lower_lim);
+    assert(rnd >= 0); //Otherwise the integral function interprets rnd as a ratio
 
     last_energy_initial = energy_initial;
     last_partial_sum = rnd;

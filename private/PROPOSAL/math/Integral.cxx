@@ -293,8 +293,7 @@ double Integral::IntegrateWithLog(double min, double max, std::function<double(d
 
     if (randomNumber_ < 0)
     {
-        randomNumber_ /= -std::abs(result);
-
+        randomNumber_ /= -aux * result;
         if (randomNumber_ > 1)
         {
             randomNumber_ = 1;
