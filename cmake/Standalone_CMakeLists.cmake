@@ -238,6 +238,7 @@ IF(ADD_TESTS)
     package_add_test(UnitTest_Time tests/Time_TEST.cxx)
     package_add_test(UnitTest_Interaction tests/Interaction_TEST.cxx)
     package_add_test(UnitTest_UtilityIntegral tests/UtilityIntegral_TEST.cxx)
+    package_add_test(UnitTest_UtilityInterpolant tests/UtilityInterpolant_TEST.cxx)
 
 else (ADD_TESTS)
     MESSAGE(STATUS "No tests will be build.")
