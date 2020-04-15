@@ -63,7 +63,7 @@ double UtilityInterpolant::GetUpperLimit(double energy_initial, double rnd)
 
     auto lower_limit = interpolant_->FindLimit(upper_limit.first - rnd);
 
-    if (energy_initial - lower_limit > energy_initial * IPREC)
+    if (std::abs(energy_initial - lower_limit) > energy_initial * IPREC)
         return lower_limit;
 
     auto initial_step
