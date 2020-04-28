@@ -528,6 +528,9 @@ std::shared_ptr<DynamicData> Sector::DoContinuous(
     double displacement
         = Displacement(p_condition, final_energy, sector_border);
 
+    if(std::abs(displacement - sector_border) < PARTICLE_POSITION_RESOLUTION)
+        displacement = sector_border;
+
     double dist = p_condition.GetPropagatedDistance() + displacement;
     double time = CalculateTime(p_condition, final_energy, displacement);
 
