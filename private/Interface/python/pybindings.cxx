@@ -10,7 +10,6 @@
 namespace py = pybind11;
 using namespace PROPOSAL;
 
-// #define DEF_PY_PRINT(cls) .def("__str__", &py_print<cls>)
 
 void init_components(py::module& m);
 void init_medium(py::module& m);
@@ -44,7 +43,8 @@ PYBIND11_MODULE(proposal, m)
         .def(py::init<>())
         .def(py::init<double, double, double>(), py::arg("x"), py::arg("y"),
             py::arg("z"))
-        .def(py::init<const Vector3D&>()) DEF_PY_PRINT(Vector3D)
+        .def(py::init<const Vector3D&>())
+        .def("__str__", &py_print<Vector3D>)
         .def(py::self + py::self)
         .def(py::self - py::self)
         .def(py::self * float())
@@ -214,6 +214,7 @@ PYBIND11_MODULE(proposal, m)
     py::class_<Utility::Definition, std::shared_ptr<Utility::Definition>>(
         m, "UtilityDefinition")
         .def(py::init<>())
+        .def("__str__", &py_print<Utility::Definition>)
         .def_readwrite(
             "annihilation_def", &Utility::Definition::annihilation_def)
         .def_readwrite("brems_def", &Utility::Definition::brems_def)
@@ -344,6 +345,7 @@ PYBIND11_MODULE(proposal, m)
                 approximation.
             )pbdoc")
         .def(py::init<>())
+        .def("__str__", &py_print<Sector::Definition>)
         .def_readwrite("cut_settings", &Sector::Definition::cut_settings,
             R"pbdoc(
                     Definition of the :meth:`EnergyCutSettings`
