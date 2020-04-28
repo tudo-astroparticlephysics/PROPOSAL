@@ -17,12 +17,11 @@ std::shared_ptr<Medium> CreateMedium(Medium_Type type, double density_correction
     std::unique_ptr<Density_distr> density_distr(new Density_homogeneous(density_correction));
     auto searched_medium = Medium_Map.find(type);
     if (searched_medium != Medium_Map.end()) {
-        searched_medium->second->SetDensityDistribution(*density_distr);
-    } else {
-        throw std::invalid_argument("Medium not found.");
+        auto medium = std::make_shared<Medium>(*searched_medium->second);
+        medium->SetDensityDistribution(*density_distr);
+        return medium;
     }
-
-    return searched_medium->second;
+    throw std::invalid_argument("Medium not found.");
 }
 } // namespace PROPOSAL
 
