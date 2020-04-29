@@ -43,9 +43,10 @@ public:
     ScatteringHighlandIntegral<T>(const ParticleDef& p_def,
         std::shared_ptr<const Medium> medium, CrossSectionList cross)
         : ScatteringHighland(p_def, medium)
+        , lower_lim(InitializeLowerLim(cross))
         , displacement(new DisplacementBuilder<UtilityIntegral>(cross))
         , integral(std::bind(&ScatteringHighlandIntegral::HighlandIntegral,
-              this, std::placeholders::_1), p_def.mass)
+              this, std::placeholders::_1), lower_lim)
     {
         if (typeid(T) == typeid(UtilityInterpolant)) {
             size_t hash_digest = 0;
@@ -97,7 +98,15 @@ private:
         return std::min(aux, cutoff);
     }
 
-    T integral;
+    double InitializeLowerLim(CrossSectionList cross){
+        double lower_lim_tmp = std::numeric_limits<double>::max();
+        for (auto c : cross)
+            lower_lim_tmp = std::min(lower_lim_tmp, c->GetParametrization().GetLowerEnergyLim());
+        return lower_lim_tmp;
+    }
+
+    double lower_lim;
     std::unique_ptr<Displacement> displacement;
+    T integral;
 };
 } // namespace PROPOSAL

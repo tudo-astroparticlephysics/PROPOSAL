@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crossection/CrossSectionBuilder.h"
 #include "PROPOSAL/propagation_utility/Displacement.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
@@ -16,13 +16,13 @@ constexpr auto b = 1.e-3;
 
 TEST(constructor, integral)
 {
-    CrossSectionList crosss{ std::make_shared<CrossSectionBuilder>("empty") };
+    CrossSectionList crosss{ std::make_shared<CrossSectionBuilder>("empty", EMinusDef()) };
     DisplacementBuilder<UtilityIntegral> disp(crosss);
 }
 
 TEST(constructor, interpolant)
 {
-    auto cross = std::make_shared<CrossSectionBuilder>("empty");
+    auto cross = std::make_shared<CrossSectionBuilder>("empty", EMinusDef());
     cross->SetdEdx_function([](double energy) { return 1; });
 
     CrossSectionList crosss{ cross };
@@ -41,9 +41,9 @@ constexpr const std::array<double, 7> energies
 
 TEST(utility_integral, function_to_integral)
 {
-    auto const_loss = std::make_shared<CrossSectionBuilder>("constant");
+    auto const_loss = std::make_shared<CrossSectionBuilder>("constant", EMinusDef());
     const_loss->SetdEdx_function([](double energy) { return a; });
-    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin");
+    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin", EMinusDef());
     lin_loss->SetdEdx_function([](double energy) { return b * energy; });
 
     CrossSectionList crosss{ const_loss, lin_loss };
@@ -57,9 +57,9 @@ TEST(utility_integral, function_to_integral)
 
 TEST(utility_integral, solve_track_integral)
 {
-    auto const_loss = std::make_shared<CrossSectionBuilder>("constant");
+    auto const_loss = std::make_shared<CrossSectionBuilder>("constant", EMinusDef());
     const_loss->SetdEdx_function([](double energy) { return a; });
-    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin");
+    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin", EMinusDef());
     lin_loss->SetdEdx_function([](double energy) { return b * energy; });
 
     CrossSectionList crosss{ const_loss, lin_loss };
@@ -83,9 +83,9 @@ TEST(utility_integral, solve_track_integral)
 
 TEST(utility_integral, upper_limit_track_integral)
 {
-    auto const_loss = std::make_shared<CrossSectionBuilder>("constant");
+    auto const_loss = std::make_shared<CrossSectionBuilder>("constant", EMinusDef());
     const_loss->SetdEdx_function([](double energy) { return a; });
-    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin");
+    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin", EMinusDef());
     lin_loss->SetdEdx_function([](double energy) { return b * energy; });
 
     CrossSectionList crosss{ const_loss, lin_loss };
@@ -106,9 +106,9 @@ TEST(utility_integral, upper_limit_track_integral)
 
 TEST(utility_interpolant, solve_track_integral)
 {
-    auto const_loss = std::make_shared<CrossSectionBuilder>("constant");
+    auto const_loss = std::make_shared<CrossSectionBuilder>("constant", EMinusDef());
     const_loss->SetdEdx_function([](double energy) { return a; });
-    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin");
+    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin", EMinusDef());
     lin_loss->SetdEdx_function([](double energy) { return b * energy; });
 
     CrossSectionList crosss{ const_loss, lin_loss };
@@ -131,9 +131,9 @@ TEST(utility_interpolant, solve_track_integral)
 
 TEST(utility_interpolant, upper_limit_track_integral)
 {
-    auto const_loss = std::make_shared<CrossSectionBuilder>("constant");
+    auto const_loss = std::make_shared<CrossSectionBuilder>("constant", EMinusDef());
     const_loss->SetdEdx_function([](double energy) { return a; });
-    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin");
+    auto lin_loss = std::make_shared<CrossSectionBuilder>("lin", EMinusDef());
     lin_loss->SetdEdx_function([](double energy) { return b * energy; });
 
     CrossSectionList crosss{ const_loss, lin_loss };

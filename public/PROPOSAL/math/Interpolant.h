@@ -58,8 +58,8 @@ class Interpolant
 { /// implements FunctionInt{
 
 private:
-    const static double bigNumber_;
-    const static double aBigNumber_;
+    const static double log_cutoff_;
+    const static double exp_cutoff_;
 
     int romberg_, rombergY_;
 
@@ -110,7 +110,7 @@ private:
     /**
      * Exp(x) with CutOff.
      *
-     * if x > exp(aBigNumber): exp(x) \n
+     * if x > exp_cutoff_: exp(x) \n
      * else: 0
      *
      * \param    x
@@ -125,10 +125,10 @@ private:
      * Log if not zero.
      *
      * if x > 0: log(x) \n
-     * else: bigNumber
+     * else: log_cutoff_
      *
      * \param    x
-     * \return   log(x) OR bigNumber;
+     * \return   log(x) OR log_cutoff_;
      */
 
     double Log(double x);

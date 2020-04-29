@@ -22,6 +22,7 @@
 #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/crossection/CrossSectionBuilder.h"
 
 using namespace PROPOSAL;
 
@@ -218,7 +219,7 @@ TEST(Scattering, FirstMomentum){
 
     int statistics = 1e7;
 
-    auto cross_dummy = std::make_shared<CrossSectionBuilder>("scattering_dummy");
+    auto cross_dummy = std::make_shared<CrossSectionBuilder>("scattering_dummy", getParticleDef("MuMinus"));
     cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
 
     std::array<Scattering*, 3> scatter_list = {new ScatteringMoliere(getParticleDef("MuMinus"), medium),
@@ -261,7 +262,7 @@ TEST(Scattering, SecondMomentum){
 
     double E_i = 1e14;
     std::array<double, 10> final_energies = {1e13, 1e12, 1e11, 1e10, 1e9, 1e8, 1e7, 1e6, 1e5, 1e4};
-    auto cross_dummy = std::make_shared<CrossSectionBuilder>("scattering_dummy");
+    auto cross_dummy = std::make_shared<CrossSectionBuilder>("scattering_dummy", getParticleDef("MuMinus"));
     cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
 
     std::array<Scattering*, 3> scatter_list = {new ScatteringMoliere(getParticleDef("MuMinus"), medium),
@@ -303,6 +304,36 @@ TEST(Scattering, SecondMomentum){
     }
 }
 
+TEST(Scattering, compare_integral_interpolant) {
+    RandomGenerator::Get().SetSeed(24601);
+    std::shared_ptr<const Medium> medium = CreateMedium("StandardRock");
+    Vector3D position_init  = Vector3D(0, 0, 0);
+    Vector3D direction_init = Vector3D(0, 0, 1);
+    direction_init.CalculateSphericalCoordinates();
+
+    auto cross_dummy = std::make_shared<CrossSectionBuilder>("scattering_dummy", getParticleDef("MuMinus"));
+    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
+
+    auto scatter_integral = new ScatteringHighlandIntegral<UtilityIntegral>(getParticleDef("MuMinus"), medium, CrossSectionList{cross_dummy});
+    auto scatter_interpol = new ScatteringHighlandIntegral<UtilityInterpolant>(getParticleDef("MuMinus"), medium, CrossSectionList{cross_dummy});
+
+    auto energies = std::array<double, 5> {1e6, 1e7, 1e8, 1e9, 1e10};
+
+    for(auto E_i : energies){
+        auto rnd = std::array<double, 4>{RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble(),
+                                         RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble()};
+        auto vec_integral = scatter_integral->Scatter(1e4, E_i, 1e5, position_init, direction_init, rnd);
+        auto vec_interpol = scatter_interpol->Scatter(1e4, E_i, 1e5, position_init, direction_init, rnd);
+
+        EXPECT_NEAR(std::get<0>(vec_integral).GetX(), std::get<0>(vec_interpol).GetX(),std::abs(std::get<0>(vec_integral).GetX()*1e-5));
+        EXPECT_NEAR(std::get<0>(vec_integral).GetY(), std::get<0>(vec_interpol).GetY(),std::abs(std::get<0>(vec_integral).GetY()*1e-5));
+        EXPECT_NEAR(std::get<0>(vec_integral).GetZ(), std::get<0>(vec_interpol).GetZ(),std::abs(std::get<0>(vec_integral).GetZ()*1e-5));
+
+        EXPECT_NEAR(std::get<1>(vec_integral).GetX(), std::get<1>(vec_interpol).GetX(),std::abs(std::get<1>(vec_integral).GetX()*1e-5));
+        EXPECT_NEAR(std::get<1>(vec_integral).GetY(), std::get<1>(vec_interpol).GetY(),std::abs(std::get<1>(vec_integral).GetY()*1e-5));
+        EXPECT_NEAR(std::get<1>(vec_integral).GetZ(), std::get<1>(vec_interpol).GetZ(),std::abs(std::get<1>(vec_integral).GetZ()*1e-5));
+    }
+}
 
 TEST(Scattering, ScatterReproducibilityTest)
 {
@@ -377,7 +408,7 @@ TEST(Scattering, ScatterReproducibilityTest)
         while (energy_previous < energy_init)
         {
             energy_previous = energy_init;
-            if(parametrization!="NoScattering") {
+            if(parametrization!="NoScattering" && energy_final > particle_def.mass) {
                 std::array<double, 4> rnd{rnd1, rnd2, rnd3, rnd4};
                 auto directions = scattering->Scatter(distance,
                                                       energy_init,

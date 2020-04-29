@@ -7,7 +7,9 @@ namespace PROPOSAL {
 
 class Time {
 public:
-    virtual double TimeElapsed(double initial_energy, double final_energy, double time) = 0;
+    virtual double TimeElapsed(
+        double initial_energy, double final_energy, double time)
+        = 0;
     virtual double TimeElapsed(double distance) = 0;
 
 protected:
@@ -18,24 +20,30 @@ extern Interpolant1DBuilder::Definition time_interpol_def;
 
 template <class T> class ExactTimeBuilder : public Time {
 public:
-    ExactTimeBuilder<T>(CrossSectionList cross, const ParticleDef& p_def) : ExactTimeBuilder<T>(cross, p_def.mass){};
+    ExactTimeBuilder<T>(CrossSectionList cross, const ParticleDef& p_def)
+        : ExactTimeBuilder<T>(cross, p_def.mass){};
 
     ExactTimeBuilder<T>(CrossSectionList cross, double mass)
         : mass(mass)
         , displacement(cross)
         , lower_lim(InitializeLowerLim(cross))
-        , integral(std::bind(
-              &ExactTimeBuilder::TimeIntegrand, this, std::placeholders::_1), lower_lim)
+        , integral(std::bind(&ExactTimeBuilder::TimeIntegrand, this,
+                       std::placeholders::_1),
+              lower_lim)
     {
         if (cross.size() < 1)
-            throw std::invalid_argument("at least one crosssection is required.");
-
-
+            throw std::invalid_argument(
+                "at least one crosssection is required.");
 
         if (typeid(T) == typeid(UtilityInterpolant)) {
             size_t hash_digest = 0;
             for (const auto& c : cross)
                 hash_combine(hash_digest, c->GetHash());
+
+            time_interpol_def.function1d = [this](double energy) {
+                return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
+                    energy, lower_lim, 0);
+            };
             integral.BuildTables(name, hash_digest, time_interpol_def);
         }
     }
@@ -54,24 +62,27 @@ public:
     double TimeElapsed(
         double initial_energy, double final_energy, double time) override
     {
+        assert(initial_energy >= final_energy);
         return integral.Calculate(initial_energy, final_energy, time);
     }
 
     double TimeElapsedUpperLimit(double initial_energy, double time)
     {
+        assert(time >= 0);
+        assert(initial_energy >= mass);
         return integral.GetUpperLimit(initial_energy, time);
     }
 
     double TimeElapsed(double distance) override
     {
-        (void) distance;
+        (void)distance;
         throw std::logic_error(
             "Exact elapsed time can only be calculated using two energies");
     }
 
-
 protected:
-    double InitializeLowerLim(CrossSectionList cross){
+    double InitializeLowerLim(CrossSectionList cross)
+    {
         double lower_lim_tmp = std::numeric_limits<double>::max();
         for (auto c : cross)
             lower_lim_tmp = std::min(lower_lim_tmp, c->GetLowerEnergyLimit());
@@ -97,6 +108,10 @@ public:
                                "calculated using a given distance");
     }
 
-    double TimeElapsed(double distance) override { return distance / SPEED; }
+    double TimeElapsed(double distance) override
+    {
+        assert(distance >= 0);
+        return distance / SPEED;
+    }
 };
 }

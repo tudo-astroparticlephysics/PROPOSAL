@@ -33,8 +33,8 @@
 
 using namespace PROPOSAL;
 
-const double Interpolant::bigNumber_  = -300;
-const double Interpolant::aBigNumber_ = -299;
+const double Interpolant::log_cutoff_ = -300;
+const double Interpolant::exp_cutoff_ = -299;
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -1739,7 +1739,7 @@ double Interpolant::Interpolate(double x, int start)
         {
             for (i = 0; i < romberg_; i++)
             {
-                if (iY_.at(start + i) == bigNumber_)
+                if (iY_.at(start + i) == log_cutoff_)
                 {
                     doLog = true;
                     break;
@@ -1944,7 +1944,7 @@ double Interpolant::Interpolate(double x, int start)
 
 double Interpolant::Exp(double x)
 {
-    if (x <= aBigNumber_)
+    if (x <= exp_cutoff_)
     {
         return 0;
     } else
@@ -1960,7 +1960,7 @@ double Interpolant::Log(double x)
 {
     if (x <= 0)
     {
-        return bigNumber_;
+        return log_cutoff_;
     } else
     {
         return std::log(x);

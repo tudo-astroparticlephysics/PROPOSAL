@@ -43,14 +43,14 @@ double UtilityInterpolant::Calculate(
 {
     (void)rnd;
 
-    assert(energy_initial > energy_final);
-    assert(energy_final > lower_lim);
+    assert(energy_initial >= energy_final);
+    assert(energy_final >= lower_lim);
 
     upper_limit = std::make_pair(
         interpolant_->Interpolate(energy_initial), energy_initial);
 
     if (energy_initial - energy_final < energy_initial * IPREC)
-        return upper_limit.first * (energy_initial - energy_final);
+        return FunctionToIntegral((energy_initial+energy_initial)/2) * (energy_final - energy_initial);
 
     return upper_limit.first - interpolant_->Interpolate(energy_final);
 }
@@ -58,12 +58,13 @@ double UtilityInterpolant::Calculate(
 // ------------------------------------------------------------------------- //
 double UtilityInterpolant::GetUpperLimit(double energy_initial, double rnd)
 {
+    assert(rnd >= 0);
     if (energy_initial != upper_limit.second)
         Calculate(energy_initial, lower_lim, rnd);
 
     auto lower_limit = interpolant_->FindLimit(upper_limit.first - rnd);
 
-    if (upper_limit.first - lower_limit > upper_limit.first * IPREC)
+    if (std::abs(energy_initial - lower_limit) > energy_initial * IPREC)
         return lower_limit;
 
     auto initial_step

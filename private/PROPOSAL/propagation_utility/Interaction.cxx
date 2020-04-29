@@ -20,6 +20,7 @@ Interaction::Interaction(CrossSectionList cross)
 std::shared_ptr<CrossSection> Interaction::TypeInteraction(
     double energy, const std::array<double, 2>& rnd)
 {
+    assert(energy >= lower_lim);
     std::vector<double> rates;
     for (const auto& c : cross)
         rates.push_back(c->CalculatedNdx(energy, rnd[1]));

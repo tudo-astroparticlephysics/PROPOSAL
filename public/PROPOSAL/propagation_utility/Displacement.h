@@ -51,7 +51,7 @@ DisplacementBuilder<T>::DisplacementBuilder(const CrossSectionList& cross)
             hash_combine(hash_digest, c->GetHash());
         displacement_interpol_def.function1d = [this](double energy) {
             return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                lower_lim, energy, 0);
+                energy, lower_lim, 0);
         };
         integral.BuildTables(
             "displacement", hash_digest, displacement_interpol_def);
