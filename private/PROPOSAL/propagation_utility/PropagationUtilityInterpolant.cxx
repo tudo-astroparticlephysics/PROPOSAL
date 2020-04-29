@@ -1,6 +1,6 @@
 
-#include <cmath>
 #include <cassert>
+#include <cmath>
 #include <functional>
 
 #include "PROPOSAL/math/Interpolant.h"
@@ -32,9 +32,10 @@ void UtilityInterpolant::BuildTables(std::string name, size_t hash,
     Interpolant1DBuilder::Definition interpol_def)
 {
     interpol_def.xmin = lower_lim;
-    Interpolant1DBuilder interpolant_builder(interpol_def);
+    std::unique_ptr<Interpolant1DBuilder> interpolant_builder(
+        new Interpolant1DBuilder(interpol_def));
     interpolant_ = InitializeInterpolation(
-        name, interpolant_builder, hash, InterpolationDef());
+        name, std::move(interpolant_builder), hash, InterpolationDef());
 }
 
 double UtilityInterpolant::Calculate(

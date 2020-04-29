@@ -250,7 +250,7 @@ namespace Helper {
     }
 
     std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(
-        std::string name, InterpolantBuilderContainer& builder_container,
+        std::string name, const InterpolantBuilderContainer& builder_container,
         size_t hash_digest, const InterpolationDef& interpolation_def)
     {
         std::vector<std::unique_ptr<Interpolant>> interpolants;

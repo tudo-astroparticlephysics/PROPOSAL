@@ -43,7 +43,7 @@ public:
         typename = typename enable_if<
             is_base_of<Ionization, typename decay<T>::type>::value>::type>
     IonizIntegral(T&&, shared_ptr<const EnergyCutSettings>);
-    virtual ~IonizIntegral();
+    virtual ~IonizIntegral() = default;
 };
 } // namespace PROPOSAL
 

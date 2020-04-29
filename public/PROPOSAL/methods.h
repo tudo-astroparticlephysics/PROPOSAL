@@ -31,8 +31,8 @@
 #include "PROPOSAL/json.hpp"
 #include <deque>
 #include <functional>
-#include <memory>
 #include <map>
+#include <memory>
 #include <vector>
 
 #define PROPOSAL_MAKE_HASHABLE(type, ...)                                      \
@@ -162,7 +162,8 @@ namespace Helper {
     // ----------------------------------------------------------------------------
     std::string Centered(int width, const std::string& str, char fill = '=');
 
-    using InterpolantBuilderContainer = std::vector<unique_ptr<InterpolantBuilder>>;
+    using InterpolantBuilderContainer
+        = std::vector<unique_ptr<InterpolantBuilder>>;
 
     // ----------------------------------------------------------------------------
     /// @brief Helper for interpolation initialization
@@ -175,13 +176,12 @@ namespace Helper {
     /// @return vector of unique_ptr to created interpolants
     // ----------------------------------------------------------------------------
 
-    std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(
-        std::string, InterpolantBuilderContainer&, size_t,
+    std::unique_ptr<Interpolant> InitializeInterpolation(
+        std::string, unique_ptr<InterpolantBuilder>, size_t,
         const InterpolationDef&);
 
-    std::unique_ptr<Interpolant> InitializeInterpolation(
-        std::string, const InterpolantBuilder&, size_t,
-        const InterpolationDef&);
+    std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(std::string,
+        const InterpolantBuilderContainer&, size_t, const InterpolationDef&);
 
     // ----------------------------------------------------------------------------
     /// @brief Simple map structure where keys and values can be used for

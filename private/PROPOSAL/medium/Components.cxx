@@ -269,6 +269,7 @@ double Component::WoodSaxonPotential(double r0)
         * (r0 * r0 * std::log(2) + a * r0 * PI * PI / 6 + a * a * 1.5 * ZETA3);
 }
 
+namespace PROPOSAL {
 double calculate_proton_massnumber_fraction(const component_list& comp_list) noexcept
 {
     double charge = 0.;
@@ -279,6 +280,7 @@ double calculate_proton_massnumber_fraction(const component_list& comp_list) noe
     }
     return charge / nucleons;
 }
+} // namespace PROPOSAL
 
 /******************************************************************************
  *                            Different Components                             *

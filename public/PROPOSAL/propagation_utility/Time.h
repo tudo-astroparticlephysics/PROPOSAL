@@ -7,7 +7,6 @@ namespace PROPOSAL {
 
 class Time {
 public:
-    Time();
     virtual double TimeElapsed(double initial_energy, double final_energy, double time) = 0;
     virtual double TimeElapsed(double distance) = 0;
 

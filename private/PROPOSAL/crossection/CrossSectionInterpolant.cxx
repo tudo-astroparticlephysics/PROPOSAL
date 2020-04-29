@@ -33,10 +33,10 @@ unique_ptr<Interpolant> CrossSectionInterpolant::init_dedx_interpolation(
     interpol_def.rombergY = def.order_of_interpolation;
     interpol_def.logSubst = true;
 
-    Interpolant1DBuilder builder(interpol_def);
+    unique_ptr<InterpolantBuilder> builder(new Interpolant1DBuilder(interpol_def));
     auto hash = parametrization_->GetHash();
 
-    return Helper::InitializeInterpolation("dEdx", builder, hash, def);
+    return Helper::InitializeInterpolation("dEdx", std::move(builder), hash, def);
 }
 
 unique_ptr<Interpolant> CrossSectionInterpolant::init_de2dx_interpolation(
@@ -52,10 +52,10 @@ unique_ptr<Interpolant> CrossSectionInterpolant::init_de2dx_interpolation(
     interpol_def.isLog = true;
     interpol_def.rombergY = def.order_of_interpolation;
 
-    Interpolant1DBuilder builder(interpol_def);
+    unique_ptr<InterpolantBuilder> builder(new Interpolant1DBuilder(interpol_def));
     auto hash = parametrization_->GetHash();
 
-    return Helper::InitializeInterpolation("dE2dx", builder, hash, def);
+    return Helper::InitializeInterpolation("dE2dx", std::move(builder), hash, def);
 }
 
 vector<unique_ptr<Interpolant>>

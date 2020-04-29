@@ -42,5 +42,6 @@ vector<unique_ptr<Interpolant>> ComptonInterpolant::init_dndx_interpolation(
     }
 
     const auto& hash = parametrization_->GetHash();
-    return Helper::InitializeInterpolation("dNdx_diff", builders, hash, def);
+    auto aux = Helper::InitializeInterpolation("dNdx_diff", builders, hash, def);
+    return aux;
 }
