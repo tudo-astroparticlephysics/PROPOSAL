@@ -31,6 +31,7 @@
 #include "PROPOSAL/json.hpp"
 #include <deque>
 #include <functional>
+#include <memory>
 #include <map>
 #include <vector>
 
@@ -45,6 +46,8 @@
         }                                                                      \
     };                                                                         \
     }
+
+using std::unique_ptr;
 
 namespace PROPOSAL {
 
@@ -159,7 +162,7 @@ namespace Helper {
     // ----------------------------------------------------------------------------
     std::string Centered(int width, const std::string& str, char fill = '=');
 
-    using InterpolantBuilderContainer = std::vector<InterpolantBuilder*>;
+    using InterpolantBuilderContainer = std::vector<unique_ptr<InterpolantBuilder>>;
 
     // ----------------------------------------------------------------------------
     /// @brief Helper for interpolation initialization
@@ -177,7 +180,7 @@ namespace Helper {
         const InterpolationDef&);
 
     std::unique_ptr<Interpolant> InitializeInterpolation(
-        std::string, InterpolantBuilder&, size_t,
+        std::string, const InterpolantBuilder&, size_t,
         const InterpolationDef&);
 
     // ----------------------------------------------------------------------------

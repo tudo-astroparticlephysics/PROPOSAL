@@ -173,16 +173,16 @@ struct ParticleDef {
     bool operator!=(const ParticleDef&) const;
 
     void AddCrossSections(
-        std::shared_ptr<Medium>, std::shared_ptr<EnergyCutSettings>);
-    CrossSectionList GetCrossSections(
-        std::shared_ptr<Medium>, std::shared_ptr<EnergyCutSettings>);
+        const Medium&, std::shared_ptr<EnergyCutSettings>);
+    std::vector<shared_ptr<CrossSection>> GetCrossSections(
+        const Medium&, std::shared_ptr<EnergyCutSettings>);
 
     friend std::ostream& operator<<(std::ostream&, ParticleDef const&);
 
 private:
     ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
 
-    std::unordered_map<size_t, CrossSectionList> cross_sections;
+    std::unordered_map<size_t, std::vector<shared_ptr<CrossSection>>> cross_sections;
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::ParticleDef const&);

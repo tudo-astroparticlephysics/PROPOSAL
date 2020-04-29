@@ -32,41 +32,28 @@
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
 
 namespace PROPOSAL {
-
 class MupairProduction;
+} // namespace PROPOSAL
 
-class MupairInterpolant : public CrossSectionInterpolant
-{
+namespace PROPOSAL {
+class MupairInterpolant : public CrossSectionInterpolant {
 public:
-    MupairInterpolant(const MupairProduction&, std::shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    //MupairInterpolant(const MupairInterpolant&);
-    virtual ~MupairInterpolant();
-
-    //CrossSection* clone() const { return new MupairInterpolant(*this); }
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    double CalculatedEdx(double energy);
-    std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction) override;
-    double FunctionToBuildDNdxInterpolant2D(double energy, double v, Integral&, int component) override;
-
-protected:
-    virtual bool compare(const CrossSection&) const;
-
-private:
-    std::function<double(double, double)> functiondNdxIntegral;
-    std::unordered_map<std::string, bool> interpolateDifferentialCrossSection = {
-            {"KelnerKokoulinPetrukhin",true}
-    };
-    double FunctionToBuildDiffCrossSectionInterpolant(double energy, double v, int component);
-    double InterpolatedCrossSection(double energy, double v);
-    void InitializeDifferentialCrossSectionInterpolation(const InterpolationDef& def);
-    InterpolantVec interpolant_;
-
-    ParticleDef const* muminus_def_;
-    ParticleDef const* muplus_def_;
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<MupairProduction, typename decay<T>::type>::value>::type>
+    MupairInterpolant(
+        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
+    virtual ~MupairInterpolant() = default;
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<MupairProduction, typename decay<T>::type>::value>::type>
+MupairInterpolant::MupairInterpolant(T&& param,
+    shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& interpol_def)
+    : CrossSectionInterpolant(param, cuts, interpol_def)
+{
+}
 } // namespace PROPOSAL

@@ -3,8 +3,7 @@
 using namespace PROPOSAL;
 
 namespace PROPOSAL {
-Interpolant1DBuilder::Definition interaction_interpol_def(
-    nullptr, 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+Interpolant1DBuilder::Definition interaction_interpol_def;
 } // namespace PROPOSAL
 
 Interaction::Interaction(CrossSectionList cross)
@@ -15,7 +14,7 @@ Interaction::Interaction(CrossSectionList cross)
         throw std::invalid_argument("at least one crosssection is required.");
 
     for (auto c : cross)
-        lower_lim = std::min(lower_lim, c->GetParametrization().GetLowerEnergyLim());
+        lower_lim = std::min(lower_lim, c->GetLowerEnergyLimit());
 }
 
 std::shared_ptr<CrossSection> Interaction::TypeInteraction(

@@ -1,4 +1,3 @@
-
 /******************************************************************************
  *                                                                            *
  * This file is part of the simulation tool PROPOSAL.                         *
@@ -26,39 +25,38 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
+
+#include <array>
+
+using std::array;
+using std::vector;
 
 namespace PROPOSAL {
 
-    class Annihilation;
+class DynamicData;
+class Vector3D;
+class Annihilation;
 
-    class AnnihilationIntegral : public CrossSectionIntegral
-    {
-    public:
-        AnnihilationIntegral(const Annihilation&);
-        AnnihilationIntegral(const AnnihilationIntegral&);
-        virtual ~AnnihilationIntegral();
+class AnnihilationIntegral : public CrossSectionIntegral {
+public:
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<Annihilation, typename decay<T>::type>::value>::type>
+    AnnihilationIntegral(T&&);
 
-        CrossSection* clone() const { return new AnnihilationIntegral(*this); }
+    double CalculatedEdx(double) override;
+    double CalculatedE2dx(double) override;
+};
 
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
-
-        //these methods return zero because annihilation contribution is stochastic only
-        double CalculatedEdx(double energy){ (void)energy; return 0; }
-        double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }
-        double CalculatedE2dx(double energy){ (void)energy; return 0; }
-        double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
-        std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D&);
-
-    private:
-        double rndc_;
-        ParticleDef const* gamma_def_;
-    };
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<Annihilation, typename decay<T>::type>::value>::type>
+AnnihilationIntegral::AnnihilationIntegral(T&& param)
+    : CrossSectionIntegral(param, nullptr)
+{
+}
 
 } // namespace PROPOSAL

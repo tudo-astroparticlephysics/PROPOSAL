@@ -1,93 +1,53 @@
 
+#include <cassert>
 #include <cmath>
 
-#include "PROPOSAL/crossection/parametrization/Annihilation.h"
-
-#include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Logging.h"
+#include "PROPOSAL/crossection/parametrization/Annihilation.h"
+#include "PROPOSAL/medium/Components.h"
 
 using namespace PROPOSAL;
 
-// ------------------------------------------------------------------------- //
-// Constructor & Destructor
-// ------------------------------------------------------------------------- //
-
-Annihilation::Annihilation(const ParticleDef& particle_def,
-                                 std::shared_ptr<const Medium> medium,
-                                 double multiplier)
-        : Parametrization(particle_def, medium, particle_def.mass, multiplier)
+Annihilation::Annihilation(const ParticleDef& p_def, const component_list& comp)
+    : Parametrization("annihililation", p_def, comp, 2 * ME)
+    , za_(calculate_proton_massnumber_fraction(comp))
 {
 }
-
-Annihilation::Annihilation(const Annihilation& param)
-        : Parametrization(param)
-{
-}
-
-Annihilation::~Annihilation() {}
-
-bool Annihilation::compare(const Parametrization& parametrization) const
-{
-    return Parametrization::compare(parametrization);
-}
-
-// ------------------------------------------------------------------------- //
-// Public methods
-// ------------------------------------------------------------------------- //
 
 Parametrization::KinematicLimits Annihilation::GetKinematicLimits(double energy)
 {
     // Limits according to simple 2->2 body interactions
-    KinematicLimits limits;
 
-    double gamma    = energy / particle_mass_;
+    assert(energy >= particle_mass_);
+    auto gamma = energy / particle_mass_;
+    auto aux = std::sqrt((gamma - 1.) / (gamma + 1.));
 
-    limits.vMin     = 0.5 * (1. - std::sqrt( std::max(0., (gamma - 1.)/(gamma + 1.) ) ));
-    limits.vMax     = 0.5 * (1. + std::sqrt( std::max(0., (gamma - 1.)/(gamma + 1.) ) ));
+    auto vmin = 0.5 * (1. - aux);
+    auto vmax = 0.5 * (1. + aux);
 
-    return limits;
+    return KinematicLimits(vmin, vmax);
 }
 
-size_t Annihilation::GetHash() const
+AnnihilationHeitler::AnnihilationHeitler(
+    const ParticleDef& p_def, const component_list& comp)
+    : Annihilation(p_def, comp)
 {
-    size_t seed = Parametrization::GetHash();
-    hash_combine(seed);
-
-    return seed;
 }
-
-// ------------------------------------------------------------------------- //
-// Specific implementations
-// ------------------------------------------------------------------------- //
-
-AnnihilationHeitler::AnnihilationHeitler(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium, double multiplier)
-        : Annihilation(particle_def, medium, multiplier)
-{}
-
-AnnihilationHeitler::AnnihilationHeitler(const AnnihilationHeitler& param)
-        : Annihilation(param)
-{}
-
-AnnihilationHeitler::~AnnihilationHeitler()
-{}
 
 double AnnihilationHeitler::DifferentialCrossSection(double energy, double v)
 {
-    // W. Heitler. The Quantum Theory of Radiation, Clarendon Press, Oxford (1954)
-    // Adapted from Geant4 PhysicsReferenceManual
+    // W. Heitler. The Quantum Theory of Radiation, Clarendon Press, Oxford
+    // (1954) Adapted from Geant4 PhysicsReferenceManual
 
     // v = energy of photon1 / total available energy
-    // with the total available energy being the sum of the total positron energy and the electron mass
+    // with the total available energy being the sum of the total positron
+    // energy and the electron mass
 
-    double gamma    = energy / particle_mass_;
-    double aux      = 1. + (2. * gamma) / std::pow(gamma + 1., 2.) - v - 1. / std::pow(gamma + 1., 2.) * 1. / v;
-    aux *= medium_->GetMassDensity() * NA * medium_->GetZA() * PI * RE * RE / (gamma - 1.) * 1. / v; // TODO: prefactors
+    assert(energy >= particle_mass_);
+    auto gamma = energy / particle_mass_;
+    auto aux = 1. + (2. * gamma) / std::pow(gamma + 1., 2.) - v
+        - 1. / std::pow(gamma + 1., 2.) * 1. / v;
+    aux *= NA * za_ * PI * RE * RE / (gamma - 1.) * 1. / v; // TODO: prefactors
 
     return aux;
 }
-
-
-const std::string AnnihilationHeitler::name_ = "AnnihilationHeitler";

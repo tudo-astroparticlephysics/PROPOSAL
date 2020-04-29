@@ -26,33 +26,32 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 
 namespace PROPOSAL {
+class WeakInteraction;
+} // namespace PROPOSAL
 
-    class WeakInteraction;
+namespace PROPOSAL {
+class WeakIntegral : public CrossSectionIntegral {
+public:
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<WeakInteraction, typename decay<T>::type>::value>::type>
+    WeakIntegral(T&&);
+    virtual ~WeakIntegral() = default;
 
-    class WeakIntegral : public CrossSectionIntegral
-    {
-    public:
-        WeakIntegral(const WeakInteraction&);
-        WeakIntegral(const WeakIntegral&);
-        virtual ~WeakIntegral();
+    double CalculatedEdx(double energy) override;
+    double CalculatedE2dx(double energy) override;
+};
 
-        CrossSection* clone() const { return new WeakIntegral(*this); }
-
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
-
-        //these methods return zero because the weak interaction contribution is stochastic only
-        double CalculatedEdx(double energy){ (void)energy; return 0; }
-        double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }
-        double CalculatedE2dx(double energy){ (void)energy; return 0; }
-        std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction);
-    };
-
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<WeakInteraction, typename decay<T>::type>::value>::type>
+WeakIntegral::WeakIntegral(T&& param)
+    : CrossSectionIntegral(param, nullptr)
+{
+}
 } // namespace PROPOSAL

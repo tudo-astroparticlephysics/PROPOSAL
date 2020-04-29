@@ -36,8 +36,7 @@ public:
         if (typeid(T) == typeid(UtilityInterpolant)) {
             size_t hash_digest = 0;
             for (const auto& c : cross)
-                hash_combine(hash_digest, c->GetParametrization().GetHash(),
-                    c->GetParametrization().GetMultiplier());
+                hash_combine(hash_digest, c->GetHash());
             integral.BuildTables(name, hash_digest, time_interpol_def);
         }
     }
@@ -76,7 +75,7 @@ protected:
     double InitializeLowerLim(CrossSectionList cross){
         double lower_lim_tmp = std::numeric_limits<double>::max();
         for (auto c : cross)
-            lower_lim_tmp = std::min(lower_lim_tmp, c->GetParametrization().GetLowerEnergyLim());
+            lower_lim_tmp = std::min(lower_lim_tmp, c->GetLowerEnergyLimit());
         return lower_lim_tmp;
     }
     double lower_lim;

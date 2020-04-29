@@ -26,49 +26,52 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/crossection/CrossSectionIntegral.h"
+#include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/methods.h"
 
 namespace PROPOSAL {
-
-class Integral;
-class Interpolant;
-
-class CrossSectionInterpolant : public CrossSection
-{
-public:
-    CrossSectionInterpolant(const Parametrization&, std::shared_ptr<const EnergyCutSettings>);
-    //CrossSectionInterpolant(const CrossSectionInterpolant&);
-
-    //virtual CrossSection* clone() const = 0;
-
-    virtual double CalculatedEdx(double energy) = 0;
-    virtual double CalculatedE2dx(double energy);
-    virtual double CalculatedNdx(double energy);
-    virtual double CalculatedNdx(double energy, double rnd);
-    virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
-
-    // Needed to initialize interpolation
-    virtual double FunctionToBuildDNdxInterpolant(double energy, int component);
-    virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, Integral&, int component);
-    virtual double CalculateCumulativeCrossSection(double energy, int component, double v);
-
+class CrossSectionInterpolant : public CrossSectionIntegral {
+    size_t hash_interpol_def;
 protected:
-    virtual bool compare(const CrossSection&) const;
+    unique_ptr<Interpolant> dedx_interpolant_;
+    unique_ptr<Interpolant> de2dx_interpolant_;
+    vector<unique_ptr<Interpolant>> dndx_interpolants_;
 
-    typedef std::vector<std::unique_ptr<Interpolant>> InterpolantVec;
+    double logarithm_trafo(double, double, double) const;
 
-    virtual double CalculateStochasticLoss(double energy, double rnd1);
-    virtual void InitdNdxInterpolation(const InterpolationDef& def);
+    virtual vector<unique_ptr<Interpolant>> init_dndx_interpolation(
+        const InterpolationDef&);
+    unique_ptr<Interpolant> init_dedx_interpolation(const InterpolationDef&);
+    unique_ptr<Interpolant> init_de2dx_interpolation(const InterpolationDef&);
 
-    std::unique_ptr<Interpolant> dedx_interpolant_;
-    std::unique_ptr<Interpolant> de2dx_interpolant_;
-    InterpolantVec dndx_interpolant_1d_; // Stochastic dNdx()
-    InterpolantVec dndx_interpolant_2d_; // Stochastic dNdx()
+
+public:
+    template <typename T>
+    CrossSectionInterpolant(
+        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
+
+    double CalculatedEdx(double) override;
+    double CalculatedE2dx(double) override;
+    double CalculatedNdx(double, double = 1) override;
+
+    size_t GetHash() const override;
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+template <typename T>
+CrossSectionInterpolant::CrossSectionInterpolant(T&& param,
+    shared_ptr<const EnergyCutSettings> cut, const InterpolationDef& def)
+    : CrossSectionIntegral(param, cut)
+    , hash_interpol_def(def.GetHash())
+    , dedx_interpolant_(init_dedx_interpolation(def))
+    , de2dx_interpolant_(init_de2dx_interpolation(def))
+    , dndx_interpolants_(init_dndx_interpolation(def))
+{
+}
 } // namespace PROPOSAL

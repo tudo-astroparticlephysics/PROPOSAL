@@ -26,50 +26,37 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
+using std::shared_ptr;
 
 namespace PROPOSAL {
+class PhotoPairProduction;
+} // namespace PROPOSAL
 
-    class PhotoPairProduction;
+namespace PROPOSAL {
+class PhotoPairInterpolant : public CrossSectionInterpolant {
+public:
+    template <typename T,
+        typename = typename enable_if<is_base_of<PhotoPairProduction,
+            typename decay<T>::type>::value>::type>
+    PhotoPairInterpolant(
+        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
+    virtual ~PhotoPairInterpolant();
 
-    class PhotoPairInterpolant : public CrossSectionInterpolant
-    {
-    public:
-        PhotoPairInterpolant(const PhotoPairProduction&, const PhotoAngleDistribution&, const InterpolationDef&);
-        //PhotoPairInterpolant(const PhotoPairInterpolant&);
-        virtual ~PhotoPairInterpolant();
+    double CalculatedEdx(double energy) override;
+    double CalculatedE2dx(double energy) override;
+};
+} // namespace PROPOSAL
 
-        //CrossSection* clone() const { return new PhotoPairInterpolant(*this); }
-
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
-
-        double CalculatedNdx(double energy);
-        double CalculatedNdx(double energy, double rnd);
-
-        //these methods return zero because the photopairproduction contribution is stochastic only
-        double CalculatedEdx(double energy){ (void)energy; return 0; }
-        double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }
-        double CalculatedE2dx(double energy){ (void)energy; return 0; }
-
-        std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D&);
-        double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
-
-        PhotoAngleDistribution& GetPhotoAngleDistribution() const { return *photoangle_; }
-
-    protected:
-        virtual bool compare(const CrossSection&) const;
-        void InitdNdxInterpolation(const InterpolationDef& def);
-
-        PhotoAngleDistribution* photoangle_;
-    private:
-        double rndc_;
-        ParticleDef const* eminus_def_;
-        ParticleDef const* eplus_def_;
-    };
-
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<PhotoPairProduction, typename decay<T>::type>::value>::type>
+PhotoPairInterpolant::PhotoPairInterpolant(
+        T&& param, shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& interpol_def)
+    : CrossSectionInterpolant(param, cuts, interpol_def)
+{
+}
 } // namespace PROPOSAL

@@ -3,12 +3,16 @@
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/medium/Medium.h"
 
+using std::shared_ptr;
+using std::vector;
+
 namespace PROPOSAL {
 class InterpolationDef;
 class ParticleDef;
 
 extern InterpolationDef std_interpolation_def;
 
-CrossSectionList GetStdCrossSections(std::shared_ptr<Medium>, std::shared_ptr<EnergyCutSettings>, const ParticleDef&);
+vector<shared_ptr<CrossSection>> GetStdCrossSections(const Medium&,
+    std::shared_ptr<EnergyCutSettings>, const ParticleDef&);
 
 } // namespace PROPOSAL

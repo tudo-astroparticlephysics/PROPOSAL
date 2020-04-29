@@ -50,15 +50,10 @@ public:
 
     virtual RealPhoton* clone() const = 0;
 
-    bool operator==(const RealPhoton&) const;
-    bool operator!=(const RealPhoton&) const;
-
     virtual double CalculateHardComponent(double energy, double v) = 0;
 
     virtual const std::string& GetName() const = 0;
 
-protected:
-    virtual bool compare(const RealPhoton&) const;
 };
 
 class SoftComponent : public RealPhoton
@@ -92,7 +87,6 @@ public:
     virtual const std::string& GetName() const { return name_; }
 
 private:
-    virtual bool compare(const RealPhoton&) const;
 
     static std::vector<double> x;
     std::vector<Interpolant*> interpolant_;
@@ -108,13 +102,8 @@ class ShadowEffect
 {
 public:
     ShadowEffect() {}
-    ShadowEffect(const ShadowEffect&) {}
     virtual ~ShadowEffect() {}
 
-    virtual ShadowEffect* clone() const = 0;
-
-    bool operator==(const ShadowEffect&) const;
-    bool operator!=(const ShadowEffect&) const;
 
     virtual double CalculateShadowEffect(const Components::Component&, double x, double nu) = 0;
 
@@ -133,14 +122,6 @@ public:
         : ShadowEffect()
     {
     }
-    ShadowDuttaRenoSarcevicSeckel(const ShadowDuttaRenoSarcevicSeckel& sh)
-        : ShadowEffect(sh)
-    {
-    }
-    virtual ~ShadowDuttaRenoSarcevicSeckel() {}
-
-    ShadowEffect* clone() const { return new ShadowDuttaRenoSarcevicSeckel(*this); }
-    static ShadowEffect* create() { return new ShadowDuttaRenoSarcevicSeckel(); }
 
     double CalculateShadowEffect(const Components::Component&, double x, double nu);
 
@@ -162,14 +143,6 @@ public:
         : ShadowEffect()
     {
     }
-    ShadowButkevichMikhailov(const ShadowButkevichMikhailov& sh)
-        : ShadowEffect(sh)
-    {
-    }
-    virtual ~ShadowButkevichMikhailov() {}
-
-    ShadowEffect* clone() const { return new ShadowButkevichMikhailov(*this); }
-    static ShadowEffect* create() { return new ShadowButkevichMikhailov(); }
 
     double CalculateShadowEffect(const Components::Component&, double x, double nu);
 
@@ -191,22 +164,13 @@ private:
 class Photonuclear : public Parametrization
 {
 public:
-    Photonuclear(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
-    Photonuclear(const Photonuclear&);
-    virtual ~Photonuclear();
+    Photonuclear(const ParticleDef&, const component_list&);
 
-    virtual Parametrization* clone() const = 0;
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-    virtual InteractionType GetInteractionType() const final {return InteractionType::Photonuclear;}
     virtual double DifferentialCrossSection(double energy, double v) = 0;
 
     virtual KinematicLimits GetKinematicLimits(double energy);
 
 protected:
-    virtual bool compare(const Parametrization&) const;
 };
 
 } // namespace PROPOSAL

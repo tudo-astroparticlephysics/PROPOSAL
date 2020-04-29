@@ -26,41 +26,37 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
+#include "PROPOSAL/crossection/parametrization/Annihilation.h"
+
+using std::vector;
 
 namespace PROPOSAL {
+class DynamicData;
+class Vector3D;
+} // namespace PROPOSAL
 
-    class Annihilation;
+namespace PROPOSAL {
+class AnnihilationInterpolant : public CrossSectionInterpolant {
+public:
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<Annihilation, typename decay<T>::type>::value>::type>
+    AnnihilationInterpolant(T&&, const InterpolationDef&);
 
-    class AnnihilationInterpolant : public CrossSectionInterpolant
-    {
-    public:
-        AnnihilationInterpolant(const Annihilation&, const InterpolationDef&);
-        //AnnihilationInterpolant(const AnnihilationInterpolant&);
-        virtual ~AnnihilationInterpolant();
+    double CalculatedEdx(double) override;
+    double CalculatedE2dx(double) override;
+};
 
-        //CrossSection* clone() const { return new AnnihilationInterpolant(*this); }
-
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
-
-        //these methods return zero because the annihilation contribution is stochastic only
-        double CalculatedEdx(double energy){ (void)energy; return 0; }
-        double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }
-        double CalculatedE2dx(double energy){ (void)energy; return 0; }
-        double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
-        std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction);
-
-    protected:
-        virtual bool compare(const CrossSection&) const;
-
-    private:
-        double rndc_;
-        ParticleDef const* gamma_def_;
-    };
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<Annihilation, typename decay<T>::type>::value>::type>
+AnnihilationInterpolant::AnnihilationInterpolant(
+    T&& param, const InterpolationDef& def)
+    : CrossSectionInterpolant(param, nullptr)
+{
+}
 
 } // namespace PROPOSAL

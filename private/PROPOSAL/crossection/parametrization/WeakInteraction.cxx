@@ -1,15 +1,13 @@
 
 #include <cmath>
 
-#include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
-
-#include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/medium/Medium.h"
-
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Logging.h"
-#include "PROPOSAL/crossection/parametrization/ParamTables.h"
 
+#include "PROPOSAL/crossection/parametrization/ParamTables.h"
+#include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
+#include "PROPOSAL/particle/ParticleDef.h"
+
+#include "PROPOSAL/math/Interpolant.h"
 
 using namespace PROPOSAL;
 
@@ -17,127 +15,57 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-WeakInteraction::WeakInteraction(const ParticleDef& particle_def,
-                                 std::shared_ptr<const Medium> medium,
-                                 double multiplier)
-        : Parametrization(particle_def, medium, particle_def.mass, multiplier), weak_partner_(particle_def.weak_partner)
+WeakInteraction::WeakInteraction(
+    const ParticleDef& p_def, const component_list& comp)
+    : Parametrization("weak_interaction", p_def, comp, p_def.mass)
 {
 }
 
-WeakInteraction::WeakInteraction(const WeakInteraction& param)
-        : Parametrization(param), weak_partner_(param.weak_partner_)
+Parametrization::KinematicLimits WeakInteraction::GetKinematicLimits(
+    double energy)
 {
-}
-
-WeakInteraction::~WeakInteraction() {}
-
-bool WeakInteraction::compare(const Parametrization& parametrization) const
-{
-    const WeakInteraction* param_weak = static_cast<const WeakInteraction*>(&parametrization);
-    if(weak_partner_ != param_weak->GetWeakPartner())
-        return false;
-    else
-        return Parametrization::compare(parametrization);
-}
-
-// ------------------------------------------------------------------------- //
-// Public methods
-// ------------------------------------------------------------------------- //
-
-Parametrization::KinematicLimits WeakInteraction::GetKinematicLimits(double energy)
-{
-    KinematicLimits limits;
-
-    double aux = (MP + MN) / 2; //for isoscalar targets
+    double aux = (MP + MN) / 2; // for isoscalar targets
     aux = 2 * energy * aux + pow(aux, 2);
 
-    limits.vMin = 1e6 / (aux ); //q^2_min = 1e6 MeV for experimental reasons
-    limits.vMax = 1;
+    auto v_min = 1e6 / (aux); // q^2_min = 1e6 MeV for experimental reasons
+    auto v_max = 1;
 
-    return limits;
+    return KinematicLimits(v_min, v_max);
 }
 
-size_t WeakInteraction::GetHash() const
+WeakCooperSarkarMertsch::WeakCooperSarkarMertsch(
+    const ParticleDef& p_def, const component_list& comp)
+    : WeakInteraction(p_def, comp)
 {
-    size_t seed = Parametrization::GetHash();
-    hash_combine(seed, particle_charge_);
-
-    return seed;
-}
-
-// ------------------------------------------------------------------------- //
-// Specific implementations
-// ------------------------------------------------------------------------- //
-
-WeakCooperSarkarMertsch::WeakCooperSarkarMertsch(const ParticleDef& particle_def,
-                                                 std::shared_ptr<const Medium> medium,
-                                                 double multiplier)
-        : WeakInteraction(particle_def, medium, multiplier)
-        , interpolant_(2, NULL)
-{
-
-    if(particle_def.charge < 0.)
-    {
-        // Initialize interpolant for particles (remember crossing symmetry rules)
-        interpolant_[0] = new Interpolant(energies, y_nubar_p, sigma_nubar_p, IROMB, false, false, IROMB, false, false);
-        interpolant_[1] = new Interpolant(energies, y_nubar_n, sigma_nubar_n, IROMB, false, false, IROMB, false, false);
-    }
-    else if(particle_def.charge > 0.){
-        // Initialize interpolant for antiparticles (remember crossing symmetry rules)
-        interpolant_[0] = new Interpolant(energies, y_nu_p, sigma_nu_p, IROMB, false, false, IROMB, false, false);
-        interpolant_[1] = new Interpolant(energies, y_nu_n, sigma_nu_n, IROMB, false, false, IROMB, false, false);
-    }else{
-        log_fatal("Weak interaction: Particle to propagate is not a charged lepton");
-    }
-
-}
-
-WeakCooperSarkarMertsch::WeakCooperSarkarMertsch(const WeakCooperSarkarMertsch& param)
-        : WeakInteraction(param)
-        , interpolant_()
-{
-    interpolant_.resize(param.interpolant_.size());
-
-    for (unsigned int i = 0; i < param.interpolant_.size(); ++i)
-    {
-        interpolant_[i] = new Interpolant(*param.interpolant_[i]);
+    // Initialize interpolant for particles (remember crossing symmetry rules)
+    if (p_def.charge < 0.) {
+        interpolant_.emplace_back(new Interpolant(energies, y_nubar_p,
+            sigma_nubar_p, IROMB, false, false, IROMB, false, false));
+        interpolant_.emplace_back(new Interpolant(energies, y_nubar_n,
+            sigma_nubar_n, IROMB, false, false, IROMB, false, false));
+    } else if (p_def.charge > 0.) {
+        interpolant_.emplace_back(new Interpolant(energies, y_nu_p, sigma_nu_p,
+            IROMB, false, false, IROMB, false, false));
+        interpolant_.emplace_back(new Interpolant(energies, y_nu_n, sigma_nu_n,
+            IROMB, false, false, IROMB, false, false));
     }
 }
 
-WeakCooperSarkarMertsch::~WeakCooperSarkarMertsch()
+double WeakCooperSarkarMertsch::DifferentialCrossSection(
+    double energy, double v)
 {
-    for (std::vector<Interpolant*>::const_iterator iter = interpolant_.begin(); iter != interpolant_.end(); ++iter)
-    {
-        delete *iter;
-    }
+    auto log10_energy = std::log10(energy);
+    const auto& nuclear_charge = current_component_.GetNucCharge();
+    const auto& nuclear_number = current_component_.GetAtomicNum();
 
-    interpolant_.clear();
+    auto proton_contr
+        = nuclear_charge * interpolant_[0]->InterpolateArray(log10_energy, v);
+    auto neutron_contr = (nuclear_number - nuclear_charge)
+        * interpolant_[1]->InterpolateArray(log10_energy, v);
+    auto mean_contr = (proton_contr + neutron_contr) / nuclear_number;
+
+    assert(mean_contr > 0);
+
+    // factor 1e-36: conversion from pb to cm^2
+    return current_component_.GetAtomInMolecule() * 1e-36 * mean_contr;
 }
-
-bool WeakCooperSarkarMertsch::compare(const Parametrization& parametrization) const
-{
-    const WeakCooperSarkarMertsch* weak = static_cast<const WeakCooperSarkarMertsch*>(&parametrization);
-
-    if (interpolant_.size() != weak->interpolant_.size())
-        return false;
-
-    for (unsigned int i = 0; i < interpolant_.size(); ++i)
-    {
-        if (*interpolant_[i] != *weak->interpolant_[i])
-            return false;
-    }
-
-    return WeakInteraction::compare(parametrization);
-}
-
-double WeakCooperSarkarMertsch::DifferentialCrossSection(double energy, double v)
-{
-    double proton_contribution = components_[component_index_].GetNucCharge() * interpolant_.at(0)->InterpolateArray(std::log10(energy), v);
-    double neutron_contribution =  (components_[component_index_].GetAtomicNum() - components_[component_index_].GetNucCharge()) * interpolant_.at(1)->InterpolateArray(std::log10(energy), v);
-    double mean_contribution = (proton_contribution + neutron_contribution) / (components_[component_index_].GetAtomicNum());
-
-    return medium_->GetMolDensity() * components_[component_index_].GetAtomInMolecule() * 1e-36 * std::max(0.0, mean_contribution); //factor 1e-36: conversion from pb to cm^2
-}
-
-
-const std::string WeakCooperSarkarMertsch::name_ = "WeakCooperSarkarMertsch";

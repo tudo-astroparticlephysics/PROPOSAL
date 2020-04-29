@@ -26,121 +26,116 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include <string>
+#include <vector>
 
-#define COMPONENT_DEC(cls, ATOMS)                                                                                      \
-    class cls : public Component                                                                                       \
-    {                                                                                                                  \
-    public:                                                                                                            \
-        cls(double atomInMolecule = ATOMS);                                                                            \
-        cls(const cls&);                                                                                               \
-        virtual ~cls() {}                                                                                              \
-                                                                                                                       \
-        virtual Component* clone() const { return new cls(*this); };                                                   \
+#define COMPONENT_DEC(cls, ATOMS)                                              \
+    class cls : public Component {                                             \
+    public:                                                                    \
+        cls(double atomInMolecule = ATOMS);                                    \
     };
 
 namespace PROPOSAL {
 
 namespace Components {
 
-class Component
-{
-public:
-    Component(std::string name, double charge, double atomicNum, double atomInMolecule);
-    Component(const Component&) = default;
-    virtual ~Component() = default;
-    Component& operator=(const Component&) = default;
+    class Component {
+    public:
+        Component() = default;
+        Component(std::string name, double charge, double atomicNum, double atomInMolecule);
 
-    virtual Component* clone() const { return new Component(*this); };
+        bool operator==(const Component&) const;
+        bool operator!=(const Component&) const;
+        friend std::ostream& operator<<(std::ostream&, Component const&);
 
-    bool operator==(const Component&) const;
-    bool operator!=(const Component&) const;
-    friend std::ostream& operator<<(std::ostream&, Component const&);
+        // Getter
+        std::string GetName() const { return name_; }
+        double GetNucCharge() const { return nucCharge_; }
+        double GetAtomicNum() const { return atomicNum_; }
+        double GetAtomInMolecule() const { return atomInMolecule_; }
+        double GetLogConstant() const { return logConstant_; }
+        double GetBPrime() const { return bPrime_; }
+        double GetAverageNucleonWeight() const { return averageNucleonWeight_; }
+        double GetWoodSaxon() const { return wood_saxon_; }
 
-    // Getter
-    std::string GetName() const { return name_; }
-    double GetNucCharge() const { return nucCharge_; }
-    double GetAtomicNum() const { return atomicNum_; }
-    double GetAtomInMolecule() const { return atomInMolecule_; }
-    double GetLogConstant() const { return logConstant_; }
-    double GetBPrime() const { return bPrime_; }
-    double GetAverageNucleonWeight() const { return averageNucleonWeight_; }
-    double GetWoodSaxon() const { return wood_saxon_; }
+        size_t GetHash() const noexcept;
 
-    size_t GetHash() const noexcept;
+    protected:
+        /*!
+         * set the value of radiation logarithm constant B
+         *
+         * \param   i   nucleon number
+         * \return  value of radiation logarithm constant B
+         */
+        void SetLogConstant();
 
-protected:
-    /*!
-     * set the value of radiation logarithm constant B
-     *
-     * \param   i   nucleon number
-     * \return  value of radiation logarithm constant B
-     */
-    void SetLogConstant();
+        /*!
+         * set the value of radiation logarithm constant bPrime
+         *
+         * \param   i   nucleon number
+         * \return  value of radiation logarithm constant bPrime
+         */
+        void SetBPrime();
 
-    /*!
-     * set the value of radiation logarithm constant bPrime
-     *
-     * \param   i   nucleon number
-     * \return  value of radiation logarithm constant bPrime
-     */
-    void SetBPrime();
+        /*!
+         * Woods-Saxon potential calculation - function to integrate
+         *
+         * \param   r
+         * \return  value of the Woods-Saxon potential
+         */
+        double FunctionToIntegral(double r);
 
-    /*!
-     * Woods-Saxon potential calculation - function to integrate
-     *
-     * \param   r
-     * \return  value of the Woods-Saxon potential
-     */
-    double FunctionToIntegral(double r);
+        /*!
+         * Woods-Saxon potential calculation
+         *
+         * \param   r
+         * \return  value of the Woods-Saxon potential
+         *
+         * Calculation of the integral defined in
+         * Butkevich Mikheyev JETP 95 (2002), 11 eq. 46
+         * This can be integrated analytically.
+         */
+        double WoodSaxonPotential(double r0);
 
-    /*!
-     * Woods-Saxon potential calculation
-     *
-     * \param   r
-     * \return  value of the Woods-Saxon potential
-     *
-     * Calculation of the integral defined in
-     * Butkevich Mikheyev JETP 95 (2002), 11 eq. 46
-     * This can be integrated analytically.
-     */
-    double WoodSaxonPotential(double r0);
+        // Passed to constructor
+        std::string name_;
+        double nucCharge_;      ///< nucleus charge
+        double atomicNum_;      ///< molar mass [g/mol]
+        double atomInMolecule_; ///< number of atoms in a molecule
 
-    // Passed to constructor
-    std::string name_;
-    double nucCharge_;      ///< nucleus charge
-    double atomicNum_;      ///< molar mass [g/mol]
-    double atomInMolecule_; ///< number of atoms in a molecule
+        // Calculated in constructor
+        double logConstant_;          ///< radiation logarithm constant B
+        double bPrime_;               ///< radiation logarithm constant bPrime
+        double averageNucleonWeight_; ///< average nucleon weight in a nucleus
+                                      ///< [MeV]
+        double wood_saxon_;           ///< Woods-Saxon potential factor
+    };
 
-    // Calculated in constructor
-    double logConstant_; ///< radiation logarithm constant B
-    double bPrime_;      ///< radiation logarithm constant bPrime
-    double averageNucleonWeight_; ///< average nucleon weight in a nucleus [MeV]
-    double wood_saxon_;  ///< Woods-Saxon potential factor
-};
-
-COMPONENT_DEC(Hydrogen, 2.0)
-COMPONENT_DEC(Carbon, 1.0)
-COMPONENT_DEC(Nitrogen, 1.0)
-COMPONENT_DEC(Oxygen, 1.0)
-COMPONENT_DEC(Sodium, 1.0)
-COMPONENT_DEC(Magnesium, 1.0)
-COMPONENT_DEC(Sulfur, 1.0)
-COMPONENT_DEC(Chlorine, 1.0)
-COMPONENT_DEC(Argon, 1.0)
-COMPONENT_DEC(Potassium, 1.0)
-COMPONENT_DEC(Calcium, 1.0)
-COMPONENT_DEC(Iron, 1.0)
-COMPONENT_DEC(Copper, 1.0)
-COMPONENT_DEC(Lead, 1.0)
-COMPONENT_DEC(Uranium, 1.0)
-COMPONENT_DEC(StandardRock, 1.0)
-COMPONENT_DEC(FrejusRock, 1.0)
+    COMPONENT_DEC(Hydrogen, 2.0)
+    COMPONENT_DEC(Carbon, 1.0)
+    COMPONENT_DEC(Nitrogen, 1.0)
+    COMPONENT_DEC(Oxygen, 1.0)
+    COMPONENT_DEC(Sodium, 1.0)
+    COMPONENT_DEC(Magnesium, 1.0)
+    COMPONENT_DEC(Sulfur, 1.0)
+    COMPONENT_DEC(Chlorine, 1.0)
+    COMPONENT_DEC(Argon, 1.0)
+    COMPONENT_DEC(Potassium, 1.0)
+    COMPONENT_DEC(Calcium, 1.0)
+    COMPONENT_DEC(Iron, 1.0)
+    COMPONENT_DEC(Copper, 1.0)
+    COMPONENT_DEC(Lead, 1.0)
+    COMPONENT_DEC(Uranium, 1.0)
+    COMPONENT_DEC(StandardRock, 1.0)
+    COMPONENT_DEC(FrejusRock, 1.0)
 
 } // namespace Components
+
+using component_list = std::vector<Components::Component>;
+
+double calculate_proton_massnumber_fraction(const component_list& comp_list) noexcept;
 
 } // namespace PROPOSAL
 

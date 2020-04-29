@@ -26,30 +26,31 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 
 namespace PROPOSAL {
-
 class Photonuclear;
+} // namespace PROPOSAL
 
-class PhotoIntegral : public CrossSectionIntegral
-{
+namespace PROPOSAL {
+class PhotoIntegral : public CrossSectionIntegral {
 public:
-    PhotoIntegral(const Photonuclear&, std::shared_ptr<const EnergyCutSettings>);
-    PhotoIntegral(const PhotoIntegral&);
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<Photonuclear, typename decay<T>::type>::value>::type>
+    PhotoIntegral(T&&, shared_ptr<const EnergyCutSettings>);
     virtual ~PhotoIntegral();
-
-    CrossSection* clone() const { return new PhotoIntegral(*this); }
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    double CalculatedEdx(double energy);
-    double CalculatedEdxWithoutMultiplier(double energy);
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<Photonuclear, typename decay<T>::type>::value>::type>
+PhotoIntegral::PhotoIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
+    : CrossSectionIntegral(param, cut)
+{
+}
 } // namespace PROPOSAL

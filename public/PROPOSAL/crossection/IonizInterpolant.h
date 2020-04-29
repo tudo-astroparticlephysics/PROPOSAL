@@ -26,39 +26,33 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
 
 namespace PROPOSAL {
-
 class Ionization;
+} // namespace PROPOSAL
 
-class IonizInterpolant : public CrossSectionInterpolant
-{
+namespace PROPOSAL {
+class IonizInterpolant : public CrossSectionInterpolant {
 public:
-    IonizInterpolant(const Ionization&, std::shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    //IonizInterpolant(const IonizInterpolant&);
-    virtual ~IonizInterpolant();
-
-    //CrossSection* clone() const { return new IonizInterpolant(*this); }
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    double CalculatedEdx(double energy);
-    virtual double CalculatedNdx(double energy);
-    virtual double CalculatedNdx(double energy, double rnd);
-
-    // Needed to initialize interpolation
-    double FunctionToBuildDNdxInterpolant(double energy, int component);
-    virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, Integral&, int component);
-
-private:
-    virtual double CalculateStochasticLoss(double energy, double rnd1);
-    virtual void InitdNdxInterpolation(const InterpolationDef& def);
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<Ionization, typename decay<T>::type>::value>::type>
+    IonizInterpolant(
+        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
+    virtual ~IonizInterpolant() = default;
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<Ionization, typename decay<T>::type>::value>::type>
+IonizInterpolant::IonizInterpolant(T&& param,
+    shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& interpol_def)
+    : CrossSectionInterpolant(param, cuts, interpol_def)
+{
+}
 } // namespace PROPOSAL

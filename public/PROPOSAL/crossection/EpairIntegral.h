@@ -26,7 +26,6 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
@@ -35,27 +34,26 @@ namespace PROPOSAL {
 
 class EpairProduction;
 
-class EpairIntegral : public CrossSectionIntegral
-{
+class EpairIntegral : public CrossSectionIntegral {
+    double dedx_integral(double energy) override;
+
 public:
-    EpairIntegral(const EpairProduction&, std::shared_ptr<const EnergyCutSettings>);
-    EpairIntegral(const EpairIntegral&);
-    virtual ~EpairIntegral();
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<EpairProduction, typename decay<T>::type>::value>::type>
+    EpairIntegral(T&&, shared_ptr<const EnergyCutSettings>);
 
-    CrossSection* clone() const { return new EpairIntegral(*this); }
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    double CalculatedEdx(double energy);
-    double CalculatedEdxWithoutMultiplier(double energy);
-
-private:
-    // ----------------------------------------------------------------------------
-    /// @brief calls FunctionToDEdxIntegral from the parametrization
-    // ----------------------------------------------------------------------------
     double FunctionToDEdxIntegralReverse(double energy, double v);
 };
 
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<EpairProduction, typename decay<T>::type>::value>::type>
+EpairIntegral::EpairIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
+    : CrossSectionIntegral(param, cut)
+{
+}
 } // namespace PROPOSAL

@@ -26,114 +26,66 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/EnergyCutSettings.h"
 
 namespace PROPOSAL {
-class Ionization : public Parametrization
-{
-public:
-    Ionization(const ParticleDef&, std::shared_ptr<const Medium>, std::shared_ptr<const EnergyCutSettings>, double multiplier);
-    Ionization(const Ionization&);
-    virtual ~Ionization();
-
-    virtual Parametrization* clone() const = 0;
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-    double Delta(double beta, double gamma);
-    virtual InteractionType GetInteractionType() const final {return InteractionType::Ioniz;}
-    double DifferentialCrossSection(double energy, double v) = 0;
-
+class Ionization : public Parametrization {
 protected:
-    std::shared_ptr<const EnergyCutSettings> cuts_;
-};
+    EnergyCutSettings cuts_;
+    double X0_;
+    double X1_;
+    double D0_;
+    double m_;
+    double C_;
+    double a_;
+    double I_;
+    double ZA_;
 
-// ----------------------------------------------------------------- //
-// Spefific Parametrization
-// ----------------------------------------------------------------- //
+    double Delta(double beta, double gamma);
 
-class IonizBetheBlochRossi : public Ionization
-{
 public:
-    IonizBetheBlochRossi(const ParticleDef&, std::shared_ptr<const Medium>, std::shared_ptr<const EnergyCutSettings>, double multiplier);
-    IonizBetheBlochRossi(const IonizBetheBlochRossi&);
-    ~IonizBetheBlochRossi();
+    Ionization(const ParticleDef&, const Medium&, const EnergyCutSettings&);
 
-    Parametrization* clone() const { return new IonizBetheBlochRossi(*this); }
-    static Ionization* create(const ParticleDef& particle_def,
-                                      std::shared_ptr<const Medium> medium,
-                                      std::shared_ptr<const EnergyCutSettings> cuts,
-                                      double multiplier)
-        {
-            return new IonizBetheBlochRossi(particle_def, medium, cuts, multiplier);
-        }
-
-     KinematicLimits GetKinematicLimits(double energy);
-     double DifferentialCrossSection(double energy, double v);
-     double FunctionToDEdxIntegral(double energy, double v);
-
-     const std::string& GetName() const { return name_; }
-
-private:
-     double InelCorrection(double energy, double v);
-     double CrossSectionWithoutInelasticCorrection(double energy, double v);
-     static const std::string name_;
+    KinematicLimits GetKinematicLimits(double energy) = 0;
+    double DifferentialCrossSection(double energy, double v) = 0;
+    double FunctionToDEdxIntegral(double energy, double v) = 0;
 };
 
-class IonizBergerSeltzerBhabha : public Ionization
-{
+class IonizBetheBlochRossi : public Ionization {
+    double InelCorrection(double energy, double v);
+    double CrossSectionWithoutInelasticCorrection(double energy, double v);
+
 public:
-    IonizBergerSeltzerBhabha(const ParticleDef&, std::shared_ptr<const Medium>, std::shared_ptr<const EnergyCutSettings>, double multiplier);
-    IonizBergerSeltzerBhabha(const IonizBergerSeltzerBhabha&);
-    ~IonizBergerSeltzerBhabha();
+    IonizBetheBlochRossi(
+        const ParticleDef&, const Medium&, const EnergyCutSettings&);
 
-    Parametrization* clone() const { return new IonizBergerSeltzerBhabha(*this); }
-    static Ionization* create(const ParticleDef& particle_def,
-                                    std::shared_ptr<const Medium> medium,
-                                    std::shared_ptr<const EnergyCutSettings> cuts,
-                                    double multiplier)
-        {
-            return new IonizBergerSeltzerBhabha(particle_def, medium, cuts, multiplier);
-        }
-
-    KinematicLimits GetKinematicLimits(double energy);
-    double DifferentialCrossSection(double energy, double v);
-    double FunctionToDEdxIntegral(double energy, double v);
-
-    const std::string& GetName() const { return name_; }
-
-private:
-    static const std::string name_;
+    KinematicLimits GetKinematicLimits(double energy) override;
+    double DifferentialCrossSection(double energy, double v) override;
+    double FunctionToDEdxIntegral(double energy, double v) override;
 };
 
-class IonizBergerSeltzerMoller : public Ionization
-    {
-    public:
-    IonizBergerSeltzerMoller(const ParticleDef&, std::shared_ptr<const Medium>, std::shared_ptr<const EnergyCutSettings>, double multiplier);
-    IonizBergerSeltzerMoller(const IonizBergerSeltzerMoller&);
-    ~IonizBergerSeltzerMoller();
+class IonizBergerSeltzerBhabha : public Ionization {
+public:
+    IonizBergerSeltzerBhabha(
+        const ParticleDef&, const Medium&, const EnergyCutSettings&);
 
-    Parametrization* clone() const { return new IonizBergerSeltzerMoller(*this); }
-        static Ionization* create(const ParticleDef& particle_def,
-                                  std::shared_ptr<const Medium> medium,
-                                  std::shared_ptr<const EnergyCutSettings> cuts,
-                                  double multiplier)
-        {
-            return new IonizBergerSeltzerMoller(particle_def, medium, cuts, multiplier);
-        }
+    KinematicLimits GetKinematicLimits(double energy) override;
+    double DifferentialCrossSection(double energy, double v) override;
+    double FunctionToDEdxIntegral(double energy, double v) override;
+};
 
-        KinematicLimits GetKinematicLimits(double energy);
-        double DifferentialCrossSection(double energy, double v);
-        double FunctionToDEdxIntegral(double energy, double v);
+class IonizBergerSeltzerMoller : public Ionization {
+public:
+    IonizBergerSeltzerMoller(
+        const ParticleDef&, const Medium&, const EnergyCutSettings&);
 
-        const std::string& GetName() const { return name_; }
-
-    private:
-        static const std::string name_;
-    };
+    KinematicLimits GetKinematicLimits(double energy) override;
+    double DifferentialCrossSection(double energy, double v) override;
+    double FunctionToDEdxIntegral(double energy, double v) override;
+};
 
 } // namespace PROPOSAL

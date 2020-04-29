@@ -139,12 +139,13 @@ class Medium {
 
     double sumCharge_;  ///< sum of charges of all nuclei
 
-    double ZA_;                ///< <Z/A>
-    double I_;                 ///< ionization potential [eV]
-    double C_, a_;             ///< ionization formula constants
-    double m_, X0_, X1_, d0_;  ///< ionization formula constants (continued)
+    double ZA_;                // <Z/A>
+    double I_;                 // mean excitation energy [eV]
+    double C_, a_;             //< ionization formula constants
+    double m_, X0_, X1_;       //< ionization formula constants (continued)
+    double d0_;                // sternheimer et al density effect parameters
 
-    double massDensity_;      ///< mass density [g/cm3]
+    double massDensity_;      ///< mass density (20° C, 1 atm) [g/cm3]
     double molDensity_;       ///< molecule density [number/cm3]
     double radiationLength_;  ///< radiation length [cm]
 

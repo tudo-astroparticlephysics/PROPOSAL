@@ -26,36 +26,32 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 namespace PROPOSAL {
-
 class MupairProduction;
+} // namespace PROPOSAL
 
-class MupairIntegral : public CrossSectionIntegral
-{
+namespace PROPOSAL {
+class MupairIntegral : public CrossSectionIntegral {
 public:
-    MupairIntegral(const MupairProduction&, std::shared_ptr<const EnergyCutSettings>);
-    MupairIntegral(const MupairIntegral&);
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<MupairProduction, typename decay<T>::type>::value>::type>
+    MupairIntegral(T&&, shared_ptr<const EnergyCutSettings>);
     virtual ~MupairIntegral();
-
-    CrossSection* clone() const { return new MupairIntegral(*this); }
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    double CalculatedEdx(double energy);
-    double CalculatedEdxWithoutMultiplier(double energy);
-    std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction);
-
-private:
-    ParticleDef const* muminus_def_;
-    ParticleDef const* muplus_def_;
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<MupairProduction, typename decay<T>::type>::value>::type>
+MupairIntegral::MupairIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
+    : CrossSectionIntegral(param, cut)
+{
+}
 } // namespace PROPOSAL

@@ -1,7 +1,6 @@
 
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/math/MathMethods.h"
-#include <PROPOSAL/crossection/factories/PhotoPairFactory.h>
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
@@ -103,8 +102,9 @@ std::shared_ptr<CrossSection> Utility::TypeInteraction(
 double Utility::EnergyStochasticloss(
     CrossSection& crosssection, double energy, const std::array<double, 2>& rnd)
 {
-    auto aux = crosssection.CalculateStochasticLoss(energy, rnd[0], rnd[1]);
-    return aux;
+    throw std::logic_error("Not implemented jet!");
+    /* auto aux = crosssection.CalculateStochasticLoss(energy, rnd[0], rnd[1]); */
+    /* return aux; */
 }
 
 double Utility::EnergyDecay(double energy, double rnd)
@@ -141,7 +141,8 @@ tuple<Vector3D, Vector3D> Utility::DirectionsScatter(double displacement,
 
 std::pair<double, double> DirectionDeflect(CrossSection& crosssection, double particle_energy, double loss_energy)
 {
-    return crosssection.StochasticDeflection(particle_energy, loss_energy);
+    throw std::logic_error("Not implemented jet!");
+    /* return crosssection.StochasticDeflection(particle_energy, loss_energy); */
 }
 
 double Utility::LengthContinuous(

@@ -26,39 +26,39 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
+#include "PROPOSAL/crossection/parametrization/Compton.h"
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 
+using std::shared_ptr;
+
 namespace PROPOSAL {
+class Compton;
+} // namespace PROPOSAL
 
-    class Compton;
+namespace PROPOSAL {
+class ComptonIntegral : public CrossSectionIntegral {
+    double log_substitution(double) const;
 
-    class ComptonIntegral : public CrossSectionIntegral
-    {
-    public:
-        ComptonIntegral(const Compton&, std::shared_ptr<const EnergyCutSettings>);
-        ComptonIntegral(const ComptonIntegral&);
-        virtual ~ComptonIntegral();
+    double dndx_integral(double energy, double rnd) override;
+    double dedx_integral(double energy) override;
+    double de2dx_integral(double energy) override;
 
-        CrossSection* clone() const { return new ComptonIntegral(*this); }
+public:
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<Compton, typename decay<T>::type>::value>::type>
+    ComptonIntegral(T&&, shared_ptr<const EnergyCutSettings>);
+};
+} // namespace PROPOSAL
 
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
-
-        double CalculatedEdx(double energy);
-        double CalculatedEdxWithoutMultiplier(double energy);
-        virtual double CalculatedE2dxWithoutMultiplier(double energy);
-        virtual double CalculatedNdx(double energy);
-        virtual double CalculatedNdx(double energy, double rnd);
-
-        double CalculateCumulativeCrossSection(double energy, int i, double v);
-        virtual std::pair<double, double> StochasticDeflection(double energy, double energy_loss);
-    private:
-        double CalculateStochasticLoss(double energy, double rnd1);
-
-    };
-
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<Compton, typename decay<T>::type>::value>::type>
+ComptonIntegral::ComptonIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
+    : CrossSectionIntegral(param, cut)
+{
+}
 } // namespace PROPOSAL

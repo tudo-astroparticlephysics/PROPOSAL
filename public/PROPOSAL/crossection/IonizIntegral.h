@@ -26,37 +26,33 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 
 namespace PROPOSAL {
-
 class Ionization;
+} // namespace PROPOSAL
 
-class IonizIntegral : public CrossSectionIntegral
-{
+namespace PROPOSAL {
+class IonizIntegral : public CrossSectionIntegral {
+    double dedx_integral(double energy);
+
 public:
-    IonizIntegral(const Ionization&, std::shared_ptr<const EnergyCutSettings>);
-    IonizIntegral(const IonizIntegral&);
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<Ionization, typename decay<T>::type>::value>::type>
+    IonizIntegral(T&&, shared_ptr<const EnergyCutSettings>);
     virtual ~IonizIntegral();
-
-    CrossSection* clone() const { return new IonizIntegral(*this); }
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    double CalculatedEdx(double energy);
-    double CalculatedEdxWithoutMultiplier(double energy);
-    double CalculatedE2dx(double energy);
-    double CalculatedE2dxWithoutMultiplier(double energy);
-    double CalculatedNdx(double energy);
-    double CalculatedNdx(double energy, double rnd);
-
-private:
-    virtual double CalculateStochasticLoss(double energy, double rnd1);
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<Ionization, typename decay<T>::type>::value>::type>
+IonizIntegral::IonizIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
+    : CrossSectionIntegral(param, cut)
+{
+}
 } // namespace PROPOSAL

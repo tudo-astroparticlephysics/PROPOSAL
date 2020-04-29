@@ -26,45 +26,34 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 
 namespace PROPOSAL {
+class PhotoPairProduction;
+} // namespace PROPOSAL
+namespace PROPOSAL {
+class PhotoPairIntegral : public CrossSectionIntegral {
+public:
+    template <typename T,
+        typename = typename enable_if<is_base_of<PhotoPairProduction,
+            typename decay<T>::type>::value>::type>
+    PhotoPairIntegral(T&&, shared_ptr<const EnergyCutSettings>);
+    virtual ~PhotoPairIntegral() = default;
 
-    class PhotoPairProduction;
-    class PhotoAngleDistribution;
+    double CalculatedEdx(double energy) override;
+    double CalculatedE2dx(double energy) override;
+};
+} // namespace PROPOSAL
 
-    class PhotoPairIntegral : public CrossSectionIntegral
-    {
-    public:
-        PhotoPairIntegral(const PhotoPairProduction&, const PhotoAngleDistribution&);
-        PhotoPairIntegral(const PhotoPairIntegral&);
-        virtual ~PhotoPairIntegral();
-
-        CrossSection* clone() const { return new PhotoPairIntegral(*this); }
-
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
-
-        //these methods return zero because the weak interaction contribution is stochastic only
-        double CalculatedEdx(double energy){ (void)energy; return 0; }
-        double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }
-        double CalculatedE2dx(double energy){ (void)energy; return 0; }
-        std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D&);
-        double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
-
-        PhotoAngleDistribution& GetPhotoAngleDistribution() const { return *photoangle_; }
-    protected:
-        virtual bool compare(const CrossSection&) const;
-        PhotoAngleDistribution* photoangle_;
-    private:
-        double rndc_;
-        ParticleDef const* eminus_def_;
-        ParticleDef const* eplus_def_;
-    };
-
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<PhotoPairProduction, typename decay<T>::type>::value>::type>
+PhotoPairIntegral::PhotoPairIntegral(
+    T&& param, shared_ptr<const EnergyCutSettings> cut)
+    : CrossSectionIntegral(param, cut)
+{
+}
 } // namespace PROPOSAL

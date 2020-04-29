@@ -28,122 +28,46 @@
 
 #pragma once
 
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/json.hpp"
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/particle/ParticleDef.h"
-#include <functional>
+#include "PROPOSAL/medium/Components.h"
+
+using std::string;
 
 namespace PROPOSAL {
-
-namespace Components {
-    class Component;
-}
+class ParticleDef;
 
 class Parametrization {
+protected:
+    const string param_name_;
+    const double particle_mass_;
+    const double particle_charge_;
+    const component_list components_;
+    Components::Component current_component_;
+    const double lower_energy_lim_;
+
 public:
-    Parametrization(const ParticleDef&, std::shared_ptr<const Medium>, double lower_energy_lim, double multiplier);
-    Parametrization(const Parametrization&);
-    virtual ~Parametrization();
+    Parametrization(const string&, const ParticleDef&, const component_list&, double);
+    virtual ~Parametrization() = default;
 
-    bool operator==(const Parametrization& parametrization) const;
-    bool operator!=(const Parametrization& parametrization) const;
-
-    virtual Parametrization* clone() const {};
-
-    friend std::ostream& operator<<(std::ostream&, Parametrization const&);
-
-    // bounds of integration
     struct KinematicLimits {
-        double vMin; //!< lower physical, kinematic limit
-        double vMax; //!< upper physical, kinematic limit
+        double vMin;
+        double vMax;
+
+        KinematicLimits(double, double);
     };
 
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    virtual double DifferentialCrossSection(double energy, double v) = 0;
-
-    double FunctionToDNdxIntegral(double energy, double v);
-    virtual double FunctionToDEdxIntegral(double energy, double v);
-    double FunctionToDE2dxIntegral(double energy, double v);
-
-    virtual double Calculaterho(
-        double energy, double v, double rnd1, double rnd2)
-    {
-        (void)energy;
-        (void)v;
-        (void)rnd1;
-        (void)rnd2;
-        return 0;
-    }
+    virtual double DifferentialCrossSection(double, double) = 0;
+    virtual double FunctionToDNdxIntegral(double, double);
+    virtual double FunctionToDEdxIntegral(double, double);
+    virtual double FunctionToDE2dxIntegral(double, double);
 
     virtual KinematicLimits GetKinematicLimits(double energy) = 0;
-
-    // ----------------------------------------------------------------- //
-    // Getter
-    // ----------------------------------------------------------------- //
-
-    virtual const std::string& GetName() const = 0; //{ return name_; }
-    std::shared_ptr<const Medium> GetMedium() const { return medium_; }
-    double GetParticleMass() const { return particle_mass_; }
-    double GetParticleCharge() const { return particle_charge_; }
-    double GetParticleLifetime() const { return particle_lifetime_; }
     double GetLowerEnergyLim() const { return lower_energy_lim_; }
-    virtual InteractionType GetInteractionType() const = 0;
-    double GetMultiplier() const { return multiplier_; }
-    double GetCurrentComponent() {return component_index_;}
+    string GetName() const { return param_name_; }
+    component_list GetComponents() const { return components_; }
     virtual size_t GetHash() const;
 
-    // ----------------------------------------------------------------- //
-    // Setter
-    // ----------------------------------------------------------------- //
-
-    // void SetCurrentComponent(Components::Component* component)
-    // {current_component_ = component;}
-    void SetCurrentComponent(int index) { component_index_ = index; }
-
-protected:
-    virtual bool compare(const Parametrization&) const;
-    virtual void print(std::ostream&) const {};
-
-    // const std::string name_;
-
-    double particle_mass_;
-    double particle_charge_;
-    double particle_lifetime_;
-
-    double lower_energy_lim_;
-
-    std::shared_ptr<const Medium> medium_;
-    const std::vector<Components::Component>& components_;
-    int component_index_;
-
-    double multiplier_;
+    void SetCurrentComponent(Components::Component&);
 };
 
-class Parametrization_builder : public Parametrization {
-    std::function<double(const Parametrization&, double, double)> diff_cross;
-    std::function<KinematicLimits(const Parametrization&, double)> kinematic_limits;
-    const std::string name_ = "parametrization_builder";
-
-public:
-    Parametrization_builder(const ParticleDef& p_def,
-        std::shared_ptr<const Medium> medium, double multiplier)
-        : Parametrization(p_def, medium, p_def.mass, multiplier)
-        , diff_cross(nullptr)
-        , kinematic_limits(nullptr){};
-
-    double DifferentialCrossSection(double energy, double v) override;
-    KinematicLimits GetKinematicLimits(double energy) override;
-    const std::string& GetName() const override { return name_; }
-    virtual InteractionType GetInteractionType() const override {return static_cast<InteractionType>(0);}
-};
-
-std::ostream& operator<<(std::ostream&, PROPOSAL::Parametrization const&);
-
-size_t GetHash(const std::vector<Parametrization*>& params);
 
 } // namespace PROPOSAL

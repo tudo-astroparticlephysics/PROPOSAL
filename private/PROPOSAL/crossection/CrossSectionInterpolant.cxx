@@ -1,334 +1,123 @@
 
-#include <functional>
 #include <cmath>
+#include <functional>
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/medium/Medium.h"
 
-#include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/math/Interpolant.h"
-
-#include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Logging.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
-
 using namespace PROPOSAL;
+using std::bind;
+using std::placeholders::_1;
+using std::placeholders::_2;
 
-// ------------------------------------------------------------------------- //
-// Constructor & Destructor
-// ------------------------------------------------------------------------- //
-
-CrossSectionInterpolant::CrossSectionInterpolant(const Parametrization& param, std::shared_ptr<const EnergyCutSettings> cuts)
-    : CrossSection(param, cuts)
-    , dedx_interpolant_(nullptr)
-    , de2dx_interpolant_(nullptr)
-    , dndx_interpolant_1d_(param.GetMedium()->GetNumComponents())
-    , dndx_interpolant_2d_(param.GetMedium()->GetNumComponents())
+double CrossSectionInterpolant::logarithm_trafo(
+    double v, double v_cut, double v_max) const
 {
+    return v_cut * std::exp(v * std::log(v_max / v_cut));
 }
 
-bool CrossSectionInterpolant::compare(const CrossSection& cross_section) const
+unique_ptr<Interpolant> CrossSectionInterpolant::init_dedx_interpolation(
+    const InterpolationDef& def)
 {
-    const CrossSectionInterpolant* cross_section_interpolant =
-        static_cast<const CrossSectionInterpolant*>(&cross_section);
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d
+        = bind(&CrossSectionIntegral::CalculatedEdx, this, _1);
+    interpol_def.max = def.nodes_cross_section;
+    interpol_def.xmin = parametrization_->GetLowerEnergyLim();
+    interpol_def.xmax = def.max_node_energy;
+    interpol_def.romberg = def.order_of_interpolation;
+    interpol_def.rational = true;
+    interpol_def.isLog = true;
+    interpol_def.rombergY = def.order_of_interpolation;
+    interpol_def.logSubst = true;
 
-    if (*dedx_interpolant_ != *cross_section_interpolant->dedx_interpolant_)
-        return false;
-    else if (*de2dx_interpolant_ != *cross_section_interpolant->de2dx_interpolant_)
-        return false;
-    else if (dndx_interpolant_1d_.size() != cross_section_interpolant->dndx_interpolant_1d_.size())
-        return false;
-    else if (dndx_interpolant_2d_.size() != cross_section_interpolant->dndx_interpolant_2d_.size())
-        return false;
+    Interpolant1DBuilder builder(interpol_def);
+    auto hash = parametrization_->GetHash();
 
-    for (unsigned int i = 0; i < dndx_interpolant_1d_.size(); ++i)
-    {
-        if (*dndx_interpolant_1d_[i] != *cross_section_interpolant->dndx_interpolant_1d_[i])
-            return false;
-    }
-    for (unsigned int i = 0; i < dndx_interpolant_2d_.size(); ++i)
-    {
-        if (*dndx_interpolant_2d_[i] != *cross_section_interpolant->dndx_interpolant_2d_[i])
-            return false;
-    }
-
-    return true;
+    return Helper::InitializeInterpolation("dEdx", builder, hash, def);
 }
 
-// ------------------------------------------------------------------------- //
-void CrossSectionInterpolant::InitdNdxInterpolation(const InterpolationDef& def)
+unique_ptr<Interpolant> CrossSectionInterpolant::init_de2dx_interpolation(
+    const InterpolationDef& def)
 {
-    // --------------------------------------------------------------------- //
-    // Builder for dNdx
-    // --------------------------------------------------------------------- //
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d
+        = bind(&CrossSectionIntegral::CalculatedE2dx, this, _1);
+    interpol_def.max = def.nodes_continous_randomization;
+    interpol_def.xmin = parametrization_->GetLowerEnergyLim();
+    interpol_def.xmax = def.max_node_energy;
+    interpol_def.romberg = def.order_of_interpolation;
+    interpol_def.isLog = true;
+    interpol_def.rombergY = def.order_of_interpolation;
 
-    std::vector<Interpolant1DBuilder> builder1d(components_.size());
-    std::vector<Interpolant2DBuilder> builder2d(components_.size());
+    Interpolant1DBuilder builder(interpol_def);
+    auto hash = parametrization_->GetHash();
 
-    Helper::InterpolantBuilderContainer builder_container1d(components_.size());
-    Helper::InterpolantBuilderContainer builder_container2d(components_.size());
-
-    Integral integral(IROMB, IMAXS, IPREC);
-
-    for (unsigned int i = 0; i < components_.size(); ++i)
-    {
-        // !!! IMPORTANT !!!
-        // Order of builder matter because the functions needed for 1d interpolation
-        // needs the already intitialized 2d interpolants.
-        builder2d[i]
-            .SetMax1(def.nodes_cross_section)
-            .SetX1Min(parametrization_->GetParticleMass())
-            .SetX1Max(def.max_node_energy)
-            .SetMax2(def.nodes_cross_section)
-            .SetX2Min(0.0)
-            .SetX2Max(1.0)
-            .SetRomberg1(def.order_of_interpolation)
-            .SetRational1(false)
-            .SetRelative1(false)
-            .SetIsLog1(true)
-            .SetRomberg2(def.order_of_interpolation)
-            .SetRational2(false)
-            .SetRelative2(false)
-            .SetIsLog2(false)
-            .SetRombergY(def.order_of_interpolation)
-            .SetRationalY(true)
-            .SetRelativeY(false)
-            .SetLogSubst(false)
-            .SetFunction2D(std::bind(
-                &CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                std::ref(integral),
-                i));
-
-        builder_container2d[i] = &builder2d[i];
-
-        builder1d[i]
-            .SetMax(def.nodes_cross_section)
-            .SetXMin(parametrization_->GetParticleMass())
-            .SetXMax(def.max_node_energy)
-            .SetRomberg(def.order_of_interpolation)
-            .SetRational(false)
-            .SetRelative(false)
-            .SetIsLog(true)
-            .SetRombergY(def.order_of_interpolation)
-            .SetRationalY(true)
-            .SetRelativeY(false)
-            .SetLogSubst(false)
-            .SetFunction1D(std::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, std::placeholders::_1, i));
-
-        builder_container1d[i]  = &builder1d[i];
-    }
-
-    dndx_interpolant_2d_ = Helper::InitializeInterpolation("dNdx", builder_container2d, parametrization_->GetHash(), def);
-    dndx_interpolant_1d_ = Helper::InitializeInterpolation("dNdx", builder_container1d, parametrization_->GetHash(), def);
-
+    return Helper::InitializeInterpolation("dE2dx", builder, hash, def);
 }
-/*
-CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& cross_section)
-    : CrossSection(cross_section)
+
+vector<unique_ptr<Interpolant>>
+CrossSectionInterpolant::init_dndx_interpolation(const InterpolationDef& def)
 {
-    if (cross_section.dedx_interpolant_ != NULL)
-    {
-        dedx_interpolant_.reset(new Interpolant(*cross_section.dedx_interpolant_));
-    }
-    else{
-        dedx_interpolant_ = NULL;
+    Interpolant2DBuilder::Definition interpol_def;
+    interpol_def.max1 = def.nodes_cross_section;
+    interpol_def.x1min = parametrization_->GetLowerEnergyLim();
+    interpol_def.x1max = def.max_node_energy;
+    interpol_def.max2 = def.nodes_cross_section;
+    interpol_def.x2min = 0.0;
+    interpol_def.x2max = 1.0;
+    interpol_def.romberg1 = def.order_of_interpolation;
+    interpol_def.isLog1 = true;
+    interpol_def.romberg2 = def.order_of_interpolation;
+    interpol_def.rombergY = def.order_of_interpolation;
+    interpol_def.rationalY = true;
+
+    vector<unique_ptr<InterpolantBuilder>> builder;
+    for (const auto& dndx : dndx_integral_) {
+        interpol_def.function2d = dndx;
+        builder.emplace_back(new Interpolant2DBuilder(interpol_def));
     }
 
-    if (cross_section.de2dx_interpolant_ != NULL)
-    {
-        de2dx_interpolant_.reset(new Interpolant(*cross_section.de2dx_interpolant_));
-    }
-    else{
-        de2dx_interpolant_ = NULL;
-    }
-
-    int num_components = cross_section.parametrization_->GetMedium()->GetNumComponents();
-
-    dndx_interpolant_1d_.reserve(num_components);
-    for (auto& interpolant: cross_section.dndx_interpolant_1d_)
-    {
-        if (interpolant != nullptr)
-        {
-            dndx_interpolant_1d_.push_back(std::move(interpolant));
-        }
-    }
-
-    dndx_interpolant_2d_.reserve(num_components);
-    for (auto& interpolant: cross_section.dndx_interpolant_2d_)
-    {
-        if (interpolant != nullptr)
-        {
-            dndx_interpolant_2d_.push_back(std::move(interpolant));
-        }
-    }
+    return Helper::InitializeInterpolation(
+        "dNdx", builder, parametrization_->GetHash(), def);
 }
-*/
-// ------------------------------------------------------------------------- //
-// Pulblic methods
-// ------------------------------------------------------------------------- //
 
-// ------------------------------------------------------------------------- //
+double CrossSectionInterpolant::CalculatedEdx(double energy)
+{
+    return dedx_interpolant_->Interpolate(energy);
+}
+
 double CrossSectionInterpolant::CalculatedE2dx(double energy)
 {
-    return parametrization_->GetMultiplier() * std::max(de2dx_interpolant_->Interpolate(energy), 0.0);
+    return de2dx_interpolant_->Interpolate(energy);
 }
 
-// ------------------------------------------------------------------------- //
-double CrossSectionInterpolant::CalculatedNdx(double energy)
-{
-    if (parametrization_->GetMultiplier() <= 0)
-    {
-        return 0;
-    }
-
-    sum_of_rates_ = 0;
-
-    const auto& components = parametrization_->GetMedium()->GetComponents();
-    for (size_t i = 0; i < components.size(); ++i)
-    {
-        prob_for_component_[i] = std::max(dndx_interpolant_1d_[i]->Interpolate(energy), 0.);
-        sum_of_rates_ += prob_for_component_[i];
-    }
-    return parametrization_->GetMultiplier() * sum_of_rates_;
-}
-
-// ------------------------------------------------------------------------- //
 double CrossSectionInterpolant::CalculatedNdx(double energy, double rnd)
 {
-    if (parametrization_->GetMultiplier() <= 0)
-    {
-        return 0;
+    vector<double> rates;
+    for (auto& interpol : dndx_interpolants_)
+        rates.emplace_back(interpol->Interpolate(energy, 1.));
+
+    auto total_rate = accumulate(rates.begin(), rates.end(), 0.);
+
+    size_t nth_component = 0;
+    for (const auto& rate : rates) {
+        total_rate -= rate / rnd;
+        if (total_rate < 0)
+            return dndx_interpolants_.at(nth_component)
+                ->Interpolate(energy, total_rate);
+        nth_component += 1;
     }
 
-    // The random number will be stored to be able
-    // to check if dNdx is already calculated for this random number.
-    // This avoids a second calculation in CalculateStochaticLoss
-    rnd_ = rnd;
-
-    sum_of_rates_ = 0;
-
-    const auto& components = parametrization_->GetMedium()->GetComponents();
-    for (size_t i = 0; i < components.size(); ++i)
-    {
-        prob_for_component_[i] = std::max(dndx_interpolant_1d_[i]->Interpolate(energy), 0.);
-        sum_of_rates_ += prob_for_component_[i];
-    }
-
-    return parametrization_->GetMultiplier() * sum_of_rates_;
+    return total_rate;
 }
 
-// ------------------------------------------------------------------------- //
-double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rnd1, double rnd2)
+size_t CrossSectionInterpolant::GetHash() const
 {
-    if (rnd1 != rnd_)
-    {
-        CalculatedNdx(energy, rnd1);
-    }
+    size_t hash_digest = 0;
+    hash_combine(hash_digest, hash_interpol_def, CrossSection::GetHash());
 
-    return CalculateStochasticLoss(energy, rnd2);
-}
-
-// ------------------------------------------------------------------------- //
-// Private methods
-// ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
-double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rnd1)
-{
-
-    double rnd;
-    double rsum;
-    double vUp;
-
-    rnd  = rnd1 * sum_of_rates_;
-    rsum = 0;
-
-    for (size_t i = 0; i < components_.size(); ++i)
-    {
-        rsum += prob_for_component_[i];
-
-        if (rsum > rnd)
-        {
-            parametrization_->SetCurrentComponent(i);
-            Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
-
-            vUp = GetEnergyCut(energy);
-
-            if (vUp == limits.vMax)
-            {
-                return energy * vUp;
-            }
-
-            return energy *
-                   (vUp * std::exp(dndx_interpolant_2d_.at(i)->FindLimit(energy, rnd_ * prob_for_component_[i]) *
-                                     std::log(limits.vMax / vUp)));
-        }
-    }
-
-    // sometime everything is fine, just the probability for interaction is zero
-    bool prob_for_all_comp_is_zero = true;
-    for (size_t i = 0; i < components_.size(); ++i)
-    {
-        parametrization_->SetCurrentComponent(i);
-        Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
-
-        vUp = GetEnergyCut(energy);
-
-        if (vUp != limits.vMax)
-            prob_for_all_comp_is_zero = false;
-    }
-
-    if (prob_for_all_comp_is_zero)
-        return 0;
-
-    log_fatal("sum was not initialized correctly");
-    return 0; // just to prevent warnings
-}
-
-// ------------------------------------------------------------------------- //
-// Function needed for interpolation intitialization
-// ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
-double CrossSectionInterpolant::FunctionToBuildDNdxInterpolant(double energy, int component)
-{
-    return dndx_interpolant_2d_[component]->Interpolate(energy, 1.);
-}
-
-double CrossSectionInterpolant::CalculateCumulativeCrossSection(double energy, int component, double v)
-{
-    parametrization_->SetCurrentComponent(component);
-    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
-
-    double vUp = GetEnergyCut(energy);
-
-    v = std::log(v / vUp) / std::log(limits.vMax / vUp);
-
-    return dndx_interpolant_2d_.at(component)->Interpolate(energy, v);
-}
-
-//----------------------------------------------------------------------------//
-double CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D(double energy,
-                                                                 double v,
-                                                                 Integral& integral,
-                                                                 int component)
-{
-    parametrization_->SetCurrentComponent(component);
-    Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
-
-    double vUp = GetEnergyCut(energy);
-
-    if (vUp == limits.vMax)
-    {
-        return 0;
-    }
-
-    v = vUp * std::exp(v * std::log(limits.vMax / vUp));
-
-    return integral.Integrate(
-        vUp, v, std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1), 4);
+    return hash_digest;
 }

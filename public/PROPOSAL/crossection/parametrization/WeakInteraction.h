@@ -26,84 +26,31 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include <functional>
-#include <cmath>
-#include <fstream>
-
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
-#include "PROPOSAL/medium/Medium.h"
 
-#include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
-
-#include "PROPOSAL/methods.h"
-
+#include <memory>
+#include <vector>
 
 namespace PROPOSAL {
 
-    class Interpolant;
+class Interpolant;
 
-    class WeakInteraction : public Parametrization
-    {
-    public:
-        WeakInteraction(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
-        WeakInteraction(const WeakInteraction&);
-        virtual ~WeakInteraction();
-
-        virtual Parametrization* clone() const = 0;
-
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
-        virtual InteractionType GetInteractionType() const final {return InteractionType::WeakInt;}
-        virtual double DifferentialCrossSection(double energy, double v) = 0;
-
-        virtual KinematicLimits GetKinematicLimits(double energy);
-
-        virtual size_t GetHash() const;
-
-        int GetWeakPartner() const {return weak_partner_;}
-
-    protected:
-        bool compare(const Parametrization&) const;
-
-        int weak_partner_;
-
-    };
-
-
-class WeakCooperSarkarMertsch : public WeakInteraction
-{
+class WeakInteraction : public Parametrization {
 public:
-        typedef std::vector<Interpolant*> InterpolantVec;
+    WeakInteraction(const ParticleDef&, const component_list&);
 
-        WeakCooperSarkarMertsch(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
-        WeakCooperSarkarMertsch(const WeakCooperSarkarMertsch&);
-        virtual ~WeakCooperSarkarMertsch();
+    virtual double DifferentialCrossSection(double energy, double v) = 0;
+    KinematicLimits GetKinematicLimits(double energy);
+};
 
-        virtual Parametrization* clone() const { return new WeakCooperSarkarMertsch(*this); }
-        static WeakInteraction* create(const ParticleDef& particle_def,
-                                       std::shared_ptr<const Medium> medium,
-                                       double multiplier)
-        {
-            return new WeakCooperSarkarMertsch(particle_def, medium, multiplier);
-        }
+class WeakCooperSarkarMertsch : public WeakInteraction {
+    std::vector<std::unique_ptr<Interpolant>> interpolant_;
 
-        virtual double DifferentialCrossSection(double energy, double v);
-
-        const std::string& GetName() const { return name_; }
-
-    protected:
-        static const std::string name_;
-
-        virtual bool compare(const Parametrization&) const;
-
-        InterpolantVec interpolant_;
-
-    };
+public:
+    WeakCooperSarkarMertsch(const ParticleDef&, const component_list&);
+    double DifferentialCrossSection(double energy, double v) override;
+};
 
 } // namespace PROPOSAL

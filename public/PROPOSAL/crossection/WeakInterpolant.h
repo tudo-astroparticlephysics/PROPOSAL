@@ -26,35 +26,34 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
 
 namespace PROPOSAL {
+class WeakInteraction;
+} // namespace PROPOSAL
 
-    class WeakInteraction;
+namespace PROPOSAL {
+class WeakInterpolant : public CrossSectionInterpolant {
+public:
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<WeakInteraction, typename decay<T>::type>::value>::type>
+    WeakInterpolant(T&&, const InterpolationDef&);
+    virtual ~WeakInterpolant();
 
-    class WeakInterpolant : public CrossSectionInterpolant
-    {
-    public:
-        WeakInterpolant(const WeakInteraction&, const InterpolationDef&);
-        //WeakInterpolant(const WeakInterpolant&);
-        virtual ~WeakInterpolant();
+    double CalculatedEdx(double energy) override;
+    double CalculatedE2dx(double energy) override;
+};
+} // namespace PROPOSAL
 
-        //CrossSection* clone() const { return new WeakInterpolant(*this); }
-
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
-
-        //these methods return zero because the weak interaction contribution is stochastic only
-        double CalculatedEdx(double energy){ (void)energy; return 0; }
-        double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }
-        double CalculatedE2dx(double energy){ (void)energy; return 0; }
-        std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles(double energy, double energy_loss, const Vector3D& initial_direction);
-    protected:
-        virtual bool compare(const CrossSection&) const;
-    };
-
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<WeakInteraction, typename decay<T>::type>::value>::type>
+WeakInterpolant::WeakInterpolant(T&& param, const InterpolationDef& def)
+    : CrossSectionInterpolant(param, nullptr)
+{
+}
 } // namespace PROPOSAL

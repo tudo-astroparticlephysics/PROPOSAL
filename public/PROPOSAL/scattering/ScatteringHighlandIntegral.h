@@ -35,6 +35,8 @@
 
 namespace PROPOSAL {
 
+extern Interpolant1DBuilder::Definition interpol_def;
+
 template <class T>
 class ScatteringHighlandIntegral : public ScatteringHighland {
 public:
@@ -65,8 +67,6 @@ public:
 
         return displacement->FunctionToIntegral(energy) * aux * aux;
     }
-
-    static Interpolant1DBuilder::Definition interpol_def;
 
 private:
     ScatteringHighlandIntegral& operator=(const ScatteringHighlandIntegral&)
@@ -100,9 +100,4 @@ private:
     T integral;
     std::unique_ptr<Displacement> displacement;
 };
-
-template <class T>
-Interpolant1DBuilder::Definition ScatteringHighlandIntegral<T>::interpol_def(
-    nullptr, 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
-
 } // namespace PROPOSAL

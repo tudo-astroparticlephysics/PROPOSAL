@@ -26,50 +26,33 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
 
 namespace PROPOSAL {
-
 class Photonuclear;
+} // namespace PROPOSAL
 
-class PhotoInterpolant : public CrossSectionInterpolant
-{
+namespace PROPOSAL {
+class PhotoInterpolant : public CrossSectionInterpolant {
 public:
-    PhotoInterpolant(const Photonuclear&, std::shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    //PhotoInterpolant(const PhotoInterpolant&);
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<Photonuclear, typename decay<T>::type>::value>::type>
+    PhotoInterpolant(
+        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
     virtual ~PhotoInterpolant();
-
-    //CrossSection* clone() const { return new PhotoInterpolant(*this); }
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    double CalculatedEdx(double energy);
-    double FunctionToBuildDNdxInterpolant2D(double energy, double v, Integral&, int component) override;
-
-protected:
-    virtual bool compare(const CrossSection&) const;
-
-private:
-    std::function<double(double, double)> functiondNdxIntegral;
-    std::unordered_map<std::string, bool> interpolateDifferentialCrossSection = {
-            {"PhotoAbramowiczLevinLevyMaor91",true},
-            {"PhotoAbramowiczLevinLevyMaor97",true},
-            {"PhotoButkevichMikhailov", true},
-            {"PhotoRenoSarcevicSu", true},
-            {"PhotoZeus", false},
-            {"PhotoBezrukovBugaev", false},
-            {"PhotoRhode", false},
-            {"PhotoKokoulin", false}
-    };
-    double FunctionToBuildDiffCrossSectionInterpolant(double energy, double v, int component);
-    double InterpolatedCrossSection(double energy, double v);
-    void InitializeDifferentialCrossSectionInterpolation(const InterpolationDef& def);
-    InterpolantVec interpolant_;
 };
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<Photonuclear, typename decay<T>::type>::value>::type>
+PhotoInterpolant::PhotoInterpolant(T&& param,
+    shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& interpol_def)
+    : CrossSectionInterpolant(param, cuts, interpol_def)
+{
+}
 } // namespace PROPOSAL

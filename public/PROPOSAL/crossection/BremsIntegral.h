@@ -26,31 +26,31 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 
-namespace PROPOSAL {
+using std::shared_ptr;
 
+namespace PROPOSAL {
 class Bremsstrahlung;
 
-class BremsIntegral : public CrossSectionIntegral
-{
+class BremsIntegral : public CrossSectionIntegral {
 public:
-    BremsIntegral(const Bremsstrahlung&, std::shared_ptr<const EnergyCutSettings>);
-    BremsIntegral(const BremsIntegral&);
-    virtual ~BremsIntegral();
-
-    CrossSection* clone() const { return new BremsIntegral(*this); }
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    double CalculatedEdx(double energy);
-    double CalculatedEdxWithoutMultiplier(double energy);
-
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<Bremsstrahlung, typename decay<T>::type>::value>::type>
+    BremsIntegral(T&&, shared_ptr<const EnergyCutSettings>);
 };
+} // namespace PROPOSAL
 
+
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<Bremsstrahlung, typename decay<T>::type>::value>::type>
+BremsIntegral::BremsIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
+    : CrossSectionIntegral(param, cut)
+{
+}
 } // namespace PROPOSAL

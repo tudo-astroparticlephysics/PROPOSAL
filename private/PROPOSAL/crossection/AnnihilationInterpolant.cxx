@@ -1,120 +1,90 @@
 
 #include <functional>
 
-#include "PROPOSAL/crossection/AnnihilationIntegral.h"
 #include "PROPOSAL/crossection/AnnihilationInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/Annihilation.h"
 
-#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
+#include "PROPOSAL/particle/Particle.h"
+
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/math/RandomGenerator.h"
+#include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/methods.h"
 
+using std::pair;
+using std::vector;
 
 using namespace PROPOSAL;
 
-AnnihilationInterpolant::AnnihilationInterpolant(const Annihilation& param, const InterpolationDef& def)
-        : CrossSectionInterpolant(param, nullptr), rndc_(-1.) {
-    // Use parent CrossSecition dNdx interpolation
-    InitdNdxInterpolation(def);
-    gamma_def_ = &GammaDef::Get();
-}
-
-/*AnnihilationInterpolant::AnnihilationInterpolant(const AnnihilationInterpolant& annihilation)
-        : CrossSectionInterpolant(annihilation), rndc_(annihilation.rndc_), gamma_def_(annihilation.gamma_def_)
+double AnnihilationInterpolant::CalculatedEdx(double energy)
 {
-}*/
+    (void)energy;
+    return 0;
+}
 
-AnnihilationInterpolant::~AnnihilationInterpolant() {}
-
-bool AnnihilationInterpolant::compare(const CrossSection& cross_section) const
+double AnnihilationInterpolant::CalculatedE2dx(double energy)
 {
-    const AnnihilationInterpolant* cross_section_interpolant =
-            static_cast<const AnnihilationInterpolant*>(&cross_section);
-
-    if (dndx_interpolant_1d_.size() != cross_section_interpolant->dndx_interpolant_1d_.size())
-        return false;
-    else if (dndx_interpolant_2d_.size() != cross_section_interpolant->dndx_interpolant_2d_.size())
-        return false;
-
-    for (unsigned int i = 0; i < dndx_interpolant_1d_.size(); ++i)
-    {
-        if (*dndx_interpolant_1d_[i] != *cross_section_interpolant->dndx_interpolant_1d_[i])
-            return false;
-    }
-    for (unsigned int i = 0; i < dndx_interpolant_2d_.size(); ++i)
-    {
-        if (*dndx_interpolant_2d_[i] != *cross_section_interpolant->dndx_interpolant_2d_[i])
-            return false;
-    }
-
-    return true;
+    (void)energy;
+    return 0;
 }
 
-double AnnihilationInterpolant::CalculateStochasticLoss(double energy, double rnd1, double rnd2) {
-    if(rnd1 != rnd_){
-        CalculatedNdx(energy, rnd1);
-    }
-    rndc_ = rnd2; // save random number for component sampling
-    return energy; // losses are always catastrophic
-}
+/* double AnnihilationInterpolant::CalculateStochasticLoss( */
+/*     double energy, array<double, 2> rnd) */
+/* { */
+/*     CalculatedNdx(energy, rnd[0]); */
+/*     rndc_ = rnd[1]; // save random number for component sampling */
+/*     return energy;  // losses are always catastrophic */
+/* } */
 
-std::pair<std::vector<DynamicData>, bool> AnnihilationInterpolant::CalculateProducedParticles(double energy,
-                                                                                            double energy_loss,
-                                                                                            const Vector3D& initial_direction) {
-    (void)energy_loss;
-    double rnd, rsum, rho;
+/* vector<DynamicData> AnnihilationInterpolant::CalculateProducedParticles( */
+/*     double energy, Vector3D&& initial_dir, array<double, 2>&& rnd) */
+/* { */
+/*     auto rates = CalculatedNdx(energy, rnd[0]); */
+/*     auto sampled_rate = rnd[1] * accumulate(rates.begin(), rates.end(), 0.); */
 
-    std::vector<DynamicData> particle_list{};
+/*     vector<DynamicData> particle_list(2); */
+/*     particle_list.emplace_back(static_cast<int>(ParticleType::Gamma)); */
+/*     particle_list.emplace_back(static_cast<int>(ParticleType::Gamma)); */
 
-    if(rndc_<0){
-        //CalculateStochasticLoss has never been called before, return empty list
-        //TODO: find a better way of checking the random numbers
-        log_warn("CalculateProducedParticles has been called with no call of CalculateStochasticLoss for PhotoPairProduction");
-        return std::make_pair(particle_list, true);
-    }
+/*     auto rate = rates.cbegin(); */
+/*     auto dndx = dndx_interpolants_.begin(); */
+/*     auto kin_limit = kinematic_limits_.begin(); */
+/*     for (; rate != rates.end(); ++rate, ++dndx, ++kin_limit) { */
+/*         sampled_rate -= *rate; */
 
-    particle_list.push_back(DynamicData(gamma_def_->particle_type));
-    particle_list.push_back(DynamicData(gamma_def_->particle_type));
+/*         if (sampled_rate < 0) { */
+/*             auto v_max = (*kin_limit)(energy).vMax; */
+/*             auto v_cut = GetEnergyCut(energy); */
 
-    rnd  = rndc_ * sum_of_rates_;
-    rsum = 0;
+/*             auto v = (*dndx)->FindLimit(energy, rnd[1] * *rate); */
 
-    for (size_t i = 0; i < components_.size(); ++i)
-    {
-        rsum += prob_for_component_[i];
+/*             auto rho = logarithm_trafo(v, v_cut, v_max); */
 
-        if (rsum > rnd)
-        {
-            parametrization_->SetCurrentComponent(i);
-            Parametrization::KinematicLimits limits = parametrization_->GetKinematicLimits(energy);
-            rho = (limits.vMin * std::exp(dndx_interpolant_2d_.at(i)->FindLimit(energy, rnd_ * prob_for_component_[i]) *
-                                         std::log(limits.vMax / limits.vMin)));
+/*             // The available energy is the positron energy plus the mass of the */
+/*             // electron */
+/*             particle_list[0].SetEnergy((energy + ME) * (1 - rho)); */
+/*             particle_list[1].SetEnergy((energy + ME) * rho); */
 
-            // The available energy is the positron energy plus the mass of the electron
-            particle_list[0].SetEnergy((energy + ME) * (1-rho));
-            particle_list[1].SetEnergy((energy + ME) * rho);
+/*             particle_list[0].SetDirection(initial_dir); */
+/*             particle_list[1].SetDirection(initial_dir); */
 
-            particle_list[0].SetDirection(initial_direction);
-            particle_list[1].SetDirection(initial_direction);
+/*             double cosphi0 = ((energy + ME) * (1. - rho) - ME) */
+/*                 / ((1. - rho) * std::sqrt((energy + ME) * (energy - ME))); */
+/*             double cosphi1 = ((energy + ME) * rho - ME) */
+/*                 / (rho * std::sqrt((energy + ME) * (energy - ME))); */
 
-            double cosphi0 = ((energy + ME) * (1. - rho) - ME)/( (1. - rho) * std::sqrt( (energy + ME) * (energy - ME) ) );
-            double cosphi1 = ((energy + ME) * rho - ME)/( rho * std::sqrt((energy + ME) * (energy - ME)));
+/*             double rndtheta = RandomGenerator::Get().RandomDouble(); */
 
-            double rndtheta = RandomGenerator::Get().RandomDouble();
+/*             particle_list[0].DeflectDirection(cosphi0, rndtheta * 2. * PI); */
+/*             particle_list[1].DeflectDirection( */
+/*                 cosphi1, std::fmod(rndtheta * 2. * PI + PI, 2. * PI)); */
 
-            particle_list[0].DeflectDirection(cosphi0, rndtheta * 2. * PI);
-            particle_list[1].DeflectDirection(cosphi1, std::fmod(rndtheta * 2. * PI + PI, 2. * PI));
+/*             return particle_list; */
+/*         } */
+/*     } */
 
-            return std::make_pair(particle_list, true);
-        }
-    }
-
-
-    log_fatal("could not sample ProducedParticles for PhotoPairProduction!");
-    return std::make_pair(particle_list, true);
-
-}
+/*     throw std::logic_error( */
+/*         "Could not sample ProducedParticles for PhotoPairProduction."); */
+/* } */

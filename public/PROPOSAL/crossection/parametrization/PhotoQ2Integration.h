@@ -26,99 +26,62 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include <functional>
+#include <type_traits>
 
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
 
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/methods.h"
 
-#define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                                                             \
-    class Photo##param : public PhotoQ2Integral                                                                        \
-    {                                                                                                                  \
-    public:                                                                                                            \
-        Photo##param(const ParticleDef&,                                                                               \
-                     std::shared_ptr<const Medium>,                                                                                    \
-                     double multiplier,                                                                                \
-                     const ShadowEffect& shadow_effect);                                                               \
-        Photo##param(const Photo##param&);                                                                             \
-        virtual ~Photo##param();                                                                                       \
-                                                                                                                       \
-        virtual Parametrization* clone() const { return new Photo##param(*this); }                                     \
-        static Photonuclear* create(const ParticleDef& particle_def,                                                   \
-                                    std::shared_ptr<const Medium> medium,                                                              \
-                                    double multiplier,                                                                 \
-                                    const ShadowEffect& shadow_effect)                                                 \
-        {                                                                                                              \
-            return new Photo##param(particle_def, medium, multiplier, shadow_effect);                                  \
-        }                                                                                                              \
-                                                                                                                       \
-        double FunctionToQ2Integral(double energy, double v, double Q2);                                               \
-                                                                                                                       \
-        const std::string& GetName() const { return name_; }                                                           \
-                                                                                                                       \
-    protected:                                                                                                         \
-        static const std::string name_;                                                                                \
+#define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                     \
+    class Photo##param : public PhotoQ2Integral {                              \
+    public:                                                                    \
+        template <typename T,                                                  \
+            typename = typename std::enable_if<std::is_base_of<ShadowEffect,   \
+                typename std::decay<T>::type>::value>::type>                   \
+        Photo##param(const ParticleDef&, const component_list&, T&&);          \
+        double FunctionToQ2Integral(double energy, double v, double Q2);       \
     };
 
-
 namespace PROPOSAL {
-
-// class Interpolant;
-
-/******************************************************************************
- *                            Photo Q2 Integration                            *
- ******************************************************************************/
-
-class PhotoQ2Integral : public Photonuclear
-{
+class PhotoQ2Integral : public Photonuclear {
 public:
-    PhotoQ2Integral(const ParticleDef&,
-                    std::shared_ptr<const Medium>,
-                    double multiplier,
-                    const ShadowEffect&);
-    PhotoQ2Integral(const PhotoQ2Integral&);
-    virtual ~PhotoQ2Integral();
-
-    virtual Parametrization* clone() const = 0;
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
+    template <typename T,
+        typename = typename std::enable_if<std::is_base_of<ShadowEffect,
+            typename std::decay<T>::type>::value>::type>
+    PhotoQ2Integral(const ParticleDef&, const component_list&, T&&);
 
     virtual double DifferentialCrossSection(double energy, double v);
-
     virtual double FunctionToQ2Integral(double energy, double v, double Q2) = 0;
 
-    // --------------------------------------------------------------------- //
-    // Getter
-    // --------------------------------------------------------------------- //
-
-    virtual size_t GetHash() const;
-
-protected:
-    virtual bool compare(const Parametrization&) const;
-    virtual void print(std::ostream&) const;
-
-    ShadowEffect* shadow_effect_;
+    std::unique_ptr<ShadowEffect> shadow_effect_;
     Integral integral_;
 };
+} // namespace PROPOSAL
 
-/******************************************************************************
- *                     Declare Integral Parametrizations                      *
- ******************************************************************************/
+namespace PROPOSAL {
+template <typename T,
+    typename = typename std::enable_if<std::is_base_of<ShadowEffect,
+        typename std::decay<T>::type>::value>::type>
+PhotoQ2Integral::PhotoQ2Integral(
+    const ParticleDef& p_def, const component_list& comp, T&& shadow_effect)
+    : Photonuclear(p_def, comp)
+    , shadow_effect_(new std::remove_reference<T>(shadow_effect))
+    , integral_(IROMB, IMAXS, IPREC)
+{
+}
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor91)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor97)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(ButkevichMikhailov)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(RenoSarcevicSu)
+} // namespace PROPOSAL
 
 #undef Q2_PHOTO_PARAM_INTEGRAL_DEC
-
-} // namespace PROPOSAL

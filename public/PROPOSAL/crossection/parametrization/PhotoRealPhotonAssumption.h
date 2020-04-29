@@ -26,116 +26,49 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
+#include <memory>
 
-#define PHOTO_PARAM_REAL_DEC(param, parent)                                                                            \
-    class Photo##param : public Photo##parent                                                                          \
-    {                                                                                                                  \
-    public:                                                                                                            \
-        Photo##param(const ParticleDef&,                                                                               \
-                     std::shared_ptr<const Medium>,                                                                                    \
-                     double multiplier,                                                                                \
-                     bool hard_component);                                                                             \
-        Photo##param(const Photo##param&);                                                                             \
-        virtual ~Photo##param();                                                                                       \
-                                                                                                                       \
-        Parametrization* clone() const { return new Photo##param(*this); }                                             \
-        static Photonuclear* create(const ParticleDef& particle_def,                                                   \
-                                    std::shared_ptr<const Medium> medium,                                                              \
-                                    double multiplier,                                                                 \
-                                    bool hard_component)                                                               \
-        {                                                                                                              \
-            return new Photo##param(particle_def, medium, multiplier, hard_component);                           \
-        }                                                                                                              \
-                                                                                                                       \
-        virtual double CalculateParametrization(double nu);                                                            \
-                                                                                                                       \
-        const std::string& GetName() const { return name_; }                                                           \
-                                                                                                                       \
-    private:                                                                                                           \
-        static const std::string name_;                                                                                \
+#define PHOTO_PARAM_REAL_DEC(param, parent)                                    \
+    class Photo##param : public Photo##parent {                                \
+    public:                                                                    \
+        Photo##param(                                                          \
+            const ParticleDef&, const component_list&, bool hard_component);   \
+                                                                               \
+        virtual double CalculateParametrization(double nu);                    \
     };
 
 namespace PROPOSAL {
 
-/******************************************************************************
- *                         PhotoRealPhotonAssumption                           *
- ******************************************************************************/
+class PhotoRealPhotonAssumption : public Photonuclear {
+protected:
+    std::unique_ptr<RealPhoton> hard_component_;
 
-class PhotoRealPhotonAssumption : public Photonuclear
-{
 public:
-    PhotoRealPhotonAssumption(const ParticleDef&,
-                              std::shared_ptr<const Medium>,
-                              double multiplier,
-                              bool hard_component);
-    PhotoRealPhotonAssumption(const PhotoRealPhotonAssumption&);
-    virtual ~PhotoRealPhotonAssumption();
-
-    virtual Parametrization* clone() const = 0;
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
+    PhotoRealPhotonAssumption(
+        const ParticleDef&, const component_list&, bool hard_component);
+    virtual ~PhotoRealPhotonAssumption() = default;
 
     virtual double DifferentialCrossSection(double energy, double v);
-
     virtual double CalculateParametrization(double nu) = 0;
     double NucleusCrossSectionCaldwell(double nu);
-
-    // --------------------------------------------------------------------- //
-    // Getter
-    // --------------------------------------------------------------------- //
-
-    virtual size_t GetHash() const;
-
-protected:
-    virtual bool compare(const Parametrization&) const;
-    virtual void print(std::ostream&) const;
-
-    RealPhoton* hard_component_;
 };
 
-/******************************************************************************
- *                       Zeus, BezrukovBugaev, Kokoulin                       *
- ******************************************************************************/
-
-// Signature: (new class, parent class)
 PHOTO_PARAM_REAL_DEC(Zeus, RealPhotonAssumption)
 PHOTO_PARAM_REAL_DEC(BezrukovBugaev, RealPhotonAssumption)
-PHOTO_PARAM_REAL_DEC(Kokoulin, BezrukovBugaev) // Kokoulin derives from BezrukovBugaev
+PHOTO_PARAM_REAL_DEC(Kokoulin, BezrukovBugaev)
 
-/******************************************************************************
- *                           Rhode Parametrization                            *
- ******************************************************************************/
-
-class PhotoRhode : public PhotoRealPhotonAssumption
-{
-public:
-    PhotoRhode(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier, bool hard_component);
-    PhotoRhode(const PhotoRhode&);
-    virtual ~PhotoRhode();
-
-    Parametrization* clone() const { return new PhotoRhode(*this); }
-    static Photonuclear* create(const ParticleDef&,
-                                std::shared_ptr<const Medium>,
-                                double multiplier,
-                                bool hard_component);
-
-    double CalculateParametrization(double nu);
-
-    const std::string& GetName() const { return name_; }
-
-private:
-    virtual bool compare(const Parametrization&) const;
+class PhotoRhode : public PhotoRealPhotonAssumption {
+    std::unique_ptr<Interpolant> interpolant_;
 
     double MeasuredSgN(double e);
 
-    static const std::string name_;
-    Interpolant* interpolant_;
+public:
+    PhotoRhode(const ParticleDef&, const component_list&, bool hard_component);
+
+    double CalculateParametrization(double nu) override;
 };
 
 #undef Q2_PHOTO_PARAM_INTEGRAL_DEC

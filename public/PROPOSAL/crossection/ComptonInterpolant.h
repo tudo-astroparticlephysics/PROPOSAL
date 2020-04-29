@@ -26,37 +26,36 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
 
+using std::shared_ptr;
+
 namespace PROPOSAL {
+class Compton;
+} // namespace PROPOSAL
 
-    class Compton;
+namespace PROPOSAL {
+class ComptonInterpolant : public CrossSectionInterpolant {
+    vector<unique_ptr<Interpolant>> init_dndx_interpolation( const InterpolationDef&) override;
 
-    class ComptonInterpolant : public CrossSectionInterpolant
-    {
-    public:
-        ComptonInterpolant(const Compton&, std::shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-        //ComptonInterpolant(const ComptonInterpolant&);
-        virtual ~ComptonInterpolant();
+public:
+    template <typename T,
+        typename = typename enable_if<
+            is_base_of<Compton, typename decay<T>::type>::value>::type>
+    ComptonInterpolant(
+        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
+};
+} // namespace PROPOSAL
 
-        //CrossSection* clone() const { return new ComptonInterpolant(*this); }
-
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
-
-        double CalculatedEdx(double energy);
-        virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, Integral&, int component);
-        virtual double CalculateCumulativeCrossSection(double energy, int component, double v);
-        virtual std::pair<double, double> StochasticDeflection(double energy, double energy_loss);
-
-    private:
-        virtual double CalculateStochasticLoss(double energy, double rnd1);
-        virtual void InitdNdxInterpolation(const InterpolationDef&);
-
-    };
-
+namespace PROPOSAL {
+template <typename T,
+    typename = typename enable_if<
+        is_base_of<Compton, typename decay<T>::type>::value>::type>
+ComptonInterpolant::ComptonInterpolant(
+    T&& param, shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& def)
+    : CrossSectionInterpolant(param, cuts, def)
+{
+}
 } // namespace PROPOSAL
