@@ -201,8 +201,12 @@ double UtilityInterpolantDisplacement::Calculate(double ei, double ef,
         stored_result_ = interpolant_->Interpolate(ei);
         aux = stored_result_ - interpolant_->Interpolate(ef);
 
-        displacement = utility_.GetMedium()->GetDensityDistribution().Correct(
-            xi, direction, aux, distance_to_border);
+        try {
+            displacement = utility_.GetMedium()->GetDensityDistribution().Correct(
+                xi, direction, aux, distance_to_border);
+        } catch (DensityException& e) {
+            throw;
+        }
 
         if (std::abs(aux) > std::abs(stored_result_) * HALF_PRECISION
             && aux >= 0) {
