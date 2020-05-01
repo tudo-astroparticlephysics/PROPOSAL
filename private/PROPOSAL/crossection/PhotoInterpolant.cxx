@@ -1,15 +1,12 @@
-
 #include <functional>
-#include <PROPOSAL/crossection/MupairInterpolant.h>
 
-#include "PROPOSAL/crossection/PhotoIntegral.h"
 #include "PROPOSAL/crossection/PhotoInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 
-#include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
-
-#include "PROPOSAL/Constants.h"
-#include "PROPOSAL/methods.h"
-
 using namespace PROPOSAL;
+
+PhotoInterpolant::PhotoInterpolant(unique_ptr<Photonuclear>&& param,
+    shared_ptr<const EnergyCutSettings> cut, const InterpolationDef& def)
+    : CrossSectionInterpolant(forward<unique_ptr<Photonuclear>>(param), cut, def)
+{
+}

@@ -1,19 +1,15 @@
-
-#include <cmath>
-#include <functional>
-
-#include "PROPOSAL/crossection/PhotoPairIntegral.h"
 #include "PROPOSAL/crossection/PhotoPairInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/PhotoPairProduction.h"
 
-#include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
-
-#include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Logging.h"
-#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
+
+PhotoPairInterpolant::PhotoPairInterpolant(unique_ptr<PhotoPairProduction>&& param,
+    shared_ptr<const EnergyCutSettings> cut, const InterpolationDef& def)
+    : CrossSectionInterpolant(forward<unique_ptr<PhotoPairProduction>>(param), cut, def)
+{
+}
+
 double PhotoPairInterpolant::CalculatedEdx(double energy)
 {
     (void)energy;

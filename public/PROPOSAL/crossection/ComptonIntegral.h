@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include "PROPOSAL/crossection/parametrization/Compton.h"
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
+#include "PROPOSAL/crossection/parametrization/Compton.h"
 
 using std::shared_ptr;
 
@@ -46,19 +46,6 @@ class ComptonIntegral : public CrossSectionIntegral {
     double de2dx_integral(double energy) override;
 
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<Compton, typename decay<T>::type>::value>::type>
-    ComptonIntegral(T&&, shared_ptr<const EnergyCutSettings>);
+    ComptonIntegral(unique_ptr<Compton>&&, shared_ptr<const EnergyCutSettings>);
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<Compton, typename decay<T>::type>::value>::type>
-ComptonIntegral::ComptonIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
-    : CrossSectionIntegral(param, cut)
-{
-}
 } // namespace PROPOSAL

@@ -37,22 +37,6 @@ class Photonuclear;
 namespace PROPOSAL {
 class PhotoInterpolant : public CrossSectionInterpolant {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<Photonuclear, typename decay<T>::type>::value>::type>
-    PhotoInterpolant(
-        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    virtual ~PhotoInterpolant();
+    PhotoInterpolant(unique_ptr<Photonuclear>&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<Photonuclear, typename decay<T>::type>::value>::type>
-PhotoInterpolant::PhotoInterpolant(T&& param,
-    shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& interpol_def)
-    : CrossSectionInterpolant(param, cuts, interpol_def)
-{
-}
 } // namespace PROPOSAL

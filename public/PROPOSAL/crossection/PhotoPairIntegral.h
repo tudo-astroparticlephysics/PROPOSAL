@@ -33,27 +33,14 @@
 namespace PROPOSAL {
 class PhotoPairProduction;
 } // namespace PROPOSAL
+
 namespace PROPOSAL {
 class PhotoPairIntegral : public CrossSectionIntegral {
 public:
-    template <typename T,
-        typename = typename enable_if<is_base_of<PhotoPairProduction,
-            typename decay<T>::type>::value>::type>
-    PhotoPairIntegral(T&&, shared_ptr<const EnergyCutSettings>);
-    virtual ~PhotoPairIntegral() = default;
+    PhotoPairIntegral(
+        unique_ptr<PhotoPairProduction>&&, shared_ptr<const EnergyCutSettings>);
 
     double CalculatedEdx(double energy) override;
     double CalculatedE2dx(double energy) override;
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<PhotoPairProduction, typename decay<T>::type>::value>::type>
-PhotoPairIntegral::PhotoPairIntegral(
-    T&& param, shared_ptr<const EnergyCutSettings> cut)
-    : CrossSectionIntegral(param, cut)
-{
-}
 } // namespace PROPOSAL

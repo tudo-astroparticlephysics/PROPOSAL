@@ -41,21 +41,6 @@ class ComptonInterpolant : public CrossSectionInterpolant {
     vector<unique_ptr<Interpolant>> init_dndx_interpolation( const InterpolationDef&) override;
 
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<Compton, typename decay<T>::type>::value>::type>
-    ComptonInterpolant(
-        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
+    ComptonInterpolant(unique_ptr<Compton>&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<Compton, typename decay<T>::type>::value>::type>
-ComptonInterpolant::ComptonInterpolant(
-    T&& param, shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& def)
-    : CrossSectionInterpolant(param, cuts, def)
-{
-}
 } // namespace PROPOSAL

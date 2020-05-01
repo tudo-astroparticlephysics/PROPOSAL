@@ -11,14 +11,20 @@
 using namespace PROPOSAL;
 
 #define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                    \
-        template <typename T,                                                  \
-            typename = typename std::enable_if<std::is_base_of<ShadowEffect,   \
-                typename std::decay<T>::type>::value>::type>                   \
     Photo##param::Photo##param(const ParticleDef& p_def,                       \
-        const component_list& comp_list, T&& shadow_effect)    \
-        : PhotoQ2Integral(p_def, comp_list, shadow_effect)                     \
+        const component_list& comp_list,                                       \
+        unique_ptr<ShadowEffect> shadow_effect)                                \
+        : PhotoQ2Integral(p_def, comp_list, std::move(shadow_effect))          \
     {                                                                          \
     }
+
+PhotoQ2Integral::PhotoQ2Integral(
+    const ParticleDef& p_def, const component_list& comp, unique_ptr<ShadowEffect> shadow_effect)
+    : Photonuclear(p_def, comp)
+    , shadow_effect_(std::move(shadow_effect))
+    , integral_(IROMB, IMAXS, IPREC)
+{
+}
 
 double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
 {

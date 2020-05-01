@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include "PROPOSAL/crossection/BremsIntegral.h"
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
 
 namespace PROPOSAL {
@@ -38,22 +37,8 @@ class Bremsstrahlung;
 namespace PROPOSAL {
 class BremsInterpolant : public CrossSectionInterpolant {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<Bremsstrahlung, typename decay<T>::type>::value>::type>
-    BremsInterpolant(
-        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
+    BremsInterpolant(unique_ptr<Bremsstrahlung>&&,
+        shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
     virtual ~BremsInterpolant() = default;
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<Bremsstrahlung, typename decay<T>::type>::value>::type>
-BremsInterpolant::BremsInterpolant(T&& param,
-    shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& interpol_def)
-    : CrossSectionInterpolant(param, cuts, interpol_def)
-{
-}
 } // namespace PROPOSAL

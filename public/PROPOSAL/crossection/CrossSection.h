@@ -46,6 +46,7 @@ using std::pair;
 using std::remove_reference;
 using std::shared_ptr;
 using std::unique_ptr;
+using std::forward;
 using std::vector;
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -54,11 +55,11 @@ namespace PROPOSAL {
 class CrossSection {
 protected:
     unique_ptr<Parametrization> parametrization_;
-    shared_ptr<EnergyCutSettings> cuts_;
+    shared_ptr<const EnergyCutSettings> cuts_;
 
 public:
-    template <typename T, typename = typename enable_if< is_base_of<Parametrization, typename decay<T>::type>::value>::type>
-    CrossSection(T&&, shared_ptr<const EnergyCutSettings>);
+    /* CrossSection() { std::cout <<"default cstr. " << std::endl; }; */
+    CrossSection(unique_ptr<Parametrization>&&, shared_ptr<const EnergyCutSettings>);
     virtual ~CrossSection() = default;
 
     virtual double CalculatedEdx(double) = 0;
@@ -66,21 +67,10 @@ public:
     virtual double CalculatedNdx(double, double = 1) = 0;
 
     double GetEnergyCut(double energy) const;
-
     double GetLowerEnergyLimit() const;
 
     virtual size_t GetHash() const;
 };
 
 using CrossSectionList = vector<shared_ptr<CrossSection>>;
-
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<Parametrization, typename decay<T>::type>::value>::type>
-CrossSection::CrossSection(T&& param, shared_ptr<const EnergyCutSettings> cut)
-    : parametrization_(new remove_reference<T>(param))
-    , cuts_(cut)
-{
-}
-
 } // namespace PROPOSAL

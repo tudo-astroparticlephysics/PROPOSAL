@@ -37,22 +37,7 @@ class Ionization;
 namespace PROPOSAL {
 class IonizInterpolant : public CrossSectionInterpolant {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<Ionization, typename decay<T>::type>::value>::type>
-    IonizInterpolant(
-        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
+    IonizInterpolant(unique_ptr<Ionization>&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
     virtual ~IonizInterpolant() = default;
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<Ionization, typename decay<T>::type>::value>::type>
-IonizInterpolant::IonizInterpolant(T&& param,
-    shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& interpol_def)
-    : CrossSectionInterpolant(param, cuts, interpol_def)
-{
-}
 } // namespace PROPOSAL

@@ -8,6 +8,12 @@
 
 using namespace PROPOSAL;
 
+EpairIntegral::EpairIntegral(
+    unique_ptr<EpairProduction>&& param, shared_ptr<const EnergyCutSettings> cut)
+    : CrossSectionIntegral(forward<unique_ptr<EpairProduction>>(param), cut)
+{
+}
+
 double EpairIntegral::FunctionToDEdxIntegralReverse(double energy, double v)
 {
     return (1 - v) * parametrization_->DifferentialCrossSection(energy, v);

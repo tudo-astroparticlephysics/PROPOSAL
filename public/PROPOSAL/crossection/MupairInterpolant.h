@@ -26,7 +26,6 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
@@ -38,22 +37,7 @@ class MupairProduction;
 namespace PROPOSAL {
 class MupairInterpolant : public CrossSectionInterpolant {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<MupairProduction, typename decay<T>::type>::value>::type>
-    MupairInterpolant(
-        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    virtual ~MupairInterpolant() = default;
+    MupairInterpolant(unique_ptr<MupairProduction>&&,
+        shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<MupairProduction, typename decay<T>::type>::value>::type>
-MupairInterpolant::MupairInterpolant(T&& param,
-    shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& interpol_def)
-    : CrossSectionInterpolant(param, cuts, interpol_def)
-{
-}
 } // namespace PROPOSAL

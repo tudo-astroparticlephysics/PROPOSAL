@@ -38,25 +38,9 @@ class PhotoPairProduction;
 namespace PROPOSAL {
 class PhotoPairInterpolant : public CrossSectionInterpolant {
 public:
-    template <typename T,
-        typename = typename enable_if<is_base_of<PhotoPairProduction,
-            typename decay<T>::type>::value>::type>
-    PhotoPairInterpolant(
-        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    virtual ~PhotoPairInterpolant();
+    PhotoPairInterpolant(unique_ptr<PhotoPairProduction>&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
 
     double CalculatedEdx(double energy) override;
     double CalculatedE2dx(double energy) override;
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<PhotoPairProduction, typename decay<T>::type>::value>::type>
-PhotoPairInterpolant::PhotoPairInterpolant(
-        T&& param, shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& interpol_def)
-    : CrossSectionInterpolant(param, cuts, interpol_def)
-{
-}
 } // namespace PROPOSAL

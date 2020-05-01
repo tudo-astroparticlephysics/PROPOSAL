@@ -58,9 +58,7 @@ public:
     bool operator==(const EnergyCutSettings& energyCutSettings) const noexcept;
 
     double GetCut(double energy) const noexcept;
-
     size_t GetHash() const noexcept;
-
     double GetEcut() const noexcept { return ecut_; }
     double GetVcut() const noexcept { return vcut_; }
     bool GetContRand() const noexcept { return continuous_randomization_; }

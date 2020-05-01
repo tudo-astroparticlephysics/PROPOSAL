@@ -30,13 +30,13 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
-#include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/methods.h"
 
 namespace PROPOSAL {
 class CrossSectionInterpolant : public CrossSectionIntegral {
     size_t hash_interpol_def;
+
 protected:
     unique_ptr<Interpolant> dedx_interpolant_;
     unique_ptr<Interpolant> de2dx_interpolant_;
@@ -49,11 +49,9 @@ protected:
     unique_ptr<Interpolant> init_dedx_interpolation(const InterpolationDef&);
     unique_ptr<Interpolant> init_de2dx_interpolation(const InterpolationDef&);
 
-
 public:
-    template <typename T>
-    CrossSectionInterpolant(
-        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
+    CrossSectionInterpolant(unique_ptr<Parametrization>&&,
+        shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
 
     double CalculatedEdx(double) override;
     double CalculatedE2dx(double) override;
@@ -61,17 +59,4 @@ public:
 
     size_t GetHash() const override;
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T>
-CrossSectionInterpolant::CrossSectionInterpolant(T&& param,
-    shared_ptr<const EnergyCutSettings> cut, const InterpolationDef& def)
-    : CrossSectionIntegral(param, cut)
-    , hash_interpol_def(def.GetHash())
-    , dedx_interpolant_(init_dedx_interpolation(def))
-    , de2dx_interpolant_(init_de2dx_interpolation(def))
-    , dndx_interpolants_(init_dndx_interpolation(def))
-{
-}
 } // namespace PROPOSAL

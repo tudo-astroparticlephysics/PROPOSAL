@@ -101,7 +101,7 @@ private:
     double InitializeLowerLim(CrossSectionList cross){
         double lower_lim_tmp = std::numeric_limits<double>::max();
         for (auto c : cross)
-            lower_lim_tmp = std::min(lower_lim_tmp, c->GetParametrization().GetLowerEnergyLim());
+            lower_lim_tmp = std::min(lower_lim_tmp, c->GetLowerEnergyLimit());
         return lower_lim_tmp;
     }
 

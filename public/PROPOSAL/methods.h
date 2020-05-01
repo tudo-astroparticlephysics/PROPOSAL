@@ -51,6 +51,12 @@ using std::unique_ptr;
 
 namespace PROPOSAL {
 
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 inline void hash_combine(std::size_t& seed) { (void)seed; }
 
 // ----------------------------------------------------------------------------

@@ -2,7 +2,6 @@
 #include <cmath>
 #include <functional>
 
-#include "PROPOSAL/crossection/ComptonIntegral.h"
 #include "PROPOSAL/crossection/ComptonInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/Compton.h"
 
@@ -16,6 +15,12 @@
 
 using namespace PROPOSAL;
 using std::placeholders::_1;
+
+ComptonInterpolant::ComptonInterpolant(unique_ptr<Compton>&& param,
+    shared_ptr<const EnergyCutSettings> cut, const InterpolationDef& def)
+    : CrossSectionInterpolant(forward<unique_ptr<Compton>>(param), cut, def)
+{
+}
 
 vector<unique_ptr<Interpolant>> ComptonInterpolant::init_dndx_interpolation(
     const InterpolationDef& def)
@@ -42,6 +47,7 @@ vector<unique_ptr<Interpolant>> ComptonInterpolant::init_dndx_interpolation(
     }
 
     const auto& hash = parametrization_->GetHash();
-    auto aux = Helper::InitializeInterpolation("dNdx_diff", builders, hash, def);
+    auto aux
+        = Helper::InitializeInterpolation("dNdx_diff", builders, hash, def);
     return aux;
 }

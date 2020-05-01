@@ -37,23 +37,9 @@ class WeakInteraction;
 namespace PROPOSAL {
 class WeakInterpolant : public CrossSectionInterpolant {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<WeakInteraction, typename decay<T>::type>::value>::type>
-    WeakInterpolant(T&&, const InterpolationDef&);
-    virtual ~WeakInterpolant();
+    WeakInterpolant(unique_ptr<WeakInteraction>&&, const InterpolationDef&);
 
     double CalculatedEdx(double energy) override;
     double CalculatedE2dx(double energy) override;
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<WeakInteraction, typename decay<T>::type>::value>::type>
-WeakInterpolant::WeakInterpolant(T&& param, const InterpolationDef& def)
-    : CrossSectionInterpolant(param, nullptr)
-{
-}
 } // namespace PROPOSAL

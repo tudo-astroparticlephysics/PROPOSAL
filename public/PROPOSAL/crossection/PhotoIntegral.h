@@ -37,20 +37,7 @@ class Photonuclear;
 namespace PROPOSAL {
 class PhotoIntegral : public CrossSectionIntegral {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<Photonuclear, typename decay<T>::type>::value>::type>
-    PhotoIntegral(T&&, shared_ptr<const EnergyCutSettings>);
-    virtual ~PhotoIntegral();
+    PhotoIntegral(
+        unique_ptr<Photonuclear>&&, shared_ptr<const EnergyCutSettings>);
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<Photonuclear, typename decay<T>::type>::value>::type>
-PhotoIntegral::PhotoIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
-    : CrossSectionIntegral(param, cut)
-{
-}
 } // namespace PROPOSAL

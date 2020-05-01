@@ -66,7 +66,7 @@ public:
     component_list GetComponents() const { return components_; }
     virtual size_t GetHash() const;
 
-    void SetCurrentComponent(Components::Component&);
+    void SetCurrentComponent(const Components::Component&);
 };
 
 

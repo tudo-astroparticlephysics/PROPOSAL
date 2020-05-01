@@ -1,9 +1,9 @@
 
 #include <cmath>
+#include <memory>
 #include <functional>
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/medium/Medium.h"
 
@@ -11,6 +11,16 @@ using namespace PROPOSAL;
 using std::bind;
 using std::placeholders::_1;
 using std::placeholders::_2;
+
+CrossSectionInterpolant::CrossSectionInterpolant(unique_ptr<Parametrization>&& param,
+    shared_ptr<const EnergyCutSettings> cut, const InterpolationDef& def)
+    : CrossSectionIntegral(forward<unique_ptr<Parametrization>>(param), cut)
+    , hash_interpol_def(def.GetHash())
+    , dedx_interpolant_(init_dedx_interpolation(def))
+    , de2dx_interpolant_(init_de2dx_interpolation(def))
+    , dndx_interpolants_(init_dndx_interpolation(def))
+{
+}
 
 double CrossSectionInterpolant::logarithm_trafo(
     double v, double v_cut, double v_max) const
@@ -21,6 +31,7 @@ double CrossSectionInterpolant::logarithm_trafo(
 unique_ptr<Interpolant> CrossSectionInterpolant::init_dedx_interpolation(
     const InterpolationDef& def)
 {
+    std::cout << "initi_dedx_interpolation" << parametrization_.get() << std::endl;
     Interpolant1DBuilder::Definition interpol_def;
     interpol_def.function1d
         = bind(&CrossSectionIntegral::CalculatedEdx, this, _1);

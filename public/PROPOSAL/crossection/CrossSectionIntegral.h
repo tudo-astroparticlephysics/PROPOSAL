@@ -36,11 +36,14 @@
 #include <utility>
 #include <vector>
 
+using std::bind;
 using std::function;
 using std::vector;
+using std::placeholders::_1;
+using std::placeholders::_2;
 
 namespace PROPOSAL {
-class CrossSectionIntegral : public virtual CrossSection {
+class CrossSectionIntegral : public CrossSection {
 protected:
     Integral integral_;
 
@@ -49,11 +52,11 @@ protected:
     vector<function<double(double)>> de2dx_integral_;
 
 public:
-    template <typename T>
-    CrossSectionIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut);
+    /* CrossSectionIntegral(); */
+    CrossSectionIntegral(unique_ptr<Parametrization>&& param, shared_ptr<const EnergyCutSettings> cut);
     virtual ~CrossSectionIntegral() = default;
 
-    enum {TOTAL_RATE, SAMPLED_RATE};
+    enum { TOTAL_RATE, SAMPLED_RATE };
     virtual double dndx_integral(double energy, double rnd);
     virtual double dedx_integral(double energy);
     virtual double de2dx_integral(double energy);
@@ -62,21 +65,4 @@ public:
     virtual double CalculatedE2dx(double energy);
     virtual double CalculatedNdx(double energy, double rnd = 0);
 };
-} // namespace PROPOSAL
-
-
-
-namespace PROPOSAL {
-template <typename T>
-CrossSectionIntegral::CrossSectionIntegral(
-    T&& param, shared_ptr<const EnergyCutSettings> cut)
-    : CrossSection(param, cut)
-{
-    for (const auto& comp : parametrization_->GetComponents()) {
-        parametrization_->current_component_(comp);
-        dndx_integral_.emplace_back(&CrossSectionIntegral::dndx_integral);
-        dedx_integral_.emplace_back(&CrossSectionIntegral::dedx_integral);
-        de2dx_integral_.emplace_back(&CrossSectionIntegral::de2dx_integral);
-    }
-}
 } // namespace PROPOSAL

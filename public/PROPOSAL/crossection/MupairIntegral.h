@@ -29,7 +29,6 @@
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
-#include "PROPOSAL/particle/ParticleDef.h"
 
 namespace PROPOSAL {
 class MupairProduction;
@@ -38,20 +37,7 @@ class MupairProduction;
 namespace PROPOSAL {
 class MupairIntegral : public CrossSectionIntegral {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<MupairProduction, typename decay<T>::type>::value>::type>
-    MupairIntegral(T&&, shared_ptr<const EnergyCutSettings>);
-    virtual ~MupairIntegral();
+    MupairIntegral(
+        unique_ptr<MupairProduction>&&, shared_ptr<const EnergyCutSettings>);
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<MupairProduction, typename decay<T>::type>::value>::type>
-MupairIntegral::MupairIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
-    : CrossSectionIntegral(param, cut)
-{
-}
 } // namespace PROPOSAL

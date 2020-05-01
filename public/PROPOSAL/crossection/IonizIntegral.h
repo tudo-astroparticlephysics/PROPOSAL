@@ -39,20 +39,7 @@ class IonizIntegral : public CrossSectionIntegral {
     double dedx_integral(double energy);
 
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<Ionization, typename decay<T>::type>::value>::type>
-    IonizIntegral(T&&, shared_ptr<const EnergyCutSettings>);
+    IonizIntegral(unique_ptr<Ionization>&&, shared_ptr<const EnergyCutSettings>);
     virtual ~IonizIntegral() = default;
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<Ionization, typename decay<T>::type>::value>::type>
-IonizIntegral::IonizIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
-    : CrossSectionIntegral(param, cut)
-{
-}
 } // namespace PROPOSAL

@@ -38,22 +38,10 @@ class EpairIntegral : public CrossSectionIntegral {
     double dedx_integral(double energy) override;
 
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<EpairProduction, typename decay<T>::type>::value>::type>
-    EpairIntegral(T&&, shared_ptr<const EnergyCutSettings>);
+    EpairIntegral(
+        unique_ptr<EpairProduction>&&, shared_ptr<const EnergyCutSettings>);
 
     double FunctionToDEdxIntegralReverse(double energy, double v);
 };
 
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<EpairProduction, typename decay<T>::type>::value>::type>
-EpairIntegral::EpairIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
-    : CrossSectionIntegral(param, cut)
-{
-}
 } // namespace PROPOSAL

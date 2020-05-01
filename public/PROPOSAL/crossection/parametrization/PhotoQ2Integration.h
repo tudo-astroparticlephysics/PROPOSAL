@@ -41,20 +41,16 @@
 #define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                     \
     class Photo##param : public PhotoQ2Integral {                              \
     public:                                                                    \
-        template <typename T,                                                  \
-            typename = typename std::enable_if<std::is_base_of<ShadowEffect,   \
-                typename std::decay<T>::type>::value>::type>                   \
-        Photo##param(const ParticleDef&, const component_list&, T&&);          \
+        Photo##param(const ParticleDef&, const component_list&,                \
+            unique_ptr<ShadowEffect>);                                         \
         double FunctionToQ2Integral(double energy, double v, double Q2);       \
     };
 
 namespace PROPOSAL {
 class PhotoQ2Integral : public Photonuclear {
 public:
-    template <typename T,
-        typename = typename std::enable_if<std::is_base_of<ShadowEffect,
-            typename std::decay<T>::type>::value>::type>
-    PhotoQ2Integral(const ParticleDef&, const component_list&, T&&);
+    PhotoQ2Integral(
+        const ParticleDef&, const component_list&, unique_ptr<ShadowEffect>);
 
     virtual double DifferentialCrossSection(double energy, double v);
     virtual double FunctionToQ2Integral(double energy, double v, double Q2) = 0;
@@ -62,22 +58,7 @@ public:
     std::unique_ptr<ShadowEffect> shadow_effect_;
     Integral integral_;
 };
-} // namespace PROPOSAL
 
-namespace PROPOSAL {
-template <typename T,
-    typename = typename std::enable_if<std::is_base_of<ShadowEffect,
-        typename std::decay<T>::type>::value>::type>
-PhotoQ2Integral::PhotoQ2Integral(
-    const ParticleDef& p_def, const component_list& comp, T&& shadow_effect)
-    : Photonuclear(p_def, comp)
-    , shadow_effect_(new std::remove_reference<T>(shadow_effect))
-    , integral_(IROMB, IMAXS, IPREC)
-{
-}
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor91)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor97)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(ButkevichMikhailov)

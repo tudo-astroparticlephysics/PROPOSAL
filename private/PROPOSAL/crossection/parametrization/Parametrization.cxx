@@ -61,7 +61,7 @@ size_t Parametrization::GetHash() const
     return hash_digest;
 }
 
-void Parametrization::SetCurrentComponent(Components::Component& comp)
+void Parametrization::SetCurrentComponent(const Components::Component& comp)
 {
     current_component_ = comp;
 }

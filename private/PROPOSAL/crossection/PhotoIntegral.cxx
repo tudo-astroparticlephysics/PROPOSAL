@@ -1,9 +1,7 @@
-
-#include <functional>
-
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/PhotoIntegral.h"
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
-#include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
+
+PhotoIntegral::PhotoIntegral(unique_ptr<Photonuclear>&& param, shared_ptr<const EnergyCutSettings> cut)
+    : CrossSectionIntegral(forward<unique_ptr<Photonuclear>>(param), cut) {}

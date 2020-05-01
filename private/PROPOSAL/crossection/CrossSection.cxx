@@ -9,6 +9,12 @@ using std::min;
 
 using namespace PROPOSAL;
 
+CrossSection::CrossSection(unique_ptr<Parametrization>&& param, shared_ptr<const EnergyCutSettings> cut)
+    : parametrization_(std::forward<unique_ptr<Parametrization>>(param))
+    , cuts_(cut)
+{
+}
+
 double CrossSection::GetEnergyCut(double energy) const
 {
     auto limits = parametrization_->GetKinematicLimits(energy);
@@ -30,4 +36,4 @@ size_t CrossSection::GetHash() const
 double CrossSection::GetLowerEnergyLimit() const
 {
     return parametrization_->GetLowerEnergyLim();
-};
+}

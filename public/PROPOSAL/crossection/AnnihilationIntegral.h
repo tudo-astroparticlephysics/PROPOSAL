@@ -29,34 +29,16 @@
 
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 
-#include <array>
-
-using std::array;
-using std::vector;
-
 namespace PROPOSAL {
 
-class DynamicData;
-class Vector3D;
 class Annihilation;
 
 class AnnihilationIntegral : public CrossSectionIntegral {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<Annihilation, typename decay<T>::type>::value>::type>
-    AnnihilationIntegral(T&&);
+    AnnihilationIntegral(unique_ptr<Annihilation>&&);
 
     double CalculatedEdx(double) override;
     double CalculatedE2dx(double) override;
 };
-
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<Annihilation, typename decay<T>::type>::value>::type>
-AnnihilationIntegral::AnnihilationIntegral(T&& param)
-    : CrossSectionIntegral(param, nullptr)
-{
-}
 
 } // namespace PROPOSAL

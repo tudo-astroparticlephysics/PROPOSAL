@@ -11,6 +11,12 @@ using std::exp;
 using std::log;
 using std::vector;
 
+ComptonIntegral::ComptonIntegral(
+    unique_ptr<Compton>&& param, shared_ptr<const EnergyCutSettings> cut)
+    : CrossSectionIntegral(forward<unique_ptr<Compton>>(param), cut)
+{
+}
+
 // Integrate with the substitution t = ln(1-v) to avoid numerical problems
 double ComptonIntegral::log_substitution(double v) const { return log(1 - v); }
 
@@ -43,9 +49,12 @@ double ComptonIntegral::dedx_integral(double energy)
     auto t_max = log_substitution(v_max);
 
     /* auto dedx_func = bind( */
-    /*     &Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1); */
-    auto func_transformed
-        = [&](double t) { return exp(t) * (parametrization_->FunctionToDEdxIntegral)(energy, 1 - exp(t)); };
+    /*     &Parametrization::FunctionToDEdxIntegral, parametrization_, energy,
+     * _1); */
+    auto func_transformed = [&](double t) {
+        return exp(t)
+            * (parametrization_->FunctionToDEdxIntegral)(energy, 1 - exp(t));
+    };
 
     return integral_.Integrate(t_min, t_max, func_transformed, 2);
 }
@@ -60,7 +69,10 @@ double ComptonIntegral::de2dx_integral(double energy)
 
     /* auto de2dx_func = bind(&Parametrization::FunctionToDE2dxIntegral, */
     /*     parametrization_, energy, _1); */
-    auto func_transformed = [&](double t) { return exp(t) * (parametrization_->FunctionToDE2dxIntegral)(energy, 1 - exp(t)); };
+    auto func_transformed = [&](double t) {
+        return exp(t)
+            * (parametrization_->FunctionToDE2dxIntegral)(energy, 1 - exp(t));
+    };
 
     return integral_.Integrate(t_min, t_max, func_transformed, 2);
 }

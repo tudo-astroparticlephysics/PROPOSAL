@@ -29,34 +29,17 @@
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/Annihilation.h"
-
-using std::vector;
 
 namespace PROPOSAL {
-class DynamicData;
-class Vector3D;
+class Annihilation;
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
 class AnnihilationInterpolant : public CrossSectionInterpolant {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<Annihilation, typename decay<T>::type>::value>::type>
-    AnnihilationInterpolant(T&&, const InterpolationDef&);
+    AnnihilationInterpolant(unique_ptr<Annihilation>&&, const InterpolationDef&);
 
     double CalculatedEdx(double) override;
     double CalculatedE2dx(double) override;
 };
-
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<Annihilation, typename decay<T>::type>::value>::type>
-AnnihilationInterpolant::AnnihilationInterpolant(
-    T&& param, const InterpolationDef& def)
-    : CrossSectionInterpolant(param, nullptr)
-{
-}
-
 } // namespace PROPOSAL

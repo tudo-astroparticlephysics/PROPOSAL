@@ -15,6 +15,9 @@
 
 using namespace PROPOSAL;
 
+IonizIntegral::IonizIntegral(unique_ptr<Ionization>&& param, shared_ptr<const EnergyCutSettings> cut)
+    : CrossSectionIntegral(forward<unique_ptr<Ionization>>(param), cut)
+{}
 
 double IonizIntegral::dedx_integral(double energy)
 {

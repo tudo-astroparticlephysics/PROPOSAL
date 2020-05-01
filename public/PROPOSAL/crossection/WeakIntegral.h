@@ -37,21 +37,10 @@ class WeakInteraction;
 namespace PROPOSAL {
 class WeakIntegral : public CrossSectionIntegral {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<WeakInteraction, typename decay<T>::type>::value>::type>
-    WeakIntegral(T&&);
+    WeakIntegral(unique_ptr<WeakInteraction>&&);
     virtual ~WeakIntegral() = default;
 
     double CalculatedEdx(double energy) override;
     double CalculatedE2dx(double energy) override;
 };
-
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<WeakInteraction, typename decay<T>::type>::value>::type>
-WeakIntegral::WeakIntegral(T&& param)
-    : CrossSectionIntegral(param, nullptr)
-{
-}
 } // namespace PROPOSAL

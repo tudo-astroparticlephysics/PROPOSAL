@@ -37,22 +37,7 @@ class EpairProduction;
 namespace PROPOSAL {
 class EpairInterpolant : public CrossSectionInterpolant {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<EpairProduction, typename decay<T>::type>::value>::type>
-    EpairInterpolant(
-        T&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
-    virtual ~EpairInterpolant() = default;
+    EpairInterpolant(unique_ptr<EpairProduction>&&,
+        shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
 };
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<EpairProduction, typename decay<T>::type>::value>::type>
-EpairInterpolant::EpairInterpolant(
-    T&& param, shared_ptr<const EnergyCutSettings> cuts, const InterpolationDef& interpol_def)
-    : CrossSectionInterpolant(param, cuts, interpol_def)
-{
-}
 } // namespace PROPOSAL

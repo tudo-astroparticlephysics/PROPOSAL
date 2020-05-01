@@ -37,20 +37,6 @@ class Bremsstrahlung;
 
 class BremsIntegral : public CrossSectionIntegral {
 public:
-    template <typename T,
-        typename = typename enable_if<
-            is_base_of<Bremsstrahlung, typename decay<T>::type>::value>::type>
-    BremsIntegral(T&&, shared_ptr<const EnergyCutSettings>);
+    BremsIntegral(unique_ptr<Bremsstrahlung>&&, shared_ptr<const EnergyCutSettings>);
 };
-} // namespace PROPOSAL
-
-
-namespace PROPOSAL {
-template <typename T,
-    typename = typename enable_if<
-        is_base_of<Bremsstrahlung, typename decay<T>::type>::value>::type>
-BremsIntegral::BremsIntegral(T&& param, shared_ptr<const EnergyCutSettings> cut)
-    : CrossSectionIntegral(param, cut)
-{
-}
 } // namespace PROPOSAL
