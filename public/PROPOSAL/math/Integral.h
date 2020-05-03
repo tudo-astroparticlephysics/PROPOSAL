@@ -30,7 +30,6 @@
 #pragma once
 
 #include <functional>
-#include <iostream>
 #include <vector>
 
 namespace PROPOSAL {
@@ -172,12 +171,12 @@ public:
     // Setter
     // --------------------------------------------------------------------- //
 
-    void Set_Function(std::function<double(double)> integrand)
-    {
-        std::cerr << "Integral::set_funtion2use is depricated and might even be buggy. \n better make use of "
-                     "Integral::integrateOpened(...) to set the function to use, and its range...\n";
-        this->integrand_ = integrand;
-    }
+    /* void Set_Function(std::function<double(double)> integrand) */
+    /* { */
+    /*     std::cerr << "Integral::set_funtion2use is depricated and might even be buggy. \n better make use of " */
+    /*                  "Integral::integrateOpened(...) to set the function to use, and its range...\n"; */
+    /*     this->integrand_ = integrand; */
+    /* } */
     void SetIntegrand(std::function<double(double)> integrand);
     void SetMax(double max);
     void SetMaxStepsUpperLimit(int maxSteps);

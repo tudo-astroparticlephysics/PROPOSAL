@@ -245,7 +245,8 @@ namespace Helper {
         // Simple wrapper for inizializing one Interpolant only
         Helper::InterpolantBuilderContainer builder_container;
         builder_container.push_back(std::move(builder));
-        auto return_vec = InitializeInterpolation(name, builder_container, hash_digest, interpolation_def);
+        auto return_vec = InitializeInterpolation(
+            name, builder_container, hash_digest, interpolation_def);
         return std::move(return_vec.at(0));
     }
 
@@ -296,7 +297,8 @@ namespace Helper {
 
                     for (const auto& builder : builder_container) {
                         // TODO(mario): read check Tue 2017/09/05
-                        interpolants.emplace_back(new Interpolant());
+                        interpolants.emplace_back(
+                            unique_ptr<Interpolant>(new Interpolant()));
                         interpolants.back()->Load(input, binary_tables);
                     }
                     reading_worked = true;

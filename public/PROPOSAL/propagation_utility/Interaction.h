@@ -40,23 +40,27 @@ public:
 
     double InteractionIntegrand(double energy)
     {
-        assert(energy >= lower_lim);
-        double total_rate = 0.0;
-        for (const auto& crosssection : cross)
-            total_rate += crosssection->CalculatedNdx(energy);
+        /* assert(energy >= lower_lim); */
+        /* double total_rate = 0.0; */
+        /* for (const auto& crosssection : cross) */
+        /*     total_rate += crosssection->CalculatedNdx(energy); */
 
-        return displacement.FunctionToIntegral(energy) * total_rate;
+        /* return displacement.FunctionToIntegral(energy) * total_rate; */
+    throw std::logic_error(
+        "Something went wrong during the total rate calculation.");
     }
 
     double EnergyInteraction(double initial_energy, double rnd) override
     {
-        assert(initial_energy >= lower_lim);
-        auto rndi = -std::log(rnd);
-        auto rndiMin = integral.Calculate(initial_energy, lower_lim, rndi);
-        if (rndi >= rndiMin)
-            return lower_lim;
+        /* assert(initial_energy >= lower_lim); */
+        /* auto rndi = -std::log(rnd); */
+        /* auto rndiMin = integral.Calculate(initial_energy, lower_lim, rndi); */
+        /* if (rndi >= rndiMin) */
+        /*     return lower_lim; */
 
-        return integral.GetUpperLimit(initial_energy, rndi);
+        /* return integral.GetUpperLimit(initial_energy, rndi); */
+    throw std::logic_error(
+        "Something went wrong during the total rate calculation.");
     }
 
 

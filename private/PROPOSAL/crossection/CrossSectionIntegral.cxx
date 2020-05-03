@@ -18,16 +18,14 @@ CrossSectionIntegral::CrossSectionIntegral(unique_ptr<Parametrization>&& param,
     shared_ptr<const EnergyCutSettings> cut)
     : CrossSection(std::forward<unique_ptr<Parametrization>>(param), cut)
 {
-    std::cout << "Number of components: "
-              << parametrization_->GetComponents().size() << std::endl;
     for (auto comp : parametrization_->GetComponents()) {
-        /*     parametrization_->SetCurrentComponent(comp); */
-        /*     dndx_integral_.emplace_back( */
-        /*         bind(&CrossSectionIntegral::dndx_integral, this, _1, _2)); */
+        parametrization_->SetCurrentComponent(comp);
+        dndx_integral_.emplace_back(
+            bind(&CrossSectionIntegral::dndx_integral, this, _1, _2));
         dedx_integral_.emplace_back(
             bind(&CrossSectionIntegral::dedx_integral, this, _1));
-        /*     de2dx_integral_.emplace_back( */
-        /*         bind(&CrossSectionIntegral::de2dx_integral, this, _1)); */
+        de2dx_integral_.emplace_back(
+            bind(&CrossSectionIntegral::de2dx_integral, this, _1));
     }
 }
 
@@ -36,12 +34,15 @@ double CrossSectionIntegral::dndx_integral(double energy, double rnd)
     auto v_cut = GetEnergyCut(energy);
     auto v_max = parametrization_->GetKinematicLimits(energy).vMax;
 
-    integral_.IntegrateWithRandomRatio(v_cut, v_max,
+    auto rate = integral_.IntegrateWithRandomRatio(v_cut, v_max,
         bind(&Parametrization::FunctionToDNdxIntegral, parametrization_.get(),
             energy, _1),
         4, rnd);
 
-    return integral_.GetUpperLimit();
+    if (rnd != 1)
+        return integral_.GetUpperLimit();
+
+    return rate;
 }
 
 double CrossSectionIntegral::dedx_integral(double energy)
@@ -57,8 +58,8 @@ double CrossSectionIntegral::dedx_integral(double energy)
 
 double CrossSectionIntegral::de2dx_integral(double energy)
 {
-    auto v_cut = GetEnergyCut(energy);
     auto v_min = parametrization_->GetKinematicLimits(energy).vMin;
+    auto v_cut = GetEnergyCut(energy);
 
     return integral_.Integrate(v_min, v_cut,
         bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_.get(),
@@ -66,51 +67,42 @@ double CrossSectionIntegral::de2dx_integral(double energy)
         2);
 }
 
-double CrossSectionIntegral::CalculatedNdx(double energy, double rnd)
+vector<double> CrossSectionIntegral::CalculatedNdx(double energy)
 {
     vector<double> rates;
     for (auto& dndx : dndx_integral_)
         rates.push_back(dndx(energy, 1.));
 
-    auto total_rate = accumulate(rates.begin(), rates.end(), 0);
+    return rates;
+}
 
-    size_t nth_component = 0;
-    for (const auto& rate : rates) {
-        total_rate -= rate / rnd;
-        if (total_rate < 0)
-            return dndx_integral_.at(nth_component)(energy, total_rate);
-        nth_component += 1;
+vector<double> CrossSectionIntegral::CalculateEnergyLoss(
+    double energy, const vector<double>& component_rates)
+{
+    vector<double> relativ_loss;
+    auto component_rate = component_rates.cbegin();
+    for (auto& dndx : dndx_integral_) {
+        relativ_loss.push_back(dndx(energy, *component_rate));
+        ++component_rate;
     }
 
-    return total_rate;
+    return relativ_loss;
 }
 
 double CrossSectionIntegral::CalculatedEdx(double energy)
 {
-    auto integrate_and_sum
-        = [energy](double sum, function<double(double)> func) {
-              return sum + func(energy);
-          };
-
-    std::cout << "size of dedx_integral_ : " << dedx_integral_.size()
-              << std::endl;
-    std::cout << dedx_integral_[0](energy) << std::endl;
-
-    auto sum = accumulate(
-        dedx_integral_.begin(), dedx_integral_.end(), 0, integrate_and_sum);
+    double sum = 0.;
+    for (auto dedx: dedx_integral_)
+        sum += dedx(energy);
 
     return energy * sum;
 }
 
 double CrossSectionIntegral::CalculatedE2dx(double energy)
 {
-    auto integrate_and_sum
-        = [energy](double sum, function<double(double)> func) {
-              return sum + func(energy);
-          };
-
-    auto sum = accumulate(
-        de2dx_integral_.begin(), de2dx_integral_.end(), 0, integrate_and_sum);
+    double sum = 0.;
+    for (auto de2dx : de2dx_integral_)
+        sum += de2dx(energy);
 
     return energy * energy * sum;
 }

@@ -3,6 +3,7 @@
 #include "PROPOSAL/math/Interpolant.h"
 
 #include <memory>
+#include <iostream>
 
 using std::unique_ptr;
 using namespace PROPOSAL;

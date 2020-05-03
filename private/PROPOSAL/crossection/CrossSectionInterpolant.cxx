@@ -1,7 +1,7 @@
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
@@ -12,7 +12,8 @@ using std::bind;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-CrossSectionInterpolant::CrossSectionInterpolant(unique_ptr<Parametrization>&& param,
+CrossSectionInterpolant::CrossSectionInterpolant(
+    unique_ptr<Parametrization>&& param,
     shared_ptr<const EnergyCutSettings> cut, const InterpolationDef& def)
     : CrossSectionIntegral(forward<unique_ptr<Parametrization>>(param), cut)
     , hash_interpol_def(def.GetHash())
@@ -31,10 +32,10 @@ double CrossSectionInterpolant::logarithm_trafo(
 unique_ptr<Interpolant> CrossSectionInterpolant::init_dedx_interpolation(
     const InterpolationDef& def)
 {
-    std::cout << "initi_dedx_interpolation" << parametrization_.get() << std::endl;
     Interpolant1DBuilder::Definition interpol_def;
-    interpol_def.function1d
-        = bind(&CrossSectionIntegral::CalculatedEdx, this, _1);
+    interpol_def.function1d = [this](double energy) {
+        return CrossSectionIntegral::CalculatedEdx(energy);
+    };
     interpol_def.max = def.nodes_cross_section;
     interpol_def.xmin = parametrization_->GetLowerEnergyLim();
     interpol_def.xmax = def.max_node_energy;
@@ -44,18 +45,23 @@ unique_ptr<Interpolant> CrossSectionInterpolant::init_dedx_interpolation(
     interpol_def.rombergY = def.order_of_interpolation;
     interpol_def.logSubst = true;
 
-    unique_ptr<InterpolantBuilder> builder(new Interpolant1DBuilder(interpol_def));
+    unique_ptr<InterpolantBuilder> builder(
+        new Interpolant1DBuilder(interpol_def));
     auto hash = parametrization_->GetHash();
 
-    return Helper::InitializeInterpolation("dEdx", std::move(builder), hash, def);
+    auto aux = Helper::InitializeInterpolation(
+        "dEdx", std::move(builder), hash, def);
+
+    return aux;
 }
 
 unique_ptr<Interpolant> CrossSectionInterpolant::init_de2dx_interpolation(
     const InterpolationDef& def)
 {
     Interpolant1DBuilder::Definition interpol_def;
-    interpol_def.function1d
-        = bind(&CrossSectionIntegral::CalculatedE2dx, this, _1);
+    interpol_def.function1d = [this](double energy) {
+        return CrossSectionIntegral::CalculatedE2dx(energy);
+    };
     interpol_def.max = def.nodes_continous_randomization;
     interpol_def.xmin = parametrization_->GetLowerEnergyLim();
     interpol_def.xmax = def.max_node_energy;
@@ -63,10 +69,12 @@ unique_ptr<Interpolant> CrossSectionInterpolant::init_de2dx_interpolation(
     interpol_def.isLog = true;
     interpol_def.rombergY = def.order_of_interpolation;
 
-    unique_ptr<InterpolantBuilder> builder(new Interpolant1DBuilder(interpol_def));
+    unique_ptr<InterpolantBuilder> builder(
+        new Interpolant1DBuilder(interpol_def));
     auto hash = parametrization_->GetHash();
 
-    return Helper::InitializeInterpolation("dE2dx", std::move(builder), hash, def);
+    return Helper::InitializeInterpolation(
+        "dE2dx", std::move(builder), hash, def);
 }
 
 vector<unique_ptr<Interpolant>>
@@ -105,24 +113,23 @@ double CrossSectionInterpolant::CalculatedE2dx(double energy)
     return de2dx_interpolant_->Interpolate(energy);
 }
 
-double CrossSectionInterpolant::CalculatedNdx(double energy, double rnd)
+vector<double> CrossSectionInterpolant::CalculatedNdx(double energy)
 {
     vector<double> rates;
     for (auto& interpol : dndx_interpolants_)
         rates.emplace_back(interpol->Interpolate(energy, 1.));
+    return rates;
+}
 
-    auto total_rate = accumulate(rates.begin(), rates.end(), 0.);
+vector<double> CrossSectionInterpolant::CalculateEnergyLoss(
+    double energy, const vector<double>& component_rates)
+{
+    vector<double> loss;
+    auto sampled_component_rate = component_rates.cbegin();
+    for (auto& interpol : dndx_interpolants_)
+        loss.emplace_back(interpol->FindLimit(energy, *sampled_component_rate));
 
-    size_t nth_component = 0;
-    for (const auto& rate : rates) {
-        total_rate -= rate / rnd;
-        if (total_rate < 0)
-            return dndx_interpolants_.at(nth_component)
-                ->Interpolate(energy, total_rate);
-        nth_component += 1;
-    }
-
-    return total_rate;
+    return loss;
 }
 
 size_t CrossSectionInterpolant::GetHash() const

@@ -71,7 +71,7 @@ double EpairProduction::lpm(
         throw std::logic_error("need further thoughts");
         /* eLpm_ *= (eLpm_ * eLpm_) * ALPHA * particle_mass_ */
         /*     / (2 * PI * medium_->GetMolDensity() * particle_charge_ */
-                  /* * particle_charge_ * sum); */
+        /* * particle_charge_ * sum); */
     }
 
     // Ternovskii functions calculated in appendix (eq. A.2)
@@ -182,8 +182,9 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
     double g1, g2;
     double aux, aux1, aux2, r2;
     double diagram_e, diagram_mu, atomic_electron_contribution;
-    double medium_charge = current_component_.GetNucCharge();
-    double medium_log_constant = current_component_.GetLogConstant();
+
+    auto medium_charge = current_component_.GetNucCharge();
+    auto medium_log_constant = current_component_.GetLogConstant();
 
     r = 1 - r; // only for integral optimization - do not forget to swap
                // integration limits!
@@ -260,11 +261,10 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
 
     // combining the results
     aux = ALPHA * RE * particle_charge_;
-    ;
     aux *= aux / (1.5 * PI) * 2 * medium_charge
         * (medium_charge + atomic_electron_contribution);
     aux1 = ME / particle_mass_ * particle_charge_;
-    ;
+
     aux *= (1 - v) / v * (diagram_e + aux1 * aux1 * diagram_mu);
 
     if (lpm_) {

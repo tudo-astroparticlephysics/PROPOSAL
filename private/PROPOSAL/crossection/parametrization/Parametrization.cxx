@@ -20,13 +20,8 @@ Parametrization::Parametrization(const string& param_name,
     , particle_charge_(p_def.charge)
     , components_(components)
     , lower_energy_lim_(lower_energy_lim)
+    , current_component_(components.front())
 {
-    /* for (const auto& comp : components) { */
-    /*     components.emplace_back(comp); */
-    /* } */
-
-    /* shared_ptr<Component> current_component; */
-    /* current_component = component[1]; */
 }
 
 Parametrization::KinematicLimits::KinematicLimits(double v_min, double v_max)

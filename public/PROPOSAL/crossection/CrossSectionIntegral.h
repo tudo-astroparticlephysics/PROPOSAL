@@ -53,7 +53,8 @@ protected:
 
 public:
     /* CrossSectionIntegral(); */
-    CrossSectionIntegral(unique_ptr<Parametrization>&& param, shared_ptr<const EnergyCutSettings> cut);
+    CrossSectionIntegral(unique_ptr<Parametrization>&& param,
+        shared_ptr<const EnergyCutSettings> cut);
     virtual ~CrossSectionIntegral() = default;
 
     enum { TOTAL_RATE, SAMPLED_RATE };
@@ -61,8 +62,9 @@ public:
     virtual double dedx_integral(double energy);
     virtual double de2dx_integral(double energy);
 
-    virtual double CalculatedEdx(double energy);
-    virtual double CalculatedE2dx(double energy);
-    virtual double CalculatedNdx(double energy, double rnd = 0);
+    double CalculatedEdx(double) override;
+    double CalculatedE2dx(double) override;
+    vector<double> CalculatedNdx(double) override;
+    vector<double> CalculateEnergyLoss(double, const vector<double>&) override;
 };
 } // namespace PROPOSAL

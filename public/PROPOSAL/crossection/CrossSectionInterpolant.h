@@ -55,7 +55,8 @@ public:
 
     double CalculatedEdx(double) override;
     double CalculatedE2dx(double) override;
-    double CalculatedNdx(double, double = 1) override;
+    vector<double> CalculatedNdx(double) override;
+    vector<double> CalculateEnergyLoss(double, const vector<double>&) override;
 
     size_t GetHash() const override;
 };

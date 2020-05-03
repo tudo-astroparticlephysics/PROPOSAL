@@ -39,8 +39,6 @@ namespace Components {
         ss << " Component (" << &component << ") ";
         os << Helper::Centered(60, ss.str()) << '\n';
 
-        os << std::fixed << std::setprecision(6);
-
         os << component.GetName() << std::endl;
         os << "AtomicNuc:"
            << "\t\t" << component.GetAtomicNum() << std::endl;
