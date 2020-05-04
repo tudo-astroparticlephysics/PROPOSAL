@@ -56,7 +56,8 @@ void init_crosssection(py::module& m) {
                 >>> param = proposal.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
                 >>> cross = proposal.crosssection.BremsInterpolant(param, interpol)
                 >>> cross.calculate_dEdx(1e6) # exmaple usage of the created crosssection class...
-                )pbdoc") DEF_PY_PRINT(CrossSection)
+                )pbdoc")
+        .def("__str__", &py_print<CrossSection>)
         .def("calculate_dEdx", &CrossSection::CalculatedEdx, py::arg("energy"),
              R"pbdoc( 
 
