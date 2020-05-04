@@ -404,9 +404,16 @@ std::pair<double, int> Sector::MakeStochasticLoss(double particle_energy)
 double Sector::Displacement(const DynamicData& p_condition,
     const double final_energy, const double border_length)
 {
-    return displacement_calculator_->Calculate(p_condition.GetEnergy(),
+    try{
+        return displacement_calculator_->Calculate(p_condition.GetEnergy(),
         final_energy, border_length, p_condition.GetPosition(),
         p_condition.GetDirection());
+    }
+    catch(DensityException& e)
+    {
+        throw;
+    }
+    
 }
 
 double Sector::BorderLength(const Vector3D& position, const Vector3D& direction)
@@ -521,15 +528,10 @@ std::shared_ptr<DynamicData> Sector::DoDecay(const DynamicData& p_condition)
 }
 
 std::shared_ptr<DynamicData> Sector::DoContinuous(
-    const DynamicData& p_condition, double final_energy, double sector_border)
+    const DynamicData& p_condition, double final_energy, double displacement)
 {
 
     double initial_energy{ p_condition.GetEnergy() };
-    double displacement
-        = Displacement(p_condition, final_energy, sector_border);
-
-    if(std::abs(displacement - sector_border) < PARTICLE_POSITION_RESOLUTION)
-        displacement = sector_border;
 
     double dist = p_condition.GetPropagatedDistance() + displacement;
     double time = CalculateTime(p_condition, final_energy, displacement);
@@ -547,15 +549,16 @@ std::shared_ptr<DynamicData> Sector::DoContinuous(
 }
 
 Secondaries Sector::Propagate(
-    const DynamicData& p_initial, double distance, const double minimal_energy)
+    const DynamicData& p_initial, double border_distance, const double minimal_energy)
 {
     Secondaries secondaries(std::make_shared<ParticleDef>(particle_def_));
 
     auto p_condition = std::make_shared<DynamicData>(p_initial);
-    double dist_limit{ p_initial.GetPropagatedDistance() + distance };
+    double dist_limit{ p_initial.GetPropagatedDistance() + border_distance };
     double rnd;
     int minimalLoss;
     std::array<double, 4> LossEnergies;
+    double displacement;
 
     while (true) {
         rnd = RandomGenerator::Get().RandomDouble();
@@ -566,17 +569,41 @@ Secondaries Sector::Propagate(
         LossEnergies[LossType::Interaction]
             = EnergyInteraction(p_condition->GetEnergy(), rnd);
 
-        distance = dist_limit - p_condition->GetPropagatedDistance();
+        border_distance = dist_limit - p_condition->GetPropagatedDistance();
         LossEnergies[LossType::Distance]
-            = EnergyDistance(p_condition->GetEnergy(), distance);
+            = EnergyDistance(p_condition->GetEnergy(), border_distance);
 
         LossEnergies[LossType::MinimalE]
             = EnergyMinimal(p_condition->GetEnergy(), minimal_energy);
 
         minimalLoss = maximizeEnergy(LossEnergies);
 
+        if (minimalLoss == LossType::Distance)
+        {
+            displacement = border_distance;
+        }
+        else
+        {
+            try{
+                displacement = Displacement(*p_condition, LossEnergies[minimalLoss], border_distance);
+            }
+            catch(DensityException& e){
+                // due to numerical instabilities
+                // the calculated Energy to the distance to the sector border
+                // may be slightly bigger than an interaction length, which could
+                // exceed the sector border.
+                minimalLoss = LossType::Distance;
+                displacement = border_distance;
+            }
+
+            if(std::abs(displacement - border_distance) < PARTICLE_POSITION_RESOLUTION){
+                minimalLoss = LossType::Distance;
+                displacement = border_distance;
+            }
+        }
+
         p_condition
-            = DoContinuous(*p_condition, LossEnergies[minimalLoss], distance);
+            = DoContinuous(*p_condition, LossEnergies[minimalLoss], displacement);
         if (sector_def_.do_continuous_energy_loss_output)
             secondaries.push_back(*p_condition);
 
