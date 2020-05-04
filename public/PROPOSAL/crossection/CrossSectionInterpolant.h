@@ -42,7 +42,8 @@ protected:
     unique_ptr<Interpolant> de2dx_interpolant_;
     vector<unique_ptr<Interpolant>> dndx_interpolants_;
 
-    double logarithm_trafo(double, double, double) const;
+    double dndx_integral(double energy, double v) override;
+    double transform_relativ_loss(double, double) const;
 
     virtual vector<unique_ptr<Interpolant>> init_dndx_interpolation(
         const InterpolationDef&);
@@ -56,7 +57,8 @@ public:
     double CalculatedEdx(double) override;
     double CalculatedE2dx(double) override;
     vector<double> CalculatedNdx(double) override;
-    vector<double> CalculateEnergyLoss(double, const vector<double>&) override;
+    vector<double> CalculateStochasticLoss(double, const vector<double>&) override;
+
 
     size_t GetHash() const override;
 };

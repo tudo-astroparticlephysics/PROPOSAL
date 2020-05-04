@@ -65,7 +65,7 @@ public:
     virtual double CalculatedEdx(double) = 0;
     virtual double CalculatedE2dx(double) = 0;
     virtual vector<double> CalculatedNdx(double) = 0;
-    virtual vector<double> CalculateEnergyLoss(double, const vector<double>&) = 0;
+    virtual vector<double> CalculateStochasticLoss(double, const vector<double>&) = 0;
 
     double GetEnergyCut(double energy) const;
     double GetLowerEnergyLimit() const;

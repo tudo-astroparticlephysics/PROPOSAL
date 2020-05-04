@@ -23,10 +23,24 @@ CrossSectionInterpolant::CrossSectionInterpolant(
 {
 }
 
-double CrossSectionInterpolant::logarithm_trafo(
-    double v, double v_cut, double v_max) const
+double CrossSectionInterpolant::transform_relativ_loss(
+    double v, double energy) const
 {
+    auto v_cut = GetEnergyCut(energy);
+    auto v_max = parametrization_->GetKinematicLimits(energy).vMax;
+
     return v_cut * std::exp(v * std::log(v_max / v_cut));
+}
+
+double CrossSectionInterpolant::dndx_integral(double energy, double v)
+{
+    auto v_cut = GetEnergyCut(energy);
+    v = transform_relativ_loss(v, energy);
+
+    return integral_.Integrate(v_cut, v,
+        bind(&Parametrization::FunctionToDNdxIntegral, parametrization_.get(),
+            energy, _1),
+        4);
 }
 
 unique_ptr<Interpolant> CrossSectionInterpolant::init_dedx_interpolation(
@@ -121,15 +135,22 @@ vector<double> CrossSectionInterpolant::CalculatedNdx(double energy)
     return rates;
 }
 
-vector<double> CrossSectionInterpolant::CalculateEnergyLoss(
+vector<double> CrossSectionInterpolant::CalculateStochasticLoss(
     double energy, const vector<double>& component_rates)
 {
-    vector<double> loss;
+    vector<double> relativ_losses;
     auto sampled_component_rate = component_rates.cbegin();
     for (auto& interpol : dndx_interpolants_)
-        loss.emplace_back(interpol->FindLimit(energy, *sampled_component_rate));
+        relativ_losses.emplace_back(interpol->FindLimit(energy, *sampled_component_rate));
 
-    return loss;
+    auto relativ_loss = relativ_losses.begin();
+    for (const auto& comp : parametrization_->GetComponents()) {
+        parametrization_->SetCurrentComponent(comp);
+        *relativ_loss = transform_relativ_loss(*relativ_loss, energy);
+        ++relativ_loss;
+    }
+
+    return relativ_losses;
 }
 
 size_t CrossSectionInterpolant::GetHash() const

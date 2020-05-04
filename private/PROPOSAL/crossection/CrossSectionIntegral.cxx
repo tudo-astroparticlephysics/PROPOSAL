@@ -76,23 +76,23 @@ vector<double> CrossSectionIntegral::CalculatedNdx(double energy)
     return rates;
 }
 
-vector<double> CrossSectionIntegral::CalculateEnergyLoss(
+vector<double> CrossSectionIntegral::CalculateStochasticLoss(
     double energy, const vector<double>& component_rates)
 {
-    vector<double> relativ_loss;
-    auto component_rate = component_rates.cbegin();
+    vector<double> relativ_losses;
+    auto component_rate = component_rates.begin();
     for (auto& dndx : dndx_integral_) {
-        relativ_loss.push_back(dndx(energy, *component_rate));
+        relativ_losses.push_back(dndx(energy, *component_rate));
         ++component_rate;
     }
 
-    return relativ_loss;
+    return relativ_losses;
 }
 
 double CrossSectionIntegral::CalculatedEdx(double energy)
 {
     double sum = 0.;
-    for (auto dedx: dedx_integral_)
+    for (auto dedx : dedx_integral_)
         sum += dedx(energy);
 
     return energy * sum;

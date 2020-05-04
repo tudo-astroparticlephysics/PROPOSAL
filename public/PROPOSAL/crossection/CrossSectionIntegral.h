@@ -65,6 +65,6 @@ public:
     double CalculatedEdx(double) override;
     double CalculatedE2dx(double) override;
     vector<double> CalculatedNdx(double) override;
-    vector<double> CalculateEnergyLoss(double, const vector<double>&) override;
+    vector<double> CalculateStochasticLoss(double, const vector<double>&) override;
 };
 } // namespace PROPOSAL
