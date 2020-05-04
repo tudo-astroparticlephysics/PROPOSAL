@@ -54,7 +54,7 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
             std::placeholders::_1),
         4);
 
-    aux *= current_component_.GetAtomInMolecule() * particle_charge_
+    aux *= NA / current_component_.GetAtomicNum() * particle_charge_
         * particle_charge_;
 
     return aux;

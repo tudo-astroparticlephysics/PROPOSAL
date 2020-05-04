@@ -30,9 +30,9 @@ vector<shared_ptr<CrossSection>> BuildEMinusStdCrossSections(
     auto shadow = make_unique<ShadowButkevichMikhailov>();
 
     auto brems = make_unique<BremsKelnerKokoulinPetrukhin>(
-        p_def, medium.GetComponents(), true);
+        p_def, medium.GetComponents(), false);
     auto epair = make_unique<EpairKelnerKokoulinPetrukhin>(
-        p_def, medium.GetComponents(), true);
+        p_def, medium.GetComponents(), false);
     auto ioniz = make_unique<IonizBetheBlochRossi>(p_def, medium, *cut);
     auto photo = make_unique<PhotoAbramowiczLevinLevyMaor97>(
         p_def, medium.GetComponents(), std::move(shadow));
@@ -58,9 +58,9 @@ vector<shared_ptr<CrossSection>> BuildMuMinusStdCrossSections(
     auto shadow = make_unique<ShadowButkevichMikhailov>();
 
     auto brems = make_unique<BremsKelnerKokoulinPetrukhin>(
-        p_def, medium.GetComponents(), true);
+        p_def, medium.GetComponents(), false);
     auto epair = make_unique<EpairKelnerKokoulinPetrukhin>(
-        p_def, medium.GetComponents(), true);
+        p_def, medium.GetComponents(), false);
     auto ioniz = make_unique<IonizBetheBlochRossi>(p_def, medium, *cut);
     auto photo = make_unique<PhotoAbramowiczLevinLevyMaor97>(
         p_def, medium.GetComponents(), std::move(shadow));
@@ -85,9 +85,9 @@ vector<shared_ptr<CrossSection>> BuildTauMinusStdCrossSections(
     auto shadow = make_unique<ShadowButkevichMikhailov>();
 
     auto brems = make_unique<BremsKelnerKokoulinPetrukhin>(
-        p_def, medium.GetComponents(), true);
+        p_def, medium.GetComponents(), false);
     auto epair = make_unique<EpairKelnerKokoulinPetrukhin>(
-        p_def, medium.GetComponents(), true);
+        p_def, medium.GetComponents(), false);
     auto ioniz = make_unique<IonizBetheBlochRossi>(p_def, medium, *cut);
     auto photo = make_unique<PhotoAbramowiczLevinLevyMaor97>(
         p_def, medium.GetComponents(), std::move(shadow));

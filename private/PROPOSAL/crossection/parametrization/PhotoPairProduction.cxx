@@ -161,7 +161,7 @@ double PhotoPairTsai::DifferentialCrossSection(double energy, double x)
     aux *= x * std::pow(k, 2.) / p; // conversion from differential cross
                                     // section in electron momentum to x
 
-    return std::max(current_component_.GetAtomInMolecule() * aux,
+    return std::max(NA / current_component_.GetAtomicNum() * aux,
         0.); // TODO what are the real factors here, those are just guesses
 }
 

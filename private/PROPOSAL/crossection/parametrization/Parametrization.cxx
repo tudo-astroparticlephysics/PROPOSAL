@@ -49,7 +49,7 @@ size_t Parametrization::GetHash() const
 {
     size_t hash_digest = 0;
     hash_combine(
-        hash_digest, particle_mass_, particle_charge_, lower_energy_lim_);
+        hash_digest, param_name_, particle_mass_, particle_charge_, lower_energy_lim_);
     for (const auto& comp : components_)
         hash_combine(hash_digest, comp.GetHash());
 

@@ -82,7 +82,7 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(
     aux += current_component_.GetAtomicNum() * 1.e-30
         * hard_component_->CalculateHardComponent(energy, v);
 
-    return current_component_.GetAtomInMolecule() * particle_charge_
+    return NA / current_component_.GetAtomicNum() * particle_charge_
         * particle_charge_ * aux;
 }
 

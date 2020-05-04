@@ -46,7 +46,7 @@ double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
         aux *= lpm(energy, v);
     }
 
-    return current_component_.GetAtomInMolecule() * aux;
+    return NA / current_component_.GetAtomicNum() * aux;
 }
 
 Parametrization::KinematicLimits Bremsstrahlung::GetKinematicLimits(
@@ -517,7 +517,7 @@ double BremsElectronScreening::DifferentialCrossSection(double energy, double v)
         aux *= lpm(energy, v);
     }
 
-    return current_component_.GetAtomInMolecule() * aux;
+    return NA / current_component_.GetAtomicNum() * aux;
 }
 
 double BremsElectronScreening::CalculateParametrization(double energy, double v)

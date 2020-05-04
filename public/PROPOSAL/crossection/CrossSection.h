@@ -53,11 +53,10 @@ using std::placeholders::_2;
 
 namespace PROPOSAL {
 class CrossSection {
-protected:
+public:
     unique_ptr<Parametrization> parametrization_;
     shared_ptr<const EnergyCutSettings> cuts_;
 
-public:
     /* CrossSection() { std::cout <<"default cstr. " << std::endl; }; */
     CrossSection(unique_ptr<Parametrization>&&, shared_ptr<const EnergyCutSettings>);
     virtual ~CrossSection() = default;

@@ -59,7 +59,5 @@ public:
     vector<double> CalculatedNdx(double) override;
     vector<double> CalculateStochasticLoss(double, const vector<double>&) override;
 
-
-    size_t GetHash() const override;
 };
 } // namespace PROPOSAL

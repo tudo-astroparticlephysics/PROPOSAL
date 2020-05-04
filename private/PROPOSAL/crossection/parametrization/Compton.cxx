@@ -54,6 +54,6 @@ double ComptonKleinNishina::DifferentialCrossSection(double energy, double v)
                    // to v
 
     aux *= PI * std::pow(RE, 2.) * ME;
-    return current_component_.GetAtomInMolecule()
+    return NA / current_component_.GetAtomicNum()
         * current_component_.GetNucCharge() * aux;
 }

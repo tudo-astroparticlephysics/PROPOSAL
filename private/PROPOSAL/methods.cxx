@@ -29,6 +29,9 @@
 
 namespace PROPOSAL {
 
+std::string InterpolationDef::path_to_tables = "";
+std::string InterpolationDef::path_to_tables_readonly = "";
+
 InterpolationDef::InterpolationDef(const nlohmann::json& config)
 {
     nodes_propagate = config.value("nodes_propagate", 1000);
@@ -266,7 +269,8 @@ namespace Helper {
         // ---------------------------------------------------------------------
         // // first check the reading paths if one of the reading paths already
         // has the required tables
-        pathname = ResolvePath(interpolation_def.path_to_tables_readonly, true);
+
+        pathname = ResolvePath(InterpolationDef::path_to_tables_readonly, true);
         if (!pathname.empty()) {
             filename << pathname << "/" << name << "_" << hash_digest;
             if (!binary_tables) {
@@ -332,7 +336,8 @@ namespace Helper {
         // ---------------------------------------------------------------------
         // // if none of the reading paths has the required interpolation table
         // the interpolation tables will be written in the path for writing
-        pathname = ResolvePath(interpolation_def.path_to_tables);
+
+        pathname = ResolvePath(InterpolationDef::path_to_tables);
 
         // clear the stringstream
         filename.str(std::string());

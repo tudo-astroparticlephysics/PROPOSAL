@@ -67,5 +67,5 @@ double WeakCooperSarkarMertsch::DifferentialCrossSection(
     assert(mean_contr > 0);
 
     // factor 1e-36: conversion from pb to cm^2
-    return current_component_.GetAtomInMolecule() * 1e-36 * mean_contr;
+    return NA / current_component_.GetAtomicNum() * 1e-36 * mean_contr;
 }

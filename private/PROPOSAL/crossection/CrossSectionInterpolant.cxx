@@ -61,10 +61,9 @@ unique_ptr<Interpolant> CrossSectionInterpolant::init_dedx_interpolation(
 
     unique_ptr<InterpolantBuilder> builder(
         new Interpolant1DBuilder(interpol_def));
-    auto hash = parametrization_->GetHash();
 
     auto aux = Helper::InitializeInterpolation(
-        "dEdx", std::move(builder), hash, def);
+        "dEdx", std::move(builder), GetHash(), def);
 
     return aux;
 }
@@ -85,10 +84,9 @@ unique_ptr<Interpolant> CrossSectionInterpolant::init_de2dx_interpolation(
 
     unique_ptr<InterpolantBuilder> builder(
         new Interpolant1DBuilder(interpol_def));
-    auto hash = parametrization_->GetHash();
 
     return Helper::InitializeInterpolation(
-        "dE2dx", std::move(builder), hash, def);
+        "dE2dx", std::move(builder), GetHash(), def);
 }
 
 vector<unique_ptr<Interpolant>>
@@ -114,7 +112,7 @@ CrossSectionInterpolant::init_dndx_interpolation(const InterpolationDef& def)
     }
 
     return Helper::InitializeInterpolation(
-        "dNdx", builder, parametrization_->GetHash(), def);
+        "dNdx", builder, GetHash(), def);
 }
 
 double CrossSectionInterpolant::CalculatedEdx(double energy)
@@ -151,12 +149,4 @@ vector<double> CrossSectionInterpolant::CalculateStochasticLoss(
     }
 
     return relativ_losses;
-}
-
-size_t CrossSectionInterpolant::GetHash() const
-{
-    size_t hash_digest = 0;
-    hash_combine(hash_digest, hash_interpol_def, CrossSection::GetHash());
-
-    return hash_digest;
 }

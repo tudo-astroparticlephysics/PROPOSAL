@@ -77,7 +77,7 @@ double MupairProductionRhoIntegral::DifferentialCrossSection(double energy, doub
         return 0;
     }
 
-    return current_component_.GetAtomInMolecule() * particle_charge_
+    return NA / current_component_.GetAtomicNum() * particle_charge_
         * particle_charge_
         * (integral_.Integrate(0, rMax,
               std::bind(&MupairProductionRhoIntegral::FunctionToIntegral, this,

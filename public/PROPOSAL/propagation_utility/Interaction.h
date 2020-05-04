@@ -40,14 +40,16 @@ public:
 
     double InteractionIntegrand(double energy)
     {
-        /* assert(energy >= lower_lim); */
-        /* double total_rate = 0.0; */
-        /* for (const auto& crosssection : cross) */
-        /*     total_rate += crosssection->CalculatedNdx(energy); */
+        assert(energy >= lower_lim);
+        double total_rate = 0.0;
+        for (const auto& crosssection : cross)
+        {
+            auto component_rates = crosssection->CalculatedNdx(energy);
+            total_rate += accumulate(component_rates.begin(), component_rates.end(), 0);
+        }
+        std::cout << "total_rate: " << total_rate << std::endl;
 
-        /* return displacement.FunctionToIntegral(energy) * total_rate; */
-    throw std::logic_error(
-        "Something went wrong during the total rate calculation.");
+        return displacement.FunctionToIntegral(energy) * total_rate;
     }
 
     double EnergyInteraction(double initial_energy, double rnd) override

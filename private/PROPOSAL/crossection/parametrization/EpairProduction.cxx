@@ -134,7 +134,7 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(
 
     aux = std::max(1 - rMax, COMPUTER_PRECISION);
 
-    return current_component_.GetAtomInMolecule() * particle_charge_
+    return NA / current_component_.GetAtomicNum() * particle_charge_
         * particle_charge_
         * (integral_.Integrate(1 - rMax, aux,
                std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this,
