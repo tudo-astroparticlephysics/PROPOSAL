@@ -29,7 +29,6 @@ size_t CrossSection::GetHash() const
 {
     size_t hash_digest = 0;
     hash_combine(hash_digest, parametrization_->GetHash(), cuts_->GetHash());
-    std::cout << "Hash: " << hash_digest << std::endl;
 
     return hash_digest;
 }

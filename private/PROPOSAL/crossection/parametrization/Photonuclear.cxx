@@ -233,10 +233,11 @@ Parametrization::KinematicLimits Photonuclear::GetKinematicLimits(double energy)
                                * current_component_.GetAverageNucleonWeight()))
         / energy;
 
-    auto v_max = 1;
+    auto v_max = 1.;
     if (particle_mass_ < MPI) {
         auto aux = particle_mass_
             / current_component_.GetAverageNucleonWeight();
+
         v_max -= current_component_.GetAverageNucleonWeight()
             * (1 + aux * aux) / (2 * energy);
     }
