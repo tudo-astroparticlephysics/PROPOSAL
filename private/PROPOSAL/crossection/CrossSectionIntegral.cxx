@@ -53,7 +53,7 @@ double CrossSectionIntegral::dedx_integral(double energy)
     return integral_.Integrate(v_min, v_cut,
         bind(&Parametrization::FunctionToDEdxIntegral, parametrization_.get(),
             energy, _1),
-        2);
+        4);
 }
 
 double CrossSectionIntegral::de2dx_integral(double energy)
