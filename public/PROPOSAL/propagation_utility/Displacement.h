@@ -21,6 +21,7 @@ protected:
 public:
     Displacement(const CrossSectionList&);
     virtual ~Displacement() = default;
+
     double FunctionToIntegral(double);
     virtual double SolveTrackIntegral(double, double) = 0;
     virtual double UpperLimitTrackIntegral(double, double) = 0;

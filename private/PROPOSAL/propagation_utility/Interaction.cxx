@@ -8,6 +8,7 @@ Interpolant1DBuilder::Definition interaction_interpol_def;
 
 Interaction::Interaction(CrossSectionList cross)
     : cross(cross)
+    , displacement(cross)
     , lower_lim(std::numeric_limits<double>::max())
 {
     if (cross.size() < 1)
@@ -17,25 +18,46 @@ Interaction::Interaction(CrossSectionList cross)
         lower_lim = std::min(lower_lim, c->GetLowerEnergyLimit());
 }
 
-std::shared_ptr<CrossSection> Interaction::TypeInteraction(
-    double energy, const std::array<double, 2>& rnd)
+vector<vector<double>> Interaction::CalculateRates(double energy)
 {
-    /* assert(energy >= lower_lim); */
-    /* std::vector<double> rates; */
-    /* for (const auto& c : cross) */
-    /*     rates.push_back(c->CalculatedNdx(energy, rnd[1])); */
+    vector<vector<double>> rates;
+    for (const auto& crosssection : cross)
+        rates.emplace_back(crosssection->CalculatedNdx(energy));
+    return rates;
+}
 
-    /* auto total_rate = std::accumulate(rates.begin(), rates.end(), 0.0); */
-    /* log_debug("Total rate = %f, total rate weighted = %f", total_rate, */
-    /*     total_rate * rnd[0]); */
+double Interaction::FunctionToIntegral(double energy)
+{
+    auto interaction_rates = CalculateRates(energy);
 
-    /* double rates_sum = 0.; */
-    /* for (size_t i = 0; i < rates.size(); i++) { */
-    /*     rates_sum += rates[i]; */
-    /*     if (rates_sum >= total_rate * rnd[0]) */
-    /*         return cross.at(i); */
-    /* } */
+    auto total_rate = (double)0;
+    for (const auto& comp_rates : interaction_rates)
+        total_rate += accumulate(comp_rates.begin(), comp_rates.end(), 0);
 
-    throw std::logic_error(
-        "Something went wrong during the total rate calculation.");
+    return displacement.FunctionToIntegral(energy) * total_rate;
+}
+
+tuple<double, InteractionType> Interaction::SampleStochasticLoss(double energy, double rnd)
+{
+    auto interaction_rates = CalculateRates(energy);
+
+    auto total_rate = (double)0;
+    for (const auto& comp_rates : interaction_rates)
+        total_rate += accumulate(comp_rates.begin(), comp_rates.end(), 0);
+
+    auto sampled_rate = total_rate * rnd;
+
+    auto interaction = cross.begin()
+    for (const auto& comp_rates : interaction_rates){
+        auto comp = interaction->GetComponents();
+        for (const auto & rate : comp_rates) {
+            sampled_rate -= rate;
+
+            if(sampled_rate < 0){
+
+            }
+        }
+        ++interaction;
+    }
+
 }
