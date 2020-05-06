@@ -40,7 +40,7 @@ public:
                 hash_combine(hash_digest, c->GetHash());
             decay_interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                        lower_lim, energy, 0);
+                        lower_lim, energy);
             };
             integral.BuildTables("decay", hash_digest, decay_interpol_def);
         }
@@ -59,7 +59,7 @@ public:
     double EnergyDecay(double initial_energy, double rnd) override
     {
         auto rndd = -std::log(rnd);
-        auto rnddMin = integral.Calculate(initial_energy, lower_lim, rndd) / lifetime;
+        auto rnddMin = integral.Calculate(initial_energy, lower_lim) / lifetime;
 
         if (rndd >= rnddMin)
             return lower_lim;

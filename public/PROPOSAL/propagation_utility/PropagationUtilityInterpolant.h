@@ -28,12 +28,11 @@
 
 #pragma once
 
-#include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
+#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
 #include <functional>
 #include <memory>
 #include <string>
@@ -55,11 +54,10 @@ class UtilityInterpolant : public UtilityIntegral {
     // std::unique_ptr<Interpolant> interpolant_diff_;
 
 public:
-    UtilityInterpolant(std::function<double(double)>, double lower_lim);
+    UtilityInterpolant(std::function<double(double)>, double);
     void BuildTables(const string, size_t, Interpolant1DBuilder::Definition);
 
-    double Calculate(double ei, double ef, double rnd);
-    double GetUpperLimit(double ei, double rnd);
-
+    double Calculate(double, double);
+    double GetUpperLimit(double, double);
 };
 } // namespace PROPOSAL

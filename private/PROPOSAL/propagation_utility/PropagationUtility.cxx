@@ -126,9 +126,9 @@ double Utility::EnergyRandomize(
     return final_energy;
 }
 
-double Utility::TimeElapsed(double initial_energy, double final_energy, double distance)
+double Utility::TimeElapsed(double initial_energy, double final_energy)
 {
-    return utility_def->time_calc->TimeElapsed(initial_energy, final_energy, distance);
+    return utility_def->time_calc->TimeElapsed(initial_energy, final_energy);
 }
 
 tuple<Vector3D, Vector3D> Utility::DirectionsScatter(double displacement,
@@ -145,9 +145,8 @@ std::pair<double, double> DirectionDeflect(CrossSection& crosssection, double pa
     /* return crosssection.StochasticDeflection(particle_energy, loss_energy); */
 }
 
-double Utility::LengthContinuous(
-    double initial_energy, double final_energy, double border_length)
+double Utility::LengthContinuous( double initial_energy, double final_energy)
 {
     return utility_def->displacement_calc->SolveTrackIntegral(
-        initial_energy, final_energy, border_length);
+        initial_energy, final_energy);
 }

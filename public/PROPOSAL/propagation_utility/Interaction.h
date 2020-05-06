@@ -32,7 +32,7 @@ public:
                 hash_combine(hash_digest, c->GetHash());
             interaction_interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                        energy, 1e14, 0);
+                        energy, 1e14);
             };
             integral.BuildTables("interaction", hash_digest, interaction_interpol_def);
         }

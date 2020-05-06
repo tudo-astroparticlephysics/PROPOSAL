@@ -67,8 +67,8 @@ public:
     double EnergyDecay(double, double);
     double EnergyInteraction(double, double);
     double EnergyRandomize(double, double, double);
-    double LengthContinuous(double, double, double);
-    double TimeElapsed(double, double, double);
+    double LengthContinuous(double, double);
+    double TimeElapsed(double, double);
 
     /* // TODO: return value doesn't tell what it include. Maybe it would be better */
     /* // to give a tuple of two directions back. One is the mean over the */

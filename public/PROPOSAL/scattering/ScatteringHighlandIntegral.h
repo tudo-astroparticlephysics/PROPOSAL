@@ -54,7 +54,7 @@ public:
                 hash_combine(hash_digest, crosssection->GetHash());
             interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                     energy, interpol_def.xmax, 0);
+                     energy, interpol_def.xmax);
             };
 
             integral.BuildTables("scattering", hash_digest, interpol_def);
@@ -86,7 +86,7 @@ private:
     double CalculateTheta0(
         double dr, double ei, double ef, const Vector3D& pos) override
     {
-        double aux = integral.Calculate(ei, ef, 0.0)
+        double aux = integral.Calculate(ei, ef)
             * medium_->GetDensityDistribution().Evaluate(pos);
         double cutoff = 1;
         double radiation_length = medium_->GetRadiationLength(pos);

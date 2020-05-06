@@ -7,9 +7,7 @@ namespace PROPOSAL {
 
 class Time {
 public:
-    virtual double TimeElapsed(
-        double initial_energy, double final_energy, double time)
-        = 0;
+    virtual double TimeElapsed(double initial_energy, double final_energy) = 0;
     virtual double TimeElapsed(double distance) = 0;
 
 protected:
@@ -42,7 +40,7 @@ public:
 
             time_interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                    energy, lower_lim, 0);
+                    energy, lower_lim);
             };
             integral.BuildTables(name, hash_digest, time_interpol_def);
         }
@@ -59,11 +57,10 @@ public:
             / (particle_momentum * SPEED);
     }
 
-    double TimeElapsed(
-        double initial_energy, double final_energy, double time) override
+    double TimeElapsed(double initial_energy, double final_energy) override
     {
         assert(initial_energy >= final_energy);
-        return integral.Calculate(initial_energy, final_energy, time);
+        return integral.Calculate(initial_energy, final_energy);
     }
 
     double TimeElapsedUpperLimit(double initial_energy, double time)
@@ -98,8 +95,7 @@ class ApproximateTimeBuilder : public Time {
 public:
     ApproximateTimeBuilder() {}
 
-    double TimeElapsed(
-        double initial_energy, double final_energy, double time) override
+    double TimeElapsed(double initial_energy, double final_energy) override
     {
         (void)initial_energy;
         (void)final_energy;

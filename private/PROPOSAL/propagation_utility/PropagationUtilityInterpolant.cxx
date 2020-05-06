@@ -38,37 +38,36 @@ void UtilityInterpolant::BuildTables(std::string name, size_t hash,
         name, std::move(interpolant_builder), hash, InterpolationDef());
 }
 
-double UtilityInterpolant::Calculate(
-    double energy_initial, double energy_final, double rnd)
+double UtilityInterpolant::Calculate(double energy_initial, double energy_final)
 {
-    (void)rnd;
-
     assert(energy_initial >= energy_final);
     assert(energy_final >= lower_lim);
 
-    upper_limit = std::make_pair(
-        interpolant_->Interpolate(energy_initial), energy_initial);
-
     if (energy_initial - energy_final < energy_initial * IPREC)
-        return FunctionToIntegral((energy_initial+energy_initial)/2) * (energy_final - energy_initial);
+        return FunctionToIntegral((energy_initial + energy_initial) / 2)
+            * (energy_final - energy_initial);
 
-    return upper_limit.first - interpolant_->Interpolate(energy_final);
+    const auto integral_upper_limit = interpolant_->Interpolate(energy_initial);
+    const auto integral_lower_limit = interpolant_->Interpolate(energy_final);
+
+    return integral_upper_limit - integral_lower_limit;
 }
 
 // ------------------------------------------------------------------------- //
-double UtilityInterpolant::GetUpperLimit(double energy_initial, double rnd)
+double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
 {
     assert(rnd >= 0);
-    if (energy_initial != upper_limit.second)
-        Calculate(energy_initial, lower_lim, rnd);
 
-    auto lower_limit = interpolant_->FindLimit(upper_limit.first - rnd);
+    const auto integrated_to_upper = interpolant_->Interpolate(upper_limit);
+    const auto lower_limit = interpolant_->FindLimit(integrated_to_upper - rnd);
 
-    if (std::abs(energy_initial - lower_limit) > energy_initial * IPREC)
+    assert(integrated_to_upper > rnd); // searched Energy is below lower_lim
+                                       // return lower_lim as a lower limit
+
+    if (upper_limit - lower_limit > upper_limit * IPREC)
         return lower_limit;
 
-    auto initial_step
-        = energy_initial + 0.5 * rnd / FunctionToIntegral(energy_initial);
+    const auto step = upper_limit + 0.5 * rnd / FunctionToIntegral(upper_limit);
 
-    return energy_initial + rnd / FunctionToIntegral(initial_step);
+    return upper_limit + rnd / FunctionToIntegral(step);
 }

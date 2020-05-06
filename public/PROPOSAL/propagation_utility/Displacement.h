@@ -22,7 +22,7 @@ public:
     Displacement(const CrossSectionList&);
     virtual ~Displacement() = default;
     double FunctionToIntegral(double);
-    virtual double SolveTrackIntegral(double, double, double) = 0;
+    virtual double SolveTrackIntegral(double, double) = 0;
     virtual double UpperLimitTrackIntegral(double, double) = 0;
 };
 
@@ -33,7 +33,7 @@ template <class T> class DisplacementBuilder : public Displacement {
 
 public:
     DisplacementBuilder(const CrossSectionList&);
-    double SolveTrackIntegral(double, double, double) override;
+    double SolveTrackIntegral(double, double) override;
     double UpperLimitTrackIntegral(double, double) override;
 };
 
@@ -51,7 +51,7 @@ DisplacementBuilder<T>::DisplacementBuilder(const CrossSectionList& cross)
             hash_combine(hash_digest, c->GetHash());
         displacement_interpol_def.function1d = [this](double energy) {
             return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                energy, lower_lim, 0);
+                energy, lower_lim);
         };
         integral.BuildTables(
             "displacement", hash_digest, displacement_interpol_def);
@@ -60,9 +60,9 @@ DisplacementBuilder<T>::DisplacementBuilder(const CrossSectionList& cross)
 
 template <class T>
 double DisplacementBuilder<T>::SolveTrackIntegral(
-    double upper_limit, double lower_limit, double sum)
+    double upper_limit, double lower_limit)
 {
-    return integral.Calculate(upper_limit, lower_limit, sum);
+    return integral.Calculate(upper_limit, lower_limit);
 }
 
 template <class T>

@@ -20,6 +20,8 @@ protected:
 extern Interpolant1DBuilder::Definition contrand_interpol_def;
 
 template <class T> class ContRandBuilder : public ContRand {
+    T integral;
+    DisplacementBuilder<UtilityIntegral> displacement;
 public:
     ContRandBuilder<T>(CrossSectionList cross)
         : ContRand(cross)
@@ -36,7 +38,7 @@ public:
             }
             contrand_interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                        energy, lower_lim, 0);
+                        energy, lower_lim);
             };
             integral.BuildTables("contrand", hash_digest, contrand_interpol_def);
         }
@@ -56,14 +58,10 @@ public:
         double initial_energy, double final_energy, double rnd) override
     {
         assert(initial_energy >= final_energy);
-        double variance = integral.Calculate(initial_energy, final_energy, 0.0);
+        double variance = integral.Calculate(initial_energy, final_energy);
         return SampleFromGaussian(
             final_energy, std::sqrt(variance), rnd, lower_lim, initial_energy);
     }
-
-private:
-    T integral;
-    DisplacementBuilder<UtilityIntegral> displacement;
 };
 
 }
