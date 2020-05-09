@@ -20,12 +20,12 @@ CrossSectionIntegral::CrossSectionIntegral(unique_ptr<Parametrization>&& param,
 {
     for (auto comp : parametrization_->GetComponents()) {
         parametrization_->SetCurrentComponent(comp);
-        dndx_integral_.emplace_back(
-            bind(&CrossSectionIntegral::dndx_integral, this, _1, _2));
         dedx_integral_.emplace_back(
             bind(&CrossSectionIntegral::dedx_integral, this, _1));
         de2dx_integral_.emplace_back(
             bind(&CrossSectionIntegral::de2dx_integral, this, _1));
+        dndx_integral_[comp.GetHash()]
+            = bind(&CrossSectionIntegral::dndx_integral, this, _1, _2);
     }
 }
 
@@ -67,32 +67,25 @@ double CrossSectionIntegral::de2dx_integral(double energy)
         2);
 }
 
-vector<double> CrossSectionIntegral::CalculatedNdx(double energy)
+unordered_map<size_t, double> CrossSectionIntegral::CalculatedNdx(double energy)
 {
-    vector<double> rates;
-    for (auto& dndx : dndx_integral_)
-        rates.push_back(dndx(energy, 1.));
+    unordered_map<size_t, double> rates;
+    for (auto& comp : parametrization_->GetComponents())
+        rates[comp.GetHash()] = dndx_integral_[comp.GetHash()](energy, 1.);
 
     return rates;
 }
 
-vector<double> CrossSectionIntegral::CalculateStochasticLoss(
-    double energy, const vector<double>& component_rates)
+double CrossSectionIntegral::CalculateStochasticLoss(
+    double energy, double rate, size_t comp_hash)
 {
-    vector<double> relativ_losses;
-    auto component_rate = component_rates.begin();
-    for (auto& dndx : dndx_integral_) {
-        relativ_losses.push_back(dndx(energy, *component_rate));
-        ++component_rate;
-    }
-
-    return relativ_losses;
+    return dndx_integral_[comp_hash](energy, rate);
 }
 
 double CrossSectionIntegral::CalculatedEdx(double energy)
 {
     double sum = 0.;
-    for (auto dedx : dedx_integral_)
+    for (const auto& dedx : dedx_integral_)
         sum += dedx(energy);
 
     return energy * sum;
@@ -101,7 +94,7 @@ double CrossSectionIntegral::CalculatedEdx(double energy)
 double CrossSectionIntegral::CalculatedE2dx(double energy)
 {
     double sum = 0.;
-    for (auto de2dx : de2dx_integral_)
+    for (const auto& de2dx : de2dx_integral_)
         sum += de2dx(energy);
 
     return energy * energy * sum;

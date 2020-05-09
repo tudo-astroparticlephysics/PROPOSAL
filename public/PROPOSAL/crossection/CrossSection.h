@@ -36,35 +36,39 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <unordered_map>
 
 using std::array;
 using std::decay;
 using std::enable_if;
+using std::forward;
 using std::function;
 using std::is_base_of;
 using std::pair;
 using std::remove_reference;
 using std::shared_ptr;
 using std::unique_ptr;
-using std::forward;
+using std::unordered_map;
 using std::vector;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
 namespace PROPOSAL {
+
+using Components::Component;
+
 class CrossSection {
 public:
     unique_ptr<Parametrization> parametrization_;
     shared_ptr<const EnergyCutSettings> cuts_;
 
-    /* CrossSection() { std::cout <<"default cstr. " << std::endl; }; */
     CrossSection(unique_ptr<Parametrization>&&, shared_ptr<const EnergyCutSettings>);
     virtual ~CrossSection() = default;
 
     virtual double CalculatedEdx(double) = 0;
     virtual double CalculatedE2dx(double) = 0;
-    virtual vector<double> CalculatedNdx(double) = 0;
-    virtual vector<double> CalculateStochasticLoss(double, const vector<double>&) = 0;
+    virtual unordered_map<size_t, double> CalculatedNdx(double) = 0;
+    virtual double CalculateStochasticLoss(double, double, size_t) = 0;
 
     double GetEnergyCut(double energy) const;
     double GetLowerEnergyLimit() const;

@@ -5,7 +5,7 @@
 
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/Constants.h"
 
@@ -20,7 +20,7 @@ using namespace PROPOSAL;
 
 EpairProduction::EpairProduction(
     const ParticleDef& p_def, const component_list& comp, bool lpm)
-    : Parametrization("Epair", p_def, comp, p_def.mass + 2 * ME)
+    : Parametrization(InteractionType::Epair, "Epair", p_def, comp, p_def.mass + 2 * ME)
     , init_lpm_effect_(true)
     , lpm_(lpm)
     , eLpm_(0)

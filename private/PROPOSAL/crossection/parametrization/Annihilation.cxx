@@ -5,11 +5,12 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/parametrization/Annihilation.h"
 #include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
 
 Annihilation::Annihilation(const ParticleDef& p_def, const component_list& comp)
-    : Parametrization("annihililation", p_def, comp, 2 * ME)
+    : Parametrization(InteractionType::Annihilation, "annihililation", p_def, comp, 2 * ME)
     , za_(calculate_proton_massnumber_fraction(comp))
 {
 }

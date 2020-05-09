@@ -5,7 +5,7 @@
 
 #include "PROPOSAL/crossection/parametrization/ParamTables.h"
 #include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
-#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/math/Interpolant.h"
 
@@ -17,7 +17,7 @@ using namespace PROPOSAL;
 
 WeakInteraction::WeakInteraction(
     const ParticleDef& p_def, const component_list& comp)
-    : Parametrization("weak_interaction", p_def, comp, p_def.mass)
+    : Parametrization(InteractionType::WeakInt, "weak_interaction", p_def, comp, p_def.mass)
 {
 }
 

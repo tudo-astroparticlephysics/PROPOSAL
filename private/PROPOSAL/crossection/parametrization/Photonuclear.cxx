@@ -8,7 +8,7 @@
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
 
@@ -216,7 +216,7 @@ size_t ShadowButkevichMikhailov::GetHash() const
 
 Photonuclear::Photonuclear(
     const ParticleDef& particle_def, const component_list& comp)
-    : Parametrization("photonuclear", particle_def, comp, particle_def.mass)
+    : Parametrization(InteractionType::Photonuclear, "photonuclear", particle_def, comp, particle_def.mass)
 {
 }
 

@@ -4,16 +4,13 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/parametrization/Compton.h"
-#include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/methods.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
 
 Compton::Compton(const ParticleDef& p_def, const component_list& comp)
-    : Parametrization("compton", p_def, comp, ME)
+    : Parametrization(InteractionType::Compton, "compton", p_def, comp, ME)
 {
 }
 

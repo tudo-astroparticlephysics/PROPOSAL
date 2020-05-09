@@ -4,13 +4,13 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
 
 Ionization::Ionization(const ParticleDef& p_def, const Medium& medium,
     const EnergyCutSettings& cuts)
-    : Parametrization("ionization", p_def, medium.GetComponents(), p_def.mass)
+    : Parametrization(InteractionType::Ioniz, "ionization", p_def, medium.GetComponents(), p_def.mass)
     , cuts_(cuts)
     , X0_(medium.GetX0())
     , X1_(medium.GetX1())

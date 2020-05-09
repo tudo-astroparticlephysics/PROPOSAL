@@ -8,7 +8,7 @@
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #define BREMSSTRAHLUNG_IMPL(param)                                             \
     Brems##param::Brems##param(                                                \
@@ -21,7 +21,7 @@ using namespace PROPOSAL;
 
 Bremsstrahlung::Bremsstrahlung(
     const ParticleDef& p_def, const component_list& comp, bool lpm)
-    : Parametrization("Brems", p_def, comp, p_def.mass)
+    : Parametrization(InteractionType::Brems, "Brems", p_def, comp, p_def.mass)
     , lorenz_(false) // TODO(mario): make it use to enable Mon 2017/09/04
     , lorenz_cut_(1e6)
     , init_lpm_effect_(true)

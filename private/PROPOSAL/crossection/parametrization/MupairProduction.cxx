@@ -4,7 +4,7 @@
 #include "PROPOSAL/crossection/parametrization/MupairProduction.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
-#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/Constants.h"
 
@@ -19,7 +19,7 @@ using namespace PROPOSAL;
 
 MupairProduction::MupairProduction(
     const ParticleDef& p_def, const component_list& comp)
-    : Parametrization("mupair", p_def, comp, p_def.mass + 2 * ME)
+    : Parametrization(InteractionType::MuPair,"mupair", p_def, comp, p_def.mass + 2 * ME)
     , drho_integral_(IROMB, IMAXS, IPREC)
 {
 }

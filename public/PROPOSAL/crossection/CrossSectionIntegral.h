@@ -31,13 +31,13 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/math/Integral.h"
-#include <array>
 #include <functional>
-#include <utility>
+#include <unordered_map>
 #include <vector>
 
 using std::bind;
 using std::function;
+using std::unordered_map;
 using std::vector;
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -47,12 +47,11 @@ class CrossSectionIntegral : public CrossSection {
 protected:
     Integral integral_;
 
-    vector<function<double(double, double)>> dndx_integral_;
+    unordered_map<size_t, function<double(double, double)>> dndx_integral_;
     vector<function<double(double)>> dedx_integral_;
     vector<function<double(double)>> de2dx_integral_;
 
 public:
-    /* CrossSectionIntegral(); */
     CrossSectionIntegral(unique_ptr<Parametrization>&& param,
         shared_ptr<const EnergyCutSettings> cut);
     virtual ~CrossSectionIntegral() = default;
@@ -64,7 +63,7 @@ public:
 
     double CalculatedEdx(double) override;
     double CalculatedE2dx(double) override;
-    vector<double> CalculatedNdx(double) override;
-    vector<double> CalculateStochasticLoss(double, const vector<double>&) override;
+    unordered_map<size_t, double> CalculatedNdx(double) override;
+    inline double CalculateStochasticLoss(double, double, size_t) override;
 };
 } // namespace PROPOSAL

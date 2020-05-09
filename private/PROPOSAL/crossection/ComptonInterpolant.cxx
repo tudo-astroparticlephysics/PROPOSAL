@@ -22,7 +22,7 @@ ComptonInterpolant::ComptonInterpolant(unique_ptr<Compton>&& param,
 {
 }
 
-vector<unique_ptr<Interpolant>> ComptonInterpolant::init_dndx_interpolation(
+unordered_map<size_t, unique_ptr<Interpolant>> ComptonInterpolant::init_dndx_interpolation(
     const InterpolationDef& def)
 {
     Interpolant2DBuilder::Definition interpolant_def;
@@ -40,14 +40,16 @@ vector<unique_ptr<Interpolant>> ComptonInterpolant::init_dndx_interpolation(
     interpolant_def.rombergY = def.order_of_interpolation;
     interpolant_def.rationalY = true;
 
-    vector<unique_ptr<InterpolantBuilder>> builders;
+    unordered_map<size_t, unique_ptr<Interpolant>> dndx_;
     for (auto dndx : dndx_integral_) {
-        interpolant_def.function2d = dndx;
-        builders.emplace_back(new Interpolant2DBuilder(interpolant_def));
+        interpolant_def.function2d = dndx.second;
+
+        auto builder = make_unique<Interpolant2DBuilder>(interpolant_def);
+        auto interpolant = Helper::InitializeInterpolation(
+            "dNdx", std::move(builder), GetHash(), def);
+
+        dndx_[dndx.first] = std::move(interpolant);
     }
 
-    const auto& hash = parametrization_->GetHash();
-    auto aux
-        = Helper::InitializeInterpolation("dNdx_diff", builders, hash, def);
-    return aux;
+    return dndx_;
 }

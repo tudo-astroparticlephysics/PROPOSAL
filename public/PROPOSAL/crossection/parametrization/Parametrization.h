@@ -34,9 +34,11 @@ using std::string;
 
 namespace PROPOSAL {
 class ParticleDef;
+enum class InteractionType;
 
 class Parametrization {
 protected:
+    const InteractionType interaction_type_;
     const string param_name_;
     const double particle_mass_;
     const double particle_charge_;
@@ -45,7 +47,8 @@ protected:
     const double lower_energy_lim_;
 
 public:
-    Parametrization(const string&, const ParticleDef&, const component_list&, double);
+    Parametrization(const InteractionType, const string&, const ParticleDef&,
+        const component_list&, double);
     virtual ~Parametrization() = default;
 
     struct KinematicLimits {
@@ -63,11 +66,11 @@ public:
     virtual KinematicLimits GetKinematicLimits(double energy) = 0;
     double GetLowerEnergyLim() const { return lower_energy_lim_; }
     string GetName() const { return param_name_; }
+    InteractionType GetType() const { return interaction_type_; }
     component_list GetComponents() const { return components_; }
     virtual size_t GetHash() const;
 
     void SetCurrentComponent(const Components::Component&);
 };
-
 
 } // namespace PROPOSAL

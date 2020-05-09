@@ -12,10 +12,11 @@ using std::string;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-Parametrization::Parametrization(const string& param_name,
-    const ParticleDef& p_def, const component_list& components,
-    double lower_energy_lim)
-    : param_name_(param_name)
+Parametrization::Parametrization(const InteractionType interaction_type,
+    const string& param_name, const ParticleDef& p_def,
+    const component_list& components, double lower_energy_lim)
+    : interaction_type_(interaction_type)
+    , param_name_(param_name)
     , particle_mass_(p_def.mass)
     , particle_charge_(p_def.charge)
     , components_(components)
@@ -48,8 +49,8 @@ double Parametrization::FunctionToDE2dxIntegral(double energy, double variable)
 size_t Parametrization::GetHash() const
 {
     size_t hash_digest = 0;
-    hash_combine(
-        hash_digest, param_name_, particle_mass_, particle_charge_, lower_energy_lim_);
+    hash_combine(hash_digest, param_name_, particle_mass_, particle_charge_,
+        lower_energy_lim_);
     for (const auto& comp : components_)
         hash_combine(hash_digest, comp.GetHash());
 

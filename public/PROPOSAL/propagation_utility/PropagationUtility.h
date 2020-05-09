@@ -60,8 +60,6 @@ public:
         std::unique_ptr<Time> time_calc = nullptr;
     };
 
-    std::shared_ptr<CrossSection> TypeInteraction(
-        double, const std::array<double, 2>&);
     double EnergyStochasticloss(
          CrossSection&, double, const std::array<double, 2>&);
     double EnergyDecay(double, double);

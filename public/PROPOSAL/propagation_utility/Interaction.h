@@ -1,9 +1,10 @@
 #pragma once
 #include <tuple>
-
 #include "PROPOSAL/propagation_utility/Displacement.h"
 
 using std::tuple;
+
+using comp_rates = unordered_map<size_t, double>;
 
 namespace PROPOSAL {
 
@@ -20,9 +21,10 @@ public:
     Interaction(CrossSectionList cross);
     virtual ~Interaction() = default;
 
-    vector<vector<double>> CalculateRates(double);
 
-    enum { RELATIV_LOSS, INTERACTION_TYPE };
+    unordered_map<InteractionType, comp_rates> CalculateRates(double);
+
+    /* enum { RELATIV_LOSS, INTERACTION_TYPE }; */
     tuple<double, InteractionType> SampleStochasticLoss(double, double);
 
     virtual double SolveEnergyIntegral(double, double) = 0;

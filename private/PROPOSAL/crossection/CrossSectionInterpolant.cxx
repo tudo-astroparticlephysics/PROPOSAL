@@ -59,13 +59,10 @@ unique_ptr<Interpolant> CrossSectionInterpolant::init_dedx_interpolation(
     interpol_def.rombergY = def.order_of_interpolation;
     interpol_def.logSubst = true;
 
-    unique_ptr<InterpolantBuilder> builder(
-        new Interpolant1DBuilder(interpol_def));
+    auto builder = make_unique<Interpolant1DBuilder>(interpol_def);
 
-    auto aux = Helper::InitializeInterpolation(
+    return Helper::InitializeInterpolation(
         "dEdx", std::move(builder), GetHash(), def);
-
-    return aux;
 }
 
 unique_ptr<Interpolant> CrossSectionInterpolant::init_de2dx_interpolation(
@@ -82,14 +79,13 @@ unique_ptr<Interpolant> CrossSectionInterpolant::init_de2dx_interpolation(
     interpol_def.isLog = true;
     interpol_def.rombergY = def.order_of_interpolation;
 
-    unique_ptr<InterpolantBuilder> builder(
-        new Interpolant1DBuilder(interpol_def));
+    auto builder = make_unique<Interpolant1DBuilder>(interpol_def);
 
     return Helper::InitializeInterpolation(
         "dE2dx", std::move(builder), GetHash(), def);
 }
 
-vector<unique_ptr<Interpolant>>
+unordered_map<size_t, unique_ptr<Interpolant>>
 CrossSectionInterpolant::init_dndx_interpolation(const InterpolationDef& def)
 {
     Interpolant2DBuilder::Definition interpol_def;
@@ -105,14 +101,18 @@ CrossSectionInterpolant::init_dndx_interpolation(const InterpolationDef& def)
     interpol_def.rombergY = def.order_of_interpolation;
     interpol_def.rationalY = true;
 
-    vector<unique_ptr<InterpolantBuilder>> builder;
-    for (const auto& dndx : dndx_integral_) {
-        interpol_def.function2d = dndx;
-        builder.emplace_back(new Interpolant2DBuilder(interpol_def));
+    unordered_map<size_t, unique_ptr<Interpolant>> dndx_;
+    for (auto& dndx : dndx_integral_) {
+        interpol_def.function2d = dndx.second;
+
+        auto builder = make_unique<Interpolant2DBuilder>(interpol_def);
+        auto interpolant = Helper::InitializeInterpolation(
+            "dNdx", std::move(builder), GetHash(), def);
+
+        dndx_[dndx.first] = std::move(interpolant);
     }
 
-    return Helper::InitializeInterpolation(
-        "dNdx", builder, GetHash(), def);
+    return dndx_;
 }
 
 double CrossSectionInterpolant::CalculatedEdx(double energy)
@@ -125,28 +125,18 @@ double CrossSectionInterpolant::CalculatedE2dx(double energy)
     return de2dx_interpolant_->Interpolate(energy);
 }
 
-vector<double> CrossSectionInterpolant::CalculatedNdx(double energy)
+unordered_map<size_t, double> CrossSectionInterpolant::CalculatedNdx(double energy)
 {
-    vector<double> rates;
-    for (auto& interpol : dndx_interpolants_)
-        rates.emplace_back(interpol->Interpolate(energy, 1.));
+    unordered_map<size_t, double> rates;
+    for (auto& comp : parametrization_->GetComponents())
+        rates[comp.GetHash()]
+            = dndx_interpolants_[comp.GetHash()]->Interpolate(energy, 1.);
+
     return rates;
 }
 
-vector<double> CrossSectionInterpolant::CalculateStochasticLoss(
-    double energy, const vector<double>& component_rates)
+double CrossSectionInterpolant::CalculateStochasticLoss(
+    double energy, double rate, size_t comp_hash)
 {
-    vector<double> relativ_losses;
-    auto sampled_component_rate = component_rates.cbegin();
-    for (auto& interpol : dndx_interpolants_)
-        relativ_losses.emplace_back(interpol->FindLimit(energy, *sampled_component_rate));
-
-    auto relativ_loss = relativ_losses.begin();
-    for (const auto& comp : parametrization_->GetComponents()) {
-        parametrization_->SetCurrentComponent(comp);
-        *relativ_loss = transform_relativ_loss(*relativ_loss, energy);
-        ++relativ_loss;
-    }
-
-    return relativ_losses;
+    return dndx_interpolants_[comp_hash]->FindLimit(energy, rate);
 }

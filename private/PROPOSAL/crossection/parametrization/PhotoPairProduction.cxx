@@ -7,6 +7,7 @@
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
 
@@ -16,7 +17,7 @@ using namespace PROPOSAL;
 
 PhotoPairProduction::PhotoPairProduction(
     const ParticleDef& p_def, const component_list& comp)
-    : Parametrization("photopairproduction", p_def, comp, 2 * ME)
+    : Parametrization(InteractionType::Photopair, "photopairproduction", p_def, comp, 2 * ME)
 {
 }
 

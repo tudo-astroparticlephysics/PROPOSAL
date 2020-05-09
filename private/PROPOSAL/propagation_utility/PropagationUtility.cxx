@@ -93,12 +93,6 @@ Utility::Definition::Definition(CrossSectionList cross,
 // // Constructors
 // -------------------------------------------------------------------------
 
-std::shared_ptr<CrossSection> Utility::TypeInteraction(
-    double energy, const std::array<double, 2>& rnd)
-{
-    return utility_def->interaction_calc->TypeInteraction(energy, rnd);
-}
-
 double Utility::EnergyStochasticloss(
     CrossSection& crosssection, double energy, const std::array<double, 2>& rnd)
 {
@@ -114,7 +108,7 @@ double Utility::EnergyDecay(double energy, double rnd)
 
 double Utility::EnergyInteraction(double energy, double rnd)
 {
-    return utility_def->interaction_calc->EnergyInteraction(energy, rnd);
+    return utility_def->interaction_calc->UpperLimitEnergyIntegral(energy, rnd);
 }
 
 double Utility::EnergyRandomize(

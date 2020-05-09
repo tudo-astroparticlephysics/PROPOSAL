@@ -38,7 +38,7 @@ class Compton;
 
 namespace PROPOSAL {
 class ComptonInterpolant : public CrossSectionInterpolant {
-    vector<unique_ptr<Interpolant>> init_dndx_interpolation( const InterpolationDef&) override;
+    unordered_map<size_t, unique_ptr<Interpolant>> init_dndx_interpolation( const InterpolationDef&) override;
 
 public:
     ComptonInterpolant(unique_ptr<Compton>&&, shared_ptr<const EnergyCutSettings>, const InterpolationDef&);
