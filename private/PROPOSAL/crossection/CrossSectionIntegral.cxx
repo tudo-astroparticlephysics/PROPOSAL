@@ -79,7 +79,7 @@ unordered_map<size_t, double> CrossSectionIntegral::CalculatedNdx(double energy)
 double CrossSectionIntegral::CalculateStochasticLoss(
     double energy, double rate, size_t comp_hash)
 {
-    return dndx_integral_[comp_hash](energy, rate);
+    return dndx_integral_[comp_hash](energy, -rate);
 }
 
 double CrossSectionIntegral::CalculatedEdx(double energy)
