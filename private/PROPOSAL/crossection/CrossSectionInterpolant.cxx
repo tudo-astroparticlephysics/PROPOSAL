@@ -17,6 +17,7 @@ CrossSectionInterpolant::CrossSectionInterpolant(
     shared_ptr<const EnergyCutSettings> cut, const InterpolationDef& def)
     : CrossSectionIntegral(forward<unique_ptr<Parametrization>>(param), cut)
     , hash_interpol_def(def.GetHash())
+    , v_trafo(init_v_trafo())
     , dedx_interpolant_(init_dedx_interpolation(def))
     , de2dx_interpolant_(init_de2dx_interpolation(def))
     , dndx_interpolants_(init_dndx_interpolation(def))
@@ -115,6 +116,18 @@ CrossSectionInterpolant::init_dndx_interpolation(const InterpolationDef& def)
     return dndx_;
 }
 
+unordered_map<size_t, function<double(double, double)>>
+CrossSectionInterpolant::init_v_trafo()
+{
+    unordered_map<size_t, function<double(double, double)>> trafo;
+    for (const auto& comp : parametrization_->GetComponents()) {
+        parametrization_->SetCurrentComponent(comp);
+        trafo[comp.GetHash()] = bind(
+            &CrossSectionInterpolant::transform_relativ_loss, this, _1, _2);
+    }
+    return trafo;
+}
+
 double CrossSectionInterpolant::CalculatedEdx(double energy)
 {
     return dedx_interpolant_->Interpolate(energy);
@@ -125,7 +138,8 @@ double CrossSectionInterpolant::CalculatedE2dx(double energy)
     return de2dx_interpolant_->Interpolate(energy);
 }
 
-unordered_map<size_t, double> CrossSectionInterpolant::CalculatedNdx(double energy)
+unordered_map<size_t, double> CrossSectionInterpolant::CalculatedNdx(
+    double energy)
 {
     unordered_map<size_t, double> rates;
     for (auto& comp : parametrization_->GetComponents())
@@ -138,5 +152,6 @@ unordered_map<size_t, double> CrossSectionInterpolant::CalculatedNdx(double ener
 double CrossSectionInterpolant::CalculateStochasticLoss(
     double energy, double rate, size_t comp_hash)
 {
-    return dndx_interpolants_[comp_hash]->FindLimit(energy, rate);
+    auto v = dndx_interpolants_[comp_hash]->FindLimit(energy, rate);
+    return v_trafo[comp_hash](v, energy);
 }

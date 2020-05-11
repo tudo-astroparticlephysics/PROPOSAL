@@ -36,6 +36,7 @@
 namespace PROPOSAL {
 class CrossSectionInterpolant : public CrossSectionIntegral {
     size_t hash_interpol_def;
+    unordered_map<size_t, function<double(double, double)>> v_trafo;
 
 protected:
     unique_ptr<Interpolant> dedx_interpolant_;
@@ -45,9 +46,13 @@ protected:
     double dndx_integral(double energy, double v) override;
     double transform_relativ_loss(double, double) const;
 
-    virtual unordered_map<size_t, unique_ptr<Interpolant>> init_dndx_interpolation(const InterpolationDef&);
     unique_ptr<Interpolant> init_dedx_interpolation(const InterpolationDef&);
     unique_ptr<Interpolant> init_de2dx_interpolation(const InterpolationDef&);
+
+    virtual unordered_map<size_t, function<double(double, double)>>
+    init_v_trafo();
+    virtual unordered_map<size_t, unique_ptr<Interpolant>>
+    init_dndx_interpolation(const InterpolationDef&);
 
 public:
     CrossSectionInterpolant(unique_ptr<Parametrization>&&,
