@@ -102,14 +102,14 @@ CrossSectionInterpolant::init_dndx_interpolation(const InterpolationDef& def)
     interpol_def.rationalY = true;
 
     unordered_map<size_t, unique_ptr<Interpolant>> dndx_;
-    for (auto& dndx : dndx_integral_) {
-        interpol_def.function2d = dndx.second;
+    for (const auto& comp : parametrization_->GetComponents()) {
+        interpol_def.function2d = dndx_integral_[comp.GetHash()];
 
         auto builder = make_unique<Interpolant2DBuilder>(interpol_def);
         auto interpolant = Helper::InitializeInterpolation(
             "dNdx", std::move(builder), GetHash(), def);
 
-        dndx_[dndx.first] = std::move(interpolant);
+        dndx_[comp.GetHash()] = std::move(interpolant);
     }
 
     return dndx_;
