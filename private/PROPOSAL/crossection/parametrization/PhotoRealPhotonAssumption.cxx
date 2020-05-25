@@ -7,25 +7,20 @@
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 #define PHOTO_PARAM_REAL_IMPL(param, parent)                                   \
-    Photo##param::Photo##param(const ParticleDef& p_def,                       \
-        const component_list& comp, bool hard_component)                       \
-        : Photo##parent(p_def, comp, hard_component)                           \
+    Photo##param::Photo##param(bool hard_component)                            \
+        : Photo##parent(hard_component)                                        \
     {                                                                          \
     }
 
 using namespace PROPOSAL;
 
-PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(
-    const ParticleDef& p_def, const component_list& comp, bool hard_component)
-    : Photonuclear(p_def, comp)
+PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(bool hard_component)
+    : Photonuclear()
+    , hard_component_(hard_component)
 {
-    if (hard_component) {
-        hard_component_.reset(new HardComponent(p_def));
-    } else {
-        hard_component_.reset(new SoftComponent());
-    }
 }
 
 // ------------------------------------------------------------------------- //
@@ -34,13 +29,13 @@ PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(
 // eq. 23
 // ------------------------------------------------------------------------- //
 double PhotoRealPhotonAssumption::DifferentialCrossSection(
-    double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v)
 {
     double aux, aum, G, t;
 
     double nu = v * energy * 1.e-3;
 
-    double sgn = CalculateParametrization(nu);
+    double sgn = CalculateParametrization(comp, nu);
 
     const double m1 = 0.54; // in GeV^2
     const double m2 = 1.80; // in GeV^2
@@ -48,12 +43,11 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(
     double kappa = 1 - 2 / v + 2 / (v * v);
 
     // calculate the shadowing factor
-    if (current_component_.GetNucCharge() == 1) {
+    if (comp.GetNucCharge() == 1) {
         G = 1;
     } else {
         // eq. 18
-        double tmp = 0.00282
-            * std::pow(current_component_.GetAtomicNum(), 1. / 3) * sgn;
+        double tmp = 0.00282 * std::pow(comp.GetAtomicNum(), 1. / 3) * sgn;
         // eq. 3
         G = (3 / tmp) * (0.5 + ((1 + tmp) * std::exp(-tmp) - 1) / (tmp * tmp));
     }
@@ -62,9 +56,9 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(
     // Phys. Rev. D 67 (2003), 034027
     // eq. 4.6
     G *= 3;
-    aux = v * particle_mass_ * 1.e-3;
+    aux = v * p_def.mass * 1.e-3;
     t = aux * aux / (1 - v);
-    aum = particle_mass_ * 1.e-3;
+    aum = p_def.mass * 1.e-3;
     aum *= aum;
     aux = 2 * aum / t;
     aux = G
@@ -73,17 +67,26 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(
         + ((kappa + 2 * aum / m2) * std::log(1 + m2 / t) - aux)
         + aux * (G * (m1 - 4 * t) / (m1 + t) + (m2 / t) * std::log(1 + t / m2));
 
-    aux *= ALPHA / (8 * PI) * current_component_.GetAtomicNum() * v * sgn
-        * 1.e-30;
+    aux *= ALPHA / (8 * PI) * comp.GetAtomicNum() * v * sgn * 1.e-30;
 
     // hard component by Bugaev, Montaruli, Shelpin, Sokalski
     // Astrop. Phys. 21 (2004), 491
     // in the appendix
-    aux += current_component_.GetAtomicNum() * 1.e-30
-        * hard_component_->CalculateHardComponent(energy, v);
+    auto search = hard_component_map.find(p_def.GetHash());
+    if (search != hard_component_map.end()) {
+        aux += comp.GetAtomicNum() * 1.e-30
+            * search->second->CalculateHardComponent(energy, v);
+    } else {
+        if (hard_component_)
+            hard_component_map[p_def.GetHash()]
+                = make_unique<HardComponent>(p_def);
+        else
+            hard_component_map[p_def.GetHash()] = make_unique<SoftComponent>();
+        aux += comp.GetAtomicNum() * 1.e-30
+            * search->second->CalculateHardComponent(energy, v);
+    }
 
-    return NA / current_component_.GetAtomicNum() * particle_charge_
-        * particle_charge_ * aux;
+    return NA / comp.GetAtomicNum() * p_def.charge * p_def.charge * aux;
 }
 
 // ------------------------------------------------------------------------- //
@@ -103,11 +106,11 @@ PHOTO_PARAM_REAL_IMPL(Zeus, RealPhotonAssumption)
 // Eur. Phys. J. C 7 (1999), 609
 // eq. 6
 // ------------------------------------------------------------------------- //
-double PhotoZeus::CalculateParametrization(double nu)
+double PhotoZeus::CalculateParametrization(const Component& comp, double nu)
 {
     double aux;
 
-    aux = nu * 2.e-3 * this->current_component_.GetAverageNucleonWeight();
+    aux = nu * 2.e-3 * comp.GetAverageNucleonWeight();
     aux = 63.5 * std::pow(aux, 0.097) + 145 * std::pow(aux, -0.5);
 
     return aux;
@@ -120,7 +123,8 @@ PHOTO_PARAM_REAL_IMPL(BezrukovBugaev, RealPhotonAssumption)
 // Sov. J. Nucl. Phys. 32 (1980), 847
 // eq. 21
 // ------------------------------------------------------------------------- //
-double PhotoBezrukovBugaev::CalculateParametrization(double nu)
+double PhotoBezrukovBugaev::CalculateParametrization(
+    const Component& comp, double nu)
 {
     double aux;
 
@@ -133,23 +137,22 @@ double PhotoBezrukovBugaev::CalculateParametrization(double nu)
 PHOTO_PARAM_REAL_IMPL(Kokoulin, BezrukovBugaev)
 
 // ------------------------------------------------------------------------- //
-double PhotoKokoulin::CalculateParametrization(double nu)
+double PhotoKokoulin::CalculateParametrization(const Component& comp, double nu)
 {
     if (nu <= 200.) {
         if (nu <= 17.) {
             // Bezrukov, Bugaev, Sov. J. Nucl. Phys. 33 (1981), 635
             return 96.1 + 82. / std::sqrt(nu);
         } else {
-            return PhotoBezrukovBugaev::CalculateParametrization(nu);
+            return PhotoBezrukovBugaev::CalculateParametrization(comp, nu);
         }
     } else {
         return NucleusCrossSectionCaldwell(nu);
     }
 }
 
-PhotoRhode::PhotoRhode(const ParticleDef& particle_def,
-    const component_list& components, bool hard_component)
-    : PhotoRealPhotonAssumption(particle_def, components, hard_component)
+PhotoRhode::PhotoRhode(bool hard_component)
+    : PhotoRealPhotonAssumption(hard_component)
 {
     std::vector<double> x = { 0, 0.1, 0.144544, 0.20893, 0.301995, 0.436516,
         0.630957, 0.912011, 1.31826, 1.90546, 2.75423, 3.98107, 5.7544, 8.31764,
@@ -176,7 +179,7 @@ double PhotoRhode::MeasuredSgN(double e)
     return interpolant_->InterpolateArray(e);
 }
 
-double PhotoRhode::CalculateParametrization(double nu)
+double PhotoRhode::CalculateParametrization(const Component& comp, double nu)
 {
     if (nu <= 200.) {
         return MeasuredSgN(nu);

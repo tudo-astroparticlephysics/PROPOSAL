@@ -26,68 +26,68 @@
  *                                                                            *
  ******************************************************************************/
 
-#pragma once
+/* #pragma once */
 
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
+/* #include <map> */
+/* #include <memory> */
+/* #include <string> */
+/* #include <vector> */
 
-#include "PROPOSAL/crossection/CrossSection.h"
-#include "PROPOSAL/methods.h"
-#include "PROPOSAL/scattering/Scattering.h"
+/* #include "PROPOSAL/crossection/CrossSection.h" */
+/* #include "PROPOSAL/methods.h" */
+/* #include "PROPOSAL/scattering/Scattering.h" */
 
-namespace PROPOSAL {
+/* namespace PROPOSAL { */
 
-class Medium;
-class Utility;
-struct InterpolationDef;
+/* class Medium; */
+/* class Utility; */
+/* struct InterpolationDef; */
 
-class ScatteringFactory {
-public:
-    enum Enum { None = 0, HighlandIntegral, Moliere, Highland };
+/* class ScatteringFactory { */
+/* public: */
+/*     enum Enum { None = 0, HighlandIntegral, Moliere, Highland }; */
 
-    typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
+/*     typedef Helper::Bimap<std::string, Enum> BimapStringEnum; */
 
-    Scattering* CreateScattering(const std::string&, const ParticleDef&,
-        std::shared_ptr<const Medium>, std::shared_ptr<InterpolationDef>,
-        std::unique_ptr<CrossSectionList> = nullptr);
-    Scattering* CreateScattering(const Enum, const ParticleDef&,
-        std::shared_ptr<const Medium>, std::shared_ptr<InterpolationDef>,
-        std::unique_ptr<CrossSectionList> = nullptr);
+/*     Scattering* CreateScattering(const std::string&, const ParticleDef&, */
+/*         std::shared_ptr<const Medium>, std::shared_ptr<InterpolationDef>, */
+/*         std::unique_ptr<CrossSectionList> = nullptr); */
+/*     Scattering* CreateScattering(const Enum, const ParticleDef&, */
+/*         std::shared_ptr<const Medium>, std::shared_ptr<InterpolationDef>, */
+/*         std::unique_ptr<CrossSectionList> = nullptr); */
 
-    Scattering* CreateScattering(const std::string&, const ParticleDef&,
-        std::shared_ptr<const Medium>,
-        std::unique_ptr<CrossSectionList> = nullptr);
-    Scattering* CreateScattering(const Enum, const ParticleDef&,
-        std::shared_ptr<const Medium>,
-        std::unique_ptr<CrossSectionList> = nullptr);
+/*     Scattering* CreateScattering(const std::string&, const ParticleDef&, */
+/*         std::shared_ptr<const Medium>, */
+/*         std::unique_ptr<CrossSectionList> = nullptr); */
+/*     Scattering* CreateScattering(const Enum, const ParticleDef&, */
+/*         std::shared_ptr<const Medium>, */
+/*         std::unique_ptr<CrossSectionList> = nullptr); */
 
-    // ----------------------------------------------------------------------------
-    /// @brief string to enum conversation for photo parametrizations
-    // ----------------------------------------------------------------------------
-    Enum GetEnumFromString(const std::string&);
+/*     // ---------------------------------------------------------------------------- */
+/*     /// @brief string to enum conversation for photo parametrizations */
+/*     // ---------------------------------------------------------------------------- */
+/*     Enum GetEnumFromString(const std::string&); */
 
-    // ----------------------------------------------------------------------------
-    /// @brief enum to string conversation for photo parametrizations
-    // ----------------------------------------------------------------------------
-    std::string GetStringFromEnum(const Enum&);
+/*     // ---------------------------------------------------------------------------- */
+/*     /// @brief enum to string conversation for photo parametrizations */
+/*     // ---------------------------------------------------------------------------- */
+/*     std::string GetStringFromEnum(const Enum&); */
 
-    static ScatteringFactory& Get()
-    {
-        static ScatteringFactory instance;
-        return instance;
-    }
+/*     static ScatteringFactory& Get() */
+/*     { */
+/*         static ScatteringFactory instance; */
+/*         return instance; */
+/*     } */
 
-private:
-    ScatteringFactory();
-    ~ScatteringFactory();
+/* private: */
+/*     ScatteringFactory(); */
+/*     ~ScatteringFactory(); */
 
-    void Register(const std::string& name, const Enum);
+/*     void Register(const std::string& name, const Enum); */
 
-    std::vector<Enum> registerd_enum;
-    std::vector<std::string> registerd_str;
-    BimapStringEnum string_enum_;
-};
+/*     std::vector<Enum> registerd_enum; */
+/*     std::vector<std::string> registerd_str; */
+/*     BimapStringEnum string_enum_; */
+/* }; */
 
-} // namespace PROPOSAL
+/* } // namespace PROPOSAL */

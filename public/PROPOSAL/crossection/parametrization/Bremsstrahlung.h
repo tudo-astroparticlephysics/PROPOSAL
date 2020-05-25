@@ -27,15 +27,17 @@
 
 #pragma once
 
-#include <memory>
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include <memory>
 
 #define BREMSSTRAHLUNG_DEF(param)                                              \
     class Brems##param : public Bremsstrahlung {                               \
     public:                                                                    \
-        Brems##param(const ParticleDef&, const component_list&, bool); \
+        using base_param_t = Bremsstrahlung;                                   \
+        Brems##param(bool);                                                    \
                                                                                \
-        double CalculateParametrization(double energy, double v) override;     \
+        double CalculateParametrization(const ParticleDef&, const Component&,  \
+            double energy, double v) override;                                 \
     };
 
 using std::unique_ptr;
@@ -46,6 +48,7 @@ class Interpolant;
 
 namespace PROPOSAL {
 class Bremsstrahlung : public Parametrization {
+
 protected:
     bool lorenz_;       // enable lorenz cut
     double lorenz_cut_; // in [MeV]
@@ -53,16 +56,22 @@ protected:
     bool lpm_;
     double eLpm_;
 
-    double lpm(double energy, double v);
+    double lpm(const ParticleDef&, const Component&, double, double, double);
 
 public:
-    Bremsstrahlung(const ParticleDef&, const component_list&, bool);
+    using only_stochastic = std::false_type;
+    Bremsstrahlung(bool);
     virtual ~Bremsstrahlung() = default;
 
-    virtual double DifferentialCrossSection(double energy, double v);
-    virtual double CalculateParametrization(double energy, double v) = 0;
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double);
+    virtual double CalculateParametrization(
+        const ParticleDef&, const Component&, double, double)
+        = 0;
 
-    KinematicLimits GetKinematicLimits(double energy);
+    KinematicLimits GetKinematicLimits(
+        const ParticleDef&, const Component&, double energy);
+    double GetLowerEnergyLim(const ParticleDef&) const override;
     size_t GetHash() const;
 };
 
@@ -76,10 +85,12 @@ class BremsElectronScreening : public Bremsstrahlung {
     std::unique_ptr<Interpolant> interpolant_;
 
 public:
-    BremsElectronScreening(const ParticleDef&, const component_list&, bool);
+    BremsElectronScreening(bool);
 
-    double CalculateParametrization(double energy, double v) override;
-    double DifferentialCrossSection(double energy, double v) override;
+    double CalculateParametrization(
+        const ParticleDef&, const Component&, double energy, double v) override;
+    double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double energy, double v) override;
 };
 
 #undef BREMSSTRAHLUNG_DEF

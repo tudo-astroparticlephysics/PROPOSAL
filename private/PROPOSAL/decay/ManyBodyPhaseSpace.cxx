@@ -16,9 +16,9 @@ using namespace PROPOSAL;
 const std::string ManyBodyPhaseSpace::name_ = "ManyBodyPhaseSpace";
 
 // ------------------------------------------------------------------------- //
-ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters, MatrixElementFunction me)
+ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<shared_ptr<const ParticleDef>> daughters, MatrixElementFunction me)
     : DecayChannel()
-    , daughters_()
+    , daughters_(daughters)
     , daughter_masses_()
     , number_of_daughters_(static_cast<int>(daughters.size()))
     , sum_daughter_masses_(0.0)
@@ -40,30 +40,18 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters
         use_default_matrix_element_ = false;
         estimate_ = std::bind(&ManyBodyPhaseSpace::SampleEstimateMaxWeight, this, std::placeholders::_1, std::placeholders::_2);
     }
+    for (const auto& i : daughters) {
 
-    for (std::vector<const ParticleDef*>::iterator it = daughters.begin(); it != daughters.end(); ++it)
-    {
-        daughters_.push_back((*it)->clone());
-        daughter_masses_.push_back((*it)->mass);
-        sum_daughter_masses_ += (*it)->mass;
+        daughter_masses_.push_back(i->mass);
+        sum_daughter_masses_ += i->mass;
     }
 }
 
-// ------------------------------------------------------------------------- //
-ManyBodyPhaseSpace::~ManyBodyPhaseSpace()
-{
-    for (std::vector<const ParticleDef*>::const_iterator it = daughters_.begin(); it != daughters_.end(); ++it)
-    {
-        delete *it;
-    }
-
-    daughters_.clear();
-}
 
 // ------------------------------------------------------------------------- //
 ManyBodyPhaseSpace::ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode)
     : DecayChannel(mode)
-    , daughters_()
+    , daughters_(mode.daughters_)
     , daughter_masses_(mode.daughter_masses_)
     , number_of_daughters_(mode.number_of_daughters_)
     , sum_daughter_masses_(mode.sum_daughter_masses_)
@@ -81,11 +69,6 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode)
         estimate_ = std::bind(&ManyBodyPhaseSpace::SampleEstimateMaxWeight, this, std::placeholders::_1, std::placeholders::_2);
     }
 
-    for (std::vector<const ParticleDef*>::const_iterator it = mode.daughters_.begin(); it != mode.daughters_.end();
-         ++it)
-    {
-        daughters_.push_back((*it)->clone());
-    }
 }
 
 // ------------------------------------------------------------------------- //
@@ -350,10 +333,8 @@ ManyBodyPhaseSpace::PhaseSpaceKinematics ManyBodyPhaseSpace::CalculateKinematics
 void ManyBodyPhaseSpace::print(std::ostream& os) const
 {
     os << "Used particle definitions:" << '\n';
-    for (std::vector<const ParticleDef*>::const_iterator it = daughters_.begin(); it != daughters_.end(); ++it)
-    {
-        os << (*it)->name << '\t' << (*it)->mass << '\n';
-    }
+    for (const auto& it : daughters_)
+        os << it->name << '\t' << it->mass << '\n';
     os << "Sum of masses: " << sum_daughter_masses_ << '\n';
 }
 
@@ -373,20 +354,11 @@ ManyBodyPhaseSpace::Builder::Builder(const Builder& builder)
 {
 }
 
-ManyBodyPhaseSpace::Builder::~Builder()
-{
-    for (std::vector<const ParticleDef*>::const_iterator it = daughters_.begin(); it != daughters_.end(); ++it)
-    {
-        delete *it;
-    }
-
-    daughters_.clear();
-}
 
 // ------------------------------------------------------------------------- //
 ManyBodyPhaseSpace::Builder& ManyBodyPhaseSpace::Builder::addDaughter(const ParticleDef& daughter)
 {
-    daughters_.push_back(daughter.clone());
+    daughters_.push_back(std::make_shared<ParticleDef>(daughter));
     return *this;
 }
 

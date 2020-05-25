@@ -26,11 +26,14 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include <iostream>
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/json.hpp"
+#include <iostream>
+#include <memory>
+
+using std::shared_ptr;
 
 namespace PROPOSAL {
 
@@ -45,8 +48,7 @@ namespace PROPOSAL {
  * \f$v_{cut}=1\f$ is assumed.
  */
 
-class EnergyCutSettings
-{
+class EnergyCutSettings {
     double ecut_;
     double vcut_;
     bool continuous_randomization_;
@@ -58,12 +60,14 @@ public:
     bool operator==(const EnergyCutSettings& energyCutSettings) const noexcept;
 
     double GetCut(double energy) const noexcept;
+    double GetCut(const Parametrization::KinematicLimits& lim, double energy) const noexcept;
     size_t GetHash() const noexcept;
     double GetEcut() const noexcept { return ecut_; }
     double GetVcut() const noexcept { return vcut_; }
     bool GetContRand() const noexcept { return continuous_randomization_; }
 };
 
-std::ostream& operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings);
+std::ostream& operator<<(
+    std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings);
 
 } // namespace PROPOSAL

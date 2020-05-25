@@ -5,22 +5,23 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/parametrization/Annihilation.h"
 #include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
 
-Annihilation::Annihilation(const ParticleDef& p_def, const component_list& comp)
-    : Parametrization(InteractionType::Annihilation, "annihililation", p_def, comp, 2 * ME)
-    , za_(calculate_proton_massnumber_fraction(comp))
+Annihilation::Annihilation()
+    : Parametrization(InteractionType::Annihilation, "annihililation")
 {
 }
 
-Parametrization::KinematicLimits Annihilation::GetKinematicLimits(double energy)
+Parametrization::KinematicLimits Annihilation::GetKinematicLimits(
+    const ParticleDef& p_def, const Component& comp, double energy)
 {
     // Limits according to simple 2->2 body interactions
 
-    assert(energy >= particle_mass_);
-    auto gamma = energy / particle_mass_;
+    assert(energy >= p_def.mass);
+    auto gamma = energy / p_def.mass;
     auto aux = std::sqrt((gamma - 1.) / (gamma + 1.));
 
     auto vmin = 0.5 * (1. - aux);
@@ -29,13 +30,8 @@ Parametrization::KinematicLimits Annihilation::GetKinematicLimits(double energy)
     return KinematicLimits(vmin, vmax);
 }
 
-AnnihilationHeitler::AnnihilationHeitler(
-    const ParticleDef& p_def, const component_list& comp)
-    : Annihilation(p_def, comp)
-{
-}
-
-double AnnihilationHeitler::DifferentialCrossSection(double energy, double v)
+double AnnihilationHeitler::DifferentialCrossSection(
+    const ParticleDef& p_def, const Component& comp, double energy, double v)
 {
     // W. Heitler. The Quantum Theory of Radiation, Clarendon Press, Oxford
     // (1954) Adapted from Geant4 PhysicsReferenceManual
@@ -44,11 +40,12 @@ double AnnihilationHeitler::DifferentialCrossSection(double energy, double v)
     // with the total available energy being the sum of the total positron
     // energy and the electron mass
 
-    assert(energy >= particle_mass_);
-    auto gamma = energy / particle_mass_;
+    assert(energy >= p_def.mass);
+    auto gamma = energy / p_def.mass;
     auto aux = 1. + (2. * gamma) / std::pow(gamma + 1., 2.) - v
         - 1. / std::pow(gamma + 1., 2.) * 1. / v;
-    aux *= NA * za_ * PI * RE * RE / (gamma - 1.) * 1. / v; // TODO: prefactors
+    aux *= NA * comp.GetNucCharge() / comp.GetAtomicNum() * PI * RE * RE
+        / (gamma - 1.) * 1. / v; // TODO: prefactors
 
     return aux;
 }

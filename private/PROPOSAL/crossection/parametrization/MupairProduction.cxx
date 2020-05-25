@@ -9,26 +9,24 @@
 #include "PROPOSAL/Constants.h"
 
 #define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                      \
-    Mupair##param::Mupair##param(                                              \
-        const ParticleDef& p_def, const component_list& comp)                  \
-        : MupairProductionRhoIntegral(p_def, comp)                             \
+    Mupair##param::Mupair##param()                                             \
+        : MupairProductionRhoIntegral()                                        \
     {                                                                          \
     }
 
 using namespace PROPOSAL;
 
-MupairProduction::MupairProduction(
-    const ParticleDef& p_def, const component_list& comp)
-    : Parametrization(InteractionType::MuPair,"mupair", p_def, comp, p_def.mass + 2 * ME)
+MupairProduction::MupairProduction()
+    : Parametrization(InteractionType::MuPair, "mupair")
     , drho_integral_(IROMB, IMAXS, IPREC)
 {
 }
 
 Parametrization::KinematicLimits MupairProduction::GetKinematicLimits(
-    double energy)
+    const ParticleDef& p_def, const Component& comp, double energy)
 {
     auto vmin = 2 * MMU / energy;
-    auto vmax = 1 - particle_mass_ / energy;
+    auto vmax = 1 - p_def.mass / energy;
 
     if (vmax < vmin)
         vmax = vmin;
@@ -36,7 +34,7 @@ Parametrization::KinematicLimits MupairProduction::GetKinematicLimits(
     return KinematicLimits(vmin, vmax);
 }
 
-double MupairProduction::Calculaterho(
+double MupairProduction::Calculaterho(const ParticleDef& p_def, const Component& comp,
     double energy, double v, double rnd1, double rnd2)
 {
     double rho = 0;
@@ -47,7 +45,7 @@ double MupairProduction::Calculaterho(
         return 0;
 
     static_cast<void>(drho_integral_.IntegrateWithRandomRatio(rho_min, rho_max,
-        std::bind(&MupairProduction::FunctionToIntegral, this, energy, v,
+        std::bind(&MupairProduction::FunctionToIntegral, this, p_def, comp, energy, v,
             std::placeholders::_1),
         3, rnd1));
 
@@ -59,13 +57,14 @@ double MupairProduction::Calculaterho(
     return rho;
 }
 
-MupairProductionRhoIntegral::MupairProductionRhoIntegral(const ParticleDef& p_def, const component_list& comp)
-    : MupairProduction(p_def, comp)
+MupairProductionRhoIntegral::MupairProductionRhoIntegral()
+    : MupairProduction()
     , integral_(IROMB, IMAXS, IPREC)
 {
 }
 
-double MupairProductionRhoIntegral::DifferentialCrossSection(double energy, double v)
+double MupairProductionRhoIntegral::DifferentialCrossSection(const ParticleDef& p_def, const Component& comp,
+    double energy, double v)
 {
     double rMax, aux;
 
@@ -77,17 +76,17 @@ double MupairProductionRhoIntegral::DifferentialCrossSection(double energy, doub
         return 0;
     }
 
-    return NA / current_component_.GetAtomicNum() * particle_charge_
-        * particle_charge_
+    return NA / comp.GetAtomicNum() * p_def.charge
+        * p_def.charge
         * (integral_.Integrate(0, rMax,
               std::bind(&MupairProductionRhoIntegral::FunctionToIntegral, this,
-                  energy, v, std::placeholders::_1),
+                 p_def, comp,  energy, v, std::placeholders::_1),
               2));
 }
 
 MUPAIR_PARAM_INTEGRAL_IMPL(KelnerKokoulinPetrukhin)
 
-double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
+double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(const ParticleDef& p_def, const Component& comp,
     double energy, double v, double r)
 {
     // Parametrization of Kelner/Kokoulin/Petrukhin
@@ -97,8 +96,8 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
 
     double aux, aux1, aux2, r2, rMax, Z3, xi, beta, A_pow, r_mu;
     double phi, U, U_max, X, Y;
-    double medium_charge = current_component_.GetNucCharge();
-    double atomic_weight = current_component_.GetAtomInMolecule();
+    double medium_charge = comp.GetNucCharge();
+    double atomic_weight = comp.GetAtomInMolecule();
     // double medium_log_constant =
     // components_[component_index_]->GetLogConstant();
     double medium_log_constant = 183; // According to the paper, B is set to 183
@@ -106,7 +105,7 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
     r2 = r * r;
     rMax = 1 - 2 * MMU / (v * energy);
     Z3 = std::pow(medium_charge, -1. / 3);
-    aux = (particle_mass_ * v) / (2 * MMU);
+    aux = (p_def.mass * v) / (2 * MMU);
     xi = aux * aux * (1 - r2) / (1 - v);
     beta = (v * v) / (2 * (1 - v));
     A_pow = std::pow(atomic_weight, -0.27);
@@ -137,7 +136,7 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
     X = 1 + U - U_max;
 
     // Combine results
-    aux = ALPHA * r_mu * particle_charge_ * medium_charge;
+    aux = ALPHA * r_mu * p_def.charge * medium_charge;
     aux *= 2 * aux * phi * (1 - v)
         / (1.5 * PI * v); // Factor 2: Similar to factor 2 from EPairProduction,
                           // probably from symmetry in Rho

@@ -45,8 +45,8 @@ public:
     void BuildTables(
         const std::string, size_t, Interpolant1DBuilder::Definition);
 
-    double Calculate(double, double);
-    double GetUpperLimit(double, double);
+    virtual double Calculate(double, double);
+    virtual double GetUpperLimit(double, double);
 
     std::function<double(double)> FunctionToIntegral;
 };

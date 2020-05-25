@@ -11,18 +11,13 @@
 
 using namespace PROPOSAL;
 
-// ------------------------------------------------------------------------- //
-// Constructor & Destructor
-// ------------------------------------------------------------------------- //
-
-WeakInteraction::WeakInteraction(
-    const ParticleDef& p_def, const component_list& comp)
-    : Parametrization(InteractionType::WeakInt, "weak_interaction", p_def, comp, p_def.mass)
+WeakInteraction::WeakInteraction()
+    : Parametrization(InteractionType::WeakInt, "weak_interaction")
 {
 }
 
 Parametrization::KinematicLimits WeakInteraction::GetKinematicLimits(
-    double energy)
+    const ParticleDef& p_def, const Component& comp, double energy)
 {
     double aux = (MP + MN) / 2; // for isoscalar targets
     aux = 2 * energy * aux + pow(aux, 2);
@@ -33,39 +28,37 @@ Parametrization::KinematicLimits WeakInteraction::GetKinematicLimits(
     return KinematicLimits(v_min, v_max);
 }
 
-WeakCooperSarkarMertsch::WeakCooperSarkarMertsch(
-    const ParticleDef& p_def, const component_list& comp)
-    : WeakInteraction(p_def, comp)
+WeakCooperSarkarMertsch::WeakCooperSarkarMertsch()
+    : WeakInteraction()
 {
     // Initialize interpolant for particles (remember crossing symmetry rules)
-    if (p_def.charge < 0.) {
-        interpolant_.emplace_back(new Interpolant(energies, y_nubar_p,
-            sigma_nubar_p, IROMB, false, false, IROMB, false, false));
-        interpolant_.emplace_back(new Interpolant(energies, y_nubar_n,
-            sigma_nubar_n, IROMB, false, false, IROMB, false, false));
-    } else if (p_def.charge > 0.) {
-        interpolant_.emplace_back(new Interpolant(energies, y_nu_p, sigma_nu_p,
-            IROMB, false, false, IROMB, false, false));
-        interpolant_.emplace_back(new Interpolant(energies, y_nu_n, sigma_nu_n,
-            IROMB, false, false, IROMB, false, false));
-    }
+    interpolant_[false].emplace_back(new Interpolant(energies, y_nubar_p,
+        sigma_nubar_p, IROMB, false, false, IROMB, false, false));
+    interpolant_[false].emplace_back(new Interpolant(energies, y_nubar_n,
+        sigma_nubar_n, IROMB, false, false, IROMB, false, false));
+    interpolant_[true].emplace_back(new Interpolant(energies, y_nu_p,
+        sigma_nu_p, IROMB, false, false, IROMB, false, false));
+    interpolant_[true].emplace_back(new Interpolant(energies, y_nu_n,
+        sigma_nu_n, IROMB, false, false, IROMB, false, false));
 }
 
 double WeakCooperSarkarMertsch::DifferentialCrossSection(
-    double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v)
 {
     auto log10_energy = std::log10(energy);
-    const auto& nuclear_charge = current_component_.GetNucCharge();
-    const auto& nuclear_number = current_component_.GetAtomicNum();
+    const auto& nuclear_charge = comp.GetNucCharge();
+    const auto& nuclear_number = comp.GetAtomicNum();
 
-    auto proton_contr
-        = nuclear_charge * interpolant_[0]->InterpolateArray(log10_energy, v);
+    auto proton_contr = nuclear_charge
+        * interpolant_[p_def.lifetime > 0][0]->InterpolateArray(
+              log10_energy, v);
     auto neutron_contr = (nuclear_number - nuclear_charge)
-        * interpolant_[1]->InterpolateArray(log10_energy, v);
+        * interpolant_[p_def.lifetime > 0][1]->InterpolateArray(
+              log10_energy, v);
     auto mean_contr = (proton_contr + neutron_contr) / nuclear_number;
 
     assert(mean_contr > 0);
 
     // factor 1e-36: conversion from pb to cm^2
-    return NA / current_component_.GetAtomicNum() * 1e-36 * mean_contr;
+    return NA / comp.GetAtomicNum() * 1e-36 * mean_contr;
 }

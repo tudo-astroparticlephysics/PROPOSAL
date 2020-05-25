@@ -11,18 +11,13 @@
 
 using namespace PROPOSAL;
 
-// ------------------------------------------------------------------------- //
-// Constructor & Destructor
-// ------------------------------------------------------------------------- //
-
-PhotoPairProduction::PhotoPairProduction(
-    const ParticleDef& p_def, const component_list& comp)
-    : Parametrization(InteractionType::Photopair, "photopairproduction", p_def, comp, 2 * ME)
+PhotoPairProduction::PhotoPairProduction()
+    : Parametrization(InteractionType::Photopair, "photopairproduction")
 {
 }
 
 Parametrization::KinematicLimits PhotoPairProduction::GetKinematicLimits(
-    double energy)
+    const ParticleDef& p_def, const Component& comp, double energy)
 {
     // x is the integration variable here
     if (energy <= 2. * ME)
@@ -34,21 +29,21 @@ Parametrization::KinematicLimits PhotoPairProduction::GetKinematicLimits(
     return KinematicLimits(vmin, vmax);
 }
 
-PhotoPairTsai::PhotoPairTsai(
-    const ParticleDef& p_def, const component_list& comp)
-    : PhotoPairProduction(p_def, comp)
+PhotoPairTsai::PhotoPairTsai()
+    : PhotoPairProduction()
 {
 }
 
-double PhotoPairTsai::DifferentialCrossSection(double energy, double x)
+double PhotoPairTsai::DifferentialCrossSection(
+    const ParticleDef& p_def, const Component& comp, double energy, double x)
 {
     // Pair production and bremsstrahlung of chraged leptons, Yung-Su Tsai,
     // Review of Modern Physics, Vol. 46, No. 4, October 1974
     // see formula (3.9)
 
     double Phi1, Phi2, Psi1, Psi2;
-    double Z = current_component_.GetNucCharge();
-    double logZ = std::log(current_component_.GetNucCharge());
+    double Z = comp.GetNucCharge();
+    double logZ = std::log(comp.GetNucCharge());
     double eta;
     double k = energy;
     double delta = std::pow(ME, 2.) / (2. * k * x * (1. - x)); // (3.20);
@@ -162,24 +157,18 @@ double PhotoPairTsai::DifferentialCrossSection(double energy, double x)
     aux *= x * std::pow(k, 2.) / p; // conversion from differential cross
                                     // section in electron momentum to x
 
-    return std::max(NA / current_component_.GetAtomicNum() * aux,
+    return std::max(NA / comp.GetAtomicNum() * aux,
         0.); // TODO what are the real factors here, those are just guesses
 }
 
-// PhotoAngleDistribution
-PhotoAngleDistribution::PhotoAngleDistribution(const component_list& comp)
-    : components_(comp)
-{
-}
-
-PhotoAngleTsaiIntegral::PhotoAngleTsaiIntegral(const component_list& comp)
-    : PhotoAngleDistribution(comp)
+PhotoAngleTsaiIntegral::PhotoAngleTsaiIntegral()
+    : PhotoAngleDistribution()
     , integral_(IROMB, IMAXS, IPREC)
 {
 }
 
 PhotoAngleDistribution::DeflectionAngles PhotoAngleTsaiIntegral::SampleAngles(
-    double energy, double rho)
+    const Component& comp, double energy, double rho)
 {
     PhotoAngleDistribution::DeflectionAngles angles;
 
@@ -191,7 +180,7 @@ PhotoAngleDistribution::DeflectionAngles PhotoAngleTsaiIntegral::SampleAngles(
 
     auto integrand_substitution = [&](double energy, double rho, double t) {
         return subst * std::pow(t, subst - 1.)
-            * this->FunctionToIntegral(energy, rho, std::pow(t, subst));
+            * this->FunctionToIntegral(comp, energy, rho, std::pow(t, subst));
     };
 
     double t_min = 0;
@@ -225,7 +214,7 @@ PhotoAngleDistribution::DeflectionAngles PhotoAngleTsaiIntegral::SampleAngles(
 }
 
 double PhotoAngleTsaiIntegral::FunctionToIntegral(
-    double energy, double x, double theta)
+    const Component& comp, double energy, double x, double theta)
 {
 
     // Pair production and bremsstrahlung of chraged leptons, Yung-Su Tsai,
@@ -235,8 +224,8 @@ double PhotoAngleTsaiIntegral::FunctionToIntegral(
     double aux;
     double E = energy * x; // electron energy
     double l = E * E * theta * theta / (ME * ME);
-    double Z = current_component_.GetNucCharge();
-    double Z3 = std::pow(current_component_.GetNucCharge(), -1. / 3);
+    double Z = comp.GetNucCharge();
+    double Z3 = std::pow(comp.GetNucCharge(), -1. / 3);
     double G2 = Z * Z + Z;
     double tminprimesqrt = (ME * ME * (1. + l)) / (2. * energy * x * (1. - x));
 
@@ -321,7 +310,7 @@ double PhotoAngleTsaiIntegral::FunctionToIntegral(
 }
 
 PhotoAngleDistribution::DeflectionAngles PhotoAngleNoDeflection::SampleAngles(
-    double energy, double rho)
+    const Component&, double energy, double rho)
 {
     (void)energy;
     (void)rho;
@@ -336,13 +325,13 @@ PhotoAngleDistribution::DeflectionAngles PhotoAngleNoDeflection::SampleAngles(
     return angles;
 }
 
-PhotoAngleEGS::PhotoAngleEGS(const component_list& comp)
-    : PhotoAngleDistribution(comp)
+PhotoAngleEGS::PhotoAngleEGS()
+    : PhotoAngleDistribution()
 {
 }
 
 PhotoAngleDistribution::DeflectionAngles PhotoAngleEGS::SampleAngles(
-    double energy, double rho)
+    const Component&, double energy, double rho)
 {
     (void)rho;
 

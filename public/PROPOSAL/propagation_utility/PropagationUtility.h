@@ -26,58 +26,58 @@
  *                                                                            *
  ******************************************************************************/
 
-#pragma once
+/* #pragma once */
 
-#include <vector>
+/* #include <vector> */
 
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/scattering/Scattering.h"
-#include "PROPOSAL/propagation_utility/Time.h"
-#include "PROPOSAL/propagation_utility/Decay.h"
-#include "PROPOSAL/propagation_utility/ContRand.h"
-#include "PROPOSAL/propagation_utility/Displacement.h"
-#include "PROPOSAL/propagation_utility/Interaction.h"
+/* #include "PROPOSAL/EnergyCutSettings.h" */
+/* #include "PROPOSAL/particle/ParticleDef.h" */
+/* #include "PROPOSAL/scattering/Scattering.h" */
+/* #include "PROPOSAL/propagation_utility/Time.h" */
+/* #include "PROPOSAL/propagation_utility/Decay.h" */
+/* #include "PROPOSAL/propagation_utility/ContRand.h" */
+/* #include "PROPOSAL/propagation_utility/Displacement.h" */
+/* #include "PROPOSAL/propagation_utility/Interaction.h" */
 
-using std::tuple;
-namespace PROPOSAL {
+/* using std::tuple; */
+/* namespace PROPOSAL { */
 
-class Utility {
-public:
-    struct Definition {
-        CrossSectionList cross;              // copy is expensive
-        std::shared_ptr<Scattering> scattering;      // no scattering
-        std::shared_ptr<InterpolationDef> inter_def; // integration used
+/* class Utility { */
+/* public: */
+/*     struct Definition { */
+/*         CrossSectionList cross;              // copy is expensive */
+/*         std::shared_ptr<Scattering> scattering;      // no scattering */
+/*         std::shared_ptr<InterpolationDef> inter_def; // integration used */
 
-        Definition(CrossSectionList, const ParticleDef&,
-            std::shared_ptr<Scattering>, std::shared_ptr<InterpolationDef>);
-        ~Definition();
+/*         Definition(CrossSectionList, const ParticleDef&, */
+/*             std::shared_ptr<Scattering>, std::shared_ptr<InterpolationDef>); */
+/*         ~Definition(); */
 
-        std::unique_ptr<Displacement> displacement_calc = nullptr;
-        std::unique_ptr<Interaction> interaction_calc = nullptr;
-        std::unique_ptr<Decay> decay_calc = nullptr;
-        std::unique_ptr<ContRand> cont_rand = nullptr;
-        std::unique_ptr<Time> time_calc = nullptr;
-    };
+/*         std::unique_ptr<Displacement> displacement_calc = nullptr; */
+/*         std::unique_ptr<Interaction> interaction_calc = nullptr; */
+/*         std::unique_ptr<Decay> decay_calc = nullptr; */
+/*         std::unique_ptr<ContRand> cont_rand = nullptr; */
+/*         std::unique_ptr<Time> time_calc = nullptr; */
+/*     }; */
 
-    double EnergyStochasticloss(
-         CrossSection&, double, const std::array<double, 2>&);
-    double EnergyDecay(double, double);
-    double EnergyInteraction(double, double);
-    double EnergyRandomize(double, double, double);
-    double LengthContinuous(double, double);
-    double TimeElapsed(double, double);
+/*     double EnergyStochasticloss( */
+/*          CrossSection&, double, const std::array<double, 2>&); */
+/*     double EnergyDecay(double, double); */
+/*     double EnergyInteraction(double, double); */
+/*     double EnergyRandomize(double, double, double); */
+/*     double LengthContinuous(double, double); */
+/*     double TimeElapsed(double, double); */
 
     /* // TODO: return value doesn't tell what it include. Maybe it would be better */
     /* // to give a tuple of two directions back. One is the mean over the */
     /* // displacement and the other is the actual direction. With a get method */
     /* // there could be a possible access with the position of the object stored */
     /* // in an enum. */
-    tuple<Vector3D, Vector3D> DirectionsScatter(double, double, double,
-        const Vector3D&, const Vector3D&, const std::array<double, 4>&);
-    std::pair<double, double> DirectionDeflect(CrossSection& , double particle_energy, double loss_energy);
+    /* tuple<Vector3D, Vector3D> DirectionsScatter(double, double, double, */
+    /*     const Vector3D&, const Vector3D&, const std::array<double, 4>&); */
+    /* std::pair<double, double> DirectionDeflect(CrossSection& , double particle_energy, double loss_energy); */
 
-private:
-    std::unique_ptr<Definition> utility_def;
-};
-} // namespace PROPOSAL
+/* private: */
+    /* std::unique_ptr<Definition> utility_def; */
+/* }; */
+/* } // namespace PROPOSAL */

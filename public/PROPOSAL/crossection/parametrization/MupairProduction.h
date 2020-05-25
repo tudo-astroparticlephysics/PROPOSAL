@@ -38,35 +38,42 @@
 #define MUPAIR_PARAM_INTEGRAL_DEC(param)                                       \
     class Mupair##param : public MupairProductionRhoIntegral {                 \
     public:                                                                    \
-        Mupair##param(const ParticleDef&, const component_list&);              \
+        Mupair##param();                                                       \
                                                                                \
-        double FunctionToIntegral(double energy, double v, double r);          \
+        double FunctionToIntegral(                                             \
+            const ParticleDef&, const Component&, double energy, double v, double r);    \
     };
 
 namespace PROPOSAL {
 
 class MupairProduction : public Parametrization {
+    using only_stochastic = std::false_type;
 protected:
     Integral drho_integral_;
 
 public:
-    MupairProduction(const ParticleDef&, const component_list&);
+    MupairProduction();
     virtual ~MupairProduction() = default;
 
-    virtual double DifferentialCrossSection(double energy, double v) = 0;
-    virtual double FunctionToIntegral(double energy, double v, double rho) = 0;
-    double Calculaterho(double energy, double v, double rnd1, double rnd2);
+    double Calculaterho(
+        const ParticleDef&, const Component&, double, double, double, double);
 
-    KinematicLimits GetKinematicLimits(double energy);
+    virtual double FunctionToIntegral(
+        const ParticleDef&, const Component&, double energy, double v, double r)
+        = 0;
+
+    KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&, double);
 };
 
 class MupairProductionRhoIntegral : public MupairProduction {
     Integral integral_;
+
 public:
-    MupairProductionRhoIntegral(const ParticleDef&, const component_list&);
+    MupairProductionRhoIntegral();
     virtual ~MupairProductionRhoIntegral() = default;
 
-    virtual double DifferentialCrossSection(double energy, double v);
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double);
 };
 
 MUPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)

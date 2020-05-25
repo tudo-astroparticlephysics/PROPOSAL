@@ -30,9 +30,7 @@
               DecayTable().addChannel(1.1, StableChannel()), PARTICLE_TYPE,    \
               static_cast<int>(ParticleType::None))                            \
     {                                                                          \
-    }                                                                          \
-                                                                               \
-    cls##Def::~cls##Def() {}
+    }
 
 using namespace PROPOSAL;
 
@@ -148,20 +146,18 @@ ParticleDef::ParticleDef(std::string name, double mass, double low,
 {
 }
 
-ParticleDef::~ParticleDef() {}
-
-ParticleDef::ParticleDef(const ParticleDef& def)
-    : name(def.name)
-    , mass(def.mass)
-    , low(def.low)
-    , lifetime(def.lifetime)
-    , charge(def.charge)
-    , hard_component_table(def.hard_component_table)
-    , decay_table(def.decay_table)
-    , particle_type(def.particle_type)
-    , weak_partner(def.weak_partner)
-{
-}
+/* ParticleDef::ParticleDef(const ParticleDef& def) */
+/*     : name(def.name) */
+/*     , mass(def.mass) */
+/*     , low(def.low) */
+/*     , lifetime(def.lifetime) */
+/*     , charge(def.charge) */
+/*     , hard_component_table(def.hard_component_table) */
+/*     , decay_table(def.decay_table) */
+/*     , particle_type(def.particle_type) */
+/*     , weak_partner(def.weak_partner) */
+/* { */
+/* } */
 
 // ParticleDef& ParticleDef::operator=(const ParticleDef& def)
 // {
@@ -216,27 +212,31 @@ bool ParticleDef::operator!=(const ParticleDef& def) const
     return !(*this == def);
 }
 
-void ParticleDef::AddCrossSections(
-    const Medium& medium, std::shared_ptr<EnergyCutSettings> cuts)
+void ParticleDef::AddCrossSections(std::shared_ptr<EnergyCutSettings> cuts)
 {
     size_t hash_digest = 0;
-    hash_combine(hash_digest, medium.GetHash(), cuts->GetHash());
+    hash_combine(hash_digest, cuts->GetHash());
 
-    cross_sections[hash_digest] = GetStdCrossSections(medium, cuts, *this);
+    cross_sections[hash_digest] = GetStdCrossSections(cuts, *this);
 }
 
-std::vector<std::shared_ptr<CrossSection>> ParticleDef::GetCrossSections(
-    const Medium& medium, std::shared_ptr<EnergyCutSettings> cuts)
+std::vector<std::shared_ptr<CrossSection>> ParticleDef::GetCrossSections( std::shared_ptr<EnergyCutSettings> cuts)
 {
     size_t hash_digest = 0;
-    hash_combine(hash_digest, medium.GetHash(), cuts->GetHash());
+    hash_combine(hash_digest, cuts->GetHash());
 
     auto search = cross_sections.find(hash_digest);
     if (search != cross_sections.end())
         return search->second;
 
-    AddCrossSections(medium, cuts);
-    return GetCrossSections(medium, cuts);
+    AddCrossSections(cuts);
+    return GetCrossSections(cuts);
+}
+
+size_t ParticleDef::GetHash() const{
+    size_t hash_digest = 0;
+    hash_combine(hash_digest, mass, low, lifetime, charge, weak_partner);
+    return hash_digest;
 }
 
 /******************************************************************************
@@ -269,7 +269,6 @@ EMinusDef::EMinusDef()
 {
 }
 
-EMinusDef::~EMinusDef() {}
 
 EPlusDef::EPlusDef()
     : ParticleDef("EPlus", ME, ME, STABLE_PARTICLE, 1.0,
@@ -280,32 +279,29 @@ EPlusDef::EPlusDef()
 {
 }
 
-EPlusDef::~EPlusDef() {}
 
 MuMinusDef::MuMinusDef()
     : ParticleDef("MuMinus", MMU, MMU, LMU, -1.0,
           HardComponentTables::MuonTable,
           DecayTable().addChannel(1.0,
               LeptonicDecayChannelApprox(
-                  EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get())),
+                  EMinusDef(), NuMuDef(), NuEBarDef())),
           static_cast<int>(ParticleType::MuMinus),
           static_cast<int>(ParticleType::NuMu))
 {
 }
 
-MuMinusDef::~MuMinusDef() {}
 
 MuPlusDef::MuPlusDef()
     : ParticleDef("MuPlus", MMU, MMU, LMU, 1.0, HardComponentTables::MuonTable,
           DecayTable().addChannel(1.0,
               LeptonicDecayChannelApprox(
-                  EPlusDef::Get(), NuMuBarDef::Get(), NuEDef::Get())),
+                  EPlusDef(), NuMuBarDef(), NuEDef())),
           static_cast<int>(ParticleType::MuPlus),
           static_cast<int>(ParticleType::NuMuBar))
 {
 }
 
-MuPlusDef::~MuPlusDef() {}
 
 TauMinusDef::TauMinusDef()
     : ParticleDef("TauMinus", MTAU, MTAU, LTAU, -1.0,
@@ -313,67 +309,66 @@ TauMinusDef::TauMinusDef()
           DecayTable()
               .addChannel(0.1737,
                   LeptonicDecayChannel(
-                      MuMinusDef::Get(), NuTauDef::Get(), NuMuBarDef::Get()))
+                      MuMinusDef(), NuTauDef(), NuMuBarDef()))
               .addChannel(0.1783,
                   LeptonicDecayChannelApprox(
-                      EMinusDef::Get(), NuTauDef::Get(), NuEBarDef::Get()))
+                      EMinusDef(), NuTauDef(), NuEBarDef()))
               .addChannel(
-                  0.1153, TwoBodyPhaseSpace(PiMinusDef::Get(), NuTauDef::Get()))
+                  0.1153, TwoBodyPhaseSpace(PiMinusDef(), NuTauDef()))
               .addChannel(0.2595,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(NuTauDef::Get())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(NuTauDef())
                       .build())
               .addChannel(0.0952,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(NuTauDef::Get())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(NuTauDef())
                       .build())
               .addChannel(0.098,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(NuTauDef::Get())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(NuTauDef())
                       .build())
               .addChannel(0.0457,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(NuTauDef::Get())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(NuTauDef())
                       .build())
               .addChannel(0.0119,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(NuTauDef::Get())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(NuTauDef())
                       .build())
               .addChannel(0.01,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(K0Def::Get())
-                      .addDaughter(NuTauDef::Get())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(K0Def())
+                      .addDaughter(NuTauDef())
                       .build())
               .addChannel(0.00349,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(KMinusDef::Get())
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(NuTauDef::Get())
+                      .addDaughter(KMinusDef())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(NuTauDef())
                       .build()),
           static_cast<int>(ParticleType::TauMinus),
           static_cast<int>(ParticleType::NuTau))
 {
 }
 
-TauMinusDef::~TauMinusDef() {}
 
 TauPlusDef::TauPlusDef()
     : ParticleDef("TauPlus", MTAU, MTAU, LTAU, 1.0,
@@ -381,67 +376,66 @@ TauPlusDef::TauPlusDef()
           DecayTable()
               .addChannel(0.1737,
                   LeptonicDecayChannel(
-                      MuPlusDef::Get(), NuTauBarDef::Get(), NuMuDef::Get()))
+                      MuPlusDef(), NuTauBarDef(), NuMuDef()))
               .addChannel(0.1783,
                   LeptonicDecayChannelApprox(
-                      EPlusDef::Get(), NuTauBarDef::Get(), NuEDef::Get()))
+                      EPlusDef(), NuTauBarDef(), NuEDef()))
               .addChannel(0.1153,
-                  TwoBodyPhaseSpace(PiPlusDef::Get(), NuTauBarDef::Get()))
+                  TwoBodyPhaseSpace(PiPlusDef(), NuTauBarDef()))
               .addChannel(0.2595,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(NuTauBarDef::Get())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(NuTauBarDef())
                       .build())
               .addChannel(0.0952,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(NuTauBarDef::Get())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(NuTauBarDef())
                       .build())
               .addChannel(0.098,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(NuTauBarDef::Get())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(NuTauBarDef())
                       .build())
               .addChannel(0.0457,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(NuTauBarDef::Get())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(NuTauBarDef())
                       .build())
               .addChannel(0.0119,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(Pi0Def::Get())
-                      .addDaughter(NuTauBarDef::Get())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(Pi0Def())
+                      .addDaughter(NuTauBarDef())
                       .build())
               .addChannel(0.01,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(K0Def::Get())
-                      .addDaughter(NuTauBarDef::Get())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(K0Def())
+                      .addDaughter(NuTauBarDef())
                       .build())
               .addChannel(0.00349,
                   ManyBodyPhaseSpace::Builder()
-                      .addDaughter(KPlusDef::Get())
-                      .addDaughter(PiPlusDef::Get())
-                      .addDaughter(PiMinusDef::Get())
-                      .addDaughter(NuTauBarDef::Get())
+                      .addDaughter(KPlusDef())
+                      .addDaughter(PiPlusDef())
+                      .addDaughter(PiMinusDef())
+                      .addDaughter(NuTauBarDef())
                       .build()),
           static_cast<int>(ParticleType::TauPlus),
           static_cast<int>(ParticleType::NuTauBar))
 {
 }
 
-TauPlusDef::~TauPlusDef() {}
 
 // ------------------------------------------------------------------------- //
 // Photon definition:
@@ -458,7 +452,6 @@ GammaDef::GammaDef()
 {
 }
 
-GammaDef::~GammaDef() {}
 
 NuEDef::NuEDef()
     : ParticleDef("NuE", 0.0, 0.0, STABLE_PARTICLE, 0.0,
@@ -469,7 +462,6 @@ NuEDef::NuEDef()
 {
 }
 
-NuEDef::~NuEDef() {}
 
 NuEBarDef::NuEBarDef()
     : ParticleDef("NuEBar", 0.0, 0.0, STABLE_PARTICLE, 0.0,
@@ -480,7 +472,6 @@ NuEBarDef::NuEBarDef()
 {
 }
 
-NuEBarDef::~NuEBarDef() {}
 
 NuMuDef::NuMuDef()
     : ParticleDef("NuMu", 0.0, 0.0, STABLE_PARTICLE, 0.0,
@@ -491,7 +482,6 @@ NuMuDef::NuMuDef()
 {
 }
 
-NuMuDef::~NuMuDef() {}
 
 NuMuBarDef::NuMuBarDef()
     : ParticleDef("NuMuBar", 0.0, 0.0, STABLE_PARTICLE, 0.0,
@@ -502,7 +492,6 @@ NuMuBarDef::NuMuBarDef()
 {
 }
 
-NuMuBarDef::~NuMuBarDef() {}
 
 NuTauDef::NuTauDef()
     : ParticleDef("NuTau", 0.0, 0.0, STABLE_PARTICLE, 0.0,
@@ -513,7 +502,6 @@ NuTauDef::NuTauDef()
 {
 }
 
-NuTauDef::~NuTauDef() {}
 
 NuTauBarDef::NuTauBarDef()
     : ParticleDef("NuTauBar", 0.0, 0.0, STABLE_PARTICLE, 0.0,
@@ -524,7 +512,6 @@ NuTauBarDef::NuTauBarDef()
 {
 }
 
-NuTauBarDef::~NuTauBarDef() {}
 
 // ------------------------------------------------------------------------- //
 // Signature for following macro definitions:

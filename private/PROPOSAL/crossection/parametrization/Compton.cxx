@@ -9,12 +9,13 @@
 
 using namespace PROPOSAL;
 
-Compton::Compton(const ParticleDef& p_def, const component_list& comp)
-    : Parametrization(InteractionType::Compton, "compton", p_def, comp, ME)
+Compton::Compton()
+    : Parametrization(InteractionType::Compton, "compton")
 {
 }
 
-Parametrization::KinematicLimits Compton::GetKinematicLimits(double energy)
+Parametrization::KinematicLimits Compton::GetKinematicLimits(
+    const ParticleDef&, const Component&, double energy)
 {
     assert(energy > 0);
     auto vmax = 1. - 1. / (1. + 2. * energy / ME);
@@ -22,13 +23,8 @@ Parametrization::KinematicLimits Compton::GetKinematicLimits(double energy)
     return KinematicLimits(0., vmax);
 }
 
-ComptonKleinNishina::ComptonKleinNishina(
-    const ParticleDef& p_def, const component_list& comp)
-    : Compton(p_def, comp)
-{
-}
-
-double ComptonKleinNishina::DifferentialCrossSection(double energy, double v)
+double ComptonKleinNishina::DifferentialCrossSection(
+    const ParticleDef& p_def, const Component& comp, double energy, double v)
 {
     // Adapted from "THE EGS5 CODE SYSTEM" by Hideo Harayama and Yoshihito
     // Namito SLAC Report number SLAC-R-730, KEK Report number 2005-8 Equation
@@ -37,7 +33,7 @@ double ComptonKleinNishina::DifferentialCrossSection(double energy, double v)
     // Relativistischen Quantum Dynamic von Dirac", Zeitschrift für Physik, 52,
     // 853-868.
 
-    assert(energy >= particle_mass_);
+    assert(energy >= p_def.mass);
 
     auto kp = energy / ME;
     auto C1 = std::pow(kp, -2.);
@@ -51,6 +47,5 @@ double ComptonKleinNishina::DifferentialCrossSection(double energy, double v)
                    // to v
 
     aux *= PI * std::pow(RE, 2.) * ME;
-    return NA / current_component_.GetAtomicNum()
-        * current_component_.GetNucCharge() * aux;
+    return NA / comp.GetAtomicNum() * comp.GetNucCharge() * aux;
 }

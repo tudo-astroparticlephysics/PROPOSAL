@@ -6,6 +6,8 @@
 #include <stdexcept>
 
 using namespace PROPOSAL;
+using std::max;
+using std::min;
 
 //----------------------------------------------------------------------------//
 //-------------------------public member functions----------------------------//
@@ -74,8 +76,14 @@ double EnergyCutSettings::GetCut(double energy) const noexcept
     return std::min(ecut_ / energy, vcut_);
 }
 
+auto EnergyCutSettings::GetCut(const Parametrization::KinematicLimits& lim,
+    double energy) const noexcept -> double
+{
+    return min(max(lim.vMin, GetCut(energy)), lim.vMax);
+}
 
-size_t EnergyCutSettings::GetHash() const noexcept {
+size_t EnergyCutSettings::GetHash() const noexcept
+{
     size_t hash_digest = 0;
     hash_combine(hash_digest, ecut_, vcut_, continuous_randomization_);
     return hash_digest;

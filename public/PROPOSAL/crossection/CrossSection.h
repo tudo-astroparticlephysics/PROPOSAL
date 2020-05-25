@@ -34,9 +34,9 @@
 #include <functional>
 #include <memory>
 #include <type_traits>
+#include <unordered_map>
 #include <utility>
 #include <vector>
-#include <unordered_map>
 
 using std::array;
 using std::decay;
@@ -57,23 +57,26 @@ namespace PROPOSAL {
 
 using Components::Component;
 
+using rates_t = unordered_map<size_t, double>;
+
 class CrossSection {
-public:
-    unique_ptr<Parametrization> parametrization_;
+protected:
     shared_ptr<const EnergyCutSettings> cuts_;
 
-    CrossSection(unique_ptr<Parametrization>&&, shared_ptr<const EnergyCutSettings>);
+public:
+    CrossSection(shared_ptr<const EnergyCutSettings>);
     virtual ~CrossSection() = default;
 
-    virtual double CalculatedEdx(double) = 0;
-    virtual double CalculatedE2dx(double) = 0;
-    virtual unordered_map<size_t, double> CalculatedNdx(double) = 0;
-    virtual double CalculateStochasticLoss(double, double, size_t) = 0;
+    virtual double CalculatedEdx(const ParticleDef&, const Medium&, double) = 0;
+    virtual double CalculatedE2dx(const ParticleDef&, const Medium&, double) = 0;
+    virtual rates_t CalculatedNdx(const ParticleDef&, const Medium&, double) = 0;
+    virtual double CalculateStochasticLoss(
+        const ParticleDef&, const Component&, double, double)
+        = 0;
 
-    double GetEnergyCut(double energy) const;
-    double GetLowerEnergyLimit() const;
-
-    virtual size_t GetHash() const;
+    virtual size_t GetHash(const ParticleDef&, const Medium&) const = 0;
+    virtual size_t GetHash(const ParticleDef&, const Component&) const = 0;
+    virtual double GetLowerEnergyLim(const ParticleDef&) const = 0;
 };
 
 using CrossSectionList = vector<shared_ptr<CrossSection>>;

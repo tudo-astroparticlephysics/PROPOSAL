@@ -17,9 +17,6 @@
 
 using namespace PROPOSAL;
 using Helper::InitializeInterpolation;
-/******************************************************************************
- *                              Utility Integral                              *
- ******************************************************************************/
 
 UtilityInterpolant::UtilityInterpolant(
     std::function<double(double)> func, double lower_lim)
@@ -31,11 +28,14 @@ UtilityInterpolant::UtilityInterpolant(
 void UtilityInterpolant::BuildTables(std::string name, size_t hash,
     Interpolant1DBuilder::Definition interpol_def)
 {
+    auto utility_func = [&](double energy) {
+        return UtilityIntegral::Calculate(energy, lower_lim);
+    };
+    interpol_def.function1d = utility_func;
     interpol_def.xmin = lower_lim;
-    std::unique_ptr<Interpolant1DBuilder> interpolant_builder(
-        new Interpolant1DBuilder(interpol_def));
+    auto builder = make_unique<Interpolant1DBuilder>(interpol_def);
     interpolant_ = InitializeInterpolation(
-        name, std::move(interpolant_builder), hash, InterpolationDef());
+        name, std::move(builder), hash, InterpolationDef());
 }
 
 double UtilityInterpolant::Calculate(double energy_initial, double energy_final)

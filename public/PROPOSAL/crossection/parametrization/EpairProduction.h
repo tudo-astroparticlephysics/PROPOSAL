@@ -32,30 +32,23 @@
 #include <functional>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
-#include "PROPOSAL/medium/Medium.h"
-
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
-
-#include "PROPOSAL/Logging.h"
-#include "PROPOSAL/methods.h"
 
 using PROPOSAL::Components::Component;
 
 #define EPAIR_PARAM_INTEGRAL_DEC(param)                                        \
     class Epair##param : public EpairProductionRhoIntegral {                   \
     public:                                                                    \
-        Epair##param(const ParticleDef&, const component_list&, bool lpm);     \
+        Epair##param(bool lpm);                                                \
                                                                                \
-        double FunctionToIntegral(double energy, double v, double lpm);        \
+        double FunctionToIntegral(const ParticleDef&, const Component&,        \
+            double energy, double v, double lpm);                              \
     };
 
 namespace PROPOSAL {
 
-class Interpolant;
-
 class EpairProduction : public Parametrization {
+    using only_stochastic = std::false_type;
 protected:
     // ----------------------------------------------------------------------------
     /// @brief Landau Pomeranchuk Migdal effect
@@ -66,14 +59,15 @@ protected:
     /// \f[lpm=return=\frac{(1+b)(A+(1+r^2)B)+b(C+(1+r^2)D)+(1-r^2)E}{[(2+r^2)(1+b)
     /// +x(3+r^2)]\ln\Big(1+\frac{1}{x}\Big)+\frac{1-r^2-b}{1+x}-(3+r^2)}\f]
     // ----------------------------------------------------------------------------
-    double lpm(double energy, double v, double r2, double b, double x);
+    double lpm(const ParticleDef&, const Medium&, double energy, double v,
+        double r2, double b, double x);
 
     bool init_lpm_effect_;
     bool lpm_;
     double eLpm_;
 
 public:
-    EpairProduction(const ParticleDef&, const component_list&, bool);
+    EpairProduction(bool);
     virtual ~EpairProduction() = default;
 
     // ----------------------------------------------------------------------------
@@ -85,24 +79,24 @@ public:
     /// \sqrt{1-\frac{4m_e}{E_p v}}\Big(1-\frac{6m_p^2}{E_p^2(1-v)}\Big)\f$
     ///
     // ----------------------------------------------------------------------------
-    virtual double DifferentialCrossSection(double energy, double v) = 0;
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double energy, double v)
+        = 0;
 
-    KinematicLimits GetKinematicLimits(double energy);
+    KinematicLimits GetKinematicLimits(
+        const ParticleDef&, const Component&, double energy);
 };
-
-// ------------------------------------------------------------------------- //
-// Differentiate between rho integration & interpolation
-// ------------------------------------------------------------------------- //
 
 class EpairProductionRhoIntegral : public EpairProduction {
 private:
     Integral integral_;
 
 public:
-    EpairProductionRhoIntegral(const ParticleDef&, const component_list&, bool);
+    EpairProductionRhoIntegral(bool);
     virtual ~EpairProductionRhoIntegral() = default;
 
-    double DifferentialCrossSection(double energy, double v) override;
+    double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double energy, double v) override;
 
     // ----------------------------------------------------------------------------
     /// @brief This is the calculation of the d2Sigma/dvdRo - interface to
@@ -112,14 +106,12 @@ public:
     /// \f[ f(r) =return= \alpha^2r_e^2 \frac{2Z}{1,5\pi}(Z+k)
     /// \frac{1-v}{v}lpm(r^2,b,s)(F_e+\frac{m_e^2}{m_p^2}F_m)\f]
     // ----------------------------------------------------------------------------
-    virtual double FunctionToIntegral(double energy, double v, double rho) = 0;
+    virtual double FunctionToIntegral(const ParticleDef&, const Component&,
+        double energy, double v, double rho)
+        = 0;
 
     virtual size_t GetHash() const;
 };
-
-/******************************************************************************
- *                     Declare Integral Parametrizations                      *
- ******************************************************************************/
 
 EPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
 EPAIR_PARAM_INTEGRAL_DEC(SandrockSoedingreksoRhode)

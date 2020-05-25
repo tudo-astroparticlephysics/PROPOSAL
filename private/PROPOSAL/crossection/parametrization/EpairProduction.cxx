@@ -1,26 +1,27 @@
 
 #include <cmath>
+#include <stdexcept>
 
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/Constants.h"
 
 #define EPAIR_PARAM_INTEGRAL_IMPL(param)                                       \
-    Epair##param::Epair##param(                                                \
-        const ParticleDef& p_def, const component_list& comp, bool lpm)        \
-        : EpairProductionRhoIntegral(p_def, comp, lpm)                         \
+    Epair##param::Epair##param(bool lpm)                                       \
+        : EpairProductionRhoIntegral(lpm)                                      \
     {                                                                          \
     }
 
 using namespace PROPOSAL;
+using std::logic_error;
 
-EpairProduction::EpairProduction(
-    const ParticleDef& p_def, const component_list& comp, bool lpm)
-    : Parametrization(InteractionType::Epair, "Epair", p_def, comp, p_def.mass + 2 * ME)
+EpairProduction::EpairProduction(bool lpm)
+    : Parametrization(InteractionType::Epair, "Epair")
     , init_lpm_effect_(true)
     , lpm_(lpm)
     , eLpm_(0)
@@ -28,18 +29,18 @@ EpairProduction::EpairProduction(
 }
 
 Parametrization::KinematicLimits EpairProduction::GetKinematicLimits(
-    double energy)
+    const ParticleDef& p_def, const Component& comp, double energy)
 {
-    auto aux = particle_mass_ / energy;
+    auto aux = p_def.mass / energy;
 
     auto v_min = 4 * ME / energy;
     auto v_max = 1
         - 0.75 * SQRTE * aux
-            * std::pow(current_component_.GetNucCharge(), 1. / 3);
+            * std::pow(comp.GetNucCharge(), 1. / 3);
 
     aux = 1 - 6 * aux * aux;
     v_max = std::min(v_max, aux);
-    // limits.vMax = std::min(limits.vMax, 1 - particle_mass / particle_energy);
+    // limits.vMax = std::min(limits.vMax, 1 - p_def.mass / particle_energy);
 
     if (v_max < v_min) {
         v_max = v_min;
@@ -53,25 +54,25 @@ Parametrization::KinematicLimits EpairProduction::GetKinematicLimits(
 // J. Phys. G: Nucl Part. Phys. 28 (2002) 427
 // ------------------------------------------------------------------------- //
 
-double EpairProduction::lpm(
+double EpairProduction::lpm(const ParticleDef& p_def, const Medium& medium,
     double energy, double v, double r2, double b, double x)
 {
     if (init_lpm_effect_) {
         init_lpm_effect_ = false;
         double sum = 0;
 
-        for (const auto& component : components_) {
+        for (const auto& component : medium.GetComponents()) {
             sum += component.GetNucCharge() * component.GetNucCharge()
                 * std::log(3.25 * component.GetLogConstant()
                       * std::pow(component.GetNucCharge(), -1. / 3));
         }
 
         // eq. 29
-        eLpm_ = particle_mass_ / (ME * RE);
+        eLpm_ = p_def.mass / (ME * RE);
         throw std::logic_error("need further thoughts");
-        /* eLpm_ *= (eLpm_ * eLpm_) * ALPHA * particle_mass_ */
-        /*     / (2 * PI * medium_->GetMolDensity() * particle_charge_ */
-        /* * particle_charge_ * sum); */
+        /* eLpm_ *= (eLpm_ * eLpm_) * ALPHA * p_def.mass */
+        /*     / (2 * PI * medium_->GetMolDensity() * p_def.charge */
+        /* * p_def.charge * sum); */
     }
 
     // Ternovskii functions calculated in appendix (eq. A.2)
@@ -109,21 +110,20 @@ double EpairProduction::lpm(
 // Parametrization of Kelner/Kokoulin/Petrukhin
 // Proc. 12th ICCR (1971), 2436
 // ------------------------------------------------------------------------- //
-EpairProductionRhoIntegral::EpairProductionRhoIntegral(
-    const ParticleDef& p_def, const component_list& comp, bool lpm)
-    : EpairProduction(p_def, comp, lpm)
+EpairProductionRhoIntegral::EpairProductionRhoIntegral(bool lpm)
+    : EpairProduction(lpm)
     , integral_(IROMB, IMAXS, IPREC)
 {
 }
 
 // ------------------------------------------------------------------------- //
 double EpairProductionRhoIntegral::DifferentialCrossSection(
-    double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v)
 {
 
     auto aux = 1 - (4 * ME) / (energy * v);
     auto aux2 = 1
-        - (6 * particle_mass_ * particle_mass_) / (energy * energy * (1 - v));
+        - (6 * p_def.mass * p_def.mass) / (energy * energy * (1 - v));
 
     double rMax;
     if (aux > 0 && aux2 > 0) {
@@ -134,15 +134,15 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(
 
     aux = std::max(1 - rMax, COMPUTER_PRECISION);
 
-    return NA / current_component_.GetAtomicNum() * particle_charge_
-        * particle_charge_
+    return NA / comp.GetAtomicNum() * p_def.charge
+        * p_def.charge
         * (integral_.Integrate(1 - rMax, aux,
                std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this,
-                   energy, v, std::placeholders::_1),
+                   p_def, comp, energy, v, std::placeholders::_1),
                2)
               + integral_.Integrate(aux, 1,
                     std::bind(&EpairProductionRhoIntegral::FunctionToIntegral,
-                        this, energy, v, std::placeholders::_1),
+                        this, p_def, comp, energy, v, std::placeholders::_1),
                     4));
 }
 
@@ -167,7 +167,8 @@ EPAIR_PARAM_INTEGRAL_IMPL(SandrockSoedingreksoRhode)
 
 // ------------------------------------------------------------------------- //
 double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
-    double energy, double v, double r)
+    const ParticleDef& p_def, const Component& comp, double energy, double v,
+    double r)
 {
     // Parametrization of Kelner/Kokoulin/Petrukhin
     // Proc. 12th ICCR (1971), 2436
@@ -183,14 +184,14 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
     double aux, aux1, aux2, r2;
     double diagram_e, diagram_mu, atomic_electron_contribution;
 
-    auto medium_charge = current_component_.GetNucCharge();
-    auto medium_log_constant = current_component_.GetLogConstant();
+    auto medium_charge = comp.GetNucCharge();
+    auto medium_log_constant = comp.GetLogConstant();
 
     r = 1 - r; // only for integral optimization - do not forget to swap
                // integration limits!
     r2 = r * r;
     double Z3 = std::pow(medium_charge, -1. / 3);
-    aux = (particle_mass_ * v) / (2 * ME);
+    aux = (p_def.mass * v) / (2 * ME);
     double xi = aux * aux * (1 - r2) / (1 - v);
     double beta = (v * v) / (2 * (1 - v));
 
@@ -202,7 +203,7 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
         / ((1 + r2) * (1.5 + 2 * beta) * std::log(3 + xi) + 1 - 1.5 * r2);
 
     // these arae the L_e and L_mu expressions
-    aux = (1.5 * ME) / (particle_mass_ * Z3);
+    aux = (1.5 * ME) / (p_def.mass * Z3);
     aux1 = (1 + xi) * (1 + diagram_e);
     aux2
         = (2 * ME * SQRTE * medium_log_constant * Z3) / (energy * v * (1 - r2));
@@ -249,7 +250,7 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
         g2 = 5.3e-5;
     }
 
-    aux = energy / particle_mass_;
+    aux = energy / p_def.mass;
     aux1 = 0.073 * std::log(aux / (1 + g1 * aux / (Z3 * Z3))) - 0.26;
     aux2 = 0.058 * std::log(aux / (1 + g2 * aux / Z3)) - 0.14;
 
@@ -260,15 +261,16 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
     }
 
     // combining the results
-    aux = ALPHA * RE * particle_charge_;
+    aux = ALPHA * RE * p_def.charge;
     aux *= aux / (1.5 * PI) * 2 * medium_charge
         * (medium_charge + atomic_electron_contribution);
-    aux1 = ME / particle_mass_ * particle_charge_;
+    aux1 = ME / p_def.mass * p_def.charge;
 
     aux *= (1 - v) / v * (diagram_e + aux1 * aux1 * diagram_mu);
 
     if (lpm_) {
-        aux *= lpm(energy, v, r2, beta, xi);
+        throw logic_error("some work to do!");
+        /* aux *= lpm(energy, v, r2, beta, xi); */
     }
 
     if (aux < 0) {
@@ -280,14 +282,15 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
 
 // ------------------------------------------------------------------------- //
 double EpairSandrockSoedingreksoRhode::FunctionToIntegral(
-    double energy, double v, double rho)
+    const ParticleDef& p_def, const Component& comp, double energy, double v,
+    double rho)
 {
-    double m_in = particle_mass_;
+    double m_in = p_def.mass;
 
-    double nucl_Z = current_component_.GetNucCharge();
-    double nucl_A = current_component_.GetAtomicNum();
+    double nucl_Z = comp.GetNucCharge();
+    double nucl_A = comp.GetAtomicNum();
 
-    double rad_log = current_component_.GetLogConstant();
+    double rad_log = comp.GetLogConstant();
 
     double const_prefactor
         = 4.0 / (3.0 * PI) * nucl_Z * std::pow(ALPHA * RE, 2.0);
@@ -445,7 +448,8 @@ double EpairSandrockSoedingreksoRhode::FunctionToIntegral(
     double aux = diagram_e + diagram_mu;
 
     if (lpm_) {
-        aux *= lpm(energy, v, rho2, beta, xi);
+        throw logic_error("some work to do!");
+        /* aux *= lpm(energy, v, rho2, beta, xi); */
     }
 
     if (aux < 0.0) {

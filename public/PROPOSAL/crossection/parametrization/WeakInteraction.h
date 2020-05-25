@@ -32,25 +32,29 @@
 
 #include <memory>
 #include <vector>
+#include <unordered_map>
+
+using std::unordered_map;
 
 namespace PROPOSAL {
 
 class Interpolant;
 
 class WeakInteraction : public Parametrization {
-public:
-    WeakInteraction(const ParticleDef&, const component_list&);
+    using only_stochastic = std::true_type;
 
-    virtual double DifferentialCrossSection(double energy, double v) = 0;
-    KinematicLimits GetKinematicLimits(double energy);
+public:
+    WeakInteraction();
+
+    KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&, double);
 };
 
 class WeakCooperSarkarMertsch : public WeakInteraction {
-    std::vector<std::unique_ptr<Interpolant>> interpolant_;
+    unordered_map<bool, std::vector<std::unique_ptr<Interpolant>>> interpolant_;
 
 public:
-    WeakCooperSarkarMertsch(const ParticleDef&, const component_list&);
-    double DifferentialCrossSection(double energy, double v) override;
+    WeakCooperSarkarMertsch();
+    double DifferentialCrossSection(const ParticleDef&, const Component&, double, double) override;
 };
 
 } // namespace PROPOSAL

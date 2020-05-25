@@ -31,61 +31,65 @@
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
 
-
 namespace PROPOSAL {
 
 class PhotoPairProduction : public Parametrization {
+    using only_stochastic = std::true_type;
 public:
-    PhotoPairProduction(const ParticleDef&, const component_list&);
-    virtual double DifferentialCrossSection(double energy, double x) = 0;
+    PhotoPairProduction();
 
-    virtual KinematicLimits GetKinematicLimits(double energy);
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double)
+        = 0;
+
+    virtual KinematicLimits GetKinematicLimits(
+        const ParticleDef&, const Component&, double);
 };
 
 class PhotoPairTsai : public PhotoPairProduction {
 public:
-    PhotoPairTsai(const ParticleDef&, const component_list&);
+    PhotoPairTsai();
 
-    virtual double DifferentialCrossSection(double energy, double x);
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double);
 };
 
 class PhotoAngleDistribution {
-protected:
-    component_list components_;
-    Components::Component current_component_;
-
 public:
-    PhotoAngleDistribution(const component_list&);
+    PhotoAngleDistribution() = default;
+    virtual ~PhotoAngleDistribution() = default;
 
     struct DeflectionAngles {
         double cosphi0, theta0, cosphi1, theta1;
     };
 
-    virtual DeflectionAngles SampleAngles(double energy, double rho) = 0;
+    virtual DeflectionAngles SampleAngles(
+        const Component& comp, double energy, double rho)
+        = 0;
 };
 
 class PhotoAngleTsaiIntegral : public PhotoAngleDistribution {
     Integral integral_;
-    double FunctionToIntegral(double energy, double x, double theta);
+    double FunctionToIntegral(const Component&, double, double, double);
 
 public:
-    PhotoAngleTsaiIntegral(const component_list&);
+    PhotoAngleTsaiIntegral();
 
-    DeflectionAngles SampleAngles(double, double) override;
+    DeflectionAngles SampleAngles(const Component&, double, double) override;
 };
 
 class PhotoAngleNoDeflection : public PhotoAngleDistribution {
 public:
-    PhotoAngleNoDeflection(const component_list&);
+    PhotoAngleNoDeflection();
 
-    DeflectionAngles SampleAngles(double, double) override;
+    DeflectionAngles SampleAngles(const Component&, double, double) override;
 };
 
 class PhotoAngleEGS : public PhotoAngleDistribution {
 public:
-    PhotoAngleEGS(const component_list&);
+    PhotoAngleEGS();
 
-    DeflectionAngles SampleAngles(double, double) override;
+    DeflectionAngles SampleAngles(const Component&, double, double) override;
 };
 
 } // namespace PROPOSAL

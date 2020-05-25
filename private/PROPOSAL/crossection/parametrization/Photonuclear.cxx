@@ -9,12 +9,10 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 using namespace PROPOSAL;
-
-/******************************************************************************
- *                              HardComponent                                  *
- ******************************************************************************/
+using std::make_shared;
 
 std::vector<double> HardComponent::x = { 3, 4, 5, 6, 7, 8, 9 };
 
@@ -28,8 +26,7 @@ HardComponent::HardComponent(const ParticleDef& particle_def)
 
     if (!y.empty()) {
         for (unsigned int i = 0; i < y.size(); i++) {
-            interpolant_.push_back(
-                new Interpolant(x, y.at(i), 4, false, false));
+            interpolant_.push_back(make_shared<Interpolant>(x, y.at(i), 4, false, false));
         }
     } else {
         log_fatal("No HardComponent tables provided for the given particle %s",
@@ -37,25 +34,6 @@ HardComponent::HardComponent(const ParticleDef& particle_def)
     }
 }
 
-HardComponent::HardComponent(const HardComponent& hard_component)
-    : RealPhoton(hard_component)
-    , interpolant_()
-{
-    interpolant_.resize(hard_component.interpolant_.size());
-
-    for (unsigned int i = 0; i < hard_component.interpolant_.size(); ++i) {
-        interpolant_[i] = new Interpolant(*hard_component.interpolant_[i]);
-    }
-}
-
-HardComponent::~HardComponent()
-{
-    for (auto interpolant : interpolant_) {
-        delete interpolant;
-    }
-}
-
-// ------------------------------------------------------------------------- //
 double HardComponent::CalculateHardComponent(double energy, double v)
 {
     if (energy < 1.0e5 || v < 1.0e-7) {
@@ -79,19 +57,6 @@ double HardComponent::CalculateHardComponent(double energy, double v)
     return sum / v;
 }
 
-/******************************************************************************
- *                             SoftComponent                                   *
- ******************************************************************************/
-
-SoftComponent::SoftComponent() {}
-
-SoftComponent::SoftComponent(const SoftComponent& hard_component)
-    : RealPhoton(hard_component)
-{
-}
-
-SoftComponent::~SoftComponent() {}
-
 double SoftComponent::CalculateHardComponent(double energy, double v)
 {
     (void)energy;
@@ -99,10 +64,6 @@ double SoftComponent::CalculateHardComponent(double energy, double v)
 
     return 0;
 }
-
-/******************************************************************************
- *                                ShadowEffect                                *
- ******************************************************************************/
 
 const std::string ShadowDuttaRenoSarcevicSeckel::name_
     = "ShadowDuttaRenoSarcevicSeckel";
@@ -114,18 +75,18 @@ const std::string ShadowButkevichMikhailov::name_ = "ShadowButkevichMikhailov";
 // eq. 3.10
 // ------------------------------------------------------------------------- //
 double ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(
-    const Components::Component& component, double x, double nu)
+    const Component& comp, double x, double nu)
 {
     (void)nu;
 
-    if (component.GetNucCharge() == 1)
+    if (comp.GetNucCharge() == 1)
         return 1;
 
     if (x < 0.0014) {
-        return std::pow(component.GetAtomicNum(), -0.1);
+        return std::pow(comp.GetAtomicNum(), -0.1);
     } else if (x < 0.04) {
         return std::pow(
-            component.GetAtomicNum(), 0.069 * std::log(x) / LOG10 + 0.097);
+            comp.GetAtomicNum(), 0.069 * std::log(x) / LOG10 + 0.097);
     } else {
         return 1;
     }
@@ -144,9 +105,9 @@ size_t ShadowDuttaRenoSarcevicSeckel::GetHash() const
 // JETP 95 (2002), 11
 // ------------------------------------------------------------------------- //
 double ShadowButkevichMikhailov::CalculateShadowEffect(
-    const Components::Component& component, double x, double nu)
+    const Component& comp, double x, double nu)
 {
-    if (component.GetNucCharge() == 1)
+    if (comp.GetNucCharge() == 1)
         return 1;
 
     double G;
@@ -161,10 +122,9 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(
         // eq. 48
         double Aosc = (1 - la * x)
             * (au - ac
-                  - MPI / component.GetAverageNucleonWeight()
-                      * (au * au - ac * ac));
+                  - MPI / comp.GetAverageNucleonWeight() * (au * au - ac * ac));
         // eq. 44
-        G = 1 - Mb * component.GetWoodSaxon() * Aosc;
+        G = 1 - Mb * comp.GetWoodSaxon() * Aosc;
     } else {
         const double M1 = 0.129;
         const double M2 = 0.456;
@@ -172,16 +132,16 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(
 
         double m1, m2, m3, x0, sgn, tmp;
 
-        m1 = M1 * component.GetWoodSaxon();
-        m2 = M2 * component.GetWoodSaxon();
-        m3 = M3 * component.GetWoodSaxon();
+        m1 = M1 * comp.GetWoodSaxon();
+        m2 = M2 * comp.GetWoodSaxon();
+        m3 = M3 * comp.GetWoodSaxon();
         nu *= 1.e-3;
         // eq. 53
         sgn = 112.2
             * (0.609 * std::pow(nu, 0.0988) + 1.037 * std::pow(nu, -0.5944));
 
         // Bezrukav Bugaev shadow
-        tmp = 0.00282 * std::pow(component.GetAtomicNum(), 1. / 3) * sgn;
+        tmp = 0.00282 * std::pow(comp.GetAtomicNum(), 1. / 3) * sgn;
         G = (3 / tmp) * (0.5 + ((1 + tmp) * exp(-tmp) - 1) / (tmp * tmp));
 
         // eq. 55
@@ -197,7 +157,6 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(
     return G;
 }
 
-// ------------------------------------------------------------------------- //
 size_t ShadowButkevichMikhailov::GetHash() const
 {
     size_t seed = 0;
@@ -206,46 +165,30 @@ size_t ShadowButkevichMikhailov::GetHash() const
     return seed;
 }
 
-/******************************************************************************
- *                               Photonuclear                                  *
- ******************************************************************************/
-
-// ------------------------------------------------------------------------- //
-// Constructor & Destructor
-// ------------------------------------------------------------------------- //
-
-Photonuclear::Photonuclear(
-    const ParticleDef& particle_def, const component_list& comp)
-    : Parametrization(InteractionType::Photonuclear, "photonuclear", particle_def, comp, particle_def.mass)
+Photonuclear::Photonuclear()
+    : Parametrization(InteractionType::Photonuclear, "photonuclear")
 {
 }
 
-// ------------------------------------------------------------------------- //
-// Public methods
-// ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
-Parametrization::KinematicLimits Photonuclear::GetKinematicLimits(double energy)
+Parametrization::KinematicLimits Photonuclear::GetKinematicLimits(const ParticleDef& p_def, const Component& comp, double energy)
 {
-    auto v_min = (MPI
-                     + MPI * MPI
-                         / (2
-                               * current_component_.GetAverageNucleonWeight()))
+    auto v_min
+        = (MPI + MPI * MPI / (2 * comp.GetAverageNucleonWeight()))
         / energy;
 
     auto v_max = 1.;
-    if (particle_mass_ < MPI) {
-        auto aux = particle_mass_
-            / current_component_.GetAverageNucleonWeight();
+    if (p_def.mass < MPI) {
+        auto aux
+            = p_def.mass / comp.GetAverageNucleonWeight();
 
-        v_max -= current_component_.GetAverageNucleonWeight()
-            * (1 + aux * aux) / (2 * energy);
+        v_max -= comp.GetAverageNucleonWeight() * (1 + aux * aux)
+            / (2 * energy);
     }
 
     // vMax calculated above is always smaller than 1-m/E
     // in comparison, the following inequality arise
     // (M-m)^2 >= 0
-    // limits.vMax = std::min(limits.vMax, 1 - particle_mass_/energy);
+    // limits.vMax = std::min(limits.vMax, 1 - p_def.mass/energy);
 
     if (v_max < v_min) {
         v_max = v_min;

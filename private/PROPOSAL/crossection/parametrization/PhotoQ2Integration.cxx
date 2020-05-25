@@ -4,43 +4,39 @@
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
 
 #include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/methods.h"
+#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
 #define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                    \
-    Photo##param::Photo##param(const ParticleDef& p_def,                       \
-        const component_list& comp_list,                                       \
-        unique_ptr<ShadowEffect> shadow_effect)                                \
-        : PhotoQ2Integral(p_def, comp_list, std::move(shadow_effect))          \
+    Photo##param::Photo##param(unique_ptr<ShadowEffect> shadow_effect)         \
+        : PhotoQ2Integral(std::move(shadow_effect))                            \
     {                                                                          \
     }
 
-PhotoQ2Integral::PhotoQ2Integral(
-    const ParticleDef& p_def, const component_list& comp, unique_ptr<ShadowEffect> shadow_effect)
-    : Photonuclear(p_def, comp)
+PhotoQ2Integral::PhotoQ2Integral(unique_ptr<ShadowEffect> shadow_effect)
+    : Photonuclear()
     , shadow_effect_(std::move(shadow_effect))
     , integral_(IROMB, IMAXS, IPREC)
 {
 }
 
-double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
+double PhotoQ2Integral::DifferentialCrossSection(const ParticleDef& p_def, const Component& comp, double energy, double v)
 {
-    KinematicLimits limits = GetKinematicLimits(energy);
+    KinematicLimits limits = GetKinematicLimits(p_def, comp, energy);
 
     double aux, q2_min, q2_max;
 
-    q2_min = particle_mass_ * v;
+    q2_min = p_def.mass * v;
     q2_min *= q2_min / (1 - v);
 
-    if (particle_mass_ < MPI) {
-        aux = particle_mass_ * particle_mass_ / energy;
+    if (p_def.mass < MPI) {
+        aux = p_def.mass * p_def.mass / energy;
         q2_min -= (aux * aux) / (2 * (1 - v));
     }
 
-    q2_max = 2 * current_component_.GetAverageNucleonWeight() * energy
+    q2_max = 2 * comp.GetAverageNucleonWeight() * energy
         * (v - limits.vMin);
 
     //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and
@@ -50,12 +46,12 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
     }
 
     aux = integral_.Integrate(q2_min, q2_max,
-        std::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, energy, v,
+        std::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, p_def, comp, energy, v,
             std::placeholders::_1),
         4);
 
-    aux *= NA / current_component_.GetAtomicNum() * particle_charge_
-        * particle_charge_;
+    aux *= NA / comp.GetAtomicNum() * p_def.charge
+        * p_def.charge;
 
     return aux;
 }
@@ -69,12 +65,10 @@ Q2_PHOTO_PARAM_INTEGRAL_IMPL(RenoSarcevicSu)
 // Abramowicz Levin Levy Maor 91
 // Phys. Lett. B 269 (1991), 465
 // ------------------------------------------------------------------------- //
-double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(
+double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(const ParticleDef& p_def, const Component& comp,
     double energy, double v, double Q2)
 {
-    Components::Component component = current_component_;
-
-    double mass_nucleus = component.GetAverageNucleonWeight();
+    double mass_nucleus = comp.GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
     double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
@@ -187,9 +181,9 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
     double structure_function_nucleus = structure_function_proton
         * shadow_effect_->CalculateShadowEffect(
-              component, bjorken_x, v * energy)
-        * (component.GetNucCharge()
-              + (component.GetAtomicNum() - component.GetNucCharge())
+              comp, bjorken_x, v * energy)
+        * (comp.GetNucCharge()
+              + (comp.GetAtomicNum() - comp.GetNucCharge())
                   * relation_proton_neutron);
 
     // differential cross section from Dutta et al.
@@ -204,7 +198,7 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v
         * (1 - v - mass_nucleus * bjorken_x * v / (2 * energy)
-              + (1 - 2 * particle_mass_ * particle_mass_ / Q2) * v * v
+              + (1 - 2 * p_def.mass * p_def.mass / Q2) * v * v
                   * (1
                         + 4 * mass_nucleus * mass_nucleus * bjorken_x
                             * bjorken_x / Q2)
@@ -217,12 +211,11 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(
 // Abramowicz Levin Levy Maor 97
 // arXiv:hep-ph/9712415
 // ------------------------------------------------------------------------- //
-double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
+double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(const ParticleDef& p_def, const Component& comp,
     double energy, double v, double Q2)
 {
-    Components::Component component = current_component_;
 
-    double mass_nucleus = component.GetAverageNucleonWeight();
+    double mass_nucleus = comp.GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
     double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
@@ -334,9 +327,9 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
     double structure_function_nucleus = structure_function_proton
         * shadow_effect_->CalculateShadowEffect(
-              component, bjorken_x, v * energy)
-        * (component.GetNucCharge()
-              + (component.GetAtomicNum() - component.GetNucCharge())
+              comp, bjorken_x, v * energy)
+        * (comp.GetNucCharge()
+              + (comp.GetAtomicNum() - comp.GetNucCharge())
                   * relation_proton_neutron);
 
     // differential cross section from Dutta et al.
@@ -351,7 +344,7 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v
         * (1 - v - mass_nucleus * bjorken_x * v / (2 * energy)
-              + (1 - 2 * particle_mass_ * particle_mass_ / Q2) * v * v
+              + (1 - 2 * p_def.mass * p_def.mass / Q2) * v * v
                   * (1
                         + 4 * mass_nucleus * mass_nucleus * bjorken_x
                             * bjorken_x / Q2)
@@ -364,12 +357,11 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
 // Butkevich Mikheyev Parametrization
 // JETP 95 (2002), 11
 // ------------------------------------------------------------------------- //
-double PhotoButkevichMikhailov::FunctionToQ2Integral(
+double PhotoButkevichMikhailov::FunctionToQ2Integral(const ParticleDef& p_def, const Component& comp,
     double energy, double v, double Q2)
 {
-    Components::Component component = current_component_;
 
-    double mass_nucleus = component.GetAverageNucleonWeight();
+    double mass_nucleus = comp.GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
     double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
@@ -433,9 +425,9 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(
         = F_neutron_singlet + F_neutron_non_singlet;
     // F_{2, nucleus} = G (Z F_{2, Proton} + (A-Z) F_{2, Neutron})
     double structure_function_nucleus = shadow_effect_->CalculateShadowEffect(
-                                            component, bjorken_x, v * energy)
-        * (component.GetNucCharge() * structure_function_proton
-              + (component.GetAtomicNum() - component.GetNucCharge())
+                                            comp, bjorken_x, v * energy)
+        * (comp.GetNucCharge() * structure_function_proton
+              + (comp.GetAtomicNum() - comp.GetNucCharge())
                   * structure_function_neutron);
 
     // differential cross section from Dutta et al.
@@ -450,7 +442,7 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v
         * (1 - v - mass_nucleus * bjorken_x * v / (2 * energy)
-              + (1 - 2 * particle_mass_ * particle_mass_ / Q2) * v * v
+              + (1 - 2 * p_def.mass * p_def.mass / Q2) * v * v
                   * (1
                         + 4 * mass_nucleus * mass_nucleus * bjorken_x
                             * bjorken_x / Q2)
@@ -465,12 +457,11 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(
 // this parametrization was calculated for sTaus with spin 0
 // the other parametrizations are for charged leptons with spin 1/2
 // ------------------------------------------------------------------------- //
-double PhotoRenoSarcevicSu::FunctionToQ2Integral(
+double PhotoRenoSarcevicSu::FunctionToQ2Integral(const ParticleDef& p_def, const Component& comp,
     double energy, double v, double Q2)
 {
-    Components::Component component = current_component_;
 
-    double mass_nucleus = component.GetAverageNucleonWeight();
+    double mass_nucleus = comp.GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
     double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
@@ -582,9 +573,9 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
     double structure_function_nucleus = structure_function_proton
         * shadow_effect_->CalculateShadowEffect(
-              component, bjorken_x, v * energy)
-        * (component.GetNucCharge()
-              + (component.GetAtomicNum() - component.GetNucCharge())
+              comp, bjorken_x, v * energy)
+        * (comp.GetNucCharge()
+              + (comp.GetAtomicNum() - comp.GetNucCharge())
                   * relation_proton_neutron);
 
     // --------------------------------------------------------------------- //
@@ -600,7 +591,7 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v
         * (1 - v + 0.25 * v * v
-              - (1 + 4 * particle_mass_ * particle_mass_ / Q2) * 0.25 * v * v
+              - (1 + 4 * p_def.mass * p_def.mass / Q2) * 0.25 * v * v
                   * (1
                         + 4 * mass_nucleus * mass_nucleus * bjorken_x
                             * bjorken_x / Q2)

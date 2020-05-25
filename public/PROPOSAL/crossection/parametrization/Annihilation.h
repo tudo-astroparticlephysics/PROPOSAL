@@ -31,29 +31,28 @@
 #include <cmath>
 #include <fstream>
 #include <functional>
+#include <functional>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 namespace PROPOSAL {
 
 class Annihilation : public Parametrization {
-protected:
-    double za_; // protonnumber / massnumber
+    using only_stochastic = std::true_type;
 
 public:
-    Annihilation(const ParticleDef&, const component_list&);
+    Annihilation();
     virtual ~Annihilation() = default;
 
-    virtual double DifferentialCrossSection(double energy, double v) = 0;
-
-    KinematicLimits GetKinematicLimits(double energy) override;
+    KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&, double) override;
 };
 
 class AnnihilationHeitler : public Annihilation {
 public:
-    AnnihilationHeitler(const ParticleDef&, const component_list&);
+    AnnihilationHeitler();
 
-    double DifferentialCrossSection(double energy, double v) override;
+    double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double) override;
 };
 
 } // namespace PROPOSAL

@@ -29,31 +29,29 @@
 #pragma once
 
 #include <functional>
-#include <type_traits>
 
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/math/Integral.h"
-
-#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
 
 #define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                     \
     class Photo##param : public PhotoQ2Integral {                              \
     public:                                                                    \
-        Photo##param(const ParticleDef&, const component_list&,                \
-            unique_ptr<ShadowEffect>);                                         \
-        double FunctionToQ2Integral(double energy, double v, double Q2);       \
+        Photo##param(unique_ptr<ShadowEffect>);                                \
+        double FunctionToQ2Integral(const ParticleDef&, const Component&,      \
+            double energy, double v, double Q2);                               \
     };
 
 namespace PROPOSAL {
 class PhotoQ2Integral : public Photonuclear {
 public:
-    PhotoQ2Integral(
-        const ParticleDef&, const component_list&, unique_ptr<ShadowEffect>);
+    PhotoQ2Integral(unique_ptr<ShadowEffect>);
 
-    virtual double DifferentialCrossSection(double energy, double v);
-    virtual double FunctionToQ2Integral(double energy, double v, double Q2) = 0;
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double energy, double v);
+    virtual double FunctionToQ2Integral(const ParticleDef&, const Component&,
+        double energy, double v, double Q2)
+        = 0;
 
     std::unique_ptr<ShadowEffect> shadow_effect_;
     Integral integral_;

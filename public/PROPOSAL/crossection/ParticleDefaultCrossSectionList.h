@@ -12,7 +12,11 @@ class ParticleDef;
 
 extern InterpolationDef std_interpolation_def;
 
-vector<shared_ptr<CrossSection>> GetStdCrossSections(const Medium&,
+template <typename Param>
+shared_ptr<CrossSection> make_crosssection(
+    Param&& param, shared_ptr<const EnergyCutSettings> cuts, bool interpolate);
+
+vector<shared_ptr<CrossSection>> GetStdCrossSections(
     std::shared_ptr<EnergyCutSettings>, const ParticleDef&);
 
 } // namespace PROPOSAL
