@@ -51,4 +51,20 @@ public:
     double DifferentialCrossSection(
         const ParticleDef&, const Component&, double energy, double v);
 };
+
+template <>
+double integrate_dndx(Integral&, Compton&, const ParticleDef&,
+    const Component&, double, double, double);
+
+template <>
+double calculate_upper_lim_dndx(Integral&, Compton&, const ParticleDef&,
+    const Component&, double, double, double, double);
+
+template <>
+double integrate_dedx(Integral&, Compton&, const ParticleDef&,
+    const Component&, double, double, double);
+
+template <>
+double integrate_de2dx(Integral&, Compton&, const ParticleDef&,
+    const Component&, double, double, double);
 } // namespace PROPOSAL

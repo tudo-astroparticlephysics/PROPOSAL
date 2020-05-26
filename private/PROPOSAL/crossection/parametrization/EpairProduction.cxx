@@ -6,8 +6,8 @@
 
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/Constants.h"
 
@@ -34,9 +34,7 @@ Parametrization::KinematicLimits EpairProduction::GetKinematicLimits(
     auto aux = p_def.mass / energy;
 
     auto v_min = 4 * ME / energy;
-    auto v_max = 1
-        - 0.75 * SQRTE * aux
-            * std::pow(comp.GetNucCharge(), 1. / 3);
+    auto v_max = 1 - 0.75 * SQRTE * aux * std::pow(comp.GetNucCharge(), 1. / 3);
 
     aux = 1 - 6 * aux * aux;
     v_max = std::min(v_max, aux);
@@ -106,6 +104,48 @@ double EpairProduction::lpm(const ParticleDef& p_def, const Medium& medium,
               + (1 - r2 - b) / (1 + x) - (3 + r2));
 }
 
+namespace PROPOSAL {
+template <>
+double integrate_dedx(Integral& integral, EpairProduction& param,
+    const ParticleDef& p_def, const Component& comp, double energy,
+    double v_min, double v_max)
+{
+    double r1 = 0.8;
+    double rUp = v_max * (1 - HALF_PRECISION);
+    bool rflag = false;
+    if (r1 < rUp) {
+        if (2 * param.FunctionToDEdxIntegral(p_def, comp, energy, r1)
+            < param.FunctionToDEdxIntegral(p_def, comp, energy, rUp)) {
+            rflag = true;
+        }
+    }
+    auto func = [&param, &p_def, &comp, energy](double v) {
+        return param.FunctionToDEdxIntegral(p_def, comp, energy, v);
+    };
+    if (rflag) {
+        if (r1 > v_max) {
+            r1 = v_max;
+        }
+        if (r1 < v_min) {
+            r1 = v_min;
+        }
+        auto sum = integral.Integrate(v_min, r1, func, 4);
+        double r2 = std::max(1 - v_max, COMPUTER_PRECISION);
+        if (r2 > 1 - r1) {
+            r2 = 1 - r1;
+        }
+        auto func_reverse = [&, energy](double v) {
+            return (1 - v)
+                * param.DifferentialCrossSection(p_def, comp, energy, v);
+        };
+        sum += integral.Integrate(1 - v_max, r2, func_reverse, 2)
+            + integral.Integrate(r2, 1 - r1, func_reverse, 4);
+        return energy * sum;
+    }
+    return energy * integral.Integrate(v_min, v_max, func, 4);
+}
+} // namespace PROPOSAL
+
 // ------------------------------------------------------------------------- //
 // Parametrization of Kelner/Kokoulin/Petrukhin
 // Proc. 12th ICCR (1971), 2436
@@ -122,8 +162,7 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(
 {
 
     auto aux = 1 - (4 * ME) / (energy * v);
-    auto aux2 = 1
-        - (6 * p_def.mass * p_def.mass) / (energy * energy * (1 - v));
+    auto aux2 = 1 - (6 * p_def.mass * p_def.mass) / (energy * energy * (1 - v));
 
     double rMax;
     if (aux > 0 && aux2 > 0) {
@@ -134,8 +173,7 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(
 
     aux = std::max(1 - rMax, COMPUTER_PRECISION);
 
-    return NA / comp.GetAtomicNum() * p_def.charge
-        * p_def.charge
+    return NA / comp.GetAtomicNum() * p_def.charge * p_def.charge
         * (integral_.Integrate(1 - rMax, aux,
                std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this,
                    p_def, comp, energy, v, std::placeholders::_1),

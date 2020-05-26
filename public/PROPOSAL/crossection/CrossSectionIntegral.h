@@ -84,6 +84,12 @@ double calculate_dedx(Param&& param, Integral& integral,
     return energy * sum;
 }
 
+class Ionization;
+template <>
+double calculate_dedx(Ionization&, Integral&, const ParticleDef&,
+    const Medium&, const EnergyCutSettings&, double, std::false_type);
+
+
 template <typename Param>
 double calculate_de2dx(Param&& param, Integral& integral,
     const ParticleDef& p_def, const Medium& medium,
@@ -206,6 +212,7 @@ double CrossSectionIntegral<Param>::CalculateStochasticLoss(
 {
     auto physical_lim = param.GetKinematicLimits(p_def, comp, energy);
     auto v_cut = cuts_->GetCut(physical_lim, energy);
-    return calculate_upper_lim_dndx(integral, param, p_def, comp, energy, v_cut, physical_lim.vMax, -rate);
+    return calculate_upper_lim_dndx(
+        integral, param, p_def, comp, energy, v_cut, physical_lim.vMax, -rate);
 }
 } // namepace PROPOSAL

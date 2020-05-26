@@ -86,6 +86,7 @@ double integrate_dndx(Integral& integral, Param&& param,
     return integral.Integrate(v_min, v_max, dNdx, 4);
 }
 
+
 template <typename Param>
 double calculate_upper_lim_dndx(Integral& integral, Param&& param,
     const ParticleDef& p_def, const Component& comp, double energy,

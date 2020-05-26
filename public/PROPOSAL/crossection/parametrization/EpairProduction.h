@@ -49,6 +49,7 @@ namespace PROPOSAL {
 
 class EpairProduction : public Parametrization {
     using only_stochastic = std::false_type;
+
 protected:
     // ----------------------------------------------------------------------------
     /// @brief Landau Pomeranchuk Migdal effect
@@ -86,6 +87,10 @@ public:
     KinematicLimits GetKinematicLimits(
         const ParticleDef&, const Component&, double energy);
 };
+
+template <>
+double integrate_dedx(Integral&, EpairProduction&, const ParticleDef&,
+    const Component&, double, double, double);
 
 class EpairProductionRhoIntegral : public EpairProduction {
 private:

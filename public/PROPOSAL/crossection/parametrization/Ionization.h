@@ -44,6 +44,7 @@ public:
     Ionization(const EnergyCutSettings&);
 
     KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&, double);
+    virtual double FunctionToDEdxIntegral(const ParticleDef&, const Medium&, double, double) = 0;
     virtual KinematicLimits GetKinematicLimits( const ParticleDef&, const Medium&, double energy) = 0;
     double DifferentialCrossSection(const ParticleDef&, const Component&, double, double);
 };
