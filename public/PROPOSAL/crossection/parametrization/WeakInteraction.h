@@ -31,8 +31,8 @@
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 #include <memory>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 using std::unordered_map;
 
@@ -46,7 +46,8 @@ class WeakInteraction : public Parametrization {
 public:
     WeakInteraction();
 
-    KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&, double);
+    KinematicLimits GetKinematicLimits(
+        const ParticleDef&, const Component&, double);
 };
 
 class WeakCooperSarkarMertsch : public WeakInteraction {
@@ -54,7 +55,9 @@ class WeakCooperSarkarMertsch : public WeakInteraction {
 
 public:
     WeakCooperSarkarMertsch();
-    double DifferentialCrossSection(const ParticleDef&, const Component&, double, double) override;
+    using base_param_t = WeakInteraction;
+    double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double) override;
 };
 
 } // namespace PROPOSAL

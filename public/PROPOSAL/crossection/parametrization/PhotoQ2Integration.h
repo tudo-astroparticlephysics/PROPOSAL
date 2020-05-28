@@ -35,9 +35,9 @@
 #include "PROPOSAL/methods.h"
 
 #define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                     \
-    class Photo##param : public PhotoQ2Integral {                              \
-    public:                                                                    \
+    struct Photo##param : public PhotoQ2Integral {                             \
         Photo##param(unique_ptr<ShadowEffect>);                                \
+        using base_param_t = Photonuclear;                                     \
         double FunctionToQ2Integral(const ParticleDef&, const Component&,      \
             double energy, double v, double Q2);                               \
     };

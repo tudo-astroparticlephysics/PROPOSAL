@@ -37,6 +37,7 @@ using std::unordered_map;
     class Photo##param : public Photo##parent {                                \
     public:                                                                    \
         Photo##param(bool hard_component);                                     \
+        using base_param_t = Photonuclear;                                     \
                                                                                \
         virtual double CalculateParametrization(const Component&, double nu);  \
     };

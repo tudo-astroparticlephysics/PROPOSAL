@@ -57,17 +57,19 @@ public:
     };
 
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double)
-        = 0;
-    virtual double FunctionToDNdxIntegral(
-        const ParticleDef&, const Component&, double, double);
-    virtual double FunctionToDEdxIntegral(
-        const ParticleDef&, const Component&, double, double);
-    virtual double FunctionToDE2dxIntegral(
-        const ParticleDef&, const Component&, double, double);
+        ParticleDef&, Component&, double, double);
     virtual KinematicLimits GetKinematicLimits(
-        const ParticleDef&, const Component&, double)
-        = 0;
+        ParticleDef&, Component&, double);
+    virtual double DifferentialCrossSection(
+        ParticleDef&, Medium&, double, double);
+    virtual KinematicLimits GetKinematicLimits(ParticleDef&, Medium&, double);
+
+    template <typename T>
+    double FunctionToDNdxIntegral(const ParticleDef&, T&&, double, double);
+    template <typename T>
+    double FunctionToDEdxIntegral(const ParticleDef&, T&&, double, double);
+    template <typename T>
+    double FunctionToDE2dxIntegral(const ParticleDef&, T&&, double, double);
 
     virtual double GetLowerEnergyLim(const ParticleDef&) const { return 0; };
     virtual size_t GetHash() const;
@@ -75,25 +77,23 @@ public:
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-template <typename Param>
-double integrate_dndx(Integral& integral, Param&& param,
-    const ParticleDef& p_def, const Component& comp, double energy,
-    double v_min, double v_max)
+template <typename P, typename M>
+double integrate_dndx(Integral& integral, P&& param, const ParticleDef& p_def,
+    const M& medium, double energy, double v_min, double v_max)
 {
-    auto dNdx = [&param, &p_def, &comp, energy](double v) {
-        return param.FunctionToDNdxIntegral(p_def, comp, energy, v);
+    auto dNdx = [&param, &p_def, &medium, energy](double v) {
+        return param.FunctionToDNdxIntegral(p_def, medium, energy, v);
     };
     return integral.Integrate(v_min, v_max, dNdx, 4);
 }
 
-
-template <typename Param>
-double calculate_upper_lim_dndx(Integral& integral, Param&& param,
-    const ParticleDef& p_def, const Component& comp, double energy,
-    double v_min, double v_max, double rnd)
+template <typename P, typename M>
+double calculate_upper_lim_dndx(Integral& integral, P&& param,
+    const ParticleDef& p_def, M&& medium, double energy, double v_min,
+    double v_max, double rnd)
 {
-    auto dNdx = [&param, &p_def, &comp, energy](double v) {
-        return param.FunctionToDNdxIntegral(p_def, comp, energy, v);
+    auto dNdx = [&param, &p_def, &medium, energy](double v) {
+        return param.FunctionToDNdxIntegral(p_def, medium, energy, v);
     };
     integral.IntegrateWithRandomRatio(v_min, v_max, dNdx, 4, rnd);
     return integral.GetUpperLimit();

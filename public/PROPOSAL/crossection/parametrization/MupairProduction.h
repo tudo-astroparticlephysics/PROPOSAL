@@ -36,24 +36,25 @@
 #include "PROPOSAL/math/Integral.h"
 
 #define MUPAIR_PARAM_INTEGRAL_DEC(param)                                       \
-    class Mupair##param : public MupairProductionRhoIntegral {                 \
-    public:                                                                    \
+    struct Mupair##param : public MupairProductionRhoIntegral {                \
         Mupair##param();                                                       \
+        using base_param_t = MupairProduction;                                 \
                                                                                \
-        double FunctionToIntegral(                                             \
-            const ParticleDef&, const Component&, double energy, double v, double r);    \
+        double FunctionToIntegral(const ParticleDef&, const Component&,        \
+            double energy, double v, double r);                                \
     };
 
 namespace PROPOSAL {
 
 class MupairProduction : public Parametrization {
-    using only_stochastic = std::false_type;
+
 protected:
     Integral drho_integral_;
 
 public:
     MupairProduction();
     virtual ~MupairProduction() = default;
+    using only_stochastic = std::false_type;
 
     double Calculaterho(
         const ParticleDef&, const Component&, double, double, double, double);
@@ -62,7 +63,8 @@ public:
         const ParticleDef&, const Component&, double energy, double v, double r)
         = 0;
 
-    KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&, double);
+    KinematicLimits GetKinematicLimits(
+        const ParticleDef&, const Component&, double);
 };
 
 class MupairProductionRhoIntegral : public MupairProduction {
@@ -70,7 +72,7 @@ class MupairProductionRhoIntegral : public MupairProduction {
 
 public:
     MupairProductionRhoIntegral();
-    virtual ~MupairProductionRhoIntegral() = default;
+    ~MupairProductionRhoIntegral() = default;
 
     virtual double DifferentialCrossSection(
         const ParticleDef&, const Component&, double, double);

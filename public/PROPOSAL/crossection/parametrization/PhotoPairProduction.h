@@ -34,9 +34,9 @@
 namespace PROPOSAL {
 
 class PhotoPairProduction : public Parametrization {
-    using only_stochastic = std::true_type;
 public:
     PhotoPairProduction();
+    using only_stochastic = std::true_type;
 
     virtual double DifferentialCrossSection(
         const ParticleDef&, const Component&, double, double)
@@ -46,9 +46,9 @@ public:
         const ParticleDef&, const Component&, double);
 };
 
-class PhotoPairTsai : public PhotoPairProduction {
-public:
+struct PhotoPairTsai : public PhotoPairProduction {
     PhotoPairTsai();
+    using base_param_t = PhotoPairProduction;
 
     virtual double DifferentialCrossSection(
         const ParticleDef&, const Component&, double, double);

@@ -34,7 +34,6 @@
 
 namespace PROPOSAL {
 class Ionization : public Parametrization {
-    using only_stochastic = std::false_type;
 protected:
     EnergyCutSettings cuts_;
 
@@ -42,11 +41,20 @@ protected:
 
 public:
     Ionization(const EnergyCutSettings&);
+    using only_stochastic = std::false_type;
 
-    KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&, double);
-    virtual double FunctionToDEdxIntegral(const ParticleDef&, const Medium&, double, double) = 0;
-    virtual KinematicLimits GetKinematicLimits( const ParticleDef&, const Medium&, double energy) = 0;
-    double DifferentialCrossSection(const ParticleDef&, const Component&, double, double);
+    KinematicLimits GetKinematicLimits(
+        const ParticleDef&, const Component&, double);
+    virtual double FunctionToDEdxIntegral(
+        const ParticleDef&, const Medium&, double, double)
+        = 0;
+    virtual KinematicLimits GetKinematicLimits(
+        const ParticleDef&, const Medium&, double energy)
+        = 0;
+    double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double) override;
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Medium&, double, double) = 0;
 };
 
 class IonizBetheBlochRossi : public Ionization {
@@ -56,28 +64,38 @@ class IonizBetheBlochRossi : public Ionization {
 
 public:
     IonizBetheBlochRossi(const EnergyCutSettings&);
+    using base_param_t = Ionization;
 
-    KinematicLimits GetKinematicLimits(const ParticleDef&, const Medium&, double);
-    double DifferentialCrossSection(const ParticleDef&, const Medium&, double, double);
-    double FunctionToDEdxIntegral(const ParticleDef&, const Medium&, double, double);
+    KinematicLimits GetKinematicLimits(
+        const ParticleDef&, const Medium&, double) override;
+    double DifferentialCrossSection(
+        const ParticleDef&, const Medium&, double, double) override;
+    double FunctionToDEdxIntegral(
+        const ParticleDef&, const Medium&, double, double) override;
 };
 
-class IonizBergerSeltzerBhabha : public Ionization {
-public:
+struct IonizBergerSeltzerBhabha : public Ionization {
     IonizBergerSeltzerBhabha(const EnergyCutSettings&);
+    using base_param_t = Ionization;
 
-    KinematicLimits GetKinematicLimits(const ParticleDef&, const Medium&, double);
-    double DifferentialCrossSection(const ParticleDef&, const Medium&, double, double);
-    double FunctionToDEdxIntegral(const ParticleDef&, const Medium&, double, double);
+    KinematicLimits GetKinematicLimits(
+        const ParticleDef&, const Medium&, double) override;
+    double DifferentialCrossSection(
+        const ParticleDef&, const Medium&, double, double) override;
+    double FunctionToDEdxIntegral(
+        const ParticleDef&, const Medium&, double, double) override;
 };
 
-class IonizBergerSeltzerMoller : public Ionization {
-public:
+struct IonizBergerSeltzerMoller : public Ionization {
     IonizBergerSeltzerMoller(const EnergyCutSettings&);
+    using base_param_t = Ionization;
 
-    KinematicLimits GetKinematicLimits(const ParticleDef&, const Medium&, double);
-    double DifferentialCrossSection(const ParticleDef&, const Medium&, double, double);
-    double FunctionToDEdxIntegral(const ParticleDef&, const Medium&, double, double);
+    KinematicLimits GetKinematicLimits(
+        const ParticleDef&, const Medium&, double) override;
+    double DifferentialCrossSection(
+        const ParticleDef&, const Medium&, double, double) override;
+    double FunctionToDEdxIntegral(
+        const ParticleDef&, const Medium&, double, double) override;
 };
 
 } // namespace PROPOSAL

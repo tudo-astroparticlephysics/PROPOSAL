@@ -38,18 +38,17 @@
 namespace PROPOSAL {
 
 class Annihilation : public Parametrization {
-    using only_stochastic = std::true_type;
-
 public:
     Annihilation();
     virtual ~Annihilation() = default;
+    using only_stochastic = std::true_type;
 
     KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&, double) override;
 };
 
-class AnnihilationHeitler : public Annihilation {
-public:
+struct AnnihilationHeitler : public Annihilation {
     AnnihilationHeitler();
+    using base_param_t = Annihilation;                                   \
 
     double DifferentialCrossSection(
         const ParticleDef&, const Component&, double, double) override;

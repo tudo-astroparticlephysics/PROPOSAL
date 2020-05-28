@@ -37,9 +37,9 @@
 using PROPOSAL::Components::Component;
 
 #define EPAIR_PARAM_INTEGRAL_DEC(param)                                        \
-    class Epair##param : public EpairProductionRhoIntegral {                   \
-    public:                                                                    \
+    struct Epair##param : public EpairProductionRhoIntegral {                  \
         Epair##param(bool lpm);                                                \
+        using base_param_t = EpairProduction;                                  \
                                                                                \
         double FunctionToIntegral(const ParticleDef&, const Component&,        \
             double energy, double v, double lpm);                              \
@@ -48,7 +48,6 @@ using PROPOSAL::Components::Component;
 namespace PROPOSAL {
 
 class EpairProduction : public Parametrization {
-    using only_stochastic = std::false_type;
 
 protected:
     // ----------------------------------------------------------------------------
@@ -68,6 +67,7 @@ protected:
     double eLpm_;
 
 public:
+    using only_stochastic = std::false_type;
     EpairProduction(bool);
     virtual ~EpairProduction() = default;
 

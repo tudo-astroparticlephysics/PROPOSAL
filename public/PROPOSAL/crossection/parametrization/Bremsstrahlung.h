@@ -31,10 +31,9 @@
 #include <memory>
 
 #define BREMSSTRAHLUNG_DEF(param)                                              \
-    class Brems##param : public Bremsstrahlung {                               \
-    public:                                                                    \
-        using base_param_t = Bremsstrahlung;                                   \
+    struct Brems##param : public Bremsstrahlung {                              \
         Brems##param(bool);                                                    \
+        using base_param_t = Bremsstrahlung;                                   \
                                                                                \
         double CalculateParametrization(const ParticleDef&, const Component&,  \
             double energy, double v) override;                                 \

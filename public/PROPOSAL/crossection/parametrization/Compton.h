@@ -34,19 +34,18 @@ using PROPOSAL::Components::Component;
 
 namespace PROPOSAL {
 class Compton : public Parametrization {
-    using only_stochastic = std::false_type;
-
 public:
     Compton();
     virtual ~Compton() = default;
+    using only_stochastic = std::false_type;
 
     KinematicLimits GetKinematicLimits(
         const ParticleDef&, const Component&, double energy) override;
 };
 
-class ComptonKleinNishina : public Compton {
-public:
+struct ComptonKleinNishina : public Compton {
     ComptonKleinNishina() = default;
+    using base_param_t = Compton;                                   \
 
     double DifferentialCrossSection(
         const ParticleDef&, const Component&, double energy, double v);
