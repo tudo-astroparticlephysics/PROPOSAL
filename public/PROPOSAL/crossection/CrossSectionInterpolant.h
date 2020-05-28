@@ -44,8 +44,18 @@ template <class Param> class CrossSectionInterpolant : public CrossSection {
     InterpolationDef def;
     Param param;
 
-    using base_param_t = typename std::add_lvalue_reference<
-        typename decay<Param>::type::base_param_t>::type;
+    using base_param_t = typename decay<Param>::type::base_param_t;
+    using base_param_ref_t = typename add_lvalue_reference<base_param_t>::type;
+
+    rates_t CalculatedNdx_impl(const ParticleDef& p_def, const Medium& medium,
+        double energy, std::true_type);
+    rates_t CalculatedNdx_impl(const ParticleDef& p_def, const Medium& medium,
+        double energy, std::false_type);
+
+    double CalculateStochasticLoss_impl(const ParticleDef&, const Medium&,
+        const Component&, double, double, std::false_type);
+    double CalculateStochasticLoss_impl(const ParticleDef&, const Medium&,
+        const Component&, double, double, std::true_type);
 
 protected:
     unordered_map<size_t, unique_ptr<Interpolant>> dedx_interpolants;
@@ -60,7 +70,7 @@ public:
     double CalculatedE2dx(const ParticleDef&, const Medium&, double) override;
     rates_t CalculatedNdx(const ParticleDef&, const Medium&, double) override;
     double CalculateStochasticLoss(
-        const ParticleDef&, const Component&, double, double);
+        const ParticleDef&, const Medium&, const Component&, double, double);
 
     double GetLowerEnergyLim(const ParticleDef&) const override;
     size_t GetHash(const ParticleDef&, const Medium&) const override;
@@ -98,6 +108,7 @@ unique_ptr<Interpolant> build_dedx(Param&& param, const ParticleDef& p_def,
     interpol_def.isLog = true;
     interpol_def.rombergY = def.order_of_interpolation;
     interpol_def.logSubst = true;
+    hash_combine(hash, param.GetHash(), cut.GetHash());
     return Helper::InitializeInterpolation(
         "dEdx", make_unique<Interpolant1DBuilder>(interpol_def), hash, def);
 }
@@ -121,13 +132,14 @@ unique_ptr<Interpolant> build_de2dx(Param&& param, const ParticleDef& p_def,
     interpol_def.isLog = true;
     interpol_def.rombergY = def.order_of_interpolation;
     auto builder = make_unique<Interpolant1DBuilder>(interpol_def);
+    hash_combine(hash, param.GetHash(), cut.GetHash());
     return Helper::InitializeInterpolation(
         "dE2dx", std::move(builder), hash, def);
 }
 
-template <typename Param>
-unique_ptr<Interpolant> build_dndx(Param&& param, const ParticleDef& p_def,
-    const Component& comp, const EnergyCutSettings& cut,
+template <typename P, typename M>
+unique_ptr<Interpolant> build_dndx(P&& param, const ParticleDef& p_def,
+     M&& medium, const EnergyCutSettings& cut,
     const InterpolationDef& def, size_t hash)
 {
     Integral integral;
@@ -144,14 +156,15 @@ unique_ptr<Interpolant> build_dndx(Param&& param, const ParticleDef& p_def,
     interpol_def.romberg2 = def.order_of_interpolation;
     interpol_def.rombergY = def.order_of_interpolation;
     interpol_def.rationalY = true;
-    interpol_def.function2d = [&integral, &param, &p_def, &comp, &cut](
+    interpol_def.function2d = [&integral, &param, &p_def, &medium, &cut](
                                   double energy, double v) {
-        auto physical_lim = param.GetKinematicLimits(p_def, comp, energy);
+        auto physical_lim = param.GetKinematicLimits(p_def, medium, energy);
         auto v_cut = cut.GetCut(physical_lim, energy);
         v = transform_relativ_loss(v_cut, physical_lim.vMax, v);
-        return integrate_dndx(integral, param, p_def, comp, energy, v_cut, v);
+        return integrate_dndx(integral, param, p_def, medium, energy, v_cut, v);
     };
     auto builder = make_unique<Interpolant2DBuilder>(interpol_def);
+    hash_combine(hash, param.GetHash(), cut.GetHash());
     return Helper::InitializeInterpolation(
         "dNdx", std::move(builder), hash, def);
 }
@@ -160,12 +173,14 @@ template <class Param>
 double CrossSectionInterpolant<Param>::CalculatedEdx(
     const ParticleDef& p_def, const Medium& medium, double energy)
 {
-    auto hash = GetHash(p_def, medium);
+    auto hash = size_t{ 0 };
+    hash_combine(hash, p_def.GetHash(), medium.GetHash());
     auto search = dedx_interpolants.find(hash);
     if (search != dedx_interpolants.end())
         return search->second->Interpolate(energy);
-    dedx_interpolants[hash] = build_dedx(reinterpret_cast<base_param_t>(param),
-        p_def, medium, *cuts_, def, hash);
+    dedx_interpolants[hash]
+        = build_dedx(reinterpret_cast<base_param_ref_t>(param), p_def, medium,
+            *cuts_, def, hash);
     return dedx_interpolants[hash]->Interpolate(energy);
 }
 
@@ -173,41 +188,74 @@ template <class Param>
 double CrossSectionInterpolant<Param>::CalculatedE2dx(
     const ParticleDef& p_def, const Medium& medium, double energy)
 {
-    auto hash = GetHash(p_def, medium);
+    auto hash = size_t{ 0 };
+    hash_combine(hash, p_def.GetHash(), medium.GetHash());
     auto search = de2dx_interpolants.find(hash);
     if (search != de2dx_interpolants.end())
         return search->second->Interpolate(energy);
     de2dx_interpolants[hash]
-        = build_de2dx(reinterpret_cast<base_param_t>(param), p_def, medium,
+        = build_de2dx(reinterpret_cast<base_param_ref_t>(param), p_def, medium,
             *cuts_, def, hash);
     return de2dx_interpolants[hash]->Interpolate(energy);
 }
 
-template <class Param>
-unordered_map<size_t, double> CrossSectionInterpolant<Param>::CalculatedNdx(
-    const ParticleDef& p_def, const Medium& medium, double energy)
+template <typename Param>
+rates_t CrossSectionInterpolant<Param>::CalculatedNdx_impl(
+    const ParticleDef& p_def, const Medium& medium, double energy,
+    std::true_type)
 {
-    unordered_map<size_t, double> rates;
-    for (const auto comp : medium.GetComponents()) {
-        auto hash = GetHash(p_def, comp);
+    rates_t rates;
+    for (auto& c : medium.GetComponents()) {
+        auto hash = size_t{ 0 };
+        hash_combine(hash, p_def.GetHash(), c.GetHash());
         auto search = dndx_interpolants.find(hash);
         if (search != dndx_interpolants.end())
-            rates[hash] = search->second->Interpolate(energy, 1.);
+            rates[&c] = search->second->Interpolate(energy, 1.);
         else {
             dndx_interpolants[hash]
-                = build_dndx(reinterpret_cast<base_param_t>(param), p_def, comp,
-                    *cuts_, def, hash);
-            rates[hash] = dndx_interpolants[hash]->Interpolate(energy, 1.);
+                = build_dndx(reinterpret_cast<base_param_ref_t>(param), p_def,
+                    c, *cuts_, def, hash);
+            rates[&c] = dndx_interpolants[hash]->Interpolate(energy, 1.);
         }
     }
     return rates;
 }
 
-template <class Param>
-double CrossSectionInterpolant<Param>::CalculateStochasticLoss(
-    const ParticleDef& p_def, const Component& comp, double energy, double rate)
+template <typename Param>
+rates_t CrossSectionInterpolant<Param>::CalculatedNdx_impl(
+    const ParticleDef& p_def, const Medium& medium, double energy,
+    std::false_type)
 {
-    auto hash = GetHash(p_def, comp);
+    rates_t rates;
+    auto hash = size_t{ 0 };
+    hash_combine(hash, p_def.GetHash(), medium.GetHash());
+    auto search = dndx_interpolants.find(hash);
+    if (search != dndx_interpolants.end())
+        rates[nullptr] = search->second->Interpolate(energy, 1.);
+    else {
+        dndx_interpolants[hash]
+            = build_dndx(reinterpret_cast<base_param_ref_t>(param), p_def,
+                medium, *cuts_, def, hash);
+        rates[nullptr] = dndx_interpolants[hash]->Interpolate(energy, 1.);
+    }
+    return rates;
+}
+
+template <class Param>
+rates_t CrossSectionInterpolant<Param>::CalculatedNdx(
+    const ParticleDef& p_def, const Medium& medium, double energy)
+{
+    return CalculatedNdx_impl(
+        p_def, medium, energy, typename base_param_t::component_wise{});
+}
+
+template <typename Param>
+double CrossSectionInterpolant<Param>::CalculateStochasticLoss_impl(
+    const ParticleDef& p_def, const Medium& medium, const Component& comp,
+    double energy, double rate, std::true_type)
+{
+    auto hash = size_t{ 0 };
+    hash_combine(hash, p_def.GetHash(), comp.GetHash());
     auto v = dndx_interpolants[hash]->FindLimit(energy, rate);
     auto physical_lim = param.GetKinematicLimits(p_def, comp, energy);
     auto v_cut = cuts_->GetCut(physical_lim, energy);
@@ -215,27 +263,47 @@ double CrossSectionInterpolant<Param>::CalculateStochasticLoss(
 }
 
 template <typename Param>
+double CrossSectionInterpolant<Param>::CalculateStochasticLoss_impl(
+    const ParticleDef& p_def, const Medium& medium, const Component& comp,
+    double energy, double rate, std::false_type)
+{
+    auto hash = size_t{ 0 };
+    hash_combine(hash, p_def.GetHash());
+    auto v = dndx_interpolants[hash]->FindLimit(energy, rate);
+    auto physical_lim = param.GetKinematicLimits(p_def, medium, energy);
+    auto v_cut = cuts_->GetCut(physical_lim, energy);
+    return transform_relativ_loss(v_cut, physical_lim.vMax, v);
+}
+
+template <class Param>
+double CrossSectionInterpolant<Param>::CalculateStochasticLoss(
+    const ParticleDef& p_def, const Medium& medium, const Component& comp,
+    double energy, double rate)
+{
+    return CalculateStochasticLoss_impl(p_def, medium, comp, energy, rate,
+        typename base_param_t::component_wise{});
+}
+
+template <typename Param>
 size_t CrossSectionInterpolant<Param>::GetHash(
     const ParticleDef& p_def, const Medium& medium) const
 {
-    size_t hash_digest = 0;
-    hash_combine(hash_digest, param.GetHash(), p_def.GetHash(),
-        medium.GetHash(), def.GetHash());
+    auto hash = size_t{ 0 };
+    hash_combine(hash, p_def.GetHash(), medium.GetHash(), def.GetHash());
     if (cuts_)
-        hash_combine(hash_digest, cuts_->GetHash());
-    return hash_digest;
+        hash_combine(hash, cuts_->GetHash());
+    return hash;
 }
 
 template <typename Param>
 size_t CrossSectionInterpolant<Param>::GetHash(
     const ParticleDef& p_def, const Component& comp) const
 {
-    size_t hash_digest = 0;
-    hash_combine(hash_digest, param.GetHash(), p_def.GetHash(), comp.GetHash(),
-        def.GetHash());
+    auto hash = size_t{ 0 };
+    hash_combine(hash, p_def.GetHash(), comp.GetHash(), def.GetHash());
     if (cuts_)
-        hash_combine(hash_digest, cuts_->GetHash());
-    return hash_digest;
+        hash_combine(hash, cuts_->GetHash());
+    return hash;
 }
 
 template <typename Param>

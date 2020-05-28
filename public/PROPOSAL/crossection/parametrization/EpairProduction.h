@@ -68,6 +68,7 @@ protected:
 
 public:
     using only_stochastic = std::false_type;
+    using component_wise = std::true_type;
     EpairProduction(bool);
     virtual ~EpairProduction() = default;
 

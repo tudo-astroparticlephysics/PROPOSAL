@@ -55,6 +55,7 @@ public:
     MupairProduction();
     virtual ~MupairProduction() = default;
     using only_stochastic = std::false_type;
+    using component_wise = std::true_type;
 
     double Calculaterho(
         const ParticleDef&, const Component&, double, double, double, double);

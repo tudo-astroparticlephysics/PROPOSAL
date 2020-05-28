@@ -137,6 +137,7 @@ class Photonuclear : public Parametrization
 public:
     Photonuclear();
     using only_stochastic = std::false_type;
+    using component_wise = std::true_type;
 
     virtual double DifferentialCrossSection(const ParticleDef&, const Component&, double energy, double v) = 0;
 

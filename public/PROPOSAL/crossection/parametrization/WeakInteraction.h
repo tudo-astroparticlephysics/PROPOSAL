@@ -41,10 +41,12 @@ namespace PROPOSAL {
 class Interpolant;
 
 class WeakInteraction : public Parametrization {
-    using only_stochastic = std::true_type;
-
 public:
     WeakInteraction();
+    ~WeakInteraction() = default;
+
+    using only_stochastic = std::true_type;
+    using component_wise = std::true_type;
 
     KinematicLimits GetKinematicLimits(
         const ParticleDef&, const Component&, double);
@@ -56,6 +58,7 @@ class WeakCooperSarkarMertsch : public WeakInteraction {
 public:
     WeakCooperSarkarMertsch();
     using base_param_t = WeakInteraction;
+
     double DifferentialCrossSection(
         const ParticleDef&, const Component&, double, double) override;
 };

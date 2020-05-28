@@ -2,13 +2,15 @@
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/methods.h"
 
-using std::shared_ptr;
+#include "PROPOSAL/crossection/CrossSectionIntegral.h"
+#include "PROPOSAL/crossection/CrossSectionInterpolant.h"
+
+using std::unique_ptr;
 using std::vector;
 
 namespace PROPOSAL {
-class InterpolationDef;
-class ParticleDef;
 
 extern InterpolationDef std_interpolation_def;
 

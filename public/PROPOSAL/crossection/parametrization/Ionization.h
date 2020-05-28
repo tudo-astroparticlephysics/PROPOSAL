@@ -42,6 +42,7 @@ protected:
 public:
     Ionization(const EnergyCutSettings&);
     using only_stochastic = std::false_type;
+    using component_wise = std::false_type;
 
     KinematicLimits GetKinematicLimits(
         const ParticleDef&, const Component&, double);
@@ -49,12 +50,15 @@ public:
         const ParticleDef&, const Medium&, double, double)
         = 0;
     virtual KinematicLimits GetKinematicLimits(
-        const ParticleDef&, const Medium&, double energy)
+        const ParticleDef&, const Medium&, double)
         = 0;
+    double FunctionToDNdxIntegral(
+        const ParticleDef&, const Medium&, double, double);
     double DifferentialCrossSection(
         const ParticleDef&, const Component&, double, double) override;
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Medium&, double, double) = 0;
+        const ParticleDef&, const Medium&, double, double)
+        = 0;
 };
 
 class IonizBetheBlochRossi : public Ionization {

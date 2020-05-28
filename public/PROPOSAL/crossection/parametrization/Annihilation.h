@@ -41,6 +41,7 @@ class Annihilation : public Parametrization {
 public:
     Annihilation();
     virtual ~Annihilation() = default;
+    using component_wise = std::true_type;
     using only_stochastic = std::true_type;
 
     KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&, double) override;

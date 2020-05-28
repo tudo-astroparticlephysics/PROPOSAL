@@ -57,7 +57,7 @@ namespace PROPOSAL {
 
 using Components::Component;
 
-using rates_t = unordered_map<size_t, double>;
+using rates_t = unordered_map<const Component*, double>;
 
 class CrossSection {
 protected:
@@ -68,10 +68,12 @@ public:
     virtual ~CrossSection() = default;
 
     virtual double CalculatedEdx(const ParticleDef&, const Medium&, double) = 0;
-    virtual double CalculatedE2dx(const ParticleDef&, const Medium&, double) = 0;
-    virtual rates_t CalculatedNdx(const ParticleDef&, const Medium&, double) = 0;
+    virtual double CalculatedE2dx(const ParticleDef&, const Medium&, double)
+        = 0;
+    virtual rates_t CalculatedNdx(const ParticleDef&, const Medium&, double)
+        = 0;
     virtual double CalculateStochasticLoss(
-        const ParticleDef&, const Component&, double, double)
+        const ParticleDef&, const Medium&, const Component&, double, double)
         = 0;
 
     virtual size_t GetHash(const ParticleDef&, const Medium&) const = 0;

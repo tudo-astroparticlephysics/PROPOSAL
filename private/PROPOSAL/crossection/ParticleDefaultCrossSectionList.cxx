@@ -1,9 +1,6 @@
 #include "PROPOSAL/crossection/ParticleDefaultCrossSectionList.h"
 #include "PROPOSAL/methods.h"
 
-#include "PROPOSAL/crossection/CrossSectionIntegral.h"
-#include "PROPOSAL/crossection/CrossSectionInterpolant.h"
-
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
@@ -15,12 +12,10 @@
 
 using std::make_shared;
 using std::shared_ptr;
+using std::unique_ptr;
 using std::vector;
 
 namespace PROPOSAL {
-
-InterpolationDef std_interpolation_def;
-
 template <typename Param>
 shared_ptr<CrossSection> make_crosssection(
     Param&& param, shared_ptr<const EnergyCutSettings> cuts, bool interpolate)
@@ -34,26 +29,20 @@ shared_ptr<CrossSection> make_crosssection(
 vector<shared_ptr<CrossSection>> BuildEMinusStdCrossSections(
     std::shared_ptr<EnergyCutSettings> cut) noexcept
 {
-    EMinusDef p_def;
+    BremsKelnerKokoulinPetrukhin brems{ false };
+    EpairKelnerKokoulinPetrukhin epair{ false };
+    IonizBetheBlochRossi ioniz{ EnergyCutSettings(*cut) };
+    PhotoAbramowiczLevinLevyMaor97 photo{
+        make_unique<ShadowButkevichMikhailov>()
+    };
 
-    auto shadow = make_unique<ShadowButkevichMikhailov>();
-    BremsKelnerKokoulinPetrukhin brems(false);
-    EpairKelnerKokoulinPetrukhin epair(false);
-    IonizBetheBlochRossi ioniz(EnergyCutSettings(*cut));
-    PhotoAbramowiczLevinLevyMaor97 photo(std::move(shadow));
+    vector<shared_ptr<CrossSection>> cross_list;
+    cross_list.emplace_back(make_crosssection(brems, cut, false));
+    cross_list.emplace_back(make_crosssection(epair, cut, false));
+    cross_list.emplace_back(make_crosssection(ioniz, cut, false));
+    cross_list.emplace_back(make_crosssection(photo, cut, false));
 
-    auto brems_inter(make_crosssection(brems, cut, false));
-    /* auto epair_inter = std::make_shared<EpairInterpolant>( */
-    /*     std::move(epair), cut, std_interpolation_def); */
-    /* auto ioniz_inter = std::make_shared<IonizInterpolant>( */
-    /*     std::move(ioniz), cut, std_interpolation_def); */
-    /* auto photo_inter = std::make_shared<PhotoInterpolant>( */
-    /*     std::move(photo), cut, std_interpolation_def); */
-
-    return vector<shared_ptr<CrossSection>>({
-        brems_inter
-        /* epair_inter, ioniz_inter, photo_inter */
-    });
+    return cross_list;
 }
 
 /* vector<shared_ptr<CrossSection>> BuildMuMinusStdCrossSections( */

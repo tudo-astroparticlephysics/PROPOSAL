@@ -22,24 +22,6 @@ Parametrization::KinematicLimits::KinematicLimits(double v_min, double v_max)
 {
 }
 
-double Parametrization::FunctionToDNdxIntegral(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
-{
-    return DifferentialCrossSection(p_def, comp, energy, v);
-}
-
-double Parametrization::FunctionToDEdxIntegral(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
-{
-    return v * DifferentialCrossSection(p_def, comp, energy, v);
-}
-
-double Parametrization::FunctionToDE2dxIntegral(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
-{
-    return v * v * DifferentialCrossSection(p_def, comp, energy, v);
-}
-
 size_t Parametrization::GetHash() const
 {
     size_t hash_digest = 0;

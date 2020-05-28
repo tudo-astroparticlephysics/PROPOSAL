@@ -57,19 +57,34 @@ public:
     };
 
     virtual double DifferentialCrossSection(
-        ParticleDef&, Component&, double, double);
-    virtual KinematicLimits GetKinematicLimits(
-        ParticleDef&, Component&, double);
-    virtual double DifferentialCrossSection(
-        ParticleDef&, Medium&, double, double);
-    virtual KinematicLimits GetKinematicLimits(ParticleDef&, Medium&, double);
+        const ParticleDef&, const Component&, double, double)
+    {
+        throw std::logic_error("Not implemented error.");
+    }
 
-    template <typename T>
-    double FunctionToDNdxIntegral(const ParticleDef&, T&&, double, double);
-    template <typename T>
-    double FunctionToDEdxIntegral(const ParticleDef&, T&&, double, double);
-    template <typename T>
-    double FunctionToDE2dxIntegral(const ParticleDef&, T&&, double, double);
+    virtual KinematicLimits GetKinematicLimits(
+        const ParticleDef&, const Component&, double)
+    {
+        throw std::logic_error("Not implemented error.");
+    }
+
+    inline double FunctionToDNdxIntegral(
+        const ParticleDef& p_def, const Component& comp, double energy, double v)
+    {
+        return DifferentialCrossSection(p_def, comp, energy, v);
+    }
+
+    inline double FunctionToDEdxIntegral(
+        const ParticleDef& p_def, const Component& comp, double energy, double v)
+    {
+        return v * DifferentialCrossSection(p_def, comp, energy, v);
+    }
+
+    inline double FunctionToDE2dxIntegral(
+        const ParticleDef& p_def, const Component& comp, double energy, double v)
+    {
+        return v * v * DifferentialCrossSection(p_def, comp, energy, v);
+    }
 
     virtual double GetLowerEnergyLim(const ParticleDef&) const { return 0; };
     virtual size_t GetHash() const;

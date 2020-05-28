@@ -29,6 +29,12 @@ double Ionization::DifferentialCrossSection(
         "Componentwise operation doesn't make sense for ionization.");
 }
 
+double Ionization::FunctionToDNdxIntegral(
+    const ParticleDef& p_def, const Medium& medium, double energy, double v)
+{
+    return DifferentialCrossSection(p_def, medium, energy, v);
+}
+
 double Ionization::Delta(const Medium& medium, double beta, double gamma)
 {
     auto X = std::log(beta * gamma) / std::log(10);
@@ -278,7 +284,8 @@ double IonizBergerSeltzerBhabha::DifferentialCrossSection(
 
 // ------------------------------------------------------------------------- //
 double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(
-    const ParticleDef& p_def, const Medium& medium, double energy, double variable)
+    const ParticleDef& p_def, const Medium& medium, double energy,
+    double variable)
 {
     /* Berger Seltzer Formula, taken from:
      * The EGS5 Code System,
@@ -339,7 +346,8 @@ double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(
 // excitation probabilities of the atom (first order independent!)
 // ------------------------------------------------------------------------- //
 
-IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(const EnergyCutSettings& cuts)
+IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(
+    const EnergyCutSettings& cuts)
     : Ionization(cuts)
 {
 }
@@ -392,7 +400,8 @@ double IonizBergerSeltzerMoller::DifferentialCrossSection(
 
 // ------------------------------------------------------------------------- //
 double IonizBergerSeltzerMoller::FunctionToDEdxIntegral(
-    const ParticleDef& p_def, const Medium& medium, double energy, double variable)
+    const ParticleDef& p_def, const Medium& medium, double energy,
+    double variable)
 {
     /* Berger Seltzer Formula, taken from:
      * The EGS5 Code System,
