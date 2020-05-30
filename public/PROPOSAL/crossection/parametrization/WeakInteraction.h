@@ -48,7 +48,7 @@ public:
     using only_stochastic = std::true_type;
     using component_wise = std::true_type;
 
-    KinematicLimits GetKinematicLimits(
+    tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double);
 };
 

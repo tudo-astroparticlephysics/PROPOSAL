@@ -8,6 +8,7 @@
 using namespace PROPOSAL;
 using std::max;
 using std::min;
+using std::get;
 
 //----------------------------------------------------------------------------//
 //-------------------------public member functions----------------------------//
@@ -70,16 +71,17 @@ bool EnergyCutSettings::operator==(const EnergyCutSettings& cut) const noexcept
     return true;
 }
 
-double EnergyCutSettings::GetCut(double energy) const noexcept
+inline double EnergyCutSettings::GetCut(double energy) const noexcept
 {
     assert(energy > 0);
     return std::min(ecut_ / energy, vcut_);
 }
 
-auto EnergyCutSettings::GetCut(const Parametrization::KinematicLimits& lim,
-    double energy) const noexcept -> double
+inline auto EnergyCutSettings::GetCut(
+    tuple<double, double>& lim, double energy) const noexcept -> double
 {
-    return min(max(lim.vMin, GetCut(energy)), lim.vMax);
+    return min(max(get<Parametrization::V_MIN>(lim), GetCut(energy)),
+        get<Parametrization::V_MAX>(lim));
 }
 
 size_t EnergyCutSettings::GetHash() const noexcept

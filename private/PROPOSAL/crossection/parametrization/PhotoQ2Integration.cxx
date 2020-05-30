@@ -8,6 +8,7 @@
 #include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
+using std::get;
 
 #define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                    \
     Photo##param::Photo##param(unique_ptr<ShadowEffect> shadow_effect)         \
@@ -24,7 +25,7 @@ PhotoQ2Integral::PhotoQ2Integral(unique_ptr<ShadowEffect> shadow_effect)
 
 double PhotoQ2Integral::DifferentialCrossSection(const ParticleDef& p_def, const Component& comp, double energy, double v)
 {
-    KinematicLimits limits = GetKinematicLimits(p_def, comp, energy);
+    auto limits = GetKinematicLimits(p_def, comp, energy);
 
     double aux, q2_min, q2_max;
 
@@ -37,7 +38,7 @@ double PhotoQ2Integral::DifferentialCrossSection(const ParticleDef& p_def, const
     }
 
     q2_max = 2 * comp.GetAverageNucleonWeight() * energy
-        * (v - limits.vMin);
+        * (v - get<Parametrization::V_MIN>(limits));
 
     //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and
     //  Mikheyev

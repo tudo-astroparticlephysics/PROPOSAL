@@ -12,7 +12,6 @@ CrossSection::CrossSection(shared_ptr<const EnergyCutSettings> cut)
 {
 }
 
-
 namespace PROPOSAL {
 
 } // namespace PROPOSAL

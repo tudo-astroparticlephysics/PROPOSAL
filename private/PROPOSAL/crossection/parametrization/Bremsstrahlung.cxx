@@ -18,6 +18,7 @@
     }
 
 using std::logic_error;
+using std::make_tuple;
 using namespace PROPOSAL;
 
 Bremsstrahlung::Bremsstrahlung(bool lpm)
@@ -51,7 +52,7 @@ double Bremsstrahlung::DifferentialCrossSection(
     return NA / comp.GetAtomicNum() * aux;
 }
 
-Parametrization::KinematicLimits Bremsstrahlung::GetKinematicLimits(
+tuple<double, double> Bremsstrahlung::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy)
 {
     // The limit is taken from the Petrukhin/Shestakov Parametrization
@@ -71,7 +72,7 @@ Parametrization::KinematicLimits Bremsstrahlung::GetKinematicLimits(
     // so the next line will never be called, or?
     // limits.vMax = std::min(limits.vMax, 1 - p_def.mass / energy);
 
-    return KinematicLimits(v_min, v_max);
+    return make_tuple(v_min, v_max);
 }
 
 double Bremsstrahlung::GetLowerEnergyLim(const ParticleDef& p_def) const

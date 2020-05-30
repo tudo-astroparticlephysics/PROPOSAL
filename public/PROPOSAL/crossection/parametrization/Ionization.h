@@ -44,12 +44,12 @@ public:
     using only_stochastic = std::false_type;
     using component_wise = std::false_type;
 
-    KinematicLimits GetKinematicLimits(
+    tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double);
     virtual double FunctionToDEdxIntegral(
         const ParticleDef&, const Medium&, double, double)
         = 0;
-    virtual KinematicLimits GetKinematicLimits(
+    virtual tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Medium&, double)
         = 0;
     double FunctionToDNdxIntegral(
@@ -70,7 +70,7 @@ public:
     IonizBetheBlochRossi(const EnergyCutSettings&);
     using base_param_t = Ionization;
 
-    KinematicLimits GetKinematicLimits(
+    tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Medium&, double) override;
     double DifferentialCrossSection(
         const ParticleDef&, const Medium&, double, double) override;
@@ -82,7 +82,7 @@ struct IonizBergerSeltzerBhabha : public Ionization {
     IonizBergerSeltzerBhabha(const EnergyCutSettings&);
     using base_param_t = Ionization;
 
-    KinematicLimits GetKinematicLimits(
+    tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Medium&, double) override;
     double DifferentialCrossSection(
         const ParticleDef&, const Medium&, double, double) override;
@@ -94,7 +94,7 @@ struct IonizBergerSeltzerMoller : public Ionization {
     IonizBergerSeltzerMoller(const EnergyCutSettings&);
     using base_param_t = Ionization;
 
-    KinematicLimits GetKinematicLimits(
+    tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Medium&, double) override;
     double DifferentialCrossSection(
         const ParticleDef&, const Medium&, double, double) override;

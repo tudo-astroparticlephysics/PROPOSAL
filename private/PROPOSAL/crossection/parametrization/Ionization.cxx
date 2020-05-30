@@ -8,6 +8,8 @@
 #include "PROPOSAL/particle/Particle.h"
 
 using std::logic_error;
+using std::get;
+using std::make_tuple;
 using namespace PROPOSAL;
 
 Ionization::Ionization(const EnergyCutSettings& cuts)
@@ -16,7 +18,7 @@ Ionization::Ionization(const EnergyCutSettings& cuts)
 {
 }
 
-Parametrization::KinematicLimits Ionization::GetKinematicLimits(
+tuple<double, double> Ionization::GetKinematicLimits(
     const ParticleDef&, const Component&, double)
 {
     throw logic_error(
@@ -49,7 +51,7 @@ double Ionization::Delta(const Medium& medium, double beta, double gamma)
     }
 }
 
-Parametrization::KinematicLimits IonizBetheBlochRossi::GetKinematicLimits(
+tuple<double, double> IonizBetheBlochRossi::GetKinematicLimits(
     const ParticleDef& p_def, const Medium& medium, double energy)
 {
     auto mass_ration = ME / p_def.mass;
@@ -68,7 +70,7 @@ Parametrization::KinematicLimits IonizBetheBlochRossi::GetKinematicLimits(
     if (v_max < v_min)
         v_max = v_min;
 
-    return KinematicLimits(v_min, v_max);
+    return make_tuple(v_min, v_max);
 }
 
 IonizBetheBlochRossi::IonizBetheBlochRossi(const EnergyCutSettings& cuts)
@@ -101,7 +103,11 @@ double IonizBetheBlochRossi::DifferentialCrossSection(
     // chapter 2, eq. 7
     double spin_1_2_contribution = v / (1 + 1 / gamma);
     spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
-    result = 1 - beta * (v / GetKinematicLimits(p_def, medium, energy).vMax)
+    result = 1
+        - beta
+            * (v
+                  / get<Parametrization::V_MAX>(
+                        GetKinematicLimits(p_def, medium, energy)))
         + spin_1_2_contribution;
     result *= IONK * p_def.charge * p_def.charge
         * calculate_proton_massnumber_fraction(medium.GetComponents())
@@ -128,7 +134,7 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(const ParticleDef& p_def,
     double gamma = energy / p_def.mass;
     double v_up;
 
-    v_up = limits.vMax;
+    v_up = get<Parametrization::V_MAX>(limits);
     v_up = std::min(v_up, cuts_.GetCut(energy));
 
     aux = beta * gamma / (1.e-6 * medium.GetI());
@@ -136,7 +142,8 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(const ParticleDef& p_def,
     aux = v_up / (2 * (1 + 1 / gamma));
     result += aux * aux;
     aux = beta * beta;
-    result -= aux * (1 + v_up / limits.vMax) + Delta(medium, beta, gamma);
+    result -= aux * (1 + v_up / get<Parametrization::V_MAX>(limits))
+        + Delta(medium, beta, gamma);
 
     if (result > 0) {
         result *= IONK * p_def.charge * p_def.charge
@@ -146,10 +153,10 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(const ParticleDef& p_def,
         result = 0;
     }
 
-    if (v_up == limits.vMin)
+    if (v_up == get<Parametrization::V_MIN>(limits))
         return 0;
 
-    result /= (v_up - limits.vMin);
+    result /= (v_up - get<Parametrization::V_MIN>(limits));
 
     return result / energy
         + variable
@@ -180,7 +187,7 @@ double IonizBetheBlochRossi::InelCorrection(
 
     a = std::log(1 + 2 * v * energy / ME);
     b = std::log(
-        (1 - v / GetKinematicLimits(p_def, medium, energy).vMax) / (1 - v));
+        (1 - v / get<Parametrization::V_MAX>(GetKinematicLimits(p_def, medium, energy))) / (1 - v));
     c = std::log((2 * gamma * (1 - v) * ME) / (p_def.mass * v));
     result = a * (2 * b + c) - b * b;
 
@@ -211,7 +218,7 @@ double IonizBetheBlochRossi::CrossSectionWithoutInelasticCorrection(
     // chapter 2, eq. 7
     double spin_1_2_contribution = v / (1 + 1 / gamma);
     spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
-    result = 1 - beta * (v / GetKinematicLimits(p_def, medium, energy).vMax)
+    result = 1 - beta * (v / get<Parametrization::V_MAX>(GetKinematicLimits(p_def, medium, energy)))
         + spin_1_2_contribution;
     result *= IONK * p_def.charge * p_def.charge
         * calculate_proton_massnumber_fraction(medium.GetComponents())
@@ -234,7 +241,7 @@ IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(
 {
 }
 
-Parametrization::KinematicLimits IonizBergerSeltzerBhabha::GetKinematicLimits(
+tuple<double, double> IonizBergerSeltzerBhabha::GetKinematicLimits(
     const ParticleDef& p_def, const Medium& medium, double energy)
 {
     auto v_min = 0.;
@@ -243,7 +250,7 @@ Parametrization::KinematicLimits IonizBergerSeltzerBhabha::GetKinematicLimits(
     if (v_max < 0)
         v_max = 0;
 
-    return KinematicLimits(v_min, v_max);
+    return make_tuple(v_min, v_max);
 }
 
 double IonizBergerSeltzerBhabha::DifferentialCrossSection(
@@ -307,15 +314,16 @@ double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(
     double v_up;
     auto limits = GetKinematicLimits(p_def, medium, energy);
 
-    v_up = limits.vMax;
+    v_up = get<Parametrization::V_MAX>(limits);
     v_up = std::min(cuts_.GetCut(energy), v_up);
 
     double bigDelta
-        = std::min(limits.vMax * energy / ME, v_up * energy / ME); // (2.265)
-    double gamma = energy / ME;                                    // (2.258)
-    double betasquared = 1. - 1. / (gamma * gamma);                // (2.260)
-    double tau = gamma - 1.;                                       // (2.262)
-    double y = 1. / (gamma + 1.);                                  // (2.263)
+        = std::min(get<Parametrization::V_MAX>(limits) * energy / ME,
+            v_up * energy / ME);                    // (2.265)
+    double gamma = energy / ME;                     // (2.258)
+    double betasquared = 1. - 1. / (gamma * gamma); // (2.260)
+    double tau = gamma - 1.;                        // (2.262)
+    double y = 1. / (gamma + 1.);                   // (2.263)
 
     aux = tau + 2 * bigDelta - (3. * bigDelta * bigDelta * y / 2.)
         - (bigDelta - std::pow(bigDelta, 3.) / 3.) * y * y
@@ -352,7 +360,7 @@ IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(
 {
 }
 
-Parametrization::KinematicLimits IonizBergerSeltzerMoller::GetKinematicLimits(
+tuple<double, double> IonizBergerSeltzerMoller::GetKinematicLimits(
     const ParticleDef& p_def, const Medium& medium, double energy)
 {
     auto v_min = 0.;
@@ -361,7 +369,7 @@ Parametrization::KinematicLimits IonizBergerSeltzerMoller::GetKinematicLimits(
     if (v_max < 0)
         v_max = 0;
 
-    return KinematicLimits(v_min, v_max);
+    return make_tuple(v_min, v_max);
 }
 
 double IonizBergerSeltzerMoller::DifferentialCrossSection(
@@ -425,14 +433,15 @@ double IonizBergerSeltzerMoller::FunctionToDEdxIntegral(
     double fminus; // (2.268)
     double v_up;
 
-    v_up = limits.vMax;
+    v_up = get<Parametrization::V_MAX>(limits);
     v_up = std::min(cuts_.GetCut(energy), v_up);
 
     double bigDelta
-        = std::min(limits.vMax * energy / ME, v_up * energy / ME); // (2.265)
-    double gamma = energy / ME;                                    // (2.258)
-    double betasquared = 1. - 1. / (gamma * gamma);                // (2.260)
-    double tau = gamma - 1.;                                       // (2.262)
+        = std::min(get<Parametrization::V_MAX>(limits) * energy / ME,
+            v_up * energy / ME);                    // (2.265)
+    double gamma = energy / ME;                     // (2.258)
+    double betasquared = 1. - 1. / (gamma * gamma); // (2.260)
+    double tau = gamma - 1.;                        // (2.262)
 
     aux = bigDelta * bigDelta / 2.
         + (2. * tau + 1.) * std::log(1. - bigDelta / tau);

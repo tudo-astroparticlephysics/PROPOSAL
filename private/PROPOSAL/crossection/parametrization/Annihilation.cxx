@@ -9,13 +9,14 @@
 #include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
+using std::make_tuple;
 
 Annihilation::Annihilation()
     : Parametrization(InteractionType::Annihilation, "annihililation")
 {
 }
 
-Parametrization::KinematicLimits Annihilation::GetKinematicLimits(
+tuple<double, double> Annihilation::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy)
 {
     // Limits according to simple 2->2 body interactions
@@ -27,7 +28,7 @@ Parametrization::KinematicLimits Annihilation::GetKinematicLimits(
     auto vmin = 0.5 * (1. - aux);
     auto vmax = 0.5 * (1. + aux);
 
-    return KinematicLimits(vmin, vmax);
+    return make_tuple(vmin, vmax);
 }
 
 double AnnihilationHeitler::DifferentialCrossSection(

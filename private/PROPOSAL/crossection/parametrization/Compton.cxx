@@ -8,18 +8,19 @@
 #include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
+using std::make_tuple;
 
 Compton::Compton()
     : Parametrization(InteractionType::Compton, "compton")
 {
 }
 
-Parametrization::KinematicLimits Compton::GetKinematicLimits(
+tuple<double, double> Compton::GetKinematicLimits(
     const ParticleDef&, const Component&, double energy)
 {
     assert(energy > 0);
     auto vmax = 1. - 1. / (1. + 2. * energy / ME);
-    return KinematicLimits(0., vmax);
+    return make_tuple(0., vmax);
 }
 
 double ComptonKleinNishina::DifferentialCrossSection(

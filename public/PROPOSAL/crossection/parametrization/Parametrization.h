@@ -31,10 +31,12 @@
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
 #include <iostream>
+#include <tuple>
 #include <type_traits>
 
 using PROPOSAL::Components::Component;
 using std::string;
+using std::tuple;
 
 namespace PROPOSAL {
 class ParticleDef;
@@ -49,42 +51,32 @@ public:
     Parametrization(InteractionType, const string&);
     virtual ~Parametrization() = default;
 
-    struct KinematicLimits {
-        double vMin;
-        double vMax;
-
-        KinematicLimits(double, double);
-    };
+    enum { V_MIN, V_MAX };
 
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double)
-    {
-        throw std::logic_error("Not implemented error.");
-    }
+        const ParticleDef&, const Component&, double, double);
 
-    virtual KinematicLimits GetKinematicLimits(
-        const ParticleDef&, const Component&, double)
-    {
-        throw std::logic_error("Not implemented error.");
-    }
+    virtual tuple<double, double> GetKinematicLimits(
+        const ParticleDef&, const Component&, double);
 
-    inline double FunctionToDNdxIntegral(
-        const ParticleDef& p_def, const Component& comp, double energy, double v)
+    inline double FunctionToDNdxIntegral(const ParticleDef& p_def,
+        const Component& comp, double energy, double v)
     {
         return DifferentialCrossSection(p_def, comp, energy, v);
     }
 
-    inline double FunctionToDEdxIntegral(
-        const ParticleDef& p_def, const Component& comp, double energy, double v)
+    inline double FunctionToDEdxIntegral(const ParticleDef& p_def,
+        const Component& comp, double energy, double v)
     {
         return v * DifferentialCrossSection(p_def, comp, energy, v);
     }
 
-    inline double FunctionToDE2dxIntegral(
-        const ParticleDef& p_def, const Component& comp, double energy, double v)
+    inline double FunctionToDE2dxIntegral(const ParticleDef& p_def,
+        const Component& comp, double energy, double v)
     {
         return v * v * DifferentialCrossSection(p_def, comp, energy, v);
     }
+
 
     virtual double GetLowerEnergyLim(const ParticleDef&) const { return 0; };
     virtual size_t GetHash() const;

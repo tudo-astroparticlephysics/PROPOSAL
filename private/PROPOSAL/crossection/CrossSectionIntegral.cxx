@@ -2,6 +2,8 @@
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 #include "PROPOSAL/math/Integral.h"
 
+using std::get;
+
 namespace PROPOSAL {
 template <>
 double calculate_dedx(Ionization& param, Integral& integral,
@@ -17,6 +19,7 @@ double calculate_dedx(Ionization& param, Integral& integral,
     auto dEdx = [&param, &p_def, &medium, energy](double v) {
         return param.FunctionToDEdxIntegral(p_def, medium, energy, v);
     };
-    return integral.Integrate(physical_lim.vMin, v_cut, dEdx, 4);
+    return integral.Integrate(
+        get<Parametrization::V_MIN>(physical_lim), v_cut, dEdx, 4);
 }
 } // namespace PROPOSAL

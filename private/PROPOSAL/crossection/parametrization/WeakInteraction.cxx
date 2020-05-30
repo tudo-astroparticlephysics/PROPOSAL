@@ -10,13 +10,14 @@
 #include "PROPOSAL/math/Interpolant.h"
 
 using namespace PROPOSAL;
+using std::make_tuple;
 
 WeakInteraction::WeakInteraction()
     : Parametrization(InteractionType::WeakInt, "weak_interaction")
 {
 }
 
-Parametrization::KinematicLimits WeakInteraction::GetKinematicLimits(
+tuple<double, double> WeakInteraction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy)
 {
     double aux = (MP + MN) / 2; // for isoscalar targets
@@ -25,7 +26,7 @@ Parametrization::KinematicLimits WeakInteraction::GetKinematicLimits(
     auto v_min = 1e6 / (aux); // q^2_min = 1e6 MeV for experimental reasons
     auto v_max = 1;
 
-    return KinematicLimits(v_min, v_max);
+    return make_tuple(v_min, v_max);
 }
 
 WeakCooperSarkarMertsch::WeakCooperSarkarMertsch()

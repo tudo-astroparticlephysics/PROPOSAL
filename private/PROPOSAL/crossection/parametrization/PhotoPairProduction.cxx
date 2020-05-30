@@ -10,23 +10,24 @@
 #include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
+using std::make_tuple;
 
 PhotoPairProduction::PhotoPairProduction()
     : Parametrization(InteractionType::Photopair, "photopairproduction")
 {
 }
 
-Parametrization::KinematicLimits PhotoPairProduction::GetKinematicLimits(
+tuple<double, double> PhotoPairProduction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy)
 {
     // x is the integration variable here
     if (energy <= 2. * ME)
-        return KinematicLimits(0.5, 0.5);
+        return make_tuple(0.5, 0.5);
 
     auto vmin = ME / energy;
     auto vmax = 1. - ME / energy;
 
-    return KinematicLimits(vmin, vmax);
+    return make_tuple(vmin, vmax);
 }
 
 PhotoPairTsai::PhotoPairTsai()

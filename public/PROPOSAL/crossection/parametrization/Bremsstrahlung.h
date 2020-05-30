@@ -69,7 +69,7 @@ public:
         const ParticleDef&, const Component&, double, double)
         = 0;
 
-    KinematicLimits GetKinematicLimits(
+    tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double energy);
     double GetLowerEnergyLim(const ParticleDef&) const override;
     size_t GetHash() const;

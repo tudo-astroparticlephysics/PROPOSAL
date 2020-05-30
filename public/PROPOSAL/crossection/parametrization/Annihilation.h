@@ -44,7 +44,7 @@ public:
     using component_wise = std::true_type;
     using only_stochastic = std::true_type;
 
-    KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&, double) override;
+    tuple<double, double> GetKinematicLimits(const ParticleDef&, const Component&, double) override;
 };
 
 struct AnnihilationHeitler : public Annihilation {

@@ -19,6 +19,7 @@
 
 using namespace PROPOSAL;
 using std::logic_error;
+using std::make_tuple;
 
 EpairProduction::EpairProduction(bool lpm)
     : Parametrization(InteractionType::Epair, "Epair")
@@ -28,7 +29,7 @@ EpairProduction::EpairProduction(bool lpm)
 {
 }
 
-Parametrization::KinematicLimits EpairProduction::GetKinematicLimits(
+tuple<double, double> EpairProduction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy)
 {
     auto aux = p_def.mass / energy;
@@ -44,7 +45,7 @@ Parametrization::KinematicLimits EpairProduction::GetKinematicLimits(
         v_max = v_min;
     }
 
-    return KinematicLimits(v_min, v_max);
+    return make_tuple(v_min, v_max);
 }
 
 // ------------------------------------------------------------------------- //

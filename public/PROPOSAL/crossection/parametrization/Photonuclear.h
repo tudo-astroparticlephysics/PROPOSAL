@@ -141,7 +141,7 @@ public:
 
     virtual double DifferentialCrossSection(const ParticleDef&, const Component&, double energy, double v) = 0;
 
-    virtual KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&, double energy);
+    virtual tuple<double, double> GetKinematicLimits(const ParticleDef&, const Component&, double energy);
 };
 
 } // namespace PROPOSAL

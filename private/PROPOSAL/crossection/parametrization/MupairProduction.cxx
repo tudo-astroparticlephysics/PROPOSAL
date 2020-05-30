@@ -15,6 +15,7 @@
     }
 
 using namespace PROPOSAL;
+using std::make_tuple;
 
 MupairProduction::MupairProduction()
     : Parametrization(InteractionType::MuPair, "mupair")
@@ -22,7 +23,7 @@ MupairProduction::MupairProduction()
 {
 }
 
-Parametrization::KinematicLimits MupairProduction::GetKinematicLimits(
+tuple<double, double> MupairProduction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy)
 {
     auto vmin = 2 * MMU / energy;
@@ -31,7 +32,7 @@ Parametrization::KinematicLimits MupairProduction::GetKinematicLimits(
     if (vmax < vmin)
         vmax = vmin;
 
-    return KinematicLimits(vmin, vmax);
+    return make_tuple(vmin, vmax);
 }
 
 double MupairProduction::Calculaterho(const ParticleDef& p_def, const Component& comp,

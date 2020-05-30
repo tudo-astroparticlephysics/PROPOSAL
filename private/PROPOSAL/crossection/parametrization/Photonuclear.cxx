@@ -13,6 +13,7 @@
 
 using namespace PROPOSAL;
 using std::make_shared;
+using std::make_tuple;
 
 std::vector<double> HardComponent::x = { 3, 4, 5, 6, 7, 8, 9 };
 
@@ -170,7 +171,7 @@ Photonuclear::Photonuclear()
 {
 }
 
-Parametrization::KinematicLimits Photonuclear::GetKinematicLimits(const ParticleDef& p_def, const Component& comp, double energy)
+tuple<double, double> Photonuclear::GetKinematicLimits(const ParticleDef& p_def, const Component& comp, double energy)
 {
     auto v_min
         = (MPI + MPI * MPI / (2 * comp.GetAverageNucleonWeight()))
@@ -194,5 +195,5 @@ Parametrization::KinematicLimits Photonuclear::GetKinematicLimits(const Particle
         v_max = v_min;
     }
 
-    return KinematicLimits(v_min, v_max);
+    return make_tuple(v_min, v_max);
 }

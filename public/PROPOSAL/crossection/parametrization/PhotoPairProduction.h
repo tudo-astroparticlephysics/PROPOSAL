@@ -44,7 +44,7 @@ public:
         const ParticleDef&, const Component&, double, double)
         = 0;
 
-    virtual KinematicLimits GetKinematicLimits(
+    virtual tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double);
 };
 

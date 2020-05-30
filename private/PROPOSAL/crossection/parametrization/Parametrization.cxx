@@ -8,18 +8,19 @@
 #include <sstream>
 
 using namespace PROPOSAL;
+using std::make_tuple;
 using std::string;
 
-Parametrization::Parametrization(InteractionType type, const string& name)
-    : interaction_type(type)
-    , name(name)
+double Parametrization::DifferentialCrossSection(
+    const ParticleDef&, const Component&, double, double)
 {
+    throw std::logic_error("Not implemented error.");
 }
 
-Parametrization::KinematicLimits::KinematicLimits(double v_min, double v_max)
-    : vMin(v_min)
-    , vMax(v_max)
+tuple<double, double> Parametrization::GetKinematicLimits(
+    const ParticleDef&, const Component&, double)
 {
+    throw std::logic_error("Not implemented error.");
 }
 
 size_t Parametrization::GetHash() const

@@ -38,6 +38,8 @@
 
 #include "PROPOSAL/particle/ParticleDef.h"
 
+using std::get;
+
 namespace PROPOSAL {
 
 template <class Param> class CrossSectionInterpolant : public CrossSection {
@@ -146,7 +148,6 @@ unique_ptr<Interpolant> build_dndx(P&& param, const ParticleDef& p_def,
     Interpolant2DBuilder::Definition interpol_def;
     interpol_def.max1 = def.nodes_cross_section;
     interpol_def.x1min = param.GetLowerEnergyLim(p_def);
-    std::cout << "interpol_def.x1min: " << interpol_def.x1min << std::endl;
     interpol_def.x1max = def.max_node_energy;
     interpol_def.max2 = def.nodes_cross_section;
     interpol_def.x2min = 0.0;
@@ -158,9 +159,9 @@ unique_ptr<Interpolant> build_dndx(P&& param, const ParticleDef& p_def,
     interpol_def.rationalY = true;
     interpol_def.function2d = [&integral, &param, &p_def, &medium, &cut](
                                   double energy, double v) {
-        auto physical_lim = param.GetKinematicLimits(p_def, medium, energy);
-        auto v_cut = cut.GetCut(physical_lim, energy);
-        v = transform_relativ_loss(v_cut, physical_lim.vMax, v);
+        auto lim = param.GetKinematicLimits(p_def, medium, energy);
+        auto v_cut = cut.GetCut(lim, energy);
+        v = transform_relativ_loss(v_cut, get<Parametrization::V_MAX>(lim), v);
         return integrate_dndx(integral, param, p_def, medium, energy, v_cut, v);
     };
     auto builder = make_unique<Interpolant2DBuilder>(interpol_def);
@@ -257,9 +258,9 @@ double CrossSectionInterpolant<Param>::CalculateStochasticLoss_impl(
     auto hash = size_t{ 0 };
     hash_combine(hash, p_def.GetHash(), comp.GetHash());
     auto v = dndx_interpolants[hash]->FindLimit(energy, rate);
-    auto physical_lim = param.GetKinematicLimits(p_def, comp, energy);
-    auto v_cut = cuts_->GetCut(physical_lim, energy);
-    return transform_relativ_loss(v_cut, physical_lim.vMax, v);
+    auto lim = param.GetKinematicLimits(p_def, comp, energy);
+    auto v_cut = cuts_->GetCut(lim, energy);
+    return transform_relativ_loss(v_cut, get<Parametrization::V_MAX>(lim), v);
 }
 
 template <typename Param>
@@ -270,9 +271,9 @@ double CrossSectionInterpolant<Param>::CalculateStochasticLoss_impl(
     auto hash = size_t{ 0 };
     hash_combine(hash, p_def.GetHash());
     auto v = dndx_interpolants[hash]->FindLimit(energy, rate);
-    auto physical_lim = param.GetKinematicLimits(p_def, medium, energy);
-    auto v_cut = cuts_->GetCut(physical_lim, energy);
-    return transform_relativ_loss(v_cut, physical_lim.vMax, v);
+    auto lim = param.GetKinematicLimits(p_def, medium, energy);
+    auto v_cut = cuts_->GetCut(lim, energy);
+    return transform_relativ_loss(v_cut, get<Parametrization::V_MAX>(lim), v);
 }
 
 template <class Param>

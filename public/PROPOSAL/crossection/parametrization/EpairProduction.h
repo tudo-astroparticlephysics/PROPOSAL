@@ -85,7 +85,7 @@ public:
         const ParticleDef&, const Component&, double energy, double v)
         = 0;
 
-    KinematicLimits GetKinematicLimits(
+    tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double energy);
 };
 
