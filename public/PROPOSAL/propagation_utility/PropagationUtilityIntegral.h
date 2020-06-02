@@ -41,11 +41,12 @@ protected:
     Integral integral;
 
 public:
-    UtilityIntegral(std::function<double(double)>, double lower_lim);
+    UtilityIntegral(std::function<double(double)>, double);
     void BuildTables(const std::string, size_t, Interpolant1DBuilder::Definition);
 
-    double Calculate(double energy_initial, double energy_final, double rnd);
-    double GetUpperLimit(double energy_initial, double rnd);
+    virtual double Calculate(double, double);
+    virtual double GetUpperLimit(double, double);
+
     std::function<double(double)> FunctionToIntegral;
 };
 } // namespace PROPOSAL

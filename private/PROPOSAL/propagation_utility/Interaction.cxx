@@ -1,42 +1,69 @@
-#include "PROPOSAL/propagation_utility/Interaction.h"
+/* #include "PROPOSAL/propagation_utility/Interaction.h" */
 
-using namespace PROPOSAL;
+/* using namespace PROPOSAL; */
+/* using std::make_tuple; */
 
-namespace PROPOSAL {
-Interpolant1DBuilder::Definition interaction_interpol_def(
-    nullptr, 1000, 0., 1e14, 5, false, false, true, 5, false, false, false);
-} // namespace PROPOSAL
+/* namespace PROPOSAL { */
+/* Interpolant1DBuilder::Definition interaction_interpol_def; */
+/* } // namespace PROPOSAL */
 
-Interaction::Interaction(CrossSectionList cross)
-    : cross(cross)
-    , lower_lim(std::numeric_limits<double>::max())
-{
-    if (cross.size() < 1)
-        throw std::invalid_argument("at least one crosssection is required.");
+/* Interaction::Interaction(CrossSectionList cross) */
+/*     : cross(cross) */
+/*     , displacement(cross) */
+/*     , lower_lim(std::numeric_limits<double>::max()) */
+/* { */
+/*     if (cross.size() < 1) */
+/*         throw std::invalid_argument("at least one crosssection is required."); */
 
-    for (auto c : cross)
-        lower_lim = std::min(lower_lim, c->GetParametrization().GetLowerEnergyLim());
-}
+/*     for (auto c : cross) */
+/*         lower_lim = std::min(lower_lim, c->GetLowerEnergyLimit()); */
+/* } */
 
-std::shared_ptr<CrossSection> Interaction::TypeInteraction(
-    double energy, const std::array<double, 2>& rnd)
-{
-    assert(energy >= lower_lim);
-    std::vector<double> rates;
-    for (const auto& c : cross)
-        rates.push_back(c->CalculatedNdx(energy, rnd[1]));
+/* unordered_map<InteractionType, comp_rates> Interaction::CalculateRates(double energy) */
+/* { */
+/*     unordered_map<InteractionType, comp_rates> rates; */
+/*     for (const auto& c: cross) */
+/*         rates[c->parametrization_->GetType()] = c->CalculatedNdx(energy); */
 
-    auto total_rate = std::accumulate(rates.begin(), rates.end(), 0.0);
-    log_debug("Total rate = %f, total rate weighted = %f", total_rate,
-        total_rate * rnd[0]);
+/*     return rates; */
+/* } */
 
-    double rates_sum = 0.;
-    for (size_t i = 0; i < rates.size(); i++) {
-        rates_sum += rates[i];
-        if (rates_sum >= total_rate * rnd[0])
-            return cross.at(i);
-    }
+/* double Interaction::FunctionToIntegral(double energy) */
+/* { */
+/*     auto interaction_rates = CalculateRates(energy); */
 
-    throw std::logic_error(
-        "Something went wrong during the total rate calculation.");
-}
+/*     auto total_rate = (double)0; */
+/*     for (const auto& comp_rates : interaction_rates) { */
+/*         for (const auto& rate : comp_rates.second) */
+/*             total_rate += rate.second; */
+/*     } */
+
+/*     return displacement.FunctionToIntegral(energy) * total_rate; */
+/* } */
+
+/* tuple<double, InteractionType> Interaction::SampleStochasticLoss( */
+/*     double energy, double rnd) */
+/* { */
+/*     auto interaction_rates = CalculateRates(energy); */
+/*     auto total_rate = (double)0; */
+/*     for (const auto& comp_rates : interaction_rates) { */
+/*         for (const auto& rate : comp_rates.second) */
+/*             total_rate += rate.second; */
+/*     } */
+
+/*     auto sampled_rate = total_rate * rnd; */
+/*     auto inter = begin(cross); */
+/*     for (const auto& inter_rate : interaction_rates) { */
+/*         for (const auto& rate : inter_rate.second) { */
+/*             sampled_rate -= rate.second; */
+/*             if (sampled_rate < 0) { */
+/*                 auto loss = (*inter)->CalculateStochasticLoss( */
+/*                     energy, -sampled_rate, rate.first); */
+/*                 return make_tuple(loss, inter_rate.first); */
+/*             } */
+/*         } */
+/*     } */
+
+/*     throw std::logic_error("Sampling interaction rate goes wrong. Maybe the " */
+/*                            "random number is not in range [0,1] "); */
+/* } */

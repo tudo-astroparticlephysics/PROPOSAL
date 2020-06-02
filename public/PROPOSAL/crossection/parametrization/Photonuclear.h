@@ -30,8 +30,11 @@
 #pragma once
 
 #include <cmath>
+#include <memory>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+
+using std::shared_ptr;
 
 namespace PROPOSAL {
 
@@ -44,83 +47,51 @@ class Interpolant;
 class RealPhoton
 {
 public:
-    RealPhoton() {}
-    RealPhoton(const RealPhoton&) {}
+    RealPhoton() =default;
     virtual ~RealPhoton() {}
-
-    virtual RealPhoton* clone() const = 0;
-
-    bool operator==(const RealPhoton&) const;
-    bool operator!=(const RealPhoton&) const;
 
     virtual double CalculateHardComponent(double energy, double v) = 0;
 
     virtual const std::string& GetName() const = 0;
 
-protected:
-    virtual bool compare(const RealPhoton&) const;
 };
 
 class SoftComponent : public RealPhoton
 {
+    static const std::string name_;
 public:
-    SoftComponent();
-    SoftComponent(const SoftComponent&);
-    virtual ~SoftComponent();
-
-    RealPhoton* clone() const { return new SoftComponent(*this); }
+    SoftComponent() =default;
+    virtual ~SoftComponent() = default;
 
     virtual double CalculateHardComponent(double energy, double v);
 
     virtual const std::string& GetName() const { return name_; }
-
-private:
-    static const std::string name_;
 };
 
 class HardComponent : public RealPhoton
 {
+    static std::vector<double> x;
+    std::vector<shared_ptr<Interpolant>> interpolant_;
+
+    static const std::string name_;
 public:
     HardComponent(const ParticleDef&);
-    HardComponent(const HardComponent&);
-    virtual ~HardComponent();
-
-    RealPhoton* clone() const { return new HardComponent(*this); }
+    virtual ~HardComponent() = default;
 
     double CalculateHardComponent(double energy, double v);
 
     virtual const std::string& GetName() const { return name_; }
 
-private:
-    virtual bool compare(const RealPhoton&) const;
-
-    static std::vector<double> x;
-    std::vector<Interpolant*> interpolant_;
-
-    static const std::string name_;
 };
-
-/******************************************************************************
- *                                ShadowEffect                                 *
- ******************************************************************************/
 
 class ShadowEffect
 {
 public:
     ShadowEffect() {}
-    ShadowEffect(const ShadowEffect&) {}
     virtual ~ShadowEffect() {}
 
-    virtual ShadowEffect* clone() const = 0;
 
-    bool operator==(const ShadowEffect&) const;
-    bool operator!=(const ShadowEffect&) const;
-
-    virtual double CalculateShadowEffect(const Components::Component&, double x, double nu) = 0;
-
-    // --------------------------------------------------------------------- //
-    // Getter
-    // --------------------------------------------------------------------- //
+    virtual double CalculateShadowEffect(const Component&, double x, double nu) = 0;
 
     virtual const std::string& GetName() const = 0;
     virtual size_t GetHash() const             = 0;
@@ -133,20 +104,8 @@ public:
         : ShadowEffect()
     {
     }
-    ShadowDuttaRenoSarcevicSeckel(const ShadowDuttaRenoSarcevicSeckel& sh)
-        : ShadowEffect(sh)
-    {
-    }
-    virtual ~ShadowDuttaRenoSarcevicSeckel() {}
 
-    ShadowEffect* clone() const { return new ShadowDuttaRenoSarcevicSeckel(*this); }
-    static ShadowEffect* create() { return new ShadowDuttaRenoSarcevicSeckel(); }
-
-    double CalculateShadowEffect(const Components::Component&, double x, double nu);
-
-    // --------------------------------------------------------------------- //
-    // Getter
-    // --------------------------------------------------------------------- //
+    double CalculateShadowEffect(const Component&, double x, double nu);
 
     virtual const std::string& GetName() const { return name_; }
     virtual size_t GetHash() const;
@@ -162,20 +121,9 @@ public:
         : ShadowEffect()
     {
     }
-    ShadowButkevichMikhailov(const ShadowButkevichMikhailov& sh)
-        : ShadowEffect(sh)
-    {
-    }
-    virtual ~ShadowButkevichMikhailov() {}
 
-    ShadowEffect* clone() const { return new ShadowButkevichMikhailov(*this); }
-    static ShadowEffect* create() { return new ShadowButkevichMikhailov(); }
+    double CalculateShadowEffect(const Component&, double x, double nu);
 
-    double CalculateShadowEffect(const Components::Component&, double x, double nu);
-
-    // --------------------------------------------------------------------- //
-    // Getter
-    // --------------------------------------------------------------------- //
 
     virtual const std::string& GetName() const { return name_; }
     virtual size_t GetHash() const;
@@ -184,29 +132,16 @@ private:
     static const std::string name_;
 };
 
-/******************************************************************************
- *                               Photonuclear                                  *
- ******************************************************************************/
-
 class Photonuclear : public Parametrization
 {
 public:
-    Photonuclear(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
-    Photonuclear(const Photonuclear&);
-    virtual ~Photonuclear();
+    Photonuclear();
+    using only_stochastic = std::false_type;
+    using component_wise = std::true_type;
 
-    virtual Parametrization* clone() const = 0;
+    virtual double DifferentialCrossSection(const ParticleDef&, const Component&, double energy, double v) = 0;
 
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-    virtual InteractionType GetInteractionType() const final {return InteractionType::Photonuclear;}
-    virtual double DifferentialCrossSection(double energy, double v) = 0;
-
-    virtual KinematicLimits GetKinematicLimits(double energy);
-
-protected:
-    virtual bool compare(const Parametrization&) const;
+    virtual tuple<double, double> GetKinematicLimits(const ParticleDef&, const Component&, double energy);
 };
 
 } // namespace PROPOSAL

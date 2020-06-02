@@ -61,7 +61,6 @@ public:
     {
         auto rndd = -std::log(rnd);
         auto rnddMin = integral.Calculate(initial_energy, lower_lim, rndd) / lifetime;
-        std::cout << "rndd: " << rndd << ", rnddMin: " << rnddMin << std::endl; //DEBUG
 
         if (rndd >= rnddMin)
             return lower_lim;

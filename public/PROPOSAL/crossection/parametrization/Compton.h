@@ -26,71 +26,45 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
+using PROPOSAL::Components::Component;
 
 namespace PROPOSAL {
-    class Compton : public Parametrization
-    {
-    public:
-        Compton(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
-        Compton(const Compton&);
-        virtual ~Compton();
+class Compton : public Parametrization {
+public:
+    Compton();
+    virtual ~Compton() = default;
+    using only_stochastic = std::false_type;
+    using component_wise = std::true_type;
 
-        virtual Parametrization* clone() const = 0;
+    tuple<double, double> GetKinematicLimits(
+        const ParticleDef&, const Component&, double energy) override;
+};
 
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
+struct ComptonKleinNishina : public Compton {
+    ComptonKleinNishina() = default;
+    using base_param_t = Compton;                                   \
 
-        virtual InteractionType GetInteractionType() const final {return InteractionType::Compton;}
-        virtual double DifferentialCrossSection(double energy, double v) = 0;
+    double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double energy, double v);
+};
 
-        virtual KinematicLimits GetKinematicLimits(double energy);
+template <>
+double integrate_dndx(Integral&, Compton&, const ParticleDef&,
+    const Component&, double, double, double);
 
-        // ----------------------------------------------------------------- //
-        // Getter
-        // ----------------------------------------------------------------- //
+template <>
+double calculate_upper_lim_dndx(Integral&, Compton&, const ParticleDef&,
+    const Component&, double, double, double, double);
 
-        virtual size_t GetHash() const;
+template <>
+double integrate_dedx(Integral&, Compton&, const ParticleDef&,
+    const Component&, double, double, double);
 
-    protected:
-        virtual bool compare(const Parametrization&) const;
-
-    };
-
-// ------------------------------------------------------------------------- //
-// Declare the specific parametrizations
-// ------------------------------------------------------------------------- //
-
-
-    class ComptonKleinNishina : public Compton
-    {
-    public:
-        ComptonKleinNishina(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
-        ComptonKleinNishina(const ComptonKleinNishina&);
-        ~ComptonKleinNishina();
-
-        Parametrization* clone() const { return new ComptonKleinNishina(*this); }
-        static Compton* create(const ParticleDef& particle_def,
-                                      std::shared_ptr<const Medium> medium,
-                                      double multiplier)
-        {
-            return new ComptonKleinNishina(particle_def, medium, multiplier);
-        }
-
-        double DifferentialCrossSection(double energy, double v);
-
-        const std::string& GetName() const { return name_; }
-
-    private:
-        virtual bool compare(const Parametrization&) const;
-
-        static const std::string name_;
-    };
-
-
+template <>
+double integrate_de2dx(Integral&, Compton&, const ParticleDef&,
+    const Component&, double, double, double);
 } // namespace PROPOSAL

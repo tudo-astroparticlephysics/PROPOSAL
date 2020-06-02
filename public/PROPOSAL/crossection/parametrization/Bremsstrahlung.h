@@ -1,4 +1,3 @@
-
 /******************************************************************************
  *                                                                            *
  * This file is part of the simulation tool PROPOSAL.                         *
@@ -26,86 +25,55 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include <memory>
 
-#define BREMSSTRAHLUNG_DEF(param)                                                                                      \
-    class Brems##param : public Bremsstrahlung                                                                         \
-    {                                                                                                                  \
-    public:                                                                                                            \
-        Brems##param(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier, bool lpm);        \
-        Brems##param(const Brems##param&);                                                                             \
-        ~Brems##param();                                                                                               \
-                                                                                                                       \
-        Parametrization* clone() const { return new Brems##param(*this); }                                             \
-        static Bremsstrahlung* create(const ParticleDef& particle_def,                                                 \
-                                      std::shared_ptr<const Medium> medium,                                                            \
-                                      double multiplier,                                                               \
-                                      bool lpm)                                                                        \
-        {                                                                                                              \
-            return new Brems##param(particle_def, medium, multiplier, lpm);                                      \
-        }                                                                                                              \
-                                                                                                                       \
-        double CalculateParametrization(double energy, double v);                                                      \
-                                                                                                                       \
-        const std::string& GetName() const { return name_; }                                                           \
-                                                                                                                       \
-    private:                                                                                                           \
-        static const std::string name_;                                                                                \
+#define BREMSSTRAHLUNG_DEF(param)                                              \
+    struct Brems##param : public Bremsstrahlung {                              \
+        Brems##param(bool);                                                    \
+        using base_param_t = Bremsstrahlung;                                   \
+                                                                               \
+        double CalculateParametrization(const ParticleDef&, const Component&,  \
+            double energy, double v) override;                                 \
     };
 
+using std::unique_ptr;
+
 namespace PROPOSAL {
-class Bremsstrahlung : public Parametrization
-{
-public:
-    Bremsstrahlung(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier, bool lpm);
-    Bremsstrahlung(const Bremsstrahlung&);
-    virtual ~Bremsstrahlung();
+class Interpolant;
+} // namespace PROPOSAL
 
-    virtual Parametrization* clone() const = 0;
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    virtual InteractionType GetInteractionType() const final {return InteractionType::Brems;}
-    virtual double DifferentialCrossSection(double energy, double v);
-    virtual double CalculateParametrization(double energy, double v) = 0;
-
-    virtual KinematicLimits GetKinematicLimits(double energy);
-
-    // ----------------------------------------------------------------- //
-    // Getter
-    // ----------------------------------------------------------------- //
-
-    virtual size_t GetHash() const;
+namespace PROPOSAL {
+class Bremsstrahlung : public Parametrization {
 
 protected:
-    virtual bool compare(const Parametrization&) const;
-    virtual void print(std::ostream&) const;
-
-    // ----------------------------------------------------------------- //
-    // Protected methods
-    // ----------------------------------------------------------------- //
-
-    double lpm(double energy, double v);
-
-    // ----------------------------------------------------------------- //
-    // Protected member
-    // ----------------------------------------------------------------- //
-
-    bool lorenz_;       /// enable lorenz cut
-    double lorenz_cut_; /// in [MeV] // - set to 1.e6 in Constructor
+    bool lorenz_;       // enable lorenz cut
+    double lorenz_cut_; // in [MeV]
     bool init_lpm_effect_;
     bool lpm_;
     double eLpm_;
-};
 
-// ------------------------------------------------------------------------- //
-// Declare the specific parametrizations
-// ------------------------------------------------------------------------- //
+    double lpm(const ParticleDef&, const Component&, double, double, double);
+
+public:
+    using only_stochastic = std::false_type;
+    using component_wise = std::true_type;
+    Bremsstrahlung(bool);
+    virtual ~Bremsstrahlung() = default;
+
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double);
+    virtual double CalculateParametrization(
+        const ParticleDef&, const Component&, double, double)
+        = 0;
+
+    tuple<double, double> GetKinematicLimits(
+        const ParticleDef&, const Component&, double energy);
+    double GetLowerEnergyLim(const ParticleDef&) const override;
+    size_t GetHash() const;
+};
 
 BREMSSTRAHLUNG_DEF(PetrukhinShestakov)
 BREMSSTRAHLUNG_DEF(KelnerKokoulinPetrukhin)
@@ -113,36 +81,16 @@ BREMSSTRAHLUNG_DEF(CompleteScreening)
 BREMSSTRAHLUNG_DEF(AndreevBezrukovBugaev)
 BREMSSTRAHLUNG_DEF(SandrockSoedingreksoRhode)
 
-// ------------------------------------------------------------------------- //
-// ElectronSceening declaration
-// ------------------------------------------------------------------------- //
+class BremsElectronScreening : public Bremsstrahlung {
+    std::unique_ptr<Interpolant> interpolant_;
 
-class BremsElectronScreening : public Bremsstrahlung
-{
 public:
-    BremsElectronScreening(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier, bool lpm);
-    BremsElectronScreening(const BremsElectronScreening&);
-    ~BremsElectronScreening();
+    BremsElectronScreening(bool);
 
-    Parametrization* clone() const { return new BremsElectronScreening(*this); }
-    static Bremsstrahlung* create(const ParticleDef& particle_def,
-                                  std::shared_ptr<const Medium> medium,
-                                  double multiplier,
-                                  bool lpm)
-    {
-        return new BremsElectronScreening(particle_def, medium, multiplier, lpm);
-    }
-
-    double CalculateParametrization(double energy, double v);
-    double DifferentialCrossSection(double energy, double v);
-
-    const std::string& GetName() const { return name_; }
-
-private:
-    virtual bool compare(const Parametrization&) const;
-
-    static const std::string name_;
-    Interpolant* interpolant_;
+    double CalculateParametrization(
+        const ParticleDef&, const Component&, double energy, double v) override;
+    double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double energy, double v) override;
 };
 
 #undef BREMSSTRAHLUNG_DEF

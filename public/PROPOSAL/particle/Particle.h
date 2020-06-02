@@ -82,9 +82,6 @@ public:
     DynamicData();
     DynamicData(const int&);
     DynamicData(const int&, const Vector3D&, const Vector3D&, const double&, const double&, const double&, const double&);
-    DynamicData(const DynamicData&);
-    DynamicData(DynamicData&&);
-    virtual ~DynamicData();
 
     friend std::ostream& operator<<(std::ostream&, DynamicData const&);
     DynamicData& operator=(const DynamicData&);

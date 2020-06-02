@@ -37,16 +37,6 @@
 #include "PROPOSAL/geometry/GeometryFactory.h"
 #include "PROPOSAL/geometry/Sphere.h"
 
-#include "PROPOSAL/crossection/factories/AnnihilationFactory.h"
-#include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
-#include "PROPOSAL/crossection/factories/ComptonFactory.h"
-#include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
-#include "PROPOSAL/crossection/factories/IonizationFactory.h"
-#include "PROPOSAL/crossection/factories/MupairProductionFactory.h"
-#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
-#include "PROPOSAL/crossection/factories/PhotoPairFactory.h"
-#include "PROPOSAL/crossection/factories/WeakInteractionFactory.h"
-
 #include "PROPOSAL/crossection/parametrization/Annihilation.h"
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crossection/parametrization/Compton.h"

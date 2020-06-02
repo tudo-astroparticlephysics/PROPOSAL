@@ -32,6 +32,7 @@
 #include <deque>
 #include <functional>
 #include <map>
+#include <memory>
 #include <vector>
 
 #define PROPOSAL_MAKE_HASHABLE(type, ...)                                      \
@@ -46,7 +47,15 @@
     };                                                                         \
     }
 
+using std::unique_ptr;
+
 namespace PROPOSAL {
+
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
 
 inline void hash_combine(std::size_t& seed) { (void)seed; }
 
@@ -71,11 +80,11 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest)
 // ----------------------------------------------------------------------------
 /// @brief Definition needed to initialize interpolation
 // ----------------------------------------------------------------------------
+
+
 struct InterpolationDef {
     InterpolationDef()
         : order_of_interpolation(5)
-        , path_to_tables(std::string())
-        , path_to_tables_readonly(std::string())
         , max_node_energy(1e14)    // upper energy bound for Interpolation (MeV)
         , nodes_cross_section(100) // number of interpolation in cross section
         , nodes_continous_randomization(
@@ -88,9 +97,9 @@ struct InterpolationDef {
 
     InterpolationDef(const nlohmann::json&);
 
+    static std::string path_to_tables;
+    static std::string path_to_tables_readonly;
     int order_of_interpolation;
-    std::string path_to_tables;
-    std::string path_to_tables_readonly;
     double max_node_energy;
     int nodes_cross_section;
     int nodes_continous_randomization;
@@ -159,7 +168,8 @@ namespace Helper {
     // ----------------------------------------------------------------------------
     std::string Centered(int width, const std::string& str, char fill = '=');
 
-    using InterpolantBuilderContainer = std::vector<InterpolantBuilder*>;
+    using InterpolantBuilderContainer
+        = std::vector<unique_ptr<InterpolantBuilder>>;
 
     // ----------------------------------------------------------------------------
     /// @brief Helper for interpolation initialization
@@ -172,13 +182,12 @@ namespace Helper {
     /// @return vector of unique_ptr to created interpolants
     // ----------------------------------------------------------------------------
 
-    std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(
-        std::string, InterpolantBuilderContainer&, size_t,
+    std::unique_ptr<Interpolant> InitializeInterpolation(
+        std::string, unique_ptr<InterpolantBuilder>, size_t,
         const InterpolationDef&);
 
-    std::unique_ptr<Interpolant> InitializeInterpolation(
-        std::string, InterpolantBuilder&, size_t,
-        const InterpolationDef&);
+    std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(std::string,
+        const InterpolantBuilderContainer&, size_t, const InterpolationDef&);
 
     // ----------------------------------------------------------------------------
     /// @brief Simple map structure where keys and values can be used for
@@ -261,5 +270,6 @@ namespace Helper {
     };
 
 } // namespace Helper
+
 
 } // namespace PROPOSAL

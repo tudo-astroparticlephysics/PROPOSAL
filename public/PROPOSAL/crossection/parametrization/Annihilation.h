@@ -26,71 +26,33 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include <functional>
 #include <cmath>
 #include <fstream>
+#include <functional>
+#include <functional>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
-
 namespace PROPOSAL {
 
-    class Annihilation : public Parametrization
-    {
-    public:
-        Annihilation(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
-        Annihilation(const Annihilation&);
-        virtual ~Annihilation();
+class Annihilation : public Parametrization {
+public:
+    Annihilation();
+    virtual ~Annihilation() = default;
+    using component_wise = std::true_type;
+    using only_stochastic = std::true_type;
 
-        virtual Parametrization* clone() const = 0;
+    tuple<double, double> GetKinematicLimits(const ParticleDef&, const Component&, double) override;
+};
 
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
+struct AnnihilationHeitler : public Annihilation {
+    AnnihilationHeitler();
+    using base_param_t = Annihilation;                                   \
 
-        virtual InteractionType GetInteractionType() const final {return InteractionType::Annihilation;}
-        virtual double DifferentialCrossSection(double energy, double v) = 0;
-
-        virtual KinematicLimits GetKinematicLimits(double energy);
-
-        virtual size_t GetHash() const;
-
-    protected:
-        bool compare(const Parametrization&) const;
-
-    };
-
-
-    class AnnihilationHeitler : public Annihilation
-    {
-    public:
-
-        AnnihilationHeitler(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
-        AnnihilationHeitler(const AnnihilationHeitler&);
-        virtual ~AnnihilationHeitler();
-
-        virtual Parametrization* clone() const { return new AnnihilationHeitler(*this); }
-        static Annihilation* create(const ParticleDef& particle_def,
-                                       std::shared_ptr<const Medium> medium,
-                                       double multiplier)
-        {
-            return new AnnihilationHeitler(particle_def, medium, multiplier);
-        }
-
-        virtual double DifferentialCrossSection(double energy, double v);
-
-        const std::string& GetName() const { return name_; }
-
-    protected:
-        static const std::string name_;
-    };
-
-
-
-
-
+    double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double) override;
+};
 
 } // namespace PROPOSAL

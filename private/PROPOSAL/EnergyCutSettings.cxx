@@ -6,6 +6,9 @@
 #include <stdexcept>
 
 using namespace PROPOSAL;
+using std::max;
+using std::min;
+using std::get;
 
 //----------------------------------------------------------------------------//
 //-------------------------public member functions----------------------------//
@@ -68,14 +71,9 @@ bool EnergyCutSettings::operator==(const EnergyCutSettings& cut) const noexcept
     return true;
 }
 
-double EnergyCutSettings::GetCut(double energy) const noexcept
+
+size_t EnergyCutSettings::GetHash() const noexcept
 {
-    assert(energy > 0);
-    return std::min(ecut_ / energy, vcut_);
-}
-
-
-size_t EnergyCutSettings::GetHash() const noexcept {
     size_t hash_digest = 0;
     hash_combine(hash_digest, ecut_, vcut_, continuous_randomization_);
     return hash_digest;

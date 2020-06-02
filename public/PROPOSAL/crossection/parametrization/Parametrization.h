@@ -28,122 +28,103 @@
 
 #pragma once
 
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/json.hpp"
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/particle/ParticleDef.h"
-#include <functional>
+#include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/medium/Components.h"
+#include <iostream>
+#include <tuple>
+#include <type_traits>
+
+using PROPOSAL::Components::Component;
+using std::string;
+using std::tuple;
 
 namespace PROPOSAL {
-
-namespace Components {
-    class Component;
-}
+class ParticleDef;
+class Medium;
+enum class InteractionType;
 
 class Parametrization {
 public:
-    Parametrization(const ParticleDef&, std::shared_ptr<const Medium>, double lower_energy_lim, double multiplier);
-    Parametrization(const Parametrization&);
-    virtual ~Parametrization();
+    const InteractionType interaction_type;
+    const string name;
 
-    bool operator==(const Parametrization& parametrization) const;
-    bool operator!=(const Parametrization& parametrization) const;
+    Parametrization(InteractionType, const string&);
+    virtual ~Parametrization() = default;
 
-    virtual Parametrization* clone() const {};
+    enum { V_MIN, V_MAX };
 
-    friend std::ostream& operator<<(std::ostream&, Parametrization const&);
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double);
 
-    // bounds of integration
-    struct KinematicLimits {
-        double vMin; //!< lower physical, kinematic limit
-        double vMax; //!< upper physical, kinematic limit
-    };
+    virtual tuple<double, double> GetKinematicLimits(
+        const ParticleDef&, const Component&, double);
 
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    virtual double DifferentialCrossSection(double energy, double v) = 0;
-
-    double FunctionToDNdxIntegral(double energy, double v);
-    virtual double FunctionToDEdxIntegral(double energy, double v);
-    double FunctionToDE2dxIntegral(double energy, double v);
-
-    virtual double Calculaterho(
-        double energy, double v, double rnd1, double rnd2)
+    inline double FunctionToDNdxIntegral(const ParticleDef& p_def,
+        const Component& comp, double energy, double v)
     {
-        (void)energy;
-        (void)v;
-        (void)rnd1;
-        (void)rnd2;
-        return 0;
+        return DifferentialCrossSection(p_def, comp, energy, v);
     }
 
-    virtual KinematicLimits GetKinematicLimits(double energy) = 0;
+    inline double FunctionToDEdxIntegral(const ParticleDef& p_def,
+        const Component& comp, double energy, double v)
+    {
+        return v * DifferentialCrossSection(p_def, comp, energy, v);
+    }
 
-    // ----------------------------------------------------------------- //
-    // Getter
-    // ----------------------------------------------------------------- //
+    inline double FunctionToDE2dxIntegral(const ParticleDef& p_def,
+        const Component& comp, double energy, double v)
+    {
+        return v * v * DifferentialCrossSection(p_def, comp, energy, v);
+    }
 
-    virtual const std::string& GetName() const = 0; //{ return name_; }
-    std::shared_ptr<const Medium> GetMedium() const { return medium_; }
-    double GetParticleMass() const { return particle_mass_; }
-    double GetParticleCharge() const { return particle_charge_; }
-    double GetParticleLifetime() const { return particle_lifetime_; }
-    double GetLowerEnergyLim() const { return lower_energy_lim_; }
-    virtual InteractionType GetInteractionType() const = 0;
-    double GetMultiplier() const { return multiplier_; }
-    double GetCurrentComponent() {return component_index_;}
+
+    virtual double GetLowerEnergyLim(const ParticleDef&) const { return 0; };
     virtual size_t GetHash() const;
-
-    // ----------------------------------------------------------------- //
-    // Setter
-    // ----------------------------------------------------------------- //
-
-    // void SetCurrentComponent(Components::Component* component)
-    // {current_component_ = component;}
-    void SetCurrentComponent(int index) { component_index_ = index; }
-
-protected:
-    virtual bool compare(const Parametrization&) const;
-    virtual void print(std::ostream&) const {};
-
-    // const std::string name_;
-
-    double particle_mass_;
-    double particle_charge_;
-    double particle_lifetime_;
-
-    double lower_energy_lim_;
-
-    std::shared_ptr<const Medium> medium_;
-    const std::vector<Components::Component>& components_;
-    int component_index_;
-
-    double multiplier_;
 };
+} // namespace PROPOSAL
 
-class Parametrization_builder : public Parametrization {
-    std::function<double(const Parametrization&, double, double)> diff_cross;
-    std::function<KinematicLimits(const Parametrization&, double)> kinematic_limits;
-    const std::string name_ = "parametrization_builder";
+namespace PROPOSAL {
+template <typename P, typename M>
+double integrate_dndx(Integral& integral, P&& param, const ParticleDef& p_def,
+    const M& medium, double energy, double v_min, double v_max)
+{
+    auto dNdx = [&param, &p_def, &medium, energy](double v) {
+        return param.FunctionToDNdxIntegral(p_def, medium, energy, v);
+    };
+    return integral.Integrate(v_min, v_max, dNdx, 4);
+}
 
-public:
-    Parametrization_builder(const ParticleDef& p_def,
-        std::shared_ptr<const Medium> medium, double multiplier)
-        : Parametrization(p_def, medium, p_def.mass, multiplier)
-        , diff_cross(nullptr)
-        , kinematic_limits(nullptr){};
+template <typename P, typename M>
+double calculate_upper_lim_dndx(Integral& integral, P&& param,
+    const ParticleDef& p_def, M&& medium, double energy, double v_min,
+    double v_max, double rnd)
+{
+    auto dNdx = [&param, &p_def, &medium, energy](double v) {
+        return param.FunctionToDNdxIntegral(p_def, medium, energy, v);
+    };
+    integral.IntegrateWithRandomRatio(v_min, v_max, dNdx, 4, rnd);
+    return integral.GetUpperLimit();
+}
 
-    double DifferentialCrossSection(double energy, double v) override;
-    KinematicLimits GetKinematicLimits(double energy) override;
-    const std::string& GetName() const override { return name_; }
-    virtual InteractionType GetInteractionType() const override {return static_cast<InteractionType>(0);}
-};
+template <typename Param>
+double integrate_dedx(Integral& integral, Param&& param,
+    const ParticleDef& p_def, const Component& comp, double energy,
+    double v_min, double v_max)
+{
+    auto dEdx = [&param, &p_def, &comp, energy](double v) {
+        return param.FunctionToDEdxIntegral(p_def, comp, energy, v);
+    };
+    return integral.Integrate(v_min, v_max, dEdx, 2);
+}
 
-std::ostream& operator<<(std::ostream&, PROPOSAL::Parametrization const&);
-
-size_t GetHash(const std::vector<Parametrization*>& params);
-
+template <typename Param>
+double integrate_de2dx(Integral& integral, Param&& param,
+    const ParticleDef& p_def, const Component& comp, double energy,
+    double v_min, double v_max)
+{
+    auto dE2dx = [&param, &p_def, &comp, energy](double v) {
+        return param.FunctionToDE2dxIntegral(p_def, comp, energy, v);
+    };
+    return integral.Integrate(v_min, v_max, dE2dx, 2);
+}
 } // namespace PROPOSAL

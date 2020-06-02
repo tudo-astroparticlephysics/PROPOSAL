@@ -29,6 +29,9 @@
 
 namespace PROPOSAL {
 
+std::string InterpolationDef::path_to_tables = "";
+std::string InterpolationDef::path_to_tables_readonly = "";
+
 InterpolationDef::InterpolationDef(const nlohmann::json& config)
 {
     nodes_propagate = config.value("nodes_propagate", 1000);
@@ -239,19 +242,19 @@ namespace Helper {
     // -------------------------------------------------------------------------
     // //
     std::unique_ptr<Interpolant> InitializeInterpolation(std::string name,
-        InterpolantBuilder& builder, size_t hash_diget,
+        unique_ptr<InterpolantBuilder> builder, size_t hash_digest,
         const InterpolationDef& interpolation_def)
     {
         // Simple wrapper for inizializing one Interpolant only
         Helper::InterpolantBuilderContainer builder_container;
-        builder_container.push_back(&builder);
+        builder_container.push_back(std::move(builder));
         auto return_vec = InitializeInterpolation(
-            name, builder_container, hash_diget, interpolation_def);
+            name, builder_container, hash_digest, interpolation_def);
         return std::move(return_vec.at(0));
     }
 
     std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(
-        std::string name, InterpolantBuilderContainer& builder_container,
+        std::string name, const InterpolantBuilderContainer& builder_container,
         size_t hash_digest, const InterpolationDef& interpolation_def)
     {
         std::vector<std::unique_ptr<Interpolant>> interpolants;
@@ -266,7 +269,8 @@ namespace Helper {
         // ---------------------------------------------------------------------
         // // first check the reading paths if one of the reading paths already
         // has the required tables
-        pathname = ResolvePath(interpolation_def.path_to_tables_readonly, true);
+
+        pathname = ResolvePath(InterpolationDef::path_to_tables_readonly, true);
         if (!pathname.empty()) {
             filename << pathname << "/" << name << "_" << hash_digest;
             if (!binary_tables) {
@@ -297,7 +301,8 @@ namespace Helper {
 
                     for (const auto& builder : builder_container) {
                         // TODO(mario): read check Tue 2017/09/05
-                        interpolants.emplace_back(new Interpolant());
+                        interpolants.emplace_back(
+                            unique_ptr<Interpolant>(new Interpolant()));
                         interpolants.back()->Load(input, binary_tables);
                     }
                     reading_worked = true;
@@ -331,7 +336,8 @@ namespace Helper {
         // ---------------------------------------------------------------------
         // // if none of the reading paths has the required interpolation table
         // the interpolation tables will be written in the path for writing
-        pathname = ResolvePath(interpolation_def.path_to_tables);
+
+        pathname = ResolvePath(InterpolationDef::path_to_tables);
 
         // clear the stringstream
         filename.str(std::string());

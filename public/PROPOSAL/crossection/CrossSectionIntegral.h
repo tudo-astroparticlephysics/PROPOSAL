@@ -26,43 +26,174 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/particle/ParticleDef.h"
+#include <unordered_map>
+
+using std::add_lvalue_reference;
+using std::get;
+using std::unordered_map;
 
 namespace PROPOSAL {
+template <typename Param, typename P, typename M>
+class CrossSectionIntegral : public crosssection_t<P, M> {
+    Integral integral;
+    Param param;
+    P p_def;
+    M medium;
+    shared_ptr<const EnergyCutSettings> cut;
 
-class CrossSectionIntegral : public CrossSection
-{
+    using base_param_t = typename decay<Param>::type::base_param_t;
+    using base_param_ref_t = typename add_lvalue_reference<base_param_t>::type;
+
+    rates_t CalculatedNdx_impl(double energy, std::true_type);
+    rates_t CalculatedNdx_impl(double energy, std::false_type);
+
+    double CalculateStochasticLoss_impl(
+        const Component&, double, double, std::true_type);
+    double CalculateStochasticLoss_impl(
+        const Component&, double, double, std::false_type);
+
 public:
-    typedef std::vector<Integral> IntegralVec;
+    CrossSectionIntegral(Param&& param, P&& p_def, M&& medium,
+        shared_ptr<const EnergyCutSettings> cut)
+        : CrossSection<typename decay<P>::type, typename decay<M>::type>()
+        , param(param)
+        , p_def(p_def)
+        , medium(medium)
+        , cut(cut)
+    {
+    }
 
-public:
-    CrossSectionIntegral(const Parametrization&, std::shared_ptr<const EnergyCutSettings>);
-    CrossSectionIntegral(const CrossSectionIntegral&);
-    virtual ~CrossSectionIntegral();
-
-    virtual CrossSection* clone() const = 0;
-
-    virtual double CalculatedEdx(double energy) = 0;
-    virtual double CalculatedEdxWithoutMultiplier(double energy) = 0;
-    virtual double CalculatedE2dx(double energy);
-    virtual double CalculatedE2dxWithoutMultiplier(double energy);
-    virtual double CalculatedNdx(double energy);
-    virtual double CalculatedNdx(double energy, double rnd);
-    virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
-    virtual double CalculateCumulativeCrossSection(double energy, int component, double v);
-
-protected:
-    virtual bool compare(const CrossSection&) const;
-
-    Integral dedx_integral_;
-    Integral de2dx_integral_;
-    IntegralVec dndx_integral_;
-
-    virtual double CalculateStochasticLoss(double energy, double rnd1);
+    inline double CalculatedEdx(double energy)
+    {
+        return calculate_dedx(reinterpret_cast<base_param_ref_t>(param),
+            integral, p_def, medium, *cut, energy,
+            typename decay<Param>::type::only_stochastic{});
+    }
+    inline double CalculatedE2dx(double energy)
+    {
+        return calculate_de2dx(reinterpret_cast<base_param_ref_t>(param),
+            integral, p_def, medium, *cut, energy,
+            typename decay<Param>::type::only_stochastic{});
+    }
+    inline rates_t CalculatedNdx(double energy)
+    {
+        return CalculatedNdx_impl(
+            energy, typename base_param_t::component_wise{});
+    }
+    inline double CalculateStochasticLoss(
+        const Component& comp, double energy, double rate)
+    {
+        return CalculateStochasticLoss_impl(
+            comp, energy, rate, typename base_param_t::component_wise{});
+    }
 };
-
 } // namespace PROPOSAL
+
+namespace PROPOSAL {
+template <typename Param>
+double calculate_dedx(Param&& param, Integral& integral,
+    const ParticleDef& p_def, const Medium& medium,
+    const EnergyCutSettings& cut, double energy, std::false_type)
+{
+    double sum = 0.;
+    for (const auto& comp : medium.GetComponents()) {
+        auto lim = param.GetKinematicLimits(p_def, comp, energy);
+        auto v_cut = cut.GetCut(lim, energy);
+        sum += integrate_dedx(integral, param, p_def, comp, energy,
+            get<Parametrization::V_MIN>(lim), v_cut);
+    }
+    return energy * sum;
+}
+
+template <typename Param>
+double calculate_dedx(Param&&, Integral&, const ParticleDef&, const Medium&,
+    const EnergyCutSettings&, double, std::true_type)
+{
+    return 0.;
+}
+
+class Ionization;
+template <>
+double calculate_dedx(Ionization&, Integral&, const ParticleDef&, const Medium&,
+    const EnergyCutSettings&, double, std::false_type);
+
+template <typename Param>
+double calculate_de2dx(Param&& param, Integral& integral,
+    const ParticleDef& p_def, const Medium& medium,
+    const EnergyCutSettings& cut, double energy, std::false_type)
+{
+    double sum = 0.;
+    for (const auto& comp : medium.GetComponents()) {
+        auto lim = param.GetKinematicLimits(p_def, comp, energy);
+        auto v_cut = cut.GetCut(lim, energy);
+        sum += integrate_de2dx(integral, param, p_def, comp, energy,
+            get<Parametrization::V_MIN>(lim), v_cut);
+    }
+    return energy * energy * sum;
+}
+
+template <typename Param>
+double calculate_de2dx(Param&&, Integral&, const ParticleDef&, const Medium&,
+    const EnergyCutSettings&, double, std::true_type)
+{
+    return 0.;
+}
+
+template <typename P, typename M>
+double calculate_dndx(P&& param, Integral& integral, const ParticleDef& p_def,
+    M&& medium, const EnergyCutSettings& cut, double energy)
+{
+    auto lim = param.GetKinematicLimits(p_def, medium, energy);
+    auto v_cut = cut.GetCut(lim, energy);
+    return integrate_dndx(integral, param, p_def, medium, energy, v_cut,
+        get<Parametrization::V_MAX>(lim));
+}
+
+template <typename Param, typename P, typename M>
+rates_t CrossSectionIntegral<Param, P, M>::CalculatedNdx_impl(
+    double energy, std::true_type)
+{
+    rates_t rates;
+    for (auto& c : medium.GetComponents())
+        rates[&c] = calculate_dndx(reinterpret_cast<base_param_ref_t>(param),
+            integral, p_def, c, *cut, energy);
+    return rates;
+}
+
+template <typename Param, typename P, typename M>
+rates_t CrossSectionIntegral<Param, P, M>::CalculatedNdx_impl(
+    double energy, std::false_type)
+{
+    rates_t rates;
+    rates[nullptr] = calculate_dndx(reinterpret_cast<base_param_ref_t>(param),
+        integral, p_def, medium, *cut, energy);
+    return rates;
+}
+
+template <typename Param, typename P, typename M>
+double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
+    const Component& comp, double energy, double rate, std::true_type)
+{
+    auto lim = param.GetKinematicLimits(p_def, comp, energy);
+    auto v_cut = cut->GetCut(lim, energy);
+    return calculate_upper_lim_dndx(integral, param, p_def, comp, energy, v_cut,
+        get<Parametrization::V_MAX>(lim), -rate);
+}
+
+template <typename Param, typename P, typename M>
+double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
+    const Component& comp, double energy, double rate, std::false_type)
+{
+    auto lim = param.GetKinematicLimits(p_def, medium, energy);
+    auto v_cut = cut->GetCut(lim, energy);
+    return calculate_upper_lim_dndx(integral, param, p_def, medium, energy,
+        v_cut, get<Parametrization::V_MAX>(lim), -rate);
+}
+} // namepace PROPOSAL

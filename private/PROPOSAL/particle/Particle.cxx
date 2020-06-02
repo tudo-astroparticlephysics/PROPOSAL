@@ -80,32 +80,6 @@ DynamicData::DynamicData(const int& type, const Vector3D& position, const Vector
 {
 }
 
-DynamicData::DynamicData(const DynamicData& data)
-    : type_(data.type_)
-    , position_(data.position_)
-    , direction_(data.direction_)
-    , energy_(data.energy_)
-    , parent_particle_energy_(data.parent_particle_energy_)
-    , time_(data.time_)
-    , propagated_distance_(data.propagated_distance_)
-{
-}
-
-
-
-DynamicData::DynamicData(DynamicData&& other)
-    : type_(std::move(other.type_))
-    , position_(std::move(other.position_))
-    , direction_(std::move(other.direction_))
-    , energy_(std::move(other.energy_))
-    , parent_particle_energy_(std::move(other.parent_particle_energy_))
-    , time_(std::move(other.time_))
-    , propagated_distance_(std::move(other.propagated_distance_))
-{
-}
-
-DynamicData::~DynamicData() {}
-
 DynamicData& DynamicData::operator=(const DynamicData& data)
 {
     if (this != &data){

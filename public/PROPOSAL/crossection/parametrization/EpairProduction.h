@@ -26,64 +26,51 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include <functional>
 #include <cmath>
+#include <functional>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
-#include "PROPOSAL/medium/Medium.h"
-
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
 
-#include "PROPOSAL/methods.h"
-#include "PROPOSAL/Logging.h"
+using PROPOSAL::Components::Component;
 
-#define EPAIR_PARAM_INTEGRAL_DEC(param)                                                                                \
-    class Epair##param : public EpairProductionRhoIntegral                                                             \
-    {                                                                                                                  \
-    public:                                                                                                            \
-        Epair##param(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier, bool lpm);                  \
-        Epair##param(const Epair##param&);                                                                             \
-        virtual ~Epair##param();                                                                                       \
-                                                                                                                       \
-        virtual Parametrization* clone() const { return new Epair##param(*this); }                                     \
-        static EpairProduction* create(const ParticleDef& particle_def,                                                \
-                                       std::shared_ptr<const Medium> medium,                                           \
-                                       double multiplier,                                                              \
-                                       bool lpm)                                                                       \
-        {                                                                                                              \
-            return new Epair##param(particle_def, medium, multiplier, lpm);                                            \
-        }                                                                                                              \
-                                                                                                                       \
-        double FunctionToIntegral(double energy, double v, double lpm);                                                \
-                                                                                                                       \
-        const std::string& GetName() const { return name_; }                                                           \
-                                                                                                                       \
-    protected:                                                                                                         \
-        static const std::string name_;                                                                                \
+#define EPAIR_PARAM_INTEGRAL_DEC(param)                                        \
+    struct Epair##param : public EpairProductionRhoIntegral {                  \
+        Epair##param(bool lpm);                                                \
+        using base_param_t = EpairProduction;                                  \
+                                                                               \
+        double FunctionToIntegral(const ParticleDef&, const Component&,        \
+            double energy, double v, double lpm);                              \
     };
-
 
 namespace PROPOSAL {
 
-class Interpolant;
+class EpairProduction : public Parametrization {
 
-class EpairProduction : public Parametrization
-{
+protected:
+    // ----------------------------------------------------------------------------
+    /// @brief Landau Pomeranchuk Migdal effect
+    ///
+    /// Landau Pomeranchuk Migdal effect evaluation,
+    /// if the Landau Pomeranchuk Migdal effect is considered in
+    /// the calculation, function is modified by a factor
+    /// \f[lpm=return=\frac{(1+b)(A+(1+r^2)B)+b(C+(1+r^2)D)+(1-r^2)E}{[(2+r^2)(1+b)
+    /// +x(3+r^2)]\ln\Big(1+\frac{1}{x}\Big)+\frac{1-r^2-b}{1+x}-(3+r^2)}\f]
+    // ----------------------------------------------------------------------------
+    double lpm(const ParticleDef&, const Medium&, double energy, double v,
+        double r2, double b, double x);
+
+    bool init_lpm_effect_;
+    bool lpm_;
+    double eLpm_;
+
 public:
-    EpairProduction(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier, bool lpm);
-    EpairProduction(const EpairProduction&);
-    virtual ~EpairProduction();
-
-    virtual Parametrization* clone() const = 0;
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
+    using only_stochastic = std::false_type;
+    using component_wise = std::true_type;
+    EpairProduction(bool);
+    virtual ~EpairProduction() = default;
 
     // ----------------------------------------------------------------------------
     /// @brief This is the calculation of the dSigma/dv
@@ -94,70 +81,43 @@ public:
     /// \sqrt{1-\frac{4m_e}{E_p v}}\Big(1-\frac{6m_p^2}{E_p^2(1-v)}\Big)\f$
     ///
     // ----------------------------------------------------------------------------
-    virtual InteractionType GetInteractionType() const final {return InteractionType::Epair;}
-    virtual double DifferentialCrossSection(double energy, double v) = 0;
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double energy, double v)
+        = 0;
 
-    virtual KinematicLimits GetKinematicLimits(double energy);
-
-
-protected:
-    bool compare(const Parametrization&) const;
-
-    // ----------------------------------------------------------------------------
-    /// @brief Landau Pomeranchuk Migdal effect
-    ///
-    /// Landau Pomeranchuk Migdal effect evaluation,
-    /// if the Landau Pomeranchuk Migdal effect is considered in
-    /// the calculation, function is modified by a factor
-    /// \f[lpm=return=\frac{(1+b)(A+(1+r^2)B)+b(C+(1+r^2)D)+(1-r^2)E}{[(2+r^2)(1+b)
-    /// +x(3+r^2)]\ln\Big(1+\frac{1}{x}\Big)+\frac{1-r^2-b}{1+x}-(3+r^2)}\f]
-    // ----------------------------------------------------------------------------
-    double lpm(double energy, double v, double r2, double b, double x);
-
-    bool init_lpm_effect_;
-    bool lpm_;
-    double eLpm_;
+    tuple<double, double> GetKinematicLimits(
+        const ParticleDef&, const Component&, double energy);
 };
 
-// ------------------------------------------------------------------------- //
-// Differentiate between rho integration & interpolation
-// ------------------------------------------------------------------------- //
+template <>
+double integrate_dedx(Integral&, EpairProduction&, const ParticleDef&,
+    const Component&, double, double, double);
 
-class EpairProductionRhoIntegral : public EpairProduction
-{
+class EpairProductionRhoIntegral : public EpairProduction {
+private:
+    Integral integral_;
+
 public:
-    EpairProductionRhoIntegral(const ParticleDef&,
-                               std::shared_ptr<const Medium>,
-                               double multiplier,
-                               bool lpm);
-    EpairProductionRhoIntegral(const EpairProductionRhoIntegral&);
-    virtual ~EpairProductionRhoIntegral();
+    EpairProductionRhoIntegral(bool);
+    virtual ~EpairProductionRhoIntegral() = default;
 
-    Parametrization* clone() const = 0;
-
-    virtual double DifferentialCrossSection(double energy, double v);
+    double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double energy, double v) override;
 
     // ----------------------------------------------------------------------------
-    /// @brief This is the calculation of the d2Sigma/dvdRo - interface to Integral
+    /// @brief This is the calculation of the d2Sigma/dvdRo - interface to
+    /// Integral
     ///
     /// the function which is defined here is:
     /// \f[ f(r) =return= \alpha^2r_e^2 \frac{2Z}{1,5\pi}(Z+k)
     /// \frac{1-v}{v}lpm(r^2,b,s)(F_e+\frac{m_e^2}{m_p^2}F_m)\f]
     // ----------------------------------------------------------------------------
-    virtual double FunctionToIntegral(double energy, double v, double rho) = 0;
+    virtual double FunctionToIntegral(const ParticleDef&, const Component&,
+        double energy, double v, double rho)
+        = 0;
 
     virtual size_t GetHash() const;
-
-private:
-    bool compare(const Parametrization&) const;
-    virtual void print(std::ostream&) const;
-
-    Integral integral_;
 };
-
-/******************************************************************************
- *                     Declare Integral Parametrizations                      *
- ******************************************************************************/
 
 EPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
 EPAIR_PARAM_INTEGRAL_DEC(SandrockSoedingreksoRhode)

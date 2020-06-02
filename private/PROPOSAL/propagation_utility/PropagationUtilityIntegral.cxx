@@ -12,7 +12,8 @@
 
 using namespace PROPOSAL;
 
-UtilityIntegral::UtilityIntegral(std::function<double(double)> func, double lower_lim)
+UtilityIntegral::UtilityIntegral(
+    std::function<double(double)> func, double lower_lim)
     : integral(IROMB, IMAXS, IPREC2)
     , FunctionToIntegral(func)
     , lower_lim(lower_lim)
@@ -27,22 +28,19 @@ void UtilityIntegral::BuildTables(const std::string str, size_t hash_digest,
     (void)interpol_def;
 };
 
-double UtilityIntegral::Calculate(
-    double energy_initial, double energy_final, double rnd)
+double UtilityIntegral::Calculate(double energy_initial, double energy_final)
 {
-    assert(rnd >= 0); //Otherwise the integral function interprets rnd as a ratio
-
-    last_energy_initial = energy_initial;
-    last_partial_sum = rnd;
-
-    return integral.IntegrateWithRandomRatio(
-        energy_initial, energy_final, FunctionToIntegral, 4, -rnd);
+    return integral.Integrate(
+        energy_initial, energy_final, FunctionToIntegral, 4);
 }
 
 double UtilityIntegral::GetUpperLimit(double energy_initial, double rnd)
 {
-    if (energy_initial != last_energy_initial || rnd != last_partial_sum)
-        Calculate(energy_initial, lower_lim, rnd);
+    auto sum = integral.IntegrateWithRandomRatio(
+        energy_initial, lower_lim, FunctionToIntegral, 4, -rnd);
+
+    assert(sum > rnd); // searched Energy is below lower_lim return lower_lim as
+                       // a lower limit
 
     return integral.GetUpperLimit();
 }

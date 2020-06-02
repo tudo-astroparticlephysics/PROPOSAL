@@ -61,9 +61,9 @@ public:
     typedef std::function<void(PhaseSpaceParameters&, const ParticleDef&)> EstimateFunction;
 
 public:
-    ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters, MatrixElementFunction ME = nullptr);
+    ManyBodyPhaseSpace(std::vector<shared_ptr<const ParticleDef>> daughters, MatrixElementFunction ME = nullptr);
     ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode);
-    virtual ~ManyBodyPhaseSpace();
+    virtual ~ManyBodyPhaseSpace() = default;
 
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() const { return new ManyBodyPhaseSpace(*this); }
@@ -112,7 +112,7 @@ public:
     const std::string& GetName() const { return name_; }
 
 private:
-    ManyBodyPhaseSpace& operator=(const ManyBodyPhaseSpace&); // Undefined & not allowed
+    /* ManyBodyPhaseSpace& operator=(const ManyBodyPhaseSpace&); // Undefined & not allowed */
 
 
     // ----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ private:
     bool compare(const DecayChannel&) const;
     void print(std::ostream&) const;
 
-    std::vector<const ParticleDef*> daughters_;
+    std::vector<shared_ptr<const ParticleDef>> daughters_;
     std::vector<double> daughter_masses_;
 
     int number_of_daughters_;
@@ -210,7 +210,6 @@ class ManyBodyPhaseSpace::Builder
 public:
     Builder();
     Builder(const Builder&);
-    ~Builder();
 
     // --------------------------------------------------------------------- //
     // Setter
@@ -221,7 +220,7 @@ public:
     ManyBodyPhaseSpace build();
 
 private:
-    std::vector<const ParticleDef*> daughters_;
+    std::vector<shared_ptr<const ParticleDef>> daughters_;
     MatrixElementFunction matrix_element_;
 };
 

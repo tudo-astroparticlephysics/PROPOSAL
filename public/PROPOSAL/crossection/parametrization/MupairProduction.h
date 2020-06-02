@@ -26,113 +26,58 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include <functional>
 #include <cmath>
+#include <functional>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
-#include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
 
-#include "PROPOSAL/methods.h"
-#include "PROPOSAL/Logging.h"
-
-#define MUPAIR_PARAM_INTEGRAL_DEC(param)                                                                               \
-    class Mupair##param : public MupairProductionRhoIntegral                                                           \
-    {                                                                                                                  \
-    public:                                                                                                            \
-        Mupair##param(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);                           \
-        Mupair##param(const Mupair##param&);                                                                           \
-        virtual ~Mupair##param();                                                                                      \
-                                                                                                                       \
-        virtual Parametrization* clone() const { return new Mupair##param(*this); }                                    \
-        static MupairProduction* create(const ParticleDef& particle_def,                                               \
-                                       std::shared_ptr<const Medium> medium,                                           \
-                                       double multiplier)                                                              \
-        {                                                                                                              \
-            return new Mupair##param(particle_def, medium, multiplier);                                                \
-        }                                                                                                              \
-                                                                                                                       \
-        double FunctionToIntegral(double energy, double v, double r);                                                  \
-                                                                                                                       \
-        const std::string& GetName() const { return name_; }                                                           \
-                                                                                                                       \
-    protected:                                                                                                         \
-        static const std::string name_;                                                                                \
+#define MUPAIR_PARAM_INTEGRAL_DEC(param)                                       \
+    struct Mupair##param : public MupairProductionRhoIntegral {                \
+        Mupair##param();                                                       \
+        using base_param_t = MupairProduction;                                 \
+                                                                               \
+        double FunctionToIntegral(const ParticleDef&, const Component&,        \
+            double energy, double v, double r);                                \
     };
-
 
 namespace PROPOSAL {
 
-class Interpolant;
-
-class MupairProduction : public Parametrization
-{
-public:
-    MupairProduction(const ParticleDef&, std::shared_ptr<const Medium>, double multiplier);
-    MupairProduction(const MupairProduction&);
-    virtual ~MupairProduction();
-
-    virtual Parametrization* clone() const = 0;
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    // ----------------------------------------------------------------------------
-    /// @brief This is the calculation of the dSigma/dv
-    // ----------------------------------------------------------------------------
-    virtual InteractionType GetInteractionType() const final {return InteractionType::MuPair;}
-    virtual double DifferentialCrossSection(double energy, double v) = 0;
-    virtual double FunctionToIntegral(double energy, double v, double rho) = 0;
-    virtual double Calculaterho(double energy, double v, double rnd1, double rnd2);
-
-    virtual KinematicLimits GetKinematicLimits(double energy);
+class MupairProduction : public Parametrization {
 
 protected:
-    bool compare(const Parametrization&) const;
     Integral drho_integral_;
-};
 
-// ------------------------------------------------------------------------- //
-// Differentiate between rho integration & interpolation
-// ------------------------------------------------------------------------- //
-
-class MupairProductionRhoIntegral : public MupairProduction
-{
 public:
-    MupairProductionRhoIntegral(const ParticleDef&,
-                               std::shared_ptr<const Medium>,
-                               double multiplier);
-    MupairProductionRhoIntegral(const MupairProductionRhoIntegral&);
-    virtual ~MupairProductionRhoIntegral();
+    MupairProduction();
+    virtual ~MupairProduction() = default;
+    using only_stochastic = std::false_type;
+    using component_wise = std::true_type;
 
-    Parametrization* clone() const = 0;
+    double Calculaterho(
+        const ParticleDef&, const Component&, double, double, double, double);
 
-    virtual double DifferentialCrossSection(double energy, double v);
+    virtual double FunctionToIntegral(
+        const ParticleDef&, const Component&, double energy, double v, double r)
+        = 0;
 
-    // ----------------------------------------------------------------------------
-    /// @brief This is the calculation of the d2Sigma/dvdRo - interface to Integral
-    ///
-    // ----------------------------------------------------------------------------
-
-    virtual size_t GetHash() const;
-
-private:
-    bool compare(const Parametrization&) const;
-    //virtual void print(std::ostream&) const;
-
-    Integral integral_;
+    tuple<double, double> GetKinematicLimits(
+        const ParticleDef&, const Component&, double);
 };
 
-/******************************************************************************
- *                     Declare Integral Parametrizations                      *
- ******************************************************************************/
+class MupairProductionRhoIntegral : public MupairProduction {
+    Integral integral_;
+
+public:
+    MupairProductionRhoIntegral();
+    ~MupairProductionRhoIntegral() = default;
+
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double);
+};
 
 MUPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
 

@@ -1,6 +1,6 @@
 
-#include <cmath>
 #include <cassert>
+#include <cmath>
 #include <functional>
 
 #include "PROPOSAL/math/Interpolant.h"
@@ -17,9 +17,6 @@
 
 using namespace PROPOSAL;
 using Helper::InitializeInterpolation;
-/******************************************************************************
- *                              PropagationUtility Integral                              *
- ******************************************************************************/
 
 UtilityInterpolant::UtilityInterpolant(
     std::function<double(double)> func, double lower_lim)
@@ -31,43 +28,46 @@ UtilityInterpolant::UtilityInterpolant(
 void UtilityInterpolant::BuildTables(std::string name, size_t hash,
     Interpolant1DBuilder::Definition interpol_def)
 {
+    auto utility_func = [&](double energy) {
+        return UtilityIntegral::Calculate(energy, lower_lim);
+    };
+    interpol_def.function1d = utility_func;
     interpol_def.xmin = lower_lim;
-    Interpolant1DBuilder interpolant_builder(interpol_def);
+    auto builder = make_unique<Interpolant1DBuilder>(interpol_def);
     interpolant_ = InitializeInterpolation(
-        name, interpolant_builder, hash, InterpolationDef());
+        name, std::move(builder), hash, InterpolationDef());
 }
 
-double UtilityInterpolant::Calculate(
-    double energy_initial, double energy_final, double rnd)
+double UtilityInterpolant::Calculate(double energy_initial, double energy_final)
 {
-    (void)rnd;
-    std::cout << "E_i, E_f: " << energy_initial << ", " << energy_final << std::endl; //DEBUG
     assert(energy_initial >= energy_final);
     assert(energy_final >= lower_lim);
 
-    upper_limit = std::make_pair(
-        interpolant_->Interpolate(energy_initial), energy_initial);
-
     if (energy_initial - energy_final < energy_initial * IPREC)
-        return FunctionToIntegral((energy_initial+energy_initial)/2) * (energy_final - energy_initial);
+        return FunctionToIntegral((energy_initial + energy_initial) / 2)
+            * (energy_final - energy_initial);
 
-    return upper_limit.first - interpolant_->Interpolate(energy_final);
+    auto integral_upper_limit = interpolant_->Interpolate(energy_initial);
+    auto integral_lower_limit = interpolant_->Interpolate(energy_final);
+
+    return integral_upper_limit - integral_lower_limit;
 }
 
 // ------------------------------------------------------------------------- //
-double UtilityInterpolant::GetUpperLimit(double energy_initial, double rnd)
+double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
 {
     assert(rnd >= 0);
-    if (energy_initial != upper_limit.second)
-        Calculate(energy_initial, lower_lim, rnd);
 
-    auto lower_limit = interpolant_->FindLimit(upper_limit.first - rnd);
+    auto integrated_to_upper = interpolant_->Interpolate(upper_limit);
+    auto lower_limit = interpolant_->FindLimit(integrated_to_upper - rnd);
 
-    if (energy_initial - lower_limit > energy_initial * IPREC)
+    assert(integrated_to_upper > rnd); // searched Energy is below lower_lim
+                                       // return lower_lim as a lower limit
+
+    if (upper_limit - lower_limit > upper_limit * IPREC)
         return lower_limit;
 
-    auto initial_step
-        = energy_initial + 0.5 * rnd / FunctionToIntegral(energy_initial);
+    auto step = upper_limit + 0.5 * rnd / FunctionToIntegral(upper_limit);
 
-    return energy_initial + rnd / FunctionToIntegral(initial_step);
+    return upper_limit + rnd / FunctionToIntegral(step);
 }

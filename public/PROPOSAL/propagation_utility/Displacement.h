@@ -12,64 +12,70 @@ using std::string;
 
 namespace PROPOSAL {
 
-class Displacement {
-    CrossSectionList cross;
+struct Displacement {
+    Displacement() = default;
+    virtual ~Displacement() = default;
+
+    template <typename Cross> double FunctionToIntegral(Cross&&, double);
+    virtual double SolveTrackIntegral(double, double) = 0;
+    virtual double UpperLimitTrackIntegral(double, double) = 0;
 
 protected:
-    double lower_lim;
-
-public:
-    Displacement(const CrossSectionList&);
-    virtual ~Displacement() = default;
-    double FunctionToIntegral(double);
-    virtual double SolveTrackIntegral(double, double, double) = 0;
-    virtual double UpperLimitTrackIntegral(double, double) = 0;
+    template <typename Cross> size_t GetHash(Cross&&) const;
+    template <typename Cross> double GetLowerLim(Cross&&) const;
 };
 
 extern Interpolant1DBuilder::Definition displacement_interpol_def;
 
-template <class T> class DisplacementBuilder : public Displacement {
-    T integral;
+template <class T, class Cross>
+class DisplacementBuilder : public Displacement {
+    Cross crosssection_list;
+    T disp_integral;
+
+protected:
+    T BuildTrackIntegral();
 
 public:
-    DisplacementBuilder(const CrossSectionList&);
-    double SolveTrackIntegral(double, double, double) override;
+    DisplacementBuilder(Cross&&);
+    double SolveTrackIntegral(double, double) override;
     double UpperLimitTrackIntegral(double, double) override;
 };
 
-template <class T>
-DisplacementBuilder<T>::DisplacementBuilder(const CrossSectionList& cross)
-    : Displacement(cross)
-    , integral(std::bind(&Displacement::FunctionToIntegral, this,
-                   std::placeholders::_1),
-          lower_lim)
+template <class T, class Cross>
+DisplacementBuilder<T, Cross>::DisplacementBuilder(Cross&& cross)
+    : crosssection_list(cross)
+    , disp_integral(BuildTrackIntegral())
 {
+    if (cross.size() < 1)
+        throw std::invalid_argument("at least one crosssection is required.");
+}
 
+template <class T, class Cross>
+T DisplacementBuilder<T, Cross>::BuildTrackIntegral()
+{
+    auto dedx = [this](double energy) {
+        return FunctionToIntegral(crosssection_list, energy);
+    };
+    T integral(dedx, GetLowerLim(crosssection_list));
     if (typeid(T) == typeid(UtilityInterpolant)) {
-        size_t hash_digest{ 0 };
-        for (const auto& c : cross)
-            hash_combine(hash_digest, c->GetHash());
-        displacement_interpol_def.function1d = [this](double energy) {
-            return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                energy, lower_lim, 0);
-        };
-        integral.BuildTables(
-            "displacement", hash_digest, displacement_interpol_def);
-    }
+        auto hash = GetHash(crosssection_list);
+        integral.BuildTables("displacement", hash, displacement_interpol_def);
+    };
+    return integral;
 }
 
-template <class T>
-double DisplacementBuilder<T>::SolveTrackIntegral(
-    double upper_limit, double lower_limit, double sum)
+template <class T, class Cross>
+double DisplacementBuilder<T, Cross>::SolveTrackIntegral(
+    double upper_lim, double lower_lim)
 {
-    return integral.Calculate(upper_limit, lower_limit, sum);
+    return disp_integral->Calculate(upper_lim, lower_lim);
 }
 
-template <class T>
-double DisplacementBuilder<T>::UpperLimitTrackIntegral(
+template <class T, class Cross>
+double DisplacementBuilder<T, Cross>::UpperLimitTrackIntegral(
     double lower_limit, double sum)
 {
-    return integral.GetUpperLimit(lower_limit, sum);
+    return disp_integral->GetUpperLimit(lower_limit, sum);
 }
 
 } // namespace PROPOSAL

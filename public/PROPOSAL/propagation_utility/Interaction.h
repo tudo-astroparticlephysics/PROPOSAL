@@ -56,11 +56,7 @@ public:
         auto rndiMin = integral.Calculate(initial_energy, lower_lim, rndi);
         if (rndi >= rndiMin)
             return lower_lim;
-        std::cout << "E_i: " << initial_energy;
-        std::cout << "rndi: " << rndi << std::endl;
-        auto aux = integral.GetUpperLimit(initial_energy, rndi);
-        std::cout << " ... E_f: " << aux << std::endl;
-        return aux;
+        return integral.GetUpperLimit(initial_energy, rndi);
     }
 
 

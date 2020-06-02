@@ -26,109 +26,53 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include <vector>
-#include <memory>
-#include <utility>
-
-/* #include "PROPOSAL/particle/Particle.h" */
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include <array>
+#include <functional>
+#include <memory>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+using std::array;
+using std::decay;
+using std::enable_if;
+using std::forward;
+using std::function;
+using std::is_base_of;
+using std::pair;
+using std::remove_reference;
+using std::shared_ptr;
+using std::unique_ptr;
+using std::unordered_map;
+using std::vector;
+using std::placeholders::_1;
+using std::placeholders::_2;
 
 namespace PROPOSAL {
 
-using Function = std::function<double(double)>;
-class DynamicData;
+using Components::Component;
 
-namespace Components {
-class Component;
-}
+using rates_t = unordered_map<const Component*, double>;
 
-class Parametrization;
-enum class InteractionType;
+template <class P, class M> struct CrossSection {
+    CrossSection() = default;
+    virtual ~CrossSection() = default;
 
-
-class CrossSection
-{
-public:
-    CrossSection(const Parametrization&, std::shared_ptr<const EnergyCutSettings>);
-    CrossSection(const CrossSection&);
-    CrossSection();
-    virtual ~CrossSection();
-
-    bool operator==(const CrossSection& cross_section) const;
-    bool operator!=(const CrossSection& cross_section) const;
-
-    //virtual CrossSection* clone() const = 0;
-
-    friend std::ostream& operator<<(std::ostream&, CrossSection const&);
-
-    // ----------------------------------------------------------------- //
-    // Public methods
-    // ----------------------------------------------------------------- //
-
-    virtual double CalculatedEdx(double energy)                                     = 0;
-    virtual double CalculatedE2dx(double energy)                                    = 0;
-    virtual double CalculatedNdx(double energy)                                     = 0;
-    virtual double CalculatedNdx(double energy, double rnd)                         = 0;
-    virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2) = 0;
-
-    virtual double GetEnergyCut(double energy);
-
-    // CalculateProducedParticles Return values:
-    // First Parameter: List of produced particles by stochastic interaction (default: no particles, e.g. empty list)
-    // Second parameter: Is the interaction a fatal interaction (e.g. will the initial particle vanish after interaction?)
-    virtual std::pair<std::vector<DynamicData>, bool> CalculateProducedParticles(
-            double energy, double energy_loss, const Vector3D& initial_direction){
-        (void)energy; (void)energy_loss; (void)initial_direction; return std::make_pair(std::vector<DynamicData>(), false);
-    }
-
-    virtual std::pair<double, double> StochasticDeflection(double energy, double energy_loss);
-
-    virtual double CalculateCumulativeCrossSection(double energy, int component, double v) = 0;
-
-    // ----------------------------------------------------------------- //
-    // Getter
-    // ----------------------------------------------------------------- //
-
-    int GetTypeId() const { return static_cast<int>(type_id_); }
-    virtual Parametrization& GetParametrization() const { return *parametrization_; }
-
-    virtual size_t GetHash() const;
-
-protected:
-
-    virtual bool compare(const CrossSection&) const = 0;
-
-    // ----------------------------------------------------------------- //
-    // Protected methods
-    // ----------------------------------------------------------------- //
-
-    virtual double CalculateStochasticLoss(double energy, double rnd1) = 0;
-
-    // ----------------------------------------------------------------- //
-    // Protected member
-    // ----------------------------------------------------------------- //
-
-    Parametrization* parametrization_;
-
-    std::vector<double> prob_for_component_; //!< probability for each medium component to
-                                             //!< interact with the particle (formerly h_)
-    double sum_of_rates_;
-
-    const std::vector<Components::Component>& components_;
-
-    static const std::vector<Components::Component> components_empty_;
-
-    double rnd_; //!< This random number will be stored in CalculateDNdx to avoid calculate dNdx a second time in
-                 //! ClaculateSochasticLoss when it is already done
-
-    std::shared_ptr<const EnergyCutSettings> cuts_;
-
-    InteractionType type_id_;
+    virtual double CalculatedEdx(double) = 0;
+    virtual double CalculatedE2dx(double) = 0;
+    virtual rates_t CalculatedNdx(double) = 0;
+    virtual double CalculateStochasticLoss(const Component&, double, double) = 0;
 };
-    using CrossSectionList = std::vector<std::shared_ptr<CrossSection>>;
+
+template <typename P, typename M>
+using crosssection_t = CrossSection<typename decay<P>::type, typename decay<M>::type>;
+
+template <typename P, typename M>
+using crosssection_list_t = vector<shared_ptr<crosssection_t<P, M>>>;
 
 } // namespace PROPOSAL
