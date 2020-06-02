@@ -41,7 +41,7 @@ using std::unordered_map;
 
 namespace PROPOSAL {
 template <typename Param, typename P, typename M>
-class CrossSectionIntegral : public CrossSection<P, M> {
+class CrossSectionIntegral : public crosssection_t<P, M> {
     Integral integral;
     Param param;
     P p_def;
@@ -62,7 +62,7 @@ class CrossSectionIntegral : public CrossSection<P, M> {
 public:
     CrossSectionIntegral(Param&& param, P&& p_def, M&& medium,
         shared_ptr<const EnergyCutSettings> cut)
-        : CrossSection<P, M>()
+        : CrossSection<typename decay<P>::type, typename decay<M>::type>()
         , param(param)
         , p_def(p_def)
         , medium(medium)

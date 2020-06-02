@@ -44,8 +44,8 @@ namespace PROPOSAL {
 
 double transform_relativ_loss(double v_cut, double v_max, double v);
 
-template <class Param, class P, class M>
-class CrossSectionInterpolant : public CrossSection<P, M> {
+template <typename Param, typename P, typename M>
+class CrossSectionInterpolant : public crosssection_t<P, M> {
     Param param;
     P p_def;
     M medium;
@@ -68,7 +68,7 @@ protected:
 public:
     CrossSectionInterpolant(Param&& param, P&& p_def, M&& medium,
         shared_ptr<const EnergyCutSettings> cut, const InterpolationDef& def)
-        : CrossSection<P, M>()
+        : CrossSection<typename decay<P>::type, typename decay<M>::type>()
         , param(param)   // only for back transformation needed
         , p_def(p_def)   // TODO: Maximilian Sackel
         , medium(medium) // 2 Jun. 2020
@@ -185,8 +185,8 @@ unordered_map<const Component*, dndx_func_t> build_dndx_functions(Param&& param,
 {
     Integral integral;
     unordered_map<const Component*, dndx_func_t> dndx_functions;
-    auto dndx_func = [integral, &param, &p_def, &medium, &cut](
-                         double energy, double v) {
+    auto dndx_func = [&param, &p_def, &medium, &cut](double energy, double v) {
+        Integral integral;
         auto lim = param.GetKinematicLimits(p_def, medium, energy);
         auto v_cut = cut.GetCut(lim, energy);
         v = transform_relativ_loss(v_cut, get<Parametrization::V_MAX>(lim), v);

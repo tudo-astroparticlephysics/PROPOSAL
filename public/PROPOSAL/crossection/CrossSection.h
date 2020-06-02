@@ -66,18 +66,13 @@ template <class P, class M> struct CrossSection {
     virtual double CalculatedEdx(double) = 0;
     virtual double CalculatedE2dx(double) = 0;
     virtual rates_t CalculatedNdx(double) = 0;
-    virtual double CalculateStochasticLoss(const Component&, double, double)
-        = 0;
+    virtual double CalculateStochasticLoss(const Component&, double, double) = 0;
 };
 
-/* template <typename P, typename M> */
-/* CrossSection<P, M>::CrossSection(P p_def, M medium, EnergyCutSettings* cut) */
-/*     : p_def(p_def) */
-/*     , medium(medium) */
-/*     , cut(cut) */
-/* { */
-/* } */
+template <typename P, typename M>
+using crosssection_t = CrossSection<typename decay<P>::type, typename decay<M>::type>;
 
 template <typename P, typename M>
-using CrossSectionList = vector<shared_ptr<CrossSection<P, M>>>;
+using crosssection_list_t = vector<shared_ptr<crosssection_t<P, M>>>;
+
 } // namespace PROPOSAL
