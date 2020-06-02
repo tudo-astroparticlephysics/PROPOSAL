@@ -10,25 +10,18 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include <unordered_map>
 
-using std::make_shared;
 using std::shared_ptr;
 using std::unique_ptr;
 using std::vector;
 
 namespace PROPOSAL {
-template <typename Param>
-shared_ptr<CrossSection> make_crosssection(
-    Param&& param, shared_ptr<const EnergyCutSettings> cuts, bool interpolate)
-{
-    if (interpolate)
-        return make_shared<CrossSectionInterpolant<Param>>(
-            param, cuts, InterpolationDef());
-    return make_shared<CrossSectionIntegral<Param>>(param, cuts);
-}
 
-vector<shared_ptr<CrossSection>> BuildEMinusStdCrossSections(
-    std::shared_ptr<EnergyCutSettings> cut) noexcept
+template <typename M>
+vector<shared_ptr<CrossSection<EMinusDef, M>>> BuildEMinusStdCrossSections(
+    M&& medium, std::shared_ptr<EnergyCutSettings> cut) noexcept
 {
+    EMinusDef e;
+
     BremsKelnerKokoulinPetrukhin brems{ false };
     EpairKelnerKokoulinPetrukhin epair{ false };
     IonizBetheBlochRossi ioniz{ EnergyCutSettings(*cut) };
@@ -36,11 +29,11 @@ vector<shared_ptr<CrossSection>> BuildEMinusStdCrossSections(
         make_unique<ShadowButkevichMikhailov>()
     };
 
-    vector<shared_ptr<CrossSection>> cross_list;
-    cross_list.emplace_back(make_crosssection(brems, cut, false));
-    cross_list.emplace_back(make_crosssection(epair, cut, false));
-    cross_list.emplace_back(make_crosssection(ioniz, cut, false));
-    cross_list.emplace_back(make_crosssection(photo, cut, false));
+    vector<shared_ptr<CrossSection<EMinusDef, M>>> cross_list;
+    cross_list.emplace_back(make_crosssection(brems, e, medium, cut, false));
+    cross_list.emplace_back(make_crosssection(epair, e, medium, cut, false));
+    cross_list.emplace_back(make_crosssection(ioniz, e, medium, cut, false));
+    cross_list.emplace_back(make_crosssection(photo, e, medium, cut, false));
 
     return cross_list;
 }
@@ -96,25 +89,25 @@ vector<shared_ptr<CrossSection>> BuildEMinusStdCrossSections(
 /*         { brems_inter, epair_inter, ioniz_inter, photo_inter }); */
 /* } */
 
-using CrossSectionListBuilder
-    = vector<shared_ptr<CrossSection>> (*)(std::shared_ptr<EnergyCutSettings>);
+/* using CrossSectionListBuilder */
+/*     = vector<shared_ptr<CrossSection>> (*)(std::shared_ptr<EnergyCutSettings>); */
 
-std::unordered_map<ParticleType, CrossSectionListBuilder>
-    BuilderStdCrossSections{
-        { ParticleType::EMinus, BuildEMinusStdCrossSections },
-        /* { ParticleType::MuMinus, BuildMuMinusStdCrossSections }, */
-        /* { ParticleType::TauMinus, BuildTauMinusStdCrossSections } */
-    };
+/* std::unordered_map<ParticleType, CrossSectionListBuilder> */
+/*     BuilderStdCrossSections{ */
+/*         { ParticleType::EMinus, BuildEMinusStdCrossSections }, */
+/*         /1* { ParticleType::MuMinus, BuildMuMinusStdCrossSections }, *1/ */
+/*         /1* { ParticleType::TauMinus, BuildTauMinusStdCrossSections } *1/ */
+/*     }; */
 
-vector<shared_ptr<CrossSection>> GetStdCrossSections(
-    std::shared_ptr<EnergyCutSettings> cut, const ParticleDef& p_def)
-{
-    auto search = BuilderStdCrossSections.find(
-        static_cast<ParticleType>(p_def.particle_type));
-    if (search != BuilderStdCrossSections.end())
-        return (*search->second)(cut);
+/* vector<shared_ptr<CrossSection>> GetStdCrossSections( */
+/*     std::shared_ptr<EnergyCutSettings> cut, const ParticleDef& p_def) */
+/* { */
+/*     auto search = BuilderStdCrossSections.find( */
+/*         static_cast<ParticleType>(p_def.particle_type)); */
+/*     if (search != BuilderStdCrossSections.end()) */
+/*         return (*search->second)(cut); */
 
-    throw std::invalid_argument(
-        "Partilce type has no standard cross section builder");
-}
+/*     throw std::invalid_argument( */
+/*         "Partilce type has no standard cross section builder"); */
+/* } */
 }

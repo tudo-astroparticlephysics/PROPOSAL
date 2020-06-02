@@ -34,6 +34,9 @@
 #include <memory>
 
 using std::shared_ptr;
+using std::get;
+using std::max;
+using std::min;
 
 namespace PROPOSAL {
 
@@ -59,8 +62,16 @@ public:
 
     bool operator==(const EnergyCutSettings& energyCutSettings) const noexcept;
 
-    inline double GetCut(double energy) const noexcept;
-    inline double GetCut(tuple<double, double>& lim, double energy) const noexcept;
+    inline double GetCut(double energy) const
+    {
+        assert(energy > 0);
+        return std::min(ecut_ / energy, vcut_);
+    }
+    inline double GetCut(const tuple<double, double>& lim, double energy) const
+    {
+        return min(max(get<Parametrization::V_MIN>(lim), GetCut(energy)),
+            get<Parametrization::V_MAX>(lim));
+    }
     size_t GetHash() const noexcept;
     double GetEcut() const noexcept { return ecut_; }
     double GetVcut() const noexcept { return vcut_; }

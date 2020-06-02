@@ -42,8 +42,7 @@ protected:
 
 public:
     UtilityIntegral(std::function<double(double)>, double);
-    void BuildTables(
-        const std::string, size_t, Interpolant1DBuilder::Definition);
+    void BuildTables(const std::string, size_t, Interpolant1DBuilder::Definition);
 
     virtual double Calculate(double, double);
     virtual double GetUpperLimit(double, double);

@@ -59,27 +59,25 @@ using Components::Component;
 
 using rates_t = unordered_map<const Component*, double>;
 
-class CrossSection {
-protected:
-    shared_ptr<const EnergyCutSettings> cuts_;
-
-public:
-    CrossSection(shared_ptr<const EnergyCutSettings>);
+template <class P, class M> struct CrossSection {
+    CrossSection() = default;
     virtual ~CrossSection() = default;
 
-    virtual double CalculatedEdx(const ParticleDef&, const Medium&, double) = 0;
-    virtual double CalculatedE2dx(const ParticleDef&, const Medium&, double)
+    virtual double CalculatedEdx(double) = 0;
+    virtual double CalculatedE2dx(double) = 0;
+    virtual rates_t CalculatedNdx(double) = 0;
+    virtual double CalculateStochasticLoss(const Component&, double, double)
         = 0;
-    virtual rates_t CalculatedNdx(const ParticleDef&, const Medium&, double)
-        = 0;
-    virtual double CalculateStochasticLoss(
-        const ParticleDef&, const Medium&, const Component&, double, double)
-        = 0;
-
-    virtual size_t GetHash(const ParticleDef&, const Medium&) const = 0;
-    virtual size_t GetHash(const ParticleDef&, const Component&) const = 0;
-    virtual double GetLowerEnergyLim(const ParticleDef&) const = 0;
 };
 
-using CrossSectionList = vector<shared_ptr<CrossSection>>;
+/* template <typename P, typename M> */
+/* CrossSection<P, M>::CrossSection(P p_def, M medium, EnergyCutSettings* cut) */
+/*     : p_def(p_def) */
+/*     , medium(medium) */
+/*     , cut(cut) */
+/* { */
+/* } */
+
+template <typename P, typename M>
+using CrossSectionList = vector<shared_ptr<CrossSection<P, M>>>;
 } // namespace PROPOSAL

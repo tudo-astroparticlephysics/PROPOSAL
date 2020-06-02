@@ -12,77 +12,70 @@ using std::string;
 
 namespace PROPOSAL {
 
-class Displacement {
-    CrossSectionList cross;
-
-public:
-    Displacement(const CrossSectionList&);
+struct Displacement {
+    Displacement() = default;
     virtual ~Displacement() = default;
 
-    double FunctionToIntegral(const ParticleDef&, const Medium&, double);
-    virtual double SolveTrackIntegral( const ParticleDef&, const Medium&, double, double) = 0;
-    virtual double UpperLimitTrackIntegral( const ParticleDef&, const Medium&, double, double) = 0;
+    template <typename Cross> double FunctionToIntegral(Cross&&, double);
+    virtual double SolveTrackIntegral(double, double) = 0;
+    virtual double UpperLimitTrackIntegral(double, double) = 0;
 
-    size_t GetHash(const ParticleDef&, const Medium&) const;
-    double GetLowerLim(const ParticleDef&) const;
+protected:
+    template <typename Cross> size_t GetHash(Cross&&) const;
+    template <typename Cross> double GetLowerLim(Cross&&) const;
 };
 
 extern Interpolant1DBuilder::Definition displacement_interpol_def;
 
-template <class T> class DisplacementBuilder : public Displacement {
-    unordered_map<size_t, T> integral;
-    T BuildTrackIntegral(const ParticleDef&, const Medium&);
+template <class T, class Cross>
+class DisplacementBuilder : public Displacement {
+    Cross crosssection_list;
+    T disp_integral;
+
+protected:
+    T BuildTrackIntegral();
+
 public:
-    DisplacementBuilder(const CrossSectionList&);
-    double SolveTrackIntegral(
-        const ParticleDef&, const Medium&, double, double) override;
-    double UpperLimitTrackIntegral(
-        const ParticleDef&, const Medium&, double, double) override;
+    DisplacementBuilder(Cross&&);
+    double SolveTrackIntegral(double, double) override;
+    double UpperLimitTrackIntegral(double, double) override;
 };
 
-template <class T>
-DisplacementBuilder<T>::DisplacementBuilder(const CrossSectionList& cross)
-    : Displacement(cross)
+template <class T, class Cross>
+DisplacementBuilder<T, Cross>::DisplacementBuilder(Cross&& cross)
+    : crosssection_list(cross)
+    , disp_integral(BuildTrackIntegral())
 {
+    if (cross.size() < 1)
+        throw std::invalid_argument("at least one crosssection is required.");
 }
 
-template <class T>
-T DisplacementBuilder<T>::BuildTrackIntegral(
-    const ParticleDef& p_def, const Medium& medium)
+template <class T, class Cross>
+T DisplacementBuilder<T, Cross>::BuildTrackIntegral()
 {
-    auto dedx = [this, &p_def, &medium](double energy) {
-        return FunctionToIntegral(p_def, medium, energy);
+    auto dedx = [this](double energy) {
+        return FunctionToIntegral(crosssection_list, energy);
     };
-    T integral(dedx, p_def, medium);
+    T integral(dedx, GetLowerLim(crosssection_list));
     if (typeid(T) == typeid(UtilityInterpolant)) {
-        auto hash = GetHash(p_def, medium);
+        auto hash = GetHash(crosssection_list);
         integral.BuildTables("displacement", hash, displacement_interpol_def);
     };
     return integral;
 }
 
-template <class T>
-double DisplacementBuilder<T>::SolveTrackIntegral(const ParticleDef& p_def,
-    const Medium& medium, double upper_lim, double lower_lim)
+template <class T, class Cross>
+double DisplacementBuilder<T, Cross>::SolveTrackIntegral(
+    double upper_lim, double lower_lim)
 {
-    auto hash = GetHash(p_def, medium);
-    auto search = integral.find(hash);
-    if (search != integral.end())
-        return search->second->Calculate(upper_lim, lower_lim);
-    integral[hash] = BuildTrackIntegral(p_def, medium);
-    return integral[hash]->Calculate(upper_lim, lower_lim);
+    return disp_integral->Calculate(upper_lim, lower_lim);
 }
 
-template <class T>
-double DisplacementBuilder<T>::UpperLimitTrackIntegral(const ParticleDef& p_def,
-    const Medium& medium, double lower_limit, double sum)
+template <class T, class Cross>
+double DisplacementBuilder<T, Cross>::UpperLimitTrackIntegral(
+    double lower_limit, double sum)
 {
-    auto hash = GetHash(p_def, medium);
-    auto search = integral.find(hash);
-    if (search != integral.end())
-        return search->second->GetUpperLimit(lower_limit, sum);
-    integral[hash] = BuildTrackIntegral(p_def, medium);
-    return integral[hash]->GetUpperLimit(lower_limit, sum);
+    return disp_integral->GetUpperLimit(lower_limit, sum);
 }
 
 } // namespace PROPOSAL

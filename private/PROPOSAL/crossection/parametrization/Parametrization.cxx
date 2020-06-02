@@ -11,6 +11,12 @@ using namespace PROPOSAL;
 using std::make_tuple;
 using std::string;
 
+Parametrization::Parametrization(InteractionType interaction_type, const string& name)
+    :interaction_type(interaction_type), name(name)
+{
+}
+
+
 double Parametrization::DifferentialCrossSection(
     const ParticleDef&, const Component&, double, double)
 {

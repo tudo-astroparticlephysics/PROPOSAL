@@ -71,18 +71,6 @@ bool EnergyCutSettings::operator==(const EnergyCutSettings& cut) const noexcept
     return true;
 }
 
-inline double EnergyCutSettings::GetCut(double energy) const noexcept
-{
-    assert(energy > 0);
-    return std::min(ecut_ / energy, vcut_);
-}
-
-inline auto EnergyCutSettings::GetCut(
-    tuple<double, double>& lim, double energy) const noexcept -> double
-{
-    return min(max(get<Parametrization::V_MIN>(lim), GetCut(energy)),
-        get<Parametrization::V_MAX>(lim));
-}
 
 size_t EnergyCutSettings::GetHash() const noexcept
 {
