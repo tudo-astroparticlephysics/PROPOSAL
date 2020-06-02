@@ -93,6 +93,6 @@ extern const double CMON; // monopole charge (in units of e) = 1/(2*ALPHA)
 extern const double MSMP;  // Stable massive particle mass (MeV)
 extern const double MSTAU; // stau mass (MeV)
 
-extern const double STABLE_PARTICLE; // lifetime of stable particle, -1 because of history
+extern const double STABLE_PARTICLE; // lifetime of stable particle
 
 } // namespace PROPOSAL

@@ -17,7 +17,6 @@ MupairProductionFactory::MupairProductionFactory()
     , string_enum_()
 {
     Register("mupairkelnerkokoulinpetrukhin", KelnerKokoulinPetrukhin, &MupairKelnerKokoulinPetrukhin::create);
-    Register("none", None, nullptr);
 }
 
 MupairProductionFactory::~MupairProductionFactory()

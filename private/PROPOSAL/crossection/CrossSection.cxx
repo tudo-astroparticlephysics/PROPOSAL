@@ -112,7 +112,7 @@ std::pair<double, double> CrossSection::StochasticDeflection(
 
 size_t CrossSection::GetHash() const{
     std::size_t hash = 0;
-    hash_combine(hash, GetParametrization().GetHash(), GetParametrization().GetMultiplier());
+    hash_combine(hash, GetParametrization().GetHash(), GetParametrization().GetMultiplier(), cuts_->GetHash());
     return hash;
 }
 

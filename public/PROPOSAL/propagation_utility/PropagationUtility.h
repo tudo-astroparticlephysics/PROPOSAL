@@ -42,31 +42,34 @@
 using std::tuple;
 namespace PROPOSAL {
 
-class Utility {
+class PropagationUtility {
 public:
-    struct Definition {
-        CrossSectionList cross;              // copy is expensive
-        std::shared_ptr<Scattering> scattering;      // no scattering
-        std::shared_ptr<InterpolationDef> inter_def; // integration used
+    struct Collection {
 
-        Definition(CrossSectionList, const ParticleDef&,
-            std::shared_ptr<Scattering>, std::shared_ptr<InterpolationDef>);
-        ~Definition();
+        bool operator==(const Collection& lhs);
 
-        std::unique_ptr<Displacement> displacement_calc = nullptr;
-        std::unique_ptr<Interaction> interaction_calc = nullptr;
-        std::unique_ptr<Decay> decay_calc = nullptr;
-        std::unique_ptr<ContRand> cont_rand = nullptr;
-        std::unique_ptr<Time> time_calc = nullptr;
+        //obligatory pointers
+        std::shared_ptr<Interaction> interaction_calc = nullptr;
+        std::shared_ptr<Displacement> displacement_calc = nullptr;
+        std::shared_ptr<Time> time_calc = nullptr;
+
+        //optional pointers
+        std::shared_ptr<Scattering> scattering = nullptr;
+        std::shared_ptr<Decay> decay_calc = nullptr;
+        std::shared_ptr<ContRand> cont_rand = nullptr;
     };
 
+    PropagationUtility(PropagationUtility::Collection collection);
+    //PropagationUtility(const PropagationUtility&);
+
     std::shared_ptr<CrossSection> TypeInteraction(
-        double, const std::array<double, 2>&);
+        double, std::function<double()>);
     double EnergyStochasticloss(
-         CrossSection&, double, const std::array<double, 2>&);
-    double EnergyDecay(double, double);
-    double EnergyInteraction(double, double);
-    double EnergyRandomize(double, double, double);
+         CrossSection&, double, std::function<double()>);
+    double EnergyDecay(double, std::function<double()>);
+    double EnergyInteraction(double, std::function<double()>);
+    double EnergyRandomize(double, double, std::function<double()>);
+    double EnergyDistance(double, double);
     double LengthContinuous(double, double, double);
     double TimeElapsed(double, double, double);
 
@@ -75,11 +78,9 @@ public:
     /* // displacement and the other is the actual direction. With a get method */
     /* // there could be a possible access with the position of the object stored */
     /* // in an enum. */
-    tuple<Vector3D, Vector3D> DirectionsScatter(double, double, double,
-        const Vector3D&, const Vector3D&, const std::array<double, 4>&);
+    tuple<Vector3D, Vector3D> DirectionsScatter(double, double, double, const Vector3D&, const std::array<double, 4>&);
     std::pair<double, double> DirectionDeflect(CrossSection& , double particle_energy, double loss_energy);
 
-private:
-    std::unique_ptr<Definition> utility_def;
+    Collection collection;
 };
 } // namespace PROPOSAL

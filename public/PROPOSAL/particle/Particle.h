@@ -102,6 +102,8 @@ public:
     void SetParentParticleEnergy(double parent_particle_energy) { parent_particle_energy_ = parent_particle_energy; }
     void SetTime(double time) { time_ = time; }
     void SetPropagatedDistance(double prop_dist) { propagated_distance_ = prop_dist; }
+    void SetType(InteractionType type) { type_ = static_cast<int>(type); }
+    void SetType(int type) { type_ = type; }
 
     // Getter
     int GetType() const { return type_; }

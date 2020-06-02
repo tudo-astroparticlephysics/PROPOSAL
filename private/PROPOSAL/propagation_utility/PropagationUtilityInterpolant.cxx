@@ -18,7 +18,7 @@
 using namespace PROPOSAL;
 using Helper::InitializeInterpolation;
 /******************************************************************************
- *                              Utility Integral                              *
+ *                              PropagationUtility Integral                              *
  ******************************************************************************/
 
 UtilityInterpolant::UtilityInterpolant(
@@ -41,7 +41,7 @@ double UtilityInterpolant::Calculate(
     double energy_initial, double energy_final, double rnd)
 {
     (void)rnd;
-
+    std::cout << "E_i, E_f: " << energy_initial << ", " << energy_final << std::endl; //DEBUG
     assert(energy_initial >= energy_final);
     assert(energy_final >= lower_lim);
 
@@ -63,7 +63,7 @@ double UtilityInterpolant::GetUpperLimit(double energy_initial, double rnd)
 
     auto lower_limit = interpolant_->FindLimit(upper_limit.first - rnd);
 
-    if (std::abs(energy_initial - lower_limit) > energy_initial * IPREC)
+    if (energy_initial - lower_limit > energy_initial * IPREC)
         return lower_limit;
 
     auto initial_step

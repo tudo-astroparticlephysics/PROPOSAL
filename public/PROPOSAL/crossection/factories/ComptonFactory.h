@@ -57,14 +57,13 @@ namespace PROPOSAL {
         enum Enum
         {
             Fail = 0,
-            None,
             KleinNishina
         };
 
         struct Definition
         {
             Definition()
-                    : parametrization(None)
+                    : parametrization(Fail)
                     , multiplier(1.0)
             {
             }

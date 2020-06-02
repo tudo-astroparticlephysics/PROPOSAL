@@ -83,17 +83,15 @@ private:
 
     void print(std::ostream&) const override {}
 
-    double CalculateTheta0(
-        double dr, double ei, double ef, const Vector3D& pos) override
+    double CalculateTheta0(double grammage, double ei, double ef) override
     {
-        double aux = integral.Calculate(ei, ef, 0.0)
-            * medium_->GetDensityDistribution().Evaluate(pos);
+        double aux = integral.Calculate(ei, ef, 0.0);
         double cutoff = 1;
-        double radiation_length = medium_->GetRadiationLength(pos);
+        double radiation_length = medium_->GetRadiationLength();
 
         aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_length)
             * std::abs(charge);
-        aux *= std::max(1 + 0.038 * std::log(dr / radiation_length), 0.0);
+        aux *= std::max(1 + 0.038 * std::log(grammage / radiation_length), 0.0);
 
         return std::min(aux, cutoff);
     }

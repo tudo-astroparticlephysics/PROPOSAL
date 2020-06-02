@@ -26,7 +26,7 @@
  ******************************************************************************/
 
 #pragma once
-#include "PROPOSAL/medium/density_distr/density_distr.h"
+#include "PROPOSAL/density_distr/density_distr.h"
 
 namespace PROPOSAL {
 
@@ -35,6 +35,7 @@ class Density_homogeneous : public Density_distr {
     Density_homogeneous();
     Density_homogeneous(const Density_homogeneous&);
     Density_homogeneous(double correction_factor);
+    Density_homogeneous(const nlohmann::json&);
 
     // ~Density_homogeneous(){};
 

@@ -17,10 +17,9 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
+Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double grammage,
                                                                  double ei,
                                                                  double ef,
-                                                                 const Vector3D& pos,
                                                                  const array<double, 4>& rnd) {
     (void)ef;
 
@@ -47,9 +46,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr,
     // Calculate Chi_c^2
     chiCSq_ =
         ((4. * PI * NA * ALPHA * ALPHA * HBAR * HBAR * SPEED * SPEED) *
-         (medium_->GetMassDensity() *
-          medium_->GetDensityDistribution().Evaluate(pos) *
-          dr) / beta_p_Sq) *
+         (grammage) / beta_p_Sq) *
         ZSq_A_average_;
 
     // Calculate B

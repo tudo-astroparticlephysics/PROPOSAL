@@ -12,7 +12,6 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
@@ -86,7 +85,6 @@ Medium::Medium(std::string name,
       radiationLength_(0),
       MM_(0),
       sumNucleons_(0),
-      dens_distr_(new Density_homogeneous(rho)),
       components_(components) {
     init();
 }
@@ -108,15 +106,12 @@ Medium::Medium(const Medium& medium)
       radiationLength_(medium.radiationLength_),
       MM_(medium.MM_),
       sumNucleons_(medium.sumNucleons_),
-      dens_distr_(medium.dens_distr_->clone()),
-        components_(medium.components_)
+      components_(medium.components_)
 {
 }
 
 // ------------------------------------------------------------------------- //
 Medium::~Medium() {
-
-    delete dens_distr_;
 }
 
 // ------------------------------------------------------------------------- //
@@ -143,7 +138,6 @@ void Medium::swap(Medium& medium) {
     swap(radiationLength_, medium.radiationLength_);
     swap(MM_, medium.MM_);
     swap(sumNucleons_, medium.sumNucleons_);
-    swap(dens_distr_, medium.dens_distr_);
 
     components_.swap(medium.components_);
 }
@@ -166,7 +160,6 @@ Medium& Medium::operator=(const Medium& medium) {
         radiationLength_ = medium.radiationLength_;
         MM_ = medium.MM_;
         sumNucleons_ = medium.sumNucleons_;
-        dens_distr_ = medium.dens_distr_->clone();
 
         components_ = medium.components_;
     }
@@ -207,8 +200,6 @@ bool Medium::operator==(const Medium& medium) const {
     else if (MM_ != medium.MM_)
         return false;
     else if (sumNucleons_ != medium.sumNucleons_)
-        return false;
-    else if (*dens_distr_ != *medium.dens_distr_)
         return false;
     else {
         bool Return = true;
@@ -268,17 +259,13 @@ void Medium::init() {
     }
 
     radiationLength_ = aux2 / aux1;
-    radiationLength_ /= massDensity_;
+    //radiationLength_ /= massDensity_; //New radiation length is in grammage
 }
 
 // ------------------------------------------------------------------------- //
 // Getter
 // ------------------------------------------------------------------------- //
 
-double Medium::GetRadiationLength(const Vector3D& position) const
-{
-    return radiationLength_ / dens_distr_->Evaluate(position);
-}
 
 size_t Medium::GetHash() const noexcept
 {
@@ -327,10 +314,6 @@ void Medium::SetMM(double MM) { MM_ = MM; }
 
 void Medium::SetSumNucleons(double sumNucleons) { sumNucleons_ = sumNucleons; }
 
-void Medium::SetDensityDistribution(Density_distr& density_distr)
-{
-    dens_distr_ = density_distr.clone();
-}
 
 /******************************************************************************
  *                              Different Media                               *

@@ -36,7 +36,6 @@ PhotonuclearFactory::PhotonuclearFactory()
         "photobezrukovbugaev", BezrukovBugaev, &PhotoBezrukovBugaev::create);
     RegisterRealPhoton("photorhode", Rhode, &PhotoRhode::create);
     RegisterRealPhoton("photokokoulin", Kokoulin, &PhotoKokoulin::create);
-    RegisterRealPhoton("none", None, nullptr);
 
     RegisterQ2("photoabramowiczlevinlevymaor91", AbramowiczLevinLevyMaor91,
         &PhotoAbramowiczLevinLevyMaor91::create);

@@ -21,7 +21,6 @@ IonizationFactory::IonizationFactory()
         &IonizBergerSeltzerBhabha::create);
     Register("ionizbergerseltzermoller", IonizBergerSeltzerMoller,
         &IonizBergerSeltzerMoller::create);
-    Register("none", None, nullptr);
 }
 
 // ------------------------------------------------------------------------- //

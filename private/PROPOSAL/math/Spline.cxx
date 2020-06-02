@@ -37,6 +37,18 @@ Spline::Spline(std::string path, bool binary) {
     reader.read(*this);
 }
 
+Spline::Spline(const nlohmann::json& config) {
+    if (!config.contains("x")) throw std::invalid_argument("Spline: x vector must be defined.");
+    if(not config["x"].is_array()) throw std::invalid_argument("Spline: x is not an array.");
+    if (!config.contains("y")) throw std::invalid_argument("Spline: y vector must be defined.");
+    if(not config["y"].is_array()) throw std::invalid_argument("Spline: y is not an array.");
+
+    x_ = config["x"].get<std::vector<double>>();
+    y_ = config["y"].get<std::vector<double>>();
+
+    if (x_.size() != y_.size()) throw std::invalid_argument("Spline: x and y must have same dimension");
+}
+
 bool Spline::operator==(const Spline& spline) const {
     if(splines_ != spline.splines_)
         return false;
@@ -173,6 +185,10 @@ Linear_Spline::Linear_Spline(std::vector<Polynom> splines,
 Linear_Spline::Linear_Spline(std::string spline_path, bool binary)
     : Spline(spline_path, binary) {}
 
+Linear_Spline::Linear_Spline(const nlohmann::json& config) : Spline(config) {
+    calculate_splines(x_, y_);
+}
+
 Linear_Spline::Linear_Spline(const Spline& spline) : Spline(spline) {}
 
 void Linear_Spline::calculate_splines(std::vector<double> x,
@@ -184,7 +200,7 @@ void Linear_Spline::calculate_splines(std::vector<double> x,
     for (unsigned int i = 0; i < n; ++i) {
         a_1 = (y[i + 1] - y[i]) / (x[i + 1] - x[i]);
         a_0 = y[i] - a_1 * x[i];
-        Polynom p = Polynom({a_0, a_1});
+        Polynom p = Polynom(std::vector<double>{a_0, a_1});
 
         splines_.push_back(p);
     }
@@ -209,6 +225,10 @@ Cubic_Spline::Cubic_Spline(std::vector<Polynom> splines,
 
 Cubic_Spline::Cubic_Spline(std::string spline_path, bool binary)
     : Spline(spline_path, binary) {}
+
+Cubic_Spline::Cubic_Spline(const nlohmann::json& config) : Spline(config) {
+    calculate_splines(x_, y_);
+}
 
 Cubic_Spline::Cubic_Spline(const Spline& spline) : Spline(spline) {}
 

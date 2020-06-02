@@ -31,28 +31,21 @@
 #include <functional>
 #include <iostream>
 #include <vector>
-#include "PROPOSAL/math/MathMethods.h"
-#include "PROPOSAL/math/Spline.h"
-#include "PROPOSAL/medium/density_distr/density_polynomial.h"
+#include "PROPOSAL/math/Function.h"
+#include "PROPOSAL/density_distr/density_distr.h"
 
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// %%%%%%%%%%%%%%%%%%% Polynomial-Density %%%%%%%%%%%%%%%%%%%%
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 namespace PROPOSAL {
-class Density_splines : public Density_distr {
+class Density_polynomial : public Density_distr {
    public:
-    Density_splines(const Axis&, const Spline&);
-    Density_splines(const Density_splines&);
-    Density_splines() {
-        delete axis_;
-        delete spline_;
-        delete integrated_spline_;
-    }
+    Density_polynomial(const Axis&, const Polynom&);
+    Density_polynomial(const Density_polynomial&);
+    Density_polynomial(const nlohmann::json&);
+    ~Density_polynomial();
 
     bool compare(const Density_distr& dens_distr) const override;
 
     Density_distr* clone() const override {
-        return new Density_splines(*this);
+        return new Density_polynomial(*this);
     };
 
     double Correct(const Vector3D& xi,
@@ -75,8 +68,8 @@ class Density_splines : public Density_distr {
                            double l) const;
 
    protected:
-    Spline* spline_;
-    Spline* integrated_spline_;
+    Polynom polynom_;
+    Polynom Polynom_;
 
     std::function<double(double)> density_distribution;
     std::function<double(double)> antiderived_density_distribution;

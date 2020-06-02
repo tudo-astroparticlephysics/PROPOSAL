@@ -54,7 +54,6 @@ public:
     enum Enum
     {
         Fail = 0,
-        None,
         BetheBlochRossi,
         IonizBergerSeltzerBhabha,
         IonizBergerSeltzerMoller,
@@ -63,7 +62,7 @@ public:
     struct Definition
     {
         Definition()
-            : parametrization(BetheBlochRossi)
+            : parametrization(Fail)
             , multiplier(1.0)
         {
         }

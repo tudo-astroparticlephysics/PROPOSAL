@@ -17,7 +17,6 @@ EpairProductionFactory::EpairProductionFactory()
 {
     Register("epairkelnerkokoulinpetrukhin", KelnerKokoulinPetrukhin, &EpairKelnerKokoulinPetrukhin::create);
     Register("epairsandrocksoedingreksorhode", SandrockSoedingreksoRhode, &EpairSandrockSoedingreksoRhode::create);
-    Register("none", None, nullptr);
 }
 
 EpairProductionFactory::~EpairProductionFactory()
@@ -38,11 +37,6 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
                                                             const Definition& def,
                                                             std::shared_ptr<const InterpolationDef> interpolation_def) const
 {
-    if(def.parametrization == EpairProductionFactory::Enum::None){
-        log_fatal("Can't return Epairproduction Crosssection if parametrization is None");
-        return NULL;
-    }
-
     EpairMapEnum::const_iterator it = epair_map_enum_.find(def.parametrization);
 
     if (it != epair_map_enum_.end())

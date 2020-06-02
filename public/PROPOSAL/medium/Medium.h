@@ -31,9 +31,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include <array>
 #include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/medium/density_distr/density_distr.h"
 
 #define MEDIUM_DEF(cls)                                                        \
     class cls : public Medium {                                                \
@@ -97,14 +96,11 @@ class Medium {
     double GetX1() const { return X1_; }
     double GetD0() const { return d0_; }
     double GetMassDensity() const { return massDensity_; }
-    double GetCorrectedMassDensity(const Vector3D& xi) const { return massDensity_ * dens_distr_->Evaluate(xi); }
     double GetRadiationLength() const { return radiationLength_; }
-    double GetRadiationLength(const Vector3D& position) const;
     double GetMolDensity() const { return molDensity_; }
     std::string GetName() const { return name_; }
     double GetMM() const { return MM_; }
     double GetSumNucleons() const { return sumNucleons_; }
-    const Density_distr& GetDensityDistribution() const { return *dens_distr_; }
     size_t GetHash() const noexcept;
 
     // Setter
@@ -125,7 +121,6 @@ class Medium {
         std::vector<Components::Component> components);
     void SetMM(double MM);
     void SetSumNucleons(double sumNucleons);
-    void SetDensityDistribution(Density_distr& dens_distr);
 
    protected:
     // Methods
@@ -151,7 +146,6 @@ class Medium {
     double MM_;           ///< average all-component nucleon weight
     double sumNucleons_;  ///< sum of nucleons of all nuclei
 
-    Density_distr* dens_distr_;
     std::vector<Components::Component> components_;  ///< Components of Medium
 };
 

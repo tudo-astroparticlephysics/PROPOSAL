@@ -2,6 +2,7 @@
 #include <string>
 
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 static std::map<const Medium_Type, std::shared_ptr<Medium>> Medium_Map{
@@ -27,4 +28,5 @@ std::shared_ptr<Medium> CreateMedium(
     Medium_Type type, double density_correction = 1.0);
 std::shared_ptr<Medium> CreateMedium(
     std::string name, double density_correction = 1.0);
+std::shared_ptr<Medium> CreateMedium(const nlohmann::json&);
 } // namespace PROPOSAL

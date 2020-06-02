@@ -11,6 +11,7 @@ protected:
 
 public:
     Interaction(CrossSectionList cross);
+    virtual ~Interaction() = default;
     virtual double EnergyInteraction(double, double) = 0;
     std::shared_ptr<CrossSection> TypeInteraction(double, const std::array<double, 2>&);
 };
@@ -32,7 +33,7 @@ public:
                 hash_combine(hash_digest, c->GetHash());
             interaction_interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                        energy, 1e14, 0);
+                        energy, lower_lim, 0);
             };
             integral.BuildTables("interaction", hash_digest, interaction_interpol_def);
         }
@@ -55,14 +56,17 @@ public:
         auto rndiMin = integral.Calculate(initial_energy, lower_lim, rndi);
         if (rndi >= rndiMin)
             return lower_lim;
-
-        return integral.GetUpperLimit(initial_energy, rndi);
+        std::cout << "E_i: " << initial_energy;
+        std::cout << "rndi: " << rndi << std::endl;
+        auto aux = integral.GetUpperLimit(initial_energy, rndi);
+        std::cout << " ... E_f: " << aux << std::endl;
+        return aux;
     }
 
 
 private:
-    T integral;
     DisplacementBuilder<UtilityIntegral> displacement;
+    T integral;
 };
 
 }

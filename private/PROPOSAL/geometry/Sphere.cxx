@@ -48,8 +48,9 @@ Sphere::Sphere(const nlohmann::json& config)
 
     config["outer_radius"].get_to(radius_);
     radius_ *= 100;
-    inner_radius_ = config.value("inner_radius", 0);
 
+    inner_radius_ = config.value("inner_radius", 0);
+    inner_radius_ *= 100;
     if(inner_radius_ < 0) throw std::logic_error("inner radius must be >= 0");
     if(radius_ < inner_radius_)
        throw std::logic_error("radius must be larger than inner radius");

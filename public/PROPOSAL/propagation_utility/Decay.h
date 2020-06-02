@@ -5,6 +5,7 @@
 #include "PROPOSAL/propagation_utility/Displacement.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/crossection/CrossSection.h"
+#include <math.h>
 
 namespace PROPOSAL {
 
@@ -40,7 +41,7 @@ public:
                 hash_combine(hash_digest, c->GetHash());
             decay_interpol_def.function1d = [this](double energy) {
                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                        lower_lim, energy, 0);
+                        energy, lower_lim, 0);
             };
             integral.BuildTables("decay", hash_digest, decay_interpol_def);
         }
@@ -48,8 +49,8 @@ public:
 
     double DecayIntegrand(double energy)
     {
-        assert(lifetime < 0);
-        assert(energy <= mass);
+        assert(!isinf(lifetime));
+        assert(energy >= mass);
 
         double square_momentum = (energy - mass) * (energy + mass);
         double aux = SPEED * std::sqrt(square_momentum) / mass;
@@ -60,11 +61,12 @@ public:
     {
         auto rndd = -std::log(rnd);
         auto rnddMin = integral.Calculate(initial_energy, lower_lim, rndd) / lifetime;
+        std::cout << "rndd: " << rndd << ", rnddMin: " << rnddMin << std::endl; //DEBUG
 
         if (rndd >= rnddMin)
             return lower_lim;
 
-        return integral.GetUpperLimit(initial_energy, rndd) / lifetime;
+        return integral.GetUpperLimit(initial_energy, rndd * lifetime);
     }
 
 

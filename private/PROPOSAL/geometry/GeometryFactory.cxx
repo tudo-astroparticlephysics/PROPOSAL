@@ -32,3 +32,23 @@ std::shared_ptr<Geometry> CreateGeometry(std::string name)
     throw std::invalid_argument("Geometry not found.");
 }
 } // namespace PROPOSAL
+
+namespace PROPOSAL{
+std::shared_ptr<Geometry> CreateGeometry(const nlohmann::json& config){
+    if (config.contains("shape")){
+        std::string shape = config["shape"];
+        if (shape == "sphere") {
+            return std::make_shared<Sphere>(config);
+        } else if (shape == "box") {
+            return std::make_shared<Box>(config);
+        } else if (shape == "cylinder") {
+            return std::make_shared<Cylinder>(config);
+        } else {
+            throw std::invalid_argument("Unknown parameter 'shape' in geometry.");
+        }
+    }
+    else{
+        throw std::invalid_argument("Geometry config file must contain a paremeter called 'shape'.");
+    }
+}
+} //namespace PROPOSAL

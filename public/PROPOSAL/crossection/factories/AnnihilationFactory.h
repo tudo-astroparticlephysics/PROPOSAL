@@ -52,14 +52,13 @@ namespace PROPOSAL {
         enum Enum
         {
             Fail = 0,
-            None,
             Heitler,
         };
 
         struct Definition
         {
             Definition()
-                : parametrization(None)
+                : parametrization(Fail)
                 , multiplier(1.0)
             {
             }
@@ -73,6 +72,7 @@ namespace PROPOSAL {
                     config.at("name").get_to(name);
                     parametrization = Get().GetEnumFromString(name);
                 }
+
                 multiplier = config.value("multiplier", 1.0);
             }
 

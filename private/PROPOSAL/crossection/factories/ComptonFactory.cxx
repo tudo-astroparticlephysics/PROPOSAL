@@ -19,7 +19,6 @@ ComptonFactory::ComptonFactory()
     // Register all compton parametrizations in lower case!
 
     Register("comptonkleinnishina", KleinNishina, &ComptonKleinNishina::create);
-    Register("none", None, nullptr); // empty parametrization
 }
 
 // ------------------------------------------------------------------------- //

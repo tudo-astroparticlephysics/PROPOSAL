@@ -70,13 +70,13 @@ void ScatteringHighland::print(std::ostream& os) const
 // Private methods
 // ------------------------------------------------------------------------- //
 
-double ScatteringHighland::CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos)
+double ScatteringHighland::CalculateTheta0(double grammage, double ei, double ef)
 {
     (void) ef;
 
     // eq 6 of Lynch, Dahl
     // Nuclear Instruments and Methods in Physics Research Section B 58 (1991)
-    double y = dr / medium_->GetRadiationLength(pos);
+    double y = grammage / medium_->GetRadiationLength();
     double momentum_Sq = (ei - mass) * (ei + mass);
     double beta_p = momentum_Sq / ei; // beta * p = p^2/sqrt(p^2 + m^2)
     y = 13.6 * std::abs(charge) / (beta_p)*std::sqrt(y)
@@ -86,13 +86,13 @@ double ScatteringHighland::CalculateTheta0(double dr, double ei, double ef, cons
 
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringHighland::CalculateRandomAngle(double dr,
-    double ei, double ef, const Vector3D& pos, const array<double, 4>& rnd)
+Scattering::RandomAngles ScatteringHighland::CalculateRandomAngle(double grammage,
+    double ei, double ef, const array<double, 4>& rnd)
 {
     double Theta0;
     Scattering::RandomAngles random_angles;
 
-    Theta0 = CalculateTheta0(dr, ei, ef, pos);
+    Theta0 = CalculateTheta0(grammage, ei, ef);
 
     auto rnd1 = Theta0 * normalppf(rnd[0]);
     auto rnd2 = Theta0 * normalppf(rnd[1]);

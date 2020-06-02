@@ -57,7 +57,6 @@ public:
     enum Enum
     {
         Fail = 0,
-        None,
         PetrukhinShestakov,
         KelnerKokoulinPetrukhin,
         CompleteScreening,
@@ -69,8 +68,8 @@ public:
     struct Definition
     {
         Definition()
-            : parametrization(KelnerKokoulinPetrukhin)
-            , lpm_effect(true)
+            : parametrization(Fail)
+            , lpm_effect(false)
             , multiplier(1.0)
         {
         }
@@ -84,7 +83,7 @@ public:
                 config.at("name").get_to(name);
                 parametrization = Get().GetEnumFromString(name);
             }
-            lpm_effect = config.value("lpm", true);
+            lpm_effect = config.value("lpm", false);
             multiplier = config.value("multiplier", 1.0);
         }
 

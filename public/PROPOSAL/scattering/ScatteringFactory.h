@@ -40,7 +40,7 @@
 namespace PROPOSAL {
 
 class Medium;
-class Utility;
+class PropagationUtility;
 struct InterpolationDef;
 
 class ScatteringFactory {

@@ -17,7 +17,6 @@ AnnihilationFactory::AnnihilationFactory()
     , string_enum_()
 {
     Register("annihilationheitler", Heitler, &AnnihilationHeitler::create);
-    Register("none", None, nullptr);
 }
 
 AnnihilationFactory::~AnnihilationFactory()

@@ -18,7 +18,6 @@ WeakInteractionFactory::WeakInteractionFactory()
 {
     Register("weakcoopersarkarmertsch", CooperSarkarMertsch,
         &WeakCooperSarkarMertsch::create);
-    Register("none", None, nullptr);
 }
 
 WeakInteractionFactory::~WeakInteractionFactory()

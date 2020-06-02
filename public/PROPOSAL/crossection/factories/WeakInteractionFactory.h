@@ -51,14 +51,13 @@ namespace PROPOSAL {
         enum Enum
         {
             Fail = 0,
-            None,
             CooperSarkarMertsch,
         };
 
         struct Definition
         {
             Definition()
-                    : parametrization(None)
+                    : parametrization(Fail)
                     , multiplier(1.0)
             {
             }

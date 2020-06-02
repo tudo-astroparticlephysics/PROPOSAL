@@ -24,7 +24,6 @@ BremsstrahlungFactory::BremsstrahlungFactory()
     Register("bremsandreevbezrukovbugaev", AndreevBezrukovBugaev, &BremsAndreevBezrukovBugaev::create);
     Register("bremssandrocksoedingreksorhode", SandrockSoedingreksoRhode, &BremsSandrockSoedingreksoRhode::create);
     Register("bremselectronscreening", ElectronScreening, &BremsElectronScreening::create);
-    Register("none", None, nullptr); //empty parametrization
 }
 
 // ------------------------------------------------------------------------- //

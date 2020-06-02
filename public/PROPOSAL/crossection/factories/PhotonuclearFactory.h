@@ -60,7 +60,6 @@ public:
     enum Enum
     {
         Fail = 0,
-        None,
         Zeus,
         BezrukovBugaev,
         Rhode,
@@ -81,9 +80,9 @@ public:
     struct Definition
     {
         Definition()
-            : parametrization(AbramowiczLevinLevyMaor97)
-            , shadow(ShadowButkevichMikhailov)
-            , hard_component(true)
+            : parametrization(Fail)
+            , shadow(ShadowNone)
+            , hard_component(false)
             , multiplier(1.0)
         {
         }
@@ -98,9 +97,9 @@ public:
                 parametrization = Get().GetEnumFromString(name);
             }
             multiplier = config.value("multiplier", 1.0);
-            hard_component = config.value("hard_component", true);
+            hard_component = config.value("hard_component", false);
 
-            std::string name_shadow = config.value("shadow", "ShadowButkevichMikhailov");
+            std::string name_shadow = config.value("shadow", "ShadowNone");
             shadow = Get().GetShadowEnumFromString(name_shadow);
         }
 

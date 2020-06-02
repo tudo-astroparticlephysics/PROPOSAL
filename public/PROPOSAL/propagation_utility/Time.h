@@ -8,6 +8,7 @@ namespace PROPOSAL {
 class Time {
 public:
     Time();
+    virtual ~Time() = default;
     virtual double TimeElapsed(double initial_energy, double final_energy, double time) = 0;
     virtual double TimeElapsed(double distance) = 0;
 
@@ -23,8 +24,8 @@ public:
 
     ExactTimeBuilder<T>(CrossSectionList cross, double mass)
         : mass(mass)
-        , displacement(cross)
         , lower_lim(InitializeLowerLim(cross))
+        , displacement(cross)
         , integral(std::bind(
               &ExactTimeBuilder::TimeIntegrand, this, std::placeholders::_1), lower_lim)
     {
@@ -84,8 +85,8 @@ protected:
             lower_lim_tmp = std::min(lower_lim_tmp, c->GetParametrization().GetLowerEnergyLim());
         return lower_lim_tmp;
     }
-    double lower_lim;
     double mass;
+    double lower_lim;
     DisplacementBuilder<UtilityIntegral> displacement;
     T integral;
 };

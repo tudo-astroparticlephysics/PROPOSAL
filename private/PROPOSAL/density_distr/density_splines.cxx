@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <functional>
 #include <iostream>
-#include "PROPOSAL/medium/density_distr/density_splines.h"
+#include "PROPOSAL/density_distr/density_splines.h"
 
 using namespace PROPOSAL;
 
@@ -17,6 +17,23 @@ Density_splines::Density_splines(const Density_splines& dens_splines)
     : Density_distr(dens_splines),
       spline_(dens_splines.spline_),
       integrated_spline_(dens_splines.integrated_spline_) {}
+
+Density_splines::Density_splines(const nlohmann::json& config) : Density_distr(config) {
+    if(!config.contains("spline_type"))
+        throw std::invalid_argument("Density_splines: Type of splines must be specified using spline_type");
+    std::string spline_type = config["spline_type"];
+    if(spline_type == "linear") {
+        spline_ = new Linear_Spline(config);
+        integrated_spline_ = new Linear_Spline(config);
+    } else if (spline_type == "cubic") {
+        spline_ = new Cubic_Spline(config);
+        integrated_spline_ = new Cubic_Spline(config);
+    } else {
+        throw std::invalid_argument("Density_splines: Type of spline must be linear or cubic");
+    }
+    integrated_spline_->Antiderivative(0);
+}
+
 
 bool Density_splines::compare(const Density_distr& dens_distr) const {
     const Density_splines* dens_splines= dynamic_cast<const Density_splines*>(&dens_distr);

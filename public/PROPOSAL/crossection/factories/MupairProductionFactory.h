@@ -51,14 +51,13 @@ public:
     enum Enum
     {
         Fail = 0,
-        None,
         KelnerKokoulinPetrukhin,
     };
 
     struct Definition
     {
         Definition()
-            : parametrization(None)
+            : parametrization(Fail)
             , multiplier(1.0)
         {
         }

@@ -22,7 +22,6 @@ PhotoPairFactory::PhotoPairFactory()
     // Register all PhotoPair parametrizations in lower case!
 
     Register("photopairtsai", Tsai, &PhotoPairTsai::create);
-    Register("none", None, nullptr); // empty parametrization
 
     // Register PhotoAngle parametrizations
 
