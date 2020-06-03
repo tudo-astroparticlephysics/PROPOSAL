@@ -13,38 +13,43 @@
 #include "PROPOSAL/geometry/GeometryFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/MediumFactory.h"
-#include "PROPOSAL/scattering/ScatteringFactory.h"
+/* #include "PROPOSAL/scattering/ScatteringFactory.h" */
 #include <fstream>
+
+#include <iomanip>
 
 using namespace PROPOSAL;
 
-Propagator::Propagator(const ParticleDef& p_def, const std::string& config_file)
-    : Propagator(p_def, ParseConfig(config_file))
-{
-}
+/* Propagator::Propagator(const ParticleDef& p_def, const std::string&
+ * config_file) */
+/*     : Propagator(p_def, ParseConfig(config_file)) */
+/* { */
+/* } */
 
-Propagator::Propagator(const ParticleDef& p_def, const nlohmann::json& config)
-    : p_def(p_def)
-{
-    GlobalSettings global;
-    if (config.contains("global")) {
-        global = GlobalSettings(config["global"]);
-    }
-    if (config.contains("interpolation")) {
-        interpol_def_global
-            = std::make_shared<InterpolationDef>(config["interpolation"]);
-    } else {
-        interpol_def_global = std::make_shared<InterpolationDef>();
-    }
-    if (config.contains("sectors")) {
-        assert(config["sectors"].is_array());
-        for (const auto& json_sector : config.at("sectors")) {
-            InitializeSectorFromJSON(p_def, json_sector, global);
-        }
-    } else {
-        throw std::invalid_argument("No sector array found in json object");
-    }
-}
+/* Propagator::Propagator(const ParticleDef& p_def, const nlohmann::json&
+ * config) */
+/*     : p_def(p_def) */
+/* { */
+/*     GlobalSettings global; */
+/*     if (config.contains("global")) { */
+/*         global = GlobalSettings(config["global"]); */
+/*     } */
+/*     if (config.contains("interpolation")) { */
+/*         interpol_def_global */
+/*             = std::make_shared<InterpolationDef>(config["interpolation"]); */
+/*     } else { */
+/*         interpol_def_global = std::make_shared<InterpolationDef>(); */
+/*     } */
+/*     if (config.contains("sectors")) { */
+/*         assert(config["sectors"].is_array()); */
+/*         for (const auto& json_sector : config.at("sectors")) { */
+/*             InitializeSectorFromJSON(p_def, json_sector, global); */
+/*         } */
+/*     } else { */
+/*         throw std::invalid_argument("No sector array found in json object");
+ */
+/*     } */
+/* } */
 
 Propagator::Propagator(const ParticleDef& p_def, std::vector<Sector> sectors)
     : p_def(p_def)
@@ -84,7 +89,7 @@ std::vector<DynamicData> Propagator::Propagate(
             = InteractionEnergy[next_interaction_type];
         // DEBUG: return value is grammage
         auto distance_to_next_interaction = utility.LengthContinuous(
-            current_pos.GetEnergy(), energy_at_next_interaction, 0.);
+            current_pos.GetEnergy(), energy_at_next_interaction);
         // DEBUG: we need to make grammage out of max_distance_left to compare
         // it in the next step (using density_distr->integrate)
         auto max_distance_left
@@ -159,17 +164,18 @@ std::vector<DynamicData> Propagator::Propagate(
 bool Propagator::DoStochasticInteraction(DynamicData& p_cond,
     PropagationUtility& utility, std::function<double()> rnd)
 {
-    auto stochastic_cross = utility.TypeInteraction(p_cond.GetEnergy(), rnd);
-    double loss_energy = utility.EnergyStochasticloss(
-        *stochastic_cross, p_cond.GetEnergy(), rnd);
+    InteractionType loss_type;
+    double loss_energy;
+    std::tie(loss_type, loss_energy)
+        = utility.EnergyStochasticloss(p_cond.GetEnergy(), rnd());
 
-    auto deflection_angles = stochastic_cross->StochasticDeflection(
-        p_cond.GetEnergy(), loss_energy); // TODO: ugly
-    p_cond.DeflectDirection(
-        get<0>(deflection_angles), get<1>(deflection_angles));
+    /* auto deflection_angles = stochastic_cross->StochasticDeflection( */
+    /*     p_cond.GetEnergy(), loss_energy); // TODO: ugly */
+    /* p_cond.DeflectDirection( */
+    /*     get<0>(deflection_angles), get<1>(deflection_angles)); */
 
     p_cond.SetEnergy(p_cond.GetEnergy() - loss_energy);
-    p_cond.SetType(stochastic_cross->GetParametrization().GetInteractionType());
+    p_cond.SetType(loss_type);
 
     return true; // TODO: Add condition for fatal interaction
 }
@@ -181,8 +187,7 @@ bool Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
     auto sector_changed = false;
 
     // TODO: For NoScattering, these random numbers are not used
-    auto rnd_scattering
-        = const std::array<double, 4>{ rnd(), rnd(), rnd(), rnd() };
+    auto rnd_scattering = std::array<double, 4>{ rnd(), rnd(), rnd(), rnd() };
 
     auto& utility = get<UTILITY>(sector);
 
@@ -257,7 +262,7 @@ double Propagator::CalculateDistanceToBorder(const Vector3D& position,
         = current_geometry.DistanceToBorder(position, direction).first;
     // TODO: These lines should be redundant as soon as the adaptive step size
     // is implemented
-    for (auto& sector; sector_list) {
+    for (auto& sector : sector_list) {
         auto& geometry = get<GEOMETRY>(sector);
         if (geometry->GetHierarchy() > current_geometry.GetHierarchy())
             distance_border = std::min(distance_border,
@@ -279,18 +284,18 @@ int Propagator::maximize(const std::array<double, 3>& InteractionEnergies)
 Sector Propagator::ChooseCurrentSector(
     const Vector3D& position, const Vector3D& direction)
 {
-    auto potential_sectors = std::vector<*Sector>{};
+    auto potential_sec = std::vector<Sector*>{};
     for (auto& sector : sector_list) {
         if (get<GEOMETRY>(sector)->IsInside(position, direction))
-            potential_sectors.push_back(&sector);
+            potential_sec.push_back(&sector);
     }
 
-    if (potential_sectors.empty())
+    if (potential_sec.empty())
         throw std::logic_error(
             "Propagator: No sector defined at current particle position.");
 
-    auto highest_sector_iter = std::max_element(potential_sector.begin(),
-        potential_sector.end(), [](Sector* a, Sector* b) {
+    auto highest_sector_iter = std::max_element(
+        potential_sec.begin(), potential_sec.end(), [](Sector* a, Sector* b) {
             return get<GEOMETRY>(*a)->GetHierarchy()
                 < get<GEOMETRY>(*b)->GetHierarchy();
         });
@@ -300,149 +305,165 @@ Sector Propagator::ChooseCurrentSector(
 
 // Init methods
 
-nlohmann::json Propagator::ParseConfig(const std::string& config_file)
-{
-    nlohmann::json json_config;
-    try {
-        std::string expanded_config_file_path
-            = Helper::ResolvePath(config_file, true);
-        std::ifstream infilestream(expanded_config_file_path);
-        infilestream >> json_config;
-    } catch (const nlohmann::json::parse_error& e) {
-        log_fatal("Unable parse \"%s\" as json file", config_file.c_str());
-    }
-    return json_config;
-};
+/* nlohmann::json Propagator::ParseConfig(const std::string& config_file) */
+/* { */
+/*     nlohmann::json json_config; */
+/*     try { */
+/*         std::string expanded_config_file_path */
+/*             = Helper::ResolvePath(config_file, true); */
+/*         std::ifstream infilestream(expanded_config_file_path); */
+/*         infilestream >> json_config; */
+/*     } catch (const nlohmann::json::parse_error& e) { */
+/*         log_fatal("Unable parse \"%s\" as json file", config_file.c_str()); */
+/*     } */
+/*     return json_config; */
+/* }; */
 
-void Propagator::InitializeSectorFromJSON(const ParticleDef& p_def,
-    const nlohmann::json& json_sector, GlobalSettings global)
-{
-    bool do_interpolation
-        = json_sector.value("do_interpolation", global.do_interpolation);
-    bool do_exact_time = json_sector.value("exact_time", global.do_exact_time);
-    std::string scattering = json_sector.value("scattering", global.scattering);
-    std::shared_ptr<Medium> medium = global.medium;
-    if (json_sector.contains("medium")) {
-        medium = CreateMedium(json_sector["medium"]);
-    } else if (medium == nullptr) {
-        throw std::invalid_argument(
-            "Neither a specific Sector medium nor a global medium is defined.");
-    }
-    std::shared_ptr<EnergyCutSettings> cuts = global.cuts;
-    if (json_sector.contains("cuts")) {
-        cuts = std::make_shared<EnergyCutSettings>(
-            EnergyCutSettings(json_sector["cuts"]));
-    } else if (cuts == nullptr) {
-        throw std::invalid_argument("Neither a specific Sector EnergyCut nor a "
-                                    "global EnergyCut is defined.");
-    }
-    CrossSectionList crosssections;
-    if (json_sector.contains("CrossSections")) {
-        crosssections = CreateCrossSectionList(
-            json_sector["CrossSections"], medium, cuts, do_interpolation);
-    } else if (global.cross != "") {
-        crosssections = CreateCrossSectionList(
-            global.cross, medium, cuts, do_interpolation);
-    } else {
-        crosssections = GetStdCrossSections(medium, cuts, p_def);
-    }
-    // Create Geometry and add them to sector_list with corresponding geometries
-    auto utility = CreateUtility(crosssections, medium, cuts->GetContRand(),
-        do_interpolation, do_exact_time, scattering);
-    if (json_sector.contains("geometries")) {
-        assert(json_sector["geometries"].is_array());
+/* void Propagator::InitializeSectorFromJSON(const ParticleDef& p_def, */
+/*     const nlohmann::json& json_sector, GlobalSettings global) */
+/* { */
+/*     bool do_interpolation */
+/*         = json_sector.value("do_interpolation", global.do_interpolation); */
+/*     bool do_exact_time = json_sector.value("exact_time",
+ * global.do_exact_time); */
+/*     std::string scattering = json_sector.value("scattering",
+ * global.scattering); */
+/*     std::shared_ptr<Medium> medium = global.medium; */
+/*     if (json_sector.contains("medium")) { */
+/*         medium = CreateMedium(json_sector["medium"]); */
+/*     } else if (medium == nullptr) { */
+/*         throw std::invalid_argument( */
+/*             "Neither a specific Sector medium nor a global medium is
+ * defined."); */
+/*     } */
+/*     std::shared_ptr<EnergyCutSettings> cuts = global.cuts; */
+/*     if (json_sector.contains("cuts")) { */
+/*         cuts = std::make_shared<EnergyCutSettings>( */
+/*             EnergyCutSettings(json_sector["cuts"])); */
+/*     } else if (cuts == nullptr) { */
+/*         throw std::invalid_argument("Neither a specific Sector EnergyCut nor
+ * a " */
+/*                                     "global EnergyCut is defined."); */
+/*     } */
+/*     CrossSectionList crosssections; */
+/*     if (json_sector.contains("CrossSections")) { */
+/*         crosssections = CreateCrossSectionList( */
+/*             json_sector["CrossSections"], medium, cuts, do_interpolation); */
+/*     } else if (global.cross != "") { */
+/*         crosssections = CreateCrossSectionList( */
+/*             global.cross, medium, cuts, do_interpolation); */
+/*     } else { */
+/*         crosssections = GetStdCrossSections(medium, cuts, p_def); */
+/*     } */
+/*     // Create Geometry and add them to sector_list with corresponding
+ * geometries */
+/*     auto utility = CreateUtility(crosssections, medium, cuts->GetContRand(),
+ */
+/*         do_interpolation, do_exact_time, scattering); */
+/*     if (json_sector.contains("geometries")) { */
+/*         assert(json_sector["geometries"].is_array()); */
+/*         nlohmann::json density_distr_default = { */
+/*             { "density_distr_type", "homogeneous" } */
+/*         }; // if no density_distr defined, fallback to homogeneous medium */
+/*         auto density_distr_sector */
+/*             = json_sector.value("density_distr", density_distr_default); */
+/*         for (const auto& json_geometry : json_sector.at("geometries")) { */
+/*             auto density_distr_json */
+/*                 = json_geometry.value("density_distr", density_distr_sector);
+ */
+/*             sector_list.push_back(std::make_tuple(CreateGeometry(json_geometry),
+ */
+/*                 utility, CreateDensityDistribution(density_distr_json))); */
+/*         } */
+/*     } else { */
+/*         throw std::invalid_argument( */
+/*             "At least one geometry must be defined for each sector"); */
+/*     } */
+/* } */
 
-        nlohmann::json density_distr_default = {
-            { "density_distr_type", "homogeneous" }
-        }; // if no density_distr defined, fallback to homogeneous medium
-        auto density_distr_sector
-            = json_sector.value("density_distr", density_distr_default);
-
-        for (const auto& json_geometry : json_sector.at("geometries")) {
-            auto density_distr_json
-                = json_geometry.value("density_distr", density_distr_sector);
-            sector_list.push_back(std::make_tuple(CreateGeometry(json_geometry),
-                utility, CreateDensityDistribution(density_distr_json)));
-        }
-    } else {
-        throw std::invalid_argument(
-            "At least one geometry must be defined for each sector");
-    }
-}
-
-PropagationUtility Propagator::CreateUtility(CrossSectionList crosssections,
-    std::shared_ptr<Medium> medium, bool do_cont_rand, bool do_interpolation,
-    bool do_exact_time, std::string scattering)
-{
-    PropagationUtility::Collection def;
-    if (do_interpolation) {
-        def.interaction_calc
-            = std::make_shared<InteractionBuilder<UtilityInterpolant>>(
-                crosssections);
-    } else {
-        def.interaction_calc
-            = std::make_shared<InteractionBuilder<UtilityIntegral>>(
-                crosssections);
-    }
-    if (do_interpolation) {
-        def.displacement_calc
-            = std::make_shared<DisplacementBuilder<UtilityInterpolant>>(
-                crosssections);
-    } else {
-        def.displacement_calc
-            = std::make_shared<DisplacementBuilder<UtilityIntegral>>(
-                crosssections);
-    }
-    if (do_exact_time) {
-        if (do_interpolation) {
-            def.time_calc
-                = std::make_shared<ExactTimeBuilder<UtilityInterpolant>>(
-                    crosssections, p_def);
-        } else {
-            def.time_calc = std::make_shared<ExactTimeBuilder<UtilityIntegral>>(
-                crosssections, p_def);
-        }
-    } else {
-        def.time_calc = std::make_shared<ApproximateTimeBuilder>();
-    }
-    if (scattering != "" and scattering != "NoScattering") {
-        if (do_interpolation) {
-            // TODO: Making a shared_ptr out of a raw pointer is bad-practise
-            // (and looks ugly), the underlying factory should be changed (jm)
-            auto aux = ScatteringFactory::Get().CreateScattering(scattering,
-                p_def, medium, interpol_def_global,
-                std::unique_ptr<CrossSectionList>(
-                    new CrossSectionList(crosssections)));
-            def.scattering = std::shared_ptr<Scattering>(aux);
-        } else {
-            auto aux = ScatteringFactory::Get().CreateScattering(scattering,
-                p_def, medium,
-                std::unique_ptr<CrossSectionList>(
-                    new CrossSectionList(crosssections)));
-            def.scattering = std::shared_ptr<Scattering>(aux);
-        }
-    }
-    if (isfinite(p_def.lifetime)) {
-        if (do_interpolation) {
-            def.decay_calc = std::make_shared<DecayBuilder<UtilityInterpolant>>(
-                crosssections, p_def);
-        } else {
-            def.decay_calc = std::make_shared<DecayBuilder<UtilityIntegral>>(
-                crosssections, p_def);
-        }
-    }
-    if (do_cont_rand) {
-        if (do_interpolation) {
-            def.cont_rand
-                = std::make_shared<ContRandBuilder<UtilityInterpolant>>(
-                    crosssections);
-        } else {
-            def.cont_rand = std::make_shared<ContRandBuilder<UtilityIntegral>>(
-                crosssections);
-        }
-    }
-    return def;
-}
+/* PropagationUtility Propagator::CreateUtility(CrossSectionList crosssections,
+ */
+/*     std::shared_ptr<Medium> medium, bool do_cont_rand, bool do_interpolation,
+ */
+/*     bool do_exact_time, std::string scattering) */
+/* { */
+/*     PropagationUtility::Collection def; */
+/*     if (do_interpolation) { */
+/*         def.interaction_calc */
+/*             = std::make_shared<InteractionBuilder<UtilityInterpolant>>( */
+/*                 crosssections); */
+/*     } else { */
+/*         def.interaction_calc */
+/*             = std::make_shared<InteractionBuilder<UtilityIntegral>>( */
+/*                 crosssections); */
+/*     } */
+/*     if (do_interpolation) { */
+/*         def.displacement_calc */
+/*             = std::make_shared<DisplacementBuilder<UtilityInterpolant>>( */
+/*                 crosssections); */
+/*     } else { */
+/*         def.displacement_calc */
+/*             = std::make_shared<DisplacementBuilder<UtilityIntegral>>( */
+/*                 crosssections); */
+/*     } */
+/*     if (do_exact_time) { */
+/*         if (do_interpolation) { */
+/*             def.time_calc */
+/*                 = std::make_shared<ExactTimeBuilder<UtilityInterpolant>>( */
+/*                     crosssections, p_def); */
+/*         } else { */
+/*             def.time_calc =
+ * std::make_shared<ExactTimeBuilder<UtilityIntegral>>( */
+/*                 crosssections, p_def); */
+/*         } */
+/*     } else { */
+/*         def.time_calc = std::make_shared<ApproximateTimeBuilder>(); */
+/*     } */
+/*     if (scattering != "" and scattering != "NoScattering") { */
+/*         if (do_interpolation) { */
+/*             // TODO: Making a shared_ptr out of a raw pointer is bad-practise
+ */
+/*             // (and looks ugly), the underlying factory should be changed
+ * (jm) */
+/*             auto aux = ScatteringFactory::Get().CreateScattering(scattering,
+ */
+/*                 p_def, medium, interpol_def_global, */
+/*                 std::unique_ptr<CrossSectionList>( */
+/*                     new CrossSectionList(crosssections))); */
+/*             def.scattering = std::shared_ptr<Scattering>(aux); */
+/*         } else { */
+/*             auto aux = ScatteringFactory::Get().CreateScattering(scattering,
+ */
+/*                 p_def, medium, */
+/*                 std::unique_ptr<CrossSectionList>( */
+/*                     new CrossSectionList(crosssections))); */
+/*             def.scattering = std::shared_ptr<Scattering>(aux); */
+/*         } */
+/*     } */
+/*     if (isfinite(p_def.lifetime)) { */
+/*         if (do_interpolation) { */
+/*             def.decay_calc =
+ * std::make_shared<DecayBuilder<UtilityInterpolant>>( */
+/*                 crosssections, p_def); */
+/*         } else { */
+/*             def.decay_calc = std::make_shared<DecayBuilder<UtilityIntegral>>(
+ */
+/*                 crosssections, p_def); */
+/*         } */
+/*     } */
+/*     if (do_cont_rand) { */
+/*         if (do_interpolation) { */
+/*             def.cont_rand */
+/*                 = std::make_shared<ContRandBuilder<UtilityInterpolant>>( */
+/*                     crosssections); */
+/*         } else { */
+/*             def.cont_rand =
+ * std::make_shared<ContRandBuilder<UtilityIntegral>>( */
+/*                 crosssections); */
+/*         } */
+/*     } */
+/*     return def; */
+/* } */
 
 /* CrossSectionList Propagator::CreateCrossSectionList( */
 /*     const nlohmann::json& config_cross, std::shared_ptr<Medium> medium, */
@@ -461,7 +482,8 @@ PropagationUtility Propagator::CreateUtility(CrossSectionList crosssections,
 /*                 p_def, medium, annihilation_def, interpol_def)); */
 /*     } */
 /*     if (config_cross.contains("brems")) { */
-/*         BremsstrahlungFactory::Definition brems_def(config_cross["brems"]); */
+/*         BremsstrahlungFactory::Definition brems_def(config_cross["brems"]);
+ */
 /*         crosssections.emplace_back( */
 /*             BremsstrahlungFactory::Get().CreateBremsstrahlung( */
 /*                 p_def, medium, cuts, brems_def, interpol_def)); */
@@ -472,18 +494,21 @@ PropagationUtility Propagator::CreateUtility(CrossSectionList crosssections,
 /*             p_def, medium, cuts, compton_def, interpol_def)); */
 /*     } */
 /*     if (config_cross.contains("epair")) { */
-/*         EpairProductionFactory::Definition epair_def(config_cross["epair"]); */
+/*         EpairProductionFactory::Definition epair_def(config_cross["epair"]);
+ */
 /*         crosssections.emplace_back( */
 /*             EpairProductionFactory::Get().CreateEpairProduction( */
 /*                 p_def, medium, cuts, epair_def, interpol_def)); */
 /*     } */
 /*     if (config_cross.contains("ioniz")) { */
 /*         IonizationFactory::Definition ioniz_def(config_cross["ioniz"]); */
-/*         crosssections.emplace_back(IonizationFactory::Get().CreateIonization( */
+/*         crosssections.emplace_back(IonizationFactory::Get().CreateIonization(
+ */
 /*             p_def, medium, cuts, ioniz_def, interpol_def)); */
 /*     } */
 /*     if (config_cross.contains("mupair")) { */
-/*         MupairProductionFactory::Definition mupair_def(config_cross["mupair"]); */
+/*         MupairProductionFactory::Definition
+ * mupair_def(config_cross["mupair"]); */
 /*         crosssections.emplace_back( */
 /*             MupairProductionFactory::Get().CreateMupairProduction( */
 /*                 p_def, medium, cuts, mupair_def, interpol_def)); */
@@ -496,8 +521,10 @@ PropagationUtility Propagator::CreateUtility(CrossSectionList crosssections,
 /*                 p_def, medium, cuts, photonuclear_def, interpol_def)); */
 /*     } */
 /*     if (config_cross.contains("photopair")) { */
-/*         PhotoPairFactory::Definition photopair_def(config_cross["photopair"]); */
-/*         crosssections.emplace_back(PhotoPairFactory::Get().CreatePhotoPair( */
+/*         PhotoPairFactory::Definition
+ * photopair_def(config_cross["photopair"]); */
+/*         crosssections.emplace_back(PhotoPairFactory::Get().CreatePhotoPair(
+ */
 /*             p_def, medium, photopair_def, interpol_def)); */
 /*     } */
 /*     if (config_cross.contains("weak")) { */

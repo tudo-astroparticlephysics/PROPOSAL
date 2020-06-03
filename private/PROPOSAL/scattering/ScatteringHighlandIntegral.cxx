@@ -1,5 +1,6 @@
 #include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 
-namespace PROPOSAL {
-Interpolant1DBuilder::Definition interpol_def;
-} // namespace PROPOSAL
+using namespace PROPOSAL;
+
+template <typename T, typename Cross>
+Interpolant1DBuilder::Definition ScatteringHighlandIntegral<T, Cross>::interpol_def{};

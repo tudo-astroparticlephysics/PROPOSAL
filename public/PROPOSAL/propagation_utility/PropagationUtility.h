@@ -32,12 +32,12 @@
 
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/scattering/Scattering.h"
-#include "PROPOSAL/propagation_utility/Time.h"
-#include "PROPOSAL/propagation_utility/Decay.h"
 #include "PROPOSAL/propagation_utility/ContRand.h"
+#include "PROPOSAL/propagation_utility/Decay.h"
 #include "PROPOSAL/propagation_utility/Displacement.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
+#include "PROPOSAL/propagation_utility/Time.h"
+#include "PROPOSAL/scattering/Scattering.h"
 
 using std::tuple;
 namespace PROPOSAL {
@@ -48,38 +48,37 @@ public:
 
         bool operator==(const Collection& lhs);
 
-        //obligatory pointers
-        std::shared_ptr<Interaction> interaction_calc = nullptr;
-        std::shared_ptr<Displacement> displacement_calc = nullptr;
-        std::shared_ptr<Time> time_calc = nullptr;
+        // obligatory pointers
+        std::shared_ptr<Interaction> interaction_calc;
+        std::shared_ptr<Displacement> displacement_calc;
+        std::shared_ptr<Time> time_calc;
 
-        //optional pointers
-        std::shared_ptr<Scattering> scattering = nullptr;
-        std::shared_ptr<Decay> decay_calc = nullptr;
-        std::shared_ptr<ContRand> cont_rand = nullptr;
+        // optional pointers
+        std::shared_ptr<Scattering> scattering;
+        std::shared_ptr<Decay> decay_calc;
+        std::shared_ptr<ContRand> cont_rand;
     };
 
-    PropagationUtility(PropagationUtility::Collection collection);
-    //PropagationUtility(const PropagationUtility&);
+    PropagationUtility(Collection collection);
+    // PropagationUtility(const PropagationUtility&);
 
-    std::shared_ptr<CrossSection> TypeInteraction(
-        double, std::function<double()>);
-    double EnergyStochasticloss(
-         CrossSection&, double, std::function<double()>);
+    tuple<InteractionType, double> EnergyStochasticloss(double, double);
     double EnergyDecay(double, std::function<double()>);
     double EnergyInteraction(double, std::function<double()>);
     double EnergyRandomize(double, double, std::function<double()>);
     double EnergyDistance(double, double);
-    double LengthContinuous(double, double, double);
+    double LengthContinuous(double, double);
     double TimeElapsed(double, double, double);
 
-    /* // TODO: return value doesn't tell what it include. Maybe it would be better */
-    /* // to give a tuple of two directions back. One is the mean over the */
-    /* // displacement and the other is the actual direction. With a get method */
-    /* // there could be a possible access with the position of the object stored */
-    /* // in an enum. */
-    tuple<Vector3D, Vector3D> DirectionsScatter(double, double, double, const Vector3D&, const std::array<double, 4>&);
-    std::pair<double, double> DirectionDeflect(CrossSection& , double particle_energy, double loss_energy);
+    // TODO: return value doesn't tell what it include. Maybe it would be better
+    // to give a tuple of two directions back. One is the mean over the
+    // displacement and the other is the actual direction. With a get method
+    // there could be a possible access with the position of the object stored
+    // in an enum.
+
+    tuple<Vector3D, Vector3D> DirectionsScatter(
+        double, double, double, const Vector3D&, const std::array<double, 4>&);
+    // std::pair<double, double> DirectionDeflect(CrossSection&, double, double);
 
     Collection collection;
 };

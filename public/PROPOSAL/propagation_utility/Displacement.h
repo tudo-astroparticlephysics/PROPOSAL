@@ -1,9 +1,6 @@
 #pragma once
 
-#include "PROPOSAL/crossection/CrossSection.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include <string>
 #include <vector>
@@ -13,6 +10,8 @@ using std::string;
 namespace PROPOSAL {
 
 struct Displacement {
+    static Interpolant1DBuilder::Definition interpol_def;
+
     Displacement() = default;
     virtual ~Displacement() = default;
 
@@ -22,18 +21,13 @@ struct Displacement {
 
 protected:
     template <typename Cross> size_t GetHash(Cross&&) const;
-    template <typename Cross> double GetLowerLim(Cross&&) const;
 };
-
-extern Interpolant1DBuilder::Definition displacement_interpol_def;
 
 template <class T, class Cross>
 class DisplacementBuilder : public Displacement {
-    Cross crosssection_list;
     T disp_integral;
 
-protected:
-    T BuildTrackIntegral();
+    T BuildTrackIntegral(Cross&&);
 
 public:
     DisplacementBuilder(Cross&&);
@@ -41,25 +35,41 @@ public:
     double UpperLimitTrackIntegral(double, double) override;
 };
 
+template <typename Cross> double GetLowerLim(Cross&& cross)
+{
+    auto result
+        = std::max_element(cross.begin(), cross.end(), [](Cross a, Cross b) {
+              return b->GetLowerEnergyLim() < b->GetLowerEnergyLim();
+          });
+    return *result->GetLowerEnergyLim();
+}
+
+template <typename Cross> size_t GetHash(Cross&& cross)
+{
+    auto hash_digest = size_t{ 0 };
+    for (const auto& c : cross)
+        hash_combine(hash_digest, c->GetHash());
+    return hash_digest;
+}
+
 template <class T, class Cross>
 DisplacementBuilder<T, Cross>::DisplacementBuilder(Cross&& cross)
-    : crosssection_list(cross)
-    , disp_integral(BuildTrackIntegral())
+    : disp_integral(BuildTrackIntegral())
 {
     if (cross.size() < 1)
         throw std::invalid_argument("at least one crosssection is required.");
 }
 
 template <class T, class Cross>
-T DisplacementBuilder<T, Cross>::BuildTrackIntegral()
+T DisplacementBuilder<T, Cross>::BuildTrackIntegral(Cross&& cross)
 {
-    auto dedx = [this](double energy) {
-        return FunctionToIntegral(crosssection_list, energy);
+    auto disp_func = [this, &cross](double energy) {
+        return FunctionToIntegral(cross, energy);
     };
-    T integral(dedx, GetLowerLim(crosssection_list));
+    T integral(disp_func, GetLowerLim(cross));
     if (typeid(T) == typeid(UtilityInterpolant)) {
-        auto hash = GetHash(crosssection_list);
-        integral.BuildTables("displacement", hash, displacement_interpol_def);
+        auto hash = GetHash(cross);
+        integral.BuildTables("displacement", hash, interpol_def);
     };
     return integral;
 }

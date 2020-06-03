@@ -16,8 +16,8 @@ typedef std::tuple<std::shared_ptr<const Geometry>, PropagationUtility, std::sha
 class Propagator
 {
 public:
-    Propagator(const ParticleDef&, const nlohmann::json&);
-    Propagator(const ParticleDef&, const std::string& config_file);
+    /* Propagator(const ParticleDef&, const nlohmann::json&); */
+    /* Propagator(const ParticleDef&, const std::string& config_file); */
     Propagator(const ParticleDef&, std::vector<Sector> sectors);
 
     std::vector<DynamicData> Propagate(const DynamicData& initial_particle, double max_distance = 1e20, double min_energy = 0.);
@@ -42,11 +42,10 @@ private:
     };
 
     //Initializing methods
-    static nlohmann::json ParseConfig(const std::string& config_file);
-    void InitializeSectorFromJSON(const ParticleDef&, const nlohmann::json&, GlobalSettings);
-    PropagationUtility CreateUtility(CrossSectionList, std::shared_ptr<Medium>, bool, bool, bool, std::string);
-    CrossSectionList CreateCrossSectionList(const nlohmann::json&, std::shared_ptr<Medium>,
-                                            std::shared_ptr<EnergyCutSettings>, bool);
+    /* static nlohmann::json ParseConfig(const std::string& config_file); */
+    /* void InitializeSectorFromJSON(const ParticleDef&, const nlohmann::json&, GlobalSettings); */
+    /* PropagationUtility CreateUtility(CrossSectionList, std::shared_ptr<Medium>, bool, bool, bool, std::string); */
+    /* CrossSectionList CreateCrossSectionList(const nlohmann::json&, std::shared_ptr<Medium>, std::shared_ptr<EnergyCutSettings>, bool); */
 
     ParticleDef p_def;
     std::shared_ptr<InterpolationDef> interpol_def_global = nullptr;

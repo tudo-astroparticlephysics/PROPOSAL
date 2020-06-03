@@ -70,28 +70,31 @@ public:
     {
     }
 
-    inline double CalculatedEdx(double energy)
+    inline double CalculatedEdx(double energy) override
     {
         return calculate_dedx(reinterpret_cast<base_param_ref_t>(param),
             integral, p_def, medium, *cut, energy,
             typename decay<Param>::type::only_stochastic{});
     }
-    inline double CalculatedE2dx(double energy)
+    inline double CalculatedE2dx(double energy) override
     {
         return calculate_de2dx(reinterpret_cast<base_param_ref_t>(param),
             integral, p_def, medium, *cut, energy,
             typename decay<Param>::type::only_stochastic{});
     }
-    inline rates_t CalculatedNdx(double energy)
+    inline rates_t CalculatedNdx(double energy) override
     {
         return CalculatedNdx_impl(
             energy, typename base_param_t::component_wise{});
     }
     inline double CalculateStochasticLoss(
-        const Component& comp, double energy, double rate)
+        const Component& comp, double energy, double rate) override
     {
         return CalculateStochasticLoss_impl(
             comp, energy, rate, typename base_param_t::component_wise{});
+    }
+    inline InteractionType GetInteractionType() const noexcept override {
+        return param.interaction_type;
     }
 };
 } // namespace PROPOSAL

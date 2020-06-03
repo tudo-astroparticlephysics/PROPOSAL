@@ -66,11 +66,15 @@ template <class P, class M> struct CrossSection {
     virtual double CalculatedEdx(double) = 0;
     virtual double CalculatedE2dx(double) = 0;
     virtual rates_t CalculatedNdx(double) = 0;
-    virtual double CalculateStochasticLoss(const Component&, double, double) = 0;
+    virtual double CalculateStochasticLoss(const Component&, double, double)
+        = 0;
+
+    virtual InteractionType GetInteractionType() const noexcept = 0;
 };
 
 template <typename P, typename M>
-using crosssection_t = CrossSection<typename decay<P>::type, typename decay<M>::type>;
+using crosssection_t
+    = CrossSection<typename decay<P>::type, typename decay<M>::type>;
 
 template <typename P, typename M>
 using crosssection_list_t = vector<shared_ptr<crosssection_t<P, M>>>;

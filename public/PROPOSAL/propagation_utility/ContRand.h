@@ -1,35 +1,32 @@
-/* #pragma once */
+#pragma once
 
-/* #include "PROPOSAL/math/MathMethods.h" */
-/* #include "PROPOSAL/propagation_utility/Displacement.h" */
+#include "PROPOSAL/math/MathMethods.h"
+#include "PROPOSAL/propagation_utility/Displacement.h"
 
-/* namespace PROPOSAL { */
+namespace PROPOSAL {
 
-/* class ContRand { */
-/* public: */
-/*     ContRand(CrossSectionList cross); */
-/*     virtual double EnergyRandomize( */
-/*         double initial_energy, double final_energy, double rnd) */
-/*         = 0; */
-
-/* protected: */
-/*     CrossSectionList cross; */
-/*     double lower_lim; */
-/* }; */
+struct ContRand {
+    ContRand() = default;
+    virtual double EnergyRandomize(double, double, double) = 0;
+};
 
 /* extern Interpolant1DBuilder::Definition contrand_interpol_def; */
 
 /* template <class T> class ContRandBuilder : public ContRand { */
 /*     T integral; */
 /*     DisplacementBuilder<UtilityIntegral> displacement; */
+
 /* public: */
 /*     ContRandBuilder<T>(CrossSectionList cross) */
 /*         : ContRand(cross) */
 /*         , displacement(cross) */
-/*         , integral(std::bind(&ContRandBuilder::ContRandIntegrand, this, std::placeholders::_1), lower_lim) */
+/*         , integral(std::bind(&ContRandBuilder::ContRandIntegrand, this, */
+/*                        std::placeholders::_1), */
+/*               lower_lim) */
 /*     { */
 /*         if (cross.size() < 1) */
-/*             throw std::invalid_argument("at least one crosssection is required."); */
+/*             throw std::invalid_argument( */
+/*                 "at least one crosssection is required."); */
 
 /*         if (typeid(T) == typeid(UtilityInterpolant)) { */
 /*             size_t hash_digest = 0; */
@@ -37,10 +34,12 @@
 /*                 hash_combine(hash_digest, c->GetHash()); */
 /*             } */
 /*             contrand_interpol_def.function1d = [this](double energy) { */
-/*                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate( */
-/*                         energy, lower_lim); */
+/*                 return
+ * reinterpret_cast<UtilityIntegral*>(&integral)->Calculate( */
+/*                     energy, lower_lim); */
 /*             }; */
-/*             integral.BuildTables("contrand", hash_digest, contrand_interpol_def); */
+/*             integral.BuildTables( */
+/*                 "contrand", hash_digest, contrand_interpol_def); */
 /*         } */
 /*     } */
 
@@ -58,8 +57,10 @@
 /*         double initial_energy, double final_energy, double rnd) override */
 /*     { */
 /*         assert(initial_energy >= final_energy); */
-/*         double variance = integral.Calculate(initial_energy, final_energy); */
+/*         double variance = integral.Calculate(initial_energy, final_energy);
+ */
 /*         return SampleFromGaussian( */
-/*             final_energy, std::sqrt(variance), rnd, lower_lim, initial_energy); */
+/*             final_energy, std::sqrt(variance), rnd, lower_lim,
+ * initial_energy); */
 /*     } */
-/* }; */
+} // namespace PROPOSAL

@@ -1,68 +1,101 @@
 #pragma once
-#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/propagation_utility/Displacement.h"
 
 namespace PROPOSAL {
 
 class Interaction {
 protected:
-    CrossSectionList cross;
     double lower_lim;
 
+    template <typename Cross, typename Disp>
+    double FunctionToIntegral(Cross&&, Disp&&, double);
+
 public:
-    Interaction(CrossSectionList cross);
+    Interaction(double lower_lim)
+        : lower_lim(lower_lim){};
     virtual ~Interaction() = default;
+
+    static Interpolant1DBuilder::Definition interpol_def;
+
+    enum { INTERACTION_TYPE, LOSS };
     virtual double EnergyInteraction(double, double) = 0;
-    std::shared_ptr<CrossSection> TypeInteraction(double, const std::array<double, 2>&);
+    virtual tuple<InteractionType, double> TypeInteraction(double, double)
+        = 0; // ARGS: energy, rate
 };
 
-extern Interpolant1DBuilder::Definition interaction_interpol_def;
+template <class T, class Cross> class InteractionBuilder : public Interaction {
+    T interaction_integral;
+    Cross crosssection_list;
 
-template <class T> class InteractionBuilder : public Interaction {
 public:
-    InteractionBuilder<T>(CrossSectionList cross)
-        : Interaction(cross)
-        , displacement(cross)
-        , integral(std::bind(&InteractionBuilder::InteractionIntegrand, this,
-                       std::placeholders::_1),
-              lower_lim)
-    {
-        if (typeid(T) == typeid(UtilityInterpolant)) {
-            size_t hash_digest = 0;
-            for (const auto& c : cross)
-                hash_combine(hash_digest, c->GetHash());
-            interaction_interpol_def.function1d = [this](double energy) {
-                return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                        energy, lower_lim, 0);
-            };
-            integral.BuildTables("interaction", hash_digest, interaction_interpol_def);
+    InteractionBuilder(Cross&&);
+
+    T BuildInteractionIntegral(Cross&&);
+
+    double EnergyInteraction(double, double) override;
+    tuple<InteractionType, double> TypeInteraction(double, double) override;
+};
+
+template <typename Cross, typename Disp>
+double Interaction::FunctionToIntegral(
+    Cross&& cross, Disp&& disp, double energy)
+{
+    auto total_rate = 0.f;
+    for (auto& c : cross)
+        total_rate += c->CalculatedNdx(energy);
+
+    return disp.FunctionToIntegral(energy) * total_rate;
+}
+
+template <class T, class Cross>
+InteractionBuilder<T, Cross>::InteractionBuilder(Cross&& cross)
+    : Interaction(GetLowerEnergyLim(cross))
+    , interaction_integral(BuildInteractionIntegral())
+    , crosssection_list(cross)
+{
+}
+
+template <class T, class Cross>
+T InteractionBuilder<T, Cross>::BuildInteractionIntegral(Cross&& cross)
+{
+    auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
+    auto interaction_func = [this, &cross, &disp](double energy) {
+        return FunctionToIntegral(cross, disp, energy);
+    };
+    T integral(interaction_func, GetLowerLim(cross));
+    if (typeid(T) == typeid(UtilityInterpolant)) {
+        auto hash = disp.GetHash(cross);
+        integral.BuildTables("interaction", hash, interpol_def);
+    };
+    return integral;
+}
+
+template <class T, class Cross>
+double InteractionBuilder<T, Cross>::EnergyInteraction(
+    double energy, double rnd)
+{
+    assert(energy >= lower_lim);
+    auto rndi = -std::log(rnd);
+    auto rndiMin = interaction_integral.Calculate(energy, lower_lim, rndi);
+    if (rndi >= rndiMin)
+        return lower_lim;
+    return interaction_integral.GetUpperLimit(energy, rndi);
+}
+
+template <class T, class Cross>
+tuple<InteractionType, double> InteractionBuilder<T, Cross>::TypeInteraction(
+    double energy, double rate)
+{
+    for (auto& c : crosssection_list) {
+        auto rates = c->CalculatedNdx(energy);
+        for (auto& r : rates) {
+            rate -= r;
+            if (rate < 0) {
+                auto loss = c->CalculateStochasticLoss(r.first, energy, -rate);
+                return make_tuple(c->GetInteractionType(), loss);
+            }
         }
     }
-
-    double InteractionIntegrand(double energy)
-    {
-        assert(energy >= lower_lim);
-        double total_rate = 0.0;
-        for (const auto& crosssection : cross)
-            total_rate += crosssection->CalculatedNdx(energy);
-
-        return displacement.FunctionToIntegral(energy) * total_rate;
-    }
-
-    double EnergyInteraction(double initial_energy, double rnd) override
-    {
-        assert(initial_energy >= lower_lim);
-        auto rndi = -std::log(rnd);
-        auto rndiMin = integral.Calculate(initial_energy, lower_lim, rndi);
-        if (rndi >= rndiMin)
-            return lower_lim;
-        return integral.GetUpperLimit(initial_energy, rndi);
-    }
-
-
-private:
-    DisplacementBuilder<UtilityIntegral> displacement;
-    T integral;
-};
-
+    throw std::logic_error("Given rate is larger than overall crosssection rate.");
+}
 }

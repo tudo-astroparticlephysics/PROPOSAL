@@ -1,24 +1,23 @@
 
-/* #include "PROPOSAL/propagation_utility/Decay.h" */
+#include "PROPOSAL/propagation_utility/Decay.h"
 
-/* using namespace PROPOSAL; */
+using namespace PROPOSAL;
 
-/* Decay::Decay(const CrossSectionList& cross, const ParticleDef& p_def) */
-/*     : Decay(cross, p_def.lifetime, p_def.mass){}; */
+Decay::Decay(double lifetime, double mass, double lower_lim)
+    : lifetime(lifetime)
+    , mass(mass)
+    , lower_lim(lower_lim)
+{
+}
 
-/* Decay::Decay(const CrossSectionList& cross, double lifetime, double mass) */
-/*     : cross(cross) */
-/*     , mass(mass) */
-/*     , lifetime(lifetime) */
-/*     , lower_lim(std::numeric_limits<double>::max()) */
-/* { */
-/*     if (cross.size() < 1) */
-/*         throw std::invalid_argument("at least one crosssection is required."); */
+Interpolant1DBuilder::Definition Decay::interpol_def{};
 
-/*     for (auto c : cross) */
-/*         lower_lim = std::min(lower_lim, c->GetLowerEnergyLimit()); */
-/* } */
-
-/* namespace PROPOSAL { */
-/* Interpolant1DBuilder::Definition decay_interpol_def; */
-/* } // namespace PROPOSAL */
+template <typename Disp>
+double Decay::FunctionToIntegral(Disp&& disp, double energy)
+{
+    assert(!isinf(lifetime));
+    assert(energy >= mass);
+    double square_momentum = (energy - mass) * (energy + mass);
+    double aux = SPEED * std::sqrt(square_momentum) / mass;
+    return disp.FunctionToIntegral(energy) / aux;
+}

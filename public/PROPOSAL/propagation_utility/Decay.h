@@ -1,76 +1,74 @@
 #pragma once
+#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/propagation_utility/Displacement.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
-#include "PROPOSAL/crossection/CrossSection.h"
 #include <math.h>
 
 namespace PROPOSAL {
 
 class Decay {
-public:
-    Decay(const CrossSectionList& cross, const ParticleDef&);
-    Decay(const CrossSectionList& cross, double lifetime, double mass);
-    virtual ~Decay() {};
-    virtual double EnergyDecay(double initial_energy, double rnd) = 0;
-
 protected:
-    CrossSectionList cross;
-    double mass;
     double lifetime;
+    double mass;
     double lower_lim;
-};
 
-extern Interpolant1DBuilder::Definition decay_interpol_def;
+    template <typename Disp> double FunctionToIntegral(Disp&&, double);
 
-template <class T> class DecayBuilder : public Decay {
 public:
-    DecayBuilder<T>(CrossSectionList cross, const ParticleDef& p_def) : DecayBuilder<T>(cross, p_def.lifetime, p_def.mass){};
+    Decay(double, double, double);
+    virtual ~Decay() = default;
 
-    DecayBuilder<T>(CrossSectionList cross, double lifetime, double mass)
-        : Decay(cross, lifetime, mass)
-        , displacement(cross)
-        , integral(std::bind(
-              &DecayBuilder::DecayIntegrand, this, std::placeholders::_1), lower_lim)
-    {
-        if (typeid(T) == typeid(UtilityInterpolant)) {
-            size_t hash_digest = 0;
-            for (const auto& c: cross)
-                hash_combine(hash_digest, c->GetHash());
-            decay_interpol_def.function1d = [this](double energy) {
-                return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                        energy, lower_lim, 0);
-            };
-            integral.BuildTables("decay", hash_digest, decay_interpol_def);
-        }
-    }
+    static Interpolant1DBuilder::Definition interpol_def;
 
-    double DecayIntegrand(double energy)
-    {
-        assert(!isinf(lifetime));
-        assert(energy >= mass);
-
-        double square_momentum = (energy - mass) * (energy + mass);
-        double aux = SPEED * std::sqrt(square_momentum) / mass;
-        return displacement.FunctionToIntegral(energy) / aux;
-    }
-
-    double EnergyDecay(double initial_energy, double rnd) override
-    {
-        auto rndd = -std::log(rnd);
-        auto rnddMin = integral.Calculate(initial_energy, lower_lim, rndd) / lifetime;
-
-        if (rndd >= rnddMin)
-            return lower_lim;
-
-        return integral.GetUpperLimit(initial_energy, rndd * lifetime);
-    }
-
-
-private:
-    T integral;
-    DisplacementBuilder<UtilityIntegral> displacement;
+    virtual double EnergyDecay(double, double) = 0;
 };
+
+template <class T, class Cross> class DecayBuilder : public Decay {
+    T decay_integral;
+
+    T BuildDecayIntegral(Cross&& cross);
+
+public:
+    DecayBuilder<T, Cross>(Cross&&, double, double);
+
+    double EnergyDecay(double, double) override;
+};
+
+template <class T, class Cross>
+DecayBuilder<T, Cross>::DecayBuilder(
+    Cross&& cross, double lifetime, double mass)
+    : Decay(lifetime, mass, GetLowerLim(cross))
+    , decay_integral(BuildDecayIntegral(cross))
+{
 }
+
+template <class T, class Cross>
+T DecayBuilder<T, Cross>::BuildDecayIntegral(Cross&& cross)
+{
+    auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
+    auto decay_func = [this, &disp](double energy) {
+        return FunctionToIntegral(disp, energy);
+    };
+    T decay_integral(decay_func, disp.GetLowerLim(cross));
+    if (typeid(T) == typeid(UtilityInterpolant)) {
+        auto hash = disp.GetHash(cross);
+        decay_integral.BuildTables("decay", hash, interpol_def);
+    };
+    return decay_integral;
+}
+
+template <class T, class Cross>
+double DecayBuilder<T, Cross>::EnergyDecay(double initial_energy, double rnd)
+{
+    auto rndd = -std::log(rnd);
+    auto rnddMin
+        = decay_integral.Calculate(initial_energy, lower_lim) / lifetime;
+    if (rndd >= rnddMin)
+        return lower_lim;
+    return decay_integral.GetUpperLimit(initial_energy, rndd * lifetime);
+}
+
+} //namespace PROPOSAL

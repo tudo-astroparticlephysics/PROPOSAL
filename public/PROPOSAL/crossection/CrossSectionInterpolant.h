@@ -93,7 +93,7 @@ public:
     }
     inline rates_t CalculatedNdx(double energy) override
     {
-        rates_t rates;
+        auto rates = rates_t{};
         for (auto& i : dndx)
             rates[i.first] = i.second->Interpolate(energy, 1.);
         return rates;
@@ -103,6 +103,9 @@ public:
     {
         return CalculateStochasticLoss_impl(
             comp, energy, rate, typename base_param_t::component_wise{});
+    }
+    inline InteractionType GetInteractionType() const noexcept override {
+        return param.interaction_type;
     }
 };
 

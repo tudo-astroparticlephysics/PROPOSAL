@@ -6,105 +6,81 @@
 namespace PROPOSAL {
 
 class Time {
-public:
-    Time();
-    virtual ~Time() = default;
-    virtual double TimeElapsed(double initial_energy, double final_energy, double time) = 0;
-    virtual double TimeElapsed(double distance) = 0;
-
-protected:
-    std::string name = "time";
-};
-
-extern Interpolant1DBuilder::Definition time_interpol_def;
-
-template <class T> class ExactTimeBuilder : public Time {
-public:
-    ExactTimeBuilder<T>(CrossSectionList cross, const ParticleDef& p_def) : ExactTimeBuilder<T>(cross, p_def.mass){};
-
-    ExactTimeBuilder<T>(CrossSectionList cross, double mass)
-        : mass(mass)
-        , lower_lim(InitializeLowerLim(cross))
-        , displacement(cross)
-        , integral(std::bind(
-              &ExactTimeBuilder::TimeIntegrand, this, std::placeholders::_1), lower_lim)
-    {
-        if (cross.size() < 1)
-            throw std::invalid_argument("at least one crosssection is required.");
-
-        if (typeid(T) == typeid(UtilityInterpolant)) {
-            size_t hash_digest = 0;
-            for (const auto& c: cross)
-                hash_combine(hash_digest, c->GetHash());
-
-            time_interpol_def.function1d = [this](double energy) {
-                return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
-                        energy, lower_lim, 0);
-            };
-            integral.BuildTables(name, hash_digest, time_interpol_def);
-        }
-    }
-
-    double TimeIntegrand(double energy)
-    {
-        assert(energy > mass);
-
-        auto square_momentum = (energy - mass) * (energy + mass);
-        auto particle_momentum = std::sqrt(square_momentum);
-
-        return displacement.FunctionToIntegral(energy) * energy
-            / (particle_momentum * SPEED);
-    }
-
-    double TimeElapsed(
-        double initial_energy, double final_energy, double time) override
-    {
-        assert(initial_energy >= final_energy);
-        return integral.Calculate(initial_energy, final_energy, time);
-    }
-
-    double TimeElapsedUpperLimit(double initial_energy, double time)
-    {
-        assert(time >= 0);
-        assert(initial_energy >= mass);
-        return integral.GetUpperLimit(initial_energy, time);
-    }
-
-    double TimeElapsed(double distance) override
-    {
-        (void) distance;
-        throw std::logic_error(
-            "Exact elapsed time can only be calculated using two energies");
-    }
-
-
-protected:
-    double InitializeLowerLim(CrossSectionList cross){
-        double lower_lim_tmp = std::numeric_limits<double>::max();
-        for (auto c : cross)
-            lower_lim_tmp = std::min(lower_lim_tmp, c->GetParametrization().GetLowerEnergyLim());
-        return lower_lim_tmp;
-    }
     double mass;
-    double lower_lim;
-    DisplacementBuilder<UtilityIntegral> displacement;
-    T integral;
+
+protected:
+    template <typename Disp> double FunctionToIntegral(Disp&&, double);
+
+public:
+    Time(double mass)
+        : mass(mass){};
+    virtual ~Time() = default;
+
+    static Interpolant1DBuilder::Definition interpol_def;
+
+    virtual double TimeElapsed(double, double, double) = 0;
 };
+
+template <typename T, typename Cross> class ExactTimeBuilder : public Time {
+    T time_integral;
+
+    T BuildTimeIntegral(Cross&&);
+
+public:
+    ExactTimeBuilder(Cross&& cross, const ParticleDef& p_def);
+
+    double TimeElapsed(double, double, double) override;
+};
+
+template <typename Disp>
+double Time::FunctionToIntegral(Disp&& disp, double energy)
+{
+    assert(energy > mass);
+    auto square_momentum = (energy - mass) * (energy + mass);
+    auto particle_momentum = std::sqrt(square_momentum);
+    return disp.FunctionToIntegral(energy) * energy
+        / (particle_momentum * SPEED);
+}
+
+template <typename T, typename Cross>
+ExactTimeBuilder<T, Cross>::ExactTimeBuilder(
+    Cross&& cross, const ParticleDef& p_def)
+    : Time(p_def.mass)
+    , time_integral(cross)
+{
+}
+
+template <typename T, typename Cross>
+T ExactTimeBuilder<T, Cross>::BuildTimeIntegral(Cross&& cross)
+{
+    auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
+    auto time_func = [this, &disp](double energy) {
+        return FunctionToIntegral(disp, energy);
+    };
+    T time_integral(time_func, disp.GetLowerLim(cross));
+    if (typeid(T) == typeid(UtilityInterpolant)) {
+        auto hash = disp.GetHash(cross);
+        time_integral.BuildTables("time", hash, interpol_def);
+    };
+    return time_integral;
+}
+
+template <typename T, typename Cross>
+double ExactTimeBuilder<T, Cross>::TimeElapsed(
+    double initial_energy, double final_energy, double)
+{
+    assert(initial_energy >= final_energy);
+    return time_integral.Calculate(initial_energy, final_energy);
+}
 
 class ApproximateTimeBuilder : public Time {
 public:
-    ApproximateTimeBuilder() {}
+    ApproximateTimeBuilder() = default;
 
-    double TimeElapsed(
-        double initial_energy, double final_energy, double time) override
+    double TimeElapsed(double, double, double distance) override
     {
-        (void)initial_energy;
-        (void)final_energy;
-        (void)time;
-        throw std::logic_error("Appoximated elapsed time can only be "
-                               "calculated using a given distance");
+        assert(distance >= 0);
+        return distance / SPEED;
     }
-
-    double TimeElapsed(double distance) override { assert(distance>=0); return distance / SPEED; }
 };
 }
