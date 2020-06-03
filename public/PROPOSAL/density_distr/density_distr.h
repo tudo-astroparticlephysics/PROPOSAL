@@ -30,12 +30,14 @@
 #include <functional>
 #include <string>
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
 class Axis {
    public:
     Axis();
     Axis(const Vector3D& fp0, const Vector3D& fAxis);
+    Axis(const nlohmann::json&);
     Axis(const Axis&);
 
     virtual ~Axis() {};
@@ -63,6 +65,7 @@ class RadialAxis : public Axis {
    public:
     RadialAxis();
     RadialAxis(const Vector3D& fAxis, const Vector3D& fp0);
+    RadialAxis(const nlohmann::json&);
 
     Axis* clone() const override { return new RadialAxis(*this); };
     ~RadialAxis() {};
@@ -77,6 +80,7 @@ class CartesianAxis : public Axis {
    public:
     CartesianAxis();
     CartesianAxis(const Vector3D& fAxis, const Vector3D& fp0);
+    CartesianAxis(const nlohmann::json&);
     ~CartesianAxis() {};
 
     Axis* clone() const override { return new CartesianAxis(*this); };
@@ -102,6 +106,7 @@ class Density_distr {
    public:
     Density_distr();
     Density_distr(const Axis& axis);
+    Density_distr(const nlohmann::json&);
     Density_distr(const Density_distr&);
 
     virtual ~Density_distr() { delete axis_; };
@@ -131,3 +136,7 @@ class Density_distr {
     Axis* axis_;
 };
 }  // namespace PROPOSAL
+
+namespace PROPOSAL {
+   std::shared_ptr<Density_distr> CreateDensityDistribution(const nlohmann::json&);
+} // namespace PROPOSAL

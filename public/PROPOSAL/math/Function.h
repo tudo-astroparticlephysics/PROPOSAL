@@ -31,6 +31,7 @@
 
 #include <functional>
 #include <vector>
+#include "PROPOSAL/json.hpp"
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%       Polynom      %%%%%%%%%%%%%%%%%%%%
@@ -41,6 +42,7 @@ namespace PROPOSAL {
 class Polynom {
    public:
     Polynom(std::vector<double> coefficients);
+    Polynom(const nlohmann::json&);
     Polynom(const Polynom&);
 
     ~Polynom() {};

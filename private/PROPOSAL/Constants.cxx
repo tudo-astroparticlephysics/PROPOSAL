@@ -1,5 +1,6 @@
 
 #include "PROPOSAL/Constants.h"
+#include <limits>
 
 // numbers
 const double PROPOSAL::PI               = 3.141592653589793;
@@ -64,4 +65,4 @@ const double PROPOSAL::CMON = 68.51799988; // monopole charge (in units of e) = 
 const double PROPOSAL::MSMP  = 1.e5; // Stable massive particle mass (MeV)
 const double PROPOSAL::MSTAU = 1.e5; // stau mass (MeV)
 
-const double PROPOSAL::STABLE_PARTICLE = -1.; // lifetime of stable particle, -1 because of history
+const double PROPOSAL::STABLE_PARTICLE = std::numeric_limits<double>::infinity(); // lifetime of stable particle

@@ -37,7 +37,7 @@
 namespace PROPOSAL {
 
 struct ParticleDef;
-class Utility;
+class PropagationUtility;
 
 struct Directions : std::enable_shared_from_this<Directions>
 {
@@ -60,10 +60,10 @@ public:
     friend std::ostream& operator<<(std::ostream&, Scattering const&);
 
     /* virtual Scattering* clone() const                          = 0; // virtual constructor idiom (used for deep copies) */
-    /* virtual Scattering* clone(const ParticleDef&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies) */
+    /* virtual Scattering* clone(const ParticleDef&, const PropagationUtility&) const = 0; // virtual constructor idiom (used for deep copies) */
 
 
-    std::tuple<Vector3D, Vector3D> Scatter(double dr, double ei, double ef, const Vector3D& pos, const Vector3D& old_direction, const std::array<double, 4>& rnd);
+    std::tuple<Vector3D, Vector3D> Scatter(double grammage, double ei, double ef, const Vector3D& old_direction, const std::array<double, 4>& rnd);
 
 
 protected:
@@ -78,10 +78,9 @@ protected:
         double sx, sy, tx, ty;
     };
 
-    virtual RandomAngles CalculateRandomAngle(double dr,
+    virtual RandomAngles CalculateRandomAngle(double grammage,
                                               double ei,
                                               double ef,
-                                              const Vector3D& pos,
                                               const std::array<double, 4>& rnd) = 0;
 
     double mass;

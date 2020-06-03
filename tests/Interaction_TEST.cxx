@@ -114,10 +114,30 @@ TEST(EnergyInteraction, Constraints){
     }
 }
 
-TEST(EnergyInteraction, compare_integral_interpolant){
+TEST(EnergyInteraction, compare_integral_interpolant1){
     RandomGenerator::Get().SetSeed(24601);
     auto medium = std::make_shared<StandardRock>();
     auto ecuts = std::make_shared<EnergyCutSettings>(std::numeric_limits<double>::infinity(), 0.05, false);
+    auto muon = MuMinusDef();
+    auto cross = muon.GetCrossSections(medium, ecuts);
+
+    auto interaction_integral = InteractionBuilder<UtilityIntegral>(cross);
+    auto interaction_interpol = InteractionBuilder<UtilityInterpolant>(cross);
+
+    auto energies = std::array<double, 6>{1e3, 1e5, 1e7, 1e9, 1e11, 1e13};
+    double rnd, energy_integral, energy_interpol;
+    for(auto E_i : energies){
+        rnd = RandomGenerator::Get().RandomDouble();
+        energy_integral = interaction_integral.EnergyInteraction(E_i, rnd);
+        energy_interpol = interaction_interpol.EnergyInteraction(E_i, rnd);
+        EXPECT_NEAR(energy_integral, energy_interpol, energy_integral*1e-4);
+    }
+}
+
+TEST(EnergyInteraction, compare_integral_interpolant2){
+    RandomGenerator::Get().SetSeed(24601);
+    auto medium = std::make_shared<StandardRock>();
+    auto ecuts = std::make_shared<EnergyCutSettings>(500, 0.05, false);
     auto muon = MuMinusDef();
     auto cross = muon.GetCrossSections(medium, ecuts);
 

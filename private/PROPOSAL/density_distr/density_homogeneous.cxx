@@ -1,7 +1,7 @@
 
 #include <cmath>
 #include <iostream>
-#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
+#include "PROPOSAL/density_distr/density_homogeneous.h"
 
 using namespace PROPOSAL;
 
@@ -14,6 +14,10 @@ Density_homogeneous::Density_homogeneous(double correction_factor)
 Density_homogeneous::Density_homogeneous(const Density_homogeneous& dens_distr)
     : Density_distr(dens_distr),
       correction_factor_(dens_distr.correction_factor_) {}
+
+Density_homogeneous::Density_homogeneous(const nlohmann::json& config) : Density_distr() {
+    correction_factor_ = config.value("correction_factor", 1.);
+}
 
 
 bool Density_homogeneous::compare(const Density_distr& dens_distr) const {

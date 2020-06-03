@@ -47,8 +47,8 @@ double UtilityInterpolant::Calculate(double energy_initial, double energy_final)
         return FunctionToIntegral((energy_initial + energy_initial) / 2)
             * (energy_final - energy_initial);
 
-    const auto integral_upper_limit = interpolant_->Interpolate(energy_initial);
-    const auto integral_lower_limit = interpolant_->Interpolate(energy_final);
+    auto integral_upper_limit = interpolant_->Interpolate(energy_initial);
+    auto integral_lower_limit = interpolant_->Interpolate(energy_final);
 
     return integral_upper_limit - integral_lower_limit;
 }
@@ -58,8 +58,8 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
 {
     assert(rnd >= 0);
 
-    const auto integrated_to_upper = interpolant_->Interpolate(upper_limit);
-    const auto lower_limit = interpolant_->FindLimit(integrated_to_upper - rnd);
+    auto integrated_to_upper = interpolant_->Interpolate(upper_limit);
+    auto lower_limit = interpolant_->FindLimit(integrated_to_upper - rnd);
 
     assert(integrated_to_upper > rnd); // searched Energy is below lower_lim
                                        // return lower_lim as a lower limit
@@ -67,7 +67,7 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
     if (upper_limit - lower_limit > upper_limit * IPREC)
         return lower_limit;
 
-    const auto step = upper_limit + 0.5 * rnd / FunctionToIntegral(upper_limit);
+    auto step = upper_limit + 0.5 * rnd / FunctionToIntegral(upper_limit);
 
     return upper_limit + rnd / FunctionToIntegral(step);
 }

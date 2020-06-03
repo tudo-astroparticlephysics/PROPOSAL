@@ -47,5 +47,6 @@ static std::map<const Geometry_Type, std::shared_ptr<Geometry>> Geometry_Map{
 
 namespace PROPOSAL {
 std::shared_ptr<Geometry> CreateGeometry(std::string name);
+std::shared_ptr<Geometry> CreateGeometry(const nlohmann::json& config);
 std::shared_ptr<Geometry> CreateGeometry(Geometry_Type type);
 } // namespace PROPOSAL

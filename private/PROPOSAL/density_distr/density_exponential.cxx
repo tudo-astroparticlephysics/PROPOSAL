@@ -1,12 +1,17 @@
 
 #include <cmath>
 #include <iostream>
-#include "PROPOSAL/medium/density_distr/density_exponential.h"
+#include "PROPOSAL/density_distr/density_exponential.h"
 
 using namespace PROPOSAL;
 
 Density_exponential::Density_exponential(const Axis& axis, double sigma)
     : Density_distr(axis), sigma_(sigma) {}
+
+Density_exponential::Density_exponential(const nlohmann::json& config) : Density_distr(config) {
+    sigma_ = config.value("sigma", 1.);
+}
+
 
 double Density_exponential::GetDepth(const Vector3D& xi) const {
     return axis_->GetDepth(xi) / sigma_;

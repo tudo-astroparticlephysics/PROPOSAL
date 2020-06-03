@@ -51,7 +51,7 @@ public:
     ScatteringHighland(const ScatteringHighland&);
 
     /* virtual Scattering* clone() const override { return new ScatteringHighland(*this); } */
-    /* virtual Scattering* clone(const ParticleDef& particle_def, const Utility& utility) const override */
+    /* virtual Scattering* clone(const ParticleDef& particle_def, const PropagationUtility& utility) const override */
     /* { */
     /*     (void)utility; */
     /*     return new ScatteringHighland(particle_def, *this); */
@@ -63,8 +63,8 @@ protected:
     bool compare(const Scattering&) const override;
     void print(std::ostream&) const override;
 
-    RandomAngles CalculateRandomAngle(double dr, double ei, double ef, const Vector3D& pos, const array<double, 4>& rnd) override;
-    virtual double CalculateTheta0(double dr, double ei, double ef, const Vector3D& pos);
+    RandomAngles CalculateRandomAngle(double grammage, double ei, double ef, const array<double, 4>& rnd) override;
+    virtual double CalculateTheta0(double grammage, double ei, double ef);
 
     std::shared_ptr<const Medium> medium_;
     double charge;

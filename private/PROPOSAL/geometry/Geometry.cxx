@@ -72,7 +72,7 @@ Geometry::Geometry(const nlohmann::json& config)
     hierarchy_ = config.value("hierarchy", 0);
 
     if(not config.contains("origin"))
-        throw std::invalid_argument("No geometry originfound.");
+        throw std::invalid_argument("No geometry origin found.");
     position_ = Vector3D(config.at("origin"));
 }
 

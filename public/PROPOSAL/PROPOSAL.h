@@ -84,11 +84,11 @@
 #include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 
-#include "PROPOSAL/medium/density_distr/density_distr.h"
-#include "PROPOSAL/medium/density_distr/density_exponential.h"
-#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
-#include "PROPOSAL/medium/density_distr/density_polynomial.h"
-#include "PROPOSAL/medium/density_distr/density_splines.h"
+#include "PROPOSAL/density_distr/density_distr.h"
+#include "PROPOSAL/density_distr/density_exponential.h"
+#include "PROPOSAL/density_distr/density_homogeneous.h"
+#include "PROPOSAL/density_distr/density_polynomial.h"
+#include "PROPOSAL/density_distr/density_splines.h"
 
 #include "PROPOSAL/math/Function.h"
 #include "PROPOSAL/math/Integral.h"
@@ -102,6 +102,8 @@
 
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+
+#include "PROPOSAL/Propagator.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"

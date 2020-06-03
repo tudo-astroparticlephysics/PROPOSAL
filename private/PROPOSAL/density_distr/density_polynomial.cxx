@@ -4,7 +4,7 @@
 #include <functional>
 #include <iostream>
 #include "PROPOSAL/math/MathMethods.h"
-#include "PROPOSAL/medium/density_distr/density_polynomial.h"
+#include "PROPOSAL/density_distr/density_polynomial.h"
 
 using namespace PROPOSAL;
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -24,6 +24,13 @@ Density_polynomial::Density_polynomial(const Density_polynomial& dens)
       Polynom_(dens.Polynom_),
       density_distribution(polynom_.GetFunction()),
       antiderived_density_distribution(Polynom_.GetFunction()) {}
+
+Density_polynomial::Density_polynomial(const nlohmann::json& config) : Density_distr(config),
+    polynom_(config),
+    Polynom_(polynom_.GetAntiderivative(0)),
+    density_distribution(polynom_.GetFunction()),
+    antiderived_density_distribution(Polynom_.GetFunction()) {}
+
 
 Density_polynomial::~Density_polynomial() {}
 

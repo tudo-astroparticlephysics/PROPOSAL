@@ -35,78 +35,81 @@
 
 namespace PROPOSAL {
 
-extern Interpolant1DBuilder::Definition interpol_def;
+template <class T>
+class ScatteringHighlandIntegral : public ScatteringHighland {
+public:
+    ScatteringHighlandIntegral<T>(const ParticleDef& p_def,
+        std::shared_ptr<const Medium> medium, CrossSectionList cross)
+        : ScatteringHighland(p_def, medium)
+        , lower_lim(InitializeLowerLim(cross))
+        , displacement(new DisplacementBuilder<UtilityIntegral>(cross))
+        , integral(std::bind(&ScatteringHighlandIntegral::HighlandIntegral,
+              this, std::placeholders::_1), lower_lim)
+    {
+        if (typeid(T) == typeid(UtilityInterpolant)) {
+            size_t hash_digest = 0;
+            for (const auto& crosssection : cross)
+                hash_combine(hash_digest, crosssection->GetHash());
+            interpol_def.function1d = [this](double energy) {
+                return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate(
+                     energy, interpol_def.xmax, 0);
+            };
 
-/* template <class T> */
-/* class ScatteringHighlandIntegral : public ScatteringHighland { */
-/* public: */
-/*     ScatteringHighlandIntegral<T>(const ParticleDef& p_def, */
-/*         std::shared_ptr<const Medium> medium, CrossSectionList cross) */
-/*         : ScatteringHighland(p_def, medium) */
-/*         , lower_lim(InitializeLowerLim(cross)) */
-/*         , displacement(new DisplacementBuilder<UtilityIntegral>(cross)) */
-/*         , integral(std::bind(&ScatteringHighlandIntegral::HighlandIntegral, */
-/*               this, std::placeholders::_1), lower_lim) */
-/*     { */
-/*         if (typeid(T) == typeid(UtilityInterpolant)) { */
-/*             size_t hash_digest = 0; */
-/*             for (const auto& crosssection : cross) */
-/*                 hash_combine(hash_digest, crosssection->GetHash()); */
-/*             interpol_def.function1d = [this](double energy) { */
-/*                 return reinterpret_cast<UtilityIntegral*>(&integral)->Calculate( */
-/*                      energy, interpol_def.xmax); */
-/*             }; */
+            integral.BuildTables("scattering", hash_digest, interpol_def);
+        }
+    }
 
-/*             integral.BuildTables("scattering", hash_digest, interpol_def); */
-/*         } */
-/*     } */
+    double HighlandIntegral(double energy)
+    {
+        double square_momentum = (energy - mass) * (energy + mass);
+        double aux = energy / square_momentum;
 
-/*     double HighlandIntegral(double energy) */
-/*     { */
-/*         double square_momentum = (energy - mass) * (energy + mass); */
-/*         double aux = energy / square_momentum; */
+        return displacement->FunctionToIntegral(energy) * aux * aux;
+    }
 
-/*         return displacement->FunctionToIntegral(energy) * aux * aux; */
-/*     } */
+    static Interpolant1DBuilder::Definition interpol_def;
 
-/* private: */
-/*     ScatteringHighlandIntegral& operator=(const ScatteringHighlandIntegral&) */
-/*         = delete; */
+private:
+    ScatteringHighlandIntegral& operator=(const ScatteringHighlandIntegral&)
+        = delete;
 
-/*     bool compare(const Scattering& scattering) const override */
-/*     { */
-/*         // TODO: Add ScatteringHighlandIntegral comparison operator */
-/*         throw std::logic_error( */
-/*             "This comparison function has not been implemented yet. " */
-/*             "The developers need to put on the thinking caps to fix it."); */
-/*     } */
+    bool compare(const Scattering& scattering) const override
+    {
+        // TODO: Add ScatteringHighlandIntegral comparison operator
+        throw std::logic_error(
+            "This comparison function has not been implemented yet. "
+            "The developers need to put on the thinking caps to fix it.");
+    }
 
-/*     void print(std::ostream&) const override {} */
+    void print(std::ostream&) const override {}
 
-/*     double CalculateTheta0( */
-/*         double dr, double ei, double ef, const Vector3D& pos) override */
-/*     { */
-/*         double aux = integral.Calculate(ei, ef) */
-/*             * medium_->GetDensityDistribution().Evaluate(pos); */
-/*         double cutoff = 1; */
-/*         double radiation_length = medium_->GetRadiationLength(pos); */
+    double CalculateTheta0(double grammage, double ei, double ef) override
+    {
+        double aux = integral.Calculate(ei, ef, 0.0);
+        double cutoff = 1;
+        double radiation_length = medium_->GetRadiationLength();
 
-/*         aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_length) */
-/*             * std::abs(charge); */
-/*         aux *= std::max(1 + 0.038 * std::log(dr / radiation_length), 0.0); */
+        aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_length)
+            * std::abs(charge);
+        aux *= std::max(1 + 0.038 * std::log(grammage / radiation_length), 0.0);
 
-/*         return std::min(aux, cutoff); */
-/*     } */
+        return std::min(aux, cutoff);
+    }
 
-/*     double InitializeLowerLim(CrossSectionList cross){ */
-/*         double lower_lim_tmp = std::numeric_limits<double>::max(); */
-/*         for (auto c : cross) */
-/*             lower_lim_tmp = std::min(lower_lim_tmp, c->GetLowerEnergyLimit()); */
-/*         return lower_lim_tmp; */
-/*     } */
+    double InitializeLowerLim(CrossSectionList cross){
+        double lower_lim_tmp = std::numeric_limits<double>::max();
+        for (auto c : cross)
+            lower_lim_tmp = std::min(lower_lim_tmp, c->GetParametrization().GetLowerEnergyLim());
+        return lower_lim_tmp;
+    }
 
-/*     double lower_lim; */
-/*     std::unique_ptr<Displacement> displacement; */
-/*     T integral; */
-/* }; */
+    double lower_lim;
+    std::unique_ptr<Displacement> displacement;
+    T integral;
+};
+
+template <class T>
+Interpolant1DBuilder::Definition ScatteringHighlandIntegral<T>::interpol_def(
+    nullptr, 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+
 } // namespace PROPOSAL

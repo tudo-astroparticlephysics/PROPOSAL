@@ -33,6 +33,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "PROPOSAL/json.hpp"
 #include "PROPOSAL/math/Function.h"
 
 namespace PROPOSAL {
@@ -55,6 +56,7 @@ class Spline {
     Spline(std::vector<double>, std::vector<double>);
     Spline(std::vector<Polynom>, std::vector<double>);
     Spline(std::string spline_path, bool binary);
+    Spline(const nlohmann::json&);
     Spline(const Spline&);
     virtual ~Spline() {};
 
@@ -101,6 +103,7 @@ class Linear_Spline : public Spline {
     Linear_Spline(std::vector<double>, std::vector<double>);
     Linear_Spline(std::vector<Polynom>, std::vector<double>);
     Linear_Spline(std::string spline_path, bool binary);
+    Linear_Spline(const nlohmann::json&);
     Linear_Spline(const Spline&);
 
     Spline* clone() const override { return new Linear_Spline(*this); };
@@ -124,6 +127,7 @@ class Cubic_Spline : public Spline {
     Cubic_Spline(std::vector<double>, std::vector<double>);
     Cubic_Spline(std::vector<Polynom>, std::vector<double>);
     Cubic_Spline(std::string spline_path, bool binary);
+    Cubic_Spline(const nlohmann::json&);
     Cubic_Spline(const Spline&);
 
     Spline* clone() const override { return new Cubic_Spline(*this); };
