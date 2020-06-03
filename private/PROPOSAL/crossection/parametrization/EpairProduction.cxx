@@ -29,23 +29,32 @@ EpairProduction::EpairProduction(bool lpm)
 {
 }
 
+double EpairProduction::GetLowerEnergyLim(const ParticleDef& p_def) const
+    noexcept
+{
+    return p_def.mass + 2.f * ME;
+}
 tuple<double, double> EpairProduction::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy)
+    const ParticleDef& p_def, const Component& comp, double energy) const
+    noexcept
 {
     auto aux = p_def.mass / energy;
-
     auto v_min = 4 * ME / energy;
     auto v_max = 1 - 0.75 * SQRTE * aux * std::pow(comp.GetNucCharge(), 1. / 3);
-
     aux = 1 - 6 * aux * aux;
     v_max = std::min(v_max, aux);
     // limits.vMax = std::min(limits.vMax, 1 - p_def.mass / particle_energy);
-
-    if (v_max < v_min) {
+    if (v_max < v_min)
         v_max = v_min;
-    }
-
     return make_tuple(v_min, v_max);
+}
+
+size_t EpairProduction::GetHash() const noexcept
+{
+    size_t seed = Parametrization::GetHash();
+    hash_combine(seed, lpm_);
+
+    return seed;
 }
 
 // ------------------------------------------------------------------------- //
@@ -183,14 +192,6 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(
                     std::bind(&EpairProductionRhoIntegral::FunctionToIntegral,
                         this, p_def, comp, energy, v, std::placeholders::_1),
                     4));
-}
-
-size_t EpairProductionRhoIntegral::GetHash() const
-{
-    size_t seed = Parametrization::GetHash();
-    hash_combine(seed, lpm_);
-
-    return seed;
 }
 
 /******************************************************************************

@@ -7,8 +7,8 @@
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/particle/Particle.h"
 
-using std::logic_error;
 using std::get;
+using std::logic_error;
 using std::make_tuple;
 using namespace PROPOSAL;
 
@@ -18,17 +18,9 @@ Ionization::Ionization(const EnergyCutSettings& cuts)
 {
 }
 
-tuple<double, double> Ionization::GetKinematicLimits(
-    const ParticleDef&, const Component&, double)
+double Ionization::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept
 {
-    throw logic_error(
-        "Componentwise operation doesn't make sense for ionization.");
-}
-double Ionization::DifferentialCrossSection(
-    const ParticleDef&, const Component&, double, double)
-{
-    throw logic_error(
-        "Componentwise operation doesn't make sense for ionization.");
+    return p_def.mass;
 }
 
 double Ionization::FunctionToDNdxIntegral(
@@ -52,13 +44,12 @@ double Ionization::Delta(const Medium& medium, double beta, double gamma)
 }
 
 tuple<double, double> IonizBetheBlochRossi::GetKinematicLimits(
-    const ParticleDef& p_def, const Medium& medium, double energy)
+    const ParticleDef& p_def, const Medium& medium, double energy) const
+    noexcept
 {
     auto mass_ration = ME / p_def.mass;
     auto gamma = energy / p_def.mass;
-
     auto v_min = (1.e-6 * medium.GetI()) / energy;
-
     // PDG eq. 33.4
     // v_{max} = \frac{1}{E} \frac{2 m_e \beta^2 \gamma^2}
     //          {1 + 2 \gamma \frac{m_e}{m_{particle} +
@@ -66,10 +57,8 @@ tuple<double, double> IonizBetheBlochRossi::GetKinematicLimits(
     auto v_max = 2 * ME * (gamma * gamma - 1)
         / ((1 + 2 * gamma * mass_ration + mass_ration * mass_ration) * energy);
     v_max = std::min(v_max, 1. - p_def.mass / energy);
-
     if (v_max < v_min)
         v_max = v_min;
-
     return make_tuple(v_min, v_max);
 }
 
@@ -87,7 +76,6 @@ IonizBetheBlochRossi::IonizBetheBlochRossi(const EnergyCutSettings& cuts)
 double IonizBetheBlochRossi::DifferentialCrossSection(
     const ParticleDef& p_def, const Medium& medium, double energy, double v)
 {
-    double result;
 
     // TODO(mario): Better way? Sat 2017/09/02
     double square_momentum = (energy - p_def.mass) * (energy + p_def.mass);
@@ -103,7 +91,7 @@ double IonizBetheBlochRossi::DifferentialCrossSection(
     // chapter 2, eq. 7
     double spin_1_2_contribution = v / (1 + 1 / gamma);
     spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
-    result = 1
+    auto result = 1
         - beta
             * (v
                   / get<Parametrization::V_MAX>(
@@ -186,8 +174,11 @@ double IonizBetheBlochRossi::InelCorrection(
     double gamma = energy / p_def.mass;
 
     a = std::log(1 + 2 * v * energy / ME);
-    b = std::log(
-        (1 - v / get<Parametrization::V_MAX>(GetKinematicLimits(p_def, medium, energy))) / (1 - v));
+    b = std::log((1
+                     - v
+                         / get<Parametrization::V_MAX>(
+                               GetKinematicLimits(p_def, medium, energy)))
+        / (1 - v));
     c = std::log((2 * gamma * (1 - v) * ME) / (p_def.mass * v));
     result = a * (2 * b + c) - b * b;
 
@@ -218,7 +209,11 @@ double IonizBetheBlochRossi::CrossSectionWithoutInelasticCorrection(
     // chapter 2, eq. 7
     double spin_1_2_contribution = v / (1 + 1 / gamma);
     spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
-    result = 1 - beta * (v / get<Parametrization::V_MAX>(GetKinematicLimits(p_def, medium, energy)))
+    result = 1
+        - beta
+            * (v
+                  / get<Parametrization::V_MAX>(
+                        GetKinematicLimits(p_def, medium, energy)))
         + spin_1_2_contribution;
     result *= IONK * p_def.charge * p_def.charge
         * calculate_proton_massnumber_fraction(medium.GetComponents())
@@ -242,7 +237,7 @@ IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(
 }
 
 tuple<double, double> IonizBergerSeltzerBhabha::GetKinematicLimits(
-    const ParticleDef& p_def, const Medium& medium, double energy)
+    const ParticleDef& p_def, const Medium& medium, double energy) const noexcept
 {
     auto v_min = 0.;
     auto v_max = 1. - ME / energy;
@@ -361,7 +356,7 @@ IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(
 }
 
 tuple<double, double> IonizBergerSeltzerMoller::GetKinematicLimits(
-    const ParticleDef& p_def, const Medium& medium, double energy)
+    const ParticleDef& p_def, const Medium& medium, double energy) const noexcept
 {
     auto v_min = 0.;
     auto v_max = 0.5 * (1. - ME / energy);

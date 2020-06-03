@@ -27,7 +27,8 @@ HardComponent::HardComponent(const ParticleDef& particle_def)
 
     if (!y.empty()) {
         for (unsigned int i = 0; i < y.size(); i++) {
-            interpolant_.push_back(make_shared<Interpolant>(x, y.at(i), 4, false, false));
+            interpolant_.push_back(
+                make_shared<Interpolant>(x, y.at(i), 4, false, false));
         }
     } else {
         log_fatal("No HardComponent tables provided for the given particle %s",
@@ -171,29 +172,26 @@ Photonuclear::Photonuclear()
 {
 }
 
-tuple<double, double> Photonuclear::GetKinematicLimits(const ParticleDef& p_def, const Component& comp, double energy)
+double Photonuclear::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept {
+    return p_def.mass;
+}
+
+tuple<double, double> Photonuclear::GetKinematicLimits(
+    const ParticleDef& p_def, const Component& comp, double energy) const noexcept
 {
     auto v_min
-        = (MPI + MPI * MPI / (2 * comp.GetAverageNucleonWeight()))
-        / energy;
-
-    auto v_max = 1.;
+        = (MPI + MPI * MPI / (2 * comp.GetAverageNucleonWeight())) / energy;
+    auto v_max = 1.f;
     if (p_def.mass < MPI) {
-        auto aux
-            = p_def.mass / comp.GetAverageNucleonWeight();
-
-        v_max -= comp.GetAverageNucleonWeight() * (1 + aux * aux)
-            / (2 * energy);
+        auto aux = p_def.mass / comp.GetAverageNucleonWeight();
+        v_max
+            -= comp.GetAverageNucleonWeight() * (1 + aux * aux) / (2 * energy);
     }
-
     // vMax calculated above is always smaller than 1-m/E
     // in comparison, the following inequality arise
     // (M-m)^2 >= 0
     // limits.vMax = std::min(limits.vMax, 1 - p_def.mass/energy);
-
-    if (v_max < v_min) {
-        v_max = v_min;
-    }
-
+    if (v_max < v_min)
+        return make_tuple(v_min, v_min);
     return make_tuple(v_min, v_max);
 }

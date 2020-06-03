@@ -31,7 +31,6 @@
 #include <cmath>
 #include <fstream>
 #include <functional>
-#include <functional>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
@@ -41,15 +40,19 @@ class Annihilation : public Parametrization {
 public:
     Annihilation();
     virtual ~Annihilation() = default;
+
     using component_wise = std::true_type;
     using only_stochastic = std::true_type;
 
-    tuple<double, double> GetKinematicLimits(const ParticleDef&, const Component&, double) override;
+    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
+    tuple<double, double> GetKinematicLimits(
+        const ParticleDef&, const Component&, double) const noexcept override;
 };
 
 struct AnnihilationHeitler : public Annihilation {
     AnnihilationHeitler();
-    using base_param_t = Annihilation;                                   \
+
+    using base_param_t = Annihilation;
 
     double DifferentialCrossSection(
         const ParticleDef&, const Component&, double, double) override;

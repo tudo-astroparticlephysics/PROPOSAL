@@ -67,10 +67,11 @@ protected:
     double eLpm_;
 
 public:
-    using only_stochastic = std::false_type;
-    using component_wise = std::true_type;
     EpairProduction(bool);
     virtual ~EpairProduction() = default;
+
+    using only_stochastic = std::false_type;
+    using component_wise = std::true_type;
 
     // ----------------------------------------------------------------------------
     /// @brief This is the calculation of the dSigma/dv
@@ -85,8 +86,10 @@ public:
         const ParticleDef&, const Component&, double energy, double v)
         = 0;
 
+    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
     tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double energy);
+        const ParticleDef&, const Component&, double energy) const noexcept override;
+    size_t GetHash() const noexcept override;
 };
 
 template <>
@@ -116,7 +119,6 @@ public:
         double energy, double v, double rho)
         = 0;
 
-    virtual size_t GetHash() const;
 };
 
 EPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)

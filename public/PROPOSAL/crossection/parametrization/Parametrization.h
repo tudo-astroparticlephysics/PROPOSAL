@@ -57,7 +57,7 @@ public:
         const ParticleDef&, const Component&, double, double);
 
     virtual tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double);
+        const ParticleDef&, const Component&, double) const noexcept;
 
     inline double FunctionToDNdxIntegral(const ParticleDef& p_def,
         const Component& comp, double energy, double v)
@@ -77,9 +77,8 @@ public:
         return v * v * DifferentialCrossSection(p_def, comp, energy, v);
     }
 
-
-    virtual double GetLowerEnergyLim(const ParticleDef&) const { return 0; };
-    virtual size_t GetHash() const;
+    virtual double GetLowerEnergyLim(const ParticleDef&) const noexcept;
+    virtual size_t GetHash() const noexcept;
 };
 } // namespace PROPOSAL
 

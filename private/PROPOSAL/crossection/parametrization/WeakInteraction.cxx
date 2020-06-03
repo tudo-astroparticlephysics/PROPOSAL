@@ -17,15 +17,16 @@ WeakInteraction::WeakInteraction()
 {
 }
 
+double WeakInteraction::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept {
+    return p_def.mass;
+}
 tuple<double, double> WeakInteraction::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy)
+    const ParticleDef& p_def, const Component& comp, double energy) const noexcept
 {
     double aux = (MP + MN) / 2; // for isoscalar targets
     aux = 2 * energy * aux + pow(aux, 2);
-
     auto v_min = 1e6 / (aux); // q^2_min = 1e6 MeV for experimental reasons
-    auto v_max = 1;
-
+    auto v_max = 1.f;
     return make_tuple(v_min, v_max);
 }
 

@@ -15,8 +15,13 @@ Compton::Compton()
 {
 }
 
+double Compton::GetLowerEnergyLim(const ParticleDef&) const noexcept
+{
+    return ME;
+}
+
 tuple<double, double> Compton::GetKinematicLimits(
-    const ParticleDef&, const Component&, double energy)
+    const ParticleDef&, const Component&, double energy) const noexcept
 {
     assert(energy > 0);
     auto vmax = 1. - 1. / (1. + 2. * energy / ME);

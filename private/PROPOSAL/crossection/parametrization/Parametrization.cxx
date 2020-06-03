@@ -11,11 +11,12 @@ using namespace PROPOSAL;
 using std::make_tuple;
 using std::string;
 
-Parametrization::Parametrization(InteractionType interaction_type, const string& name)
-    :interaction_type(interaction_type), name(name)
+Parametrization::Parametrization(
+    InteractionType interaction_type, const string& name)
+    : interaction_type(interaction_type)
+    , name(name)
 {
 }
-
 
 double Parametrization::DifferentialCrossSection(
     const ParticleDef&, const Component&, double, double)
@@ -24,15 +25,14 @@ double Parametrization::DifferentialCrossSection(
 }
 
 tuple<double, double> Parametrization::GetKinematicLimits(
-    const ParticleDef&, const Component&, double)
+    const ParticleDef&, const Component&, double) const noexcept
 {
     throw std::logic_error("Not implemented error.");
 }
 
-size_t Parametrization::GetHash() const
+size_t Parametrization::GetHash() const noexcept
 {
-    size_t hash_digest = 0;
+    auto hash_digest = size_t{ 0 };
     hash_combine(hash_digest, name);
-
     return hash_digest;
 }

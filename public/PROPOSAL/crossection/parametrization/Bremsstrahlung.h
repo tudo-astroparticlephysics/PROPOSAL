@@ -58,10 +58,11 @@ protected:
     double lpm(const ParticleDef&, const Component&, double, double, double);
 
 public:
-    using only_stochastic = std::false_type;
-    using component_wise = std::true_type;
     Bremsstrahlung(bool);
     virtual ~Bremsstrahlung() = default;
+
+    using only_stochastic = std::false_type;
+    using component_wise = std::true_type;
 
     virtual double DifferentialCrossSection(
         const ParticleDef&, const Component&, double, double);
@@ -69,10 +70,10 @@ public:
         const ParticleDef&, const Component&, double, double)
         = 0;
 
+    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
     tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double energy);
-    double GetLowerEnergyLim(const ParticleDef&) const override;
-    size_t GetHash() const;
+        const ParticleDef&, const Component&, double) const noexcept override;
+    size_t GetHash() const noexcept override;
 };
 
 BREMSSTRAHLUNG_DEF(PetrukhinShestakov)

@@ -31,29 +31,15 @@ Bremsstrahlung::Bremsstrahlung(bool lpm)
 {
 }
 
-double Bremsstrahlung::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+double Bremsstrahlung::GetLowerEnergyLim(const ParticleDef& p_def) const
+    noexcept
 {
-    // $\frac{\alpha}{v} (2 Z_{nucl} z_{particle}^2 r_e
-    // \frac{m_e}{m_{particle}})^2$ is the typical Bremsstrahlung prefactor used
-    // in every Parametrization
-
-    auto result = CalculateParametrization(p_def, comp, energy, v);
-
-    auto aux = 2 * p_def.charge * p_def.charge * (ME / p_def.mass) * RE
-        * comp.GetNucCharge();
-    aux *= aux * (ALPHA / v) * result;
-
-    if (lpm_) {
-        throw logic_error("some work to do!");
-        aux *= lpm(p_def, comp, 0, energy, v);
-    }
-
-    return NA / comp.GetAtomicNum() * aux;
+    return p_def.mass;
 }
 
 tuple<double, double> Bremsstrahlung::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy)
+    const ParticleDef& p_def, const Component& comp, double energy) const
+    noexcept
 {
     // The limit is taken from the Petrukhin/Shestakov Parametrization
     auto v_min = 0.;
@@ -75,9 +61,26 @@ tuple<double, double> Bremsstrahlung::GetKinematicLimits(
     return make_tuple(v_min, v_max);
 }
 
-double Bremsstrahlung::GetLowerEnergyLim(const ParticleDef& p_def) const
+
+double Bremsstrahlung::DifferentialCrossSection(
+    const ParticleDef& p_def, const Component& comp, double energy, double v)
 {
-    return p_def.mass;
+    // $\frac{\alpha}{v} (2 Z_{nucl} z_{particle}^2 r_e
+    // \frac{m_e}{m_{particle}})^2$ is the typical Bremsstrahlung prefactor used
+    // in every Parametrization
+
+    auto result = CalculateParametrization(p_def, comp, energy, v);
+
+    auto aux = 2 * p_def.charge * p_def.charge * (ME / p_def.mass) * RE
+        * comp.GetNucCharge();
+    aux *= aux * (ALPHA / v) * result;
+
+    if (lpm_) {
+        throw logic_error("some work to do!");
+        aux *= lpm(p_def, comp, 0, energy, v);
+    }
+
+    return NA / comp.GetAtomicNum() * aux;
 }
 
 double Bremsstrahlung::lpm(const ParticleDef& p_def, const Component& comp,
@@ -159,12 +162,11 @@ double Bremsstrahlung::lpm(const ParticleDef& p_def, const Component& comp,
         / ((4. / 3) * (1 - v) + v * v);
 }
 
-size_t Bremsstrahlung::GetHash() const
+size_t Bremsstrahlung::GetHash() const noexcept
 {
-    size_t seed = Parametrization::GetHash();
-    hash_combine(seed, lpm_, lorenz_);
-
-    return seed;
+    size_t hash_digest = Parametrization::GetHash();
+    hash_combine(hash_digest, lpm_, lorenz_);
+    return hash_digest;
 }
 
 BREMSSTRAHLUNG_IMPL(PetrukhinShestakov)

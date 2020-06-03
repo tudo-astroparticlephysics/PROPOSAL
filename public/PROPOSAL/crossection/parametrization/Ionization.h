@@ -41,24 +41,24 @@ protected:
 
 public:
     Ionization(const EnergyCutSettings&);
+    virtual ~Ionization() = default;
+
     using only_stochastic = std::false_type;
     using component_wise = std::false_type;
 
-    tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double);
     virtual double FunctionToDEdxIntegral(
         const ParticleDef&, const Medium&, double, double)
         = 0;
     virtual tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Medium&, double)
+        const ParticleDef&, const Medium&, double) const noexcept
         = 0;
     double FunctionToDNdxIntegral(
         const ParticleDef&, const Medium&, double, double);
-    double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double) override;
     virtual double DifferentialCrossSection(
         const ParticleDef&, const Medium&, double, double)
         = 0;
+
+    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
 };
 
 class IonizBetheBlochRossi : public Ionization {
@@ -71,7 +71,7 @@ public:
     using base_param_t = Ionization;
 
     tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Medium&, double) override;
+        const ParticleDef&, const Medium&, double) const noexcept override;
     double DifferentialCrossSection(
         const ParticleDef&, const Medium&, double, double) override;
     double FunctionToDEdxIntegral(
@@ -83,7 +83,7 @@ struct IonizBergerSeltzerBhabha : public Ionization {
     using base_param_t = Ionization;
 
     tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Medium&, double) override;
+        const ParticleDef&, const Medium&, double) const noexcept override;
     double DifferentialCrossSection(
         const ParticleDef&, const Medium&, double, double) override;
     double FunctionToDEdxIntegral(
@@ -95,7 +95,7 @@ struct IonizBergerSeltzerMoller : public Ionization {
     using base_param_t = Ionization;
 
     tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Medium&, double) override;
+        const ParticleDef&, const Medium&, double) const noexcept override;
     double DifferentialCrossSection(
         const ParticleDef&, const Medium&, double, double) override;
     double FunctionToDEdxIntegral(

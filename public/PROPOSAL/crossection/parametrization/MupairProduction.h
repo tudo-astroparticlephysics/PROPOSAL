@@ -64,8 +64,9 @@ public:
         const ParticleDef&, const Component&, double energy, double v, double r)
         = 0;
 
+    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
     tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double);
+        const ParticleDef&, const Component&, double) const noexcept override;
 };
 
 class MupairProductionRhoIntegral : public MupairProduction {

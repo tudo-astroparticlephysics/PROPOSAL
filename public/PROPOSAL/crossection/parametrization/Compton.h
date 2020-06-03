@@ -37,32 +37,34 @@ class Compton : public Parametrization {
 public:
     Compton();
     virtual ~Compton() = default;
+
     using only_stochastic = std::false_type;
     using component_wise = std::true_type;
 
+    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
     tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double energy) override;
+        const ParticleDef&, const Component&, double) const noexcept override;
 };
 
 struct ComptonKleinNishina : public Compton {
     ComptonKleinNishina() = default;
-    using base_param_t = Compton;                                   \
+    using base_param_t = Compton;
 
     double DifferentialCrossSection(
         const ParticleDef&, const Component&, double energy, double v);
 };
 
 template <>
-double integrate_dndx(Integral&, Compton&, const ParticleDef&,
-    const Component&, double, double, double);
+double integrate_dndx(Integral&, Compton&, const ParticleDef&, const Component&,
+    double, double, double);
 
 template <>
 double calculate_upper_lim_dndx(Integral&, Compton&, const ParticleDef&,
     const Component&, double, double, double, double);
 
 template <>
-double integrate_dedx(Integral&, Compton&, const ParticleDef&,
-    const Component&, double, double, double);
+double integrate_dedx(Integral&, Compton&, const ParticleDef&, const Component&,
+    double, double, double);
 
 template <>
 double integrate_de2dx(Integral&, Compton&, const ParticleDef&,

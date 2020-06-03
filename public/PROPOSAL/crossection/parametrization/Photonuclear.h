@@ -26,7 +26,6 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include <cmath>
@@ -38,29 +37,23 @@ using std::shared_ptr;
 
 namespace PROPOSAL {
 
-/******************************************************************************
- *                               HardComponent                                 *
- ******************************************************************************/
-
 class Interpolant;
 
-class RealPhoton
-{
+class RealPhoton {
 public:
-    RealPhoton() =default;
+    RealPhoton() = default;
     virtual ~RealPhoton() {}
 
     virtual double CalculateHardComponent(double energy, double v) = 0;
 
     virtual const std::string& GetName() const = 0;
-
 };
 
-class SoftComponent : public RealPhoton
-{
+class SoftComponent : public RealPhoton {
     static const std::string name_;
+
 public:
-    SoftComponent() =default;
+    SoftComponent() = default;
     virtual ~SoftComponent() = default;
 
     virtual double CalculateHardComponent(double energy, double v);
@@ -68,12 +61,12 @@ public:
     virtual const std::string& GetName() const { return name_; }
 };
 
-class HardComponent : public RealPhoton
-{
+class HardComponent : public RealPhoton {
     static std::vector<double> x;
     std::vector<shared_ptr<Interpolant>> interpolant_;
 
     static const std::string name_;
+
 public:
     HardComponent(const ParticleDef&);
     virtual ~HardComponent() = default;
@@ -81,24 +74,21 @@ public:
     double CalculateHardComponent(double energy, double v);
 
     virtual const std::string& GetName() const { return name_; }
-
 };
 
-class ShadowEffect
-{
+class ShadowEffect {
 public:
     ShadowEffect() {}
     virtual ~ShadowEffect() {}
 
-
-    virtual double CalculateShadowEffect(const Component&, double x, double nu) = 0;
+    virtual double CalculateShadowEffect(const Component&, double x, double nu)
+        = 0;
 
     virtual const std::string& GetName() const = 0;
-    virtual size_t GetHash() const             = 0;
+    virtual size_t GetHash() const = 0;
 };
 
-class ShadowDuttaRenoSarcevicSeckel : public ShadowEffect
-{
+class ShadowDuttaRenoSarcevicSeckel : public ShadowEffect {
 public:
     ShadowDuttaRenoSarcevicSeckel()
         : ShadowEffect()
@@ -114,8 +104,7 @@ private:
     static const std::string name_;
 };
 
-class ShadowButkevichMikhailov : public ShadowEffect
-{
+class ShadowButkevichMikhailov : public ShadowEffect {
 public:
     ShadowButkevichMikhailov()
         : ShadowEffect()
@@ -124,7 +113,6 @@ public:
 
     double CalculateShadowEffect(const Component&, double x, double nu);
 
-
     virtual const std::string& GetName() const { return name_; }
     virtual size_t GetHash() const;
 
@@ -132,16 +120,21 @@ private:
     static const std::string name_;
 };
 
-class Photonuclear : public Parametrization
-{
+class Photonuclear : public Parametrization {
 public:
     Photonuclear();
+    virtual ~Photonuclear();
+
     using only_stochastic = std::false_type;
     using component_wise = std::true_type;
 
-    virtual double DifferentialCrossSection(const ParticleDef&, const Component&, double energy, double v) = 0;
+    virtual double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double)
+        = 0;
 
-    virtual tuple<double, double> GetKinematicLimits(const ParticleDef&, const Component&, double energy);
+    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
+    tuple<double, double> GetKinematicLimits(
+        const ParticleDef&, const Component&, double) const noexcept override;
 };
 
 } // namespace PROPOSAL

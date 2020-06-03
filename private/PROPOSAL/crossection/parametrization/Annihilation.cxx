@@ -16,18 +16,20 @@ Annihilation::Annihilation()
 {
 }
 
+double Annihilation::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept
+{
+    return p_def.mass * 2.f;
+}
+
 tuple<double, double> Annihilation::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy)
+    const ParticleDef& p_def, const Component& comp, double energy) const noexcept
 {
     // Limits according to simple 2->2 body interactions
-
     assert(energy >= p_def.mass);
     auto gamma = energy / p_def.mass;
     auto aux = std::sqrt((gamma - 1.) / (gamma + 1.));
-
     auto vmin = 0.5 * (1. - aux);
     auto vmax = 0.5 * (1. + aux);
-
     return make_tuple(vmin, vmax);
 }
 

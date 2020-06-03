@@ -17,22 +17,21 @@ PhotoPairProduction::PhotoPairProduction()
 {
 }
 
+double PhotoPairProduction::GetLowerEnergyLim(const ParticleDef&) const noexcept
+{
+    return 2 * ME;
+}
+
 tuple<double, double> PhotoPairProduction::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy)
+    const ParticleDef& p_def, const Component& comp, double energy) const
+    noexcept
 {
     // x is the integration variable here
     if (energy <= 2. * ME)
         return make_tuple(0.5, 0.5);
-
     auto vmin = ME / energy;
     auto vmax = 1. - ME / energy;
-
     return make_tuple(vmin, vmax);
-}
-
-PhotoPairTsai::PhotoPairTsai()
-    : PhotoPairProduction()
-{
 }
 
 double PhotoPairTsai::DifferentialCrossSection(

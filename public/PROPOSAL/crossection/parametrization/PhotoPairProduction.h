@@ -37,6 +37,7 @@ class PhotoPairProduction : public Parametrization {
 public:
     PhotoPairProduction();
     virtual ~PhotoPairProduction() = default;
+
     using only_stochastic = std::true_type;
     using component_wise = std::true_type;
 
@@ -44,12 +45,13 @@ public:
         const ParticleDef&, const Component&, double, double)
         = 0;
 
-    virtual tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double);
+    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
+    tuple<double, double> GetKinematicLimits(
+        const ParticleDef&, const Component&, double) const noexcept override;
 };
 
 struct PhotoPairTsai : public PhotoPairProduction {
-    PhotoPairTsai();
+    PhotoPairTsai() = default;
     using base_param_t = PhotoPairProduction;
 
     virtual double DifferentialCrossSection(
