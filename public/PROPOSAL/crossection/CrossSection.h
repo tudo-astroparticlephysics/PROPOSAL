@@ -37,6 +37,9 @@
 #include <unordered_map>
 #include <vector>
 
+using std::add_lvalue_reference;
+using std::decay;
+
 namespace PROPOSAL {
 
 using Components::Component;

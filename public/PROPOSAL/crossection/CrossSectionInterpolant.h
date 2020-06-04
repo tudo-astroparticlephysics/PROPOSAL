@@ -29,7 +29,8 @@
 #pragma once
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/CrossSectionIntegral.h"
+#include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/methods.h"
 
@@ -39,6 +40,7 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 
 using std::get;
+using std::unordered_map;
 
 namespace PROPOSAL {
 
@@ -46,14 +48,18 @@ double transform_relativ_loss(double v_cut, double v_max, double v);
 
 template <typename Param, typename P, typename M>
 class CrossSectionInterpolant : public crosssection_t<P, M> {
-    Param param;
-    P p_def;
-    M medium;
+
+    using param_t = typename decay<Param>::type;
+    using particle_t = typename decay<P>::type;
+    using medium_t = typename decay<M>::type;
+    using base_param_ref_t =
+        typename add_lvalue_reference<typename param_t::base_param_t>::type;
+
+    param_t param;
+    particle_t p_def;
+    medium_t medium;
     shared_ptr<const EnergyCutSettings> cut;
     InterpolationDef def;
-
-    using base_param_t = typename decay<Param>::type::base_param_t;
-    using base_param_ref_t = typename add_lvalue_reference<base_param_t>::type;
 
     double CalculateStochasticLoss_impl(
         const Component&, double, double, std::true_type);
@@ -101,8 +107,8 @@ public:
     inline double CalculateStochasticLoss(
         const Component& comp, double energy, double rate)
     {
-        return CalculateStochasticLoss_impl(
-            comp, energy, rate, typename base_param_t::component_wise{});
+        return CalculateStochasticLoss_impl(comp, energy, rate,
+            typename param_t::base_param_t::component_wise{});
     }
     inline size_t GetHash() const noexcept override
     {
@@ -131,7 +137,8 @@ unique_ptr<Interpolant> build_dedx(Param&& param, const ParticleDef& p_def,
     interpol_def.function1d
         = [&integral, &param, &p_def, &medium, &cut](double energy) {
               return calculate_dedx(param, integral, p_def, medium, cut, energy,
-                  typename decay<Param>::type::only_stochastic{});
+                  typename decay<Param>::type::only_stochastic{},
+                  typename decay<Param>::type::component_wise{});
           };
     interpol_def.max = def.nodes_cross_section;
     interpol_def.xmin = param.GetLowerEnergyLim(p_def);
@@ -156,7 +163,8 @@ unique_ptr<Interpolant> build_de2dx(Param&& param, const ParticleDef& p_def,
     interpol_def.function1d
         = [&integral, &param, &p_def, &medium, &cut](double energy) {
               return calculate_de2dx(param, integral, p_def, medium, cut,
-                  energy, typename decay<Param>::type::only_stochastic{});
+                  energy, typename decay<Param>::type::only_stochastic{},
+                  typename decay<Param>::type::component_wise{});
           };
     interpol_def.max = def.nodes_continous_randomization;
     interpol_def.xmin = param.GetLowerEnergyLim(p_def);

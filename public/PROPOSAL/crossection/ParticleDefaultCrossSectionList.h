@@ -48,13 +48,13 @@ crosssection_list_t<EMinusDef, M> GetStdCrossSections(const EMinusDef& e,
     crosssection_list_t<EMinusDef, M> cross;
     cross.emplace_back(make_crosssection(brems, e, medium, cut, false));
     cross.emplace_back(make_crosssection(epair, e, medium, cut, false));
-    /* cross.emplace_back(make_crosssection(ioniz, e, medium, cut, false)); */
+    cross.emplace_back(make_crosssection(ioniz, e, medium, cut, false));
     cross.emplace_back(make_crosssection(photo, e, medium, cut, false));
     return cross;
 }
 
 template <typename M>
-crosssection_list_t<EMinusDef, M> GetStdCrossSections(const MuMinusDef& mu,
+crosssection_list_t<MuMinusDef, M> GetStdCrossSections(const MuMinusDef& mu,
     M&& medium, std::shared_ptr<const EnergyCutSettings> cut)
 {
     BremsKelnerKokoulinPetrukhin brems{ false };
@@ -63,7 +63,7 @@ crosssection_list_t<EMinusDef, M> GetStdCrossSections(const MuMinusDef& mu,
     PhotoAbramowiczLevinLevyMaor97 photo{
         make_unique<ShadowButkevichMikhailov>()
     };
-    crosssection_list_t<EMinusDef, M> cross;
+    crosssection_list_t<MuMinusDef, M> cross;
     cross.emplace_back(make_crosssection(brems, mu, medium, cut, false));
     cross.emplace_back(make_crosssection(epair, mu, medium, cut, false));
     cross.emplace_back(make_crosssection(ioniz, mu, medium, cut, false));

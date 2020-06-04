@@ -29,6 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -36,10 +37,10 @@
 #include <unordered_map>
 
 using std::add_lvalue_reference;
-using std::get;
-using std::forward;
-using std::shared_ptr;
 using std::decay;
+using std::forward;
+using std::get;
+using std::shared_ptr;
 using std::unordered_map;
 
 namespace PROPOSAL {
@@ -79,15 +80,19 @@ public:
 
     inline double CalculatedEdx(double energy) override
     {
-        return calculate_dedx(reinterpret_cast<base_param_ref_t>(param),
+        auto aux = calculate_dedx(reinterpret_cast<base_param_ref_t>(param),
             integral, p_def, medium, *cut, energy,
-            typename decay<Param>::type::only_stochastic{});
+            typename param_t::only_stochastic{},
+            typename param_t::component_wise{});
+        std::cout << param.name << ": " << aux / medium.GetMassDensity() << std::endl;
+        return aux;
     }
     inline double CalculatedE2dx(double energy) override
     {
         return calculate_de2dx(reinterpret_cast<base_param_ref_t>(param),
             integral, p_def, medium, *cut, energy,
-            typename decay<Param>::type::only_stochastic{});
+            typename param_t::only_stochastic{},
+            typename param_t::component_wise{});
     }
     inline rates_t CalculatedNdx(double energy) override
     {
@@ -122,7 +127,8 @@ namespace PROPOSAL {
 template <typename Param>
 double calculate_dedx(Param&& param, Integral& integral,
     const ParticleDef& p_def, const Medium& medium,
-    const EnergyCutSettings& cut, double energy, std::false_type)
+    const EnergyCutSettings& cut, double energy, std::false_type,
+    std::true_type)
 {
     double sum = 0.;
     for (const auto& comp : medium.GetComponents()) {
@@ -135,8 +141,21 @@ double calculate_dedx(Param&& param, Integral& integral,
 }
 
 template <typename Param>
+double calculate_dedx(Param&& param, Integral& integral,
+    const ParticleDef& p_def, const Medium& medium,
+    const EnergyCutSettings& cut, double energy, std::false_type,
+    std::false_type)
+{
+    auto lim = param.GetKinematicLimits(p_def, medium, energy);
+    auto v_cut = cut.GetCut(lim, energy);
+    return integrate_dedx(integral, param, p_def, medium, energy,
+               get<Parametrization::V_MIN>(lim), v_cut)
+        * energy;
+}
+
+template <typename Param, typename Comp_wise>
 double calculate_dedx(Param&&, Integral&, const ParticleDef&, const Medium&,
-    const EnergyCutSettings&, double, std::true_type)
+    const EnergyCutSettings&, double, std::true_type, Comp_wise)
 {
     return 0.;
 }
@@ -144,12 +163,13 @@ double calculate_dedx(Param&&, Integral&, const ParticleDef&, const Medium&,
 class Ionization;
 template <>
 double calculate_dedx(Ionization&, Integral&, const ParticleDef&, const Medium&,
-    const EnergyCutSettings&, double, std::false_type);
+    const EnergyCutSettings&, double, std::false_type, std::false_type);
 
 template <typename Param>
 double calculate_de2dx(Param&& param, Integral& integral,
     const ParticleDef& p_def, const Medium& medium,
-    const EnergyCutSettings& cut, double energy, std::false_type)
+    const EnergyCutSettings& cut, double energy, std::false_type,
+    std::true_type)
 {
     double sum = 0.;
     for (const auto& comp : medium.GetComponents()) {
@@ -162,8 +182,21 @@ double calculate_de2dx(Param&& param, Integral& integral,
 }
 
 template <typename Param>
+double calculate_de2dx(Param&& param, Integral& integral,
+    const ParticleDef& p_def, const Medium& medium,
+    const EnergyCutSettings& cut, double energy, std::false_type,
+    std::false_type)
+{
+    auto lim = param.GetKinematicLimits(p_def, medium, energy);
+    auto v_cut = cut.GetCut(lim, energy);
+    return integrate_de2dx(integral, param, p_def, medium, energy,
+               get<Parametrization::V_MIN>(lim), v_cut)
+        * energy * energy;
+}
+
+template <typename Param, typename Comp_wise>
 double calculate_de2dx(Param&&, Integral&, const ParticleDef&, const Medium&,
-    const EnergyCutSettings&, double, std::true_type)
+    const EnergyCutSettings&, double, std::true_type, Comp_wise)
 {
     return 0.;
 }

@@ -54,6 +54,8 @@ public:
         = 0;
     double FunctionToDNdxIntegral(
         const ParticleDef&, const Medium&, double, double);
+    double FunctionToDE2dxIntegral(
+        const ParticleDef&, const Medium&, double, double);
     virtual double DifferentialCrossSection(
         const ParticleDef&, const Medium&, double, double)
         = 0;

@@ -102,24 +102,24 @@ double calculate_upper_lim_dndx(Integral& integral, P&& param,
     return integral.GetUpperLimit();
 }
 
-template <typename Param>
+template <typename Param, typename M>
 double integrate_dedx(Integral& integral, Param&& param,
-    const ParticleDef& p_def, const Component& comp, double energy,
+    const ParticleDef& p_def, M& medium, double energy,
     double v_min, double v_max)
 {
-    auto dEdx = [&param, &p_def, &comp, energy](double v) {
-        return param.FunctionToDEdxIntegral(p_def, comp, energy, v);
+    auto dEdx = [&param, &p_def, &medium, energy](double v) {
+        return param.FunctionToDEdxIntegral(p_def, medium, energy, v);
     };
     return integral.Integrate(v_min, v_max, dEdx, 2);
 }
 
-template <typename Param>
+template <typename Param, typename M>
 double integrate_de2dx(Integral& integral, Param&& param,
-    const ParticleDef& p_def, const Component& comp, double energy,
+    const ParticleDef& p_def, M& medium, double energy,
     double v_min, double v_max)
 {
-    auto dE2dx = [&param, &p_def, &comp, energy](double v) {
-        return param.FunctionToDE2dxIntegral(p_def, comp, energy, v);
+    auto dE2dx = [&param, &p_def, &medium, energy](double v) {
+        return param.FunctionToDE2dxIntegral(p_def, medium, energy, v);
     };
     return integral.Integrate(v_min, v_max, dE2dx, 2);
 }

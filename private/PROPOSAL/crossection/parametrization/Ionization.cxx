@@ -29,6 +29,12 @@ double Ionization::FunctionToDNdxIntegral(
     return DifferentialCrossSection(p_def, medium, energy, v);
 }
 
+double Ionization::FunctionToDE2dxIntegral(
+    const ParticleDef& p_def, const Medium& medium, double energy, double v)
+{
+    return v * FunctionToDEdxIntegral(p_def, medium, energy, v);
+}
+
 double Ionization::Delta(const Medium& medium, double beta, double gamma)
 {
     auto X = std::log(beta * gamma) / std::log(10);
@@ -58,7 +64,7 @@ tuple<double, double> IonizBetheBlochRossi::GetKinematicLimits(
         / ((1 + 2 * gamma * mass_ration + mass_ration * mass_ration) * energy);
     v_max = std::min(v_max, 1. - p_def.mass / energy);
     if (v_max < v_min)
-        v_max = v_min;
+        return make_tuple(v_min, v_min);
     return make_tuple(v_min, v_max);
 }
 
@@ -237,7 +243,8 @@ IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(
 }
 
 tuple<double, double> IonizBergerSeltzerBhabha::GetKinematicLimits(
-    const ParticleDef& p_def, const Medium& medium, double energy) const noexcept
+    const ParticleDef& p_def, const Medium& medium, double energy) const
+    noexcept
 {
     auto v_min = 0.;
     auto v_max = 1. - ME / energy;
@@ -356,7 +363,8 @@ IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(
 }
 
 tuple<double, double> IonizBergerSeltzerMoller::GetKinematicLimits(
-    const ParticleDef& p_def, const Medium& medium, double energy) const noexcept
+    const ParticleDef& p_def, const Medium& medium, double energy) const
+    noexcept
 {
     auto v_min = 0.;
     auto v_max = 0.5 * (1. - ME / energy);
@@ -370,7 +378,6 @@ tuple<double, double> IonizBergerSeltzerMoller::GetKinematicLimits(
 double IonizBergerSeltzerMoller::DifferentialCrossSection(
     const ParticleDef& p_def, const Medium& medium, double energy, double v)
 {
-
     /*
      * Moller-Crosssection, taken from : "The EGS5 Code System",
      * Hirayama, Hideo and Namito, Yoshihito and Bielajew, Alex and Wilderman,
