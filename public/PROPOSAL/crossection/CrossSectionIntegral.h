@@ -37,19 +37,26 @@
 
 using std::add_lvalue_reference;
 using std::get;
+using std::forward;
+using std::shared_ptr;
+using std::decay;
 using std::unordered_map;
 
 namespace PROPOSAL {
 template <typename Param, typename P, typename M>
 class CrossSectionIntegral : public crosssection_t<P, M> {
-    Integral integral;
-    Param param;
-    P p_def;
-    M medium;
-    shared_ptr<const EnergyCutSettings> cut;
 
-    using base_param_t = typename decay<Param>::type::base_param_t;
-    using base_param_ref_t = typename add_lvalue_reference<base_param_t>::type;
+    using param_t = typename decay<Param>::type;
+    using particle_t = typename decay<P>::type;
+    using medium_t = typename decay<M>::type;
+    using base_param_ref_t =
+        typename add_lvalue_reference<typename param_t::base_param_t>::type;
+
+    Integral integral;
+    param_t param;
+    particle_t p_def;
+    medium_t medium;
+    shared_ptr<const EnergyCutSettings> cut;
 
     rates_t CalculatedNdx_impl(double energy, std::true_type);
     rates_t CalculatedNdx_impl(double energy, std::false_type);
@@ -60,13 +67,13 @@ class CrossSectionIntegral : public crosssection_t<P, M> {
         const Component&, double, double, std::false_type);
 
 public:
-    CrossSectionIntegral(Param&& param, P&& p_def, M&& medium,
-        shared_ptr<const EnergyCutSettings> cut)
+    CrossSectionIntegral(Param&& _param, P&& _p_def, M&& _medium,
+        shared_ptr<const EnergyCutSettings> _cut)
         : CrossSection<typename decay<P>::type, typename decay<M>::type>()
-        , param(param)
-        , p_def(p_def)
-        , medium(medium)
-        , cut(cut)
+        , param(forward<Param>(_param))
+        , p_def(forward<P>(_p_def))
+        , medium(forward<M>(_medium))
+        , cut(_cut)
     {
     }
 
@@ -85,15 +92,27 @@ public:
     inline rates_t CalculatedNdx(double energy) override
     {
         return CalculatedNdx_impl(
-            energy, typename base_param_t::component_wise{});
+            energy, typename param_t::base_param_t::component_wise{});
     }
     inline double CalculateStochasticLoss(
         const Component& comp, double energy, double rate) override
     {
-        return CalculateStochasticLoss_impl(
-            comp, energy, rate, typename base_param_t::component_wise{});
+        return CalculateStochasticLoss_impl(comp, energy, rate,
+            typename param_t::base_param_t::component_wise{});
     }
-    inline InteractionType GetInteractionType() const noexcept override {
+    inline size_t GetHash() const noexcept override
+    {
+        auto hash_digest = size_t{ 0 };
+        hash_combine(hash_digest, param.GetHash(), p_def.GetHash(),
+            medium.GetHash(), cut->GetHash());
+        return hash_digest;
+    }
+    inline double GetLowerEnergyLim() const override
+    {
+        return param.GetLowerEnergyLim(p_def);
+    }
+    inline InteractionType GetInteractionType() const noexcept override
+    {
         return param.interaction_type;
     }
 };

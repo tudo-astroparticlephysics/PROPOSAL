@@ -1,9 +1,11 @@
 #pragma once
 
+#include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include <string>
 #include <vector>
+#include <utility>
 
 using std::string;
 
@@ -18,16 +20,13 @@ struct Displacement {
     template <typename Cross> double FunctionToIntegral(Cross&&, double);
     virtual double SolveTrackIntegral(double, double) = 0;
     virtual double UpperLimitTrackIntegral(double, double) = 0;
-
-protected:
-    template <typename Cross> size_t GetHash(Cross&&) const;
 };
 
-template <class T, class Cross>
+template <typename T, typename Cross>
 class DisplacementBuilder : public Displacement {
     T disp_integral;
 
-    T BuildTrackIntegral(Cross&&);
+    T BuildTrackIntegral(const Cross& cross);
 
 public:
     DisplacementBuilder(Cross&&);
@@ -35,57 +34,72 @@ public:
     double UpperLimitTrackIntegral(double, double) override;
 };
 
-template <typename Cross> double GetLowerLim(Cross&& cross)
+template <typename Cross>
+double Displacement::FunctionToIntegral(Cross&& cross, double energy)
 {
-    auto result
-        = std::max_element(cross.begin(), cross.end(), [](Cross a, Cross b) {
-              return b->GetLowerEnergyLim() < b->GetLowerEnergyLim();
-          });
-    return *result->GetLowerEnergyLim();
+    auto result = 0.0;
+    for (auto& cr : cross)
+        result += cr->CalculatedEdx(energy);
+
+    return -1.0 / result;
 }
 
-template <typename Cross> size_t GetHash(Cross&& cross)
-{
-    auto hash_digest = size_t{ 0 };
-    for (const auto& c : cross)
-        hash_combine(hash_digest, c->GetHash());
-    return hash_digest;
-}
+struct CrossSectionVector {
+    template <typename CrossVec> static double GetLowerLim(CrossVec&& cross_vec)
+    {
+        using val_t = typename std::decay<CrossVec>::type::value_type;
+        auto result = std::max_element(
+            cross_vec.begin(), cross_vec.end(), [](val_t a, val_t b) {
+                return a->GetLowerEnergyLim() < b->GetLowerEnergyLim();
+            });
+        return (*result)->GetLowerEnergyLim();
+    }
 
-template <class T, class Cross>
+    template <typename CrossVec> static size_t GetHash(CrossVec&& cross)
+    {
+        auto hash_digest = size_t{ 0 };
+        for (auto& c : cross)
+            hash_combine(hash_digest, c->GetHash());
+        return hash_digest;
+    }
+};
+
+template <typename T, typename Cross>
 DisplacementBuilder<T, Cross>::DisplacementBuilder(Cross&& cross)
-    : disp_integral(BuildTrackIntegral())
+    : Displacement()
+    , disp_integral(BuildTrackIntegral(std::forward<Cross>(cross)))
+{
+}
+
+template <typename T, typename Cross>
+T DisplacementBuilder<T, Cross>::BuildTrackIntegral(const Cross& cross)
 {
     if (cross.size() < 1)
         throw std::invalid_argument("at least one crosssection is required.");
-}
-
-template <class T, class Cross>
-T DisplacementBuilder<T, Cross>::BuildTrackIntegral(Cross&& cross)
-{
     auto disp_func = [this, &cross](double energy) {
         return FunctionToIntegral(cross, energy);
     };
-    T integral(disp_func, GetLowerLim(cross));
+    auto low_lim = CrossSectionVector::GetLowerLim(cross);
+    T integral(disp_func, low_lim);
     if (typeid(T) == typeid(UtilityInterpolant)) {
-        auto hash = GetHash(cross);
+        auto hash = CrossSectionVector::GetHash(cross);
         integral.BuildTables("displacement", hash, interpol_def);
     };
     return integral;
 }
 
-template <class T, class Cross>
+template <typename T, typename Cross>
 double DisplacementBuilder<T, Cross>::SolveTrackIntegral(
     double upper_lim, double lower_lim)
 {
-    return disp_integral->Calculate(upper_lim, lower_lim);
+    return disp_integral.Calculate(upper_lim, lower_lim);
 }
 
-template <class T, class Cross>
+template <typename T, typename Cross>
 double DisplacementBuilder<T, Cross>::UpperLimitTrackIntegral(
     double lower_limit, double sum)
 {
-    return disp_integral->GetUpperLimit(lower_limit, sum);
+    return disp_integral.GetUpperLimit(lower_limit, sum);
 }
 
 } // namespace PROPOSAL

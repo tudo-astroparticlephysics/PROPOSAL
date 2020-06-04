@@ -64,20 +64,17 @@ public:
     {
         return DifferentialCrossSection(p_def, comp, energy, v);
     }
-
     inline double FunctionToDEdxIntegral(const ParticleDef& p_def,
         const Component& comp, double energy, double v)
     {
         return v * DifferentialCrossSection(p_def, comp, energy, v);
     }
-
     inline double FunctionToDE2dxIntegral(const ParticleDef& p_def,
         const Component& comp, double energy, double v)
     {
         return v * v * DifferentialCrossSection(p_def, comp, energy, v);
     }
-
-    virtual double GetLowerEnergyLim(const ParticleDef&) const noexcept;
+    virtual double GetLowerEnergyLim(const ParticleDef&) const noexcept = 0;
     virtual size_t GetHash() const noexcept;
 };
 } // namespace PROPOSAL

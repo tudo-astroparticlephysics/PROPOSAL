@@ -33,6 +33,8 @@
 #include "PROPOSAL/propagation_utility/Displacement.h"
 #include "PROPOSAL/scattering/ScatteringHighland.h"
 
+using std::shared_ptr;
+
 namespace PROPOSAL {
 
 template <class T, class Cross>

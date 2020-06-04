@@ -47,7 +47,7 @@ namespace PROPOSAL {
 class PhotoRealPhotonAssumption : public Photonuclear {
 protected:
     bool hard_component_;
-    unordered_map<size_t, std::unique_ptr<RealPhoton>> hard_component_map;
+    unordered_map<size_t, std::shared_ptr<RealPhoton>> hard_component_map;
 
 public:
     PhotoRealPhotonAssumption(bool hard_component);
@@ -64,7 +64,7 @@ PHOTO_PARAM_REAL_DEC(BezrukovBugaev, RealPhotonAssumption)
 PHOTO_PARAM_REAL_DEC(Kokoulin, BezrukovBugaev)
 
 class PhotoRhode : public PhotoRealPhotonAssumption {
-    std::unique_ptr<Interpolant> interpolant_;
+    std::shared_ptr<Interpolant> interpolant_;
 
     double MeasuredSgN(double e);
 

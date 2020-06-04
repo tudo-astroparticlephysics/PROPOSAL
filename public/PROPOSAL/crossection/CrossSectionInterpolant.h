@@ -104,7 +104,19 @@ public:
         return CalculateStochasticLoss_impl(
             comp, energy, rate, typename base_param_t::component_wise{});
     }
-    inline InteractionType GetInteractionType() const noexcept override {
+    inline size_t GetHash() const noexcept override
+    {
+        auto hash_digest = size_t{ 0 };
+        hash_combine(hash_digest, param.GetHash(), p_def.GetHash(),
+            medium.GetHash(), cut->GetHash(), def.GetHash());
+        return hash_digest;
+    }
+    inline double GetLowerEnergyLim() const override
+    {
+        return param.GetLowerEnergyLim(p_def);
+    }
+    inline InteractionType GetInteractionType() const noexcept override
+    {
         return param.interaction_type;
     }
 };

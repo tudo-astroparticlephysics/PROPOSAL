@@ -48,7 +48,7 @@ crosssection_list_t<EMinusDef, M> GetStdCrossSections(const EMinusDef& e,
     crosssection_list_t<EMinusDef, M> cross;
     cross.emplace_back(make_crosssection(brems, e, medium, cut, false));
     cross.emplace_back(make_crosssection(epair, e, medium, cut, false));
-    cross.emplace_back(make_crosssection(ioniz, e, medium, cut, false));
+    /* cross.emplace_back(make_crosssection(ioniz, e, medium, cut, false)); */
     cross.emplace_back(make_crosssection(photo, e, medium, cut, false));
     return cross;
 }

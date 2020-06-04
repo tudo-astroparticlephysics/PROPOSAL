@@ -79,9 +79,9 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(
     } else {
         if (hard_component_)
             hard_component_map[p_def.GetHash()]
-                = make_unique<HardComponent>(p_def);
+                = std::make_shared<HardComponent>(p_def);
         else
-            hard_component_map[p_def.GetHash()] = make_unique<SoftComponent>();
+            hard_component_map[p_def.GetHash()] = std::make_shared<SoftComponent>();
         aux += comp.GetAtomicNum() * 1.e-30
             * search->second->CalculateHardComponent(energy, v);
     }

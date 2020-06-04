@@ -28,36 +28,20 @@
 
 #pragma once
 
-#include "PROPOSAL/EnergyCutSettings.h"
+/* #include "PROPOSAL/EnergyCutSettings.h" */
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
-#include <array>
-#include <functional>
+#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/medium/Components.h"
 #include <memory>
 #include <type_traits>
 #include <unordered_map>
-#include <utility>
 #include <vector>
-
-using std::array;
-using std::decay;
-using std::enable_if;
-using std::forward;
-using std::function;
-using std::is_base_of;
-using std::pair;
-using std::remove_reference;
-using std::shared_ptr;
-using std::unique_ptr;
-using std::unordered_map;
-using std::vector;
-using std::placeholders::_1;
-using std::placeholders::_2;
 
 namespace PROPOSAL {
 
 using Components::Component;
 
-using rates_t = unordered_map<const Component*, double>;
+using rates_t = std::unordered_map<const Component*, double>;
 
 template <class P, class M> struct CrossSection {
     CrossSection() = default;
@@ -69,14 +53,16 @@ template <class P, class M> struct CrossSection {
     virtual double CalculateStochasticLoss(const Component&, double, double)
         = 0;
 
+    virtual size_t GetHash() const noexcept = 0;
+    virtual double GetLowerEnergyLim() const = 0;
     virtual InteractionType GetInteractionType() const noexcept = 0;
 };
 
 template <typename P, typename M>
 using crosssection_t
-    = CrossSection<typename decay<P>::type, typename decay<M>::type>;
+    = CrossSection<typename std::decay<P>::type, typename std::decay<M>::type>;
 
 template <typename P, typename M>
-using crosssection_list_t = vector<shared_ptr<crosssection_t<P, M>>>;
+using crosssection_list_t = std::vector<std::shared_ptr<crosssection_t<P, M>>>;
 
 } // namespace PROPOSAL

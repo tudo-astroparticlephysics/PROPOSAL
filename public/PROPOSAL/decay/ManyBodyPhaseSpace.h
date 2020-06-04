@@ -35,6 +35,8 @@
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
+using std::shared_ptr;
+
 namespace PROPOSAL {
 
 class ManyBodyPhaseSpace : public DecayChannel

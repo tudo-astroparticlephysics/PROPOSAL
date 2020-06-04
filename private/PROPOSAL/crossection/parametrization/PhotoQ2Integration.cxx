@@ -3,27 +3,28 @@
 
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
 
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 using std::get;
 
 #define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                    \
-    Photo##param::Photo##param(unique_ptr<ShadowEffect> shadow_effect)         \
-        : PhotoQ2Integral(std::move(shadow_effect))                            \
+    Photo##param::Photo##param(shared_ptr<ShadowEffect> shadow_effect)         \
+        : PhotoQ2Integral(shadow_effect)                                       \
     {                                                                          \
     }
 
-PhotoQ2Integral::PhotoQ2Integral(unique_ptr<ShadowEffect> shadow_effect)
+PhotoQ2Integral::PhotoQ2Integral(shared_ptr<ShadowEffect> shadow_effect)
     : Photonuclear()
-    , shadow_effect_(std::move(shadow_effect))
+    , shadow_effect_(shadow_effect)
     , integral_(IROMB, IMAXS, IPREC)
 {
 }
 
-double PhotoQ2Integral::DifferentialCrossSection(const ParticleDef& p_def, const Component& comp, double energy, double v)
+double PhotoQ2Integral::DifferentialCrossSection(
+    const ParticleDef& p_def, const Component& comp, double energy, double v)
 {
     auto limits = GetKinematicLimits(p_def, comp, energy);
 
@@ -47,12 +48,11 @@ double PhotoQ2Integral::DifferentialCrossSection(const ParticleDef& p_def, const
     }
 
     aux = integral_.Integrate(q2_min, q2_max,
-        std::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, p_def, comp, energy, v,
-            std::placeholders::_1),
+        std::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, p_def, comp,
+            energy, v, std::placeholders::_1),
         4);
 
-    aux *= NA / comp.GetAtomicNum() * p_def.charge
-        * p_def.charge;
+    aux *= NA / comp.GetAtomicNum() * p_def.charge * p_def.charge;
 
     return aux;
 }
@@ -66,8 +66,9 @@ Q2_PHOTO_PARAM_INTEGRAL_IMPL(RenoSarcevicSu)
 // Abramowicz Levin Levy Maor 91
 // Phys. Lett. B 269 (1991), 465
 // ------------------------------------------------------------------------- //
-double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(const ParticleDef& p_def, const Component& comp,
-    double energy, double v, double Q2)
+double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(
+    const ParticleDef& p_def, const Component& comp, double energy, double v,
+    double Q2)
 {
     double mass_nucleus = comp.GetAverageNucleonWeight();
 
@@ -181,8 +182,7 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(const ParticleDef& p
     // eq. 3.11
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
     double structure_function_nucleus = structure_function_proton
-        * shadow_effect_->CalculateShadowEffect(
-              comp, bjorken_x, v * energy)
+        * shadow_effect_->CalculateShadowEffect(comp, bjorken_x, v * energy)
         * (comp.GetNucCharge()
               + (comp.GetAtomicNum() - comp.GetNucCharge())
                   * relation_proton_neutron);
@@ -212,8 +212,9 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(const ParticleDef& p
 // Abramowicz Levin Levy Maor 97
 // arXiv:hep-ph/9712415
 // ------------------------------------------------------------------------- //
-double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(const ParticleDef& p_def, const Component& comp,
-    double energy, double v, double Q2)
+double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
+    const ParticleDef& p_def, const Component& comp, double energy, double v,
+    double Q2)
 {
 
     double mass_nucleus = comp.GetAverageNucleonWeight();
@@ -327,8 +328,7 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(const ParticleDef& p
     // eq. 3.11
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
     double structure_function_nucleus = structure_function_proton
-        * shadow_effect_->CalculateShadowEffect(
-              comp, bjorken_x, v * energy)
+        * shadow_effect_->CalculateShadowEffect(comp, bjorken_x, v * energy)
         * (comp.GetNucCharge()
               + (comp.GetAtomicNum() - comp.GetNucCharge())
                   * relation_proton_neutron);
@@ -358,8 +358,8 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(const ParticleDef& p
 // Butkevich Mikheyev Parametrization
 // JETP 95 (2002), 11
 // ------------------------------------------------------------------------- //
-double PhotoButkevichMikhailov::FunctionToQ2Integral(const ParticleDef& p_def, const Component& comp,
-    double energy, double v, double Q2)
+double PhotoButkevichMikhailov::FunctionToQ2Integral(const ParticleDef& p_def,
+    const Component& comp, double energy, double v, double Q2)
 {
 
     double mass_nucleus = comp.GetAverageNucleonWeight();
@@ -425,8 +425,8 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(const ParticleDef& p_def, c
     double structure_function_neutron
         = F_neutron_singlet + F_neutron_non_singlet;
     // F_{2, nucleus} = G (Z F_{2, Proton} + (A-Z) F_{2, Neutron})
-    double structure_function_nucleus = shadow_effect_->CalculateShadowEffect(
-                                            comp, bjorken_x, v * energy)
+    double structure_function_nucleus
+        = shadow_effect_->CalculateShadowEffect(comp, bjorken_x, v * energy)
         * (comp.GetNucCharge() * structure_function_proton
               + (comp.GetAtomicNum() - comp.GetNucCharge())
                   * structure_function_neutron);
@@ -458,8 +458,8 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(const ParticleDef& p_def, c
 // this parametrization was calculated for sTaus with spin 0
 // the other parametrizations are for charged leptons with spin 1/2
 // ------------------------------------------------------------------------- //
-double PhotoRenoSarcevicSu::FunctionToQ2Integral(const ParticleDef& p_def, const Component& comp,
-    double energy, double v, double Q2)
+double PhotoRenoSarcevicSu::FunctionToQ2Integral(const ParticleDef& p_def,
+    const Component& comp, double energy, double v, double Q2)
 {
 
     double mass_nucleus = comp.GetAverageNucleonWeight();
@@ -573,8 +573,7 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(const ParticleDef& p_def, const
     // eq. 3.11
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
     double structure_function_nucleus = structure_function_proton
-        * shadow_effect_->CalculateShadowEffect(
-              comp, bjorken_x, v * energy)
+        * shadow_effect_->CalculateShadowEffect(comp, bjorken_x, v * energy)
         * (comp.GetNucCharge()
               + (comp.GetAtomicNum() - comp.GetNucCharge())
                   * relation_proton_neutron);
