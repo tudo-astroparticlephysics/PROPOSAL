@@ -162,7 +162,7 @@ double calculate_dedx(Param&&, Integral&, const ParticleDef&, const Medium&,
 
 class Ionization;
 template <>
-double calculate_dedx(Ionization&, Integral&, const ParticleDef&, const Medium&,
+double calculate_dedx<Ionization&>(Ionization&, Integral&, const ParticleDef&, const Medium&,
     const EnergyCutSettings&, double, std::false_type, std::false_type);
 
 template <typename Param>

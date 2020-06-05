@@ -5,8 +5,9 @@
 using std::get;
 
 namespace PROPOSAL {
+
 template <>
-double calculate_dedx(Ionization& param, Integral& integral,
+double calculate_dedx<Ionization&>(Ionization& param, Integral& integral,
     const ParticleDef& p_def, const Medium& medium,
     const EnergyCutSettings& cut, double energy, std::false_type, std::false_type)
 {
@@ -17,7 +18,7 @@ double calculate_dedx(Ionization& param, Integral& integral,
     auto physical_lim = param.GetKinematicLimits(p_def, medium, energy);
     auto v_cut = cut.GetCut(physical_lim, energy);
     auto dEdx = [&param, &p_def, &medium, energy](double v) {
-        return param.FunctionToDEdxIntegral(p_def, medium, energy, v);
+        return energy * param.FunctionToDEdxIntegral(p_def, medium, energy, v);
     };
     return integral.Integrate(
         get<Parametrization::V_MIN>(physical_lim), v_cut, dEdx, 4);
