@@ -73,9 +73,11 @@ double ExactTimeBuilder<T, Cross>::TimeElapsed(
     return time_integral.Calculate(initial_energy, final_energy);
 }
 
-class ApproximateTimeBuilder : public Time {
-public:
-    ApproximateTimeBuilder() = default;
+struct ApproximateTimeBuilder : public Time {
+    ApproximateTimeBuilder()
+        : Time(0)
+    {
+    }
 
     double TimeElapsed(double, double, double distance) override
     {

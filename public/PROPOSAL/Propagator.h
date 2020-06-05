@@ -11,7 +11,8 @@
 using std::get;
 namespace PROPOSAL {
 
-typedef std::tuple<std::shared_ptr<const Geometry>, PropagationUtility, std::shared_ptr<const Density_distr>> Sector;
+using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
+    std::shared_ptr<const Density_distr>>;
 
 class Propagator
 {

@@ -1,6 +1,6 @@
 #pragma once
 #include "PROPOSAL/propagation_utility/Displacement.h"
-
+#include <tuple>
 namespace PROPOSAL {
 
 class Interaction {
@@ -41,16 +41,20 @@ double Interaction::FunctionToIntegral(
     Cross&& cross, Disp&& disp, double energy)
 {
     auto total_rate = 0.f;
-    for (auto& c : cross)
-        total_rate += c->CalculatedNdx(energy);
+    for (auto& c : cross) {
+        auto rates = c->CalculatedNdx(energy);
+        for (auto& r : rates) {
+            total_rate += r.second;
+        }
+    }
 
-    return disp.FunctionToIntegral(energy) * total_rate;
+    return disp.FunctionToIntegral(cross, energy) * total_rate;
 }
 
 template <class T, class Cross>
 InteractionBuilder<T, Cross>::InteractionBuilder(Cross&& cross)
-    : Interaction(GetLowerEnergyLim(cross))
-    , interaction_integral(BuildInteractionIntegral())
+    : Interaction(CrossSectionVector::GetLowerLim(cross))
+    , interaction_integral(BuildInteractionIntegral(cross))
     , crosssection_list(cross)
 {
 }
@@ -62,9 +66,9 @@ T InteractionBuilder<T, Cross>::BuildInteractionIntegral(Cross&& cross)
     auto interaction_func = [this, &cross, &disp](double energy) {
         return FunctionToIntegral(cross, disp, energy);
     };
-    T integral(interaction_func, GetLowerLim(cross));
+    T integral(interaction_func, CrossSectionVector::GetLowerLim(cross));
     if (typeid(T) == typeid(UtilityInterpolant)) {
-        auto hash = disp.GetHash(cross);
+        auto hash = CrossSectionVector::GetHash(cross);
         integral.BuildTables("interaction", hash, interpol_def);
     };
     return integral;
@@ -76,7 +80,7 @@ double InteractionBuilder<T, Cross>::EnergyInteraction(
 {
     assert(energy >= lower_lim);
     auto rndi = -std::log(rnd);
-    auto rndiMin = interaction_integral.Calculate(energy, lower_lim, rndi);
+    auto rndiMin = interaction_integral.Calculate(energy, lower_lim);
     if (rndi >= rndiMin)
         return lower_lim;
     return interaction_integral.GetUpperLimit(energy, rndi);
@@ -89,13 +93,14 @@ tuple<InteractionType, double> InteractionBuilder<T, Cross>::TypeInteraction(
     for (auto& c : crosssection_list) {
         auto rates = c->CalculatedNdx(energy);
         for (auto& r : rates) {
-            rate -= r;
+            rate -= r.second;
             if (rate < 0) {
-                auto loss = c->CalculateStochasticLoss(r.first, energy, -rate);
-                return make_tuple(c->GetInteractionType(), loss);
+                auto loss = c->CalculateStochasticLoss(*r.first, energy, -rate);
+                return std::make_tuple(c->GetInteractionType(), loss);
             }
         }
     }
-    throw std::logic_error("Given rate is larger than overall crosssection rate.");
+    throw std::logic_error(
+        "Given rate is larger than overall crosssection rate.");
 }
 }
