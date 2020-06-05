@@ -150,9 +150,9 @@ double integrate_dedx(Integral& integral, EpairProduction& param,
         };
         sum += integral.Integrate(1 - v_max, r2, func_reverse, 2)
             + integral.Integrate(r2, 1 - r1, func_reverse, 4);
-        return energy * sum;
+        return sum;
     }
-    return energy * integral.Integrate(v_min, v_max, func, 4);
+    return integral.Integrate(v_min, v_max, func, 4);
 }
 } // namespace PROPOSAL
 
