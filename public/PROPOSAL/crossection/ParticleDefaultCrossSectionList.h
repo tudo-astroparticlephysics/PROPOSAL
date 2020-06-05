@@ -25,13 +25,13 @@ namespace PROPOSAL {
 extern InterpolationDef std_interpolation_def;
 
 template <typename Param, typename P, typename M>
-shared_ptr<crosssection_t<P, M>> make_crosssection(Param&& param, P&& p_def,
+unique_ptr<crosssection_t<P, M>> make_crosssection(Param&& param, P&& p_def,
     M&& medium, shared_ptr<const EnergyCutSettings> cuts, bool interpolate)
 {
     if (interpolate)
-        return make_shared<CrossSectionInterpolant<Param, P, M>>(
+        return PROPOSAL::make_unique<CrossSectionInterpolant<Param, P, M>>(
             param, p_def, medium, cuts, InterpolationDef());
-    return make_shared<CrossSectionIntegral<Param, P, M>>(
+    return PROPOSAL::make_unique<CrossSectionIntegral<Param, P, M>>(
         param, p_def, medium, cuts);
 }
 
