@@ -39,7 +39,7 @@ struct CrossSectionVector {
         using val_t = typename std::decay<CrossVec>::type::value_type;
         auto result = std::max_element(
             cross_vec.begin(), cross_vec.end(), [](val_t a, val_t b) {
-                return a->GetLowerEnergyLim() < b->GetLowerEnergyLim();
+                return a->GetLowerEnergyLim() > b->GetLowerEnergyLim();
             });
         return (*result)->GetLowerEnergyLim();
     }
