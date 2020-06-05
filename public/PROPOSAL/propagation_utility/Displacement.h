@@ -22,17 +22,6 @@ struct Displacement {
     virtual double UpperLimitTrackIntegral(double, double) = 0;
 };
 
-template <typename T, typename Cross>
-class DisplacementBuilder : public Displacement {
-    T disp_integral;
-
-    T BuildTrackIntegral(const Cross& cross);
-
-public:
-    DisplacementBuilder(Cross&&);
-    double SolveTrackIntegral(double, double) override;
-    double UpperLimitTrackIntegral(double, double) override;
-};
 
 template <typename Cross>
 double Displacement::FunctionToIntegral(Cross&& cross, double energy)
@@ -63,43 +52,5 @@ struct CrossSectionVector {
         return hash_digest;
     }
 };
-
-template <typename T, typename Cross>
-DisplacementBuilder<T, Cross>::DisplacementBuilder(Cross&& cross)
-    : Displacement()
-    , disp_integral(BuildTrackIntegral(std::forward<Cross>(cross)))
-{
-}
-
-template <typename T, typename Cross>
-T DisplacementBuilder<T, Cross>::BuildTrackIntegral(const Cross& cross)
-{
-    if (cross.size() < 1)
-        throw std::invalid_argument("at least one crosssection is required.");
-    auto disp_func = [this, &cross](double energy) {
-        return FunctionToIntegral(cross, energy);
-    };
-    auto low_lim = CrossSectionVector::GetLowerLim(cross);
-    T integral(disp_func, low_lim);
-    if (typeid(T) == typeid(UtilityInterpolant)) {
-        auto hash = CrossSectionVector::GetHash(cross);
-        integral.BuildTables("displacement", hash, interpol_def);
-    };
-    return integral;
-}
-
-template <typename T, typename Cross>
-double DisplacementBuilder<T, Cross>::SolveTrackIntegral(
-    double upper_lim, double lower_lim)
-{
-    return disp_integral.Calculate(upper_lim, lower_lim);
-}
-
-template <typename T, typename Cross>
-double DisplacementBuilder<T, Cross>::UpperLimitTrackIntegral(
-    double lower_limit, double sum)
-{
-    return disp_integral.GetUpperLimit(lower_limit, sum);
-}
 
 } // namespace PROPOSAL
