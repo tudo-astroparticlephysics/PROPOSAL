@@ -100,8 +100,13 @@ public:
     inline rates_t CalculatedNdx(double energy) override
     {
         auto rates = rates_t{};
-        for (auto& i : dndx)
-            rates[i.first] = i.second->Interpolate(energy, 1.);
+        for (auto& i : dndx) {
+            auto comp_rate = dndx[i.first]->Interpolate(energy, 1.);
+            if (i.first)
+                comp_rate /= medium.GetSumNucleons()
+                    / (i.first->GetAtomInMolecule() * i.first->GetAtomicNum());
+            rates[i.first] = comp_rate;
+        }
         return rates;
     }
     inline double CalculateStochasticLoss(
@@ -257,7 +262,9 @@ template <typename Param, typename P, typename M>
 double CrossSectionInterpolant<Param, P, M>::CalculateStochasticLoss_impl(
     const Component& comp, double energy, double rate, std::true_type)
 {
-    auto v = dndx[&comp]->FindLimit(energy, rate);
+    auto weight_for_rate_in_medium = medium.GetSumNucleons()
+        / (comp.GetAtomInMolecule() * comp.GetAtomicNum());
+    auto v = dndx[&comp]->FindLimit(energy, rate / weight_for_rate_in_medium);
     auto lim = param.GetKinematicLimits(p_def, comp, energy);
     auto v_cut = cut->GetCut(lim, energy);
     return transform_relativ_loss(v_cut, get<Parametrization::V_MAX>(lim), v);

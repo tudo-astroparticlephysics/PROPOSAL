@@ -30,7 +30,7 @@
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
-#include "PROPOSAL/propagation_utility/Displacement.h"
+#include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/scattering/ScatteringHighland.h"
 
 using std::shared_ptr;

@@ -84,7 +84,6 @@ public:
             integral, p_def, medium, *cut, energy,
             typename param_t::only_stochastic{},
             typename param_t::component_wise{});
-        std::cout << param.name << ": " << aux / medium.GetMassDensity() << std::endl;
         return aux;
     }
     inline double CalculatedE2dx(double energy) override
@@ -131,11 +130,15 @@ double calculate_dedx(Param&& param, Integral& integral,
     std::true_type)
 {
     double sum = 0.;
-    for (const auto& comp : medium.GetComponents()) {
-        auto lim = param.GetKinematicLimits(p_def, comp, energy);
+    for (const auto& c : medium.GetComponents()) {
+        auto lim = param.GetKinematicLimits(p_def, c, energy);
         auto v_cut = cut.GetCut(lim, energy);
-        sum += integrate_dedx(integral, param, p_def, comp, energy,
+        auto loss = integrate_dedx(integral, param, p_def, c, energy,
             get<Parametrization::V_MIN>(lim), v_cut);
+        auto weight_for_loss_in_medium = medium.GetSumNucleons()
+            / (c.GetAtomInMolecule() * c.GetAtomicNum());
+
+        sum += loss / weight_for_loss_in_medium;
     }
     return energy * sum;
 }
@@ -162,8 +165,9 @@ double calculate_dedx(Param&&, Integral&, const ParticleDef&, const Medium&,
 
 class Ionization;
 template <>
-double calculate_dedx<Ionization&>(Ionization&, Integral&, const ParticleDef&, const Medium&,
-    const EnergyCutSettings&, double, std::false_type, std::false_type);
+double calculate_dedx<Ionization&>(Ionization&, Integral&, const ParticleDef&,
+    const Medium&, const EnergyCutSettings&, double, std::false_type,
+    std::false_type);
 
 template <typename Param>
 double calculate_de2dx(Param&& param, Integral& integral,
@@ -172,11 +176,15 @@ double calculate_de2dx(Param&& param, Integral& integral,
     std::true_type)
 {
     double sum = 0.;
-    for (const auto& comp : medium.GetComponents()) {
-        auto lim = param.GetKinematicLimits(p_def, comp, energy);
+    for (const auto& c : medium.GetComponents()) {
+        auto lim = param.GetKinematicLimits(p_def, c, energy);
         auto v_cut = cut.GetCut(lim, energy);
-        sum += integrate_de2dx(integral, param, p_def, comp, energy,
+        auto loss2 = integrate_de2dx(integral, param, p_def, c, energy,
             get<Parametrization::V_MIN>(lim), v_cut);
+        auto weight_for_loss_in_medium = medium.GetSumNucleons()
+            / (c.GetAtomInMolecule() * c.GetAtomicNum());
+
+        sum += loss2 / weight_for_loss_in_medium;
     }
     return energy * energy * sum;
 }
@@ -216,9 +224,13 @@ rates_t CrossSectionIntegral<Param, P, M>::CalculatedNdx_impl(
     double energy, std::true_type)
 {
     rates_t rates;
-    for (auto& c : medium.GetComponents())
-        rates[&c] = calculate_dndx(reinterpret_cast<base_param_ref_t>(param),
+    for (auto& c : medium.GetComponents()) {
+        auto weight_for_rate_in_medium = medium.GetSumNucleons()
+            / (c.GetAtomInMolecule() * c.GetAtomicNum());
+        auto rate = calculate_dndx(reinterpret_cast<base_param_ref_t>(param),
             integral, p_def, c, *cut, energy);
+        rates[&c] = rate / weight_for_rate_in_medium;
+    }
     return rates;
 }
 
@@ -238,8 +250,10 @@ double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
 {
     auto lim = param.GetKinematicLimits(p_def, comp, energy);
     auto v_cut = cut->GetCut(lim, energy);
+    auto weight_for_rate_in_medium = medium.GetSumNucleons()
+        / (comp.GetAtomInMolecule() * comp.GetAtomicNum());
     return calculate_upper_lim_dndx(integral, param, p_def, comp, energy, v_cut,
-        get<Parametrization::V_MAX>(lim), -rate);
+        get<Parametrization::V_MAX>(lim), -rate / weight_for_rate_in_medium);
 }
 
 template <typename Param, typename P, typename M>
