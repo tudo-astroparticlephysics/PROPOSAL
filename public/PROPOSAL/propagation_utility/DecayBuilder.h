@@ -11,20 +11,20 @@ template <class T, class Cross> class DecayBuilder : public Decay {
     T BuildDecayIntegral(Cross&& cross)
     {
         auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
-        auto decay_func = [this, &disp](double energy) {
-            return FunctionToIntegral(disp, energy);
+        auto decay_func = [this, &cross, &disp](double energy) {
+            return FunctionToIntegral(cross, disp, energy);
         };
-        T decay_integral(decay_func, disp.GetLowerLim(cross));
+        T decay_integral(decay_func, CrossSectionVector::GetLowerLim(cross));
         if (typeid(T) == typeid(UtilityInterpolant)) {
-            auto hash = disp.GetHash(cross);
+            auto hash = CrossSectionVector::GetHash(cross);
             decay_integral.BuildTables("decay", hash, interpol_def);
         };
         return decay_integral;
     }
 
 public:
-    DecayBuilder<T, Cross>(Cross&& cross, double lifetime, double, double mass)
-        : Decay(lifetime, mass, GetLowerLim(cross))
+    DecayBuilder<T, Cross>(Cross&& cross, double lifetime, double mass)
+        : Decay(lifetime, mass, CrossSectionVector::GetLowerLim(cross))
         , decay_integral(BuildDecayIntegral(cross))
     {
     }

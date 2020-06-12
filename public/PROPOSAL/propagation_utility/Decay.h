@@ -1,5 +1,8 @@
 #pragma once
 #include "PROPOSAL/math/InterpolantBuilder.h"
+#include "PROPOSAL/Constants.h"
+#include <cmath>
+#include <cassert>
 
 namespace PROPOSAL {
 
@@ -9,7 +12,15 @@ protected:
     double mass;
     double lower_lim;
 
-    template <typename Disp> double FunctionToIntegral(Disp&&, double);
+    template <typename Cross, typename Disp>
+    double FunctionToIntegral(Cross&& cross, Disp&& disp, double energy)
+    {
+        assert(!std::isinf(lifetime));
+        assert(energy >= mass);
+        double square_momentum = (energy - mass) * (energy + mass);
+        double aux = SPEED * std::sqrt(square_momentum) / mass;
+        return disp.FunctionToIntegral(cross, energy) / aux;
+    }
 
 public:
     Decay(double, double, double);
