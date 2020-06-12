@@ -38,7 +38,9 @@
 #include "PROPOSAL/geometry/Sphere.h"
 
 #include "PROPOSAL/crossection/parametrization/Annihilation.h"
+#include "PROPOSAL/crossection/secondaries/Annihilation.h"
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crossection/secondaries/Bremsstrahlung.h"
 #include "PROPOSAL/crossection/parametrization/Compton.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"

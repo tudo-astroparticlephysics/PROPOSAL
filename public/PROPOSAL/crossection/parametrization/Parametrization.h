@@ -30,6 +30,8 @@
 
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 #include <iostream>
 #include <tuple>
 #include <type_traits>
@@ -39,23 +41,21 @@ using std::string;
 using std::tuple;
 
 namespace PROPOSAL {
-class ParticleDef;
+/* class ParticleDef; */
 class Medium;
 enum class InteractionType;
 
-class Parametrization {
-public:
+struct Parametrization {
     const InteractionType interaction_type;
     const string name;
 
     Parametrization(InteractionType, const string&);
     virtual ~Parametrization() = default;
 
-    enum { V_MIN, V_MAX };
-
     virtual double DifferentialCrossSection(
         const ParticleDef&, const Component&, double, double);
 
+    enum { V_MIN, V_MAX };
     virtual tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double) const noexcept;
 
@@ -104,8 +104,8 @@ double calculate_upper_lim_dndx(Integral& integral, P&& param,
 
 template <typename Param, typename M>
 double integrate_dedx(Integral& integral, Param&& param,
-    const ParticleDef& p_def, M& medium, double energy,
-    double v_min, double v_max)
+    const ParticleDef& p_def, M& medium, double energy, double v_min,
+    double v_max)
 {
     auto dEdx = [&param, &p_def, &medium, energy](double v) {
         return param.FunctionToDEdxIntegral(p_def, medium, energy, v);
@@ -115,8 +115,8 @@ double integrate_dedx(Integral& integral, Param&& param,
 
 template <typename Param, typename M>
 double integrate_de2dx(Integral& integral, Param&& param,
-    const ParticleDef& p_def, M& medium, double energy,
-    double v_min, double v_max)
+    const ParticleDef& p_def, M& medium, double energy, double v_min,
+    double v_max)
 {
     auto dE2dx = [&param, &p_def, &medium, energy](double v) {
         return param.FunctionToDE2dxIntegral(p_def, medium, energy, v);

@@ -61,7 +61,6 @@ tuple<double, double> Bremsstrahlung::GetKinematicLimits(
     return make_tuple(v_min, v_max);
 }
 
-
 double Bremsstrahlung::DifferentialCrossSection(
     const ParticleDef& p_def, const Component& comp, double energy, double v)
 {

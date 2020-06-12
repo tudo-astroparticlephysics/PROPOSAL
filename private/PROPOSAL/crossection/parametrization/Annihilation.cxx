@@ -4,12 +4,15 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/parametrization/Annihilation.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/Particle.h"
 
-using namespace PROPOSAL;
 using std::make_tuple;
+using namespace PROPOSAL;
+using crosssection::Annihilation;
+using crosssection::AnnihilationHeitler;
 
 Annihilation::Annihilation()
     : Parametrization(InteractionType::Annihilation, "annihililation")
@@ -22,7 +25,7 @@ double Annihilation::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept
 }
 
 tuple<double, double> Annihilation::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy) const noexcept
+    const ParticleDef& p_def, const Component&, double energy) const noexcept
 {
     // Limits according to simple 2->2 body interactions
     assert(energy >= p_def.mass);

@@ -28,15 +28,16 @@
 
 #pragma once
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/json.hpp"
 #include <iostream>
 #include <memory>
+#include <tuple>
 
-using std::shared_ptr;
 using std::get;
 using std::max;
 using std::min;
+using std::shared_ptr;
+using std::tuple;
 
 namespace PROPOSAL {
 
@@ -69,8 +70,7 @@ public:
     }
     inline double GetCut(const tuple<double, double>& lim, double energy) const
     {
-        return min(max(get<Parametrization::V_MIN>(lim), GetCut(energy)),
-            get<Parametrization::V_MAX>(lim));
+        return min(max(get<0>(lim), GetCut(energy)), get<1>(lim));
     }
     size_t GetHash() const noexcept;
     double GetEcut() const noexcept { return ecut_; }

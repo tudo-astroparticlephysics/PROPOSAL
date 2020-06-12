@@ -42,28 +42,6 @@ tuple<double, double> MupairProduction::GetKinematicLimits(
     return make_tuple(vmin, vmax);
 }
 
-double MupairProduction::Calculaterho(const ParticleDef& p_def,
-    const Component& comp, double energy, double v, double rnd1, double rnd2)
-{
-    double rho = 0;
-    double rho_min = 0;
-    double rho_max = 1 - 2 * MMU / (v * energy);
-
-    if (rho_max < 0)
-        return 0;
-
-    static_cast<void>(drho_integral_.IntegrateWithRandomRatio(rho_min, rho_max,
-        std::bind(&MupairProduction::FunctionToIntegral, this, p_def, comp,
-            energy, v, std::placeholders::_1),
-        3, rnd1));
-
-    rho = drho_integral_.GetUpperLimit();
-
-    if (rnd2 < 0.5)
-        rho = -rho;
-
-    return rho;
-}
 
 MupairProductionRhoIntegral::MupairProductionRhoIntegral()
     : MupairProduction()
