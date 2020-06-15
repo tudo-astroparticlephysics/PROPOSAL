@@ -20,8 +20,9 @@ namespace secondaries {
             Vector3D, double, double, double) final;
         tuple<double, double> CalculateEnergy(double, double) final;
 
-        vector<Loss::secondary_t> CalculateSecondaries(
-            Loss::secondary_t, array<double, n_rnd>);
+        size_t RequiredRandomNumbers() { return n_rnd; }
+        vector<Loss::secondary_t> CalculateSecondaries(double,
+            Loss::secondary_t, const Component&, vector<double>);
     };
 } // namespace secondaries
 } // namespace PROPOSAL

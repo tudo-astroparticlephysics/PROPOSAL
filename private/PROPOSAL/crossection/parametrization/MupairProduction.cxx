@@ -16,6 +16,7 @@
 
 using namespace PROPOSAL;
 using std::make_tuple;
+using crosssection::MupairProduction;
 
 MupairProduction::MupairProduction()
     : Parametrization(InteractionType::MuPair, "mupair")
@@ -43,6 +44,7 @@ tuple<double, double> MupairProduction::GetKinematicLimits(
 }
 
 
+using crosssection::MupairProductionRhoIntegral;
 MupairProductionRhoIntegral::MupairProductionRhoIntegral()
     : MupairProduction()
     , integral_(IROMB, IMAXS, IPREC)
@@ -69,6 +71,7 @@ double MupairProductionRhoIntegral::DifferentialCrossSection(
               2));
 }
 
+using crosssection::MupairKelnerKokoulinPetrukhin;
 MUPAIR_PARAM_INTEGRAL_IMPL(KelnerKokoulinPetrukhin)
 
 double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
@@ -139,5 +142,4 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
 
     return aux;
 }
-
 #undef MUPAIR_PARAM_INTEGRAL_IMPL

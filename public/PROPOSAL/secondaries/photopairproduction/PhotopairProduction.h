@@ -1,18 +1,19 @@
 #pragma once
 
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/medium/Components.h"
+/* #include "PROPOSAL/particle/Particle.h" */
+#include "PROPOSAL/secondaries/Parametrization.h"
 
-#include <vector>
 #include <array>
+#include <vector>
 
-using std::tuple;
-using std::array;
 using PROPOSAL::Components::Component;
+using std::array;
+using std::tuple;
 
 namespace PROPOSAL {
 namespace secondaries {
-    struct PhotopairProduction {
+    struct PhotopairProduction : public secondaries::Parametrization {
         PhotopairProduction() = default;
         virtual ~PhotopairProduction() = default;
 
@@ -21,9 +22,9 @@ namespace secondaries {
 
         virtual double CalculateRho(double, double) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(
-            Vector3D, double, double, const Component&, array<double,3>)
+            Vector3D, double, double, const Component&, vector<double>)
             = 0;
-        virtual tuple<double, double> CalculateEnergy(double, double) = 0;
+        virtual tuple<double, double> CalculateEnergy(double, double, double) = 0;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

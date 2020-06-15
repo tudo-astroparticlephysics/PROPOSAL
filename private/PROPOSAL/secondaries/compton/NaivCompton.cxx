@@ -6,12 +6,13 @@
 #include <stdexcept>
 
 using std::fmod;
+using std::get;
 using std::make_tuple;
 using std::sqrt;
-using std::get;
 
 using namespace PROPOSAL;
-double secondaries::NaivCompton::CalculateRho(double primary_energy, double loss_energy)
+double secondaries::NaivCompton::CalculateRho(
+    double primary_energy, double loss_energy)
 {
     return loss_energy / primary_energy;
 };
@@ -41,9 +42,10 @@ tuple<double, double> secondaries::NaivCompton::CalculateEnergy(
 }
 
 vector<Loss::secondary_t> secondaries::NaivCompton::CalculateSecondaries(
-    Loss::secondary_t loss, array<double, secondaries::NaivCompton::n_rnd> rnd)
+    double primary_energy, Loss::secondary_t loss, const Component&,
+    vector<double> rnd)
 {
-    auto rho = CalculateRho(get<Loss::ENERGY>(loss), rnd[0]);
+    auto rho = CalculateRho(primary_energy, get<Loss::ENERGY>(loss));
     auto secondary_energy = CalculateEnergy(get<Loss::ENERGY>(loss), rho);
     auto secondary_dir = CalculateDirections(
         get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), rho, rnd[1]);

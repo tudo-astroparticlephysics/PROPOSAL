@@ -2,12 +2,13 @@
 
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/secondaries/Parametrization.h"
 
 using std::tuple;
 
 namespace PROPOSAL {
 namespace secondaries {
-    struct Annihilation {
+    struct Annihilation : public secondaries::Parametrization {
         Annihilation() = default;
 
         static constexpr InteractionType type

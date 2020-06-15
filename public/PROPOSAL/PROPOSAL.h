@@ -38,20 +38,33 @@
 #include "PROPOSAL/geometry/Sphere.h"
 
 #include "PROPOSAL/crossection/parametrization/Annihilation.h"
-#include "PROPOSAL/crossection/secondaries/Annihilation.h"
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
-#include "PROPOSAL/crossection/secondaries/Bremsstrahlung.h"
 #include "PROPOSAL/crossection/parametrization/Compton.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 #include "PROPOSAL/crossection/parametrization/MupairProduction.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/crossection/parametrization/ParamTables.h"
-#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/crossection/parametrization/PhotoPairProduction.h"
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
+#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
+
+#include "PROPOSAL/secondaries/Parametrization.h"
+#include "PROPOSAL/secondaries/annihilation/Annihilation.h"
+#include "PROPOSAL/secondaries/bremsstrahlung/Bremsstrahlung.h"
+#include "PROPOSAL/secondaries/bremsstrahlung/NaivBremsstrahlung.h"
+#include "PROPOSAL/secondaries/compton/Compton.h"
+#include "PROPOSAL/secondaries/compton/NaivCompton.h"
+#include "PROPOSAL/secondaries/ionization/Ionization.h"
+#include "PROPOSAL/secondaries/ionization/NaivIonization.h"
+#include "PROPOSAL/secondaries/mupairproduction/MupairProduction.h"
+#include "PROPOSAL/secondaries/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
+
+#include "PROPOSAL/secondaries/photopairproduction/PhotopairProduction.h"
+#include "PROPOSAL/secondaries/photopairproduction/PhotoTsai.h"
+#include "PROPOSAL/secondaries/SecondariesCalculator.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/CrossSectionBuilder.h"
@@ -107,16 +120,16 @@
 
 #include "PROPOSAL/Propagator.h"
 
-#include "PROPOSAL/propagation_utility/PropagationUtility.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-#include "PROPOSAL/propagation_utility/Interaction.h"
-#include "PROPOSAL/propagation_utility/InteractionBuilder.h"
+#include "PROPOSAL/propagation_utility/ContRand.h"
 #include "PROPOSAL/propagation_utility/Decay.h"
 #include "PROPOSAL/propagation_utility/DecayBuilder.h"
 #include "PROPOSAL/propagation_utility/Displacement.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
-#include "PROPOSAL/propagation_utility/ContRand.h"
+#include "PROPOSAL/propagation_utility/Interaction.h"
+#include "PROPOSAL/propagation_utility/InteractionBuilder.h"
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include "PROPOSAL/propagation_utility/Time.h"
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
 
@@ -129,9 +142,9 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/Secondaries.h"
+#include "PROPOSAL/methods.h"
 
 #if ROOT_SUPPORT
-    #include "PROPOSAL/interfaces/root.h"
+#include "PROPOSAL/interfaces/root.h"
 #endif

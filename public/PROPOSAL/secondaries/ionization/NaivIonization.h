@@ -2,7 +2,7 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/secondaries/ionization/Ioniaation.h"
+#include "PROPOSAL/secondaries/ionization/Ionization.h"
 
 /* #include <unordered_map> */
 
@@ -25,8 +25,9 @@ namespace secondaries {
             Vector3D, double, double, double) final;
         tuple<double, double> CalculateEnergy(double, double) final;
 
-        virtual vector<Loss::secondary_t> CalculateSecondaries(
-            Loss::secondary_t, array<double, n_rnd>);
+        size_t RequiredRandomNumbers() final { return n_rnd; }
+        vector<Loss::secondary_t> CalculateSecondaries(double,
+            Loss::secondary_t, const Component&, vector<double>) final;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

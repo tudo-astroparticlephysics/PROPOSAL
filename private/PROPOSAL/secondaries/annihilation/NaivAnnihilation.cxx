@@ -49,7 +49,7 @@ tuple<double, double> secondaries::NaivAnnihilation::CalculateEnergy(
 }
 
 vector<Loss::secondary_t> secondaries::NaivAnnihilation::CalculateSecondaries(
-    Loss::secondary_t loss, array<double, secondaries::NaivAnnihilation::n_rnd> rnd)
+    double, Loss::secondary_t loss, const Component&, vector<double> rnd)
 {
     auto rho = CalculateRho(get<Loss::ENERGY>(loss), rnd[0]);
     auto secondary_energy = CalculateEnergy(get<Loss::ENERGY>(loss), rho);

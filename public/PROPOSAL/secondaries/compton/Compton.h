@@ -2,12 +2,13 @@
 
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/secondaries/Parametrization.h"
 
 using std::tuple;
 
 namespace PROPOSAL {
 namespace secondaries {
-    struct Compton {
+    struct Compton : public secondaries::Parametrization {
         Compton() = default;
         virtual ~Compton() = default;
 

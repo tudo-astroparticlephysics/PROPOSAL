@@ -10,8 +10,8 @@
 
 using PROPOSAL::Components::Component;
 /* using std::unordered_map; */
-using std::vector;
 using std::array;
+using std::vector;
 
 namespace PROPOSAL {
 namespace secondaries {
@@ -28,8 +28,9 @@ namespace secondaries {
             Vector3D, double, double, double) final;
         tuple<double, double> CalculateEnergy(double, double) final;
 
-        virtual vector<Loss::secondary_t> CalculateSecondaries(
-            Loss::secondary_t, array<double, n_rnd>);
+        size_t RequiredRandomNumbers() { return n_rnd; }
+        vector<Loss::secondary_t> CalculateSecondaries(
+            double, Loss::secondary_t, const Component&, vector<double>);
     };
 } // namespace secondaries
 } // namespace PROPOSAL

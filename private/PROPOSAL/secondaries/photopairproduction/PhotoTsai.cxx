@@ -6,6 +6,8 @@ using std::make_tuple;
 
 using namespace PROPOSAL;
 
+using std::get;
+
 double secondaries::PhotoTsai::FunctionToIntegral(
     double energy, double x, double theta, const Component& comp)
 {
@@ -109,7 +111,8 @@ double secondaries::PhotoTsai::CalculateRho(double, double)
 }
 
 tuple<Vector3D, Vector3D> secondaries::PhotoTsai::CalculateDirections(
-    Vector3D dir, double energy, double rho, const Component& comp,array<double, 3> rnd)
+    Vector3D dir, double energy, double rho, const Component& comp,
+    vector<double> rnd)
 {
     auto subst = std::max(1., std::log10(energy));
     auto integrand_substitution = [&, energy, rho, comp](double t) {
@@ -118,12 +121,12 @@ tuple<Vector3D, Vector3D> secondaries::PhotoTsai::CalculateDirections(
     };
     auto t_max = std::pow(PI, 1. / subst);
     integral.IntegrateWithRandomRatio(
-        0., t_max, integrand_substitution, 3, rnd[0]);
+        0., t_max, integrand_substitution, 3, rnd[2]);
     auto cosphi0 = std::cos(std::pow(integral.GetUpperLimit(), subst));
     integral.IntegrateWithRandomRatio(
-        0., t_max, integrand_substitution, 3, rnd[1]);
+        0., t_max, integrand_substitution, 3, rnd[3]);
     auto cosphi1 = std::cos(std::pow(integral.GetUpperLimit(), subst));
-    auto theta0 = rnd[2] * 2. * PI;
+    auto theta0 = rnd[4] * 2. * PI;
     auto theta1 = std::fmod(theta0 + PI, 2. * PI);
     // TODO: Sometimes the intergration fails and -1 instead of 1 is returned...
     // :(
@@ -137,7 +140,26 @@ tuple<Vector3D, Vector3D> secondaries::PhotoTsai::CalculateDirections(
 }
 
 tuple<double, double> secondaries::PhotoTsai::CalculateEnergy(
-    double energy, double rho)
+    double energy, double rho, double rnd)
 {
-    return make_tuple(energy * (1 - rho), energy * rho);
+    if (rnd > 0.5)
+        return make_tuple(energy * (1 - rho), energy * rho);
+    return make_tuple(energy * rho, energy * (1 - rho));
+}
+
+vector<Loss::secondary_t> secondaries::PhotoTsai::CalculateSecondaries(
+    double, Loss::secondary_t loss, const Component& comp, vector<double> rnd)
+{
+    auto rho = CalculateRho(get<Loss::ENERGY>(loss), rnd[0]);
+    auto secondary_energy = CalculateEnergy(get<Loss::ENERGY>(loss), rho, rnd[1]);
+    auto secondary_dir = CalculateDirections(
+        get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), rho, comp, rnd);
+    auto sec = std::vector<Loss::secondary_t>();
+    sec.emplace_back(static_cast<int>(ParticleType::EMinus),
+        get<Loss::POSITION>(loss), get<0>(secondary_dir),
+        get<0>(secondary_energy), 0.);
+    sec.emplace_back(static_cast<int>(ParticleType::EPlus),
+        get<Loss::POSITION>(loss), get<1>(secondary_dir),
+        get<1>(secondary_energy), 0.);
+    return sec;
 }

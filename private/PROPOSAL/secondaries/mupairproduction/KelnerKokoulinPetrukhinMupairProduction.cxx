@@ -1,38 +1,48 @@
 
-#include "PROPOSAL/secondaries/mupairproduction/NaivMupairProduction.h"
+#include "PROPOSAL/secondaries/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/particle/Particle.h"
 
 #include <cmath>
+#include <iostream>
 #include <stdexcept>
 
 using std::fmod;
+using std::get;
 using std::make_tuple;
 using std::sqrt;
-using std::get;
 
 using namespace PROPOSAL;
 
-double secondaries::NaivMupairProduction::CalculateRho(
-    double energy, double v, double rnd)
+secondaries::KelnerKokoulinPetrukhinMupairProduction::
+    KelnerKokoulinPetrukhinMupairProduction(ParticleDef p)
+    : p_def(std::move(p))
+{
+}
+
+double secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateRho(
+    double energy, double v, const Component& comp, double rnd)
 {
     auto rho_max = 1 - 2 * MMU / (v * energy);
     if (rho_max < 0)
         return 0;
     integral.IntegrateWithRandomRatio(0, rho_max,
-        [&, energy, v](double rho) { return rho_integrand(energy, v, rho); }, 3,
-        rnd);
+        [&](double rho) {
+            return param.FunctionToIntegral(p_def, comp, energy, v, rho);
+        },
+        3, rnd);
     return integral.GetUpperLimit();
 }
 
 tuple<Vector3D, Vector3D>
-secondaries::NaivMupairProduction::CalculateDirections(
+secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateDirections(
     Vector3D primary_dir, double energy, double rho, double rnd)
 {
     return make_tuple(primary_dir, primary_dir);
 }
 
-tuple<double, double> secondaries::NaivMupairProduction::CalculateEnergy(
+tuple<double, double>
+secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateEnergy(
     double energy, double rho)
 {
     auto energy_1 = 0.5 * energy * (1 + rho);
@@ -41,11 +51,12 @@ tuple<double, double> secondaries::NaivMupairProduction::CalculateEnergy(
 }
 
 vector<Loss::secondary_t>
-secondaries::NaivMupairProduction::CalculateSecondaries(Loss::secondary_t loss,
-    array<double, secondaries::NaivMupairProduction::n_rnd> rnd)
+secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateSecondaries(
+    double initial_energy, Loss::secondary_t loss, const Component& comp,
+    vector<double> rnd)
 {
-    auto v = 0; // TODO: v initialization still missing;
-    auto rho = CalculateRho(get<Loss::ENERGY>(loss), v, rnd[0]);
+    auto v = get<Loss::ENERGY>(loss) / initial_energy;
+    auto rho = CalculateRho(get<Loss::ENERGY>(loss), v, comp, rnd[0]);
     auto secondary_energy = CalculateEnergy(get<Loss::ENERGY>(loss), rho);
     auto secondary_dir = CalculateDirections(
         get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), rho, rnd[1]);

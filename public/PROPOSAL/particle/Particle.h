@@ -36,7 +36,7 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 
 namespace PROPOSAL {
-enum class InteractionType {
+enum class InteractionType : int {
     Particle = 1000000001,
     Brems = 1000000002,
     Ioniz = 1000000003,

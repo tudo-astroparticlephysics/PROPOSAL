@@ -7,13 +7,15 @@ using std::vector;
 
 namespace PROPOSAL {
 namespace secondaries {
-    struct NaivBremsstrahlung : public secondaries::Bremsstrahlung {
+    class NaivBremsstrahlung : public secondaries::Bremsstrahlung {
         static constexpr int n_rnd = 0;
 
+    public:
         NaivBremsstrahlung() = default;
 
+        size_t RequiredRandomNumbers() { return n_rnd; }
         vector<Loss::secondary_t> CalculateSecondaries(
-            Loss::secondary_t, array<double, n_rnd>);
+            double, Loss::secondary_t, const Component&, vector<double>);
     };
 } // namespace secondaries
 } // namespace PROPOSAL

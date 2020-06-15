@@ -8,11 +8,10 @@
 using namespace PROPOSAL;
 
 vector<Loss::secondary_t> secondaries::NaivBremsstrahlung::CalculateSecondaries(
-    Loss::secondary_t loss,
-    array<double, secondaries::NaivBremsstrahlung::n_rnd> rnd)
-        {
-            std::get<Loss::TYPE>(loss)
-                = static_cast<int>(PROPOSAL::ParticleType::Gamma);
-            auto sec = vector<Loss::secondary_t>{ move(loss) };
-            return sec;
-        }
+    double, Loss::secondary_t loss, const Component&, vector<double>)
+{
+    std::get<Loss::TYPE>(loss)
+        = static_cast<int>(PROPOSAL::ParticleType::Gamma);
+    auto sec = vector<Loss::secondary_t>{ move(loss) };
+    return sec;
+}

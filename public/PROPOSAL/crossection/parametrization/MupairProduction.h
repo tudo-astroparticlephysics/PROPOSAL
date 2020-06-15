@@ -45,6 +45,7 @@
     };
 
 namespace PROPOSAL {
+namespace crosssection {
 
 class MupairProduction : public Parametrization {
 
@@ -57,8 +58,6 @@ public:
     using only_stochastic = std::false_type;
     using component_wise = std::true_type;
 
-    double Calculaterho(
-        const ParticleDef&, const Component&, double, double, double, double);
 
     virtual double FunctionToIntegral(
         const ParticleDef&, const Component&, double energy, double v, double r)
@@ -84,4 +83,5 @@ MUPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
 
 #undef MUPAIR_PARAM_INTEGRAL_DEC
 
+} // namespace crosssection
 } // namespace PROPOSAL

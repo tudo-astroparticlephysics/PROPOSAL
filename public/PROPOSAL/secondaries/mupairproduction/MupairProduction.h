@@ -1,20 +1,20 @@
 #pragma once
 
-#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/secondaries/Parametrization.h"
 
-using std::vector;
 using std::tuple;
+using std::vector;
 
 namespace PROPOSAL {
 namespace secondaries {
-    struct MupairProduction {
+    struct MupairProduction : public secondaries::Parametrization {
         MupairProduction() = default;
         virtual ~MupairProduction() = default;
 
         static constexpr InteractionType type
             = PROPOSAL::InteractionType::MuPair;
 
-        virtual double CalculateRho(double, double, double) = 0;
+        virtual double CalculateRho(double, double, const Component&, double) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(
             Vector3D, double, double, double)
             = 0;
