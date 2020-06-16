@@ -39,7 +39,7 @@
         Photo##param(shared_ptr<ShadowEffect>);                                \
         using base_param_t = Photonuclear;                                     \
         double FunctionToQ2Integral(const ParticleDef&, const Component&,      \
-            double energy, double v, double Q2);                               \
+            double energy, double v, double Q2) const;                         \
     };
 
 namespace PROPOSAL {
@@ -49,13 +49,11 @@ public:
     virtual ~PhotoQ2Integral() = default;
 
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double energy, double v);
+        const ParticleDef&, const Component&, double energy, double v) const;
     virtual double FunctionToQ2Integral(const ParticleDef&, const Component&,
-        double energy, double v, double Q2)
-        = 0;
+        double energy, double v, double Q2) const = 0;
 
     std::shared_ptr<ShadowEffect> shadow_effect_;
-    Integral integral_;
 };
 
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor91)

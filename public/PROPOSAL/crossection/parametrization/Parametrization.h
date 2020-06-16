@@ -53,24 +53,24 @@ struct Parametrization {
     virtual ~Parametrization() = default;
 
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double);
+        const ParticleDef&, const Component&, double, double) const;
 
     enum { V_MIN, V_MAX };
     virtual tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double) const noexcept;
 
     inline double FunctionToDNdxIntegral(const ParticleDef& p_def,
-        const Component& comp, double energy, double v)
+        const Component& comp, double energy, double v) const
     {
         return DifferentialCrossSection(p_def, comp, energy, v);
     }
     inline double FunctionToDEdxIntegral(const ParticleDef& p_def,
-        const Component& comp, double energy, double v)
+        const Component& comp, double energy, double v) const
     {
         return v * DifferentialCrossSection(p_def, comp, energy, v);
     }
     inline double FunctionToDE2dxIntegral(const ParticleDef& p_def,
-        const Component& comp, double energy, double v)
+        const Component& comp, double energy, double v) const
     {
         return v * v * DifferentialCrossSection(p_def, comp, energy, v);
     }

@@ -41,45 +41,43 @@
         using base_param_t = MupairProduction;                                 \
                                                                                \
         double FunctionToIntegral(const ParticleDef&, const Component&,        \
-            double energy, double v, double r);                                \
+            double energy, double v, double r) const;                          \
     };
 
 namespace PROPOSAL {
 namespace crosssection {
 
-class MupairProduction : public Parametrization {
+    class MupairProduction : public Parametrization {
 
-protected:
-    Integral drho_integral_;
+    protected:
+        Integral drho_integral_;
 
-public:
-    MupairProduction();
-    virtual ~MupairProduction() = default;
-    using only_stochastic = std::false_type;
-    using component_wise = std::true_type;
+    public:
+        MupairProduction();
+        virtual ~MupairProduction() = default;
+        using only_stochastic = std::false_type;
+        using component_wise = std::true_type;
 
+        virtual double FunctionToIntegral(const ParticleDef&, const Component&,
+            double energy, double v, double r) const
+            = 0;
 
-    virtual double FunctionToIntegral(
-        const ParticleDef&, const Component&, double energy, double v, double r)
-        = 0;
+        double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
+        tuple<double, double> GetKinematicLimits(const ParticleDef&,
+            const Component&, double) const noexcept override;
+    };
 
-    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-    tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double) const noexcept override;
-};
+    class MupairProductionRhoIntegral : public MupairProduction {
 
-class MupairProductionRhoIntegral : public MupairProduction {
-    Integral integral_;
+    public:
+        MupairProductionRhoIntegral();
+        ~MupairProductionRhoIntegral() = default;
 
-public:
-    MupairProductionRhoIntegral();
-    ~MupairProductionRhoIntegral() = default;
+        virtual double DifferentialCrossSection(
+            const ParticleDef&, const Component&, double, double) const;
+    };
 
-    virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double);
-};
-
-MUPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
+    MUPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
 
 #undef MUPAIR_PARAM_INTEGRAL_DEC
 

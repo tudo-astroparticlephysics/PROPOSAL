@@ -51,7 +51,7 @@ struct ComptonKleinNishina : public Compton {
     using base_param_t = Compton;
 
     double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double energy, double v);
+        const ParticleDef&, const Component&, double energy, double v) const;
 };
 
 template <>

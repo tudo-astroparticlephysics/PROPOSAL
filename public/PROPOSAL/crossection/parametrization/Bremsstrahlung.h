@@ -36,7 +36,7 @@
         using base_param_t = Bremsstrahlung;                                   \
                                                                                \
         double CalculateParametrization(const ParticleDef&, const Component&,  \
-            double energy, double v) override;                                 \
+            double energy, double v) const override;                                 \
     };
 
 using std::unique_ptr;
@@ -65,9 +65,9 @@ public:
     using component_wise = std::true_type;
 
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double);
+        const ParticleDef&, const Component&, double, double) const;
     virtual double CalculateParametrization(
-        const ParticleDef&, const Component&, double, double)
+        const ParticleDef&, const Component&, double, double) const
         = 0;
 
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
@@ -89,9 +89,9 @@ public:
     BremsElectronScreening(bool);
 
     double CalculateParametrization(
-        const ParticleDef&, const Component&, double energy, double v) override;
+        const ParticleDef&, const Component&, double energy, double v) const override;
     double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double energy, double v) override;
+        const ParticleDef&, const Component&, double energy, double v) const override;
 };
 
 #undef BREMSSTRAHLUNG_DEF

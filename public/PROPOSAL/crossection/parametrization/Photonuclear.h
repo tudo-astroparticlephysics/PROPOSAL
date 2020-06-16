@@ -129,7 +129,7 @@ public:
     using component_wise = std::true_type;
 
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double)
+        const ParticleDef&, const Component&, double, double) const
         = 0;
 
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;

@@ -162,13 +162,13 @@ double integrate_dedx(Integral& integral, EpairProduction& param,
 // ------------------------------------------------------------------------- //
 EpairProductionRhoIntegral::EpairProductionRhoIntegral(bool lpm)
     : EpairProduction(lpm)
-    , integral_(IROMB, IMAXS, IPREC)
 {
 }
 
 // ------------------------------------------------------------------------- //
 double EpairProductionRhoIntegral::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy,
+    double v) const
 {
 
     auto aux = 1 - (4 * ME) / (energy * v);
@@ -182,16 +182,15 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(
     }
 
     aux = std::max(1 - rMax, COMPUTER_PRECISION);
+    Integral integral(IROMB, IMAXS, IPREC);
+
+    auto func = [this, &p_def, &comp, energy, v](double r) {
+        return FunctionToIntegral(p_def, comp, energy, v, r);
+    };
 
     return NA / comp.GetAtomicNum() * p_def.charge * p_def.charge
-        * (integral_.Integrate(1 - rMax, aux,
-               std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this,
-                   p_def, comp, energy, v, std::placeholders::_1),
-               2)
-              + integral_.Integrate(aux, 1,
-                    std::bind(&EpairProductionRhoIntegral::FunctionToIntegral,
-                        this, p_def, comp, energy, v, std::placeholders::_1),
-                    4));
+        * (integral.Integrate(1 - rMax, aux, func, 2)
+              + integral.Integrate(aux, 1, func, 4));
 }
 
 /******************************************************************************
@@ -208,7 +207,7 @@ EPAIR_PARAM_INTEGRAL_IMPL(SandrockSoedingreksoRhode)
 // ------------------------------------------------------------------------- //
 double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
     const ParticleDef& p_def, const Component& comp, double energy, double v,
-    double r)
+    double r) const
 {
     // Parametrization of Kelner/Kokoulin/Petrukhin
     // Proc. 12th ICCR (1971), 2436
@@ -323,7 +322,7 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
 // ------------------------------------------------------------------------- //
 double EpairSandrockSoedingreksoRhode::FunctionToIntegral(
     const ParticleDef& p_def, const Component& comp, double energy, double v,
-    double rho)
+    double rho) const
 {
     double m_in = p_def.mass;
 

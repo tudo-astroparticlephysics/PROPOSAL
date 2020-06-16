@@ -56,7 +56,7 @@ struct AnnihilationHeitler : public Annihilation {
     using base_param_t = Annihilation;
 
     double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double) override;
+        const ParticleDef&, const Component&, double, double) const override;
 };
 } // namespace crosssection
 } // namespace PROPOSAL

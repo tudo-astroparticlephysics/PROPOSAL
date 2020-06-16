@@ -15,8 +15,8 @@
     }
 
 using namespace PROPOSAL;
-using std::make_tuple;
 using crosssection::MupairProduction;
+using std::make_tuple;
 
 MupairProduction::MupairProduction()
     : Parametrization(InteractionType::MuPair, "mupair")
@@ -43,29 +43,26 @@ tuple<double, double> MupairProduction::GetKinematicLimits(
     return make_tuple(vmin, vmax);
 }
 
-
 using crosssection::MupairProductionRhoIntegral;
 MupairProductionRhoIntegral::MupairProductionRhoIntegral()
     : MupairProduction()
-    , integral_(IROMB, IMAXS, IPREC)
 {
 }
 
 double MupairProductionRhoIntegral::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy,
+    double v) const
 {
-    double rMax, aux;
+    auto aux = 1 - 2 * MMU / (v * energy);
 
-    aux = 1 - 2 * MMU / (v * energy);
-
-    if (aux > 0) {
-        rMax = aux;
-    } else {
+    if (aux < 0)
         return 0;
-    }
 
+    auto rMax = aux;
+
+    Integral integral(IROMB, IMAXS, IPREC);
     return NA / comp.GetAtomicNum() * p_def.charge * p_def.charge
-        * (integral_.Integrate(0, rMax,
+        * (integral.Integrate(0, rMax,
               std::bind(&MupairProductionRhoIntegral::FunctionToIntegral, this,
                   p_def, comp, energy, v, std::placeholders::_1),
               2));
@@ -76,7 +73,7 @@ MUPAIR_PARAM_INTEGRAL_IMPL(KelnerKokoulinPetrukhin)
 
 double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
     const ParticleDef& p_def, const Component& comp, double energy, double v,
-    double r)
+    double r) const
 {
     // Parametrization of Kelner/Kokoulin/Petrukhin
     // Physics of Atomic Nuclei, Vol. 63, No. 9, 2000, pp. 1603-1611. Translated

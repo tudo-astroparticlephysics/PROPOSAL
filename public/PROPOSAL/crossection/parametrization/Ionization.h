@@ -37,7 +37,7 @@ class Ionization : public Parametrization {
 protected:
     EnergyCutSettings cuts_;
 
-    double Delta(const Medium&, double beta, double gamma);
+    double Delta(const Medium&, double beta, double gamma) const;
 
 public:
     Ionization(const EnergyCutSettings&);
@@ -47,37 +47,35 @@ public:
     using component_wise = std::false_type;
 
     virtual double FunctionToDEdxIntegral(
-        const ParticleDef&, const Medium&, double, double)
-        = 0;
+        const ParticleDef&, const Medium&, double, double) const = 0;
     virtual tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Medium&, double) const noexcept
         = 0;
     double FunctionToDNdxIntegral(
-        const ParticleDef&, const Medium&, double, double);
+        const ParticleDef&, const Medium&, double, double) const;
     double FunctionToDE2dxIntegral(
-        const ParticleDef&, const Medium&, double, double);
+        const ParticleDef&, const Medium&, double, double) const;
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Medium&, double, double)
-        = 0;
+        const ParticleDef&, const Medium&, double, double) const = 0;
 
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
 };
 
 class IonizBetheBlochRossi : public Ionization {
-    double InelCorrection(const ParticleDef&, const Medium&, double, double);
+    double InelCorrection(const ParticleDef&, const Medium&, double, double) const;
     double CrossSectionWithoutInelasticCorrection(
-        const ParticleDef&, const Medium&, double, double);
+        const ParticleDef&, const Medium&, double, double) const;
 
 public:
     IonizBetheBlochRossi(const EnergyCutSettings&);
     using base_param_t = Ionization;
 
     tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Medium&, double) const noexcept override;
+        const ParticleDef&, const Medium&, double) const noexcept final;
     double DifferentialCrossSection(
-        const ParticleDef&, const Medium&, double, double) override;
+        const ParticleDef&, const Medium&, double, double) const final;
     double FunctionToDEdxIntegral(
-        const ParticleDef&, const Medium&, double, double) override;
+        const ParticleDef&, const Medium&, double, double) const final;
 };
 
 struct IonizBergerSeltzerBhabha : public Ionization {
@@ -85,11 +83,11 @@ struct IonizBergerSeltzerBhabha : public Ionization {
     using base_param_t = Ionization;
 
     tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Medium&, double) const noexcept override;
+        const ParticleDef&, const Medium&, double) const noexcept final;
     double DifferentialCrossSection(
-        const ParticleDef&, const Medium&, double, double) override;
+        const ParticleDef&, const Medium&, double, double) const final;
     double FunctionToDEdxIntegral(
-        const ParticleDef&, const Medium&, double, double) override;
+        const ParticleDef&, const Medium&, double, double) const final;
 };
 
 struct IonizBergerSeltzerMoller : public Ionization {
@@ -97,11 +95,11 @@ struct IonizBergerSeltzerMoller : public Ionization {
     using base_param_t = Ionization;
 
     tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Medium&, double) const noexcept override;
+        const ParticleDef&, const Medium&, double) const noexcept final;
     double DifferentialCrossSection(
-        const ParticleDef&, const Medium&, double, double) override;
+        const ParticleDef&, const Medium&, double, double) const final;
     double FunctionToDEdxIntegral(
-        const ParticleDef&, const Medium&, double, double) override;
+        const ParticleDef&, const Medium&, double, double) const final;
 };
 
 } // namespace PROPOSAL

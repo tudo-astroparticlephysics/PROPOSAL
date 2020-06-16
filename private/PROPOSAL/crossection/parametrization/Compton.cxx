@@ -29,7 +29,7 @@ tuple<double, double> Compton::GetKinematicLimits(
 }
 
 double ComptonKleinNishina::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v) const
 {
     // Adapted from "THE EGS5 CODE SYSTEM" by Hideo Harayama and Yoshihito
     // Namito SLAC Report number SLAC-R-730, KEK Report number 2005-8 Equation

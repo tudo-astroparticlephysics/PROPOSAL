@@ -51,6 +51,11 @@
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
 
+#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDX.h"
+#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
+#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
+#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
+
 #include "PROPOSAL/secondaries/Parametrization.h"
 #include "PROPOSAL/secondaries/annihilation/Annihilation.h"
 #include "PROPOSAL/secondaries/bremsstrahlung/Bremsstrahlung.h"

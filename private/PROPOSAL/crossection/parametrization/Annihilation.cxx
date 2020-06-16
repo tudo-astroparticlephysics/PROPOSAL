@@ -37,7 +37,7 @@ tuple<double, double> Annihilation::GetKinematicLimits(
 }
 
 double AnnihilationHeitler::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v) const
 {
     // W. Heitler. The Quantum Theory of Radiation, Clarendon Press, Oxford
     // (1954) Adapted from Geant4 PhysicsReferenceManual

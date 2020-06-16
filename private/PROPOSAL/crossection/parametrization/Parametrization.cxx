@@ -19,7 +19,7 @@ Parametrization::Parametrization(
 }
 
 double Parametrization::DifferentialCrossSection(
-    const ParticleDef&, const Component&, double, double)
+    const ParticleDef&, const Component&, double, double) const
 {
     throw std::logic_error("Not implemented error.");
 }

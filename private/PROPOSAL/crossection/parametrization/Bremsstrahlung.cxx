@@ -61,8 +61,8 @@ tuple<double, double> Bremsstrahlung::GetKinematicLimits(
     return make_tuple(v_min, v_max);
 }
 
-double Bremsstrahlung::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+double Bremsstrahlung::DifferentialCrossSection(const ParticleDef& p_def,
+    const Component& comp, double energy, double v) const
 {
     // $\frac{\alpha}{v} (2 Z_{nucl} z_{particle}^2 r_e
     // \frac{m_e}{m_{particle}})^2$ is the typical Bremsstrahlung prefactor used
@@ -76,7 +76,7 @@ double Bremsstrahlung::DifferentialCrossSection(
 
     if (lpm_) {
         throw logic_error("some work to do!");
-        aux *= lpm(p_def, comp, 0, energy, v);
+        // aux *= lpm(p_def, comp, 0, energy, v);
     }
 
     return NA / comp.GetAtomicNum() * aux;
@@ -180,19 +180,17 @@ BREMSSTRAHLUNG_IMPL(SandrockSoedingreksoRhode)
 // ------------------------------------------------------------------------- //
 
 double BremsPetrukhinShestakov::CalculateParametrization(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v) const
 {
-    double result = 0;
-    double Fd = 0;
 
-    double Z3 = std::pow(comp.GetNucCharge(), -1. / 3);
+    auto Z3 = std::pow(comp.GetNucCharge(), -1. / 3);
     // least momentum transferred to the nucleus (eq. 2)
-    double delta = p_def.mass * p_def.mass * v / (2 * energy * (1 - v));
+    auto delta = p_def.mass * p_def.mass * v / (2 * energy * (1 - v));
 
     // influence of atomic form factor
     // for nuclear charge smaller 10, the nucleus is reated pointlike
     // eq. 10
-    Fd = 189 * Z3 / ME;
+    auto Fd = 189. * Z3 / ME;
     Fd = (p_def.mass) * Fd / (1 + SQRTE * delta * Fd);
     // 189 is the radiation logarithm
 
@@ -203,9 +201,7 @@ double BremsPetrukhinShestakov::CalculateParametrization(
     }
 
     // eq. 3
-    result = ((4. / 3) * (1 - v) + v * v) * std::log(Fd);
-
-    return result;
+    return ((4. / 3) * (1 - v) + v * v) * std::log(Fd);
 }
 
 // ------------------------------------------------------------------------- //
@@ -214,7 +210,7 @@ double BremsPetrukhinShestakov::CalculateParametrization(
 // ------------------------------------------------------------------------- //
 
 double BremsKelnerKokoulinPetrukhin::CalculateParametrization(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v) const
 {
     double formfactor_atomic_inelastic = 0.;
     double formfactor_nuclear_inelastic = 0.;
@@ -272,7 +268,7 @@ double BremsKelnerKokoulinPetrukhin::CalculateParametrization(
 // ------------------------------------------------------------------------- //
 
 double BremsCompleteScreening::CalculateParametrization(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v) const
 {
     (void)energy;
 
@@ -334,7 +330,7 @@ double BremsCompleteScreening::CalculateParametrization(
 // ------------------------------------------------------------------------- //
 
 double BremsAndreevBezrukovBugaev::CalculateParametrization(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v) const
 {
     double aux = 0;
     double result = 0;
@@ -398,7 +394,7 @@ double BremsAndreevBezrukovBugaev::CalculateParametrization(
 }
 
 double BremsSandrockSoedingreksoRhode::CalculateParametrization(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v) const
 {
     static const double a[3] = { -0.00349, 148.84, -987.531 };
     static const double b[4] = { 0.1642, 132.573, -585.361, 1407.77 };
@@ -487,7 +483,7 @@ BremsElectronScreening::BremsElectronScreening(bool lpm)
 }
 
 double BremsElectronScreening::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v) const
 {
     auto result = CalculateParametrization(p_def, comp, energy, v);
 
@@ -496,14 +492,14 @@ double BremsElectronScreening::DifferentialCrossSection(
 
     if (lpm_) {
         throw logic_error("some work to do!");
-        aux *= lpm(p_def, comp, 0, energy, v);
+        /* aux *= lpm(p_def, comp, 0, energy, v); */
     }
 
     return NA / comp.GetAtomicNum() * aux;
 }
 
 double BremsElectronScreening::CalculateParametrization(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+    const ParticleDef& p_def, const Component& comp, double energy, double v) const
 {
 
     double aux = 0;

@@ -48,22 +48,23 @@ public:
     using only_stochastic = std::true_type;
     using component_wise = std::true_type;
 
-
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
     tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double) const noexcept override;
 };
 
 class WeakCooperSarkarMertsch : public WeakInteraction {
-    unordered_map<bool, std::vector<std::unique_ptr<Interpolant>>> interpolant_;
-
+    unordered_map<bool,
+        tuple<std::unique_ptr<Interpolant>, unique_ptr<const Interpolant>>>
+        interpolant_;
+    tuple<Interpolant, Interpolant> BuildContribution(bool is_decayable) const;
 public:
     WeakCooperSarkarMertsch();
 
     using base_param_t = WeakInteraction;
 
     double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double) override;
+        const ParticleDef&, const Component&, double, double) const override;
 };
 
 } // namespace PROPOSAL

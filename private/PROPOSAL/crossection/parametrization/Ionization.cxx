@@ -23,19 +23,19 @@ double Ionization::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept
     return p_def.mass;
 }
 
-double Ionization::FunctionToDNdxIntegral(
-    const ParticleDef& p_def, const Medium& medium, double energy, double v)
+double Ionization::FunctionToDNdxIntegral(const ParticleDef& p_def,
+    const Medium& medium, double energy, double v) const
 {
     return DifferentialCrossSection(p_def, medium, energy, v);
 }
 
-double Ionization::FunctionToDE2dxIntegral(
-    const ParticleDef& p_def, const Medium& medium, double energy, double v)
+double Ionization::FunctionToDE2dxIntegral(const ParticleDef& p_def,
+    const Medium& medium, double energy, double v) const
 {
     return v * FunctionToDEdxIntegral(p_def, medium, energy, v);
 }
 
-double Ionization::Delta(const Medium& medium, double beta, double gamma)
+double Ionization::Delta(const Medium& medium, double beta, double gamma) const
 {
     auto X = std::log(beta * gamma) / std::log(10);
 
@@ -79,8 +79,8 @@ IonizBetheBlochRossi::IonizBetheBlochRossi(const EnergyCutSettings& cuts)
 // PDG, Chin. Phys. C 40 (2016), 100001
 // eq. 33.8
 // ------------------------------------------------------------------------- //
-double IonizBetheBlochRossi::DifferentialCrossSection(
-    const ParticleDef& p_def, const Medium& medium, double energy, double v)
+double IonizBetheBlochRossi::DifferentialCrossSection(const ParticleDef& p_def,
+    const Medium& medium, double energy, double v) const
 {
 
     // TODO(mario): Better way? Sat 2017/09/02
@@ -113,7 +113,7 @@ double IonizBetheBlochRossi::DifferentialCrossSection(
 
 // ------------------------------------------------------------------------- //
 double IonizBetheBlochRossi::FunctionToDEdxIntegral(const ParticleDef& p_def,
-    const Medium& medium, double energy, double variable)
+    const Medium& medium, double energy, double variable) const
 {
     double result, aux;
 
@@ -173,20 +173,17 @@ double IonizBetheBlochRossi::FunctionToDEdxIntegral(const ParticleDef& p_def,
 //        \log(\frac{2 \gamma (1 - v) m_e}{m_{particle}v})
 // ------------------------------------------------------------------------- //
 double IonizBetheBlochRossi::InelCorrection(
-    const ParticleDef& p_def, const Medium& medium, double energy, double v)
+    const ParticleDef& p_def, const Medium& medium, double energy, double v) const
 {
-    double result, a, b, c;
-
     double gamma = energy / p_def.mass;
-
-    a = std::log(1 + 2 * v * energy / ME);
-    b = std::log((1
-                     - v
-                         / get<Parametrization::V_MAX>(
-                               GetKinematicLimits(p_def, medium, energy)))
+    auto a = std::log(1 + 2 * v * energy / ME);
+    auto b = std::log((1
+                          - v
+                              / get<Parametrization::V_MAX>(
+                                    GetKinematicLimits(p_def, medium, energy)))
         / (1 - v));
-    c = std::log((2 * gamma * (1 - v) * ME) / (p_def.mass * v));
-    result = a * (2 * b + c) - b * b;
+    auto c = std::log((2 * gamma * (1 - v) * ME) / (p_def.mass * v));
+    auto result = a * (2 * b + c) - b * b;
 
     return ALPHA / (2 * PI) * result;
 }
@@ -197,7 +194,7 @@ double IonizBetheBlochRossi::InelCorrection(
 // ------------------------------------------------------------------------- //
 
 double IonizBetheBlochRossi::CrossSectionWithoutInelasticCorrection(
-    const ParticleDef& p_def, const Medium& medium, double energy, double v)
+    const ParticleDef& p_def, const Medium& medium, double energy, double v) const
 {
     double result;
 
@@ -256,7 +253,8 @@ tuple<double, double> IonizBergerSeltzerBhabha::GetKinematicLimits(
 }
 
 double IonizBergerSeltzerBhabha::DifferentialCrossSection(
-    const ParticleDef& p_def, const Medium& medium, double energy, double v)
+    const ParticleDef& p_def, const Medium& medium, double energy,
+    double v) const
 {
     /*
      * Bhabha-Crosssection, taken from : "The EGS5 Code System",
@@ -294,7 +292,7 @@ double IonizBergerSeltzerBhabha::DifferentialCrossSection(
 // ------------------------------------------------------------------------- //
 double IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(
     const ParticleDef& p_def, const Medium& medium, double energy,
-    double variable)
+    double variable) const
 {
     /* Berger Seltzer Formula, taken from:
      * The EGS5 Code System,
@@ -376,7 +374,8 @@ tuple<double, double> IonizBergerSeltzerMoller::GetKinematicLimits(
 }
 
 double IonizBergerSeltzerMoller::DifferentialCrossSection(
-    const ParticleDef& p_def, const Medium& medium, double energy, double v)
+    const ParticleDef& p_def, const Medium& medium, double energy,
+    double v) const
 {
     /*
      * Moller-Crosssection, taken from : "The EGS5 Code System",
@@ -411,7 +410,7 @@ double IonizBergerSeltzerMoller::DifferentialCrossSection(
 // ------------------------------------------------------------------------- //
 double IonizBergerSeltzerMoller::FunctionToDEdxIntegral(
     const ParticleDef& p_def, const Medium& medium, double energy,
-    double variable)
+    double variable) const
 {
     /* Berger Seltzer Formula, taken from:
      * The EGS5 Code System,
