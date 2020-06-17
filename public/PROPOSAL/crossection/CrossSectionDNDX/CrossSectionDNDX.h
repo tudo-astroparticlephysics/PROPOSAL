@@ -17,13 +17,13 @@ class CrossSectionDNDX {
 protected:
     function<double(Integral&, double, double, double, double)> dndx_integral;
     function<tuple<double, double>(double)> kinematic_limits;
-    shared_ptr<EnergyCutSettings> cut;
+    shared_ptr<const EnergyCutSettings> cut;
     size_t hash_cross_section;
 
 public:
     template <typename Param, typename Particle, typename Target>
     CrossSectionDNDX(Param _param, Particle _particle, Target _target,
-        shared_ptr<EnergyCutSettings> _cut)
+        shared_ptr<const EnergyCutSettings> _cut)
         : dndx_integral(
               [_param, _particle, _target](Integral& integral, double energy,
                   double v_min, double v_max, double rate) {
@@ -39,6 +39,10 @@ public:
             _target.GetHash());
     }
 
+    inline double Calculate(double energy)
+    {
+        return Calculate(energy, get<MAX>(GetIntegrationLimits(energy)));
+    }
     virtual double Calculate(double energy, double v, v_trafo_t = nullptr) = 0;
     virtual double GetUpperLimit(
         double energy, double rate, v_trafo_t = nullptr)

@@ -31,6 +31,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
@@ -59,6 +60,8 @@ class CrossSectionIntegral : public crosssection_t<P, M> {
     medium_t medium;
     shared_ptr<const EnergyCutSettings> cut;
 
+    dndx_map_t dndx_map;
+
     rates_t CalculatedNdx_impl(double energy, std::true_type);
     rates_t CalculatedNdx_impl(double energy, std::false_type);
 
@@ -75,6 +78,8 @@ public:
         , p_def(forward<P>(_p_def))
         , medium(forward<M>(_medium))
         , cut(_cut)
+        , dndx_map(
+              build_cross_section_dndx(param, p_def, medium, cut, false))
     {
     }
 
@@ -209,27 +214,16 @@ double calculate_de2dx(Param&&, Integral&, const ParticleDef&, const Medium&,
     return 0.;
 }
 
-template <typename P, typename M>
-double calculate_dndx(P&& param, Integral& integral, const ParticleDef& p_def,
-    M&& medium, const EnergyCutSettings& cut, double energy)
-{
-    auto lim = param.GetKinematicLimits(p_def, medium, energy);
-    auto v_cut = cut.GetCut(lim, energy);
-    return integrate_dndx(integral, param, p_def, medium, energy, v_cut,
-        get<Parametrization::V_MAX>(lim));
-}
-
 template <typename Param, typename P, typename M>
 rates_t CrossSectionIntegral<Param, P, M>::CalculatedNdx_impl(
     double energy, std::true_type)
 {
     rates_t rates;
-    for (auto& c : medium.GetComponents()) {
+    for (auto& dndx : dndx_map) {
         auto weight_for_rate_in_medium = medium.GetSumNucleons()
-            / (c.GetAtomInMolecule() * c.GetAtomicNum());
-        auto rate = calculate_dndx(reinterpret_cast<base_param_ref_t>(param),
-            integral, p_def, c, *cut, energy);
-        rates[&c] = rate / weight_for_rate_in_medium;
+            / (dndx.first->GetAtomInMolecule() * dndx.first->GetAtomicNum());
+        rates[dndx.first]
+            = dndx.second->Calculate(energy) / weight_for_rate_in_medium;
     }
     return rates;
 }
@@ -239,8 +233,7 @@ rates_t CrossSectionIntegral<Param, P, M>::CalculatedNdx_impl(
     double energy, std::false_type)
 {
     rates_t rates;
-    rates[nullptr] = calculate_dndx(reinterpret_cast<base_param_ref_t>(param),
-        integral, p_def, medium, *cut, energy);
+    rates[nullptr] = dndx_map[nullptr]->Calculate(energy);
     return rates;
 }
 
@@ -248,21 +241,16 @@ template <typename Param, typename P, typename M>
 double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
     const Component& comp, double energy, double rate, std::true_type)
 {
-    auto lim = param.GetKinematicLimits(p_def, comp, energy);
-    auto v_cut = cut->GetCut(lim, energy);
     auto weight_for_rate_in_medium = medium.GetSumNucleons()
         / (comp.GetAtomInMolecule() * comp.GetAtomicNum());
-    return calculate_upper_lim_dndx(integral, param, p_def, comp, energy, v_cut,
-        get<Parametrization::V_MAX>(lim), -rate / weight_for_rate_in_medium);
+    return dndx_map[&comp]->GetUpperLimit(
+        energy, rate * weight_for_rate_in_medium);
 }
 
 template <typename Param, typename P, typename M>
 double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
     const Component& comp, double energy, double rate, std::false_type)
 {
-    auto lim = param.GetKinematicLimits(p_def, medium, energy);
-    auto v_cut = cut->GetCut(lim, energy);
-    return calculate_upper_lim_dndx(integral, param, p_def, medium, energy,
-        v_cut, get<Parametrization::V_MAX>(lim), -rate);
+    return dndx_map[&comp]->GetUpperLimit(energy, rate);
 }
 } // namepace PROPOSAL

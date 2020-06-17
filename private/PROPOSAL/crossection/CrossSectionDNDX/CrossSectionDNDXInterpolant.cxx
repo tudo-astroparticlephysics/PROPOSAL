@@ -1,6 +1,16 @@
 #include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
+#include <cmath>
 
 using namespace PROPOSAL;
+
+namespace PROPOSAL {
+double transform_relativ_loss(double v_cut, double v_max, double v)
+{
+    if (v_cut == 0)
+        return v_cut;
+    return v_cut * std::exp(v * std::log(v_max / v_cut));
+}
+}
 
 unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx(
     Interpolant2DBuilder::Definition interpol_def, const InterpolationDef& def)
