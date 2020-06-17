@@ -19,13 +19,30 @@ class CrossSectionDNDXIntegral : public CrossSectionDNDX {
 
 public:
     template <typename Param, typename Particle, typename Target>
-    CrossSectionDNDXIntegral(Param _param, Particle _p_def, Target _target,
-        shared_ptr<EnergyCutSettings> cut)
-        : CrossSectionDNDX(_param, _p_def, _target, cut)
+    CrossSectionDNDXIntegral(Param _param, Particle _particle, Target _target,
+        shared_ptr<EnergyCutSettings> _cut)
+        : CrossSectionDNDX(_param, _particle, _target, _cut)
     {
     }
 
-    double Calculate(double, double, v_trafo_t = nullptr) override;
-    double GetUpperLim(double, double, v_trafo_t = nullptr) override;
+    double Calculate(
+        double energy, double v, v_trafo_t trafo = nullptr) override
+    {
+        auto integral_lim = GetIntegrationLimits(energy);
+        if (trafo)
+            v = trafo(get<MIN>(integral_lim), get<MAX>(integral_lim), v);
+        return dndx_integral(integral, energy, get<MIN>(integral_lim), v, 0);
+    }
+    double GetUpperLimit(
+        double energy, double rate, v_trafo_t trafo = nullptr) override
+    {
+        auto integral_lim = GetIntegrationLimits(energy);
+        dndx_integral(integral, energy, get<MIN>(integral_lim),
+            get<MAX>(integral_lim), -rate);
+        auto v = integral.GetUpperLimit();
+        if (trafo)
+            v = trafo(get<MIN>(integral_lim), get<MAX>(integral_lim), v);
+        return v;
+    }
 };
 } // namespace PROPOSAL

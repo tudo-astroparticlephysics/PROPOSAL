@@ -54,7 +54,7 @@ namespace PROPOSAL {
 template <>
 double integrate_dndx(Integral& integral, Compton& param,
     const ParticleDef& p_def, const Component& comp, double energy,
-    double v_min, double v_max)
+    double v_min, double v_max, double rnd)
 {
     auto t_min = std::log(1. - v_min);
     auto t_max = std::log(1. - v_max);
@@ -62,7 +62,7 @@ double integrate_dndx(Integral& integral, Compton& param,
         return exp(t)
             * param.FunctionToDNdxIntegral(p_def, comp, energy, 1 - exp(t));
     };
-    return integral.Integrate(t_min, t_max, dNdx, 4);
+    return integral.IntegrateWithRandomRatio(t_min, t_max, dNdx, 4, rnd);
 }
 
 template <>

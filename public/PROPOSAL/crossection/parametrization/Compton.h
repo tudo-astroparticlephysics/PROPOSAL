@@ -56,7 +56,7 @@ struct ComptonKleinNishina : public Compton {
 
 template <>
 double integrate_dndx(Integral&, Compton&, const ParticleDef&, const Component&,
-    double, double, double);
+    double, double, double, double);
 
 template <>
 double calculate_upper_lim_dndx(Integral&, Compton&, const ParticleDef&,

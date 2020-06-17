@@ -20,11 +20,11 @@ double CrossSectionDNDXInterpolant::Calculate(
     return dndx->Interpolate(energy, v);
 }
 
-double CrossSectionDNDXInterpolant::GetUpperLim(
-    double energy, double rnd, v_trafo_t)
+double CrossSectionDNDXInterpolant::GetUpperLimit(
+    double energy, double rate, v_trafo_t)
 {
-    auto lim = integral_limits(energy);
-    auto v = dndx->FindLimit(energy, rnd);
+    auto lim = GetIntegrationLimits(energy);
+    auto v = dndx->FindLimit(energy, rate);
     return transform_relativ_loss(get<MIN>(lim), get<MAX>(lim), v);
 }
 

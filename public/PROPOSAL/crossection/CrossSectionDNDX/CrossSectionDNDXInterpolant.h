@@ -30,7 +30,7 @@ public:
     }
 
     double Calculate(double, double, v_trafo_t = nullptr) final;
-    double GetUpperLim(double, double, v_trafo_t = nullptr) final;
+    double GetUpperLimit(double, double, v_trafo_t = nullptr) final;
 };
 
 Interpolant2DBuilder::Definition build_dndx_interpol_def(
