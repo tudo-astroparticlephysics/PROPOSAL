@@ -10,15 +10,15 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 
 #define PHOTO_PARAM_REAL_IMPL(param, parent)                                   \
-    Photo##param::Photo##param(bool hard_component)                            \
-        : Photo##parent(hard_component)                                        \
+    crosssection::Photo##param::Photo##param(bool hard_component)                            \
+        : crosssection::Photo##parent(hard_component)                                        \
     {                                                                          \
     }
 
 using namespace PROPOSAL;
 
-PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(bool hard_component)
-    : Photonuclear()
+crosssection::PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(bool hard_component)
+    : crosssection::Photonuclear()
     , hard_component_(hard_component)
 {
 }
@@ -28,7 +28,7 @@ PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(bool hard_component)
 // Sov. J. Nucl. Phys. 33 (1981), 635
 // eq. 23
 // ------------------------------------------------------------------------- //
-double PhotoRealPhotonAssumption::DifferentialCrossSection(
+double crosssection::PhotoRealPhotonAssumption::DifferentialCrossSection(
     const ParticleDef& p_def, const Component& comp, double energy,
     double v) const
 {
@@ -88,7 +88,7 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(
 // Phys. Rev Let. 42 (1979), 553
 // Table 1
 // ------------------------------------------------------------------------- //
-double PhotoRealPhotonAssumption::NucleusCrossSectionCaldwell(double nu) const
+double crosssection::PhotoRealPhotonAssumption::NucleusCrossSectionCaldwell(double nu) const
 {
     return 49.2 + 11.1 * std::log(nu) + 151.8 / std::sqrt(nu);
 }
@@ -100,7 +100,7 @@ PHOTO_PARAM_REAL_IMPL(Zeus, RealPhotonAssumption)
 // Eur. Phys. J. C 7 (1999), 609
 // eq. 6
 // ------------------------------------------------------------------------- //
-double PhotoZeus::CalculateParametrization(const Component& comp, double nu) const
+double crosssection::PhotoZeus::CalculateParametrization(const Component& comp, double nu) const
 {
     double aux;
 
@@ -117,7 +117,7 @@ PHOTO_PARAM_REAL_IMPL(BezrukovBugaev, RealPhotonAssumption)
 // Sov. J. Nucl. Phys. 32 (1980), 847
 // eq. 21
 // ------------------------------------------------------------------------- //
-double PhotoBezrukovBugaev::CalculateParametrization(
+double crosssection::PhotoBezrukovBugaev::CalculateParametrization(
     const Component& comp, double nu) const
 {
     double aux;
@@ -131,7 +131,7 @@ double PhotoBezrukovBugaev::CalculateParametrization(
 PHOTO_PARAM_REAL_IMPL(Kokoulin, BezrukovBugaev)
 
 // ------------------------------------------------------------------------- //
-double PhotoKokoulin::CalculateParametrization(const Component& comp, double nu) const
+double crosssection::PhotoKokoulin::CalculateParametrization(const Component& comp, double nu) const
 {
     if (nu <= 200.) {
         if (nu <= 17.) {
@@ -145,8 +145,8 @@ double PhotoKokoulin::CalculateParametrization(const Component& comp, double nu)
     }
 }
 
-PhotoRhode::PhotoRhode(bool hard_component)
-    : PhotoRealPhotonAssumption(hard_component)
+crosssection::PhotoRhode::PhotoRhode(bool hard_component)
+    : crosssection::PhotoRealPhotonAssumption(hard_component)
 {
     std::vector<double> x = { 0, 0.1, 0.144544, 0.20893, 0.301995, 0.436516,
         0.630957, 0.912011, 1.31826, 1.90546, 2.75423, 3.98107, 5.7544, 8.31764,
@@ -168,12 +168,12 @@ PhotoRhode::PhotoRhode(bool hard_component)
     interpolant_.reset(new Interpolant(x, y, 4, false, false));
 }
 
-double PhotoRhode::MeasuredSgN(double e) const
+double crosssection::PhotoRhode::MeasuredSgN(double e) const
 {
     return interpolant_->InterpolateArray(e);
 }
 
-double PhotoRhode::CalculateParametrization(const Component& comp, double nu) const
+double crosssection::PhotoRhode::CalculateParametrization(const Component& comp, double nu) const
 {
     if (nu <= 200.) {
         return MeasuredSgN(nu);

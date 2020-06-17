@@ -53,7 +53,8 @@ public:
     {
         auto kin_lim = kinematic_limits(energy);
         auto v_cut = cut->GetCut(kin_lim, energy);
-        return make_tuple(v_cut, get<Parametrization::V_MAX>(kin_lim));
+        return make_tuple(
+            v_cut, get<crosssection::Parametrization::V_MAX>(kin_lim));
     }
 };
 } // namespace PROPOSAL

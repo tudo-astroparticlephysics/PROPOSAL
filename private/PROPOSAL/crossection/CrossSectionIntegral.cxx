@@ -7,7 +7,7 @@ using std::get;
 namespace PROPOSAL {
 
 template <>
-double calculate_dedx<Ionization&>(Ionization& param, Integral& integral,
+double calculate_dedx<crosssection::Ionization&>(crosssection::Ionization& param, Integral& integral,
     const ParticleDef& p_def, const Medium& medium,
     const EnergyCutSettings& cut, double energy, std::false_type, std::false_type)
 {
@@ -21,6 +21,6 @@ double calculate_dedx<Ionization&>(Ionization& param, Integral& integral,
         return energy * param.FunctionToDEdxIntegral(p_def, medium, energy, v);
     };
     return integral.Integrate(
-        get<Parametrization::V_MIN>(physical_lim), v_cut, dEdx, 4);
+        get<crosssection::Parametrization::V_MIN>(physical_lim), v_cut, dEdx, 4);
 }
 } // namespace PROPOSAL

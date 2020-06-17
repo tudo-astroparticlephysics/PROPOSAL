@@ -44,7 +44,7 @@ using std::unordered_map;
     };
 
 namespace PROPOSAL {
-
+namespace crosssection {
 class PhotoRealPhotonAssumption : public Photonuclear {
 protected:
     bool hard_component_;
@@ -77,5 +77,5 @@ public:
 };
 
 #undef Q2_PHOTO_PARAM_INTEGRAL_DEC
-
+} // namespace crosssection
 } // namespace PROPOSAL

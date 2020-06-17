@@ -59,8 +59,7 @@ namespace crosssection {
         using component_wise = std::true_type;
 
         virtual double FunctionToIntegral(const ParticleDef&, const Component&,
-            double energy, double v, double r) const
-            = 0;
+            double energy, double v, double r) const = 0;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
         tuple<double, double> GetKinematicLimits(const ParticleDef&,
@@ -78,8 +77,7 @@ namespace crosssection {
     };
 
     MUPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
-
-#undef MUPAIR_PARAM_INTEGRAL_DEC
-
 } // namespace crosssection
 } // namespace PROPOSAL
+
+#undef MUPAIR_PARAM_INTEGRAL_DEC

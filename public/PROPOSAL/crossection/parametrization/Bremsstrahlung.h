@@ -46,6 +46,7 @@ class Interpolant;
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
+namespace crosssection {
 class Bremsstrahlung : public Parametrization {
 
 protected:
@@ -94,6 +95,7 @@ public:
         const ParticleDef&, const Component&, double energy, double v) const override;
 };
 
-#undef BREMSSTRAHLUNG_DEF
-
+} // namespace crosssection
 } // namespace PROPOSAL
+
+#undef BREMSSTRAHLUNG_DEF

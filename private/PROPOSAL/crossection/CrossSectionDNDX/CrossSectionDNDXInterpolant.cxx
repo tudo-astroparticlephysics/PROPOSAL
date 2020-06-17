@@ -40,7 +40,7 @@ double CrossSectionDNDXInterpolant::GetUpperLimit(
 
 namespace PROPOSAL {
 Interpolant2DBuilder::Definition build_dndx_interpol_def(
-    const Parametrization& param, const ParticleDef& p_def,
+    const crosssection::Parametrization& param, const ParticleDef& p_def,
     const InterpolationDef& def)
 {
     Interpolant2DBuilder::Definition interpol_def;

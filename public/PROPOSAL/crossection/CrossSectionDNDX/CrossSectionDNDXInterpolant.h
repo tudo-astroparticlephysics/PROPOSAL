@@ -35,5 +35,5 @@ public:
 };
 
 Interpolant2DBuilder::Definition build_dndx_interpol_def(
-    const Parametrization&, const ParticleDef&, const InterpolationDef&);
+    const crosssection::Parametrization&, const ParticleDef&, const InterpolationDef&);
 } // namespace PROPOSAL

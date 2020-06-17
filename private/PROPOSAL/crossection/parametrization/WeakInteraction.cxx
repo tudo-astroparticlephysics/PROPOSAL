@@ -13,17 +13,17 @@
 using namespace PROPOSAL;
 using std::make_tuple;
 
-WeakInteraction::WeakInteraction()
-    : Parametrization(InteractionType::WeakInt, "weak_interaction")
+crosssection::WeakInteraction::WeakInteraction()
+    : crosssection::Parametrization(InteractionType::WeakInt, "weak_interaction")
 {
 }
 
-double WeakInteraction::GetLowerEnergyLim(const ParticleDef& p_def) const
+double crosssection::WeakInteraction::GetLowerEnergyLim(const ParticleDef& p_def) const
     noexcept
 {
     return p_def.mass;
 }
-tuple<double, double> WeakInteraction::GetKinematicLimits(
+tuple<double, double> crosssection::WeakInteraction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy) const
     noexcept
 {
@@ -34,12 +34,12 @@ tuple<double, double> WeakInteraction::GetKinematicLimits(
     return make_tuple(v_min, v_max);
 }
 
-WeakCooperSarkarMertsch::WeakCooperSarkarMertsch()
-    : WeakInteraction()
+crosssection::WeakCooperSarkarMertsch::WeakCooperSarkarMertsch()
+    : crosssection::WeakInteraction()
 {
 }
 
-tuple<Interpolant, Interpolant> WeakCooperSarkarMertsch::BuildContribution(
+tuple<Interpolant, Interpolant> crosssection::WeakCooperSarkarMertsch::BuildContribution(
     bool is_decayable) const
 {
     // Initialize interpolant for particles (remember crossing symmetry rules)
@@ -55,7 +55,7 @@ tuple<Interpolant, Interpolant> WeakCooperSarkarMertsch::BuildContribution(
             false, false));
 }
 
-double WeakCooperSarkarMertsch::DifferentialCrossSection(
+double crosssection::WeakCooperSarkarMertsch::DifferentialCrossSection(
     const ParticleDef& p_def, const Component& comp, double energy,
     double v) const
 {

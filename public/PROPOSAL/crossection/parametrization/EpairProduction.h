@@ -46,7 +46,7 @@ using PROPOSAL::Components::Component;
     };
 
 namespace PROPOSAL {
-
+namespace crosssection {
 class EpairProduction : public Parametrization {
 
 protected:
@@ -92,10 +92,6 @@ public:
     size_t GetHash() const noexcept override;
 };
 
-template <>
-double integrate_dedx(Integral&, EpairProduction&, const ParticleDef&,
-    const Component&, double, double, double);
-
 class EpairProductionRhoIntegral : public EpairProduction {
     public:
     EpairProductionRhoIntegral(bool);
@@ -122,5 +118,10 @@ EPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
 EPAIR_PARAM_INTEGRAL_DEC(SandrockSoedingreksoRhode)
 
 #undef EPAIR_PARAM_INTEGRAL_DEC
+} // namespace crosssection
+
+template <>
+double integrate_dedx(Integral&, crosssection::EpairProduction&, const ParticleDef&,
+    const Component&, double, double, double);
 
 } // namespace PROPOSAL

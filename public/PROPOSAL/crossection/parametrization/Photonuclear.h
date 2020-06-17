@@ -36,9 +36,8 @@
 using std::shared_ptr;
 
 namespace PROPOSAL {
-
 class Interpolant;
-
+namespace crosssection {
 class RealPhoton {
 public:
     RealPhoton() = default;
@@ -137,4 +136,5 @@ public:
         const ParticleDef&, const Component&, double) const noexcept override;
 };
 
+} // namespace crosssection
 } // namespace PROPOSAL

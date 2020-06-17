@@ -12,17 +12,17 @@
 using namespace PROPOSAL;
 using std::make_tuple;
 
-PhotoPairProduction::PhotoPairProduction()
+crosssection::PhotoPairProduction::PhotoPairProduction()
     : Parametrization(InteractionType::Photopair, "photopairproduction")
 {
 }
 
-double PhotoPairProduction::GetLowerEnergyLim(const ParticleDef&) const noexcept
+double crosssection::PhotoPairProduction::GetLowerEnergyLim(const ParticleDef&) const noexcept
 {
     return 2 * ME;
 }
 
-tuple<double, double> PhotoPairProduction::GetKinematicLimits(
+tuple<double, double> crosssection::PhotoPairProduction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy) const
     noexcept
 {
@@ -34,7 +34,7 @@ tuple<double, double> PhotoPairProduction::GetKinematicLimits(
     return make_tuple(vmin, vmax);
 }
 
-double PhotoPairTsai::DifferentialCrossSection(
+double crosssection::PhotoPairTsai::DifferentialCrossSection(
     const ParticleDef& p_def, const Component& comp, double energy, double x) const
 {
     // Pair production and bremsstrahlung of chraged leptons, Yung-Su Tsai,

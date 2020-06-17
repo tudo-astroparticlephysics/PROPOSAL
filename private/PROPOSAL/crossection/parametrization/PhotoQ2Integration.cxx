@@ -11,18 +11,18 @@ using namespace PROPOSAL;
 using std::get;
 
 #define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                    \
-    Photo##param::Photo##param(shared_ptr<ShadowEffect> shadow_effect)         \
-        : PhotoQ2Integral(shadow_effect)                                       \
+    crosssection::Photo##param::Photo##param(shared_ptr<ShadowEffect> shadow_effect)         \
+        : crosssection::PhotoQ2Integral(shadow_effect)                                       \
     {                                                                          \
     }
 
-PhotoQ2Integral::PhotoQ2Integral(shared_ptr<ShadowEffect> shadow_effect)
-    : Photonuclear()
+crosssection::PhotoQ2Integral::PhotoQ2Integral(shared_ptr<ShadowEffect> shadow_effect)
+    : crosssection::Photonuclear()
     , shadow_effect_(shadow_effect)
 {
 }
 
-double PhotoQ2Integral::DifferentialCrossSection(const ParticleDef& p_def,
+double crosssection::PhotoQ2Integral::DifferentialCrossSection(const ParticleDef& p_def,
     const Component& comp, double energy, double v) const
 {
     auto limits = GetKinematicLimits(p_def, comp, energy);
@@ -47,7 +47,7 @@ double PhotoQ2Integral::DifferentialCrossSection(const ParticleDef& p_def,
 
     Integral integral;
     aux = integral.Integrate(q2_min, q2_max,
-        std::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, p_def, comp,
+        std::bind(&crosssection::PhotoQ2Integral::FunctionToQ2Integral, this, p_def, comp,
             energy, v, std::placeholders::_1),
         4);
 
@@ -65,7 +65,7 @@ Q2_PHOTO_PARAM_INTEGRAL_IMPL(RenoSarcevicSu)
 // Abramowicz Levin Levy Maor 91
 // Phys. Lett. B 269 (1991), 465
 // ------------------------------------------------------------------------- //
-double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(
+double crosssection::PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(
     const ParticleDef& p_def, const Component& comp, double energy, double v,
     double Q2) const
 {
@@ -211,7 +211,7 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(
 // Abramowicz Levin Levy Maor 97
 // arXiv:hep-ph/9712415
 // ------------------------------------------------------------------------- //
-double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
+double crosssection::PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
     const ParticleDef& p_def, const Component& comp, double energy, double v,
     double Q2) const
 {
@@ -357,7 +357,7 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
 // Butkevich Mikheyev Parametrization
 // JETP 95 (2002), 11
 // ------------------------------------------------------------------------- //
-double PhotoButkevichMikhailov::FunctionToQ2Integral(const ParticleDef& p_def,
+double crosssection::PhotoButkevichMikhailov::FunctionToQ2Integral(const ParticleDef& p_def,
     const Component& comp, double energy, double v, double Q2) const
 {
 
@@ -457,7 +457,7 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(const ParticleDef& p_def,
 // this parametrization was calculated for sTaus with spin 0
 // the other parametrizations are for charged leptons with spin 1/2
 // ------------------------------------------------------------------------- //
-double PhotoRenoSarcevicSu::FunctionToQ2Integral(const ParticleDef& p_def,
+double crosssection::PhotoRenoSarcevicSu::FunctionToQ2Integral(const ParticleDef& p_def,
     const Component& comp, double energy, double v, double Q2) const
 {
 

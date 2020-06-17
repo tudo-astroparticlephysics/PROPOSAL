@@ -43,6 +43,7 @@
     };
 
 namespace PROPOSAL {
+namespace crosssection {
 class PhotoQ2Integral : public Photonuclear {
 public:
     PhotoQ2Integral(shared_ptr<ShadowEffect>);
@@ -60,6 +61,7 @@ Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor91)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor97)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(ButkevichMikhailov)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(RenoSarcevicSu)
+} // namespace crosssection
 } // namespace PROPOSAL
 
 #undef Q2_PHOTO_PARAM_INTEGRAL_DEC

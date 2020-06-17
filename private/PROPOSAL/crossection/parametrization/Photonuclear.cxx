@@ -15,12 +15,12 @@ using namespace PROPOSAL;
 using std::make_shared;
 using std::make_tuple;
 
-std::vector<double> HardComponent::x = { 3, 4, 5, 6, 7, 8, 9 };
+std::vector<double> crosssection::HardComponent::x = { 3, 4, 5, 6, 7, 8, 9 };
 
-const std::string HardComponent::name_ = "HardComponent";
-const std::string SoftComponent::name_ = "SoftComponent";
+const std::string crosssection::HardComponent::name_ = "HardComponent";
+const std::string crosssection::SoftComponent::name_ = "SoftComponent";
 
-HardComponent::HardComponent(const ParticleDef& particle_def)
+crosssection::HardComponent::HardComponent(const ParticleDef& particle_def)
     : interpolant_()
 {
     const auto& y = particle_def.hard_component_table;
@@ -36,7 +36,7 @@ HardComponent::HardComponent(const ParticleDef& particle_def)
     }
 }
 
-double HardComponent::CalculateHardComponent(double energy, double v)
+double crosssection::HardComponent::CalculateHardComponent(double energy, double v)
 {
     if (energy < 1.0e5 || v < 1.0e-7) {
         return 0;
@@ -59,7 +59,7 @@ double HardComponent::CalculateHardComponent(double energy, double v)
     return sum / v;
 }
 
-double SoftComponent::CalculateHardComponent(double energy, double v)
+double crosssection::SoftComponent::CalculateHardComponent(double energy, double v)
 {
     (void)energy;
     (void)v;
@@ -67,16 +67,16 @@ double SoftComponent::CalculateHardComponent(double energy, double v)
     return 0;
 }
 
-const std::string ShadowDuttaRenoSarcevicSeckel::name_
+const std::string crosssection::ShadowDuttaRenoSarcevicSeckel::name_
     = "ShadowDuttaRenoSarcevicSeckel";
-const std::string ShadowButkevichMikhailov::name_ = "ShadowButkevichMikhailov";
+const std::string crosssection::ShadowButkevichMikhailov::name_ = "ShadowButkevichMikhailov";
 
 // ------------------------------------------------------------------------- //
 // Dutta, Reno, Sarcevic, Seckel
 // Phys Rev D 63 (2001), 094020
 // eq. 3.10
 // ------------------------------------------------------------------------- //
-double ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(
+double crosssection::ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(
     const Component& comp, double x, double nu)
 {
     (void)nu;
@@ -95,7 +95,7 @@ double ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(
 }
 
 // ------------------------------------------------------------------------- //
-size_t ShadowDuttaRenoSarcevicSeckel::GetHash() const
+size_t crosssection::ShadowDuttaRenoSarcevicSeckel::GetHash() const
 {
     size_t seed = 0;
     hash_combine(seed, std::string("ShadowDuttaRenoSarcevicSeckel"));
@@ -106,7 +106,7 @@ size_t ShadowDuttaRenoSarcevicSeckel::GetHash() const
 // Butkevich, Mikheyev
 // JETP 95 (2002), 11
 // ------------------------------------------------------------------------- //
-double ShadowButkevichMikhailov::CalculateShadowEffect(
+double crosssection::ShadowButkevichMikhailov::CalculateShadowEffect(
     const Component& comp, double x, double nu)
 {
     if (comp.GetNucCharge() == 1)
@@ -159,7 +159,7 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(
     return G;
 }
 
-size_t ShadowButkevichMikhailov::GetHash() const
+size_t crosssection::ShadowButkevichMikhailov::GetHash() const
 {
     size_t seed = 0;
     hash_combine(seed, std::string("ShadowButkevichMikhailov"));
@@ -167,16 +167,16 @@ size_t ShadowButkevichMikhailov::GetHash() const
     return seed;
 }
 
-Photonuclear::Photonuclear()
-    : Parametrization(InteractionType::Photonuclear, "photonuclear")
+crosssection::Photonuclear::Photonuclear()
+    : crosssection::Parametrization(InteractionType::Photonuclear, "photonuclear")
 {
 }
 
-double Photonuclear::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept {
+double crosssection::Photonuclear::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept {
     return p_def.mass;
 }
 
-tuple<double, double> Photonuclear::GetKinematicLimits(
+tuple<double, double> crosssection::Photonuclear::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy) const noexcept
 {
     auto v_min

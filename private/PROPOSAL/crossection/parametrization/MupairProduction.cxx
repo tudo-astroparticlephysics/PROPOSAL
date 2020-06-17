@@ -9,8 +9,8 @@
 #include "PROPOSAL/Constants.h"
 
 #define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                      \
-    Mupair##param::Mupair##param()                                             \
-        : MupairProductionRhoIntegral()                                        \
+    crosssection::Mupair##param::Mupair##param()                                             \
+        : crosssection::MupairProductionRhoIntegral()                                        \
     {                                                                          \
     }
 
@@ -18,19 +18,19 @@ using namespace PROPOSAL;
 using crosssection::MupairProduction;
 using std::make_tuple;
 
-MupairProduction::MupairProduction()
+crosssection::MupairProduction::MupairProduction()
     : Parametrization(InteractionType::MuPair, "mupair")
     , drho_integral_(IROMB, IMAXS, IPREC)
 {
 }
 
-double MupairProduction::GetLowerEnergyLim(const ParticleDef& p_def) const
+double crosssection::MupairProduction::GetLowerEnergyLim(const ParticleDef& p_def) const
     noexcept
 {
     return p_def.mass + 2.f * MMU;
 }
 
-tuple<double, double> MupairProduction::GetKinematicLimits(
+tuple<double, double> crosssection::MupairProduction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy) const
     noexcept
 {
@@ -43,13 +43,12 @@ tuple<double, double> MupairProduction::GetKinematicLimits(
     return make_tuple(vmin, vmax);
 }
 
-using crosssection::MupairProductionRhoIntegral;
-MupairProductionRhoIntegral::MupairProductionRhoIntegral()
+crosssection::MupairProductionRhoIntegral::MupairProductionRhoIntegral()
     : MupairProduction()
 {
 }
 
-double MupairProductionRhoIntegral::DifferentialCrossSection(
+double crosssection::MupairProductionRhoIntegral::DifferentialCrossSection(
     const ParticleDef& p_def, const Component& comp, double energy,
     double v) const
 {
@@ -63,15 +62,14 @@ double MupairProductionRhoIntegral::DifferentialCrossSection(
     Integral integral(IROMB, IMAXS, IPREC);
     return NA / comp.GetAtomicNum() * p_def.charge * p_def.charge
         * (integral.Integrate(0, rMax,
-              std::bind(&MupairProductionRhoIntegral::FunctionToIntegral, this,
+              std::bind(&crosssection::MupairProductionRhoIntegral::FunctionToIntegral, this,
                   p_def, comp, energy, v, std::placeholders::_1),
               2));
 }
 
-using crosssection::MupairKelnerKokoulinPetrukhin;
 MUPAIR_PARAM_INTEGRAL_IMPL(KelnerKokoulinPetrukhin)
 
-double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
+double crosssection::MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
     const ParticleDef& p_def, const Component& comp, double energy, double v,
     double r) const
 {

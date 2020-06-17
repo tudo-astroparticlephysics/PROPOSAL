@@ -32,7 +32,7 @@
 #include "PROPOSAL/math/Integral.h"
 
 namespace PROPOSAL {
-
+namespace crosssection {
 class PhotoPairProduction : public Parametrization {
 public:
     PhotoPairProduction();
@@ -91,5 +91,5 @@ struct PhotoPairTsai : public PhotoPairProduction {
 
 /*     DeflectionAngles SampleAngles(const Component&, double, double) override; */
 /* }; */
-
+} //namespace crossection
 } // namespace PROPOSAL

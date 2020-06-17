@@ -41,42 +41,43 @@ using std::string;
 using std::tuple;
 
 namespace PROPOSAL {
-/* class ParticleDef; */
 class Medium;
 enum class InteractionType;
+namespace crosssection {
 
-struct Parametrization {
-    const InteractionType interaction_type;
-    const string name;
+    struct Parametrization {
+        const InteractionType interaction_type;
+        const string name;
 
-    Parametrization(InteractionType, const string&);
-    virtual ~Parametrization() = default;
+        Parametrization(InteractionType, const string&);
+        virtual ~Parametrization() = default;
 
-    virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double) const;
+        virtual double DifferentialCrossSection(
+            const ParticleDef&, const Component&, double, double) const;
 
-    enum { V_MIN, V_MAX };
-    virtual tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double) const noexcept;
+        enum { V_MIN, V_MAX };
+        virtual tuple<double, double> GetKinematicLimits(
+            const ParticleDef&, const Component&, double) const noexcept;
 
-    inline double FunctionToDNdxIntegral(const ParticleDef& p_def,
-        const Component& comp, double energy, double v) const
-    {
-        return DifferentialCrossSection(p_def, comp, energy, v);
-    }
-    inline double FunctionToDEdxIntegral(const ParticleDef& p_def,
-        const Component& comp, double energy, double v) const
-    {
-        return v * DifferentialCrossSection(p_def, comp, energy, v);
-    }
-    inline double FunctionToDE2dxIntegral(const ParticleDef& p_def,
-        const Component& comp, double energy, double v) const
-    {
-        return v * v * DifferentialCrossSection(p_def, comp, energy, v);
-    }
-    virtual double GetLowerEnergyLim(const ParticleDef&) const noexcept = 0;
-    virtual size_t GetHash() const noexcept;
-};
+        inline double FunctionToDNdxIntegral(const ParticleDef& p_def,
+            const Component& comp, double energy, double v) const
+        {
+            return DifferentialCrossSection(p_def, comp, energy, v);
+        }
+        inline double FunctionToDEdxIntegral(const ParticleDef& p_def,
+            const Component& comp, double energy, double v) const
+        {
+            return v * DifferentialCrossSection(p_def, comp, energy, v);
+        }
+        inline double FunctionToDE2dxIntegral(const ParticleDef& p_def,
+            const Component& comp, double energy, double v) const
+        {
+            return v * v * DifferentialCrossSection(p_def, comp, energy, v);
+        }
+        virtual double GetLowerEnergyLim(const ParticleDef&) const noexcept = 0;
+        virtual size_t GetHash() const noexcept;
+    };
+} // namespace crosssection
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
@@ -123,4 +124,5 @@ double integrate_de2dx(Integral& integral, Param&& param,
     };
     return integral.Integrate(v_min, v_max, dE2dx, 2);
 }
+
 } // namespace PROPOSAL

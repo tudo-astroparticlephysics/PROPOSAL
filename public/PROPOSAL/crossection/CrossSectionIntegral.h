@@ -139,7 +139,7 @@ double calculate_dedx(Param&& param, Integral& integral,
         auto lim = param.GetKinematicLimits(p_def, c, energy);
         auto v_cut = cut.GetCut(lim, energy);
         auto loss = integrate_dedx(integral, param, p_def, c, energy,
-            get<Parametrization::V_MIN>(lim), v_cut);
+            get<crosssection::Parametrization::V_MIN>(lim), v_cut);
         auto weight_for_loss_in_medium = medium.GetSumNucleons()
             / (c.GetAtomInMolecule() * c.GetAtomicNum());
 
@@ -157,7 +157,7 @@ double calculate_dedx(Param&& param, Integral& integral,
     auto lim = param.GetKinematicLimits(p_def, medium, energy);
     auto v_cut = cut.GetCut(lim, energy);
     return integrate_dedx(integral, param, p_def, medium, energy,
-               get<Parametrization::V_MIN>(lim), v_cut)
+               get<crosssection::Parametrization::V_MIN>(lim), v_cut)
         * energy;
 }
 
@@ -185,7 +185,7 @@ double calculate_de2dx(Param&& param, Integral& integral,
         auto lim = param.GetKinematicLimits(p_def, c, energy);
         auto v_cut = cut.GetCut(lim, energy);
         auto loss2 = integrate_de2dx(integral, param, p_def, c, energy,
-            get<Parametrization::V_MIN>(lim), v_cut);
+            get<crosssection::Parametrization::V_MIN>(lim), v_cut);
         auto weight_for_loss_in_medium = medium.GetSumNucleons()
             / (c.GetAtomInMolecule() * c.GetAtomicNum());
 
@@ -203,7 +203,7 @@ double calculate_de2dx(Param&& param, Integral& integral,
     auto lim = param.GetKinematicLimits(p_def, medium, energy);
     auto v_cut = cut.GetCut(lim, energy);
     return integrate_de2dx(integral, param, p_def, medium, energy,
-               get<Parametrization::V_MIN>(lim), v_cut)
+               get<crosssection::Parametrization::V_MIN>(lim), v_cut)
         * energy * energy;
 }
 
