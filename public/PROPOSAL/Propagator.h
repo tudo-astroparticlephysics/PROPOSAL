@@ -52,9 +52,9 @@ private:
     std::shared_ptr<InterpolationDef> interpol_def_global = nullptr;
     enum {GEOMETRY, UTILITY, DENSITY_DISTR};
     enum Type : int {
-        Decay = 0,
-        Stochastic = 1,
-        MinimalE = 2,
+        MinimalE = 0,
+        Decay = 1,
+        Stochastic = 2,
         MaxDistance = 3,
         ApproachingSector = 4
     };

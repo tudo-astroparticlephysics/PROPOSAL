@@ -73,7 +73,7 @@ std::vector<DynamicData> Propagator::Propagate(
 
     // TODO: How to get accurate low information?
     auto InteractionEnergy
-        = std::array<double, 3>{ 0, 0, std::max(min_energy, p_def.mass) };
+        = std::array<double, 3>{std::max(min_energy, p_def.mass), 0., 0.};
     while (continue_propagation) {
         auto& utility = get<UTILITY>(current_sector);
         // DEBUG: rnd needs to be corrected by density (as a first
@@ -113,8 +113,7 @@ std::vector<DynamicData> Propagator::Propagate(
             next_interaction_type = ApproachingSector;
             // DEBUG: Insert grammage here
             energy_at_next_interaction
-                = get<UTILITY>(current_sector)
-                      .EnergyDistance(track.back().GetEnergy(),
+                = utility.EnergyDistance(track.back().GetEnergy(),
                           distance_to_next_interaction);
         }
 
@@ -128,7 +127,7 @@ std::vector<DynamicData> Propagator::Propagate(
             case Stochastic: {
                 track.push_back(track.back());
                 continue_propagation = DoStochasticInteraction(
-                        track.back(), get<UTILITY>(current_sector), rnd);
+                        track.back(), utility, rnd);
                 break;
             }
             case Decay:
@@ -150,7 +149,7 @@ std::vector<DynamicData> Propagator::Propagate(
             current_sector = ChooseCurrentSector(
                     track.back().GetPosition(), track.back().GetDirection());
         }
-        if (track.back().GetEnergy() <= min_energy)
+        if (track.back().GetEnergy() <= InteractionEnergy[MinimalE])
             continue_propagation = false;
     }
     return track;
