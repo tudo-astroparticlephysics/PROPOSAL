@@ -38,8 +38,17 @@ public:
     }
 
     tuple<InteractionType, double> TypeInteraction(
-        double energy, double rate) override
+        double energy, double rnd) override
     {
+        double rate = 0; //TODO: Avoid looping over the same list twice?
+        for (auto& c : crosssection_list) {
+            auto rates = c->CalculatedNdx(energy);
+            for (auto& r : rates) {
+                rate += r.second;
+            }
+        }
+        rate *= rnd;
+
         for (auto& c : crosssection_list) {
             auto rates = c->CalculatedNdx(energy);
             for (auto& r : rates) {

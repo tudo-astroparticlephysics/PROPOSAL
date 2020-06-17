@@ -61,11 +61,10 @@ std::vector<DynamicData> Propagator::Propagate(
     const DynamicData& initial_particle, double max_distance, double min_energy)
 {
     auto track = std::vector<DynamicData>{ initial_particle };
-    auto& current_pos = track.back();
-    current_pos.SetType(p_def.particle_type);
+    track.back().SetType(p_def.particle_type);
 
     auto current_sector = ChooseCurrentSector(
-        current_pos.GetPosition(), current_pos.GetDirection());
+            track.back().GetPosition(), track.back().GetDirection());
     auto rnd
         = std::bind(&RandomGenerator::RandomDouble, &RandomGenerator::Get());
 
@@ -80,26 +79,26 @@ std::vector<DynamicData> Propagator::Propagate(
         // DEBUG: rnd needs to be corrected by density (as a first
         // approximation)
         InteractionEnergy[Decay]
-            = utility.EnergyDecay(current_pos.GetEnergy(), rnd);
+            = utility.EnergyDecay(track.back().GetEnergy(), rnd);
         InteractionEnergy[Stochastic]
-            = utility.EnergyInteraction(current_pos.GetEnergy(), rnd);
-
+            = utility.EnergyInteraction(track.back().GetEnergy(), rnd);
+        std::cout << "Decay: " << InteractionEnergy[Decay] << ", " << "Stochastic: " << InteractionEnergy[Stochastic] << std::endl;
         auto next_interaction_type = maximize(InteractionEnergy);
         auto& energy_at_next_interaction
             = InteractionEnergy[next_interaction_type];
         // DEBUG: return value is grammage
         auto distance_to_next_interaction = utility.LengthContinuous(
-            current_pos.GetEnergy(), energy_at_next_interaction);
+                track.back().GetEnergy(), energy_at_next_interaction);
         // DEBUG: we need to make grammage out of max_distance_left to compare
         // it in the next step (using density_distr->integrate)
         auto max_distance_left
-            = max_distance - current_pos.GetPropagatedDistance();
+            = max_distance - track.back().GetPropagatedDistance();
         if (max_distance_left < distance_to_next_interaction) {
             // DEBUG: This is grammage now
             distance_to_next_interaction = max_distance_left;
             next_interaction_type = MaxDistance;
             energy_at_next_interaction
-                = utility.EnergyDistance(current_pos.GetEnergy(),
+                = utility.EnergyDistance(track.back().GetEnergy(),
                     distance_to_next_interaction); // DEBUG: Insert
                                                    // grammage here
         }
@@ -115,26 +114,25 @@ std::vector<DynamicData> Propagator::Propagate(
             // DEBUG: Insert grammage here
             energy_at_next_interaction
                 = get<UTILITY>(current_sector)
-                      .EnergyDistance(current_pos.GetEnergy(),
+                      .EnergyDistance(track.back().GetEnergy(),
                           distance_to_next_interaction);
         }
 
-        track.push_back(current_pos);
-        current_pos = track.back();
+        track.push_back(track.back());
         // DEBUG: We know grammage, so we will pass grammage here
         sector_changed
-            = AdvanceParticle(current_pos, energy_at_next_interaction,
+            = AdvanceParticle(track.back(), energy_at_next_interaction,
                 distance_to_next_interaction, rnd, current_sector);
         if (!sector_changed) {
             switch (next_interaction_type) {
             case Stochastic: {
-                track.push_back(current_pos);
+                track.push_back(track.back());
                 continue_propagation = DoStochasticInteraction(
-                    track.back(), get<UTILITY>(current_sector), rnd);
+                        track.back(), get<UTILITY>(current_sector), rnd);
                 break;
             }
             case Decay:
-                current_pos.SetType(InteractionType::Decay);
+                track.back().SetType(InteractionType::Decay);
                 continue_propagation = false;
                 break;
             case MaxDistance:
@@ -148,11 +146,11 @@ std::vector<DynamicData> Propagator::Propagate(
             }
             }
         } else {
-            track.push_back(current_pos);
+            track.push_back(track.back());
             current_sector = ChooseCurrentSector(
-                current_pos.GetPosition(), current_pos.GetDirection());
+                    track.back().GetPosition(), track.back().GetDirection());
         }
-        if (current_pos.GetEnergy() <= min_energy)
+        if (track.back().GetEnergy() <= min_energy)
             continue_propagation = false;
     }
     return track;
@@ -273,9 +271,6 @@ double Propagator::CalculateDistanceToBorder(const Vector3D& position,
 
 int Propagator::maximize(const std::array<double, 3>& InteractionEnergies)
 {
-    for (auto& E : InteractionEnergies) // DEBUG
-        std::cout << E << ", ";
-    std::cout << std::endl;
     auto max_element_ref = std::max_element(
         InteractionEnergies.begin(), InteractionEnergies.end());
     return std::distance(InteractionEnergies.begin(), max_element_ref);
