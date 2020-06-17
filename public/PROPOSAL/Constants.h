@@ -38,6 +38,7 @@ extern const double SQRT3;            // sqrt(3)
 extern const double SQRTE;            // sqrt(e)
 extern const double ZETA3;            // rieman zeta(3)
 extern const double EULER_MASCHERONI; // Euler-Mascheroni constant
+extern const double INF;              // positive infinity
 
 // integration parameters
 extern const int IROMB;     // romb # for integration

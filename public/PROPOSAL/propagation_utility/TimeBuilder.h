@@ -9,8 +9,8 @@ template <typename T, typename Cross> class ExactTimeBuilder : public Time {
     T BuildTimeIntegral(Cross&& cross)
     {
         auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
-        auto time_func = [this, &disp](double energy) {
-            return FunctionToIntegral(disp, energy);
+        auto time_func = [this, &cross, &disp](double energy) {
+            return FunctionToIntegral(cross, disp, energy);
         };
         T time_integral(time_func, CrossSectionVector::GetLowerLim(cross));
         if (typeid(T) == typeid(UtilityInterpolant)) {
@@ -21,19 +21,19 @@ template <typename T, typename Cross> class ExactTimeBuilder : public Time {
     }
 
     template <typename Disp>
-    double FunctionToIntegral(Disp&& disp, double energy)
+    double FunctionToIntegral(Cross&& cross, Disp&& disp, double energy)
     {
         assert(energy > mass);
         auto square_momentum = (energy - mass) * (energy + mass);
         auto particle_momentum = std::sqrt(square_momentum);
-        return disp.FunctionToIntegral(energy) * energy
+        return disp.FunctionToIntegral(cross, energy) * energy
             / (particle_momentum * SPEED);
     }
 
 public:
     ExactTimeBuilder(Cross&& cross, const ParticleDef& p_def)
         : mass(p_def.mass)
-        , time_integral(cross)
+        , time_integral(BuildTimeIntegral(cross))
     {
     }
 

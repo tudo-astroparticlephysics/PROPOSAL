@@ -155,9 +155,6 @@ std::vector<DynamicData> Propagator::Propagate(
     return track;
 }
 
-// Private methods (TODO(Maximilian): does header file not specify validy
-// range?)
-
 bool Propagator::DoStochasticInteraction(DynamicData& p_cond,
     PropagationUtility& utility, std::function<double()> rnd)
 {
