@@ -75,11 +75,11 @@ template <typename M>
 crosssection_list_t<TauMinusDef, M> GetStdCrossSections(const TauMinusDef& tau,
                                                        M&& medium, std::shared_ptr<const EnergyCutSettings> cut, bool interpolate=true)
 {
-    BremsKelnerKokoulinPetrukhin brems{ false };
-    EpairKelnerKokoulinPetrukhin epair{ false };
-    IonizBetheBlochRossi ioniz{ EnergyCutSettings(*cut) };
-    PhotoAbramowiczLevinLevyMaor97 photo{
-            make_unique<ShadowButkevichMikhailov>()
+    crosssection::BremsKelnerKokoulinPetrukhin brems{ false };
+    crosssection::EpairKelnerKokoulinPetrukhin epair{ false };
+    crosssection::IonizBetheBlochRossi ioniz{ EnergyCutSettings(*cut) };
+    crosssection::PhotoAbramowiczLevinLevyMaor97 photo{
+            make_unique<crosssection::ShadowButkevichMikhailov>()
     };
     crosssection_list_t<TauMinusDef, M> cross;
     cross.emplace_back(make_crosssection(brems, tau, medium, cut, interpolate));
