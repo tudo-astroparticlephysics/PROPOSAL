@@ -33,6 +33,7 @@
 using PROPOSAL::Components::Component;
 
 namespace PROPOSAL {
+    namespace crosssection{
 class Compton : public Parametrization {
 public:
     Compton();
@@ -51,22 +52,19 @@ struct ComptonKleinNishina : public Compton {
     using base_param_t = Compton;
 
     double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double energy, double v);
+        const ParticleDef&, const Component&, double energy, double v) const;
 };
+} // namespace crosssection
 
 template <>
-double integrate_dndx(Integral&, Compton&, const ParticleDef&, const Component&,
+double integrate_dndx(Integral&, crosssection::Compton&, const ParticleDef&, const Component&,
+    double, double, double, double);
+
+template <>
+double integrate_dedx(Integral&, crosssection::Compton&, const ParticleDef&, const Component&,
     double, double, double);
 
 template <>
-double calculate_upper_lim_dndx(Integral&, Compton&, const ParticleDef&,
-    const Component&, double, double, double, double);
-
-template <>
-double integrate_dedx(Integral&, Compton&, const ParticleDef&, const Component&,
-    double, double, double);
-
-template <>
-double integrate_de2dx(Integral&, Compton&, const ParticleDef&,
+double integrate_de2dx(Integral&, crosssection::Compton&, const ParticleDef&,
     const Component&, double, double, double);
 } // namespace PROPOSAL

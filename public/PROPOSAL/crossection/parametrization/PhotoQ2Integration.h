@@ -39,29 +39,29 @@
         Photo##param(shared_ptr<ShadowEffect>);                                \
         using base_param_t = Photonuclear;                                     \
         double FunctionToQ2Integral(const ParticleDef&, const Component&,      \
-            double energy, double v, double Q2);                               \
+            double energy, double v, double Q2) const;                         \
     };
 
 namespace PROPOSAL {
+namespace crosssection {
 class PhotoQ2Integral : public Photonuclear {
 public:
     PhotoQ2Integral(shared_ptr<ShadowEffect>);
     virtual ~PhotoQ2Integral() = default;
 
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double energy, double v);
+        const ParticleDef&, const Component&, double energy, double v) const;
     virtual double FunctionToQ2Integral(const ParticleDef&, const Component&,
-        double energy, double v, double Q2)
-        = 0;
+        double energy, double v, double Q2) const = 0;
 
     std::shared_ptr<ShadowEffect> shadow_effect_;
-    Integral integral_;
 };
 
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor91)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor97)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(ButkevichMikhailov)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(RenoSarcevicSu)
+} // namespace crosssection
 } // namespace PROPOSAL
 
 #undef Q2_PHOTO_PARAM_INTEGRAL_DEC

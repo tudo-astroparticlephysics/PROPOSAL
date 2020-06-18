@@ -9,27 +9,28 @@
 #include "PROPOSAL/Constants.h"
 
 #define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                      \
-    Mupair##param::Mupair##param()                                             \
-        : MupairProductionRhoIntegral()                                        \
+    crosssection::Mupair##param::Mupair##param()                                             \
+        : crosssection::MupairProductionRhoIntegral()                                        \
     {                                                                          \
     }
 
 using namespace PROPOSAL;
+using crosssection::MupairProduction;
 using std::make_tuple;
 
-MupairProduction::MupairProduction()
+crosssection::MupairProduction::MupairProduction()
     : Parametrization(InteractionType::MuPair, "mupair")
     , drho_integral_(IROMB, IMAXS, IPREC)
 {
 }
 
-double MupairProduction::GetLowerEnergyLim(const ParticleDef& p_def) const
+double crosssection::MupairProduction::GetLowerEnergyLim(const ParticleDef& p_def) const
     noexcept
 {
     return p_def.mass + 2.f * MMU;
 }
 
-tuple<double, double> MupairProduction::GetKinematicLimits(
+tuple<double, double> crosssection::MupairProduction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy) const
     noexcept
 {
@@ -42,60 +43,35 @@ tuple<double, double> MupairProduction::GetKinematicLimits(
     return make_tuple(vmin, vmax);
 }
 
-double MupairProduction::Calculaterho(const ParticleDef& p_def,
-    const Component& comp, double energy, double v, double rnd1, double rnd2)
-{
-    double rho = 0;
-    double rho_min = 0;
-    double rho_max = 1 - 2 * MMU / (v * energy);
-
-    if (rho_max < 0)
-        return 0;
-
-    static_cast<void>(drho_integral_.IntegrateWithRandomRatio(rho_min, rho_max,
-        std::bind(&MupairProduction::FunctionToIntegral, this, p_def, comp,
-            energy, v, std::placeholders::_1),
-        3, rnd1));
-
-    rho = drho_integral_.GetUpperLimit();
-
-    if (rnd2 < 0.5)
-        rho = -rho;
-
-    return rho;
-}
-
-MupairProductionRhoIntegral::MupairProductionRhoIntegral()
+crosssection::MupairProductionRhoIntegral::MupairProductionRhoIntegral()
     : MupairProduction()
-    , integral_(IROMB, IMAXS, IPREC)
 {
 }
 
-double MupairProductionRhoIntegral::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+double crosssection::MupairProductionRhoIntegral::DifferentialCrossSection(
+    const ParticleDef& p_def, const Component& comp, double energy,
+    double v) const
 {
-    double rMax, aux;
+    auto aux = 1 - 2 * MMU / (v * energy);
 
-    aux = 1 - 2 * MMU / (v * energy);
-
-    if (aux > 0) {
-        rMax = aux;
-    } else {
+    if (aux < 0)
         return 0;
-    }
 
+    auto rMax = aux;
+
+    Integral integral(IROMB, IMAXS, IPREC);
     return NA / comp.GetAtomicNum() * p_def.charge * p_def.charge
-        * (integral_.Integrate(0, rMax,
-              std::bind(&MupairProductionRhoIntegral::FunctionToIntegral, this,
+        * (integral.Integrate(0, rMax,
+              std::bind(&crosssection::MupairProductionRhoIntegral::FunctionToIntegral, this,
                   p_def, comp, energy, v, std::placeholders::_1),
               2));
 }
 
 MUPAIR_PARAM_INTEGRAL_IMPL(KelnerKokoulinPetrukhin)
 
-double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
+double crosssection::MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
     const ParticleDef& p_def, const Component& comp, double energy, double v,
-    double r)
+    double r) const
 {
     // Parametrization of Kelner/Kokoulin/Petrukhin
     // Physics of Atomic Nuclei, Vol. 63, No. 9, 2000, pp. 1603-1611. Translated
@@ -161,5 +137,4 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
 
     return aux;
 }
-
 #undef MUPAIR_PARAM_INTEGRAL_IMPL

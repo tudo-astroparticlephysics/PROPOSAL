@@ -39,11 +39,11 @@ template <typename M>
 crosssection_list_t<EMinusDef, M> GetStdCrossSections(const EMinusDef& e,
     M&& medium, std::shared_ptr<const EnergyCutSettings> cut, bool interpolate=true)
 {
-    BremsKelnerKokoulinPetrukhin brems{ false };
-    EpairKelnerKokoulinPetrukhin epair{ false };
-    IonizBetheBlochRossi ioniz{ EnergyCutSettings(*cut) };
-    PhotoAbramowiczLevinLevyMaor97 photo{
-        make_unique<ShadowButkevichMikhailov>()
+    crosssection::BremsKelnerKokoulinPetrukhin brems{ false };
+    crosssection::EpairKelnerKokoulinPetrukhin epair{ false };
+    crosssection::IonizBetheBlochRossi ioniz{ EnergyCutSettings(*cut) };
+    crosssection::PhotoAbramowiczLevinLevyMaor97 photo{
+        make_unique<crosssection::ShadowButkevichMikhailov>()
     };
     crosssection_list_t<EMinusDef, M> cross;
     cross.emplace_back(make_crosssection(brems, e, medium, cut, interpolate));
@@ -57,11 +57,11 @@ template <typename M>
 crosssection_list_t<MuMinusDef, M> GetStdCrossSections(const MuMinusDef& mu,
     M&& medium, std::shared_ptr<const EnergyCutSettings> cut, bool interpolate=true)
 {
-    BremsKelnerKokoulinPetrukhin brems{ false };
-    EpairKelnerKokoulinPetrukhin epair{ false };
-    IonizBetheBlochRossi ioniz{ EnergyCutSettings(*cut) };
-    PhotoAbramowiczLevinLevyMaor97 photo{
-        make_unique<ShadowButkevichMikhailov>()
+    crosssection::BremsKelnerKokoulinPetrukhin brems{ false };
+    crosssection::EpairKelnerKokoulinPetrukhin epair{ false };
+    crosssection::IonizBetheBlochRossi ioniz{ EnergyCutSettings(*cut) };
+    crosssection::PhotoAbramowiczLevinLevyMaor97 photo{
+        make_unique<crosssection::ShadowButkevichMikhailov>()
     };
     crosssection_list_t<MuMinusDef, M> cross;
     cross.emplace_back(make_crosssection(brems, mu, medium, cut, interpolate));

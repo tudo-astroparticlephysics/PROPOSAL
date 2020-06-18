@@ -8,20 +8,24 @@
 #include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 using std::make_tuple;
 
-WeakInteraction::WeakInteraction()
-    : Parametrization(InteractionType::WeakInt, "weak_interaction")
+crosssection::WeakInteraction::WeakInteraction()
+    : crosssection::Parametrization(InteractionType::WeakInt, "weak_interaction")
 {
 }
 
-double WeakInteraction::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept {
+double crosssection::WeakInteraction::GetLowerEnergyLim(const ParticleDef& p_def) const
+    noexcept
+{
     return p_def.mass;
 }
-tuple<double, double> WeakInteraction::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy) const noexcept
+tuple<double, double> crosssection::WeakInteraction::GetKinematicLimits(
+    const ParticleDef& p_def, const Component& comp, double energy) const
+    noexcept
 {
     double aux = (MP + MN) / 2; // for isoscalar targets
     aux = 2 * energy * aux + pow(aux, 2);
@@ -30,33 +34,39 @@ tuple<double, double> WeakInteraction::GetKinematicLimits(
     return make_tuple(v_min, v_max);
 }
 
-WeakCooperSarkarMertsch::WeakCooperSarkarMertsch()
-    : WeakInteraction()
+crosssection::WeakCooperSarkarMertsch::WeakCooperSarkarMertsch()
+    : crosssection::WeakInteraction()
 {
-    // Initialize interpolant for particles (remember crossing symmetry rules)
-    interpolant_[false].emplace_back(new Interpolant(energies, y_nubar_p,
-        sigma_nubar_p, IROMB, false, false, IROMB, false, false));
-    interpolant_[false].emplace_back(new Interpolant(energies, y_nubar_n,
-        sigma_nubar_n, IROMB, false, false, IROMB, false, false));
-    interpolant_[true].emplace_back(new Interpolant(energies, y_nu_p,
-        sigma_nu_p, IROMB, false, false, IROMB, false, false));
-    interpolant_[true].emplace_back(new Interpolant(energies, y_nu_n,
-        sigma_nu_n, IROMB, false, false, IROMB, false, false));
 }
 
-double WeakCooperSarkarMertsch::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+tuple<Interpolant, Interpolant> crosssection::WeakCooperSarkarMertsch::BuildContribution(
+    bool is_decayable) const
+{
+    // Initialize interpolant for particles (remember crossing symmetry rules)
+    if (!is_decayable)
+        return make_tuple(Interpolant(energies, y_nubar_p, sigma_nubar_p, IROMB,
+                              false, false, IROMB, false, false),
+            Interpolant(energies, y_nubar_n, sigma_nubar_n, IROMB, false, false,
+                IROMB, false, false));
+
+    return make_tuple(Interpolant(energies, y_nu_p, sigma_nu_p, IROMB, false,
+                          false, IROMB, false, false),
+        Interpolant(energies, y_nu_n, sigma_nu_n, IROMB, false, false, IROMB,
+            false, false));
+}
+
+double crosssection::WeakCooperSarkarMertsch::DifferentialCrossSection(
+    const ParticleDef& p_def, const Component& comp, double energy,
+    double v) const
 {
     auto log10_energy = std::log10(energy);
     const auto& nuclear_charge = comp.GetNucCharge();
     const auto& nuclear_number = comp.GetAtomicNum();
-
+    auto contributions = BuildContribution(p_def.lifetime > 0);
     auto proton_contr = nuclear_charge
-        * interpolant_[p_def.lifetime > 0][0]->InterpolateArray(
-              log10_energy, v);
+        * std::get<0>(contributions).InterpolateArray(log10_energy, v);
     auto neutron_contr = (nuclear_number - nuclear_charge)
-        * interpolant_[p_def.lifetime > 0][1]->InterpolateArray(
-              log10_energy, v);
+        * std::get<1>(contributions).InterpolateArray(log10_energy, v);
     auto mean_contr = (proton_contr + neutron_contr) / nuclear_number;
 
     assert(mean_contr > 0);

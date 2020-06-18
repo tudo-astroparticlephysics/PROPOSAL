@@ -10,17 +10,17 @@
 using namespace PROPOSAL;
 using std::make_tuple;
 
-Compton::Compton()
+crosssection::Compton::Compton()
     : Parametrization(InteractionType::Compton, "compton")
 {
 }
 
-double Compton::GetLowerEnergyLim(const ParticleDef&) const noexcept
+double crosssection::Compton::GetLowerEnergyLim(const ParticleDef&) const noexcept
 {
     return ME;
 }
 
-tuple<double, double> Compton::GetKinematicLimits(
+tuple<double, double> crosssection::Compton::GetKinematicLimits(
     const ParticleDef&, const Component&, double energy) const noexcept
 {
     assert(energy > 0);
@@ -28,8 +28,8 @@ tuple<double, double> Compton::GetKinematicLimits(
     return make_tuple(0., vmax);
 }
 
-double ComptonKleinNishina::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+double crosssection::ComptonKleinNishina::DifferentialCrossSection(
+    const ParticleDef& p_def, const Component& comp, double energy, double v) const
 {
     // Adapted from "THE EGS5 CODE SYSTEM" by Hideo Harayama and Yoshihito
     // Namito SLAC Report number SLAC-R-730, KEK Report number 2005-8 Equation
@@ -52,9 +52,9 @@ double ComptonKleinNishina::DifferentialCrossSection(
 
 namespace PROPOSAL {
 template <>
-double integrate_dndx(Integral& integral, Compton& param,
+double integrate_dndx(Integral& integral, crosssection::Compton& param,
     const ParticleDef& p_def, const Component& comp, double energy,
-    double v_min, double v_max)
+    double v_min, double v_max, double rnd)
 {
     auto t_min = std::log(1. - v_min);
     auto t_max = std::log(1. - v_max);
@@ -62,11 +62,11 @@ double integrate_dndx(Integral& integral, Compton& param,
         return exp(t)
             * param.FunctionToDNdxIntegral(p_def, comp, energy, 1 - exp(t));
     };
-    return integral.Integrate(t_min, t_max, dNdx, 4);
+    return integral.IntegrateWithRandomRatio(t_min, t_max, dNdx, 4, rnd);
 }
 
 template <>
-double integrate_dedx(Integral& integral, Compton& param,
+double integrate_dedx(Integral& integral, crosssection::Compton& param,
     const ParticleDef& p_def, const Component& comp, double energy,
     double v_min, double v_max)
 {
@@ -80,7 +80,7 @@ double integrate_dedx(Integral& integral, Compton& param,
 }
 
 template <>
-double integrate_de2dx(Integral& integral, Compton& param,
+double integrate_de2dx(Integral& integral, crosssection::Compton& param,
     const ParticleDef& p_def, const Component& comp, double energy,
     double v_min, double v_max)
 {
@@ -93,18 +93,18 @@ double integrate_de2dx(Integral& integral, Compton& param,
     return integral.Integrate(t_min, t_max, dE2dx, 2);
 }
 
-template <>
-double calculate_upper_lim_dndx(Integral& integral, Compton& param,
-    const ParticleDef& p_def, const Component& comp, double energy,
-    double v_min, double v_max, double rnd)
-{
-    auto t_min = std::log(1. - v_min);
-    auto t_max = std::log(1. - v_max);
-    auto dNdx = [&param, &p_def, &comp, energy](double t) {
-        return exp(t)
-            * param.FunctionToDNdxIntegral(p_def, comp, energy, 1 - exp(t));
-    };
-    integral.IntegrateWithRandomRatio(t_min, t_max, dNdx, 4, rnd);
-    return integral.GetUpperLimit();
-}
+/* template <> */
+/* double calculate_upper_lim_dndx(Integral& integral, crosssection::Compton& param, */
+/*     const ParticleDef& p_def, const Component& comp, double energy, */
+/*     double v_min, double v_max, double rnd) */
+/* { */
+/*     auto t_min = std::log(1. - v_min); */
+/*     auto t_max = std::log(1. - v_max); */
+/*     auto dNdx = [&param, &p_def, &comp, energy](double t) { */
+/*         return exp(t) */
+/*             * param.FunctionToDNdxIntegral(p_def, comp, energy, 1 - exp(t)); */
+/*     }; */
+/*     integral.IntegrateWithRandomRatio(t_min, t_max, dNdx, 4, rnd); */
+/*     return integral.GetUpperLimit(); */
+/* } */
 } // namespace PROPOSAL

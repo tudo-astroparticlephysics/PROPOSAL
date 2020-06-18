@@ -32,7 +32,7 @@
 #include "PROPOSAL/math/Integral.h"
 
 namespace PROPOSAL {
-
+namespace crosssection {
 class PhotoPairProduction : public Parametrization {
 public:
     PhotoPairProduction();
@@ -40,10 +40,6 @@ public:
 
     using only_stochastic = std::true_type;
     using component_wise = std::true_type;
-
-    virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double)
-        = 0;
 
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
     tuple<double, double> GetKinematicLimits(
@@ -55,45 +51,45 @@ struct PhotoPairTsai : public PhotoPairProduction {
     using base_param_t = PhotoPairProduction;
 
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double);
+        const ParticleDef&, const Component&, double, double) const;
 };
 
-class PhotoAngleDistribution {
-public:
-    PhotoAngleDistribution() = default;
-    virtual ~PhotoAngleDistribution() = default;
+/* class PhotoAngleDistribution { */
+/* public: */
+/*     PhotoAngleDistribution() = default; */
+/*     virtual ~PhotoAngleDistribution() = default; */
 
-    struct DeflectionAngles {
-        double cosphi0, theta0, cosphi1, theta1;
-    };
+/*     struct DeflectionAngles { */
+/*         double cosphi0, theta0, cosphi1, theta1; */
+/*     }; */
 
-    virtual DeflectionAngles SampleAngles(
-        const Component& comp, double energy, double rho)
-        = 0;
-};
+/*     virtual DeflectionAngles SampleAngles( */
+/*         const Component& comp, double energy, double rho) */
+/*         = 0; */
+/* }; */
 
-class PhotoAngleTsaiIntegral : public PhotoAngleDistribution {
-    Integral integral_;
-    double FunctionToIntegral(const Component&, double, double, double);
+/* class PhotoAngleTsaiIntegral : public PhotoAngleDistribution { */
+/*     Integral integral_; */
+/*     double FunctionToIntegral(const Component&, double, double, double); */
 
-public:
-    PhotoAngleTsaiIntegral();
+/* public: */
+/*     PhotoAngleTsaiIntegral(); */
 
-    DeflectionAngles SampleAngles(const Component&, double, double) override;
-};
+/*     DeflectionAngles SampleAngles(const Component&, double, double) override; */
+/* }; */
 
-class PhotoAngleNoDeflection : public PhotoAngleDistribution {
-public:
-    PhotoAngleNoDeflection();
+/* class PhotoAngleNoDeflection : public PhotoAngleDistribution { */
+/* public: */
+/*     PhotoAngleNoDeflection(); */
 
-    DeflectionAngles SampleAngles(const Component&, double, double) override;
-};
+/*     DeflectionAngles SampleAngles(const Component&, double, double) override; */
+/* }; */
 
-class PhotoAngleEGS : public PhotoAngleDistribution {
-public:
-    PhotoAngleEGS();
+/* class PhotoAngleEGS : public PhotoAngleDistribution { */
+/* public: */
+/*     PhotoAngleEGS(); */
 
-    DeflectionAngles SampleAngles(const Component&, double, double) override;
-};
-
+/*     DeflectionAngles SampleAngles(const Component&, double, double) override; */
+/* }; */
+} //namespace crossection
 } // namespace PROPOSAL

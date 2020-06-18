@@ -26,62 +26,61 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include <string>
 #include <map>
 #include <memory>
+#include <string>
 
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 namespace PROPOSAL {
-enum class InteractionType {
-    Particle               = 1000000001,
-    Brems                  = 1000000002,
-    Ioniz                  = 1000000003,
-    Epair                  = 1000000004,
-    Photonuclear           = 1000000005,
-    MuPair                 = 1000000006,
-    Hadrons                = 1000000007,
-    ContinuousEnergyLoss   = 1000000008,
-    WeakInt                = 1000000009,
-    Compton                = 1000000010,
-    Decay                  = 1000000011,
-    Annihilation           = 1000000012,
-    Photopair              = 1000000013,
+enum class InteractionType : int {
+    Particle = 1000000001,
+    Brems = 1000000002,
+    Ioniz = 1000000003,
+    Epair = 1000000004,
+    Photonuclear = 1000000005,
+    MuPair = 1000000006,
+    Hadrons = 1000000007,
+    ContinuousEnergyLoss = 1000000008,
+    WeakInt = 1000000009,
+    Compton = 1000000010,
+    Decay = 1000000011,
+    Annihilation = 1000000012,
+    Photopair = 1000000013,
 };
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-static const std::map<const int, std::string> Type_Interaction_Name_Map {
-    {static_cast<int>(InteractionType::Particle), "Particle"},
-    {static_cast<int>(InteractionType::Brems), "Brems"},
-    {static_cast<int>(InteractionType::Ioniz), "Ioniz"},
-    {static_cast<int>(InteractionType::Epair), "Epair"},
-    {static_cast<int>(InteractionType::Photonuclear), "Photonuclear"},
-    {static_cast<int>(InteractionType::MuPair), "MuPair"},
-    {static_cast<int>(InteractionType::Hadrons), "Hadrons"},
-    {static_cast<int>(InteractionType::ContinuousEnergyLoss), "ContinousEnergyLoss"},
-    {static_cast<int>(InteractionType::WeakInt), "WeakInt"},
-    {static_cast<int>(InteractionType::Compton), "Compton"},
-    {static_cast<int>(InteractionType::Decay), "Decay"},
-    {static_cast<int>(InteractionType::Annihilation), "Annihilation"},
-    {static_cast<int>(InteractionType::Photopair), "Photopair"},
+static const std::map<const int, std::string> Type_Interaction_Name_Map{
+    { static_cast<int>(InteractionType::Particle), "Particle" },
+    { static_cast<int>(InteractionType::Brems), "Brems" },
+    { static_cast<int>(InteractionType::Ioniz), "Ioniz" },
+    { static_cast<int>(InteractionType::Epair), "Epair" },
+    { static_cast<int>(InteractionType::Photonuclear), "Photonuclear" },
+    { static_cast<int>(InteractionType::MuPair), "MuPair" },
+    { static_cast<int>(InteractionType::Hadrons), "Hadrons" },
+    { static_cast<int>(InteractionType::ContinuousEnergyLoss),
+        "ContinousEnergyLoss" },
+    { static_cast<int>(InteractionType::WeakInt), "WeakInt" },
+    { static_cast<int>(InteractionType::Compton), "Compton" },
+    { static_cast<int>(InteractionType::Decay), "Decay" },
+    { static_cast<int>(InteractionType::Annihilation), "Annihilation" },
+    { static_cast<int>(InteractionType::Photopair), "Photopair" },
 };
 } // namespace PROPOSAL
-
 
 namespace PROPOSAL {
 class UtilityDecorator;
 
-class DynamicData
-{
+class DynamicData {
 public:
     DynamicData();
     DynamicData(const int&);
-    DynamicData(const int&, const Vector3D&, const Vector3D&, const double&, const double&, const double&, const double&);
+    DynamicData(const int&, const Vector3D&, const Vector3D&, const double&,
+        const double&, const double&, const double&);
 
     friend std::ostream& operator<<(std::ostream&, DynamicData const&);
     DynamicData& operator=(const DynamicData&);
@@ -96,9 +95,15 @@ public:
     void SetPosition(const Vector3D& position) { position_ = position; }
     void SetDirection(const Vector3D& direction) { direction_ = direction; }
 
-    void SetParentParticleEnergy(double parent_particle_energy) { parent_particle_energy_ = parent_particle_energy; }
+    void SetParentParticleEnergy(double parent_particle_energy)
+    {
+        parent_particle_energy_ = parent_particle_energy;
+    }
     void SetTime(double time) { time_ = time; }
-    void SetPropagatedDistance(double prop_dist) { propagated_distance_ = prop_dist; }
+    void SetPropagatedDistance(double prop_dist)
+    {
+        propagated_distance_ = prop_dist;
+    }
     void SetType(InteractionType type) { type_ = static_cast<int>(type); }
     void SetType(int type) { type_ = type; }
 
@@ -118,12 +123,12 @@ public:
     double GetPropagatedDistance() const { return propagated_distance_; }
     std::string GetName() const;
 
-    // Deflect the direction of a particle by cosphi_deflect with an azimuth of theta_deflect
+    // Deflect the direction of a particle by cosphi_deflect with an azimuth of
+    // theta_deflect
     void DeflectDirection(double cosphi_deflect, double theta_deflect);
 
 protected:
     virtual void print(std::ostream&) const {}
-
 
     int type_;
 
@@ -136,5 +141,10 @@ protected:
     double propagated_distance_;    //!< propagation distance [cm]
 
     std::shared_ptr<UtilityDecorator> utility_decorator;
+};
+
+struct Loss {
+    enum { TYPE, POSITION, DIRECTION, ENERGY, TIME };
+    using secondary_t = std::tuple<int, Vector3D, Vector3D, double, double>;
 };
 } // namespace PROPOSAL

@@ -28,10 +28,9 @@
 
 #pragma once
 
-/* #include "PROPOSAL/EnergyCutSettings.h" */
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include <memory>
 #include <type_traits>
 #include <unordered_map>

@@ -37,33 +37,37 @@
 using std::unordered_map;
 
 namespace PROPOSAL {
-
 class Interpolant;
 
-class WeakInteraction : public Parametrization {
-public:
-    WeakInteraction();
-    ~WeakInteraction() = default;
+namespace crosssection {
+    class WeakInteraction : public Parametrization {
+    public:
+        WeakInteraction();
+        ~WeakInteraction() = default;
 
-    using only_stochastic = std::true_type;
-    using component_wise = std::true_type;
+        using only_stochastic = std::true_type;
+        using component_wise = std::true_type;
 
+        double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
+        tuple<double, double> GetKinematicLimits(const ParticleDef&,
+            const Component&, double) const noexcept override;
+    };
 
-    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-    tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double) const noexcept override;
-};
+    class WeakCooperSarkarMertsch : public WeakInteraction {
+        unordered_map<bool,
+            tuple<std::unique_ptr<Interpolant>, unique_ptr<const Interpolant>>>
+            interpolant_;
+        tuple<Interpolant, Interpolant> BuildContribution(
+            bool is_decayable) const;
 
-class WeakCooperSarkarMertsch : public WeakInteraction {
-    unordered_map<bool, std::vector<std::unique_ptr<Interpolant>>> interpolant_;
+    public:
+        WeakCooperSarkarMertsch();
 
-public:
-    WeakCooperSarkarMertsch();
+        using base_param_t = WeakInteraction;
 
-    using base_param_t = WeakInteraction;
+        double DifferentialCrossSection(const ParticleDef&, const Component&,
+            double, double) const override;
+    };
 
-    double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double) override;
-};
-
+} // namespace crosssection
 } // namespace PROPOSAL

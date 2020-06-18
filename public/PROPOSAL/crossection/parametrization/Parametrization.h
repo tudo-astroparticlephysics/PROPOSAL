@@ -30,6 +30,8 @@
 
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 #include <iostream>
 #include <tuple>
 #include <type_traits>
@@ -39,55 +41,54 @@ using std::string;
 using std::tuple;
 
 namespace PROPOSAL {
-class ParticleDef;
 class Medium;
 enum class InteractionType;
+namespace crosssection {
 
-class Parametrization {
-public:
-    const InteractionType interaction_type;
-    const string name;
+    struct Parametrization {
+        const InteractionType interaction_type;
+        const string name;
 
-    Parametrization(InteractionType, const string&);
-    virtual ~Parametrization() = default;
+        Parametrization(InteractionType, const string&);
+        virtual ~Parametrization() = default;
 
-    enum { V_MIN, V_MAX };
+        virtual double DifferentialCrossSection(
+            const ParticleDef&, const Component&, double, double) const;
 
-    virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double);
+        enum { V_MIN, V_MAX };
+        virtual tuple<double, double> GetKinematicLimits(
+            const ParticleDef&, const Component&, double) const noexcept;
 
-    virtual tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double) const noexcept;
-
-    inline double FunctionToDNdxIntegral(const ParticleDef& p_def,
-        const Component& comp, double energy, double v)
-    {
-        return DifferentialCrossSection(p_def, comp, energy, v);
-    }
-    inline double FunctionToDEdxIntegral(const ParticleDef& p_def,
-        const Component& comp, double energy, double v)
-    {
-        return v * DifferentialCrossSection(p_def, comp, energy, v);
-    }
-    inline double FunctionToDE2dxIntegral(const ParticleDef& p_def,
-        const Component& comp, double energy, double v)
-    {
-        return v * v * DifferentialCrossSection(p_def, comp, energy, v);
-    }
-    virtual double GetLowerEnergyLim(const ParticleDef&) const noexcept = 0;
-    virtual size_t GetHash() const noexcept;
-};
+        inline double FunctionToDNdxIntegral(const ParticleDef& p_def,
+            const Component& comp, double energy, double v) const
+        {
+            return DifferentialCrossSection(p_def, comp, energy, v);
+        }
+        inline double FunctionToDEdxIntegral(const ParticleDef& p_def,
+            const Component& comp, double energy, double v) const
+        {
+            return v * DifferentialCrossSection(p_def, comp, energy, v);
+        }
+        inline double FunctionToDE2dxIntegral(const ParticleDef& p_def,
+            const Component& comp, double energy, double v) const
+        {
+            return v * v * DifferentialCrossSection(p_def, comp, energy, v);
+        }
+        virtual double GetLowerEnergyLim(const ParticleDef&) const noexcept = 0;
+        virtual size_t GetHash() const noexcept;
+    };
+} // namespace crosssection
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
 template <typename P, typename M>
 double integrate_dndx(Integral& integral, P&& param, const ParticleDef& p_def,
-    const M& medium, double energy, double v_min, double v_max)
+    const M& medium, double energy, double v_min, double v_max, double rnd = 0)
 {
     auto dNdx = [&param, &p_def, &medium, energy](double v) {
         return param.FunctionToDNdxIntegral(p_def, medium, energy, v);
     };
-    return integral.Integrate(v_min, v_max, dNdx, 4);
+    return integral.IntegrateWithRandomRatio(v_min, v_max, dNdx, 4, rnd);
 }
 
 template <typename P, typename M>
@@ -98,14 +99,14 @@ double calculate_upper_lim_dndx(Integral& integral, P&& param,
     auto dNdx = [&param, &p_def, &medium, energy](double v) {
         return param.FunctionToDNdxIntegral(p_def, medium, energy, v);
     };
-    integral.IntegrateWithRandomRatio(v_min, v_max, dNdx, 4, rnd);
+    return integral.IntegrateWithRandomRatio(v_min, v_max, dNdx, 4, rnd);
     return integral.GetUpperLimit();
 }
 
 template <typename Param, typename M>
 double integrate_dedx(Integral& integral, Param&& param,
-    const ParticleDef& p_def, M& medium, double energy,
-    double v_min, double v_max)
+    const ParticleDef& p_def, M& medium, double energy, double v_min,
+    double v_max)
 {
     auto dEdx = [&param, &p_def, &medium, energy](double v) {
         return param.FunctionToDEdxIntegral(p_def, medium, energy, v);
@@ -115,12 +116,13 @@ double integrate_dedx(Integral& integral, Param&& param,
 
 template <typename Param, typename M>
 double integrate_de2dx(Integral& integral, Param&& param,
-    const ParticleDef& p_def, M& medium, double energy,
-    double v_min, double v_max)
+    const ParticleDef& p_def, M& medium, double energy, double v_min,
+    double v_max)
 {
     auto dE2dx = [&param, &p_def, &medium, energy](double v) {
         return param.FunctionToDE2dxIntegral(p_def, medium, energy, v);
     };
     return integral.Integrate(v_min, v_max, dE2dx, 2);
 }
+
 } // namespace PROPOSAL

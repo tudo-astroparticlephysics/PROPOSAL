@@ -39,11 +39,12 @@ using std::unordered_map;
         Photo##param(bool hard_component);                                     \
         using base_param_t = Photonuclear;                                     \
                                                                                \
-        virtual double CalculateParametrization(const Component&, double nu);  \
+        virtual double CalculateParametrization(                               \
+            const Component&, double nu) const;                                \
     };
 
 namespace PROPOSAL {
-
+namespace crosssection {
 class PhotoRealPhotonAssumption : public Photonuclear {
 protected:
     bool hard_component_;
@@ -54,9 +55,10 @@ public:
     virtual ~PhotoRealPhotonAssumption() = default;
 
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double energy, double v);
-    virtual double CalculateParametrization(const Component&, double nu) = 0;
-    double NucleusCrossSectionCaldwell(double nu);
+        const ParticleDef&, const Component&, double energy, double v) const;
+    virtual double CalculateParametrization(
+        const Component&, double nu) const = 0;
+    double NucleusCrossSectionCaldwell(double nu) const;
 };
 
 PHOTO_PARAM_REAL_DEC(Zeus, RealPhotonAssumption)
@@ -66,14 +68,14 @@ PHOTO_PARAM_REAL_DEC(Kokoulin, BezrukovBugaev)
 class PhotoRhode : public PhotoRealPhotonAssumption {
     std::shared_ptr<Interpolant> interpolant_;
 
-    double MeasuredSgN(double e);
+    double MeasuredSgN(double e) const;
 
 public:
     PhotoRhode(bool hard_component);
 
-    double CalculateParametrization(const Component&, double nu) override;
+    double CalculateParametrization(const Component&, double nu) const override;
 };
 
 #undef Q2_PHOTO_PARAM_INTEGRAL_DEC
-
+} // namespace crosssection
 } // namespace PROPOSAL

@@ -42,11 +42,11 @@ using PROPOSAL::Components::Component;
         using base_param_t = EpairProduction;                                  \
                                                                                \
         double FunctionToIntegral(const ParticleDef&, const Component&,        \
-            double energy, double v, double lpm);                              \
+            double energy, double v, double lpm) const;                              \
     };
 
 namespace PROPOSAL {
-
+namespace crosssection {
 class EpairProduction : public Parametrization {
 
 protected:
@@ -83,7 +83,7 @@ public:
     ///
     // ----------------------------------------------------------------------------
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double energy, double v)
+        const ParticleDef&, const Component&, double energy, double v) const
         = 0;
 
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
@@ -92,20 +92,13 @@ public:
     size_t GetHash() const noexcept override;
 };
 
-template <>
-double integrate_dedx(Integral&, EpairProduction&, const ParticleDef&,
-    const Component&, double, double, double);
-
 class EpairProductionRhoIntegral : public EpairProduction {
-private:
-    Integral integral_;
-
-public:
+    public:
     EpairProductionRhoIntegral(bool);
     virtual ~EpairProductionRhoIntegral() = default;
 
     double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double energy, double v) override;
+        const ParticleDef&, const Component&, double energy, double v) const override;
 
     // ----------------------------------------------------------------------------
     /// @brief This is the calculation of the d2Sigma/dvdRo - interface to
@@ -116,7 +109,7 @@ public:
     /// \frac{1-v}{v}lpm(r^2,b,s)(F_e+\frac{m_e^2}{m_p^2}F_m)\f]
     // ----------------------------------------------------------------------------
     virtual double FunctionToIntegral(const ParticleDef&, const Component&,
-        double energy, double v, double rho)
+        double energy, double v, double rho) const
         = 0;
 
 };
@@ -125,5 +118,10 @@ EPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
 EPAIR_PARAM_INTEGRAL_DEC(SandrockSoedingreksoRhode)
 
 #undef EPAIR_PARAM_INTEGRAL_DEC
+} // namespace crosssection
+
+template <>
+double integrate_dedx(Integral&, crosssection::EpairProduction&, const ParticleDef&,
+    const Component&, double, double, double);
 
 } // namespace PROPOSAL

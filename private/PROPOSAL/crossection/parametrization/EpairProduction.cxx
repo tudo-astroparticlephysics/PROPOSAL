@@ -12,7 +12,7 @@
 #include "PROPOSAL/Constants.h"
 
 #define EPAIR_PARAM_INTEGRAL_IMPL(param)                                       \
-    Epair##param::Epair##param(bool lpm)                                       \
+    crosssection::Epair##param::Epair##param(bool lpm)                         \
         : EpairProductionRhoIntegral(lpm)                                      \
     {                                                                          \
     }
@@ -21,7 +21,7 @@ using namespace PROPOSAL;
 using std::logic_error;
 using std::make_tuple;
 
-EpairProduction::EpairProduction(bool lpm)
+crosssection::EpairProduction::EpairProduction(bool lpm)
     : Parametrization(InteractionType::Epair, "Epair")
     , init_lpm_effect_(true)
     , lpm_(lpm)
@@ -29,12 +29,12 @@ EpairProduction::EpairProduction(bool lpm)
 {
 }
 
-double EpairProduction::GetLowerEnergyLim(const ParticleDef& p_def) const
+double crosssection::EpairProduction::GetLowerEnergyLim(const ParticleDef& p_def) const
     noexcept
 {
     return p_def.mass + 2.f * ME;
 }
-tuple<double, double> EpairProduction::GetKinematicLimits(
+tuple<double, double> crosssection::EpairProduction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy) const
     noexcept
 {
@@ -49,7 +49,7 @@ tuple<double, double> EpairProduction::GetKinematicLimits(
     return make_tuple(v_min, v_max);
 }
 
-size_t EpairProduction::GetHash() const noexcept
+size_t crosssection::EpairProduction::GetHash() const noexcept
 {
     size_t seed = Parametrization::GetHash();
     hash_combine(seed, lpm_);
@@ -62,7 +62,7 @@ size_t EpairProduction::GetHash() const noexcept
 // J. Phys. G: Nucl Part. Phys. 28 (2002) 427
 // ------------------------------------------------------------------------- //
 
-double EpairProduction::lpm(const ParticleDef& p_def, const Medium& medium,
+double crosssection::EpairProduction::lpm(const ParticleDef& p_def, const Medium& medium,
     double energy, double v, double r2, double b, double x)
 {
     if (init_lpm_effect_) {
@@ -116,7 +116,7 @@ double EpairProduction::lpm(const ParticleDef& p_def, const Medium& medium,
 
 namespace PROPOSAL {
 template <>
-double integrate_dedx(Integral& integral, EpairProduction& param,
+double integrate_dedx(Integral& integral, crosssection::EpairProduction& param,
     const ParticleDef& p_def, const Component& comp, double energy,
     double v_min, double v_max)
 {
@@ -160,15 +160,15 @@ double integrate_dedx(Integral& integral, EpairProduction& param,
 // Parametrization of Kelner/Kokoulin/Petrukhin
 // Proc. 12th ICCR (1971), 2436
 // ------------------------------------------------------------------------- //
-EpairProductionRhoIntegral::EpairProductionRhoIntegral(bool lpm)
-    : EpairProduction(lpm)
-    , integral_(IROMB, IMAXS, IPREC)
+crosssection::EpairProductionRhoIntegral::EpairProductionRhoIntegral(bool lpm)
+    : crosssection::EpairProduction(lpm)
 {
 }
 
 // ------------------------------------------------------------------------- //
-double EpairProductionRhoIntegral::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double v)
+double crosssection::EpairProductionRhoIntegral::DifferentialCrossSection(
+    const ParticleDef& p_def, const Component& comp, double energy,
+    double v) const
 {
 
     auto aux = 1 - (4 * ME) / (energy * v);
@@ -182,16 +182,15 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(
     }
 
     aux = std::max(1 - rMax, COMPUTER_PRECISION);
+    Integral integral(IROMB, IMAXS, IPREC);
+
+    auto func = [this, &p_def, &comp, energy, v](double r) {
+        return FunctionToIntegral(p_def, comp, energy, v, r);
+    };
 
     return NA / comp.GetAtomicNum() * p_def.charge * p_def.charge
-        * (integral_.Integrate(1 - rMax, aux,
-               std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this,
-                   p_def, comp, energy, v, std::placeholders::_1),
-               2)
-              + integral_.Integrate(aux, 1,
-                    std::bind(&EpairProductionRhoIntegral::FunctionToIntegral,
-                        this, p_def, comp, energy, v, std::placeholders::_1),
-                    4));
+        * (integral.Integrate(1 - rMax, aux, func, 2)
+              + integral.Integrate(aux, 1, func, 4));
 }
 
 /******************************************************************************
@@ -206,9 +205,9 @@ EPAIR_PARAM_INTEGRAL_IMPL(KelnerKokoulinPetrukhin)
 EPAIR_PARAM_INTEGRAL_IMPL(SandrockSoedingreksoRhode)
 
 // ------------------------------------------------------------------------- //
-double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
+double crosssection::EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
     const ParticleDef& p_def, const Component& comp, double energy, double v,
-    double r)
+    double r) const
 {
     // Parametrization of Kelner/Kokoulin/Petrukhin
     // Proc. 12th ICCR (1971), 2436
@@ -321,9 +320,9 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
 }
 
 // ------------------------------------------------------------------------- //
-double EpairSandrockSoedingreksoRhode::FunctionToIntegral(
+double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
     const ParticleDef& p_def, const Component& comp, double energy, double v,
-    double rho)
+    double rho) const
 {
     double m_in = p_def.mass;
 

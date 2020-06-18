@@ -26,16 +26,14 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include <sstream>
 #include "PROPOSAL/json.hpp"
+#include <sstream>
 
 namespace PROPOSAL {
 
-class Vector3D
-{
+class Vector3D {
 public:
     // constructors
     Vector3D();
@@ -52,7 +50,8 @@ public:
     bool operator==(const Vector3D& vector_3d) const;
     bool operator!=(const Vector3D& vector_3d) const;
     void swap(Vector3D& vector_3d);
-    friend std::ostream& operator<<(std::ostream& os, Vector3D const& vector_3d);
+    friend std::ostream& operator<<(
+        std::ostream& os, Vector3D const& vector_3d);
 
     //-------------------------------------//
     // basic arithmetic
@@ -66,10 +65,9 @@ public:
     Vector3D operator-() const;
     double magnitude() const;
     void normalise();
-    void deflect(const double , const double);
 
     struct CartesianCoordinates {
-        CartesianCoordinates() {};
+        CartesianCoordinates(){};
         CartesianCoordinates(double, double, double);
         CartesianCoordinates(const CartesianCoordinates&);
 
@@ -77,7 +75,7 @@ public:
     };
 
     struct SphericalCoordinates {
-        SphericalCoordinates() {};
+        SphericalCoordinates(){};
         SphericalCoordinates(double, double, double);
         SphericalCoordinates(const SphericalCoordinates&);
 
@@ -99,13 +97,15 @@ public:
         cartesian_.y_ = y;
         cartesian_.z_ = z;
     }
-    void SetSphericalCoordinates(const double radius, const double azimuth, const double zenith)
+    void SetSphericalCoordinates(
+        const double radius, const double azimuth, const double zenith)
     {
-        spherical_.radius_  = radius;
+        spherical_.radius_ = radius;
         spherical_.azimuth_ = azimuth;
-        spherical_.zenith_  = zenith;
+        spherical_.zenith_ = zenith;
     }
-    // void SetCylindricalCoordinates(const double radius, const double azimuth, const double height)
+    // void SetCylindricalCoordinates(const double radius, const double azimuth,
+    // const double height)
     // {
     //     cylindric_radius_  = radius;
     //     cylindric_azimuth_ = azimuth;
@@ -120,8 +120,14 @@ public:
     double GetRadius() const { return spherical_.radius_; }
     double GetPhi() const { return spherical_.azimuth_; }
     double GetTheta() const { return spherical_.zenith_; }
-    Vector3D::CartesianCoordinates GetCartesianCoordinates() const { return cartesian_; }
-    Vector3D::SphericalCoordinates GetSphericalCoordinates() const { return spherical_; }
+    Vector3D::CartesianCoordinates GetCartesianCoordinates() const
+    {
+        return cartesian_;
+    }
+    Vector3D::SphericalCoordinates GetSphericalCoordinates() const
+    {
+        return spherical_;
+    }
 
     //----------------------------------------------//
 private:
@@ -130,5 +136,7 @@ private:
 
     // double cylindric_radius_, cylindric_azimuth_, cylindric_height_;
 };
+
+Vector3D deflect(Vector3D, double, double);
 
 } // namespace PROPOSAL

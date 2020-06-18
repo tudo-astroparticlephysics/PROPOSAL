@@ -31,7 +31,6 @@
 #include <string>
 #include <vector>
 
-#include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/decay/DecayTable.h"
 #include "PROPOSAL/methods.h"
 

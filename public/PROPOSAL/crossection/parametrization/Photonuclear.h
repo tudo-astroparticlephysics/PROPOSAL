@@ -36,9 +36,8 @@
 using std::shared_ptr;
 
 namespace PROPOSAL {
-
 class Interpolant;
-
+namespace crosssection {
 class RealPhoton {
 public:
     RealPhoton() = default;
@@ -129,7 +128,7 @@ public:
     using component_wise = std::true_type;
 
     virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double)
+        const ParticleDef&, const Component&, double, double) const
         = 0;
 
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
@@ -137,4 +136,5 @@ public:
         const ParticleDef&, const Component&, double) const noexcept override;
 };
 
+} // namespace crosssection
 } // namespace PROPOSAL
