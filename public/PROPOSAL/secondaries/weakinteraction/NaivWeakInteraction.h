@@ -7,14 +7,19 @@ using std::vector;
 
 namespace PROPOSAL {
 namespace secondaries {
-    struct NaivWeakInteraction : public secondaries::WeakInteraction {
-        static constexpr int n_rnd = 0;
+    class NaivWeakInteraction
+        : public secondaries::WeakInteraction,
+          public RegisteredInDefault<NaivWeakInteraction> {
         const int weak_partner_type;
 
-        NaivWeakInteraction(const ParticleDef&);
+    public:
+        static constexpr int n_rnd = 0;
 
-        vector<Loss::secondary_t> CalculateSecondaries(
-            Loss::secondary_t, array<double, n_rnd>);
+        NaivWeakInteraction(const ParticleDef&, const Medium&);
+
+        size_t RequiredRandomNumbers() { return n_rnd; }
+        vector<Loss::secondary_t> CalculateSecondaries(double,
+            Loss::secondary_t, const Component&, vector<double>) override;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

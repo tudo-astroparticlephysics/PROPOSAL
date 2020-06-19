@@ -6,14 +6,16 @@
 #include <stdexcept>
 
 using namespace PROPOSAL;
-secondaries::NaivWeakInteraction::NaivWeakInteraction(const ParticleDef& p_def)
+secondaries::NaivWeakInteraction::NaivWeakInteraction(
+    const ParticleDef& p_def, const Medium&)
     : weak_partner_type(p_def.weak_partner)
 {
 }
 
 vector<Loss::secondary_t>
-secondaries::NaivWeakInteraction::CalculateSecondaries(Loss::secondary_t loss,
-    array<double, secondaries::NaivWeakInteraction::n_rnd> rnd)
+secondaries::NaivWeakInteraction::CalculateSecondaries(double,
+    Loss::secondary_t loss, const Component&,
+    vector<double> rnd)
 {
     std::get<Loss::TYPE>(loss) = weak_partner_type;
     auto sec = vector<Loss::secondary_t>{ move(loss) };

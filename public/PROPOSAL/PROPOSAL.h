@@ -57,6 +57,7 @@
 #include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
 
 #include "PROPOSAL/secondaries/Parametrization.h"
+#include "PROPOSAL/secondaries/SecondariesBuilder.h"
 #include "PROPOSAL/secondaries/annihilation/Annihilation.h"
 #include "PROPOSAL/secondaries/bremsstrahlung/Bremsstrahlung.h"
 #include "PROPOSAL/secondaries/bremsstrahlung/NaivBremsstrahlung.h"
@@ -64,12 +65,12 @@
 #include "PROPOSAL/secondaries/compton/NaivCompton.h"
 #include "PROPOSAL/secondaries/ionization/Ionization.h"
 #include "PROPOSAL/secondaries/ionization/NaivIonization.h"
-#include "PROPOSAL/secondaries/mupairproduction/MupairProduction.h"
 #include "PROPOSAL/secondaries/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
+#include "PROPOSAL/secondaries/mupairproduction/MupairProduction.h"
 
-#include "PROPOSAL/secondaries/photopairproduction/PhotopairProduction.h"
-#include "PROPOSAL/secondaries/photopairproduction/PhotoTsai.h"
 #include "PROPOSAL/secondaries/SecondariesCalculator.h"
+#include "PROPOSAL/secondaries/photopairproduction/PhotoTsai.h"
+#include "PROPOSAL/secondaries/photopairproduction/PhotopairProduction.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/CrossSectionBuilder.h"

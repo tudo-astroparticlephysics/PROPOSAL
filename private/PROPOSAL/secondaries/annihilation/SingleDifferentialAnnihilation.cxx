@@ -1,8 +1,8 @@
-#include "PROPOSAL/secondaries/annihilation/NaivAnnihilation.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/secondaries/annihilation/SingleDifferentialAnnihilation.h"
 
 #include <cmath>
+#include <tuple>
 #include <stdexcept>
 
 using std::fmod;
@@ -11,21 +11,14 @@ using std::sqrt;
 
 using namespace PROPOSAL;
 
-secondaries::NaivAnnihilation::NaivAnnihilation(
-    const crosssection::Annihilation&, const ParticleDef&, const Medium&,
-    const EnergyCutSettings&)
+double secondaries::SingleDifferentialAnnihilation::CalculateRho(
+    double energy, double rnd, const Component& comp)
 {
-    throw std::logic_error("dNdx interpolants must be build.");
+    dndx[&comp]->GetUpperLimit(energy, -rnd);
 }
 
-double secondaries::NaivAnnihilation::CalculateRho(double energy, double rnd)
-{
-    throw std::logic_error("Here must take a alogrithm take place which can "
-                           "calculate out of given rnd the component "
-                           "interaction take place and sample a random v.");
-}
-
-tuple<Vector3D, Vector3D> secondaries::NaivAnnihilation::CalculateDirections(
+tuple<Vector3D, Vector3D>
+secondaries::SingleDifferentialAnnihilation::CalculateDirections(
     Vector3D primary_dir, double energy, double rho, double rnd)
 {
     auto com_energy = energy + ME; // center of mass energy
@@ -40,7 +33,8 @@ tuple<Vector3D, Vector3D> secondaries::NaivAnnihilation::CalculateDirections(
     return make_tuple(dir_1, dir_2);
 }
 
-tuple<double, double> secondaries::NaivAnnihilation::CalculateEnergy(
+tuple<double, double>
+secondaries::SingleDifferentialAnnihilation::CalculateEnergy(
     double energy, double rho)
 {
     auto energy_1 = (energy + ME) * (1 - rho);
@@ -48,10 +42,11 @@ tuple<double, double> secondaries::NaivAnnihilation::CalculateEnergy(
     return make_tuple(energy_1, energy_2);
 }
 
-vector<Loss::secondary_t> secondaries::NaivAnnihilation::CalculateSecondaries(
-    double, Loss::secondary_t loss, const Component&, vector<double> rnd)
+vector<Loss::secondary_t>
+secondaries::SingleDifferentialAnnihilation::CalculateSecondaries(
+    double, Loss::secondary_t loss, const Component& comp, vector<double> rnd)
 {
-    auto rho = CalculateRho(get<Loss::ENERGY>(loss), rnd[0]);
+    auto rho = CalculateRho(get<Loss::ENERGY>(loss), rnd[0], comp);
     auto secondary_energy = CalculateEnergy(get<Loss::ENERGY>(loss), rho);
     auto secondary_dir = CalculateDirections(
         get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), rho, rnd[1]);

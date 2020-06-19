@@ -14,15 +14,18 @@ using std::unique_ptr;
 namespace PROPOSAL {
 namespace secondaries {
     class KelnerKokoulinPetrukhinMupairProduction
-        : public secondaries::MupairProduction {
+        : public secondaries::MupairProduction,
+          public RegisteredInDefault<KelnerKokoulinPetrukhinMupairProduction> {
+
         crosssection::MupairKelnerKokoulinPetrukhin param;
         Integral integral;
-        const ParticleDef p_def;
+        ParticleDef p_def;
 
         static constexpr int n_rnd = 2;
 
     public:
-        KelnerKokoulinPetrukhinMupairProduction(ParticleDef);
+        KelnerKokoulinPetrukhinMupairProduction(
+            const ParticleDef&, const Medium&);
 
         double CalculateRho(double, double, const Component&, double) final;
         tuple<Vector3D, Vector3D> CalculateDirections(
@@ -30,8 +33,8 @@ namespace secondaries {
         tuple<double, double> CalculateEnergy(double, double) final;
 
         size_t RequiredRandomNumbers() final { return n_rnd; }
-        virtual vector<Loss::secondary_t> CalculateSecondaries(
-            double, Loss::secondary_t, const Component&, vector<double>);
+        vector<Loss::secondary_t> CalculateSecondaries(
+            double, Loss::secondary_t, const Component&, vector<double>) final;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

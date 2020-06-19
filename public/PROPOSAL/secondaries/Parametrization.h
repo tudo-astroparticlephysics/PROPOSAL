@@ -4,6 +4,8 @@
 #include "PROPOSAL/medium/Components.h"
 #include <vector>
 
+#include <iostream>
+
 using std::vector;
 using PROPOSAL::Components::Component;
 
@@ -14,7 +16,6 @@ namespace secondaries {
         ~Parametrization() = default;
 
         virtual size_t RequiredRandomNumbers() = 0;
-
         virtual vector<Loss::secondary_t> CalculateSecondaries(
             double primary_energy, Loss::secondary_t, const Component&,
             vector<double> rnd)

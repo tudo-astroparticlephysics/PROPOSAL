@@ -9,8 +9,9 @@ namespace secondaries {
         Bremsstrahlung() = default;
         virtual ~Bremsstrahlung() = default;
 
-        static constexpr InteractionType type
-            = PROPOSAL::InteractionType::Brems;
+        static InteractionType GetInteractionType() {
+             return PROPOSAL::InteractionType::Brems;
+        };
     };
 } // namespace secondaries
 } // namespace PROPOSAL

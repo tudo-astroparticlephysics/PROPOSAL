@@ -12,25 +12,28 @@ using std::vector;
 namespace PROPOSAL {
 class SecondariesCalculator {
     using param_ptr = unique_ptr<secondaries::Parametrization>;
-    unordered_map<int, param_ptr> secondary_generator;
+    unordered_map<InteractionType, param_ptr> secondary_generator;
 
 public:
     SecondariesCalculator() = default;
 
-    template <typename Param> void addInteraction(Param&&);
+    template <typename SecondaryParamList>
+    SecondariesCalculator(SecondaryParamList secondary_param_list)
+    {
+        for (auto& param : secondary_param_list)
+            addInteraction(param);
+    }
+
+    template <typename Param> void addInteraction(Param&& param)
+    {
+        secondary_generator[param.type]
+            = param_ptr(make_unique<typename std::decay<Param>::type>(
+                std::forward<Param>(param)));
+    }
 
     vector<Loss::secondary_t> CalculateSecondaries(double primary_energy,
         Loss::secondary_t loss, const Component& comp, vector<double> rnd);
 
-    size_t requiredRandomNumbers(int);
+    size_t requiredRandomNumbers(InteractionType);
 };
-}
-
-namespace PROPOSAL {
-template <typename Param>
-void SecondariesCalculator::addInteraction(Param&& param)
-{
-    secondary_generator[static_cast<int>(param.type)]
-        = param_ptr(make_unique<typename std::decay<Param>::type>(std::forward<Param>(param)));
-}
 }

@@ -17,8 +17,9 @@ namespace secondaries {
         PhotopairProduction() = default;
         virtual ~PhotopairProduction() = default;
 
-        static constexpr InteractionType type
-            = PROPOSAL::InteractionType::Photopair;
+        static InteractionType GetInteractionType() {
+             return PROPOSAL::InteractionType::Photopair;
+        };
 
         virtual double CalculateRho(double, double) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(

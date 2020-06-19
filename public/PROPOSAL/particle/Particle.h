@@ -54,21 +54,21 @@ enum class InteractionType : int {
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-static const std::map<const int, std::string> Type_Interaction_Name_Map{
-    { static_cast<int>(InteractionType::Particle), "Particle" },
-    { static_cast<int>(InteractionType::Brems), "Brems" },
-    { static_cast<int>(InteractionType::Ioniz), "Ioniz" },
-    { static_cast<int>(InteractionType::Epair), "Epair" },
-    { static_cast<int>(InteractionType::Photonuclear), "Photonuclear" },
-    { static_cast<int>(InteractionType::MuPair), "MuPair" },
-    { static_cast<int>(InteractionType::Hadrons), "Hadrons" },
-    { static_cast<int>(InteractionType::ContinuousEnergyLoss),
-        "ContinousEnergyLoss" },
-    { static_cast<int>(InteractionType::WeakInt), "WeakInt" },
-    { static_cast<int>(InteractionType::Compton), "Compton" },
-    { static_cast<int>(InteractionType::Decay), "Decay" },
-    { static_cast<int>(InteractionType::Annihilation), "Annihilation" },
-    { static_cast<int>(InteractionType::Photopair), "Photopair" },
+static const std::unordered_map<InteractionType, std::string> Type_Interaction_Name_Map
+{
+    { InteractionType::Particle, "Particle" },
+    { InteractionType::Brems, "Brems" },
+    { InteractionType::Ioniz, "Ioniz" },
+    { InteractionType::Epair, "Epair" },
+    { InteractionType::Photonuclear, "Photonuclear" },
+    { InteractionType::MuPair, "MuPair" },
+    { InteractionType::Hadrons, "Hadrons" },
+    { InteractionType::ContinuousEnergyLoss, "ContinuousEnergyLoss" },
+    { InteractionType::WeakInt, "WeakInt" },
+    { InteractionType::Compton, "Compton" },
+    { InteractionType::Decay, "Decay" },
+    { InteractionType::Annihilation, "Annihilation" },
+    { InteractionType::Photopair, "Photopair" },
 };
 } // namespace PROPOSAL
 

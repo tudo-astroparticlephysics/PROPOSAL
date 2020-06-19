@@ -52,7 +52,7 @@ namespace crosssection {
     };
 
     struct AnnihilationHeitler : public Annihilation {
-        AnnihilationHeitler();
+        AnnihilationHeitler() = default;
 
         using base_param_t = Annihilation;
 

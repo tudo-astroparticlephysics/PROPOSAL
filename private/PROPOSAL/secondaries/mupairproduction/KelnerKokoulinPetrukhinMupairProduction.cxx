@@ -15,8 +15,8 @@ using std::sqrt;
 using namespace PROPOSAL;
 
 secondaries::KelnerKokoulinPetrukhinMupairProduction::
-    KelnerKokoulinPetrukhinMupairProduction(ParticleDef p)
-    : p_def(std::move(p))
+    KelnerKokoulinPetrukhinMupairProduction(const ParticleDef& p, const Medium&)
+    : p_def(p)
 {
 }
 

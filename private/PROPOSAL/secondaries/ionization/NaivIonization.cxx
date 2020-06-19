@@ -10,7 +10,7 @@ using std::sqrt;
 
 using namespace PROPOSAL;
 
-secondaries::NaivIonization::NaivIonization(const ParticleDef& p_def)
+secondaries::NaivIonization::NaivIonization(const ParticleDef& p_def, const Medium&)
     : primary_particle_type(p_def.particle_type)
 {
 }

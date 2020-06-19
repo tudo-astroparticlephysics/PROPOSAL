@@ -8,8 +8,10 @@ namespace secondaries {
         EpairProduction() = default;
         virtual ~EpairProduction() = default;
 
-        static constexpr InteractionType type
-            = PROPOSAL::InteractionType::Epair;
+        static InteractionType GetInteractionType()
+        {
+            return PROPOSAL::InteractionType::Epair;
+        };
 
         virtual double CalculateRho(double, double) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(

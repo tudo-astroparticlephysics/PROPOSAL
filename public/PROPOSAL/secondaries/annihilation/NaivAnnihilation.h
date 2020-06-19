@@ -1,36 +1,18 @@
 #pragma once
 
-#include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crossection/parametrization/Annihilation.h"
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/secondaries/annihilation/Annihilation.h"
-
-/* #include <unordered_map> */
-
-using PROPOSAL::Components::Component;
-/* using std::unordered_map; */
-using std::array;
-using std::vector;
+#include "PROPOSAL/secondaries/annihilation/SingleDifferentialAnnihilation.h"
 
 namespace PROPOSAL {
 namespace secondaries {
-    struct NaivAnnihilation : public secondaries::Annihilation {
-        // unordered_map<Component*, unique_ptr<Interpolant>> dndx;
+    struct HeitlerAnnihilation
+        : public secondaries::SingleDifferentialAnnihilation,
+          public RegisteredInDefault<HeitlerAnnihilation> {
 
-        static constexpr int n_rnd = 2;
-
-        NaivAnnihilation(const crosssection::Annihilation&, const ParticleDef&,
-            const Medium&, const EnergyCutSettings&);
-
-        double CalculateRho(double, double) final;
-        tuple<Vector3D, Vector3D> CalculateDirections(
-            Vector3D, double, double, double) final;
-        tuple<double, double> CalculateEnergy(double, double) final;
-
-        size_t RequiredRandomNumbers() { return n_rnd; }
-        vector<Loss::secondary_t> CalculateSecondaries(
-            double, Loss::secondary_t, const Component&, vector<double>);
+        HeitlerAnnihilation(const ParticleDef& p_def, const Medium& medium)
+            : SingleDifferentialAnnihilation(crosssection::AnnihilationHeitler{}, p_def, medium, true)
+        {
+        }
     };
 } // namespace secondaries
 } // namespace PROPOSAL
