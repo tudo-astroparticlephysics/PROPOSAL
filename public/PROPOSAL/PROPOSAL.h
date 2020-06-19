@@ -63,10 +63,13 @@
 #include "PROPOSAL/secondaries/bremsstrahlung/NaivBremsstrahlung.h"
 #include "PROPOSAL/secondaries/compton/Compton.h"
 #include "PROPOSAL/secondaries/compton/NaivCompton.h"
+#include "PROPOSAL/secondaries/epairproduction/EpairProduction.h"
+#include "PROPOSAL/secondaries/epairproduction/NaivEpairProduction.h"
 #include "PROPOSAL/secondaries/ionization/Ionization.h"
 #include "PROPOSAL/secondaries/ionization/NaivIonization.h"
 #include "PROPOSAL/secondaries/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
 #include "PROPOSAL/secondaries/mupairproduction/MupairProduction.h"
+#include "PROPOSAL/secondaries/photonuclear/Photonuclear.h"
 
 #include "PROPOSAL/secondaries/SecondariesCalculator.h"
 #include "PROPOSAL/secondaries/photopairproduction/PhotoTsai.h"

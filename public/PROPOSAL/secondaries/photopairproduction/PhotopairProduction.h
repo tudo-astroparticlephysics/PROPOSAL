@@ -17,15 +17,16 @@ namespace secondaries {
         PhotopairProduction() = default;
         virtual ~PhotopairProduction() = default;
 
-        static InteractionType GetInteractionType() {
-             return PROPOSAL::InteractionType::Photopair;
-        };
+        static constexpr InteractionType type
+            = PROPOSAL::InteractionType::Photopair;
+        InteractionType GetInteractionType() { return type; };
 
         virtual double CalculateRho(double, double) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(
             Vector3D, double, double, const Component&, vector<double>)
             = 0;
-        virtual tuple<double, double> CalculateEnergy(double, double, double) = 0;
+        virtual tuple<double, double> CalculateEnergy(double, double, double)
+            = 0;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

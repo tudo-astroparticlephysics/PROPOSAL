@@ -1,17 +1,18 @@
 #pragma once
 
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/secondaries/Parametrization.h"
 
 namespace PROPOSAL {
 namespace secondaries {
-    struct EpairProduction {
+    struct EpairProduction : public Parametrization {
         EpairProduction() = default;
         virtual ~EpairProduction() = default;
 
-        static InteractionType GetInteractionType()
-        {
-            return PROPOSAL::InteractionType::Epair;
-        };
+        static constexpr InteractionType type
+            = PROPOSAL::InteractionType::Epair;
+
+        InteractionType GetInteractionType() { return type; };
 
         virtual double CalculateRho(double, double) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(

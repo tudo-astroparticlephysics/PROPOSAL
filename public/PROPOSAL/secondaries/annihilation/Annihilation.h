@@ -18,10 +18,10 @@ namespace secondaries {
             = 0;
         virtual tuple<double, double> CalculateEnergy(double, double) = 0;
 
-        static InteractionType GetInteractionType()
-        {
-            return PROPOSAL::InteractionType::Annihilation;
-        };
+        static constexpr InteractionType type
+            = PROPOSAL::InteractionType::Annihilation;
+
+        InteractionType GetInteractionType() { return type; };
     };
 } // namespace secondaries
 } // namespace PROPOSAL

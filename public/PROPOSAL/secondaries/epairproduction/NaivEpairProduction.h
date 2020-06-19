@@ -5,6 +5,7 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/secondaries/DefaultFactory.h"
+#include "PROPOSAL/secondaries/epairproduction/EpairProduction.h"
 
 /* #include <unordered_map> */
 
@@ -21,16 +22,17 @@ namespace secondaries {
         // unordered_map<Component*, unique_ptr<Interpolant>> dndx;
 
         static constexpr int n_rnd = 2;
+        size_t RequiredRandomNumbers() { return n_rnd; }
 
-        NaivEpairProduction(ParticleDef, Medium);
+        NaivEpairProduction(ParticleDef, Medium){};
 
-        double CalculateRho(double, double) final;
+        double CalculateRho(double, double) final{};
         tuple<Vector3D, Vector3D> CalculateDirections(
-            Vector3D, double, double, double) final;
-        tuple<double, double> CalculateEnergy(double, double) final;
+            Vector3D, double, double, double) final{};
+        tuple<double, double> CalculateEnergy(double, double) final{};
 
-        virtual vector<Loss::secondary_t> CalculateSecondaries(
-            Loss::secondary_t, array<double, n_rnd>);
+        vector<Loss::secondary_t> CalculateSecondaries(
+            double, Loss::secondary_t, const Component&, vector<double>){};
     };
 } // namespace secondaries
 } // namespace PROPOSAL

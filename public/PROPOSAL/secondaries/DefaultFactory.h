@@ -40,8 +40,7 @@ namespace secondaries {
         }
         std::ostringstream s;
         s << "Not two secondary builder with same interaction type ("
-          << Type_Interaction_Name_Map.find(type)->second
-          << ") can be added.";
+          << Type_Interaction_Name_Map.find(type)->second << ") can be added.";
         throw logic_error(s.str());
     }
 
@@ -53,7 +52,7 @@ namespace secondaries {
 
     template <typename T>
     bool RegisteredInDefault<T>::s_registered
-        = DefaultFactory::Register<T>(T::GetInteractionType());
+        = DefaultFactory::Register<T>(T::type);
 
 } // namespace crosssection
 } // namespace PROPOSAL

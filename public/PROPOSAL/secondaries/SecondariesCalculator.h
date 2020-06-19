@@ -1,11 +1,14 @@
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/secondaries/DefaultFactory.h"
 #include "PROPOSAL/secondaries/Parametrization.h"
 
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
+using std::decay;
+using std::forward;
 using std::unordered_map;
 using std::vector;
 
@@ -17,18 +20,25 @@ class SecondariesCalculator {
 public:
     SecondariesCalculator() = default;
 
-    template <typename SecondaryParamList>
-    SecondariesCalculator(SecondaryParamList secondary_param_list)
+    template <typename ParamList> SecondariesCalculator(ParamList&& param_list)
     {
-        for (auto& param : secondary_param_list)
-            addInteraction(param);
+        for (auto&& p : param_list)
+            addInteraction(move(p));
     }
 
-    template <typename Param> void addInteraction(Param&& param)
+    template <typename TypeList>
+    SecondariesCalculator(
+        TypeList type_list, const ParticleDef& p, const Medium& m)
     {
-        secondary_generator[param.type]
-            = param_ptr(make_unique<typename std::decay<Param>::type>(
-                std::forward<Param>(param)));
+        for (auto& t : type_list)
+            addInteraction(secondaries::DefaultFactory::Create(t, p, m));
+    }
+
+    template <typename Param> void addInteraction(Param&& p)
+    {
+        /* using P = typename decay<Param>::type; */
+        /* auto param_ptr = PROPOSAL::make_unique<P>(forward<Param>(p)); */
+        secondary_generator[p->GetInteractionType()] = move(p);
     }
 
     vector<Loss::secondary_t> CalculateSecondaries(double primary_energy,

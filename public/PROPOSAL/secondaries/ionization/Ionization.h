@@ -9,13 +9,13 @@ namespace secondaries {
         Ionization() = default;
         virtual ~Ionization() = default;
 
-        static InteractionType GetInteractionType() {
-             return PROPOSAL::InteractionType::Ioniz;
-        };
+        static constexpr InteractionType type = PROPOSAL::InteractionType::Ioniz;
+        InteractionType GetInteractionType() { return type; };
 
         virtual double CalculateRho(double, double) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(
-            Vector3D, double, double, double) = 0;
+            Vector3D, double, double, double)
+            = 0;
         virtual tuple<double, double> CalculateEnergy(double, double) = 0;
     };
 } // namespace secondaries

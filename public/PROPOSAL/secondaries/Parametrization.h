@@ -20,6 +20,7 @@ namespace secondaries {
             double primary_energy, Loss::secondary_t, const Component&,
             vector<double> rnd)
             = 0;
+        virtual InteractionType GetInteractionType() = 0;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

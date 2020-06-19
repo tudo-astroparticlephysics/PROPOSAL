@@ -12,10 +12,9 @@ namespace secondaries {
         Compton() = default;
         virtual ~Compton() = default;
 
-        static InteractionType GetInteractionType()
-        {
-            return PROPOSAL::InteractionType::Compton;
-        };
+        static constexpr InteractionType type = PROPOSAL::InteractionType::Compton;
+
+        InteractionType GetInteractionType() { return type; };
 
         virtual double CalculateRho(double, double) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(
