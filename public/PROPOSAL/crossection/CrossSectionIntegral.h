@@ -168,9 +168,11 @@ double calculate_dedx(Param&&, Integral&, const ParticleDef&, const Medium&,
     return 0.;
 }
 
-class Ionization;
+namespace crosssection{
+    class Ionization;
+}
 template <>
-double calculate_dedx<Ionization&>(Ionization&, Integral&, const ParticleDef&,
+double calculate_dedx<crosssection::Ionization&>(crosssection::Ionization&, Integral&, const ParticleDef&,
     const Medium&, const EnergyCutSettings&, double, std::false_type,
     std::false_type);
 

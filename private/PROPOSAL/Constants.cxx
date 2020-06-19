@@ -10,6 +10,7 @@ const double PROPOSAL::SQRT3            = 1.732050807568877;                    
 const double PROPOSAL::SQRTE            = 1.648721270700128;                      // sqrt(e)
 const double PROPOSAL::ZETA3            = 1.202056903159594;                      // rieman zeta(3)
 const double PROPOSAL::EULER_MASCHERONI = 0.577215664901532860606512090082402431; // Euler-Mascheroni constant
+const double PROPOSAL::INF              = std::numeric_limits<double>::infinity();// positive infinity
 
 // integration parameters
 const int PROPOSAL::IROMB     = 5;          // romb # for integration

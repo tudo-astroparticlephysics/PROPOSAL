@@ -706,7 +706,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
             smallSum = randomNumber_ * oldSum / (1.5 * stepSize);
         } else
         {
-            smallSum = -randomNumber_ * oldSum / (1.5 * stepSize);
+            smallSum = -randomNumber_ / (1.5 * stepSize);
             if (oldSum < 0)
             {
                 smallSum *= -1;

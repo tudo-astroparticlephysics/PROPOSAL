@@ -24,7 +24,7 @@ dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
 
 template <typename Param>
 dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
-    shared_ptr<const EnergyCutSettings> cut, const Medium& medium, bool interpol,
+    const Medium& medium, shared_ptr<const EnergyCutSettings> cut,  bool interpol,
     std::false_type)
 {
     auto m = dndx_map_t();
