@@ -12,7 +12,7 @@ double calculate_dedx<crosssection::Ionization&>(crosssection::Ionization& param
     const EnergyCutSettings& cut, double energy, std::false_type, std::false_type)
 {
     auto is_bhabha = param.name == "IonizBergerSeltzerBhabha";
-    auto is_moller = param.name == "IonizBergerSeltzerMoller";
+    auto is_moller = param.name == "IonizBergerSeltzerMoller"; //TODO: There is a bug, this is not working since param has already been cast to its base type
     if (is_bhabha || is_moller)
         return param.FunctionToDEdxIntegral(p_def, medium, energy, 0.);
     auto physical_lim = param.GetKinematicLimits(p_def, medium, energy);
