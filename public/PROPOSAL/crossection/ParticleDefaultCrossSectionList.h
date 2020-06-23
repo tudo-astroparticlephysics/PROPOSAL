@@ -64,7 +64,7 @@ crosssection_list_t<EMinusDef, M> GetStdCrossSections(const EMinusDef& e,
 {
     crosssection::BremsElectronScreening brems{ false };
     crosssection::EpairKelnerKokoulinPetrukhin epair{ false };
-    crosssection::IonizBergerSeltzerMoller ioniz{ EnergyCutSettings(*cut) };
+    crosssection::IonizBetheBlochRossi ioniz{ EnergyCutSettings(*cut) };
     crosssection::PhotoAbramowiczLevinLevyMaor97 photo{
         make_unique<crosssection::ShadowButkevichMikhailov>()
     };
@@ -82,7 +82,7 @@ crosssection_list_t<EPlusDef, M> GetStdCrossSections(const EPlusDef& e,
 {
     crosssection::BremsElectronScreening brems{ false };
     crosssection::EpairKelnerKokoulinPetrukhin epair{ false };
-    crosssection::IonizBergerSeltzerBhabha ioniz{ EnergyCutSettings(*cut) };
+    crosssection::IonizBetheBlochRossi ioniz{ EnergyCutSettings(*cut) };
     crosssection::PhotoAbramowiczLevinLevyMaor97 photo{
         make_unique<crosssection::ShadowButkevichMikhailov>()
     };
