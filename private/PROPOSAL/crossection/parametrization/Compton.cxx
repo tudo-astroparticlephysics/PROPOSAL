@@ -56,8 +56,8 @@ double integrate_dndx(Integral& integral, crosssection::Compton& param,
     const ParticleDef& p_def, const Component& comp, double energy,
     double v_min, double v_max, double rnd)
 {
-    auto t_min = std::log(1. - v_min);
-    auto t_max = std::log(1. - v_max);
+    auto t_min = std::log(1. - v_max);
+    auto t_max = std::log(1. - v_min);
     auto dNdx = [&param, &p_def, &comp, energy](double t) {
         return exp(t)
             * param.FunctionToDNdxIntegral(p_def, comp, energy, 1 - exp(t));
@@ -70,8 +70,8 @@ double integrate_dedx(Integral& integral, crosssection::Compton& param,
     const ParticleDef& p_def, const Component& comp, double energy,
     double v_min, double v_max)
 {
-    auto t_min = std::log(1. - v_min);
-    auto t_max = std::log(1. - v_max);
+    auto t_min = std::log(1. - v_max);
+    auto t_max = std::log(1. - v_min);
     auto dEdx = [&param, &p_def, &comp, energy](double t) {
         return exp(t)
             * param.FunctionToDEdxIntegral(p_def, comp, energy, 1 - exp(t));
@@ -84,8 +84,8 @@ double integrate_de2dx(Integral& integral, crosssection::Compton& param,
     const ParticleDef& p_def, const Component& comp, double energy,
     double v_min, double v_max)
 {
-    auto t_min = std::log(1. - v_min);
-    auto t_max = std::log(1. - v_max);
+    auto t_min = std::log(1. - v_max);
+    auto t_max = std::log(1. - v_min);
     auto dE2dx = [&param, &p_def, &comp, energy](double t) {
         return exp(t)
             * param.FunctionToDE2dxIntegral(p_def, comp, energy, 1 - exp(t));
