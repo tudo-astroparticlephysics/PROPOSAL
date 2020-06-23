@@ -11,7 +11,7 @@ namespace secondaries {
 
         static constexpr InteractionType type = PROPOSAL::InteractionType::Brems;
 
-        InteractionType GetInteractionType() { return type; };
+        InteractionType GetInteractionType() const noexcept final { return type; };
     };
 } // namespace secondaries
 } // namespace PROPOSAL

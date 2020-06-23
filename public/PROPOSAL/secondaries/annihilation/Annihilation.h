@@ -21,7 +21,7 @@ namespace secondaries {
         static constexpr InteractionType type
             = PROPOSAL::InteractionType::Annihilation;
 
-        InteractionType GetInteractionType() { return type; };
+        InteractionType GetInteractionType() const noexcept { return type; };
     };
 } // namespace secondaries
 } // namespace PROPOSAL

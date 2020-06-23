@@ -32,7 +32,7 @@ namespace secondaries {
             Vector3D, double, double, double) final;
         tuple<double, double> CalculateEnergy(double, double) final;
 
-        size_t RequiredRandomNumbers() final { return n_rnd; }
+        size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
         vector<Loss::secondary_t> CalculateSecondaries(
             double, Loss::secondary_t, const Component&, vector<double>) final;
     };

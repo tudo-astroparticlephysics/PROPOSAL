@@ -159,8 +159,9 @@ bool Propagator::DoStochasticInteraction(DynamicData& p_cond,
     PropagationUtility& utility, std::function<double()> rnd)
 {
     InteractionType loss_type;
+    const Component* comp;
     double loss_energy;
-    std::tie(loss_type, loss_energy)
+    std::tie(loss_type, comp, loss_energy)
         = utility.EnergyStochasticloss(p_cond.GetEnergy(), rnd());
 
     /* auto deflection_angles = stochastic_cross->StochasticDeflection( */

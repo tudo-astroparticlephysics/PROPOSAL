@@ -10,7 +10,7 @@ namespace secondaries {
         virtual ~Ionization() = default;
 
         static constexpr InteractionType type = PROPOSAL::InteractionType::Ioniz;
-        InteractionType GetInteractionType() { return type; };
+        InteractionType GetInteractionType() const noexcept { return type; };
 
         virtual double CalculateRho(double, double) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(

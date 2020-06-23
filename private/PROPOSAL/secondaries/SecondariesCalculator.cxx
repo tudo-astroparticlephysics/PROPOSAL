@@ -13,7 +13,7 @@ vector<Loss::secondary_t> SecondariesCalculator::CalculateSecondaries(
         primary_energy, loss, comp, rnd);
 }
 
-size_t SecondariesCalculator::requiredRandomNumbers(InteractionType type)
+size_t SecondariesCalculator::RequiredRandomNumbers(InteractionType type) const noexcept
 {
-    return secondary_generator[type]->RequiredRandomNumbers();
+    return secondary_generator.at(type)->RequiredRandomNumbers();
 }

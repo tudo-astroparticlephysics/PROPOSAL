@@ -34,9 +34,34 @@ unique_ptr<crosssection_t<P, M>> make_crosssection(Param&& param, P&& p_def,
     return PROPOSAL::make_unique<CrossSectionIntegral<Param, P, M>>(
         param, p_def, medium, cuts);
 }
+template <typename P, typename M>
+crosssection_list_t<EMinusDef, M> GetStdCrossSections(P particle,
+    M&& medium, std::shared_ptr<const EnergyCutSettings> cut, bool interpolate=true)
+{
+    std::cout << "name: " << particle.name << std::endl;
+    throw std::logic_error("No default crosssection for this particle provided.");
+}
 
 template <typename M>
 crosssection_list_t<EMinusDef, M> GetStdCrossSections(const EMinusDef& e,
+    M&& medium, std::shared_ptr<const EnergyCutSettings> cut, bool interpolate=true)
+{
+    crosssection::BremsKelnerKokoulinPetrukhin brems{ false };
+    crosssection::EpairKelnerKokoulinPetrukhin epair{ false };
+    crosssection::IonizBetheBlochRossi ioniz{ EnergyCutSettings(*cut) };
+    crosssection::PhotoAbramowiczLevinLevyMaor97 photo{
+        make_unique<crosssection::ShadowButkevichMikhailov>()
+    };
+    crosssection_list_t<EMinusDef, M> cross;
+    cross.emplace_back(make_crosssection(brems, e, medium, cut, interpolate));
+    cross.emplace_back(make_crosssection(epair, e, medium, cut, interpolate));
+    cross.emplace_back(make_crosssection(ioniz, e, medium, cut, interpolate));
+    cross.emplace_back(make_crosssection(photo, e, medium, cut, interpolate));
+    return cross;
+}
+
+template <typename M>
+crosssection_list_t<EPlusDef, M> GetStdCrossSections(const EPlusDef& e,
     M&& medium, std::shared_ptr<const EnergyCutSettings> cut, bool interpolate=true)
 {
     crosssection::BremsKelnerKokoulinPetrukhin brems{ false };

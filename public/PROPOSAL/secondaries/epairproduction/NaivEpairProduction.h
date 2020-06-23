@@ -22,7 +22,7 @@ namespace secondaries {
         // unordered_map<Component*, unique_ptr<Interpolant>> dndx;
 
         static constexpr int n_rnd = 2;
-        size_t RequiredRandomNumbers() { return n_rnd; }
+        size_t RequiredRandomNumbers() const noexcept { return n_rnd; }
 
         NaivEpairProduction(ParticleDef, Medium){};
 

@@ -30,16 +30,16 @@ public:
     SecondariesCalculator(
         TypeList type_list, const ParticleDef& p, const Medium& m)
     {
-        for (auto& t : type_list)
+       for (auto& t : type_list)
             addInteraction(secondaries::DefaultFactory::Create(t, p, m));
     }
 
     template <typename Param> void addInteraction(Param&& p)
     {
-        /* using P = typename decay<Param>::type; */
-        /* auto param_ptr = PROPOSAL::make_unique<P>(forward<Param>(p)); */
         secondary_generator[p->GetInteractionType()] = move(p);
     }
+
+    size_t RequiredRandomNumbers(InteractionType) const noexcept;
 
     vector<Loss::secondary_t> CalculateSecondaries(double primary_energy,
         Loss::secondary_t loss, const Component& comp, vector<double> rnd);

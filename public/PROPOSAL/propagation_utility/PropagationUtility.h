@@ -62,7 +62,7 @@ public:
     PropagationUtility(Collection collection);
     // PropagationUtility(const PropagationUtility&);
 
-    tuple<InteractionType, double> EnergyStochasticloss(double, double);
+    tuple<InteractionType, const Component*, double> EnergyStochasticloss(double, double);
     double EnergyDecay(double, std::function<double()>);
     double EnergyInteraction(double, std::function<double()>);
     double EnergyRandomize(double, double, std::function<double()>);

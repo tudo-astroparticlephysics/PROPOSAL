@@ -1,9 +1,12 @@
+#include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
 
 namespace PROPOSAL {
 template <class T, class Cross> class InteractionBuilder : public Interaction {
     T interaction_integral;
     Cross crosssection_list;
+
+    using cross_type = typename std::decay<Cross>::type::value_type::element_type;
 
 public:
     InteractionBuilder(Cross&& cross)
@@ -37,27 +40,28 @@ public:
         return interaction_integral.GetUpperLimit(energy, rndi);
     }
 
-    tuple<InteractionType, double> TypeInteraction(
+    enum { CROSS, COMP, RATE };
+    tuple<InteractionType, const Component*, double> TypeInteraction(
         double energy, double rnd) override
     {
-        double rate = 0; //TODO: Avoid looping over the same list twice?
+        /* double rate = 0; //TODO: Avoid looping over the same list twice? */
+        using rates_t = tuple<cross_type*, const Component*, double>;
+        auto rates = std::vector<rates_t>();
         for (auto& c : crosssection_list) {
-            auto rates = c->CalculatedNdx(energy);
-            for (auto& r : rates) {
-                rate += r.second;
-            }
+            auto rates_comp = c->CalculatedNdx(energy);
+            for (auto& r : rates_comp)
+                rates.emplace_back(c.get(), r.first, r.second);
         }
-        rate *= rnd;
-
-        for (auto& c : crosssection_list) {
-            auto rates = c->CalculatedNdx(energy);
-            for (auto& r : rates) {
-                rate -= r.second;
-                if (rate < 0) {
-                    auto loss
-                        = c->CalculateStochasticLoss(*r.first, energy, -rate);
-                    return std::make_tuple(c->GetInteractionType(), loss);
-                }
+        auto sum_of_rates = std::accumulate(rates.begin(), rates.end(), 0,
+            [](double a, rates_t r) { return a + std::get<RATE>(r); });
+        sum_of_rates *= rnd;
+        for (auto& r : rates) {
+            sum_of_rates -= std::get<RATE>(r);
+            if (sum_of_rates < 0) {
+                auto loss = std::get<CROSS>(r)->CalculateStochasticLoss(
+                    *std::get<COMP>(r), energy, -sum_of_rates);
+                return std::make_tuple(std::get<CROSS>(r)->GetInteractionType(),
+                    std::get<COMP>(r), loss);
             }
         }
         throw std::logic_error(
@@ -66,11 +70,11 @@ public:
 };
 
 template <typename T>
-std::unique_ptr<Interaction> make_Interaction(T&& cross, bool interpolate)
+std::unique_ptr<Interaction> make_interaction(T&& cross, bool interpolate)
 {
     if (interpolate)
-        return PROPOSAL::make_unique<
-            InteractionBuilder<UtilityInterpolant, T>>(std::forward<T>(cross));
+        return PROPOSAL::make_unique<InteractionBuilder<UtilityInterpolant, T>>(
+            std::forward<T>(cross));
     return PROPOSAL::make_unique<InteractionBuilder<UtilityIntegral, T>>(
         std::forward<T>(cross));
 }

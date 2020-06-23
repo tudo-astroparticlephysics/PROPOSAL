@@ -30,7 +30,8 @@ public:
 
     enum { INTERACTION_TYPE, LOSS };
     virtual double EnergyInteraction(double, double) = 0;
-    virtual tuple<InteractionType, double> TypeInteraction(double, double)
+    virtual tuple<InteractionType, const Component*, double> TypeInteraction(
+        double, double)
         = 0; // ARGS: energy, rate
 };
 } // namespace PROPOSAL

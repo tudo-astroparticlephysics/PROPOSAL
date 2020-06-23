@@ -16,7 +16,7 @@ namespace secondaries {
         NaivBremsstrahlung() = default;
         NaivBremsstrahlung(ParticleDef, Medium) {};
 
-        size_t RequiredRandomNumbers() { return n_rnd; }
+        size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
         vector<Loss::secondary_t> CalculateSecondaries(
             double, Loss::secondary_t, const Component&, vector<double>);
     };

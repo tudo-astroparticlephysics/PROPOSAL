@@ -89,7 +89,7 @@ utility_def(utility.utility_def){
 }
 */
 
-tuple<InteractionType, double> PropagationUtility::EnergyStochasticloss(
+tuple<InteractionType, const Component*, double> PropagationUtility::EnergyStochasticloss(
     double energy, double rnd)
 {
     return collection.interaction_calc->TypeInteraction(energy, rnd);

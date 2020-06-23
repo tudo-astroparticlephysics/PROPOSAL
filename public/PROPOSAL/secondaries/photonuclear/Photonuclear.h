@@ -11,11 +11,11 @@ namespace secondaries {
         Photonuclear(ParticleDef, Medium){};
 
         static constexpr size_t n_rnd = 0;
-        size_t RequiredRandomNumbers() { return n_rnd; }
+        size_t RequiredRandomNumbers() const noexcept { return n_rnd; }
 
         static constexpr InteractionType type
             = PROPOSAL::InteractionType::Photonuclear;
-        InteractionType GetInteractionType() { return type; }
+        InteractionType GetInteractionType() const noexcept { return type; }
 
         vector<Loss::secondary_t> CalculateSecondaries(
             double, Loss::secondary_t, const Component&, vector<double>)

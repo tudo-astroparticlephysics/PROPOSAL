@@ -13,7 +13,7 @@ namespace secondaries {
         virtual ~MupairProduction() = default;
 
         static constexpr InteractionType type = PROPOSAL::InteractionType::MuPair;
-        InteractionType GetInteractionType() { return type; };
+        InteractionType GetInteractionType() const noexcept { return type; };
 
         virtual double CalculateRho(double, double, const Component&, double)
             = 0;

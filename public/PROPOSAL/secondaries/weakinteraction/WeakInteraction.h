@@ -10,8 +10,9 @@ namespace secondaries {
         WeakInteraction() = default;
         virtual ~WeakInteraction() = default;
 
-        static constexpr InteractionType type = PROPOSAL::InteractionType::WeakInt;
-        InteractionType GetInteractionType() { return type; };
+        static constexpr InteractionType type
+            = PROPOSAL::InteractionType::WeakInt;
+        InteractionType GetInteractionType() const noexcept { return type; };
     };
 } // namespace secondaries
 } // namespace PROPOSAL
