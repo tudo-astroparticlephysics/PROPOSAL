@@ -2,7 +2,7 @@
 
 using namespace PROPOSAL;
 
-unordered_map<InteractionType, secondaries::TCreateMethod, InteractionType_hash>
+std::unordered_map<InteractionType, secondaries::TCreateMethod, InteractionType_hash>
     secondaries::DefaultFactory::secondaries_map{};
 
 unique_ptr<secondaries::Parametrization> secondaries::DefaultFactory::Create(
@@ -14,5 +14,5 @@ unique_ptr<secondaries::Parametrization> secondaries::DefaultFactory::Create(
     std::ostringstream s;
     s << "No secondary builder for this interaction type ("
       << Type_Interaction_Name_Map.find(type)->second << ") available.";
-    throw logic_error(s.str());
+    throw std::logic_error(s.str());
 }

@@ -9,16 +9,12 @@
 #include <unordered_map>
 #include <vector>
 
-using std::logic_error;
-using std::unordered_map;
-using std::vector;
-
 namespace PROPOSAL {
 namespace secondaries {
     using TCreateMethod = unique_ptr<Parametrization> (*)(ParticleDef, Medium);
 
     class DefaultFactory {
-        static unordered_map<InteractionType, TCreateMethod, InteractionType_hash> secondaries_map;
+        static std::unordered_map<InteractionType, TCreateMethod, InteractionType_hash> secondaries_map;
 
     public:
         DefaultFactory() = delete;
@@ -41,7 +37,7 @@ namespace secondaries {
         std::ostringstream s;
         s << "Not two secondary builder with same interaction type ("
           << Type_Interaction_Name_Map.find(type)->second << ") can be added.";
-        throw logic_error(s.str());
+        throw std::logic_error(s.str());
     }
 
     template <typename T> class RegisteredInDefault {
