@@ -105,6 +105,13 @@ enum class ParticleType : int {
     SMPPlus = 9500,
     SMPMinus = -9500,
 };
+
+struct ParticleType_hash {
+    template <class T> std::size_t operator()(const T& type) const
+    {
+        return static_cast<int>(type);
+    }
+};
 } // namespace PROPOSAL
 
 namespace std {
@@ -316,30 +323,32 @@ PROPOSAL_MAKE_HASHABLE(PROPOSAL::ParticleDef, t.mass, t.lifetime, t.charge)
 #undef PARTICLE_DEF
 
 namespace PROPOSAL {
-static const std::unordered_map<ParticleType, const ParticleDef&> Type_Particle_Map{
-    { ParticleType::EMinus, EMinusDef() },
-    { ParticleType::EPlus, EPlusDef() },
-    { ParticleType::NuE, NuEDef() },
-    { ParticleType::NuEBar, NuEBarDef() },
-    { ParticleType::MuMinus, MuMinusDef() },
-    { ParticleType::NuMu, NuMuDef() },
-    { ParticleType::NuMuBar, NuMuBarDef() },
-    { ParticleType::MuPlus, MuPlusDef() },
-    { ParticleType::TauMinus, TauMinusDef() },
-    { ParticleType::TauPlus, TauPlusDef() },
-    { ParticleType::NuTau, NuTauDef() },
-    { ParticleType::NuTauBar, NuTauBarDef() },
-    { ParticleType::Gamma, GammaDef() },
-    { ParticleType::Pi0, Pi0Def() },
-    { ParticleType::PiPlus, PiPlusDef() },
-    { ParticleType::PiMinus, PiMinusDef() },
-    { ParticleType::K0, K0Def() },
-    { ParticleType::KPlus, KPlusDef() },
-    { ParticleType::KMinus, KMinusDef() },
-    { ParticleType::PPlus, PPlusDef() },
-    { ParticleType::PMinus, PMinusDef() },
-    { ParticleType::Monopole, MonopoleDef() },
-    { ParticleType::SMPPlus, SMPPlusDef() },
-    { ParticleType::SMPMinus, SMPMinusDef() },
-};
+static const std::unordered_map<ParticleType, const ParticleDef&,
+    ParticleType_hash>
+    Type_Particle_Map{
+        { ParticleType::EMinus, EMinusDef() },
+        { ParticleType::EPlus, EPlusDef() },
+        { ParticleType::NuE, NuEDef() },
+        { ParticleType::NuEBar, NuEBarDef() },
+        { ParticleType::MuMinus, MuMinusDef() },
+        { ParticleType::NuMu, NuMuDef() },
+        { ParticleType::NuMuBar, NuMuBarDef() },
+        { ParticleType::MuPlus, MuPlusDef() },
+        { ParticleType::TauMinus, TauMinusDef() },
+        { ParticleType::TauPlus, TauPlusDef() },
+        { ParticleType::NuTau, NuTauDef() },
+        { ParticleType::NuTauBar, NuTauBarDef() },
+        { ParticleType::Gamma, GammaDef() },
+        { ParticleType::Pi0, Pi0Def() },
+        { ParticleType::PiPlus, PiPlusDef() },
+        { ParticleType::PiMinus, PiMinusDef() },
+        { ParticleType::K0, K0Def() },
+        { ParticleType::KPlus, KPlusDef() },
+        { ParticleType::KMinus, KMinusDef() },
+        { ParticleType::PPlus, PPlusDef() },
+        { ParticleType::PMinus, PMinusDef() },
+        { ParticleType::Monopole, MonopoleDef() },
+        { ParticleType::SMPPlus, SMPPlusDef() },
+        { ParticleType::SMPMinus, SMPMinusDef() },
+    };
 } // namespace PROPOSAL
