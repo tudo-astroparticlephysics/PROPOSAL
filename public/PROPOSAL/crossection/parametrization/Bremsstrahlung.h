@@ -84,10 +84,11 @@ BREMSSTRAHLUNG_DEF(AndreevBezrukovBugaev)
 BREMSSTRAHLUNG_DEF(SandrockSoedingreksoRhode)
 
 class BremsElectronScreening : public Bremsstrahlung {
-    std::unique_ptr<Interpolant> interpolant_;
+    std::shared_ptr<Interpolant> interpolant_;
 
 public:
     BremsElectronScreening(bool);
+    using base_param_t = Bremsstrahlung;
 
     double CalculateParametrization(
         const ParticleDef&, const Component&, double energy, double v) const override;
