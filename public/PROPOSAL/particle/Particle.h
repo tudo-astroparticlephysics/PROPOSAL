@@ -51,25 +51,33 @@ enum class InteractionType : int {
     Annihilation = 1000000012,
     Photopair = 1000000013,
 };
+struct InteractionType_hash {
+    template <class T> std::size_t operator()(const T& type) const
+    {
+        return static_cast<int>(type);
+    }
+};
 } // namespace PROPOSAL
 
+
 namespace PROPOSAL {
-static const std::unordered_map<InteractionType, std::string> Type_Interaction_Name_Map
-{
-    { InteractionType::Particle, "Particle" },
-    { InteractionType::Brems, "Brems" },
-    { InteractionType::Ioniz, "Ioniz" },
-    { InteractionType::Epair, "Epair" },
-    { InteractionType::Photonuclear, "Photonuclear" },
-    { InteractionType::MuPair, "MuPair" },
-    { InteractionType::Hadrons, "Hadrons" },
-    { InteractionType::ContinuousEnergyLoss, "ContinuousEnergyLoss" },
-    { InteractionType::WeakInt, "WeakInt" },
-    { InteractionType::Compton, "Compton" },
-    { InteractionType::Decay, "Decay" },
-    { InteractionType::Annihilation, "Annihilation" },
-    { InteractionType::Photopair, "Photopair" },
-};
+static const std::unordered_map<InteractionType, std::string,
+    InteractionType_hash>
+    Type_Interaction_Name_Map{
+        { InteractionType::Particle, "Particle" },
+        { InteractionType::Brems, "Brems" },
+        { InteractionType::Ioniz, "Ioniz" },
+        { InteractionType::Epair, "Epair" },
+        { InteractionType::Photonuclear, "Photonuclear" },
+        { InteractionType::MuPair, "MuPair" },
+        { InteractionType::Hadrons, "Hadrons" },
+        { InteractionType::ContinuousEnergyLoss, "ContinuousEnergyLoss" },
+        { InteractionType::WeakInt, "WeakInt" },
+        { InteractionType::Compton, "Compton" },
+        { InteractionType::Decay, "Decay" },
+        { InteractionType::Annihilation, "Annihilation" },
+        { InteractionType::Photopair, "Photopair" },
+    };
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
