@@ -57,7 +57,7 @@
 #include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
 
 #include "PROPOSAL/secondaries/Parametrization.h"
-#include "PROPOSAL/secondaries/SecondariesBuilder.h"
+#include "PROPOSAL/secondaries/DefaultFactory.h"
 #include "PROPOSAL/secondaries/annihilation/Annihilation.h"
 #include "PROPOSAL/secondaries/bremsstrahlung/Bremsstrahlung.h"
 #include "PROPOSAL/secondaries/bremsstrahlung/NaivBremsstrahlung.h"
