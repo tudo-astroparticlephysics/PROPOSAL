@@ -18,7 +18,7 @@ namespace secondaries {
     using TCreateMethod = unique_ptr<Parametrization> (*)(ParticleDef, Medium);
 
     class DefaultFactory {
-        static unordered_map<InteractionType, TCreateMethod> secondaries_map;
+        static unordered_map<InteractionType, TCreateMethod, InteractionType_hash> secondaries_map;
 
     public:
         DefaultFactory() = delete;

@@ -2,7 +2,7 @@
 
 using namespace PROPOSAL;
 
-unordered_map<InteractionType, secondaries::TCreateMethod>
+unordered_map<InteractionType, secondaries::TCreateMethod, InteractionType_hash>
     secondaries::DefaultFactory::secondaries_map{};
 
 unique_ptr<secondaries::Parametrization> secondaries::DefaultFactory::Create(
