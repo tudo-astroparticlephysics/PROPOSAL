@@ -6,7 +6,8 @@ template <class T, class Cross> class InteractionBuilder : public Interaction {
     T interaction_integral;
     Cross crosssection_list;
 
-    using cross_type = typename std::decay<Cross>::type::value_type::element_type;
+    using cross_type =
+        typename std::decay<Cross>::type::value_type::element_type;
 
 public:
     InteractionBuilder(Cross&& cross)
@@ -44,7 +45,6 @@ public:
     tuple<InteractionType, const Component*, double> TypeInteraction(
         double energy, double rnd) override
     {
-        /* double rate = 0; //TODO: Avoid looping over the same list twice? */
         using rates_t = tuple<cross_type*, const Component*, double>;
         auto rates = std::vector<rates_t>();
         for (auto& c : crosssection_list) {
@@ -52,12 +52,12 @@ public:
             for (auto& r : rates_comp)
                 rates.emplace_back(c.get(), r.first, r.second);
         }
-        auto sum_of_rates = std::accumulate(rates.begin(), rates.end(), 0,
+        auto sum_of_rates = std::accumulate(rates.begin(), rates.end(), 0.f,
             [](double a, rates_t r) { return a + std::get<RATE>(r); });
         sum_of_rates *= rnd;
         for (auto& r : rates) {
             sum_of_rates -= std::get<RATE>(r);
-            if (sum_of_rates < 0) {
+            if (sum_of_rates < 0.f) {
                 auto loss = std::get<CROSS>(r)->CalculateStochasticLoss(
                     *std::get<COMP>(r), energy, -sum_of_rates);
                 return std::make_tuple(std::get<CROSS>(r)->GetInteractionType(),
