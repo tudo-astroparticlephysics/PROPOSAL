@@ -52,7 +52,7 @@ public:
             for (auto& r : rates_comp)
                 rates.emplace_back(c.get(), r.first, r.second);
         }
-        auto sum_of_rates = std::accumulate(rates.begin(), rates.end(), 0,
+        auto sum_of_rates = std::accumulate(rates.begin(), rates.end(), 0.,
             [](double a, rates_t r) { return a + std::get<RATE>(r); });
         sum_of_rates *= rnd;
         for (auto& r : rates) {
