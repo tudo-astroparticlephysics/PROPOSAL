@@ -7,15 +7,12 @@
 #include <unordered_map>
 #include <vector>
 
-using std::decay;
-using std::forward;
-using std::unordered_map;
 using std::vector;
 
 namespace PROPOSAL {
 class SecondariesCalculator {
     using param_ptr = unique_ptr<secondaries::Parametrization>;
-    unordered_map<InteractionType, param_ptr> secondary_generator;
+    std::unordered_map<InteractionType, param_ptr, InteractionType_hash> secondary_generator;
 
 public:
     SecondariesCalculator() = default;
@@ -41,8 +38,11 @@ public:
 
     size_t RequiredRandomNumbers(InteractionType) const noexcept;
 
-    vector<Loss::secondary_t> CalculateSecondaries(double primary_energy,
-        Loss::secondary_t loss, const Component& comp, vector<double> rnd);
+    vector<Loss::secondary_t> CalculateSecondaries(
+        double primary_energy,
+        Loss::secondary_t loss,
+        const Component& comp,
+        vector<double> rnd);
 
     size_t requiredRandomNumbers(InteractionType);
 };
