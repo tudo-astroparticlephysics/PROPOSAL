@@ -38,7 +38,6 @@
     class cls : public Medium {                                                \
        public:                                                                 \
         cls(double rho = 1.0);                                                 \
-        cls(const Medium& medium) : Medium(medium) {}                          \
     };
 
 namespace PROPOSAL {
@@ -64,17 +63,9 @@ class Medium {
            double d0,
            double massDensity,
            std::vector<Components::Component>);
-    Medium(const Medium&);
-
-    ///@brief Crush this Medium.
-    virtual ~Medium();
-
-    void swap(Medium& medium);
 
     // Operators
-    Medium& operator=(const Medium&);
     bool operator==(const Medium& medium) const;
-    bool operator!=(const Medium& medium) const;
     friend std::ostream& operator<<(std::ostream& os, Medium const& medium);
 
     // ----------------------------------------------------------------- //

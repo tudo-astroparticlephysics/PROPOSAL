@@ -89,84 +89,6 @@ Medium::Medium(std::string name,
     init();
 }
 
-Medium::Medium(const Medium& medium)
-    : name_(medium.name_),
-      numComponents_(medium.numComponents_),
-      sumCharge_(medium.sumCharge_),
-      ZA_(medium.ZA_),
-      I_(medium.I_),
-      C_(medium.C_),
-      a_(medium.a_),
-      m_(medium.m_),
-      X0_(medium.X0_),
-      X1_(medium.X1_),
-      d0_(medium.d0_),
-      massDensity_(medium.massDensity_),
-      molDensity_(medium.molDensity_),
-      radiationLength_(medium.radiationLength_),
-      MM_(medium.MM_),
-      sumNucleons_(medium.sumNucleons_),
-      components_(medium.components_)
-{
-}
-
-// ------------------------------------------------------------------------- //
-Medium::~Medium() {
-}
-
-// ------------------------------------------------------------------------- //
-// Operators & swap
-// ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
-void Medium::swap(Medium& medium) {
-    using std::swap;
-
-    swap(name_, medium.name_);
-    swap(numComponents_, medium.numComponents_);
-    swap(sumCharge_, medium.sumCharge_);
-    swap(ZA_, medium.ZA_);
-    swap(I_, medium.I_);
-    swap(C_, medium.C_);
-    swap(a_, medium.a_);
-    swap(m_, medium.m_);
-    swap(X0_, medium.X0_);
-    swap(X1_, medium.X1_);
-    swap(d0_, medium.d0_);
-    swap(massDensity_, medium.massDensity_);
-    swap(molDensity_, medium.molDensity_);
-    swap(radiationLength_, medium.radiationLength_);
-    swap(MM_, medium.MM_);
-    swap(sumNucleons_, medium.sumNucleons_);
-
-    components_.swap(medium.components_);
-}
-
-// ------------------------------------------------------------------------- //
-Medium& Medium::operator=(const Medium& medium) {
-    if (this != &medium) {
-        numComponents_ = medium.numComponents_;
-        components_ = medium.components_;
-        ZA_ = medium.ZA_;
-        I_ = medium.I_;
-        C_ = medium.C_;
-        a_ = medium.a_;
-        m_ = medium.m_;
-        X0_ = medium.X0_;
-        X1_ = medium.X1_;
-        d0_ = medium.d0_;
-        massDensity_ = medium.massDensity_;
-        molDensity_ = medium.molDensity_;
-        radiationLength_ = medium.radiationLength_;
-        MM_ = medium.MM_;
-        sumNucleons_ = medium.sumNucleons_;
-
-        components_ = medium.components_;
-    }
-
-    return *this;
-}
-
 // ------------------------------------------------------------------------- //
 bool Medium::operator==(const Medium& medium) const {
     if (name_ != medium.name_)
@@ -211,10 +133,6 @@ bool Medium::operator==(const Medium& medium) const {
 
         return Return;
     }
-}
-
-bool Medium::operator!=(const Medium& medium) const {
-    return !(*this == medium);
 }
 
 // ------------------------------------------------------------------------- //

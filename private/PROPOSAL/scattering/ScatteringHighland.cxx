@@ -55,10 +55,10 @@ bool ScatteringHighland::compare(const Scattering& scattering) const
 
     if (!scatteringHighland)
         return false;
-    else if (*medium_ != *scatteringHighland->medium_)
-        return false;
-    else
+    else if (*medium_ == *scatteringHighland->medium_)
         return true;
+    else
+        return false;
 }
 
 void ScatteringHighland::print(std::ostream& os) const

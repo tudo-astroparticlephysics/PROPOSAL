@@ -193,7 +193,7 @@ bool ScatteringMoliere::compare(const Scattering& scattering) const {
 
     if (!scatteringMoliere)
         return false;
-    else if (*medium_ != *scatteringMoliere->medium_)
+    else if (!(*medium_ == *scatteringMoliere->medium_))
         return false;
     else if (numComp_ != scatteringMoliere->numComp_)
         return false;
