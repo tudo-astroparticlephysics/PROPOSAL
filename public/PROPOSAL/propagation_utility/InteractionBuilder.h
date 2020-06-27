@@ -1,29 +1,30 @@
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
+#include <type_traits>
 
 namespace PROPOSAL {
 template <class T, class Cross> class InteractionBuilder : public Interaction {
-    T interaction_integral;
-    Cross crosssection_list;
+    using cross_list_t = typename std::decay<Cross>::type;
+    using cross_type = typename cross_list_t::value_type::element_type;
 
-    using cross_type =
-        typename std::decay<Cross>::type::value_type::element_type;
+    cross_list_t cross_list;
+    T interaction_integral;
 
 public:
     InteractionBuilder(Cross&& cross)
         : Interaction(CrossSectionVector::GetLowerLim(cross))
-        , interaction_integral(BuildInteractionIntegral(cross))
-        , crosssection_list(cross)
+        , cross_list(std::forward<Cross>(cross))
+        , interaction_integral(BuildInteractionIntegral(cross_list))
     {
     }
 
-    T BuildInteractionIntegral(Cross&& cross)
+    T BuildInteractionIntegral(Cross& cross)
     {
         auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
         auto interaction_func = [this, &cross, &disp](double energy) {
             return FunctionToIntegral(cross, disp, energy);
         };
-        T integral(interaction_func, CrossSectionVector::GetLowerLim(cross));
+        T integral(interaction_func, lower_lim);
         if (typeid(T) == typeid(UtilityInterpolant)) {
             auto hash = CrossSectionVector::GetHash(cross);
             integral.BuildTables("interaction", hash, interpol_def);
@@ -47,7 +48,7 @@ public:
     {
         using rates_t = tuple<cross_type*, const Component*, double>;
         auto rates = std::vector<rates_t>();
-        for (auto& c : crosssection_list) {
+        for (auto& c : cross_list) {
             auto rates_comp = c->CalculatedNdx(energy);
             for (auto& r : rates_comp)
                 rates.emplace_back(c.get(), r.first, r.second);

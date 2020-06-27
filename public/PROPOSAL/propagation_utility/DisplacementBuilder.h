@@ -4,14 +4,16 @@
 namespace PROPOSAL {
 template <typename T, typename Cross>
 class DisplacementBuilder : public Displacement {
+    using cross_list_t = typename std::decay<Cross>::type;
+
     T disp_integral;
 
-    T BuildTrackIntegral(const Cross& cross)
+    T BuildTrackIntegral(cross_list_t cross)
     {
         if (cross.size() < 1)
             throw std::invalid_argument(
                 "at least one crosssection is required.");
-        auto disp_func = [this, &cross](double energy) {
+        auto disp_func = [this, cross](double energy) {
             return FunctionToIntegral(cross, energy);
         };
         auto low_lim = CrossSectionVector::GetLowerLim(cross);
