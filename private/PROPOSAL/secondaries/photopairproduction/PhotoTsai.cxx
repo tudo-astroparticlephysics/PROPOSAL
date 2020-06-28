@@ -104,10 +104,22 @@ double secondaries::PhotoTsai::FunctionToIntegral(
     return aux;
 }
 
-double secondaries::PhotoTsai::CalculateRho(double, double)
+double secondaries::PhotoTsai::CalculateRho(
+    double energy, double rnd, const Component& comp)
 {
-    throw std::logic_error(
-        "Comes out of differential rate of photopairproduction");
+    std::cout << "searched comp name: "<< comp.GetName() << std::endl;
+    for (auto& it : dndx) {
+        std::cout << "comp name: "<< it.first->GetName() << std::endl;
+        if (comp.GetName() == it.first->GetName())
+        {
+            std::cout << "str are equal." << std::endl;
+            return it.second->GetUpperLimit(energy, -rnd);
+        }
+    }
+    std::ostringstream s;
+    s << "Component (" << comp.GetName()
+      << ") can not be found in the precalculated tsai photonuclear tables.";
+    throw std::out_of_range(s.str());
 }
 
 tuple<Vector3D, Vector3D> secondaries::PhotoTsai::CalculateDirections(
@@ -150,8 +162,9 @@ tuple<double, double> secondaries::PhotoTsai::CalculateEnergy(
 vector<Loss::secondary_t> secondaries::PhotoTsai::CalculateSecondaries(
     double, Loss::secondary_t loss, const Component& comp, vector<double> rnd)
 {
-    auto rho = CalculateRho(get<Loss::ENERGY>(loss), rnd[0]);
-    auto secondary_energy = CalculateEnergy(get<Loss::ENERGY>(loss), rho, rnd[1]);
+    auto rho = CalculateRho(get<Loss::ENERGY>(loss), rnd[0], comp);
+    auto secondary_energy
+        = CalculateEnergy(get<Loss::ENERGY>(loss), rho, rnd[1]);
     auto secondary_dir = CalculateDirections(
         get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), rho, comp, rnd);
     auto sec = std::vector<Loss::secondary_t>();

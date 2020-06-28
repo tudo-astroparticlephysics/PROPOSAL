@@ -6,6 +6,9 @@
 #include "PROPOSAL/secondaries/DefaultFactory.h"
 #include "PROPOSAL/secondaries/photopairproduction/PhotopairProduction.h"
 
+#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
+#include "PROPOSAL/crossection/parametrization/PhotoPairProduction.h"
+
 using PROPOSAL::Components::Component;
 
 namespace PROPOSAL {
@@ -13,6 +16,7 @@ namespace secondaries {
     class PhotoTsai : public PhotopairProduction,
                       public RegisteredInDefault<PhotoTsai> {
         Integral integral;
+        dndx_map_t dndx;
 
         double FunctionToIntegral(
             double energy, double x, double theta, const Component&);
@@ -21,9 +25,13 @@ namespace secondaries {
         static constexpr int n_rnd = 3;
 
         PhotoTsai() = default;
-        PhotoTsai(ParticleDef, Medium){};
+        PhotoTsai(ParticleDef p, Medium m)
+            : dndx(build_cross_section_dndx(crosssection::PhotoPairTsai(), p, m,
+                  std::make_shared<EnergyCutSettings>(0.f, 1.f, false), false))
+        {
+        }
 
-        double CalculateRho(double, double) override;
+        double CalculateRho(double, double, const Component&) override;
         tuple<Vector3D, Vector3D> CalculateDirections(Vector3D, double, double,
             const Component&, vector<double>) override;
         tuple<double, double> CalculateEnergy(double, double, double) override;

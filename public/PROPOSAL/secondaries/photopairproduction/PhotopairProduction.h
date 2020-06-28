@@ -21,7 +21,7 @@ namespace secondaries {
             = PROPOSAL::InteractionType::Photopair;
         InteractionType GetInteractionType() const noexcept { return type; };
 
-        virtual double CalculateRho(double, double) = 0;
+        virtual double CalculateRho(double, double, const Component&) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(
             Vector3D, double, double, const Component&, vector<double>)
             = 0;
