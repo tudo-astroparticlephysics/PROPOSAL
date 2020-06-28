@@ -11,10 +11,11 @@ namespace secondaries {
     class NaivBremsstrahlung : public secondaries::Bremsstrahlung,
                                public RegisteredInDefault<NaivBremsstrahlung> {
         static constexpr int n_rnd = 0;
+        const int primary_lepton_type;
 
     public:
         NaivBremsstrahlung() = default;
-        NaivBremsstrahlung(ParticleDef, Medium) {};
+        NaivBremsstrahlung(ParticleDef p, Medium) :primary_lepton_type(p.particle_type) {};
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
         vector<Loss::secondary_t> CalculateSecondaries(
