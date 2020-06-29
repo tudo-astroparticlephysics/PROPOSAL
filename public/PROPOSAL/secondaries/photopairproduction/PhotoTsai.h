@@ -16,6 +16,7 @@ namespace secondaries {
     class PhotoTsai : public PhotopairProduction,
                       public RegisteredInDefault<PhotoTsai> {
         Integral integral;
+        Medium medium;
         dndx_map_t dndx;
 
         double FunctionToIntegral(
@@ -26,7 +27,8 @@ namespace secondaries {
 
         PhotoTsai() = default;
         PhotoTsai(ParticleDef p, Medium m)
-            : dndx(build_cross_section_dndx(crosssection::PhotoPairTsai(), p, m,
+            : medium(m),
+              dndx(build_cross_section_dndx(crosssection::PhotoPairTsai(), p, medium,
                   std::make_shared<EnergyCutSettings>(0.f, 1.f, false), false))
         {
         }

@@ -118,7 +118,7 @@ double secondaries::PhotoTsai::CalculateRho(
     }
     std::ostringstream s;
     s << "Component (" << comp.GetName()
-      << ") can not be found in the precalculated tsai photonuclear tables.";
+      << ") can not be found in the precalculated tsai photopairproduction tables.";
     throw std::out_of_range(s.str());
 }
 
