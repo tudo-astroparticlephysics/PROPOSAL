@@ -32,7 +32,10 @@ namespace secondaries {
         tuple<double, double> CalculateEnergy(double, double) final{};
 
         vector<Loss::secondary_t> CalculateSecondaries(
-            double, Loss::secondary_t, const Component&, vector<double>){};
+            double, Loss::secondary_t, const Component&, vector<double>) {
+            auto sec = vector<Loss::secondary_t>{};
+            return sec;
+        };
     };
 } // namespace secondaries
 } // namespace PROPOSAL
