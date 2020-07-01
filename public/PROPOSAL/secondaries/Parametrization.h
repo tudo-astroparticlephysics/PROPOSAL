@@ -13,7 +13,7 @@ namespace PROPOSAL {
 namespace secondaries {
     struct Parametrization {
         Parametrization() = default;
-        ~Parametrization() = default;
+        virtual ~Parametrization() = default;
 
         virtual size_t RequiredRandomNumbers() const noexcept = 0;
         virtual InteractionType GetInteractionType() const noexcept = 0;

@@ -46,4 +46,11 @@ public:
 
     size_t requiredRandomNumbers(InteractionType);
 };
+
+template <typename TypeList>
+std::unique_ptr<SecondariesCalculator> make_secondaries(TypeList&& list, const ParticleDef& p, const Medium& m)
+{
+    return PROPOSAL::make_unique<SecondariesCalculator>(std::forward<TypeList>(list), p, m);
+}
+
 }

@@ -39,6 +39,8 @@ public:
             _target.GetHash());
     }
 
+    virtual ~CrossSectionDNDX() = default;
+
     inline double Calculate(double energy)
     {
         return Calculate(energy, get<MAX>(GetIntegrationLimits(energy)));
