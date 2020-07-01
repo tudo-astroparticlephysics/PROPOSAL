@@ -59,6 +59,8 @@
 #include "PROPOSAL/secondaries/Parametrization.h"
 #include "PROPOSAL/secondaries/DefaultFactory.h"
 #include "PROPOSAL/secondaries/annihilation/Annihilation.h"
+#include "PROPOSAL/secondaries/annihilation/NaivAnnihilation.h"
+#include "PROPOSAL/secondaries/annihilation/SingleDifferentialAnnihilation.h"
 #include "PROPOSAL/secondaries/bremsstrahlung/Bremsstrahlung.h"
 #include "PROPOSAL/secondaries/bremsstrahlung/NaivBremsstrahlung.h"
 #include "PROPOSAL/secondaries/compton/Compton.h"

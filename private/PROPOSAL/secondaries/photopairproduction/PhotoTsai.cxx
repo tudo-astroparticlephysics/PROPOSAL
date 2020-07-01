@@ -107,13 +107,12 @@ double secondaries::PhotoTsai::FunctionToIntegral(
 double secondaries::PhotoTsai::CalculateRho(
     double energy, double rnd, const Component& comp)
 {
-    std::cout << "searched comp name: "<< comp.GetName() << std::endl;
     for (auto& it : dndx) {
-        std::cout << "comp name: "<< it.first->GetName() << std::endl;
         if (comp.GetName() == it.first->GetName())
         {
-            std::cout << "str are equal." << std::endl;
-            return it.second->GetUpperLimit(energy, -rnd);
+            auto rate = rnd * it.second->Calculate(energy, get<CrossSectionDNDX::MAX>(it.second->GetIntegrationLimits(energy)));
+            auto rho = it.second->GetUpperLimit(energy, rate);
+            return rho;
         }
     }
     std::ostringstream s;

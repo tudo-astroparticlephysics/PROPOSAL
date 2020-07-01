@@ -19,6 +19,7 @@ using std::vector;
 namespace PROPOSAL {
 namespace secondaries {
     class SingleDifferentialAnnihilation : public secondaries::Annihilation {
+        Medium m;
         dndx_map_t dndx;
 
     public:
@@ -26,11 +27,10 @@ namespace secondaries {
 
         template <typename Param>
         SingleDifferentialAnnihilation(
-            Param&& param, const ParticleDef& p, const Medium& m, bool interpol)
-            : dndx(build_cross_section_dndx(std::forward<Param>(param), p, m,
-                  std::make_shared<EnergyCutSettings>(
-                      0, std::numeric_limits<double>::infinity(), false),
-                  interpol))
+            Param&& param, const ParticleDef& p, const Medium& medium, bool interpol)
+            : m(medium),
+              dndx(build_cross_section_dndx(std::forward<Param>(param), p, m,
+                      std::make_shared<EnergyCutSettings>(0.f, 1.f, false), interpol))
         {
         }
 

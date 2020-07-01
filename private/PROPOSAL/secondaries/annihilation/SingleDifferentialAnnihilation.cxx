@@ -14,7 +14,18 @@ using namespace PROPOSAL;
 double secondaries::SingleDifferentialAnnihilation::CalculateRho(
     double energy, double rnd, const Component& comp)
 {
-    dndx[&comp]->GetUpperLimit(energy, -rnd);
+    for (auto& it : dndx) {
+        if (comp.GetName() == it.first->GetName())
+        {
+            auto rate = rnd * it.second->Calculate(energy, get<CrossSectionDNDX::MAX>(it.second->GetIntegrationLimits(energy)));
+            auto rho = it.second->GetUpperLimit(energy, rate);
+            return rho;
+        }
+    }
+    std::ostringstream s;
+    s << "Component (" << comp.GetName()
+      << ") can not be found in the precalculated annihilation tables.";
+    throw std::out_of_range(s.str());
 }
 
 tuple<Vector3D, Vector3D>
