@@ -54,9 +54,14 @@ public:
     inline tuple<double, double> GetIntegrationLimits(double energy)
     {
         auto kin_lim = kinematic_limits(energy);
-        auto v_cut = cut->GetCut(kin_lim, energy);
-        return make_tuple(
-            v_cut, get<crosssection::Parametrization::V_MAX>(kin_lim));
+        if (cut) {
+            return make_tuple(cut->GetCut(kin_lim, energy),
+                              get<crosssection::Parametrization::V_MAX>(kin_lim));
+        } else {
+            return make_tuple(get<crosssection::Parametrization::V_MIN>(kin_lim),
+                              get<crosssection::Parametrization::V_MAX>(kin_lim));
+        }
+
     }
 };
 } // namespace PROPOSAL
