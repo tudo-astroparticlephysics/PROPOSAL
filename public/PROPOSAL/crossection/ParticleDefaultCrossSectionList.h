@@ -33,9 +33,9 @@ unique_ptr<crosssection_t<P, M>> make_crosssection(Param&& param, P&& p_def,
 {
     if (interpolate)
         return PROPOSAL::make_unique<CrossSectionInterpolant<Param, P, M>>(
-            param, p_def, medium, cuts, InterpolationDef());
+            param, std::forward<P>(p_def), std::forward<M>(medium), cuts, InterpolationDef());
     return PROPOSAL::make_unique<CrossSectionIntegral<Param, P, M>>(
-        param, p_def, medium, cuts);
+        param, std::forward<P>(p_def), std::forward<M>(medium), cuts);
 }
 template <typename P, typename M>
 crosssection_list_t<EMinusDef, M> GetStdCrossSections(P particle,

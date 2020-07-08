@@ -9,7 +9,7 @@ namespace PROPOSAL {
 template <>
 double calculate_dedx<crosssection::Ionization&>(crosssection::Ionization& param, Integral& integral,
     const ParticleDef& p_def, const Medium& medium,
-    const EnergyCutSettings& cut, double energy, std::false_type, std::false_type)
+    const EnergyCutSettings& cut, double energy, std::false_type)
 {
     auto is_bhabha = param.name == "IonizBergerSeltzerBhabha";
     auto is_moller = param.name == "IonizBergerSeltzerMoller"; //TODO: There is a bug, this is not working since param has already been cast to its base type

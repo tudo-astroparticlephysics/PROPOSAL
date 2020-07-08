@@ -82,6 +82,11 @@ public:
         , cut(_cut)
         , dndx_map(build_cross_section_dndx(param, p_def, medium, cut, true))
     {
+        if (typename param_t::only_stochastic{} == true and cut != nullptr) {
+            throw std::invalid_argument("CrossSections of parametrizations that are only stochastic do not use"
+                                        "EnergyCuts. Pass a nullptr as an EnergyCut instead.");
+        }
+
         if (cut != nullptr) {
             // Only for a defined EnergyCut, dEdx and dE2dx return non-zero values
             dedx = build_dedx(reinterpret_cast<base_param_ref_t>(param), p_def,
@@ -151,7 +156,6 @@ unique_ptr<Interpolant> build_dedx(Param&& param, const ParticleDef& p_def,
     interpol_def.function1d
         = [&integral, &param, &p_def, &medium, &cut](double energy) {
               return calculate_dedx(param, integral, p_def, medium, cut, energy,
-                  typename decay<Param>::type::only_stochastic{},
                   typename decay<Param>::type::component_wise{});
           };
     interpol_def.max = def.nodes_cross_section;
@@ -177,8 +181,7 @@ unique_ptr<Interpolant> build_de2dx(Param&& param, const ParticleDef& p_def,
     interpol_def.function1d
         = [&integral, &param, &p_def, &medium, &cut](double energy) {
               return calculate_de2dx(param, integral, p_def, medium, cut,
-                  energy, typename decay<Param>::type::only_stochastic{},
-                  typename decay<Param>::type::component_wise{});
+                  energy, typename decay<Param>::type::component_wise{});
           };
     interpol_def.max = def.nodes_continous_randomization;
     interpol_def.xmin = param.GetLowerEnergyLim(p_def);
