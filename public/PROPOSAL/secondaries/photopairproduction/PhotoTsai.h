@@ -23,7 +23,7 @@ namespace secondaries {
             double energy, double x, double theta, const Component&);
 
     public:
-        static constexpr int n_rnd = 3;
+        static constexpr int n_rnd = 5;
 
         PhotoTsai() = default;
         PhotoTsai(ParticleDef p, Medium m)
