@@ -81,22 +81,26 @@ public:
         , dndx_map(
               build_cross_section_dndx(param, p_def, medium, cut, false))
     {
+        if (typename param_t::only_stochastic{} == true and cut != nullptr) {
+            throw std::invalid_argument("CrossSections of parametrizations that are only stochastic do not use"
+                                        "EnergyCuts. Pass a nullptr as an EnergyCut instead.");
+        }
     }
 
     inline double CalculatedEdx(double energy) override
     {
+        if (cut == nullptr)
+            return 0;
         auto aux = calculate_dedx(reinterpret_cast<base_param_ref_t>(param),
-            integral, p_def, medium, *cut, energy,
-            typename param_t::only_stochastic{},
-            typename param_t::component_wise{});
+            integral, p_def, medium, *cut, energy, typename param_t::component_wise{});
         return aux;
     }
     inline double CalculatedE2dx(double energy) override
     {
+        if (cut == nullptr)
+            return 0;
         return calculate_de2dx(reinterpret_cast<base_param_ref_t>(param),
-            integral, p_def, medium, *cut, energy,
-            typename param_t::only_stochastic{},
-            typename param_t::component_wise{});
+            integral, p_def, medium, *cut, energy, typename param_t::component_wise{});
     }
     inline rates_t CalculatedNdx(double energy) override
     {
@@ -113,7 +117,9 @@ public:
     {
         auto hash_digest = size_t{ 0 };
         hash_combine(hash_digest, param.GetHash(), p_def.GetHash(),
-            medium.GetHash(), cut->GetHash());
+            medium.GetHash());
+        if(cut != nullptr)
+            hash_combine(hash_digest, cut->GetHash());
         return hash_digest;
     }
     inline double GetLowerEnergyLim() const override
@@ -131,8 +137,7 @@ namespace PROPOSAL {
 template <typename Param>
 double calculate_dedx(Param&& param, Integral& integral,
     const ParticleDef& p_def, const Medium& medium,
-    const EnergyCutSettings& cut, double energy, std::false_type,
-    std::true_type)
+    const EnergyCutSettings& cut, double energy, std::true_type)
 {
     double sum = 0.;
     for (const auto& c : medium.GetComponents()) {
@@ -151,8 +156,7 @@ double calculate_dedx(Param&& param, Integral& integral,
 template <typename Param>
 double calculate_dedx(Param&& param, Integral& integral,
     const ParticleDef& p_def, const Medium& medium,
-    const EnergyCutSettings& cut, double energy, std::false_type,
-    std::false_type)
+    const EnergyCutSettings& cut, double energy, std::false_type)
 {
     auto lim = param.GetKinematicLimits(p_def, medium, energy);
     auto v_cut = cut.GetCut(lim, energy);
@@ -161,26 +165,18 @@ double calculate_dedx(Param&& param, Integral& integral,
         * energy;
 }
 
-template <typename Param, typename Comp_wise>
-double calculate_dedx(Param&&, Integral&, const ParticleDef&, const Medium&,
-    const EnergyCutSettings&, double, std::true_type, Comp_wise)
-{
-    return 0.;
-}
 
 namespace crosssection{
     class Ionization;
 }
 template <>
 double calculate_dedx<crosssection::Ionization&>(crosssection::Ionization&, Integral&, const ParticleDef&,
-    const Medium&, const EnergyCutSettings&, double, std::false_type,
-    std::false_type);
+    const Medium&, const EnergyCutSettings&, double, std::false_type);
 
 template <typename Param>
 double calculate_de2dx(Param&& param, Integral& integral,
     const ParticleDef& p_def, const Medium& medium,
-    const EnergyCutSettings& cut, double energy, std::false_type,
-    std::true_type)
+    const EnergyCutSettings& cut, double energy, std::true_type)
 {
     double sum = 0.;
     for (const auto& c : medium.GetComponents()) {
@@ -199,8 +195,7 @@ double calculate_de2dx(Param&& param, Integral& integral,
 template <typename Param>
 double calculate_de2dx(Param&& param, Integral& integral,
     const ParticleDef& p_def, const Medium& medium,
-    const EnergyCutSettings& cut, double energy, std::false_type,
-    std::false_type)
+    const EnergyCutSettings& cut, double energy, std::false_type)
 {
     auto lim = param.GetKinematicLimits(p_def, medium, energy);
     auto v_cut = cut.GetCut(lim, energy);
@@ -209,12 +204,6 @@ double calculate_de2dx(Param&& param, Integral& integral,
         * energy * energy;
 }
 
-template <typename Param, typename Comp_wise>
-double calculate_de2dx(Param&&, Integral&, const ParticleDef&, const Medium&,
-    const EnergyCutSettings&, double, std::true_type, Comp_wise)
-{
-    return 0.;
-}
 
 template <typename Param, typename P, typename M>
 rates_t CrossSectionIntegral<Param, P, M>::CalculatedNdx_impl(
