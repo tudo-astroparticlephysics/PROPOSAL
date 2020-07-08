@@ -1,9 +1,9 @@
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/secondaries/annihilation/SingleDifferentialAnnihilation.h"
+#include "PROPOSAL/Constants.h"
 
 #include <cmath>
-#include <tuple>
 #include <stdexcept>
+#include <tuple>
 
 using std::fmod;
 using std::make_tuple;
@@ -15,11 +15,9 @@ double secondaries::SingleDifferentialAnnihilation::CalculateRho(
     double energy, double rnd, const Component& comp)
 {
     for (auto& it : dndx) {
-        if (comp.GetName() == it.first->GetName())
-        {
-            auto rate = rnd * it.second->Calculate(energy, get<CrossSectionDNDX::MAX>(it.second->GetIntegrationLimits(energy)));
-            auto rho = it.second->GetUpperLimit(energy, rate);
-            return rho;
+        if (comp.GetName() == it.first->GetName()) {
+            auto rate = it.second->Calculate(energy);
+            return it.second->GetUpperLimit(energy, rnd * rate);
         }
     }
     std::ostringstream s;
@@ -48,6 +46,8 @@ tuple<double, double>
 secondaries::SingleDifferentialAnnihilation::CalculateEnergy(
     double energy, double rho)
 {
+    assert(rho >= 0);
+    assert(rho <= 1);
     auto energy_1 = (energy + ME) * (1 - rho);
     auto energy_2 = (energy + ME) * rho;
     return make_tuple(energy_1, energy_2);
@@ -55,12 +55,13 @@ secondaries::SingleDifferentialAnnihilation::CalculateEnergy(
 
 vector<Loss::secondary_t>
 secondaries::SingleDifferentialAnnihilation::CalculateSecondaries(
-    double, Loss::secondary_t loss, const Component& comp, vector<double> rnd)
+    double primary_energy, Loss::secondary_t loss, const Component& comp,
+    vector<double> rnd)
 {
-    auto rho = CalculateRho(get<Loss::ENERGY>(loss), rnd[0], comp);
-    auto secondary_energy = CalculateEnergy(get<Loss::ENERGY>(loss), rho);
+    auto rho = CalculateRho(primary_energy, rnd[0], comp);
+    auto secondary_energy = CalculateEnergy(primary_energy, rho);
     auto secondary_dir = CalculateDirections(
-        get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), rho, rnd[1]);
+        get<Loss::DIRECTION>(loss), primary_energy, rho, rnd[1]);
     auto sec = std::vector<Loss::secondary_t>();
     sec.emplace_back(static_cast<int>(ParticleType::Gamma),
         get<Loss::POSITION>(loss), get<0>(secondary_dir),

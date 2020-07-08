@@ -159,13 +159,13 @@ tuple<double, double> secondaries::PhotoTsai::CalculateEnergy(
 }
 
 vector<Loss::secondary_t> secondaries::PhotoTsai::CalculateSecondaries(
-    double, Loss::secondary_t loss, const Component& comp, vector<double> rnd)
+    double primary_energy, Loss::secondary_t loss, const Component& comp, vector<double> rnd)
 {
-    auto rho = CalculateRho(get<Loss::ENERGY>(loss), rnd[0], comp);
+    auto rho = CalculateRho(primary_energy, rnd[0], comp);
     auto secondary_energy
-        = CalculateEnergy(get<Loss::ENERGY>(loss), rho, rnd[1]);
+        = CalculateEnergy(primary_energy, rho, rnd[1]);
     auto secondary_dir = CalculateDirections(
-        get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), rho, comp, rnd);
+        get<Loss::DIRECTION>(loss), primary_energy, rho, comp, rnd);
     auto sec = std::vector<Loss::secondary_t>();
     sec.emplace_back(static_cast<int>(ParticleType::EMinus),
         get<Loss::POSITION>(loss), get<0>(secondary_dir),
