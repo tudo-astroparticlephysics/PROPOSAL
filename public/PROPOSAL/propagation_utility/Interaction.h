@@ -17,8 +17,19 @@ protected:
             for (auto& r : rates)
                 total_rate += r.second;
         }
-
         return disp.FunctionToIntegral(cross, energy) * total_rate;
+    }
+
+    template <typename Cross>
+    double CalculateMeanFreePath(Cross&& cross, double energy)
+    {
+        auto total_rate = 0.f;
+        for (auto& c : cross) {
+            auto rates = c->CalculatedNdx(energy);
+            for (auto& r : rates)
+                total_rate += r.second;
+        }
+        return 1 / total_rate;
     }
 
 public:
@@ -33,5 +44,6 @@ public:
     virtual tuple<InteractionType, const Component*, double> TypeInteraction(
         double, double)
         = 0; // ARGS: energy, rate
+    virtual double MeanFreePath(double) = 0;
 };
 } // namespace PROPOSAL

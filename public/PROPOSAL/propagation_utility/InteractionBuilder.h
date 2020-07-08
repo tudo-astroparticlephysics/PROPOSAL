@@ -32,7 +32,7 @@ public:
         return integral;
     }
 
-    double EnergyInteraction(double energy, double rnd) override
+    double EnergyInteraction(double energy, double rnd) final
     {
         assert(energy >= lower_lim);
         auto rndi = -std::log(rnd);
@@ -40,6 +40,11 @@ public:
         if (rndi >= rndiMin)
             return lower_lim;
         return interaction_integral.GetUpperLimit(energy, rndi);
+    }
+
+    double MeanFreePath(double energy) final
+    {
+        return CalculateMeanFreePath(cross_list, energy);
     }
 
     enum { CROSS, COMP, RATE };
