@@ -52,7 +52,7 @@ crosssection_list_t<GammaDef, M> GetStdCrossSections(const GammaDef& gamma,
     crosssection::PhotoPairTsai photopair {};
     crosssection::ComptonKleinNishina compton {};
     crosssection_list_t<GammaDef, M> cross;
-    cross.emplace_back(make_crosssection(photopair, gamma, medium, cut, interpolate));
+    cross.emplace_back(make_crosssection(photopair, gamma, medium, nullptr, interpolate));
     cross.emplace_back(make_crosssection(compton, gamma, medium, cut, interpolate));
 
     return cross;
@@ -92,7 +92,7 @@ crosssection_list_t<EPlusDef, M> GetStdCrossSections(const EPlusDef& e,
     cross.emplace_back(make_crosssection(epair, e, medium, cut, interpolate));
     cross.emplace_back(make_crosssection(ioniz, e, medium, cut, interpolate));
     cross.emplace_back(make_crosssection(photo, e, medium, cut, interpolate));
-    cross.emplace_back(make_crosssection(annih, e, medium, cut, interpolate));
+    cross.emplace_back(make_crosssection(annih, e, medium, nullptr, interpolate));
     return cross;
 }
 

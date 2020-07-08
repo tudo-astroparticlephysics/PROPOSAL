@@ -80,21 +80,28 @@ public:
         , p_def(std::forward<P>(_p_def))     // needed TODO: Maximilian Sackel
         , medium(std::forward<M>(_medium))   // 2 Jun. 2020
         , cut(_cut)
-        , dedx(build_dedx(reinterpret_cast<base_param_ref_t>(param), p_def,
-              medium, *cut, def, 0))
-        , de2dx(build_de2dx(reinterpret_cast<base_param_ref_t>(param), p_def,
-              medium, *cut, def, 0))
         , dndx_map(build_cross_section_dndx(param, p_def, medium, cut, true))
     {
+        if (cut != nullptr) {
+            // Only for a defined EnergyCut, dEdx and dE2dx return non-zero values
+            dedx = build_dedx(reinterpret_cast<base_param_ref_t>(param), p_def,
+                              medium, *cut, def, 0);
+            de2dx = build_de2dx(reinterpret_cast<base_param_ref_t>(param), p_def,
+                                medium, *cut, def, 0);
+        }
     }
 
     inline double CalculatedEdx(double energy) override
     {
+        if (dedx == nullptr)
+            return 0;
         return dedx->Interpolate(energy);
     }
 
     inline double CalculatedE2dx(double energy) override
     {
+        if (de2dx == nullptr)
+            return 0;
         return de2dx->Interpolate(energy);
     }
     inline rates_t CalculatedNdx(double energy) override
@@ -119,7 +126,9 @@ public:
     {
         auto hash_digest = size_t{ 0 };
         hash_combine(hash_digest, param.GetHash(), p_def.GetHash(),
-            medium.GetHash(), cut->GetHash(), def.GetHash());
+            medium.GetHash(), def.GetHash());
+        if (cut != nullptr)
+            hash_combine(hash_digest, cut->GetHash());
         return hash_digest;
     }
     inline double GetLowerEnergyLim() const override

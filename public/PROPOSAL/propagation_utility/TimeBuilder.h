@@ -47,7 +47,7 @@ public:
 
 
 template <typename T>
-std::unique_ptr<Time> make_decay(
+std::unique_ptr<Time> make_time(
     T&& cross, const ParticleDef& p_def, bool interpolate = true)
 {
     if (interpolate)
