@@ -67,6 +67,7 @@
 #include "PROPOSAL/secondaries/compton/NaivCompton.h"
 #include "PROPOSAL/secondaries/epairproduction/EpairProduction.h"
 #include "PROPOSAL/secondaries/epairproduction/NaivEpairProduction.h"
+#include "PROPOSAL/secondaries/epairproduction/KelnerKokoulinPetrukhinEpairProduction.h"
 #include "PROPOSAL/secondaries/ionization/Ionization.h"
 #include "PROPOSAL/secondaries/ionization/NaivIonization.h"
 #include "PROPOSAL/secondaries/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"

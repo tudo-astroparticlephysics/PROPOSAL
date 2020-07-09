@@ -61,6 +61,12 @@ secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateSecondaries(
     auto secondary_dir = CalculateDirections(
         get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), rho, rnd[1]);
     auto sec = std::vector<Loss::secondary_t>();
+
+    std::get<Loss::TYPE>(loss) = p_def.particle_type;
+    std::get<Loss::ENERGY>(loss)
+            = initial_energy - std::get<Loss::ENERGY>(loss);
+    sec.emplace_back(loss);
+
     sec.emplace_back(static_cast<int>(ParticleType::MuMinus),
         get<Loss::POSITION>(loss), get<0>(secondary_dir),
         get<0>(secondary_energy), 0.);
