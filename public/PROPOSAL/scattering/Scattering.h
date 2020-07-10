@@ -51,6 +51,7 @@ struct Directions : std::enable_shared_from_this<Directions>
 class Scattering
 {
 public:
+    Scattering() = default;
     Scattering(const ParticleDef&);
     Scattering(const Scattering&);
     virtual ~Scattering() = default;

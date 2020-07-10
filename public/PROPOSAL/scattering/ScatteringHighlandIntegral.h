@@ -37,7 +37,7 @@ using std::shared_ptr;
 
 namespace PROPOSAL {
 
-template <class T, class Cross>
+template <class T, class Cross, class Enable = void>
 class ScatteringHighlandIntegral : public ScatteringHighland {
     T highland_integral;
 
@@ -53,16 +53,36 @@ public:
     template <typename Disp> double HighlandIntegral(Disp&&, double);
 };
 
-template <typename T, typename Cross>
-ScatteringHighlandIntegral<T, Cross>::ScatteringHighlandIntegral(
+template <class T, class Cross>
+class ScatteringHighlandIntegral<T, Cross,
+    typename std::enable_if<
+        std::is_null_pointer<typename decay<Cross>::type>::value>::type>
+    : public Scattering {
+public:
+    ScatteringHighlandIntegral(
+        const ParticleDef&, shared_ptr<const Medium>, Cross&&)
+    {
+        throw std::invalid_argument("FUUU");
+    };
+
+    bool compare(const Scattering&) const {};
+    void print(std::ostream&) const {};
+
+    RandomAngles CalculateRandomAngle(double grammage, double ei, double ef,
+        const std::array<double, 4>& rnd){};
+};
+
+template <class T, class Cross, class Enable>
+ScatteringHighlandIntegral<T, Cross, Enable>::ScatteringHighlandIntegral(
     const ParticleDef& p_def, shared_ptr<const Medium> medium, Cross&& cross)
     : ScatteringHighland(p_def, medium)
     , highland_integral(BuildHighlandIntegral(cross))
 {
 }
 
-template <class T, class Cross>
-T ScatteringHighlandIntegral<T, Cross>::BuildHighlandIntegral(Cross&& cross)
+template <class T, class Cross, class Enable>
+T ScatteringHighlandIntegral<T, Cross, Enable>::BuildHighlandIntegral(
+    Cross&& cross)
 {
     auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
     auto higland_integral_func = [this, &disp](double energy) {
@@ -76,9 +96,9 @@ T ScatteringHighlandIntegral<T, Cross>::BuildHighlandIntegral(Cross&& cross)
     return decay_integral;
 }
 
-template <class T, class Cross>
+template <class T, class Cross, class Enable>
 template <typename Disp>
-double ScatteringHighlandIntegral<T, Cross>::HighlandIntegral(
+double ScatteringHighlandIntegral<T, Cross, Enable>::HighlandIntegral(
     Disp&& disp, double energy)
 {
     auto square_momentum = (energy - mass) * (energy + mass);
@@ -86,8 +106,8 @@ double ScatteringHighlandIntegral<T, Cross>::HighlandIntegral(
     return disp.FunctionToIntegral(energy) * aux * aux;
 }
 
-template <class T, class Cross>
-double ScatteringHighlandIntegral<T, Cross>::CalculateTheta0(
+template <class T, class Cross, class Enable>
+double ScatteringHighlandIntegral<T, Cross, Enable>::CalculateTheta0(
     double grammage, double ei, double ef)
 {
     auto radiation_length = medium_->GetRadiationLength();
