@@ -127,7 +127,7 @@
 
 #include "PROPOSAL/scattering/Coefficients.h"
 #include "PROPOSAL/scattering/Scattering.h"
-// #include "PROPOSAL/scattering/ScatteringFactory.h"
+#include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/ScatteringHighland.h"
 #include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"

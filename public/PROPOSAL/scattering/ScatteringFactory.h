@@ -30,64 +30,52 @@
 
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/scattering/ScatteringHighland.h"
+#include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
+#include "PROPOSAL/scattering/ScatteringMoliere.h"
 
+using std::make_shared;
 namespace PROPOSAL {
 
-class Medium;
-class PropagationUtility;
-struct InterpolationDef;
+enum class ScatteringType : int { Moliere, Highland, HighlandIntegral };
 
-class ScatteringFactory {
-public:
-    enum Enum { None = 0, HighlandIntegral, Moliere, Highland };
+static const std::unordered_map<std::string, ScatteringType> ScatteringTable
+    = { { "moliere", ScatteringType::Moliere },
+          { "highland", ScatteringType::Highland },
+          { "highland_integral", ScatteringType::HighlandIntegral } };
 
-    typedef Helper::Bimap<std::string, Enum> BimapStringEnum;
-
-    Scattering* CreateScattering(const std::string&, const ParticleDef&,
-        std::shared_ptr<const Medium>, std::shared_ptr<InterpolationDef>,
-        std::unique_ptr<CrossSectionList> = nullptr);
-    Scattering* CreateScattering(const Enum, const ParticleDef&,
-        std::shared_ptr<const Medium>, std::shared_ptr<InterpolationDef>,
-        std::unique_ptr<CrossSectionList> = nullptr);
-
-    Scattering* CreateScattering(const std::string&, const ParticleDef&,
-        std::shared_ptr<const Medium>,
-        std::unique_ptr<CrossSectionList> = nullptr);
-    Scattering* CreateScattering(const Enum, const ParticleDef&,
-        std::shared_ptr<const Medium>,
-        std::unique_ptr<CrossSectionList> = nullptr);
-
-    // ----------------------------------------------------------------------------
-    /// @brief string to enum conversation for photo parametrizations
-    // ----------------------------------------------------------------------------
-    Enum GetEnumFromString(const std::string&);
-
-    // ----------------------------------------------------------------------------
-    /// @brief enum to string conversation for photo parametrizations
-    // ----------------------------------------------------------------------------
-    std::string GetStringFromEnum(const Enum&);
-
-    static ScatteringFactory& Get()
-    {
-        static ScatteringFactory instance;
-        return instance;
+template <typename Cross = std::nullptr_t>
+unique_ptr<Scattering> make_scattering(std::string const& name,
+    ParticleDef const& p_def, Medium const& medium, Cross&& cross = nullptr)
+{
+    auto m = make_shared<const Medium>(medium);
+    auto it = ScatteringTable.find(name);
+    if (it != ScatteringTable.end()) {
+        switch (it->second) {
+        case ScatteringType::HighlandIntegral:
+            return unique_ptr<Scattering>(
+                new ScatteringHighlandIntegral<UtilityInterpolant, Cross>(
+                    p_def, m, std::forward<Cross>(cross)));
+        case ScatteringType::Highland:
+            return unique_ptr<Scattering>(new ScatteringHighland(p_def, m));
+        case ScatteringType::Moliere:
+            return unique_ptr<Scattering>(new ScatteringMoliere(p_def, m));
+        default:
+            throw std::out_of_range("This constructor is not provided.");
+        }
     }
-
-private:
-    ScatteringFactory();
-    ~ScatteringFactory();
-
-    void Register(const std::string& name, const Enum);
-
-    std::vector<Enum> registerd_enum;
-    std::vector<std::string> registerd_str;
-    BimapStringEnum string_enum_;
-};
+    throw std::out_of_range("This scattering model is not provided.");
+}
 
 } // namespace PROPOSAL
