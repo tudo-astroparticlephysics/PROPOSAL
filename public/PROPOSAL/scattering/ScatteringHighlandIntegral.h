@@ -53,6 +53,11 @@ public:
     template <typename Disp> double HighlandIntegral(Disp&&, double);
 };
 
+template <class T>
+struct is_null_pointer
+    : std::is_same<std::nullptr_t, typename std::remove_cv<T>::type> {
+};
+
 template <class T, class Cross>
 class ScatteringHighlandIntegral<T, Cross,
     typename std::enable_if<
