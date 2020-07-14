@@ -171,8 +171,6 @@ void Propagator::DoStochasticInteraction(DynamicData& p_cond,
 
     p_cond.SetEnergy(p_cond.GetEnergy() - loss_energy);
     p_cond.SetType(loss_type);
-
-    return true; // TODO: Add condition for fatal interaction
 }
 
 bool Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
