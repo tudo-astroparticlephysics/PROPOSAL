@@ -61,7 +61,7 @@ struct is_null_pointer
 template <class T, class Cross>
 class ScatteringHighlandIntegral<T, Cross,
     typename std::enable_if<
-        std::is_null_pointer<typename decay<Cross>::type>::value>::type>
+        is_null_pointer<typename decay<Cross>::type>::value>::type>
     : public Scattering {
 public:
     ScatteringHighlandIntegral(

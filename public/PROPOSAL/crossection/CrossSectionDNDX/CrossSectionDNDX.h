@@ -38,6 +38,8 @@ public:
         hash_cross_section = 0;
         hash_combine(hash_cross_section, _param.GetHash(), _particle.GetHash(),
             _target.GetHash());
+        if (cut)
+            hash_combine(hash_cross_section, cut->GetHash());
     }
 
     virtual ~CrossSectionDNDX() = default;
