@@ -126,7 +126,7 @@ std::vector<DynamicData> Propagator::Propagate(
             switch (next_interaction_type) {
             case Stochastic: {
                 track.push_back(track.back());
-                continue_propagation = DoStochasticInteraction(
+                DoStochasticInteraction(
                         track.back(), utility, rnd);
                 break;
             }
@@ -155,7 +155,7 @@ std::vector<DynamicData> Propagator::Propagate(
     return track;
 }
 
-bool Propagator::DoStochasticInteraction(DynamicData& p_cond,
+void Propagator::DoStochasticInteraction(DynamicData& p_cond,
     PropagationUtility& utility, std::function<double()> rnd)
 {
     InteractionType loss_type;
@@ -171,8 +171,6 @@ bool Propagator::DoStochasticInteraction(DynamicData& p_cond,
 
     p_cond.SetEnergy(p_cond.GetEnergy() - loss_energy);
     p_cond.SetType(loss_type);
-
-    return true; // TODO: Add condition for fatal interaction
 }
 
 bool Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
