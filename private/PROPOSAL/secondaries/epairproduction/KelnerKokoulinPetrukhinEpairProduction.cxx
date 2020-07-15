@@ -63,7 +63,7 @@ secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateSecondaries(
         vector<double> rnd)
 {
     auto v = get<Loss::ENERGY>(loss) / initial_energy;
-    auto rho = CalculateRho(get<Loss::ENERGY>(loss), v, comp, rnd[0]);
+    auto rho = CalculateRho(initial_energy, v, comp, rnd[0]);
     auto secondary_energy = CalculateEnergy(get<Loss::ENERGY>(loss), rho);
     auto secondary_dir = CalculateDirections(
             get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), rho, rnd[1]);
