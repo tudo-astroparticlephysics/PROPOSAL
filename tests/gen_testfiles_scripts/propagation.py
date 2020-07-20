@@ -1,4 +1,4 @@
-import pyPROPOSAL as pp
+import proposal as pp
 
 
 def create_table(dir_name):
@@ -10,7 +10,7 @@ def create_table(dir_name):
     statistics = 10
 
     prop = pp.Propagator(
-        pp.particle.MuMinusDef.get(),
+        pp.particle.MuMinusDef(),
         "resources/config_ice.json"
     )
 

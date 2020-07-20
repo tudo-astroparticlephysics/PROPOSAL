@@ -1,13 +1,9 @@
-import pyPROPOSAL as pp
+import proposal as pp
 import time
 from tqdm import tqdm
 
-try:
-    import matplotlib as mpl
-    import matplotlib.pyplot as plt
-    from matplotlib import colors
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 
 import numpy as np
 
@@ -24,35 +20,35 @@ form_factor = np.poly1d(np.polyfit(1e6 * data_formfactor[0], data_formfactor[1],
 #     return np.exp(-1.171 * x**(0.536)) * term
 
 leptons = [
-    pp.particle.NuTauDef.get(),
-    pp.particle.NuTauBarDef.get(),
-    pp.particle.NuMuDef.get(),
-    pp.particle.NuMuBarDef.get(),
-    pp.particle.NuEDef.get(),
-    pp.particle.NuEBarDef.get(),
-    pp.particle.TauMinusDef.get(),
-    pp.particle.TauPlusDef.get(),
-    pp.particle.MuMinusDef.get(),
-    pp.particle.MuPlusDef.get(),
-    pp.particle.EMinusDef.get(),
-    pp.particle.EPlusDef.get(),
+    pp.particle.NuTauDef(),
+    pp.particle.NuTauBarDef(),
+    pp.particle.NuMuDef(),
+    pp.particle.NuMuBarDef(),
+    pp.particle.NuEDef(),
+    pp.particle.NuEBarDef(),
+    pp.particle.TauMinusDef(),
+    pp.particle.TauPlusDef(),
+    pp.particle.MuMinusDef(),
+    pp.particle.MuPlusDef(),
+    pp.particle.EMinusDef(),
+    pp.particle.EPlusDef(),
 ]
 
 
 def filter_hadr(secondarys):
-    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
+    prods = [p for p in secondarys if p.type == pp.particle.Data.Particle]
     E = [p.energy for p in prods if p.particle_def not in leptons]
     return sum(E)
 
 
 def filter_particle(secondarys, particle):
-    prods = [p for p in secondarys if p.id == particle.particle_type]
+    prods = [p for p in secondarys if p.type == particle.particle_type]
     E = [p.energy for p in prods]
     return sum(E)
 
 
 def filter_lep(secondarys):
-    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
+    prods = [p for p in secondarys if p.type == pp.particle.Data.Particle]
     E = [p.energy for p in prods if p.particle_def in leptons]
     return sum(E)
 
@@ -99,15 +95,15 @@ if __name__ == "__main__":
     statistics = int(1e5)
     binning = 50
 
-    tau_def = pp.particle.TauMinusDef.get()
+    tau_def = pp.particle.TauMinusDef()
     tau = pp.particle.DynamicData(tau_def.particle_type)
     tau.energy = tau_def.mass
     tau.direction = pp.Vector3D(0, 0, -1)
 
     products = [
-        pp.particle.Pi0Def.get(),
-        pp.particle.PiMinusDef.get(),
-        pp.particle.NuTauDef.get()
+        pp.particle.Pi0Def(),
+        pp.particle.PiMinusDef(),
+        pp.particle.NuTauDef()
     ]
 
     products_particles = [pp.particle.DynamicData(p.particle_type) for p in products]
@@ -209,7 +205,7 @@ if __name__ == "__main__":
         s1,
         s2,
         bins=500,
-        norm=colors.LogNorm()
+        norm=LogNorm()
     )
 
     plt.colorbar(hist[3], ax=ax, pad=0.01)

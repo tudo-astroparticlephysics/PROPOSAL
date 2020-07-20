@@ -19,11 +19,12 @@
 ```
 
 
-# PROPOSAL [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3665606.svg)](https://doi.org/10.5281/zenodo.3665606)
+# PROPOSAL [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1484180.svg)](https://doi.org/10.5281/zenodo.1484180)
 
 PROPOSAL (Propagator with optimal precision and optimized speed for all
-leptons) is presented as a public tool for muon propagation through transparent
-media. Up-to-date cross sections for ionization, bremsstrahlung, photonuclear
+leptons) is presented as a public tool for propagating leptons and gamma rays
+through media.
+Up-to-date cross sections for ionization, bremsstrahlung, photonuclear
 interactions, electron pair production, Landau–Pomeranchuk–Migdal and
 Ter-Mikaelian effects, muon and tau decay, as well as Molière scattering are
 implemented for different parametrizations.
@@ -31,8 +32,8 @@ The full Paper can be found
 [here](https://doi.org/10.1016/j.cpc.2013.04.001).
 Recent improvements are documented [here](https://doi.org/10.1016/j.cpc.2019.03.021).
 
-PROPOSAL was tested on Mac OS X V. 10.13.6, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
-all these OS are UNIX based it should be fine to run and compile PROPOSAL on a UNIX based OS.
+PROPOSAL is developed and tested on macOS and linux. 
+Continuous integration is setup on travis and tests several version of gcc and clang.
 
 PROPOSAL is now a C++11 library using pybind11 Python bindings!
 
@@ -61,13 +62,14 @@ If you use PROPOSAL, please cite the PROPOSAL paper
 ```
 and our zenodo entry of the version you use
 ```bibtex
-@misc{mario_dunsch_2019_2598747,
+@misc{dunsch_2020_1484180,
   author = {Dunsch, Mario and
             Soedingrekso, Jan and
             Koehne, Jan-Hendrik and
             Fuchs, Tomasz and
             Alameddine, Jean-Marco and
             Sackel, Maximilian and
+            Noethe, Maximilian and
             van Santen, Jacob and
             Menne, Thorben and
             Sandrock, Alexander and
@@ -75,10 +77,10 @@ and our zenodo entry of the version you use
             Krings, Kai and
             Olivas, Alex},
   title  = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
-  month  = may,
-  year   = 2019,
-  doi    = {10.5281/zenodo.3665606},
-  url    = {https://doi.org/10.5281/zenodo.3665606}
+  month  = mar,
+  year   = 2020,
+  doi    = {10.5281/zenodo.1484180},
+  url    = {https://doi.org/10.5281/zenodo.1484180}
 }
 ```
 and if you want to cite the latest improvements
@@ -105,7 +107,7 @@ and if you want to cite the latest improvements
 
 ## Requirements
 
-- CMake 2.8 or higher
+- CMake 3.8 or higher
 - C++11 compatible compiler
 
 ## Recommended
@@ -120,7 +122,7 @@ and if you want to cite the latest improvements
 ## Installation
 
 Install and compiling instructions for the standalone installation
-are found in [install](INSTALL.md).
+are found in [install](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/INSTALL.md).
 
 
 ## Usage
@@ -129,10 +131,10 @@ are found in [install](INSTALL.md).
 
 PROPOSAL is built as library. So you can include this project in your own
 c++ project by including the header files. The following snippet uses the
-[configuration](resources/config.json) to propagate muons and
+[configuration](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config.json) to propagate muons and
 store the muon ranges for further proceeds.
 The parameters of the configuration file are described
-**[here](resources/config_docu.md)**.
+**[here](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config_docu.md)**.
 
 ```c++
 #include "PROPOSAL/PROPOSAL.h"
@@ -140,22 +142,21 @@ The parameters of the configuration file are described
 using namespace PROPOSAL;
 
 int main(){
-    Propagator prop(MuMinusDef::Get(), "resources/configuration/config.json");
-    Particle& mu = prop.GetParticle();
-    Particle mu_backup(mu);
+    ParticleDef mu_def = MuMinusDef::Get();
+    Propagator prop(mu_def, "resources/configuration/config.json");
+    DynamicData mu(mu_def.particle_type);
 
-    mu_backup.SetEnergy(9e6);
-    mu_backup.SetDirection(Vector3D(0, 0, -1));
+    mu.SetEnergy(9e6);
+    mu.SetPosition(Vector3D(0, 0, 0))
+    mu.SetDirection(Vector3D(0, 0, -1));
 
     std::vector<double> ranges;
 
     for (int i = 0; i < 10; i++)
     {
-    mu.InjectState(mu_backup);
-    
-    prop.Propagate();
-    
-    ranges.push_back(mu.GetPropagatedDistance());
+        Secondaries sec = prop.Propagate(mu);
+
+        ranges.push_back(sec.GetPosition().back().magnitude());
     }
     
 // ... Do stuff with ranges, e.g. plot histogram
@@ -176,61 +177,58 @@ following minimal code structure
 
 the `CMakeLists.txt` could look like
 
-```
-cmake_minimum_required(VERSION 2.6)
-set (CMAKE_CXX_STANDARD 11)
+```cmake
+cmake_minimum_required(VERSION 3.8)
 
 add_executable(foo source/foo.cxx)
 
-find_library(PROPOSAL_LIBRARIES REQUIRED NAMES PROPOSAL)
-
-if (PROPOSAL_LIBRARIES)
-  target_link_libraries (foo ${PROPOSAL_LIBRARIES})
-endif ()
+find_package(PROPOSAL REQUIRED)
+target_link_libraries(foo PRIVATE PROPOSAL::PROPOSAL)  # or PUBLIC
 ```
 
-The file can then be compiled with
-    
-    cmake . 
-    
-and
+In case you did install PROPOSAL in a custom prefix, use `PROPOSAL_DIR` to tell
+cmake where to find PROPOSAL:
 
-    make
+```
+$ mkdir build && cd build
+$ PROPOSAL_DIR=/path/to/proposal/prefix cmake .. [CMAKE options]
+$ cmake --build .
+```
+
 
 ### Python ###
 
 How to use PROPOSAL within Python is demonstrated with some example
 scripts you can find in
-[resources/examples/standalone](resources/examples/standalone).
+[resources/examples/standalone](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/examples/standalone).
 
 For a short demonstration the following snippet will create data you can use to
 show the distribution of muon ranges and the number of interactions in ice.
 The parameters of the given configuration file are described
-[here](resources/config_docu.md).
+[here](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config_docu.md).
 
 ```python
-import pyPROPOSAL as pp
+import proposal as pp
 
+mu_def = pp.particle.MuMinusDef()
 prop = pp.Propagator(
-	particle_def=pp.particle.MuMinusDef.get(),
-	config_file="path/to/config.json"
+	  particle_def=mu_def,
+	  config_file="path/to/config.json"
 )
 
-mu = prop.particle
-mu_backup = pp.particle.Particle(mu)
+mu = pp.particle.DynamicData(mu_def.particle_type)
 
-mu_backup.energy = 9e6
-mu_backup.direction = pp.Vector3D(0, 0, -1)
+mu.energy = 9e6
+mu.direction = pp.Vector3D(0, 0, -1)
 
 mu_length = []
 mu_secondaries = []
 
 for i in range(1000):
-    mu.inject_state(mu_backup)
-    secondaries = prop.propagate()
+    sec = prop.propagate(mu)
 
-    mu_length.append(prop.particle.propagated_distance / 100)
-    mu_secondaries.append(len(secondaries))
+    mu_length.append(sec.position[-1].magnitude() / 100)
+    mu_secondaries.append(sec.number_of_particles)
 ```
 
 ## Documentation ##
@@ -240,7 +238,7 @@ The C++ API can be built using
 	make doc
 
 A documentation of the configuration file can be found
-[here](resources/config_docu.md).
+[here](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config_docu.md).
 
 ## Issues ##
 
@@ -253,7 +251,7 @@ When you encounter any errors or misunderstandings don't hesitate and write a ma
 This software may be modified and distributed under the terms of
 a modified LGPL License. See the LICENSE for details of the LGPL License.
 
-Modifcations of the LGPL [License](LICENSE.md):
+Modifications of the LGPL [License](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/LICENSE.md):
 
 1. The user shall acknowledge the use of PROPOSAL by citing the following reference:
 
@@ -271,7 +269,7 @@ Modifcations of the LGPL [License](LICENSE.md):
 
 *Jan-Hendrik Koehne*, *Tomasz Fuchs*, *Mario Dunsch*
 
-## Acknowledgement ##
+## Acknowledgment ##
 
 ![SFB876](https://raw.githubusercontent.com/wiki/tudo-astroparticlephysics/Cor-PlusPlus/images/sfb876.png)
 This work was created as part of the project [C3](http://sfb876.tu-dortmund.de/SPP/sfb876-c3.html) of the [SFB876](http://sfb876.tu-dortmund.de/index.html).

@@ -1,10 +1,10 @@
-import pyPROPOSAL as pp
+import proposal as pp
 import numpy as np
 
 particle_defs = [
-    pp.particle.EMinusDef.get(),
-    pp.particle.EPlusDef.get(),
-    pp.particle.MuMinusDef.get()
+    pp.particle.EMinusDef(),
+    pp.particle.EPlusDef(),
+    pp.particle.MuMinusDef(),
 ]
 
 mediums = [

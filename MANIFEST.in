@@ -1,0 +1,9 @@
+include README.md LICENSE.md
+include pyproject.toml
+global-include CMakeLists.txt *.cmake *.in
+recursive-include public *
+recursive-include private *
+recursive-include tests *
+recursive-include resources *
+recursive-include vendor *
+global-exclude .git*

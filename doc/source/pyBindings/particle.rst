@@ -1,10 +1,10 @@
 ***********************
-``pyPROPOSAL.particle``
+``proposal.particle``
 ***********************
 
-.. currentmodule:: pyPROPOSAL.particle
+.. currentmodule:: proposal.particle
 
-.. automodule:: pyPROPOSAL.particle
+.. automodule:: proposal.particle
    :members: ParticleDef, ParticleDefBuilder, Particle, DynamicData
    :undoc-members:
    :show-inheritance:

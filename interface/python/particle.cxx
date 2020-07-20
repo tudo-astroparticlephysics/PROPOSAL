@@ -39,7 +39,7 @@ void init_particle(py::module& m) {
 
         A predefined particle can be initialize for example with
 
-        >>> muon = pyPROPOSAL.particle.MuMinusDef.get()
+        >>> muon = proposal.particle.MuMinusDef.get()
 
         The :meth:`Particle` class is a container for partilce related data.
         There can be for example initial energy set and losses read out.
@@ -71,6 +71,10 @@ void init_particle(py::module& m) {
         .def_readonly("low", &ParticleDef::low,
                       R"pbdoc(
                 lower stochastic sampling energy limit.
+            )pbdoc")
+        .def_readonly("lifetime", &ParticleDef::lifetime,
+                      R"pbdoc(
+                average lifetime of the particle in seconds.
             )pbdoc")
         .def_readonly("charge", &ParticleDef::charge,
                       R"pbdoc(
@@ -264,12 +268,15 @@ void init_particle(py::module& m) {
         .def("decay", &Secondaries::DoDecay)
         .def_property_readonly("particles", &Secondaries::GetSecondaries)
         .def_property_readonly("number_of_particles", &Secondaries::GetNumberOfParticles)
-        .def_property_readonly("position", &Secondaries::GetDirection)
-        .def_property_readonly("direction", &Secondaries::GetPosition)
+        .def_property_readonly("position", &Secondaries::GetPosition)
+        .def_property_readonly("direction", &Secondaries::GetDirection)
         .def_property_readonly("parent_particle_energy", &Secondaries::GetParentParticleEnergy)
         .def_property_readonly("energy", &Secondaries::GetEnergy)
         .def_property_readonly("time", &Secondaries::GetTime)
-        .def_property_readonly("propagated_distance", &Secondaries::GetPropagatedDistance);
+        .def_property_readonly("propagated_distance", &Secondaries::GetPropagatedDistance)
+        .def_property_readonly("entry_point", &Secondaries::GetEntryPoint)
+        .def_property_readonly("exit_point", &Secondaries::GetExitPoint)
+        .def_property_readonly("closest_approach_point", &Secondaries::GetClosestApproachPoint);
 
     py::enum_<InteractionType>(m_sub, "Interaction_Type")
         .value("Particle", InteractionType::Particle)

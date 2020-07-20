@@ -41,7 +41,7 @@ InterpolationDef::InterpolationDef(const nlohmann::json& config)
     max_node_energy = config.value("max_node_energy", 1e14);
     do_binary_tables = config.value("do_binary_tables", true);
     just_use_readonly_path = config.value("just_use_readonly_path", false);
-    order_of_interpolation = config.value("order_of_interpolation", 1000);
+    order_of_interpolation = config.value("order_of_interpolation", 5);
 
     if (!(nodes_propagate > 3))
         throw std::invalid_argument(
@@ -63,7 +63,6 @@ InterpolationDef::InterpolationDef(const nlohmann::json& config)
         log_warn("No valid writable path to interpolation tables found. Save "
                  "tables in memory, if readonly path is also not working!");
     } else {
-        std::string path_to_tables = "";
         if (config.at("path_to_tables").is_string())
             path_to_tables = Helper::ResolvePath(config.at("path_to_tables"));
 
@@ -77,7 +76,7 @@ InterpolationDef::InterpolationDef(const nlohmann::json& config)
             }
         }
         if (path_to_tables == "")
-            std::invalid_argument(
+            throw std::invalid_argument(
                 "Invalid input for option 'path_to_tables'. Expected a "
                 "string or a list of strings.");
     };
@@ -87,16 +86,15 @@ InterpolationDef::InterpolationDef(const nlohmann::json& config)
             "No valid writable path to interpolation tables readonly found."
             "Save tables in memory, if readonly path is also not working!");
     } else {
-        std::string path_to_tables = "";
         if (config.at("path_to_tables_readonly").is_string())
             path_to_tables
                 = Helper::ResolvePath(config.at("path_to_tables_readonly"));
 
-        if (config.at("path_to_tables").is_array()) {
+        if (config.at("path_to_tables_readonly").is_array()) {
             for (const auto& path : config.at("path_to_tables_readonly")) {
                 if (path.is_string()) {
-                    path_to_tables = Helper::ResolvePath(path);
-                    if (path_to_tables != "")
+                    path_to_tables_readonly = Helper::ResolvePath(path);
+                    if (path_to_tables_readonly != "")
                         break;
                 }
             }

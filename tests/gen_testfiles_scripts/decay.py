@@ -1,4 +1,4 @@
-import pyPROPOSAL as pp
+import proposal as pp
 import numpy as np
 
 def matrix_element_evaluate(particle, products):
@@ -47,11 +47,11 @@ def create_table(dir_name, particle_def, init_energy, decay_products, filename, 
 
             decay_products = channel.decay(particle_def, init_particle)
             for p in decay_products.particles:
-                if p.id==products[0].particle_type:
+                if p.type==products[0].particle_type:
                     prod_0_energies.append(p.energy)
-                elif p.id==products[1].particle_type:
+                elif p.type==products[1].particle_type:
                     prod_1_energies.append(p.energy)
-                elif p.id==products[2].particle_type:
+                elif p.type==products[2].particle_type:
                     prod_2_energies.append(p.energy)
                 else:
                     assert("This should never happen")
@@ -89,10 +89,10 @@ def create_table(dir_name, particle_def, init_energy, decay_products, filename, 
 
 
 def main(dir_name):
-    create_table(dir_name, pp.particle.MuMinusDef.get(), pp.particle.MuMinusDef.get().mass, [pp.particle.EMinusDef.get(), pp.particle.NuMuDef.get(), pp.particle.NuEBarDef.get()], "Decay_MuMinus_rest.txt", int(1e6), 50)
-    create_table(dir_name, pp.particle.MuMinusDef.get(), 1e5, [pp.particle.EMinusDef.get(), pp.particle.NuMuDef.get(), pp.particle.NuEBarDef.get()], "Decay_MuMinus_energy.txt", int(1e6), 50)
-    create_table(dir_name, pp.particle.TauMinusDef.get(), pp.particle.TauMinusDef.get().mass, [pp.particle.EMinusDef.get(), pp.particle.NuTauDef.get(), pp.particle.NuEBarDef.get()], "Decay_TauMinus_rest.txt", int(1e6), 50)
-    create_table(dir_name, pp.particle.TauMinusDef.get(), 1e5, [pp.particle.EMinusDef.get(), pp.particle.NuTauDef.get(), pp.particle.NuEBarDef.get()], "Decay_TauMinus_energy.txt", int(1e6), 50)
+    create_table(dir_name, pp.particle.MuMinusDef(), pp.particle.MuMinusDef().mass, [pp.particle.EMinusDef(), pp.particle.NuMuDef(), pp.particle.NuEBarDef()], "Decay_MuMinus_rest.txt", int(1e6), 50)
+    create_table(dir_name, pp.particle.MuMinusDef(), 1e5, [pp.particle.EMinusDef(), pp.particle.NuMuDef(), pp.particle.NuEBarDef()], "Decay_MuMinus_energy.txt", int(1e6), 50)
+    create_table(dir_name, pp.particle.TauMinusDef(), pp.particle.TauMinusDef().mass, [pp.particle.EMinusDef(), pp.particle.NuTauDef(), pp.particle.NuEBarDef()], "Decay_TauMinus_rest.txt", int(1e6), 50)
+    create_table(dir_name, pp.particle.TauMinusDef(), 1e5, [pp.particle.EMinusDef(), pp.particle.NuTauDef(), pp.particle.NuEBarDef()], "Decay_TauMinus_energy.txt", int(1e6), 50)
 
 if __name__ == "__main__":
 

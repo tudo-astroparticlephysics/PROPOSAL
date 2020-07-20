@@ -12,7 +12,7 @@ TEST(Comparison, Comparison_equal)
 {
     Sector::Definition sector_def;
     sector_def.location = Sector::ParticleLocation::InsideDetector;
-    sector_def.SetMedium(std::make_shared<Medium>(Water()));
+    sector_def.SetMedium( std::make_shared<const Water>() );
     sector_def.SetGeometry(Sphere().create());
     sector_def.scattering_model            = ScatteringFactory::Moliere;
     sector_def.cut_settings                = EnergyCutSettings();

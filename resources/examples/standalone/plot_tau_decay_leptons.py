@@ -1,45 +1,42 @@
-import pyPROPOSAL as pp
+import proposal as pp
 import time
 from tqdm import tqdm
 
-try:
-    import matplotlib as mpl
-    import matplotlib.pyplot as plt
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
+from matplotlib.gridspec import GridSpec
+import matplotlib.pyplot as plt
 
 import numpy as np
 
 leptons = [
-    pp.particle.NuTauDef.get(),
-    pp.particle.NuTauBarDef.get(),
-    pp.particle.NuMuDef.get(),
-    pp.particle.NuMuBarDef.get(),
-    pp.particle.NuEDef.get(),
-    pp.particle.NuEBarDef.get(),
-    pp.particle.TauMinusDef.get(),
-    pp.particle.TauPlusDef.get(),
-    pp.particle.MuMinusDef.get(),
-    pp.particle.MuPlusDef.get(),
-    pp.particle.EMinusDef.get(),
-    pp.particle.EPlusDef.get(),
+    pp.particle.NuTauDef(),
+    pp.particle.NuTauBarDef(),
+    pp.particle.NuMuDef(),
+    pp.particle.NuMuBarDef(),
+    pp.particle.NuEDef(),
+    pp.particle.NuEBarDef(),
+    pp.particle.TauMinusDef(),
+    pp.particle.TauPlusDef(),
+    pp.particle.MuMinusDef(),
+    pp.particle.MuPlusDef(),
+    pp.particle.EMinusDef(),
+    pp.particle.EPlusDef(),
 ]
 
 
 def filter_hadr(secondarys):
-    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
+    prods = [p for p in secondarys if p.type == pp.particle.Data.Particle]
     E = [p.energy for p in prods if p.particle_def not in leptons]
     return sum(E)
 
 
 def filter_particle(secondarys, particle_type):
-    prods = [p for p in secondarys if p.id == int(particle_type)]
+    prods = [p for p in secondarys if p.type == int(particle_type)]
     E = [p.energy for p in prods]
     return sum(E)
 
 
 def filter_lep(secondarys):
-    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
+    prods = [p for p in secondarys if p.type == pp.particle.Data.Particle]
     E = [p.energy for p in prods if p.particle_def in leptons]
     return sum(E)
 
@@ -67,11 +64,11 @@ if __name__ == "__main__":
     statistics = int(1e5)
     binning = np.linspace(0, 0.5, 50)
 
-    pdef = pp.particle.MuMinusDef.get()
+    pdef = pp.particle.MuMinusDef()
     mu = pp.particle.DynamicData(pdef.particle_type)
     mu.direction = pp.Vector3D(0, 0, -1)
 
-    products = [pp.particle.EMinusDef.get(), pp.particle.NuMuDef.get(), pp.particle.NuEBarDef.get()]
+    products = [pp.particle.EMinusDef(), pp.particle.NuMuDef(), pp.particle.NuEBarDef()]
 
     lep_ME = pp.decay.ManyBodyPhaseSpace(products, evaluate)
     lep = pp.decay.LeptonicDecayChannelApprox(*products)
@@ -90,7 +87,7 @@ if __name__ == "__main__":
         t = time.time()
 
         d = lep_ME.decay(pdef, mu).particles
-        E_lep_ME.append(filter_particle(d, pp.particle.Particle_Id.EMinus))
+        E_lep_ME.append(filter_particle(d, pp.particle.Particle_Type.EMinus))
 
         mu.position = pp.Vector3D(0, 0, 0)
         mu.direction = pp.Vector3D(0, 0, -1)
@@ -98,7 +95,7 @@ if __name__ == "__main__":
         mu.propagated_distance = 0
 
         d = lep.decay(pdef, mu).particles
-        E_lep.append(filter_particle(d, pp.particle.Particle_Id.EMinus))
+        E_lep.append(filter_particle(d, pp.particle.Particle_Type.EMinus))
 
         passed_time += time.time() - t
 
@@ -109,7 +106,7 @@ if __name__ == "__main__":
     # =========================================================
 
     fig = plt.figure()
-    gs = mpl.gridspec.GridSpec(2, 1, height_ratios=[2, 1])
+    gs = GridSpec(2, 1, height_ratios=[2, 1])
 
     ax = fig.add_subplot(gs[0])
 

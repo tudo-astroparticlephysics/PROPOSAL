@@ -1,25 +1,25 @@
-import pyPROPOSAL as pp
+import proposal as pp
 import numpy as np
 
 
 particle_defs = [
-        pp.particle.MuMinusDef(),
-        pp.particle.TauMinusDef(),
-        # pp.particle.EMinusDef()
-        ]
+    pp.particle.MuMinusDef(),
+    pp.particle.TauMinusDef(),
+    # pp.particle.EMinusDef()
+    ]
 
 mediums = [
-        pp.medium.Ice(1.0),
-        pp.medium.Hydrogen(1.0),
-        # pp.medium.Uranium(1.0)
-        ]
+    pp.medium.Ice(1.0),
+    pp.medium.Hydrogen(1.0),
+    # pp.medium.Uranium(1.0)
+    ]
 
 cuts = [
-        # pp.EnergyCutSettings(-1, -1),
-        pp.EnergyCutSettings(500, -1),
-        # pp.EnergyCutSettings(-1, 0.05),
-        pp.EnergyCutSettings(500, 0.05)
-        ]
+    # pp.EnergyCutSettings(-1, -1),
+    pp.EnergyCutSettings(500, -1),
+    # pp.EnergyCutSettings(-1, 0.05),
+    pp.EnergyCutSettings(500, 0.05)
+    ]
 
 statistics = 10
 energies = np.logspace(4, 13, num=statistics)  # MeV
@@ -60,11 +60,11 @@ def create_table_continous(dir_name):
 
                     for i in range(statistics):
                         energy = max(
-                                sector.energy_decay(energy,
-                                    pp.RandomGenerator.get().random_double()),
-                                sector.energy_interaction(energy,
-                                    pp.RandomGenerator.get().random_double())
-                                    )
+                            sector.energy_decay(energy,
+                                pp.RandomGenerator.get().random_double()),
+                            sector.energy_interaction(energy,
+                                pp.RandomGenerator.get().random_double())
+                                )
                         buf.append(str(energy))
 
                     buf.append("\n")

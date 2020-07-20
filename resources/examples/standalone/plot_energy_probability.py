@@ -1,5 +1,5 @@
 import sys
-import pyPROPOSAL as pp
+import proposal as pp
 import math
 import time
 
@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
 import numpy as np
-
+from tqdm import tqdm
 
 
 def plot_hist(ax, prim, sec):
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     #   POPOSAL
     # =========================================================
 
-    mu_def = pp.particle.MuMinusDef.get()
+    mu_def = pp.particle.MuMinusDef()
     prop = pp.Propagator(
         particle_def=mu_def,
         config_file=config_file
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     length = []
     n_secondarys = []
 
-    for i in range(statistics):
+    for i in tqdm(range(statistics)):
 
         secondarys = prop.propagate(mu).particles
 
@@ -103,19 +103,19 @@ if __name__ == "__main__":
         n_secondarys.append(len(secondarys))
 
         for sec in secondarys:
-            log_sec_energy = math.log10(sec.energy)
+            log_sec_energy = math.log10(sec.parent_particle_energy-sec.energy)
             log_energy = math.log10(sec.parent_particle_energy)
 
-            if sec.type == int(pp.particle.Interaction_Id.Epair):
+            if sec.type == int(pp.particle.Interaction_Type.Epair):
                 epair_primary_energy.append(log_energy)
                 epair_secondary_energy.append(log_sec_energy)
-            elif sec.type == int(pp.particle.Interaction_Id.Brems):
+            elif sec.type == int(pp.particle.Interaction_Type.Brems):
                 brems_primary_energy.append(log_energy)
                 brems_secondary_energy.append(log_sec_energy)
-            elif sec.type == int(pp.particle.Interaction_Id.DeltaE):
+            elif sec.type == int(pp.particle.Interaction_Type.DeltaE):
                 ioniz_primary_energy.append(log_energy)
                 ioniz_secondary_energy.append(log_sec_energy)
-            elif sec.type == int(pp.particle.Interaction_Id.NuclInt):
+            elif sec.type == int(pp.particle.Interaction_Type.NuclInt):
                 photo_primary_energy.append(log_energy)
                 photo_secondary_energy.append(log_sec_energy)
             # else:

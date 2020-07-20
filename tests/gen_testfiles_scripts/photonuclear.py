@@ -1,4 +1,4 @@
-import pyPROPOSAL as pp
+import proposal as pp
 import numpy as np
 
 photo_real = [
@@ -9,9 +9,9 @@ photo_real = [
 ]
 
 particle_defs = [
-    pp.particle.MuMinusDef.get(),
-    pp.particle.TauMinusDef.get()#,
-    # pp.particle.EMinusDef.get()
+    pp.particle.MuMinusDef(),
+    pp.particle.TauMinusDef()#,
+    # pp.particle.EMinusDef()
 ]
 
 mediums = [

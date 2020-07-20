@@ -1,6 +1,6 @@
 
-import pyPROPOSAL as pp
-import pyPROPOSAL.parametrization as parametrization
+import proposal as pp
+import proposal.parametrization as parametrization
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,7 +10,7 @@ import math
 
 if __name__ == "__main__":
 
-    mu = pp.particle.MuMinusDef.get()
+    mu = pp.particle.MuMinusDef()
     medium = pp.medium.Ice(1.0)  # With densitiy correction
     cuts = pp.EnergyCutSettings(-1, -1)  # ecut, vcut
 

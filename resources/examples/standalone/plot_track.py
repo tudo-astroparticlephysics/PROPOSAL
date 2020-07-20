@@ -1,20 +1,11 @@
 
 import math
 
-try:
-    import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
 
-try:
-    import numpy as np
-except ImportError:
-    raise ImportError(
-        "Numpy not installed! Needed to calculate the detector cylinder"
-    )
-
-import pyPROPOSAL as pp
+import proposal as pp
 
 
 def plot_3D_cylinder(
@@ -127,15 +118,15 @@ def propagate():
     interpolation_def.path_to_tables_readonly = "~/.local/share/PROPOSAL/tables"
 
     # Propagator
-
+    mu_def = pp.particle.MuMinusDef()
     prop = pp.Propagator(
-        particle_def=pp.particle.MuMinusDef.get(),
+        particle_def=mu_def,
         sector_defs=[sec_def_infront, sec_def_inside, sec_def_behind],
         detector=geo_detector,
         interpolation_def=interpolation_def
     )
 
-    mu = prop.particle
+    mu = pp.particle.DynamicData(mu_def.particle_type)
 
     # Set energy and position of the particle
 
@@ -146,11 +137,11 @@ def propagate():
     pos.set_cartesian_coordinates(0, 0, -1e5)
     mu.position = pos
 
-    mu_start = pp.particle.Particle(mu)
+    # mu_start = pp.particle.Particle(mu)
 
-    secondarys = prop.propagate().particles
+    secondarys = prop.propagate(mu).particles
 
-    return mu_start, geo_detector, secondarys
+    return mu, geo_detector, secondarys
 
 
 def plot_track(mu_start, geo_detector, secondarys):
@@ -204,13 +195,13 @@ def plot_track(mu_start, geo_detector, secondarys):
     for interaction in secondarys:
         if geo_detector.is_inside(interaction.position, interaction.direction):
             color = 'b'
-            if interaction.type == int(pp.particle.Interaction_Id.Brems):
+            if interaction.type == int(pp.particle.Interaction_Type.Brems):
                 color = 'b'
-            elif interaction.type == int(pp.particle.Interaction_Id.Epair):
+            elif interaction.type == int(pp.particle.Interaction_Type.Epair):
                 color = 'r'
-            elif interaction.type == int(pp.particle.Interaction_Id.NuclInt):
+            elif interaction.type == int(pp.particle.Interaction_Type.NuclInt):
                 color = 'm'
-            elif interaction.type == int(pp.particle.Interaction_Id.DeltaE):
+            elif interaction.type == int(pp.particle.Interaction_Type.DeltaE):
                 color = 'g'
             else:
                 color = 'k'

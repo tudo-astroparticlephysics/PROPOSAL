@@ -8,12 +8,12 @@
 
 using namespace PROPOSAL;
 
-double qubic(double x) {
-    double aux;
+double cubic(double x) {
+    double result = 0.0;
     for (int i = 0; i < 3; ++i) {
-        aux += std::pow(x, i);
+        result += std::pow(x, i);
     }
-    return aux;
+    return result;
 }
 
 double linear(double x) {
@@ -41,7 +41,7 @@ TEST(Cubic_Spline, Comparison_equal) {
     std::iota(std::begin(x), std::end(x), 0);
 
     for (int i = 0; i < x.size(); ++i) {
-        f_x[i] = qubic(x[i]);
+        f_x[i] = cubic(x[i]);
     }
     Cubic_Spline sp(x, f_x);
     for (int i = 0; i < x.size(); ++i) {

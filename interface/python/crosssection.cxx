@@ -15,8 +15,8 @@ void init_crosssection(py::module& m) {
             given by the parametrizations. A cross section class can be initialized with the following parameters
 
             Args:                                                                                                  
-                param (:meth:`~pyPROPOSAL.parametrization`): parametrization for the crosssection, including the chosen theoretical model
-                interpolation_def (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
+                param (:meth:`~proposal.parametrization`): parametrization for the crosssection, including the chosen theoretical model
+                interpolation_def (:meth:`~proposal.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
  
             The crosssection class can either work with interpolation tables or with exact intergration for every single calculation.
             Since the usage of interpolation tables can improve the speed of the propagation by several orders of magnitude (with neglible decline in accuracy) it is highly recommended
@@ -49,14 +49,15 @@ void init_crosssection(py::module& m) {
             Example:
                 To create a bremsstrahlung CrossSection
 
-                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
-                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
-                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
-                >>> interpol = pyPROPOSAL.InterpolationDef
-                >>> param = pyPROPOSAL.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
-                >>> cross = pyPROPOSAL.crosssection.BremsInterpolant(param, interpol)
+                >>> mu = proposal.particle.MuMinusDef.get()
+                >>> medium = proposal.medium.StandardRock(1.0)
+                >>> cuts = proposal.EnergyCutSettings(-1, -1)
+                >>> interpol = proposal.InterpolationDef
+                >>> param = proposal.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
+                >>> cross = proposal.crosssection.BremsInterpolant(param, interpol)
                 >>> cross.calculate_dEdx(1e6) # exmaple usage of the created crosssection class...
-                )pbdoc") DEF_PY_PRINT(CrossSection)
+                )pbdoc")
+        .def("__str__", &py_print<CrossSection>)
         .def("calculate_dEdx", &CrossSection::CalculatedEdx, py::arg("energy"),
              R"pbdoc( 
 
@@ -65,7 +66,7 @@ void init_crosssection(py::module& m) {
                 .. math:: \frac{N_A}{A} \cdot E \cdot \int_{v_{min}}^{v_{cut}} v \cdot \frac{d\sigma}{dv} dv
 
             with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value :math:`v_{cut}` is the energy cut to differentiate between
-            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+            continous and stochastic losses in PROPOSAL, see :meth:`~proposal.EnergyCutSettings` for more information on the energy cuts.
 
             Args:                                                                                                  
                 energy (float): energy in MeV
@@ -80,9 +81,9 @@ void init_crosssection(py::module& m) {
                 .. math:: \frac{N_A}{A} \cdot E^2 \cdot \int_{v_{min}}^{v_{cut}} v^2 \cdot \frac{d\sigma}{dv} dv
 
             with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value :math:`v_{cut}` is the energy cut to differentiate between
-            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+            continous and stochastic losses in PROPOSAL, see :meth:`~proposal.EnergyCutSettings` for more information on the energy cuts.
 
-            The value is important for the calculation of the ContinuousRandomization (see :meth:`~pyPROPOSAL.ContinuousRandomizer`) 
+            The value is important for the calculation of the ContinuousRandomization (see :meth:`~proposal.ContinuousRandomizer`) 
 
             Args:                                                                                                  
                 energy (float): energy in MeV
@@ -98,7 +99,7 @@ void init_crosssection(py::module& m) {
                 .. math:: \frac{N_A}{A} \cdot \int_{v_{cut}}^{v_{max}} \frac{d\sigma}{dv} dv
 
             with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value v_{cut} is the energy cut to differentiate between
-            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+            continous and stochastic losses in PROPOSAL, see :meth:`~proposal.EnergyCutSettings` for more information on the energy cuts.
 
             Note that this integral only includes the v values about our cut, therefore this values represents only the total crosssection for the stochastic energy losses. 
 
@@ -118,7 +119,7 @@ void init_crosssection(py::module& m) {
                 .. math:: \frac{N_A}{A} \cdot \int_{v_{cut}}^{v_{max}} \frac{d\sigma}{dv} dv
 
             with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value v_{cut} is the energy cut to differentiate between
-            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+            continous and stochastic losses in PROPOSAL, see :meth:`~proposal.EnergyCutSettings` for more information on the energy cuts.
 
             Furthermore, for every component in the medium, a stochatic energy loss in saved based on the random number rnd. The values are saved in the crosssection class and can be used
             by other methods.
@@ -170,7 +171,7 @@ void init_crosssection(py::module& m) {
         .def_property_readonly("id", &CrossSection::GetTypeId,
                                R"pbdoc( 
 
-            Internal id of the current interaction, see :meth:`~pyPROPOSAL.DynamicData` for all available id's.
+            Internal id of the current interaction, see :meth:`~proposal.DynamicData` for all available id's.
                                                             
                 )pbdoc")
         .def_property_readonly("parametrization",

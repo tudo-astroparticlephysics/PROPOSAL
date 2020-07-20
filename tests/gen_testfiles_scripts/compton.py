@@ -1,4 +1,4 @@
-import pyPROPOSAL as pp
+import proposal as pp
 import numpy as np
 
 parametrizations = [
@@ -11,7 +11,7 @@ mediums = [
     pp.medium.Uranium(1.0)
 ]
 
-particle = pp.particle.GammaDef.get()
+particle = pp.particle.GammaDef()
 
 cuts = [
     pp.EnergyCutSettings(-1, -1),

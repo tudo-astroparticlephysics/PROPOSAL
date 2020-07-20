@@ -1,35 +1,20 @@
 
-import pyPROPOSAL as pp
-import pyPROPOSAL.parametrization as parametrization
+import proposal as pp
+import proposal.parametrization as parametrization
 
-try:
-    import matplotlib as mpl
-    # mpl.use('Agg')
-    import matplotlib.pyplot as plt
-    import matplotlib.ticker as ticker
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
-
-try:
-    import numpy as np
-except ImportError:
-    raise ImportError(
-        "Numpy not installed! Needed to calculate the detector cylinder"
-    )
-
-import math
+from matplotlib.gridspec import GridSpec
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 if __name__ == "__main__":
 
-    mu = pp.particle.MuMinusDef.get()
+    mu = pp.particle.MuMinusDef()
     medium = pp.medium.StandardRock(1.0)  # With densitiy correction
     cuts = pp.EnergyCutSettings(-1, -1)  # ecut, vcut
 
-    dEdx_photo = []
+    dEdx_brems = []
     energy = np.logspace(2, 9, 100)
-
-    interpolation_def = pp.InterpolationDef()
 
     # =========================================================
     # 	Constructor args for parametrizations
@@ -82,19 +67,18 @@ if __name__ == "__main__":
         for E in energy:
             dEdx.append(cross.calculate_dEdx(E)/E)
 
-        dEdx_photo.append(dEdx)
-        # print(dEdx)
+        dEdx_brems.append(dEdx)
 
     # =========================================================
     # 	Plot
     # =========================================================
 
     fig = plt.figure()
-    gs = mpl.gridspec.GridSpec(2, 1, height_ratios=[1, 1])
+    gs = GridSpec(2, 1, height_ratios=[1, 1])
 
     ax = fig.add_subplot(gs[0])
 
-    for dEdx, param in zip(dEdx_photo, params):
+    for dEdx, param in zip(dEdx_brems, params):
         ax.loglog(
             energy,
             dEdx,
@@ -113,7 +97,7 @@ if __name__ == "__main__":
     start = 0
     ax.semilogx(
         energy[start:],
-        np.array(dEdx_photo)[1][start:] / np.array(dEdx_photo[0][start:]),
+        np.array(dEdx_brems)[1][start:] / np.array(dEdx_brems[0][start:]),
         linestyle='-',
         label="{} / {}".format(
             "".join([c for c in params[1].name[1:] if c.isupper()]),

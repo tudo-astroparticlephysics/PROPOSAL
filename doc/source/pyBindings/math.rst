@@ -1,10 +1,10 @@
 ***************************
-``pyPROPOSAL.math``
+``proposal.math``
 ***************************
 
-.. currentmodule:: pyPROPOSAL.math
+.. currentmodule:: proposal.math
 
-.. automodule:: pyPROPOSAL.math
+.. automodule:: proposal.math
    :members: Spline
    :undoc-members:
    :show-inheritance:

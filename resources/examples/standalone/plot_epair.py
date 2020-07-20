@@ -1,32 +1,20 @@
 
-import pyPROPOSAL as pp
-import pyPROPOSAL.parametrization as parametrization
+import proposal as pp
+import proposal.parametrization as parametrization
 
-try:
-    import matplotlib as mpl
-    # mpl.use('Agg')
-    import matplotlib.pyplot as plt
-    import matplotlib.ticker as ticker
-except ImportError:
-    raise ImportError("Matplotlib not installed!")
-
-try:
-    import numpy as np
-except ImportError:
-    raise ImportError(
-        "Numpy not installed! Needed to calculate the detector cylinder"
-    )
-
-import math
+from matplotlib.gridspec import GridSpec
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+import numpy as np
 
 
 if __name__ == "__main__":
 
-    mu = pp.particle.MuMinusDef.get()
+    mu = pp.particle.MuMinusDef()
     medium = pp.medium.StandardRock(1.0)  # With densitiy correction
     cuts = pp.EnergyCutSettings(-1, -1)  # ecut, vcut
 
-    dEdx_photo = []
+    dEdx_epair = []
     energy = np.logspace(2, 9, 100)
 
     interpolation_def = pp.InterpolationDef()
@@ -81,18 +69,18 @@ if __name__ == "__main__":
         for E in energy:
             dEdx.append(cross.calculate_dEdx(E))
 
-        dEdx_photo.append(dEdx)
+        dEdx_epair.append(dEdx)
 
     # =========================================================
     # 	Plot
     # =========================================================
 
     fig = plt.figure()
-    gs = mpl.gridspec.GridSpec(2, 1, height_ratios=[2, 1])
+    gs = GridSpec(2, 1, height_ratios=[2, 1])
 
     ax = fig.add_subplot(gs[0])
 
-    for dEdx, param in zip(dEdx_photo, params):
+    for dEdx, param in zip(dEdx_epair, params):
         ax.loglog(
             energy,
             dEdx,
@@ -111,7 +99,7 @@ if __name__ == "__main__":
     start = 0
     ax.semilogx(
         energy[start:],
-        np.array(dEdx_photo)[1][start:] / np.array(dEdx_photo[0][start:]),
+        np.array(dEdx_epair)[1][start:] / np.array(dEdx_epair[0][start:]),
         linestyle='-',
         label="RSS / KKP"
     )

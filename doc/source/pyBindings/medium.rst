@@ -1,10 +1,10 @@
 *********************
-``pyPROPOSAL.medium``
+``proposal.medium``
 *********************
 
-.. currentmodule:: pyPROPOSAL.medium
+.. currentmodule:: proposal.medium
 
-.. automodule:: pyPROPOSAL.medium
+.. automodule:: proposal.medium
    :members: Medium, density_distribution
    :undoc-members:
    :show-inheritance:

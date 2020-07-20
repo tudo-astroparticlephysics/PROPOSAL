@@ -28,82 +28,82 @@ void init_geometry(py::module& m) {
         .value("Cylinder", Geometry_Type::CYLINDER);
 
     py::class_<Geometry, std::shared_ptr<Geometry>>(m_sub, "Geometry")
-        DEF_PY_PRINT(Geometry)
-            .def("is_infront", &Geometry::IsInfront,
-                 R"pbdoc(
-                Check if particle is in fron of the geometry.
+        .def("__str__", &py_print<Geometry>)
+        .def("is_infront", &Geometry::IsInfront,
+             R"pbdoc(
+            Check if particle is in fron of the geometry.
 
-                Parameters:
-                    arg0 (Vector3D): particle position
-                    arg1 (Vector3D): particle direction
+            Parameters:
+                arg0 (Vector3D): particle position
+                arg1 (Vector3D): particle direction
 
-                Return:
-                    bool: Is particle in front of the geometry?
-            )pbdoc")
-            .def("is_inside", &Geometry::IsInside,
-                 R"pbdoc(
-                Check if particle is in the geometry.
+            Return:
+                bool: Is particle in front of the geometry?
+        )pbdoc")
+        .def("is_inside", &Geometry::IsInside,
+             R"pbdoc(
+            Check if particle is in the geometry.
 
-                Parameters:
-                    arg0 (Vector3D): particle position
-                    arg1 (Vector3D): particle direction
+            Parameters:
+                arg0 (Vector3D): particle position
+                arg1 (Vector3D): particle direction
 
-                Return:
-                    bool: Is particle in the geometry?
-            )pbdoc")
-            .def("is_behind", &Geometry::IsBehind,
-                 R"pbdoc(
-                Check if particle has passed the geometry.
+            Return:
+                bool: Is particle in the geometry?
+        )pbdoc")
+        .def("is_behind", &Geometry::IsBehind,
+             R"pbdoc(
+            Check if particle has passed the geometry.
 
-                Parameters:
-                    arg0 (Vector3D): particle position
-                    arg1 (Vector3D): particle direction
+            Parameters:
+                arg0 (Vector3D): particle position
+                arg1 (Vector3D): particle direction
 
-                Return:
-                    bool: Is particle in front of the geometry?
-            )pbdoc")
-            .def("distance_to_border", &Geometry::DistanceToBorder,
-                 py::arg("position"), py::arg("direction"),
-                 R"pbdoc(
-                Calculates in dependence of the particle position and direction
-                the distance to the next border
+            Return:
+                bool: Is particle in front of the geometry?
+        )pbdoc")
+        .def("distance_to_border", &Geometry::DistanceToBorder,
+             py::arg("position"), py::arg("direction"),
+             R"pbdoc(
+            Calculates in dependence of the particle position and direction
+            the distance to the next border
 
-                Parameters:
-                    position (Vector3D): particle position
-                    direction (Vector3D): particle direction
+            Parameters:
+                position (Vector3D): particle position
+                direction (Vector3D): particle direction
 
-                Return:
-                    float: distance to border
-            )pbdoc")
-            .def("distance_to_closet_approach",
-                 &Geometry::DistanceToClosestApproach,
-                 R"pbdoc(
-                Calculates in dependence of the particle position and direction
-                the distance where the particle pass the geometry center with
-                minimal distance.
+            Return:
+                float: distance to border
+        )pbdoc")
+        .def("distance_to_closet_approach",
+             &Geometry::DistanceToClosestApproach,
+             R"pbdoc(
+            Calculates in dependence of the particle position and direction
+            the distance where the particle pass the geometry center with
+            minimal distance.
 
-                Parameters:
-                    arg0 (Vector3D): particle position
-                    arg1 (Vector3D): particle direction
+            Parameters:
+                arg0 (Vector3D): particle position
+                arg1 (Vector3D): particle direction
 
-                Return:
-                    float: distance to closest approach
-            )pbdoc")
-            .def_property_readonly("name", &Geometry::GetName,
-                                   R"pbdoc(
-                name of the geometry
-            )pbdoc")
-            .def_property("position", &Geometry::GetPosition,
-                          &Geometry::SetPosition,
-                          R"pbdoc(
-                position of the geometry center.
-            )pbdoc")
-            .def_property("hierarchy", &Geometry::GetHierarchy,
-                          &Geometry::SetHierarchy,
-                          R"pbdoc(
-                hierachy of the geometry. If sectors overlap, the sector
-                with the highest hierachy will be selected.
-            )pbdoc");
+            Return:
+                float: distance to closest approach
+        )pbdoc")
+        .def_property_readonly("name", &Geometry::GetName,
+                               R"pbdoc(
+            name of the geometry
+        )pbdoc")
+        .def_property("position", &Geometry::GetPosition,
+                      &Geometry::SetPosition,
+                      R"pbdoc(
+            position of the geometry center.
+        )pbdoc")
+        .def_property("hierarchy", &Geometry::GetHierarchy,
+                      &Geometry::SetHierarchy,
+                      R"pbdoc(
+            hierachy of the geometry. If sectors overlap, the sector
+            with the highest hierachy will be selected.
+        )pbdoc");
 
     py::class_<Sphere, std::shared_ptr<Sphere>, Geometry>(m_sub, "Sphere")
         .def(py::init<>())

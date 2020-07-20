@@ -10,7 +10,6 @@
 namespace py = pybind11;
 using namespace PROPOSAL;
 
-// #define DEF_PY_PRINT(cls) .def("__str__", &py_print<cls>)
 
 void init_components(py::module& m);
 void init_medium(py::module& m);
@@ -22,10 +21,10 @@ void init_crosssection(py::module& m);
 void init_scattering(py::module& m);
 void init_math(py::module&);
 
-PYBIND11_MODULE(pyPROPOSAL, m)
+PYBIND11_MODULE(proposal, m)
 {
     m.doc() = R"pbdoc(
-        .. currentmodule:: pyPROPOSAL
+        .. currentmodule:: proposal
     )pbdoc";
 
     init_components(m);
@@ -38,11 +37,14 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     init_scattering(m);
     init_math(m);
 
+    m.attr("__version__") = &PROPOSAL_VERSION;
+
     py::class_<Vector3D, std::shared_ptr<Vector3D>>(m, "Vector3D")
         .def(py::init<>())
         .def(py::init<double, double, double>(), py::arg("x"), py::arg("y"),
             py::arg("z"))
-        .def(py::init<const Vector3D&>()) DEF_PY_PRINT(Vector3D)
+        .def(py::init<const Vector3D&>())
+        .def("__str__", &py_print<Vector3D>)
         .def(py::self + py::self)
         .def(py::self - py::self)
         .def(py::self * float())
@@ -70,14 +72,14 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings>>(m,
         "EnergyCutSettings",
         R"pbdoc(
-			Settings for the lower integration limit.
-			Losses below the cut will be handeled continously and the
-			other stochasticaly.
+            Settings for the lower integration limit.
+            Losses below the cut will be handeled continously and the
+            other stochasticaly.
 
-			.. math::
+            .. math::
 
-				\text{cut} = \begin{cases} e_\text{cut} & E * v_\text{cut} \geq e_\text{cut} \\ v_\text{cut} & \, \text{else} \end{cases}
-		)pbdoc")
+                \text{cut} = \begin{cases} e_\text{cut} & E * v_\text{cut} \geq e_\text{cut} \\ v_\text{cut} & \, \text{else} \end{cases}
+        )pbdoc")
         .def(py::init<>(),
             R"pbdoc(
                     Initialize some standard settings.
@@ -120,67 +122,67 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m,
         "InterpolationDef",
         R"pbdoc(
-				The set standard values have been optimized for performance
-				and accuracy. They should not be changed any further
-				without a good reason.
+                The set standard values have been optimized for performance
+                and accuracy. They should not be changed any further
+                without a good reason.
 
-				Example:
-					For speed savings it makes sense to specify a path to
-					the tables, to reuse build tables if possible.
+                Example:
+                    For speed savings it makes sense to specify a path to
+                    the tables, to reuse build tables if possible.
 
-					Sometimes it is usefull to look in the tables for a check.
-					To do this binary tables can be diabled.
+                    Sometimes it is usefull to look in the tables for a check.
+                    To do this binary tables can be diabled.
 
-					>>> interpolDef = pp.InterpolationDef()
-					>>> interpolDef.do_binary_tables = False
-					>>> interpolDef.path_to_tables = "./custom/table/path"
-					>>> interpolDef.path_to_tables_readonly = "./custom/table/path"
-			)pbdoc")
+                    >>> interpolDef = pp.InterpolationDef()
+                    >>> interpolDef.do_binary_tables = False
+                    >>> interpolDef.path_to_tables = "./custom/table/path"
+                    >>> interpolDef.path_to_tables_readonly = "./custom/table/path"
+            )pbdoc")
         .def(py::init<>())
         .def_readwrite("order_of_interpolation",
             &InterpolationDef::order_of_interpolation,
             R"pbdoc(
-				Order of Interpolation.
-			)pbdoc")
+                Order of Interpolation.
+            )pbdoc")
         .def_readwrite("path_to_tables", &InterpolationDef::path_to_tables,
             R"pbdoc(
-				Path where tables can be written from memory to disk to
-				reuse it if possible.
-			)pbdoc")
+                Path where tables can be written from memory to disk to
+                reuse it if possible.
+            )pbdoc")
         .def_readwrite("path_to_tables_readonly",
             &InterpolationDef::path_to_tables_readonly,
             R"pbdoc(
-				Path where tables can be read from disk to avoid to rebuild
-				it.
-			)pbdoc")
+                Path where tables can be read from disk to avoid to rebuild
+                it.
+            )pbdoc")
         .def_readwrite("max_node_energy", &InterpolationDef::max_node_energy,
             R"pbdoc(
-				maximum energy that will be interpolated. Energies greater
-				than the value are extrapolated. Default: 1e14 MeV
-			)pbdoc")
+                maximum energy that will be interpolated. Energies greater
+                than the value are extrapolated. Default: 1e14 MeV
+            )pbdoc")
         .def_readwrite("nodes_cross_section",
             &InterpolationDef::nodes_cross_section,
             R"pbdoc(
-				number of nodes used by evaluation of cross section
-				integrals. Default: xxx
-			)pbdoc")
+                number of nodes used by evaluation of cross section
+                integrals. Default: xxx
+            )pbdoc")
         .def_readwrite("nodes_continous_randomization",
             &InterpolationDef::nodes_continous_randomization,
             R"pbdoc(
-				number of nodes used by evaluation of continous
-				randomization integrals. Default: xxx
-			)pbdoc")
+                number of nodes used by evaluation of continous
+                randomization integrals. Default: xxx
+            )pbdoc")
         .def_readwrite("nodes_propagate", &InterpolationDef::nodes_propagate,
             R"pbdoc(
-				number of nodes used by evaluation of propagation
-				integrals. Default: xxx
-			)pbdoc")
+                number of nodes used by evaluation of propagation
+                integrals. Default: xxx
+            )pbdoc")
         .def_readwrite("do_binary_tables", &InterpolationDef::do_binary_tables,
             R"pbdoc(
-				Should binary tables be used to store the data.
-				This will increase performance, but are not readable for a
-				crosscheck by human. Default: xxx
-			)pbdoc")
+                Should binary tables be used to store the data.
+                This will increase performance, but are not readable for a
+                crosscheck by human. Default: xxx
+            )pbdoc")
         .def_readwrite("just_use_readonly_path",
             &InterpolationDef::just_use_readonly_path,
             R"pbdoc(
@@ -212,6 +214,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     py::class_<Utility::Definition, std::shared_ptr<Utility::Definition>>(
         m, "UtilityDefinition")
         .def(py::init<>())
+        .def("__str__", &py_print<Utility::Definition>)
         .def_readwrite(
             "annihilation_def", &Utility::Definition::annihilation_def)
         .def_readwrite("brems_def", &Utility::Definition::brems_def)
@@ -342,6 +345,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                 approximation.
             )pbdoc")
         .def(py::init<>())
+        .def("__str__", &py_print<Sector::Definition>)
         .def_readwrite("cut_settings", &Sector::Definition::cut_settings,
             R"pbdoc(
                     Definition of the :meth:`EnergyCutSettings`
@@ -349,12 +353,12 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_property("medium", &Sector::Definition::GetMedium,
             &Sector::Definition::SetMedium,
             R"pbdoc(
-                    Definition of the :meth:`~pyPROPOSAL.medium.Medium`
+                    Definition of the :meth:`~proposal.medium.Medium`
                 )pbdoc")
         .def_property("geometry", &Sector::Definition::GetGeometry,
             &Sector::Definition::SetGeometry,
             R"pbdoc(
-                    Definiton of the :meth:`~pyPROPOSAL.geometry.Geometry`
+                    Definiton of the :meth:`~proposal.geometry.Geometry`
                 )pbdoc")
         .def_readwrite("do_stochastic_loss_weighting",
             &Sector::Definition::do_stochastic_loss_weighting,
@@ -404,14 +408,14 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("scattering_model",
             &Sector::Definition::scattering_model,
             R"pbdoc(
-                    Definition of the scattering modell of type :meth:`~pyPROPOSAL.scattering.ScatteringModel`
+                    Definition of the scattering modell of type :meth:`~proposal.scattering.ScatteringModel`
                     or deactivate scattering.
 
                     Example:
                         Deactivating scattering can be achieved with:
 
-                        >>> sec = pyPROPOSAL.SectorDefinition()
-                        >>> sec.scattering_model = pyPROPOSAL.scattering.ScatteringModel.NoScattering
+                        >>> sec = proposal.SectorDefinition()
+                        >>> sec.scattering_model = proposal.scattering.ScatteringModel.NoScattering
                 )pbdoc")
         .def_readwrite("particle_location", &Sector::Definition::location,
             R"pbdoc(
@@ -420,7 +424,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                 )pbdoc")
         .def_readwrite("crosssection_defs", &Sector::Definition::utility_def,
             R"pbdoc(
-                    Definition of the crosssection of type :meth:`~pyPROPOSAL.UtilityDefinition`
+                    Definition of the crosssection of type :meth:`~proposal.UtilityDefinition`
                 )pbdoc");
 
     // ---------------------------------------------------------------------
@@ -431,7 +435,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     py::class_<Sector, std::shared_ptr<Sector>>(m, "Sector", R"pbdoc(
             A sector is characterized by its homogeneous attitudes.
             Within a sector there are no boundaries to consider.
-		)pbdoc")
+        )pbdoc")
         .def(py::init<ParticleDef&, const Sector::Definition&>(),
             py::arg("particle_def"), py::arg("sector_definition"))
         .def(py::init<ParticleDef&, const Sector::Definition&,
@@ -481,10 +485,10 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                     Function Docstring.
 
                     Args:
-                        particle_def (pyPROPOSAL.particle.ParticleDef): definition of the particle to propagate describing the basic properties.
-                        sector_defs (List[pyPROPOSAL.SectorDefinition]): list of the sectors describing the environment around the detector.
-                        detector (pyPROPOSAL.geometry.Geometry): geometry of the detector.
-                        interpolation_def (pyPROPOSAL.InterpolationDef): definition of the Interpolation tables like path to store them, etc.
+                        particle_def (proposal.particle.ParticleDef): definition of the particle to propagate describing the basic properties.
+                        sector_defs (List[proposal.SectorDefinition]): list of the sectors describing the environment around the detector.
+                        detector (proposal.geometry.Geometry): geometry of the detector.
+                        interpolation_def (proposal.InterpolationDef): definition of the Interpolation tables like path to store them, etc.
                 )pbdoc")
         .def(py::init<const ParticleDef&,
                  const std::vector<Sector::Definition>&, std::shared_ptr<const Geometry>>(),

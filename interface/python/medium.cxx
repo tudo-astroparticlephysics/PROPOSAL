@@ -24,9 +24,9 @@ void init_medium(py::module& m) {
 
     m_sub.doc() = R"pbdoc(
             A medium is a object which contains serveral physical constants
-            about the material. Media are constant objects and can not be 
-            modified once there are initalized, with the exception of their 
-            density distribution. There are several preimplemented media. 
+            about the material. Media are constant objects and can not be
+            modified once there are initalized, with the exception of their
+            density distribution. There are several preimplemented media.
 
             +------------+------+----------+------------------+--------------------+
             | Water      | Ice  | Salt     | CalciumCarbonate | StandardRock       |
@@ -40,37 +40,37 @@ void init_medium(py::module& m) {
             is the possibility to create inhomogen densities as listed below.
             Split densities are faster than multiple sectors and are therefore
             recommended when using different density profiles.
-            
+
             +---------------------+--------------------+-----------------+
             | Density_exponential | Density_polynomial | Density_splines |
             +---------------------+--------------------+-----------------+
 
             There is currently an issue in the calculation of the LPM effect.
-            The calculation of the LPM effect depends on the 
-            bremsstrahlungcrosssection which again depends on the depth. 
-            When generating the interpolation table, the depth is assumed to 
+            The calculation of the LPM effect depends on the
+            bremsstrahlungcrosssection which again depends on the depth.
+            When generating the interpolation table, the depth is assumed to
             be constant.
             )pbdoc";
 
     py::class_<Medium, std::shared_ptr<Medium>>(m_sub, "Medium", R"pbdoc(
 			Each Medium is a container of physical constants. There are several
-			preimplemented media. They can be scaled by a correction factor if 
-			a homogen density is used. Otherwise the density_correction take 
+			preimplemented media. They can be scaled by a correction factor if
+			a homogen density is used. Otherwise the density_correction take
 			care of scaling tasks.
 
             Example:
-				Creating a homogeneous air medium with a linear correction 
+				Creating a homogeneous air medium with a linear correction
 				factor.
 
 				>>> correction_factor = 0.9
-				>>> air = pyPROPOSAL.medium.Air(correction_factor)
+				>>> air = proposal.medium.Air(correction_factor)
 				)pbdoc")
         .def("__str__", &py_print<Medium>)
         .def(py::init<>())
         .def(py::init<
                  std::string, double, double, double, double, double, double,
                  double, double, double,
-                 const std::vector<std::shared_ptr<Components::Component>>&>(),
+                 const std::vector<Components::Component>&>(),
              py::arg("name"), py::arg("rho"), py::arg("I"), py::arg("C"),
              py::arg("a"), py::arg("m"), py::arg("X0"), py::arg("X1"),
              py::arg("d0"), py::arg("massDensity"), py::arg("components"))
@@ -80,8 +80,6 @@ void init_medium(py::module& m) {
                                R"pbdoc(Ratio of atomic and mass number.)pbdoc")
         .def_property_readonly("ionization_potential", &Medium::GetI,
                                R"pbdoc(Ionization potential in [eV])pbdoc")
-        .def_property_readonly("refraction_index", &Medium::GetR,
-                               R"pbdoc(Refraction index of the medium.)pbdoc")
         .def_property_readonly(
             "radiation_length",
             (double (Medium::*)() const) & Medium::GetRadiationLength,
@@ -105,7 +103,7 @@ void init_medium(py::module& m) {
             R"pbdoc(List of components preserved in the medium.)pbdoc")
         .def_property_readonly(
             "name", &Medium::GetName,
-            R"pbdoc(Internal name of the particle. Should be unique to prevent 
+            R"pbdoc(Internal name of the particle. Should be unique to prevent
 				undefined behaviour.)pbdoc")
         .def_property("density_distribution", &Medium::GetDensityDistribution,
                       &Medium::SetDensityDistribution,
@@ -129,24 +127,24 @@ void init_medium(py::module& m) {
 
     py::class_<Density_distr, std::shared_ptr<Density_distr>>(
         m_sub, "density_distribution", R"pbdoc(
-		Density dirstribution is a factor for the medium dependend of the place 
-		of the particle.  There has to be an axis :math:`\vec{a}` , a reference 
-		point :math:`\vec{r}_p` and a function :math:`\rho` to calculate the 
+		Density dirstribution is a factor for the medium dependend of the place
+		of the particle.  There has to be an axis :math:`\vec{a}` , a reference
+		point :math:`\vec{r}_p` and a function :math:`\rho` to calculate the
 		density correction.
-		
+
 		Note:
 			Partical locations :math:`\vec{x}` will be written in dependent of
-			propagated distance :math:`l` along particle direction 
+			propagated distance :math:`l` along particle direction
 			:math:`\vec{d}` since last interaction point :math:`\vec{x}_r` and.
 
 			.. math::
 
 				\vec{x} = \vec{x}_i + l \cdot \vec{d}
 
-		Density function will be evaluated at the projection of the particle 
- 		position onto the density axis. If corrected displacement is in the 
-		dector, it will be returned, otherwise a failure will be raised and 
-		catched by the sector class to propagate the particle continously to 
+		Density function will be evaluated at the projection of the particle
+ 		position onto the density axis. If corrected displacement is in the
+		dector, it will be returned, otherwise a failure will be raised and
+		catched by the sector class to propagate the particle continously to
 		the sector border.
 
             )pbdoc")
@@ -154,14 +152,14 @@ void init_medium(py::module& m) {
              py::arg("direction"), py::arg("displacement"),
              py::arg("distance_to_border"),
              R"pbdoc(
-			Calculate displacemet :math:`l` equivalent by inverting the equation 
-			below. The left hand side represent the displacement in reference 
+			Calculate displacemet :math:`l` equivalent by inverting the equation
+			below. The left hand side represent the displacement in reference
 			medium which will be translated with density correction.
 
 			.. math::
 				\int_{E_i}^{E_r} \frac{1}{f(E)} dE= \int^{\vec{x}_i + l}_{\vec{x}_i} \rho(\vec{a} \vec{x}) dx
-			
-			If inverting the integral is not possible the newton method will 
+
+			If inverting the integral is not possible the newton method will
 			be used. When the displacement equivalent is outside the sector an
 			error will be raised, because it imply undefined behaviour.
 
@@ -191,14 +189,14 @@ void init_medium(py::module& m) {
         .def("calculate", &Density_distr::Calculate, py::arg("xi"),
              py::arg("direction"), py::arg("displacement"),
              R"pbdoc(
-			The depth will be calculated. Therefore, the dense integral is 
-			solved from the last interaction point to the next interaction 
+			The depth will be calculated. Therefore, the dense integral is
+			solved from the last interaction point to the next interaction
 			point.
 
 			.. math::
 				\int^{\vec{x}_i + l \cdot \vec{d}}_{\vec{x}_i} \rho(\vec{a} \vec{x}) dx
-			
-			Is equivalent to the correction factor to consider density 
+
+			Is equivalent to the correction factor to consider density
 			distribution for this place.
 
 			Parameters:
@@ -207,7 +205,7 @@ void init_medium(py::module& m) {
 				displacement (float): distance since last stochastical loss
 
 			Return:
-				float: density correction 
+				float: density correction
             )pbdoc");
 
     py::class_<Density_homogeneous, Density_distr,

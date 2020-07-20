@@ -1,8 +1,8 @@
-import pyPROPOSAL as pp
+import proposal as pp
 import numpy as np
 
 particle_defs = [
-    pp.particle.GammaDef.get(),
+    pp.particle.GammaDef(),
 ]
 
 mediums = [

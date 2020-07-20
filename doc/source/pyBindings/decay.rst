@@ -1,10 +1,10 @@
 ********************
-``pyPROPOSAL.decay``
+``proposal.decay``
 ********************
 
-.. currentmodule:: pyPROPOSAL.decay
+.. currentmodule:: proposal.decay
 
-.. automodule:: pyPROPOSAL.decay
+.. automodule:: proposal.decay
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import gridspec
-import pyPROPOSAL as pp
+import proposal as pp
 
 def propagate_particle(propagator,
                        position=[-1e5, 0, 1e4],
@@ -22,7 +22,7 @@ def propagate_particle(propagator,
 
 def main():
     prop = pp.Propagator(
-        particle_def=pp.particle.MuMinusDef.get(),
+        particle_def=pp.particle.MuMinusDef(),
         config_file="resources/config.json"
     )
     # print('losses inside: ', prop.sector_list[0].sector_def.only_loss_inside_detector)
@@ -81,10 +81,11 @@ def main():
     ]
 
     for jdx in range(len(start_energies)):
-        secondarys = propagate_particle(prop,
-                           position=start_positions[jdx],
-                           direction=start_directions[jdx],
-                           energy=start_energies[jdx]).particles
+        secondary_obj = propagate_particle(prop,
+                        position=start_positions[jdx],
+                        direction=start_directions[jdx],
+                        energy=start_energies[jdx])
+        secondarys = secondary_obj.particles
 
         nsecs = len(secondarys) # to get rid of the decay neutrinos
         positions = np.empty((nsecs, 3))
@@ -96,22 +97,24 @@ def main():
             positions[idx] = np.array([secondarys[idx].position.x,
                                        secondarys[idx].position.y,
                                        secondarys[idx].position.z])
-            secs_energy[idx] = secondarys[idx].energy
             mu_energies[idx] = secondarys[idx].parent_particle_energy
-            if secondarys[idx].type == int(pp.particle.Interaction_Id.Epair):
+            secs_energy[idx] = secondarys[idx].parent_particle_energy - secondarys[idx].energy
+            if secondarys[idx].type == int(pp.particle.Interaction_Type.Epair):
                 secs_ids[idx] = 0
-            elif secondarys[idx].type == int(pp.particle.Interaction_Id.Brems):
+            elif secondarys[idx].type == int(pp.particle.Interaction_Type.Brems):
                 secs_ids[idx] = 1
-            elif secondarys[idx].type == int(pp.particle.Interaction_Id.DeltaE):
+            elif secondarys[idx].type == int(pp.particle.Interaction_Type.DeltaE):
                 secs_ids[idx] = 2
-            elif secondarys[idx].type == int(pp.particle.Interaction_Id.NuclInt):
+            elif secondarys[idx].type == int(pp.particle.Interaction_Type.NuclInt):
                 secs_ids[idx] = 3
+            elif secondarys[idx].type == int(pp.particle.Interaction_Type.ContinuousEnergyLoss):
+                secs_ids[idx] = 6
             # decay
-            elif secondarys[idx].type == int(pp.particle.Particle_Id.EMinus):
+            elif secondarys[idx].type == int(pp.particle.Particle_Type.EMinus):
                 secs_ids[idx] = 4
-            elif secondarys[idx].type == int(pp.particle.Particle_Id.NuMu):
+            elif secondarys[idx].type == int(pp.particle.Particle_Type.NuMu):
                 secs_ids[idx] = 5
-            elif secondarys[idx].type == int(pp.particle.Particle_Id.NuEBar):
+            elif secondarys[idx].type == int(pp.particle.Particle_Type.NuEBar):
                 secs_ids[idx] = 5
             else:
                 print('unknown secondary id {}'.format(secondarys[idx].type))
@@ -134,13 +137,17 @@ def main():
                                    positions,
                                    end_position),
                                    axis=0)
-        mu_energies = np.concatenate(([start_energies[jdx]], mu_energies, [prop.particle.energy]))
+        mu_energies = np.concatenate(([start_energies[jdx]], mu_energies, [prop.particle_def.mass]))
+
+        entry_pos = secondary_obj.entry_point.position
+        exit_pos = secondary_obj.exit_point.position
+        closest_appr_pos = secondary_obj.closest_approach_point.position
 
         ax2.plot(positions[:,0], mu_energies/1e3, label=r'$E_{\mu}$')
         ax2.axhline(0.5, color='r', label='ecut')
-        ax2.axvline(prop.particle.entry_point.x, color='g', ls='-', label='entry/exit')
-        ax2.axvline(prop.particle.exit_point.x, color='g', ls='-')
-        ax2.axvline(prop.particle.closet_approach_point.x, color='b', ls='dotted', label='closest approach')
+        ax2.axvline(entry_pos.x, color='g', ls='-', label='entry/exit')
+        ax2.axvline(exit_pos.x, color='g', ls='-')
+        ax2.axvline(closest_appr_pos.x, color='b', ls='dotted', label='closest approach')
         ax2.set_yscale('log')
         ax2.set_ylabel('Energy / GeV')
         ax2.set_xlabel('x coord. / cm')
@@ -150,14 +157,14 @@ def main():
         plt.setp(ax1.get_xticklabels(), visible=False)
 
         ax1.plot(positions[:,0], positions[:,2], label='muon')# {}'.format(jdx))
-        ax1.plot([prop.particle.entry_point.x, prop.particle.exit_point.x],
-                 [prop.particle.entry_point.z, prop.particle.exit_point.z],
+        ax1.plot([entry_pos.x, exit_pos.x],
+                 [entry_pos.z, exit_pos.z],
                  ls='None', marker='x', label='entry/exit')# {}'.format(jdx))
-        ax1.plot(prop.particle.closet_approach_point.x,
-                 prop.particle.closet_approach_point.z,
+        ax1.plot(closest_appr_pos.x,
+                 closest_appr_pos.z,
                  ls='None', marker='+', label='closet approach')# {}'.format(jdx))
-        # ax1.plot([prop.particle.entry_point.x, prop.particle.closet_approach_point.x, prop.particle.exit_point.x],
-        #          [prop.particle.entry_point.z, prop.particle.closet_approach_point.z, prop.particle.exit_point.z],
+        # ax1.plot([entry_pos.x, closest_appr_pos.x, exit_pos.x],
+        #          [entry_pos.z, closest_appr_pos.z, exit_pos.z],
         #          ls='dotted', label='approx line')# {}'.format(jdx))
 
     ax1.legend()
