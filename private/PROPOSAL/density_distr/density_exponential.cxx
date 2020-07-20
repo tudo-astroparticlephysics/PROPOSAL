@@ -5,8 +5,11 @@
 
 using namespace PROPOSAL;
 
-Density_exponential::Density_exponential(const Axis& axis, double sigma)
-    : Density_distr(axis), sigma_(sigma) {}
+Density_exponential::Density_exponential(const Axis& axis, double sigma, double massDensity)
+    : Density_distr(axis, massDensity), sigma_(sigma) {}
+
+Density_exponential::Density_exponential(const Axis &axis, double sigma, const Medium &medium)
+    : Density_exponential(axis, sigma, medium.GetMassDensity()) {}
 
 Density_exponential::Density_exponential(const nlohmann::json& config) : Density_distr(config) {
     sigma_ = config.value("sigma", 1.);
@@ -40,7 +43,7 @@ double Density_exponential::Correct(const Vector3D& xi,
     double phi = GetDepth(xi);
     double delta = GetEffectiveDistance(xi, direction);
 
-    double aux = 1. / delta * std::log(1 + std::exp(-phi) * res * delta);
+    double aux = 1. / delta * std::log(1 + std::exp(-phi) * res * delta / massDensity_);
 
     if (std::isnan(aux))
         throw DensityException("Next interaction point lies in infinite.");
@@ -53,7 +56,7 @@ double Density_exponential::Integrate(const Vector3D& xi,
                                       double l) const {
     double delta = GetEffectiveDistance(xi, direction);
 
-    return std::exp(GetDepth(xi) + l * delta) / delta;
+    return massDensity_ * std::exp(GetDepth(xi) + l * delta) / delta;
 }
 
 double Density_exponential::Calculate(const Vector3D& xi,
@@ -63,5 +66,5 @@ double Density_exponential::Calculate(const Vector3D& xi,
 }
 
 double Density_exponential::Evaluate(const Vector3D& xi) const {
-    return std::exp(GetDepth(xi));
+    return massDensity_ * std::exp(GetDepth(xi));
 }

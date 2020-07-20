@@ -6,10 +6,13 @@
 using namespace PROPOSAL;
 
 Density_homogeneous::Density_homogeneous()
-    : Density_distr(), correction_factor_(1.0) {}
+    : Density_distr(1.), correction_factor_(1.0) {}
 
-Density_homogeneous::Density_homogeneous(double correction_factor)
-    : Density_distr(), correction_factor_(correction_factor) {}
+Density_homogeneous::Density_homogeneous(double massDensity, double correction_factor)
+    : Density_distr(massDensity), correction_factor_(correction_factor) {}
+
+Density_homogeneous::Density_homogeneous(const Medium &medium, double correction_factor)
+    : Density_homogeneous(medium.GetMassDensity(), correction_factor) {}
 
 Density_homogeneous::Density_homogeneous(const Density_homogeneous& dens_distr)
     : Density_distr(dens_distr),
@@ -37,7 +40,7 @@ double Density_homogeneous::Correct(const Vector3D& xi,
     (void)direction;
     (void)distance_to_border;
 
-    return res / correction_factor_;
+    return res / (correction_factor_ * massDensity_);
 }
 
 double Density_homogeneous::Integrate(const Vector3D& xi,
@@ -46,7 +49,7 @@ double Density_homogeneous::Integrate(const Vector3D& xi,
     (void)xi;
     (void)direction;
 
-    return correction_factor_ * l;
+    return correction_factor_ * massDensity_ * l;
 }
 
 double Density_homogeneous::Calculate(const Vector3D& xi,
@@ -58,5 +61,5 @@ double Density_homogeneous::Calculate(const Vector3D& xi,
 double Density_homogeneous::Evaluate(const Vector3D& xi) const {
     (void)xi;
 
-    return correction_factor_;
+    return correction_factor_ * massDensity_;
 }

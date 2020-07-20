@@ -30,6 +30,7 @@
 #include <functional>
 #include <string>
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
@@ -105,7 +106,7 @@ namespace PROPOSAL {
 class Density_distr {
    public:
     Density_distr();
-    Density_distr(const Axis& axis);
+    Density_distr(const Axis& axis, double);
     Density_distr(const nlohmann::json&);
     Density_distr(const Density_distr&);
 
@@ -134,6 +135,7 @@ class Density_distr {
 
    protected:
     Axis* axis_;
+    double massDensity_;
 };
 }  // namespace PROPOSAL
 

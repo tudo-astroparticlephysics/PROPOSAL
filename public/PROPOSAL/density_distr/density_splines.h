@@ -41,7 +41,8 @@
 namespace PROPOSAL {
 class Density_splines : public Density_distr {
    public:
-    Density_splines(const Axis&, const Spline&);
+    Density_splines(const Axis&, const Spline&, double massDensity);
+    Density_splines(const Axis&, const Spline&, const Medium& medium);
     Density_splines(const Density_splines&);
     Density_splines(const nlohmann::json&);
 

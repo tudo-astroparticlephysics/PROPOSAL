@@ -33,7 +33,8 @@
 namespace PROPOSAL {
 class Density_exponential : public Density_distr {
    public:
-    Density_exponential(const Axis& axis, double sigma);
+    Density_exponential(const Axis& axis, double sigma, double massDensity);
+    Density_exponential(const Axis& axis, double sigma, const Medium& medium);
     Density_exponential(const nlohmann::json&);
 
     ~Density_exponential(){};

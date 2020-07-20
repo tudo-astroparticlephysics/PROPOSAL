@@ -11,12 +11,15 @@ using namespace PROPOSAL;
 // %%%%%%%%%%%%%%%%%%% Polynomial-Density %%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Density_polynomial::Density_polynomial(const Axis& axis, const Polynom& polynom)
-    : Density_distr(axis),
+Density_polynomial::Density_polynomial(const Axis& axis, const Polynom& polynom, double massDensity)
+    : Density_distr(axis, massDensity),
       polynom_(polynom),
       Polynom_(polynom_.GetAntiderivative(0)),
       density_distribution(polynom_.GetFunction()),
       antiderived_density_distribution(Polynom_.GetFunction()) {}
+
+Density_polynomial::Density_polynomial(const Axis& axis, const Polynom& polynom, const Medium& medium)
+    : Density_polynomial(axis, polynom, medium.GetMassDensity()) {}
 
 Density_polynomial::Density_polynomial(const Density_polynomial& dens)
     : Density_distr(dens),
@@ -89,7 +92,7 @@ double Density_polynomial::Integrate(const Vector3D& xi,
                                      double l) const {
     double delta = axis_->GetEffectiveDistance(xi, direction);
 
-    return antiderived_density_distribution(axis_->GetDepth(xi) + l * delta) /
+    return massDensity_ * antiderived_density_distribution(axis_->GetDepth(xi) + l * delta) /
            (delta * delta);
 }
 
@@ -100,5 +103,5 @@ double Density_polynomial::Calculate(const Vector3D& xi,
 }
 
 double Density_polynomial::Evaluate(const Vector3D& xi) const {
-    return density_distribution(axis_->GetDepth(xi));
+    return massDensity_ * density_distribution(axis_->GetDepth(xi));
 }

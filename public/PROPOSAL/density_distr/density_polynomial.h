@@ -37,7 +37,8 @@
 namespace PROPOSAL {
 class Density_polynomial : public Density_distr {
    public:
-    Density_polynomial(const Axis&, const Polynom&);
+    Density_polynomial(const Axis&, const Polynom&, double massDensity);
+    Density_polynomial(const Axis&, const Polynom&, const Medium& medium);
     Density_polynomial(const Density_polynomial&);
     Density_polynomial(const nlohmann::json&);
     ~Density_polynomial();

@@ -9,10 +9,10 @@
 
 using namespace PROPOSAL;
 
-Density_distr::Density_distr() : axis_(CartesianAxis().clone()) {}
+Density_distr::Density_distr() : axis_(CartesianAxis().clone()), massDensity_(1.) {}
 
 Density_distr::Density_distr(const Density_distr& density_distr)
-    : axis_(density_distr.axis_->clone()) {}
+    : axis_(density_distr.axis_->clone()), massDensity_(density_distr.massDensity_) {}
 
 Density_distr::Density_distr(const nlohmann::json& config) {
     if(!config.contains("axis_type"))
@@ -25,14 +25,22 @@ Density_distr::Density_distr(const nlohmann::json& config) {
     } else {
         throw std::invalid_argument("Axis: Type of axis must be radial or cartesian");
     }
+    if (config.contains("massDensity")) {
+        assert(config["massDensity"].is_number());
+        massDensity_ = config["massDensity"].get<double>();
+    } else {
+        throw std::invalid_argument("Density_distr: MassDensity must be defined in json");
+    }
 }
 
 
-Density_distr::Density_distr(const Axis& axis) : axis_(axis.clone()) {}
+Density_distr::Density_distr(const Axis& axis, double massDensity) : axis_(axis.clone()), massDensity_(massDensity) {}
 
 bool Density_distr::operator==(const Density_distr& dens_distr) const
 {
     if (*axis_ != *dens_distr.axis_)
+        return false;
+    if (massDensity_ != dens_distr.massDensity_)
         return false;
     if (!this->compare(dens_distr) )
         return false;

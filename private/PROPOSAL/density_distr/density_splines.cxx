@@ -6,12 +6,15 @@
 
 using namespace PROPOSAL;
 
-Density_splines::Density_splines(const Axis& axis, const Spline& splines)
-    : Density_distr(axis),
+Density_splines::Density_splines(const Axis& axis, const Spline& splines, double massDensity)
+    : Density_distr(axis, massDensity),
       spline_(splines.clone()),
       integrated_spline_(splines.clone()) {
     integrated_spline_->Antiderivative(0);
 }
+
+Density_splines::Density_splines(const PROPOSAL::Axis& axis, const PROPOSAL::Spline& splines, const Medium& medium)
+    : Density_splines(axis, splines, medium.GetMassDensity()) {}
 
 Density_splines::Density_splines(const Density_splines& dens_splines)
     : Density_distr(dens_splines),
@@ -88,7 +91,7 @@ double Density_splines::Integrate(const Vector3D& xi,
                                   double l) const {
     double delta = axis_->GetEffectiveDistance(xi, direction);
 
-    return 1 / (delta * delta) *
+    return massDensity_ / (delta * delta) *
            integrated_spline_->evaluate(axis_->GetDepth(xi) + l * delta);
 }
 
@@ -99,5 +102,5 @@ double Density_splines::Calculate(const Vector3D& xi,
 }
 
 double Density_splines::Evaluate(const Vector3D& xi) const {
-    return spline_->evaluate(axis_->GetDepth(xi));
+    return massDensity_ * spline_->evaluate(axis_->GetDepth(xi));
 }

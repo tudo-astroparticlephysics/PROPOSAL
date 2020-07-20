@@ -34,7 +34,8 @@ class Density_homogeneous : public Density_distr {
    public:
     Density_homogeneous();
     Density_homogeneous(const Density_homogeneous&);
-    Density_homogeneous(double correction_factor);
+    Density_homogeneous(double mass_density, double correction_factor = 1.);
+    Density_homogeneous(const Medium& medium, double correction_factor = 1.);
     Density_homogeneous(const nlohmann::json&);
 
     // ~Density_homogeneous(){};
