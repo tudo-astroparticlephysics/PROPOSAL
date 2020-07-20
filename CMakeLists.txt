@@ -91,7 +91,7 @@ endif()
 #################################################################
 
 option(LOG4CPLUS_BUILD_TESTING "Build unit tests for log4cplus" OFF)
-add_subdirectory("vendors/log4cplus")
+add_subdirectory("vendor/log4cplus")
 target_link_libraries(PROPOSAL PRIVATE log4cplus)
 target_compile_definitions(PROPOSAL PRIVATE -DLOG4CPLUS_SUPPORT=1)
 
@@ -120,7 +120,7 @@ add_subdirectory(doc)
 IF(ADD_PYTHON)
     message(STATUS "Building the python wrapper library.")
     find_package(PythonLibs REQUIRED)
-    add_subdirectory("vendors/pybind11")
+    add_subdirectory("vendor/pybind11")
     file(GLOB_RECURSE PYTHON_SRC_FILES ${PROJECT_SOURCE_DIR}/interface/python/*)
 
     pybind11_add_module(pyproposal SHARED ${PYTHON_SRC_FILES})
