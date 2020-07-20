@@ -25,24 +25,23 @@ public:
     {
     }
 
-    double Calculate(
-        double energy, double v, v_trafo_t trafo = nullptr) override
+    double Calculate(double energy) override
+    {
+        return Calculate(energy, get<MAX>(GetIntegrationLimits(energy)));
+    }
+
+    double Calculate(double energy, double v) override
     {
         auto integral_lim = GetIntegrationLimits(energy);
-        if (trafo)
-            v = trafo(get<MIN>(integral_lim), get<MAX>(integral_lim), v);
         return dndx_integral(integral, energy, get<MIN>(integral_lim), v, 0);
     }
 
-    double GetUpperLimit(
-        double energy, double rate, v_trafo_t trafo = nullptr) override
+    double GetUpperLimit(double energy, double rate) override
     {
         auto integral_lim = GetIntegrationLimits(energy);
         dndx_integral(integral, energy, get<MIN>(integral_lim),
             get<MAX>(integral_lim), -rate);
         auto v = integral.GetUpperLimit();
-        if (trafo)
-            v = trafo(get<MIN>(integral_lim), get<MAX>(integral_lim), v);
         return v;
     }
 };

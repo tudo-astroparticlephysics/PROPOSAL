@@ -44,14 +44,9 @@ public:
 
     virtual ~CrossSectionDNDX() = default;
 
-    inline double Calculate(double energy)
-    {
-        return Calculate(energy, get<MAX>(GetIntegrationLimits(energy)));
-    }
-    virtual double Calculate(double energy, double v, v_trafo_t = nullptr) = 0;
-    virtual double GetUpperLimit(
-        double energy, double rate, v_trafo_t = nullptr)
-        = 0;
+    virtual double Calculate(double energy) = 0;
+    virtual double Calculate(double energy, double v) = 0;
+    virtual double GetUpperLimit(double energy, double rate) = 0;
 
     enum { MIN, MAX };
     inline tuple<double, double> GetIntegrationLimits(double energy)

@@ -6,9 +6,20 @@ using namespace PROPOSAL;
 namespace PROPOSAL {
 double transform_relativ_loss(double v_cut, double v_max, double v)
 {
-    if (v_cut == 0)
+    if (v < 0 or v_max == 0)
         return v_cut;
+    if (v >= 1)
+        return v_max;
     return v_cut * std::exp(v * std::log(v_max / v_cut));
+}
+
+double retransform_relativ_loss(double v_cut, double v_max, double v)
+{
+    if (v <= v_cut)
+        return 0;
+    if (v >= v_max)
+        return 1;
+    return std::log(v / v_cut) / std::log(v_max / v_cut);
 }
 }
 
@@ -16,26 +27,32 @@ unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx(
     Interpolant2DBuilder::Definition interpol_def, const InterpolationDef& def)
 {
     interpol_def.function2d = [this](double energy, double v) {
-        return CrossSectionDNDXIntegral::Calculate(
-            energy, v, transform_relativ_loss);
+        auto integral_lim = GetIntegrationLimits(energy);
+        v = transform_relativ_loss(get<MIN>(integral_lim), get<MAX>(integral_lim), v);
+        return CrossSectionDNDXIntegral::Calculate(energy, v);
     };
     return Helper::InitializeInterpolation("dNdx",
         make_unique<Interpolant2DBuilder>(interpol_def), hash_cross_section,
         def);
 }
 
-double CrossSectionDNDXInterpolant::Calculate(
-    double energy, double v, v_trafo_t)
+double CrossSectionDNDXInterpolant::Calculate(double energy)
 {
+    return dndx->Interpolate(energy, 1.); //retransformation for v = v_max is always 1
+}
+
+double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
+{
+    auto integral_lim = GetIntegrationLimits(energy);
+    v = retransform_relativ_loss(get<MIN>(integral_lim), get<MAX>(integral_lim), v);
     return dndx->Interpolate(energy, v);
 }
 
-double CrossSectionDNDXInterpolant::GetUpperLimit(
-    double energy, double rate, v_trafo_t)
+double CrossSectionDNDXInterpolant::GetUpperLimit(double energy, double rate)
 {
-    auto lim = GetIntegrationLimits(energy);
+    auto integral_lim = GetIntegrationLimits(energy);
     auto v = dndx->FindLimit(energy, rate);
-    return transform_relativ_loss(get<MIN>(lim), get<MAX>(lim), v);
+    return transform_relativ_loss(get<MIN>(integral_lim), get<MAX>(integral_lim), v);
 }
 
 namespace PROPOSAL {

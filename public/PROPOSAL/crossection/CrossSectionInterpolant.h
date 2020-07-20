@@ -114,7 +114,9 @@ public:
     {
         auto rates = rates_t();
         for (auto& dndx : dndx_map) {
-            rates[dndx.first] = dndx.second->Calculate(energy);
+            //TODO: dNdx interpolant results for individual components can become negative for small energies
+            // Instead of clipping these values to zero, the interpolant should be revised (jm)
+            rates[dndx.first] = std::max(dndx.second->Calculate(energy), 0.);
             if (dndx.first)
                 rates[dndx.first] /= medium.GetSumNucleons()
                     / (dndx.first->GetAtomInMolecule()

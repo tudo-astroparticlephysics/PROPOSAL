@@ -11,6 +11,7 @@ using std::unique_ptr;
 namespace PROPOSAL {
 
 double transform_relativ_loss(double v_cut, double v_max, double v);
+double retransform_relativ_loss(double v_cut, double v_max, double v);
 
 class CrossSectionDNDXInterpolant : public CrossSectionDNDXIntegral {
     unique_ptr<Interpolant> dndx;
@@ -30,8 +31,9 @@ public:
     {
     }
 
-    double Calculate(double, double, v_trafo_t = nullptr) final;
-    double GetUpperLimit(double, double, v_trafo_t = nullptr) final;
+    double Calculate(double) final;
+    double Calculate(double, double) final;
+    double GetUpperLimit(double, double) final;
 };
 
 Interpolant2DBuilder::Definition build_dndx_interpol_def(
