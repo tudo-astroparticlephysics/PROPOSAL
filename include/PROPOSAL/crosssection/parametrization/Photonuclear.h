@@ -31,7 +31,7 @@
 #include <cmath>
 #include <memory>
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
 using std::shared_ptr;
 

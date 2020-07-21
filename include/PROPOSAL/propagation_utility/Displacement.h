@@ -1,7 +1,7 @@
 #pragma once
 
-#include "PROPOSAL/crossection/CrossSection.h"
-#include "PROPOSAL/crossection/CrossSectionVector.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionVector.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include <string>

@@ -1,7 +1,7 @@
 
 #include <cmath>
 
-#include "PROPOSAL/crossection/parametrization/PhotoPairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"

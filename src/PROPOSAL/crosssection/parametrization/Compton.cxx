@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/parametrization/Compton.h"
+#include "PROPOSAL/crosssection/parametrization/Compton.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/particle/Particle.h"
 

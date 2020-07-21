@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/scattering/ScatteringHighland.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDX.h"
+#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDX.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"

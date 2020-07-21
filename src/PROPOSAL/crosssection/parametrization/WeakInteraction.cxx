@@ -3,8 +3,8 @@
 
 #include "PROPOSAL/Constants.h"
 
-#include "PROPOSAL/crossection/parametrization/ParamTables.h"
-#include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
+#include "PROPOSAL/crosssection/parametrization/ParamTables.h"
+#include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 #include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/math/Interpolant.h"

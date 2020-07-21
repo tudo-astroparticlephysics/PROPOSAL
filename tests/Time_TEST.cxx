@@ -2,7 +2,7 @@
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/Time.h"
-#include "PROPOSAL/crossection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 using namespace PROPOSAL;

@@ -1,6 +1,6 @@
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
-#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/math/MathMethods.h"
 
 using namespace PROPOSAL;

@@ -3,11 +3,11 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/PhotoIntegral.h"
-#include "PROPOSAL/crossection/PhotoInterpolant.h"
-#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
-#include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
-#include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
+#include "PROPOSAL/crosssection/PhotoIntegral.h"
+#include "PROPOSAL/crosssection/PhotoInterpolant.h"
+#include "PROPOSAL/crosssection/factories/PhotonuclearFactory.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"

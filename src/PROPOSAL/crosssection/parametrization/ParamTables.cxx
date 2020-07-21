@@ -1,5 +1,5 @@
 
-#include "PROPOSAL/crossection/parametrization/ParamTables.h"
+#include "PROPOSAL/crosssection/parametrization/ParamTables.h"
 
 // Weak interaction
 

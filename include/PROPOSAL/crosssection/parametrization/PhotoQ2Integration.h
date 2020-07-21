@@ -30,7 +30,7 @@
 
 #include <functional>
 
-#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
+#include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/methods.h"
 

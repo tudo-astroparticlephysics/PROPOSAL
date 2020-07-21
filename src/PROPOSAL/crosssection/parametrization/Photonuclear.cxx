@@ -3,7 +3,7 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
-#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
+#include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"

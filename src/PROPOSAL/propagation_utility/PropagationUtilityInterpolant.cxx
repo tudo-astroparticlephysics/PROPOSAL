@@ -10,7 +10,7 @@
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
 
-#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/math/MathMethods.h"

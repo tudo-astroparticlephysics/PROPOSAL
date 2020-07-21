@@ -1,5 +1,5 @@
-#include "PROPOSAL/crossection/CrossSectionIntegral.h"
-#include "PROPOSAL/crossection/parametrization/Ionization.h"
+#include "PROPOSAL/crosssection/CrossSectionIntegral.h"
+#include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/math/Integral.h"
 
 using std::get;

@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/parametrization/Ionization.h"
+#include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/particle/Particle.h"
 

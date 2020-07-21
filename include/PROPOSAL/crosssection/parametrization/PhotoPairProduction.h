@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
 
 namespace PROPOSAL {
@@ -91,5 +91,5 @@ struct PhotoPairTsai : public PhotoPairProduction {
 
 /*     DeflectionAngles SampleAngles(const Component&, double, double) override; */
 /* }; */
-} //namespace crossection
+} //namespace crosssection
 } // namespace PROPOSAL

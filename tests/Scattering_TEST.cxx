@@ -16,13 +16,13 @@
 #include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
 
-#include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
-#include "PROPOSAL/crossection/factories/IonizationFactory.h"
-#include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
-#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
+#include "PROPOSAL/crosssection/factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crosssection/factories/IonizationFactory.h"
+#include "PROPOSAL/crosssection/factories/EpairProductionFactory.h"
+#include "PROPOSAL/crosssection/factories/PhotonuclearFactory.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-#include "PROPOSAL/crossection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 
 using namespace PROPOSAL;
 

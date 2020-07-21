@@ -2,7 +2,7 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
 
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/medium/Components.h"

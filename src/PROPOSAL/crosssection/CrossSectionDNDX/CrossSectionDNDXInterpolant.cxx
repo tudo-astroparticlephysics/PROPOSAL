@@ -1,4 +1,4 @@
-#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
+#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
 #include <cmath>
 
 using namespace PROPOSAL;

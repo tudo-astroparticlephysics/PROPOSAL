@@ -6,10 +6,10 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/ComptonIntegral.h"
-#include "PROPOSAL/crossection/ComptonInterpolant.h"
-#include "PROPOSAL/crossection/factories/ComptonFactory.h"
-#include "PROPOSAL/crossection/parametrization/Compton.h"
+#include "PROPOSAL/crosssection/ComptonIntegral.h"
+#include "PROPOSAL/crosssection/ComptonInterpolant.h"
+#include "PROPOSAL/crosssection/factories/ComptonFactory.h"
+#include "PROPOSAL/crosssection/parametrization/Compton.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"

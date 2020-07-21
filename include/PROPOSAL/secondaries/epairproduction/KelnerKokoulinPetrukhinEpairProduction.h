@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/secondaries/epairproduction/EpairProduction.h"

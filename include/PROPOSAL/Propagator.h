@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/json.hpp"

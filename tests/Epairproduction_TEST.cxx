@@ -3,10 +3,10 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/EpairIntegral.h"
-#include "PROPOSAL/crossection/EpairInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
-#include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
+#include "PROPOSAL/crosssection/EpairIntegral.h"
+#include "PROPOSAL/crosssection/EpairInterpolant.h"
+#include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
+#include "PROPOSAL/crosssection/factories/EpairProductionFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"

@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
 using PROPOSAL::Components::Component;
 

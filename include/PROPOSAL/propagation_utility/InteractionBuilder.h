@@ -1,4 +1,4 @@
-#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
 #include <type_traits>
 

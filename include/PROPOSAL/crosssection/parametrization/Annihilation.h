@@ -32,7 +32,7 @@
 #include <fstream>
 #include <functional>
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/Particle.h"
 

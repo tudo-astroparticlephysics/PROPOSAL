@@ -36,7 +36,7 @@
 #include <utility>
 #include <vector>
 
-#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"

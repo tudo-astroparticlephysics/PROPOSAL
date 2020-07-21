@@ -31,7 +31,7 @@
 #include <cmath>
 #include <functional>
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
 
 using PROPOSAL::Components::Component;

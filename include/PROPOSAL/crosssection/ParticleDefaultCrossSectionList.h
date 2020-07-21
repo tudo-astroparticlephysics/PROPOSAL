@@ -1,22 +1,22 @@
 #pragma once
 #include <type_traits>
 
-#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 
-#include "PROPOSAL/crossection/CrossSectionIntegral.h"
-#include "PROPOSAL/crossection/CrossSectionInterpolant.h"
+#include "PROPOSAL/crosssection/CrossSectionIntegral.h"
+#include "PROPOSAL/crosssection/CrossSectionInterpolant.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
-#include "PROPOSAL/crossection/parametrization/Annihilation.h"
-#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
-#include "PROPOSAL/crossection/parametrization/Compton.h"
-#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
-#include "PROPOSAL/crossection/parametrization/Ionization.h"
-#include "PROPOSAL/crossection/parametrization/PhotoPairProduction.h"
-#include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
-#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
+#include "PROPOSAL/crosssection/parametrization/Annihilation.h"
+#include "PROPOSAL/crosssection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crosssection/parametrization/Compton.h"
+#include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/Ionization.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
+#include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
 
 using std::decay;
 using std::make_shared;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PROPOSAL/crossection/parametrization/Annihilation.h"
+#include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/secondaries/annihilation/SingleDifferentialAnnihilation.h"
 
 namespace PROPOSAL {

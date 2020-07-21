@@ -27,7 +27,7 @@
 
 #pragma once
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include <memory>
 
 #define BREMSSTRAHLUNG_DEF(param)                                              \

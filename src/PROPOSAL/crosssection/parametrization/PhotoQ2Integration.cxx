@@ -1,7 +1,7 @@
 
 #include <cmath>
 
-#include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Interpolant.h"

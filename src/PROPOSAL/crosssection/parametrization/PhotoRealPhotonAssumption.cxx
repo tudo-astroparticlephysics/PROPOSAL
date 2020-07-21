@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Interpolant.h"

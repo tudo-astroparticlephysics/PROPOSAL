@@ -3,10 +3,10 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/MupairIntegral.h"
-#include "PROPOSAL/crossection/MupairInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/MupairProduction.h"
-#include "PROPOSAL/crossection/factories/MupairProductionFactory.h"
+#include "PROPOSAL/crosssection/MupairIntegral.h"
+#include "PROPOSAL/crosssection/MupairInterpolant.h"
+#include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
+#include "PROPOSAL/crosssection/factories/MupairProductionFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"

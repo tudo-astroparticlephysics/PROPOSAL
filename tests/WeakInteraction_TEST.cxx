@@ -3,10 +3,10 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/WeakIntegral.h"
-#include "PROPOSAL/crossection/WeakInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
-#include "PROPOSAL/crossection/factories/WeakInteractionFactory.h"
+#include "PROPOSAL/crosssection/WeakIntegral.h"
+#include "PROPOSAL/crosssection/WeakInterpolant.h"
+#include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
+#include "PROPOSAL/crosssection/factories/WeakInteractionFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"

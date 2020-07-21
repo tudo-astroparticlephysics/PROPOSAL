@@ -12,7 +12,6 @@
 #include <string>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/ParticleDefaultCrossSectionList.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
 #include "PROPOSAL/decay/StableChannel.h"
@@ -211,27 +210,6 @@ bool ParticleDef::operator!=(const ParticleDef& def) const
 {
     return !(*this == def);
 }
-
-/* void ParticleDef::AddCrossSections(std::shared_ptr<EnergyCutSettings> cuts) */
-/* { */
-/*     size_t hash_digest = 0; */
-/*     hash_combine(hash_digest, cuts->GetHash()); */
-
-/*     cross_sections[hash_digest] = GetStdCrossSections(cuts, *this); */
-/* } */
-
-/* std::vector<std::shared_ptr<CrossSection>> ParticleDef::GetCrossSections( std::shared_ptr<EnergyCutSettings> cuts) */
-/* { */
-/*     size_t hash_digest = 0; */
-/*     hash_combine(hash_digest, cuts->GetHash()); */
-
-/*     auto search = cross_sections.find(hash_digest); */
-/*     if (search != cross_sections.end()) */
-/*         return search->second; */
-
-/*     AddCrossSections(cuts); */
-/*     return GetCrossSections(cuts); */
-/* } */
 
 size_t ParticleDef::GetHash() const{
     size_t hash_digest = 0;

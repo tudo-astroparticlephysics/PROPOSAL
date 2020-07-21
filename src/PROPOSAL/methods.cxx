@@ -19,8 +19,6 @@
 #include <unistd.h>  // check for write permissions
 #include <wordexp.h> // Used to expand path with environment variables
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
-
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 

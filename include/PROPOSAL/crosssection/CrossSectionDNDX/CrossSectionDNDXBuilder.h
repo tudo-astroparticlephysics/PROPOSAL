@@ -1,6 +1,6 @@
 #pragma once
-#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
-#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
+#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
+#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
 #include "PROPOSAL/methods.h"
 
 namespace PROPOSAL {

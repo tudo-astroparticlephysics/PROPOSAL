@@ -6,10 +6,10 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/BremsIntegral.h"
-#include "PROPOSAL/crossection/BremsInterpolant.h"
-#include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
-#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crosssection/BremsIntegral.h"
+#include "PROPOSAL/crosssection/BremsInterpolant.h"
+#include "PROPOSAL/crosssection/factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crosssection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"

@@ -2,7 +2,7 @@
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
-#include "PROPOSAL/crossection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/math/RandomGenerator.h"

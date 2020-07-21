@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/parametrization/Annihilation.h"
+#include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"

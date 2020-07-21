@@ -776,7 +776,7 @@ void init_parametrization(py::module& m) {
  
 
                                                             
-            This virtual class includes all photonuclear interactions where the differential crossection in given in :math:`Q^2`.
+            This virtual class includes all photonuclear interactions where the differential crosssection in given in :math:`Q^2`.
             The following parametrizations are currently implemented:
 
             * AbramowiczLevinLevyMaor91

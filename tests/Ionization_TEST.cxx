@@ -3,10 +3,10 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/IonizIntegral.h"
-#include "PROPOSAL/crossection/IonizInterpolant.h"
-#include "PROPOSAL/crossection/factories/IonizationFactory.h"
-#include "PROPOSAL/crossection/parametrization/Ionization.h"
+#include "PROPOSAL/crosssection/IonizIntegral.h"
+#include "PROPOSAL/crosssection/IonizInterpolant.h"
+#include "PROPOSAL/crosssection/factories/IonizationFactory.h"
+#include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"

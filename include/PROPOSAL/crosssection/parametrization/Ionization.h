@@ -29,7 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Medium.h"
 
 namespace PROPOSAL {

@@ -4,8 +4,8 @@
 #include <stdexcept>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
-#include "PROPOSAL/crossection/parametrization/ParamTables.h"
+#include "PROPOSAL/crosssection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crosssection/parametrization/ParamTables.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/methods.h"

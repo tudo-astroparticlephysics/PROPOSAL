@@ -8,12 +8,12 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/math/MathMethods.h"
-#include "PROPOSAL/crossection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 
-#include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
-#include "PROPOSAL/crossection/factories/IonizationFactory.h"
-#include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
-#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
+#include "PROPOSAL/crosssection/factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crosssection/factories/IonizationFactory.h"
+#include "PROPOSAL/crosssection/factories/EpairProductionFactory.h"
+#include "PROPOSAL/crosssection/factories/PhotonuclearFactory.h"
 
 using namespace PROPOSAL;
 

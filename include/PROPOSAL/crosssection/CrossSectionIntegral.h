@@ -30,8 +30,8 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/crossection/CrossSection.h"
-#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"

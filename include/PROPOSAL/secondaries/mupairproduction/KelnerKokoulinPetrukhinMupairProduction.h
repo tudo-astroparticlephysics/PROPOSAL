@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PROPOSAL/crossection/parametrization/MupairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/secondaries/mupairproduction/MupairProduction.h"

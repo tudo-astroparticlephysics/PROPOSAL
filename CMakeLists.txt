@@ -38,14 +38,14 @@ OPTION(ADD_PYTHON "Choose to compile the python wrapper library" ON)
 #################################################################
 ####################       PROPOSAL      ########################
 #################################################################
-file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*)
+file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/src/PROPOSAL/*)
 add_library(PROPOSAL SHARED ${SRC_FILES})
 add_library(PROPOSAL::PROPOSAL ALIAS PROPOSAL)
 target_compile_features(PROPOSAL PUBLIC cxx_std_11)
 set_target_properties(PROPOSAL PROPERTIES CXX_EXTENSIONS OFF)
 target_include_directories(
     PROPOSAL PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/public>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 target_compile_options(PROPOSAL PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-format-security)
@@ -57,12 +57,12 @@ install(
 
 # input version from the project call, so the library knows its own version
 configure_file(
-    "${PROJECT_SOURCE_DIR}/public/PROPOSAL/version.h.in"
+    "${PROJECT_SOURCE_DIR}/include/PROPOSAL/version.h.in"
     "${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h"
 )
 install(
     FILES ${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/PROPOSAL
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/include/PROPOSAL
 )
 target_include_directories(
     PROPOSAL PUBLIC
@@ -71,11 +71,11 @@ target_include_directories(
 )
 
 # install header files
-file(GLOB_RECURSE INC_FILES ${PROJECT_SOURCE_DIR}/public/PROPOSAL/*)
+file(GLOB_RECURSE INC_FILES ${PROJECT_SOURCE_DIR}/include/*)
 foreach(INC_FILE ${INC_FILES})
-    file(RELATIVE_PATH REL_FILE ${PROJECT_SOURCE_DIR}/public ${INC_FILE})
+    file(RELATIVE_PATH REL_FILE ${PROJECT_SOURCE_DIR}/include ${INC_FILE})
     get_filename_component(DIR ${REL_FILE} DIRECTORY)
-    install(FILES "public/${REL_FILE}" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${DIR})
+    install(FILES include/${REL_FILE} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${DIR})
 endforeach()
 
 
@@ -94,6 +94,7 @@ option(LOG4CPLUS_BUILD_TESTING "Build unit tests for log4cplus" OFF)
 add_subdirectory("vendor/log4cplus")
 target_link_libraries(PROPOSAL PRIVATE log4cplus)
 target_compile_definitions(PROPOSAL PRIVATE -DLOG4CPLUS_SUPPORT=1)
+ADD_DEFINITIONS(-DLOG4CPLUS_CONFIG=\"${PROJECT_SOURCE_DIR}/resources/log4cplus.conf\")
 
 #################################################################
 #################           Tests        ########################

@@ -3,10 +3,10 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/PhotoPairIntegral.h"
-#include "PROPOSAL/crossection/PhotoPairInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/PhotoPairProduction.h"
-#include "PROPOSAL/crossection/factories/PhotoPairFactory.h"
+#include "PROPOSAL/crosssection/PhotoPairIntegral.h"
+#include "PROPOSAL/crosssection/PhotoPairInterpolant.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
+#include "PROPOSAL/crosssection/factories/PhotoPairFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"

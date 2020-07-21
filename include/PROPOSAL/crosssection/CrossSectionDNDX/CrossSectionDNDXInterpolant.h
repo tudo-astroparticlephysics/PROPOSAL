@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
+#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 

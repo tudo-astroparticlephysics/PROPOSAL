@@ -1,8 +1,8 @@
 
 /* #pragma once */
 
-/* #include "PROPOSAL/crossection/CrossSection.h" */
-/* #include "PROPOSAL/crossection/parametrization/Parametrization.h" */
+/* #include "PROPOSAL/crosssection/CrossSection.h" */
+/* #include "PROPOSAL/crosssection/parametrization/Parametrization.h" */
 
 /* namespace PROPOSAL{ */
 

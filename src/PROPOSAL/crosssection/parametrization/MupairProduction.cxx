@@ -1,8 +1,8 @@
 
 #include <cmath>
 
-#include "PROPOSAL/crossection/parametrization/MupairProduction.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
 #include "PROPOSAL/particle/Particle.h"
 

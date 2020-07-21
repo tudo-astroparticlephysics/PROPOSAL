@@ -6,8 +6,8 @@
 #include "PROPOSAL/secondaries/DefaultFactory.h"
 #include "PROPOSAL/secondaries/photopairproduction/PhotopairProduction.h"
 
-#include "PROPOSAL/crossection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
-#include "PROPOSAL/crossection/parametrization/PhotoPairProduction.h"
+#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 
 using PROPOSAL::Components::Component;
 

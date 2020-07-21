@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
+#include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
 #include <memory>
 #include <unordered_map>
 using std::unordered_map;

@@ -3,10 +3,10 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/AnnihilationIntegral.h"
-#include "PROPOSAL/crossection/AnnihilationInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/Annihilation.h"
-#include "PROPOSAL/crossection/factories/AnnihilationFactory.h"
+#include "PROPOSAL/crosssection/AnnihilationIntegral.h"
+#include "PROPOSAL/crosssection/AnnihilationInterpolant.h"
+#include "PROPOSAL/crosssection/parametrization/Annihilation.h"
+#include "PROPOSAL/crosssection/factories/AnnihilationFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
