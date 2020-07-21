@@ -12,12 +12,12 @@ Sphere::Sphere(const Vector3D position, double radius, double inner_radius)
 {
     if (inner_radius_ > radius_)
     {
-        Logging::Get("proposal.geometry")->warn("Inner radius %f is greater then radius %f (will be swaped)", inner_radius_, radius_);
+        Logging::Get("proposal.geometry")->warn("Inner radius {} is greater then radius {} (will be swaped)", inner_radius_, radius_);
         std::swap(inner_radius_, radius_);
     }
     if (inner_radius_ == radius_)
     {
-        Logging::Get("proposal.geometry")->error("Warning: Inner radius %f == radius %f (Volume is 0)", inner_radius_, radius_);
+        Logging::Get("proposal.geometry")->error("Warning: Inner radius {} == radius {} (Volume is 0)", inner_radius_, radius_);
     }
 }
 

@@ -37,18 +37,12 @@
 #include "PROPOSAL/geometry/Sphere.h"
 
 namespace PROPOSAL {
-static std::map<const Geometry_Type, std::shared_ptr<Geometry>> Geometry_Map{
-    { Geometry_Type::SPHERE,
-        std::make_shared<Sphere>(Vector3D(0, 0, 0), 0.f, 0.f) },
-    { Geometry_Type::BOX,
-        std::make_shared<Box>(Vector3D(0, 0, 0), 0.f, 0.f, 0.f) },
-    { Geometry_Type::CYLINDER,
-        std::make_shared<Cylinder>(Vector3D(0, 0, 0), 0.f, 0.f, 0.f) },
-};
+static constexpr std::array<Geometry_Type, 3> Geometry_Map
+    = { Geometry_Type::SPHERE, Geometry_Type::BOX, Geometry_Type::CYLINDER };
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-std::shared_ptr<Geometry> CreateGeometry(std::string name);
+/* std::shared_ptr<Geometry> CreateGeometry(std::string name); */
 std::shared_ptr<Geometry> CreateGeometry(const nlohmann::json& config);
-std::shared_ptr<Geometry> CreateGeometry(Geometry_Type type);
+/* std::shared_ptr<Geometry> CreateGeometry(Geometry_Type type); */
 } // namespace PROPOSAL
