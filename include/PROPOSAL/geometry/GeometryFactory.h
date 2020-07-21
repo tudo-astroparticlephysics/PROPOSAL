@@ -26,22 +26,24 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include <functional>
 #include <map>
 
-#include "PROPOSAL/geometry/Geometry.h"
-#include "PROPOSAL/geometry/Sphere.h"
 #include "PROPOSAL/geometry/Box.h"
 #include "PROPOSAL/geometry/Cylinder.h"
+#include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/geometry/Sphere.h"
 
 namespace PROPOSAL {
 static std::map<const Geometry_Type, std::shared_ptr<Geometry>> Geometry_Map{
-    { Geometry_Type::SPHERE, std::shared_ptr<Geometry>(new Sphere) },
-    { Geometry_Type::BOX, std::shared_ptr<Geometry>(new Box) },
-    { Geometry_Type::CYLINDER, std::shared_ptr<Geometry>(new Cylinder) },
+    { Geometry_Type::SPHERE,
+        std::make_shared<Sphere>(Vector3D(0, 0, 0), 0.f, 0.f) },
+    { Geometry_Type::BOX,
+        std::make_shared<Box>(Vector3D(0, 0, 0), 0.f, 0.f, 0.f) },
+    { Geometry_Type::CYLINDER,
+        std::make_shared<Cylinder>(Vector3D(0, 0, 0), 0.f, 0.f, 0.f) },
 };
 } // namespace PROPOSAL
 

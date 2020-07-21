@@ -1,9 +1,9 @@
 [submodule "vendor/googletest"]
 	path = vendor/googletest
 	url = ../../google/googletest
-[submodule "vendor/log4cplus"]
-	path = vendor/log4cplus
-	url = ../../log4cplus/log4cplus
 [submodule "vendor/pybind11"]
 	path = vendor/pybind11
 	url = ../../pybind/pybind11
+[submodule "vendor/spdlog"]
+	path = vendor/spdlog
+	url = ../../gabime/spdlog.git

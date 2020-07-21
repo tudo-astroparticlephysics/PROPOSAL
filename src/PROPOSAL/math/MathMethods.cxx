@@ -14,7 +14,7 @@ namespace PROPOSAL {
 
 double normalppf(double p) {
     if (p <= 0 || p >= 1) {
-        log_fatal(
+        Logging::Get("proposal.math")->critical(
             "The percent point function can just handle values between 0 and "
             "1.");
     }
@@ -167,7 +167,7 @@ double dilog(double x) {
 //             if (k > 5 && std::abs(addend/power_series) < uncertainty_limit)
 //                 break;
 //             if (k == max_iter)
-//                 log_fatal("reach max iterations in trilog");
+//                 Logging::Get("proposal.math")->critical("reach max iterations in trilog");
 //             power_series += addend;
 //         }
 //         return -4 + (3 - 3./x)*std::log(1 - x) + (2 + 1./x)*dilog(x) + power_series;
@@ -206,7 +206,7 @@ double NewtonRaphson(std::function<double(double)> func,
 
     if (fl * fh > 0.0) {
         throw MathException("Root must be bracketed in NewtonRaphson method!");
-        // log_error("Root must be bracketed in NewtonRaphson method!");
+        // Logging::Get("proposal.math")->error("Root must be bracketed in NewtonRaphson method!");
         // return 0;
     }
 
@@ -268,7 +268,7 @@ double NewtonRaphson(std::function<double(double)> func,
             xh = rts;
         };
     }
-    log_warn("Maximum number of iteration exeeded in NewtonRaphson");
+    Logging::Get("proposal.math")->warn("Maximum number of iteration exeeded in NewtonRaphson");
     return rts;
 }
 
@@ -277,7 +277,7 @@ std::vector<SplineCoefficients> CalculateSpline(std::vector<double> x,
     // Algorithm from https://en.wikipedia.org/wiki/Spline_(mathematics)
     int n = x.size() - 1;
     if (x.size() != y.size()) {
-        log_error(
+        Logging::Get("proposal.math")->error(
             "CalculateSpline: x and y (abscissa and ordinate) must have same "
             "dimension");
     }
@@ -343,7 +343,7 @@ std::pair<std::vector<double>, std::vector<double>> ParseSplineCoordinates(
         std::ifstream infilestream(expanded_coords_path);
         infilestream >> json_coords;
     } catch (const nlohmann::json::parse_error& e) {
-        log_fatal("Unable parse \"%s\" as json file",
+        Logging::Get("proposal.math")->critical("Unable parse \"%s\" as json file",
                   path_to_coordinates.c_str());
     }
 
@@ -361,19 +361,19 @@ std::pair<std::vector<double>, std::vector<double>> ParseSplineCoordinates(
                     if (json_coords["x"][i].is_number()) {
                         x_vec[i] = json_coords["x"][i].get<double>();
                     } else {
-                        log_fatal("Dens_spline: x coordinate is not a double");
+                        Logging::Get("proposal.math")->critical("Dens_spline: x coordinate is not a double");
                     }
                 }
             } else {
-                log_fatal(
+                Logging::Get("proposal.math")->critical(
                     "Dens_spline: at least 2 coordinates must be available to "
                     "create a spline");
             }
         } else {
-            log_fatal("Dens_spline: x object is not an array");
+            Logging::Get("proposal.math")->critical("Dens_spline: x object is not an array");
         }
     } else {
-        log_fatal("Dens_spline: no x coordinates are found");
+        Logging::Get("proposal.math")->critical("Dens_spline: no x coordinates are found");
     }
 
     if (json_coords.find("y") != json_coords.end()) {
@@ -387,19 +387,19 @@ std::pair<std::vector<double>, std::vector<double>> ParseSplineCoordinates(
                     if (json_coords["y"][i].is_number()) {
                         y_vec[i] = json_coords["y"][i].get<double>();
                     } else {
-                        log_fatal("Dens_spline: y coordinate is not a double");
+                        Logging::Get("proposal.math")->critical("Dens_spline: y coordinate is not a double");
                     }
                 }
             } else {
-                log_fatal(
+                Logging::Get("proposal.math")->critical(
                     "Dens_spline: at least 2 coordinates must be available to "
                     "create a spline");
             }
         } else {
-            log_fatal("Dens_spline: y object is not an array");
+            Logging::Get("proposal.math")->critical("Dens_spline: y object is not an array");
         }
     } else {
-        log_fatal("Dens_spline: no y coordinates are found");
+        Logging::Get("proposal.math")->critical("Dens_spline: no y coordinates are found");
     }
 
     std::pair<std::vector<double>, std::vector<double>> return_val;

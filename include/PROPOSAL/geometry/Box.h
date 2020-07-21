@@ -38,18 +38,10 @@ namespace PROPOSAL {
 class Box : public Geometry
 {
 public:
-    Box();
     Box(const Vector3D position, double x, double y, double z);
-    Box(const Box&);
     Box(const nlohmann::json& config);
 
-    std::shared_ptr<const Geometry> create() const override { return std::shared_ptr<const Geometry>( new Box(*this) ); };
-    void swap(Geometry&) override;
 
-    virtual ~Box() {}
-
-    // Operators
-    Box& operator=(const Geometry&) override;
 
     // Methods
     std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction) const override;

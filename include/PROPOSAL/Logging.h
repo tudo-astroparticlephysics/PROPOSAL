@@ -26,169 +26,38 @@
  *                                                                            *
  ******************************************************************************/
 
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/sink.h>
+#include <PROPOSAL/methods.h>
 
-#pragma once
-
-#include <iostream>
-#include <cstdio>
-#include <cstdlib>
+#include <unordered_map>
+#include <memory>
 #include <string>
 
-#ifdef ICECUBE_PROJECT
-    #include <icetray/I3Logging.h>
-#endif // ICECUBE_PROJECT
-
-#if LOG4CPLUS_SUPPORT
-    #include <log4cplus/initializer.h>
-    #include <log4cplus/configurator.h>
-    #include <log4cplus/logger.h>
-    #include <log4cplus/loggingmacros.h>
-#endif // log4cplus
+using std::unordered_map;
+using std::unique_ptr;
+using std::shared_ptr;
+using std::string;
+using std::make_shared;
 
 namespace PROPOSAL {
+struct Logging {
+    static unordered_map<std::string, unique_ptr<spdlog::logger>> logger;
+    static shared_ptr<spdlog::sinks::sink> sink;
 
-class Logging
-{
-private:
-    Logging()
+    Logging() = delete;
+
+    static unique_ptr<spdlog::logger> Create(std::string const& name)
     {
-#if LOG4CPLUS_SUPPORT
-        log4cplus::BasicConfigurator basic_config;
-        basic_config.configure();
-
-        logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("PROPOSAL"));
-        logger.setLogLevel(log4cplus::INFO_LOG_LEVEL);
-
-        // support setting the log4cplus config via an environment variable
-        /* if (const char* config = std::getenv("PROPOSAL_LOG_CONFIG")) { */
-        /*     log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(config)); */
-        /* } */
-#endif
+        return PROPOSAL::make_unique<spdlog::logger>(name, sink);
     }
 
-#if LOG4CPLUS_SUPPORT
-    log4cplus::Initializer initializer;
-#endif
-
-public:
-    Logging(Logging const&) = delete;
-    void operator=(Logging const&) = delete;
-
-#if LOG4CPLUS_SUPPORT
-    log4cplus::Logger logger;
-#endif
-
-    static Logging& getInstance()
+    static spdlog::logger* Get(std::string const& name)
     {
-        static Logging instance;
-        return instance;
+        auto it = Logging::logger.find(name);
+        if (it == logger.end())
+            Logging::logger[name] = Logging::Create(name);
+        return Logging::logger[name].get();
     }
-
-    void SetLoggingConfigurationFile(std::string file)
-    {
-#if LOG4CPLUS_SUPPORT
-        log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(file));
-#else
-        (void) file;
-        std::cout << "Log4cplus not found! No log messages will be shown!" << std::endl;
-#endif
-    }
-
 };
 } // namespace PROPOSAL
-
-
-#if LOG4CPLUS_SUPPORT
-
-template<typename... Args>
-void log_error(Args ... args)
-{
-    LOG4CPLUS_ERROR_FMT(PROPOSAL::Logging::getInstance().logger, args...);
-}
-
-template<typename... Args>
-void log_fatal(Args ... args)
-{
-    LOG4CPLUS_FATAL_FMT(PROPOSAL::Logging::getInstance().logger, args...);
-    exit(1);
-}
-
-template<typename... Args>
-void log_warn(Args ... args)
-{
-    LOG4CPLUS_WARN_FMT(PROPOSAL::Logging::getInstance().logger, args...);
-}
-
-template<typename... Args>
-void log_info(Args ... args)
-{
-    LOG4CPLUS_INFO_FMT(PROPOSAL::Logging::getInstance().logger, args...);
-}
-
-template<typename... Args>
-void log_trace(Args ... args)
-{
-    LOG4CPLUS_TRACE_FMT(PROPOSAL::Logging::getInstance().logger, args...);
-}
-
-template<typename... Args>
-void log_debug(Args ... args)
-{
-    LOG4CPLUS_DEBUG_FMT(PROPOSAL::Logging::getInstance().logger, args...);
-}
-
-template<typename... Args>
-void log_notice(Args ... args)
-{
-    LOG4CPLUS_NOTICE_FMT(PROPOSAL::Logging::getInstance().logger, args...);
-}
-
-#else // log4cplus
-#ifndef ICECUBE_PROJECT
-
-template<typename... Args>
-void log_error(Args ... args)
-{
-    printf(args...);
-}
-
-template<typename... Args>
-void log_fatal(Args ... args)
-{
-    printf("FATAL ERROR: ");
-    printf(args...);
-    exit(1);
-}
-
-template<typename... Args>
-void log_warn(Args ... args)
-{
-    printf(args...);
-}
-
-template<typename... Args>
-void log_info(Args ... args)
-{
-    printf(args...);
-}
-
-template<typename... Args>
-void log_trace(Args ... args)
-{
-    printf(args...);
-}
-
-template<typename... Args>
-void log_debug(Args ... args)
-{
-    printf(args...);
-}
-
-template<typename... Args>
-void log_notice(Args ... args)
-{
-    printf(args...);
-}
-
-#endif // not ICECUBE_PROJECT
-#endif // log4cplus

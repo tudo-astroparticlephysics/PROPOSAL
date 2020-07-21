@@ -43,24 +43,10 @@ std::ostream& operator<<(std::ostream& os, Geometry const& geometry)
  *                                  Geometry                                   *
  ******************************************************************************/
 
-Geometry::Geometry(const std::string name)
-    : position_(Vector3D())
-    , name_(name)
-    , hierarchy_(0)
-{
-}
-
 Geometry::Geometry(const std::string name, const Vector3D position)
     : position_(100. * position)
     , name_(name)
     , hierarchy_(0)
-{
-}
-
-Geometry::Geometry(const Geometry& geometry)
-    : position_(geometry.position_)
-    , name_(geometry.name_)
-    , hierarchy_(geometry.hierarchy_)
 {
 }
 
@@ -76,28 +62,6 @@ Geometry::Geometry(const nlohmann::json& config)
     position_ = Vector3D(config.at("origin"));
 }
 
-// ------------------------------------------------------------------------- //
-void Geometry::swap(Geometry& geometry)
-{
-    position_.swap(geometry.position_);
-    name_.swap(geometry.name_);
-    std::swap(hierarchy_, geometry.hierarchy_);
-}
-
-
-
-// ------------------------------------------------------------------------- //
-Geometry& Geometry::operator=(const Geometry& geometry)
-{
-    if (this != &geometry)
-    {
-        position_ = geometry.position_;
-        name_     = geometry.name_;
-        hierarchy_ = geometry.hierarchy_;
-    }
-
-    return *this;
-}
 
 // ------------------------------------------------------------------------- //
 bool Geometry::operator==(const Geometry& geometry) const

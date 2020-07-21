@@ -8,14 +8,6 @@
 
 using namespace PROPOSAL;
 
-Cylinder::Cylinder()
-    : Geometry((std::string)("Cylinder"))
-    , radius_(0.0)
-    , inner_radius_(0.0)
-    , z_(0.0)
-{
-    // Do nothing here
-}
 
 Cylinder::Cylinder(const Vector3D position, double radius, double inner_radius, double z)
     : Geometry("Cylinder", position)
@@ -25,23 +17,15 @@ Cylinder::Cylinder(const Vector3D position, double radius, double inner_radius, 
 {
     if (inner_radius_ > radius_)
     {
-        log_error("Inner radius %f is greater then radius %f (will be swaped)", inner_radius_, radius_);
+        Logging::Get("proposal.geometry")->error("Inner radius {} is greater then radius {} (will be swaped)", inner_radius_, radius_);
         std::swap(inner_radius_, radius_);
     }
     if (inner_radius_ == radius_)
     {
-        log_error("Warning: Inner radius %f == radius %f (Volume is 0)", inner_radius_, radius_);
+        Logging::Get("proposal.geometry")->error("Warning: Inner radius {} == radius {} (Volume is 0)", inner_radius_, radius_);
     }
 }
 
-Cylinder::Cylinder(const Cylinder& cylinder)
-    : Geometry(cylinder)
-    , radius_(cylinder.radius_)
-    , inner_radius_(cylinder.inner_radius_)
-    , z_(cylinder.z_)
-{
-    // Nothing to do here
-}
 
 Cylinder::Cylinder(const nlohmann::json& config)
     : Geometry(config)
@@ -59,41 +43,6 @@ Cylinder::Cylinder(const nlohmann::json& config)
     assert(z_>0);
 }
 
-// ------------------------------------------------------------------------- //
-void Cylinder::swap(Geometry& geometry)
-{
-    Cylinder* cylinder = dynamic_cast<Cylinder*>(&geometry);
-    if (!cylinder)
-    {
-        log_warn("Cannot swap Cylinder!");
-        return;
-    }
-
-    Geometry::swap(*cylinder);
-
-    std::swap(inner_radius_, cylinder->inner_radius_);
-    std::swap(radius_, cylinder->radius_);
-    std::swap(z_, cylinder->z_);
-}
-
-//------------------------------------------------------------------------- //
-Cylinder& Cylinder::operator=(const Geometry& geometry)
-{
-    if (this != &geometry)
-    {
-        const Cylinder* cylinder = dynamic_cast<const Cylinder*>(&geometry);
-        if (!cylinder)
-        {
-            log_warn("Cannot assign Sphere!");
-            return *this;
-        }
-        Cylinder tmp(*cylinder);
-        swap(tmp);
-    }
-    return *this;
-}
-
-// ------------------------------------------------------------------------- //
 bool Cylinder::compare(const Geometry& geometry) const
 {
     const Cylinder* cylinder = dynamic_cast<const Cylinder*>(&geometry);
@@ -115,7 +64,6 @@ void Cylinder::print(std::ostream& os) const
     os << "Radius: " << radius_ << "\tInnner radius: " << inner_radius_ << " Height: " << z_ << '\n';
 }
 
-// ------------------------------------------------------------------------- //
 std::pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const Vector3D& direction) const
 {
     // Calculate intersection of particle trajectory and the cylinder
@@ -287,7 +235,7 @@ std::pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, c
 
     } else
     {
-        log_error("This point should never be reached");
+        Logging::Get("proposal.geometry")->error("This point should never be reached");
     }
     // This cylinder might be hollow and we have to check if the inner border is
     // reached before.

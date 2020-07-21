@@ -31,7 +31,7 @@ EnergyCutSettings::EnergyCutSettings(
             "Relative EnergyCut (vcut) must be between [0, 1]. \nINF0: If a vc"
             "ut = 1 is set, the particle is only propagate continous.");
 
-    log_debug(
+    Logging::Get("proposal.cut")->debug(
         "EnergyCut set to ecut(%f), vcut(%f), continuous_randomization(%b)",
         ecut_, vcut_, continuous_randomization_);
 }

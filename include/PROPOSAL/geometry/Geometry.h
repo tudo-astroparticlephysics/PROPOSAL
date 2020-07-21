@@ -45,19 +45,11 @@ public:
     };
 
 public:
-    Geometry(const std::string);
     Geometry(const std::string, const Vector3D position);
-    Geometry(const Geometry&);
     Geometry(const nlohmann::json&);
-
-    /* virtual Geometry* clone() const = 0; // virtual constructor idiom (used for deep copies) */
-    virtual std::shared_ptr<const Geometry> create() const = 0;
-    virtual void swap(Geometry&);
 
     virtual ~Geometry(){};
 
-    // Operators
-    virtual Geometry& operator=(const Geometry&);
     bool operator==(const Geometry& geometry) const;
     bool operator!=(const Geometry& geometry) const;
     friend std::ostream& operator<<(std::ostream&, Geometry const&);

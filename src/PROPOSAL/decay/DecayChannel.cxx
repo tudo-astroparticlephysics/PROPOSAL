@@ -95,12 +95,12 @@ double DecayChannel::Momentum(double m1, double m2, double m3)
         // use COMPUTER_PRECISION or std::numeric_limits<double>::epsilon()
         if (std::abs(m1 - m2 - m3) < m1*COMPUTER_PRECISION)
         {
-            log_warn("(m1-m2-m3) in Kaellen function is numerically unstable and slightly negative %f. Now set to zero.",
+            Logging::Get("proposal.decay")->warn("(m1-m2-m3) in Kaellen function is numerically unstable and slightly negative {}. Now set to zero.",
                 (m1 - m2 - m3));
         }
         else
         {
-            log_fatal("Kaellen function is negative. Cannot caluclate momentum");
+            Logging::Get("proposal.decay")->error("Kaellen function is negative. Cannot caluclate momentum");
         }
         return 0.0;
     }

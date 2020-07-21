@@ -31,7 +31,7 @@ crosssection::HardComponent::HardComponent(const ParticleDef& particle_def)
                 make_shared<Interpolant>(x, y.at(i), 4, false, false));
         }
     } else {
-        log_fatal("No HardComponent tables provided for the given particle %s",
+        Logging::Get("proposal.parametrization")->error("No HardComponent tables provided for the given particle %s",
             particle_def.name.c_str());
     }
 }

@@ -90,11 +90,10 @@ endif()
 #################           log4cplus     #######################
 #################################################################
 
-option(LOG4CPLUS_BUILD_TESTING "Build unit tests for log4cplus" OFF)
-add_subdirectory("vendor/log4cplus")
-target_link_libraries(PROPOSAL PRIVATE log4cplus)
-target_compile_definitions(PROPOSAL PRIVATE -DLOG4CPLUS_SUPPORT=1)
-ADD_DEFINITIONS(-DLOG4CPLUS_CONFIG=\"${PROJECT_SOURCE_DIR}/resources/log4cplus.conf\")
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+add_subdirectory("vendor/spdlog")
+target_link_libraries(PROPOSAL PRIVATE spdlog)
+
 
 #################################################################
 #################           Tests        ########################

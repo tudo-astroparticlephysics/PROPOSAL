@@ -63,7 +63,7 @@ double Integral::Integrate(double min,
             }
             return IntegrateWithLogSubstitution(min, max, integrand, powerOfSubstitution);
         default:
-            log_fatal("Unknown integration method! 0 is returned!");
+            Logging::Get("proposal.integral")->error("Unknown integration method! 0 is returned!");
             return 0;
     }
 }
@@ -94,7 +94,7 @@ double Integral::IntegrateWithRandomRatio(double min,
             }
             return IntegrateWithLog(min, max, integrand, randomRatio);
         default:
-            log_fatal("Unknown integration method! 0 is returned!");
+            Logging::Get("proposal.integral")->error("Unknown integration method! 0 is returned!");
             return 0;
     }
 }
@@ -135,7 +135,7 @@ double Integral::GetUpperLimit()
         return randomX_;
     } else
     {
-        log_error("No previous call to upper limit functions was made!");
+        Logging::Get("proposal.integral")->error("No previous call to upper limit functions was made!");
         return 0;
     }
 }
@@ -343,19 +343,19 @@ Integral::Integral()
     int aux;
     if (romberg_ <= 0)
     {
-        log_warn("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1", romberg_);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1", romberg_);
         romberg_ = 1;
     }
 
     if (maxSteps_upper_limit_ <= 0)
     {
-        log_warn("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps_upper_limit_);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps_upper_limit_);
         maxSteps_upper_limit_ = 1;
     }
 
     if (precision_ <= 0)
     {
-        log_warn("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6", precision_);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6", precision_);
         precision_ = 1.e-6;
     }
 
@@ -426,19 +426,19 @@ Integral::Integral(int romberg, int maxSteps, double precision)
     int aux;
     if (romberg <= 0)
     {
-        log_warn("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1", romberg);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1", romberg);
         romberg = 1;
     }
 
     if (maxSteps <= 0)
     {
-        log_warn("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps);
         maxSteps = 1;
     }
 
     if (precision <= 0)
     {
-        log_warn("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6", precision);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6", precision);
         precision = 1.e-6;
     }
 
@@ -623,11 +623,11 @@ double Integral::Function(double x)
     {
         if (integrand_(t) == 0)
         {
-            log_info("substitution not suitable! returning 0!");
+            Logging::Get("proposal.integral")->info("substitution not suitable! returning 0!");
             return 0;
         } else
         {
-            log_fatal("result is nan! returning 0");
+            Logging::Get("proposal.integral")->error("result is nan! returning 0");
             return result;
         }
     }
@@ -756,7 +756,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
                             }
                         } else
                         {
-                            log_warn("Warning (in Integral/trapezoid3S): Determinant is negative, proceeding with "
+                            Logging::Get("proposal.integral")->warn("Warning (in Integral/trapezoid3S): Determinant is negative, proceeding with "
                                      "linear approximation");
                             approX = sumDifference * 2 / functionSum;
                         }
@@ -921,7 +921,7 @@ double Integral::RombergIntegrateClosed()
     }
 
     QuadpackResults q_results = qags();
-    log_warn("Precision %e has not been reached after %i steps the value is %e!\nUsing now qags! value = %e, abserr = "
+    Logging::Get("proposal.integral")->warn("Precision %e has not been reached after %i steps the value is %e!\nUsing now qags! value = %e, abserr = "
              "%e, neval = %i, ier = %i",
              precision_,
              maxSteps_romberg_,
@@ -955,7 +955,7 @@ double Integral::RombergIntegrateOpened()
             result = Trapezoid3(k, result);
             if (result != result)
             {
-                log_error("Function Value of is nan! Returning 0!");
+                Logging::Get("proposal.integral")->error("Function Value of is nan! Returning 0!");
                 return 0;
             }
 
@@ -995,7 +995,7 @@ double Integral::RombergIntegrateOpened()
     }
 
     QuadpackResults q_results = qags();
-    log_warn("Precision %e has not been reached after %i steps the value is %e!\nUsing now qags! value = %e, abserr = "
+    Logging::Get("proposal.integral")->warn("Precision %e has not been reached after %i steps the value is %e!\nUsing now qags! value = %e, abserr = "
              "%e, neval = %i, ier = %i",
              precision_,
              maxSteps_romberg_,
@@ -1044,7 +1044,7 @@ double Integral::RombergIntegrateOpened(double bigValue)
     }
 
     QuadpackResults q_results = qags();
-    log_warn("Precision %e has not been reached after %i steps the value is %e!\nUsing now qags! value = %e, abserr = "
+    Logging::Get("proposal.integral")->warn("Precision %e has not been reached after %i steps the value is %e!\nUsing now qags! value = %e, abserr = "
              "%e, neval = %i, ier = %i",
              precision_,
              maxSteps_romberg_,
@@ -1226,7 +1226,7 @@ void Integral::RefineUpperLimit(double result)
 
     if (flow * fhi > 0)
     {
-        log_error("Root must be bracketed");
+        Logging::Get("proposal.integral")->error("Root must be bracketed");
         return;
     }
 
@@ -1313,7 +1313,7 @@ void Integral::RefineUpperLimit(double result)
 
     if (i == maxSteps_upper_limit_)
     {
-        log_warn("Precision %f has not been reached after %i steps!", precision_, maxSteps_upper_limit_);
+        Logging::Get("proposal.integral")->warn("Precision %f has not been reached after %i steps!", precision_, maxSteps_upper_limit_);
     }
 
     randomX_ = currentX;
@@ -1477,7 +1477,7 @@ Integral::QuadpackResults Integral::qags(double q_limit, double q_epsabs, double
 
     if (q_limit < 1)
     {
-        log_warn("the limit is below 1, returning 0");
+        Logging::Get("proposal.integral")->warn("the limit is below 1, returning 0");
         return output;
     }
 

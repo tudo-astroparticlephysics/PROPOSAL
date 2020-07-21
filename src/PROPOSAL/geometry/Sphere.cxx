@@ -5,14 +5,6 @@
 #include "PROPOSAL/geometry/Sphere.h"
 using namespace PROPOSAL;
 
-Sphere::Sphere()
-    : Geometry((std::string)("Sphere"))
-    , radius_(0.0)
-    , inner_radius_(0.0)
-{
-    // Do nothing here
-}
-
 Sphere::Sphere(const Vector3D position, double radius, double inner_radius)
     : Geometry("Sphere", position)
     , radius_(100.0 * radius)
@@ -20,24 +12,14 @@ Sphere::Sphere(const Vector3D position, double radius, double inner_radius)
 {
     if (inner_radius_ > radius_)
     {
-        log_error("Inner radius %f is greater then radius %f (will be swaped)", inner_radius_, radius_);
+        Logging::Get("proposal.geometry")->warn("Inner radius %f is greater then radius %f (will be swaped)", inner_radius_, radius_);
         std::swap(inner_radius_, radius_);
     }
     if (inner_radius_ == radius_)
     {
-        log_error("Warning: Inner radius %f == radius %f (Volume is 0)", inner_radius_, radius_);
+        Logging::Get("proposal.geometry")->error("Warning: Inner radius %f == radius %f (Volume is 0)", inner_radius_, radius_);
     }
 }
-
-Sphere::Sphere(const Sphere& sphere)
-    : Geometry(sphere)
-    , radius_(sphere.radius_)
-    , inner_radius_(sphere.inner_radius_)
-{
-    // Nothing to do here
-}
-
-
 
 Sphere::Sphere(const nlohmann::json& config)
     : Geometry(config)
@@ -56,41 +38,6 @@ Sphere::Sphere(const nlohmann::json& config)
        throw std::logic_error("radius must be larger than inner radius");
 }
 
-// ------------------------------------------------------------------------- //
-void Sphere::swap(Geometry& geometry)
-{
-    Sphere* sphere = dynamic_cast<Sphere*>(&geometry);
-    if (!sphere)
-    {
-        log_warn("Cannot swap Sphere!");
-        return;
-    }
-
-    Geometry::swap(*sphere);
-
-    std::swap(inner_radius_, sphere->inner_radius_);
-    std::swap(radius_, sphere->radius_);
-}
-
-//------------------------------------------------------------------------- //
-Sphere& Sphere::operator=(const Geometry& geometry)
-{
-    if (this != &geometry)
-    {
-        const Sphere* sphere = dynamic_cast<const Sphere*>(&geometry);
-        if (!sphere)
-        {
-            log_warn("Cannot assign Sphere!");
-            return *this;
-        }
-
-        Sphere tmp(*sphere);
-        swap(tmp);
-    }
-    return *this;
-}
-
-// ------------------------------------------------------------------------- //
 bool Sphere::compare(const Geometry& geometry) const
 {
     const Sphere* sphere = dynamic_cast<const Sphere*>(&geometry);

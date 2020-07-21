@@ -585,7 +585,7 @@ bool Interpolant::Save(std::string Path, bool binary_tables)
 
         if (!out.good())
         {
-            log_error("Can not open file %s for writing", Path.c_str());
+            Logging::Get("proposal.interpolant")->error("Can not open file %s for writing", Path.c_str());
             return 0;
         }
     } else
@@ -595,7 +595,7 @@ bool Interpolant::Save(std::string Path, bool binary_tables)
 
         if (!out.good())
         {
-            log_error("Can not open file %s for writing", Path.c_str());
+            Logging::Get("proposal.interpolant")->error("Can not open file %s for writing", Path.c_str());
             return 0;
         }
     }
@@ -613,7 +613,7 @@ bool Interpolant::Save(std::ofstream& out, bool binary_tables)
 {
     if (!out.good())
     {
-        log_error("Can not open file for writing");
+        Logging::Get("proposal.interpolant")->error("Can not open file for writing");
         return 0;
     }
     bool D2 = false;
@@ -1193,7 +1193,7 @@ Interpolant::Interpolant(std::vector<double> x, std::vector<double> y, int rombe
 
     if (x.size() != y.size())
     {
-        log_fatal("size of x(%i) and y(%i) do not match!", (int)(x.size()), (int)(y.size()));
+        Logging::Get("proposal.interpolant")->critical("size of x(%i) and y(%i) do not match!", (int)(x.size()), (int)(y.size()));
     }
 
     for (int i = 0; i < (int)x.size(); i++)
@@ -1250,13 +1250,13 @@ Interpolant::Interpolant(std::vector<double> x1, std::vector<double> x2, std::ve
     //TODO: Not sure what is happening in the romberg=0 case
     if (romberg1 <= 0)
     {
-        log_warn("romberg1 = %i must be > 0! setting to 1!", romberg1);
+        Logging::Get("proposal.interpolant")->warn("romberg1 = %i must be > 0! setting to 1!", romberg1);
         romberg1 = 1;
     }
 
     if (romberg2 <= 0)
     {
-        log_warn("romberg2 = %i must be > 0! setting to 1!", romberg2);
+        Logging::Get("proposal.interpolant")->warn("romberg2 = %i must be > 0! setting to 1!", romberg2);
         romberg2 = 1;
     }
 
@@ -1274,12 +1274,12 @@ Interpolant::Interpolant(std::vector<double> x1, std::vector<double> x2, std::ve
 
     if (x2.size() != y[0].size())
     {
-        log_fatal("size of x2(%i) and y(%i) do not match!", (int)(x2.size()), (int)(y[0].size()));
+        Logging::Get("proposal.interpolant")->critical("size of x2(%i) and y(%i) do not match!", (int)(x2.size()), (int)(y[0].size()));
     }
 
     if (x1.size() != y.size())
     {
-        log_fatal("size of x1(%i) and y(%i) do not match!", (int)(x1.size()), (int)(y.size()));
+        Logging::Get("proposal.interpolant")->critical("size of x1(%i) and y(%i) do not match!", (int)(x1.size()), (int)(y.size()));
     }
 
 
@@ -1353,13 +1353,13 @@ Interpolant::Interpolant(std::vector<double> x1, std::vector< std::vector<double
     //TODO: Not sure what is happening in the romberg=0 case
     if (romberg1 <= 0)
     {
-        log_warn("romberg1 = %i must be > 0! setting to 1!", romberg1);
+        Logging::Get("proposal.interpolant")->warn("romberg1 = %i must be > 0! setting to 1!", romberg1);
         romberg1 = 1;
     }
 
     if (romberg2 <= 0)
     {
-        log_warn("romberg2 = %i must be > 0! setting to 1!", romberg2);
+        Logging::Get("proposal.interpolant")->warn("romberg2 = %i must be > 0! setting to 1!", romberg2);
         romberg2 = 1;
     }
 
@@ -1378,18 +1378,18 @@ Interpolant::Interpolant(std::vector<double> x1, std::vector< std::vector<double
     for(int i = 0; i < (int)x1.size(); i++){
         if (x2[i].size() != y[i].size())
         {
-            log_fatal("size of x2(%i) and y(%i) do not match!", (int)(x2[i].size()), (int)(y[i].size()));
+            Logging::Get("proposal.interpolant")->critical("size of x2(%i) and y(%i) do not match!", (int)(x2[i].size()), (int)(y[i].size()));
         }
     }
 
     if (x1.size() != y.size())
     {
-        log_fatal("size of x1(%i) and y(%i) do not match!", (int)(x1.size()), (int)(y.size()));
+        Logging::Get("proposal.interpolant")->critical("size of x1(%i) and y(%i) do not match!", (int)(x1.size()), (int)(y.size()));
     }
 
     if (x2.size() != x1.size())
     {
-        log_fatal("size of x2(%i) and x1(%i) do not match!", (int)(x2.size()), (int)(x1.size()));
+        Logging::Get("proposal.interpolant")->critical("size of x2(%i) and x1(%i) do not match!", (int)(x2.size()), (int)(x1.size()));
     }
 
 
@@ -1614,7 +1614,7 @@ void Interpolant::InitInterpolant(int max,
 
     if (max <= 0)
     {
-        log_warn("max = %i must be > 0! setting to 1!", max);
+        Logging::Get("proposal.interpolant")->warn("max = %i must be > 0! setting to 1!", max);
         max = 1;
     }
 
@@ -1622,13 +1622,13 @@ void Interpolant::InitInterpolant(int max,
     {
         if (xmin <= 0)
         {
-            log_warn("xmin = %f must be > 0! setting to 1!", xmin);
+            Logging::Get("proposal.interpolant")->warn("xmin = %f must be > 0! setting to 1!", xmin);
             xmin = 1;
         }
 
         if (xmax <= 0)
         {
-            log_warn("xmax = %f must be > 0, setting to 1", xmax);
+            Logging::Get("proposal.interpolant")->warn("xmax = %f must be > 0, setting to 1", xmax);
             xmax = 1;
         }
     }
@@ -1643,25 +1643,25 @@ void Interpolant::InitInterpolant(int max,
 
     if (romberg <= 0)
     {
-        log_warn("romberg = %i must be > 0! setting to 1!", romberg);
+        Logging::Get("proposal.interpolant")->warn("romberg = %i must be > 0! setting to 1!", romberg);
         romberg = 1;
     }
 
     if (romberg > max)
     {
-        log_warn("romberg = %i must be <= max = %i! setting to %i!", romberg, max, max);
+        Logging::Get("proposal.interpolant")->warn("romberg = %i must be <= max = %i! setting to %i!", romberg, max, max);
         romberg = max;
     }
 
     if (rombergY <= 0)
     {
-        log_warn("rombergY = %i must be > 0! setting to 1!", rombergY);
+        Logging::Get("proposal.interpolant")->warn("rombergY = %i must be > 0! setting to 1!", rombergY);
         rombergY = 1;
     }
 
     if (rombergY > max)
     {
-        log_warn("rombergY = %i must be < %i! setting to %i!", rombergY, max, max);
+        Logging::Get("proposal.interpolant")->warn("rombergY = %i must be < %i! setting to %i!", rombergY, max, max);
         rombergY = max;
     }
 

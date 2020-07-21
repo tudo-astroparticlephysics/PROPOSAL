@@ -58,7 +58,7 @@ InterpolationDef::InterpolationDef(const nlohmann::json& config)
             "Order of interpolation must be larger than one.");
 
     if (not config.contains("path_to_tables")) {
-        log_warn("No valid writable path to interpolation tables found. Save "
+        Logging::Get("proposal.methods")->warn("No valid writable path to interpolation tables found. Save "
                  "tables in memory, if readonly path is also not working!");
     } else {
         if (config.at("path_to_tables").is_string())
@@ -80,7 +80,7 @@ InterpolationDef::InterpolationDef(const nlohmann::json& config)
     };
 
     if (not config.contains("path_to_tables_readonly")) {
-        log_warn(
+        Logging::Get("proposal.methods")->warn(
             "No valid writable path to interpolation tables readonly found."
             "Save tables in memory, if readonly path is also not working!");
     } else {
@@ -141,19 +141,19 @@ namespace Helper {
             if ((access(table_dir.c_str(), R_OK) == 0)
                 && (access(table_dir.c_str(), W_OK) == 0)) {
                 writeable = true;
-                log_debug("Table directory does exist and has read and write "
+                Logging::Get("proposal.methods")->debug("Table directory does exist and has read and write "
                           "permissions: %s",
                     table_dir.c_str());
             } else {
                 if (access(table_dir.c_str(), R_OK) != 0)
-                    log_warn("Table directory is not readable: %s",
+                    Logging::Get("proposal.methods")->warn("Table directory is not readable: %s",
                         table_dir.c_str());
                 else
-                    log_warn("Table directory is not writable: %s",
+                    Logging::Get("proposal.methods")->warn("Table directory is not writable: %s",
                         table_dir.c_str());
             }
         } else
-            log_warn("Table directory does not exist: %s", table_dir.c_str());
+            Logging::Get("proposal.methods")->warn("Table directory does not exist: %s", table_dir.c_str());
 
         return writeable;
     }
@@ -168,22 +168,22 @@ namespace Helper {
             if ((access(table_dir.c_str(), R_OK) == 0)
                 && (access(table_dir.c_str(), W_OK) == 0)) {
                 readable = true;
-                log_debug("Table directory does exist and has read and write "
+                Logging::Get("proposal.methods")->debug("Table directory does exist and has read and write "
                           "permissions: %s",
                     table_dir.c_str());
             } else {
                 if (access(table_dir.c_str(), R_OK) == 0) {
                     readable = true;
-                    log_debug("Table directory does exist and has only read "
+                    Logging::Get("proposal.methods")->debug("Table directory does exist and has only read "
                               "permissions: "
                               "%s",
                         table_dir.c_str());
                 } else
-                    log_warn("Table directory is not readable: %s",
+                    Logging::Get("proposal.methods")->warn("Table directory is not readable: %s",
                         table_dir.c_str());
             }
         } else
-            log_warn("Table directory does not exist: %s", table_dir.c_str());
+            Logging::Get("proposal.methods")->warn("Table directory does not exist: %s", table_dir.c_str());
 
         return readable;
     }
@@ -287,12 +287,12 @@ namespace Helper {
                 // it might saves them in memory if the other instance is still
                 // writing them down in the same path
                 if (input.peek() == std::ifstream::traits_type::eof()) {
-                    log_info("file %s is empty! Another process is presumably "
+                    Logging::Get("proposal.methods")->info("file %s is empty! Another process is presumably "
                              "writing. "
                              "Try another reading path or write in memory!",
                         filename.str().c_str());
                 } else {
-                    log_debug("%s tables will be read from file: %s",
+                    Logging::Get("proposal.methods")->debug("%s tables will be read from file: %s",
                         name.c_str(), filename.str().c_str());
 
                     for (const auto& builder : builder_container) {
@@ -307,24 +307,24 @@ namespace Helper {
                 input.close();
 
             } else {
-                log_debug("In the readonly path to the interpolation tables, "
+                Logging::Get("proposal.methods")->debug("In the readonly path to the interpolation tables, "
                           "the file %s "
                           "does not Exist",
                     filename.str().c_str());
             }
         } else {
-            log_debug("No reading path was given, now the tables are read or "
+            Logging::Get("proposal.methods")->debug("No reading path was given, now the tables are read or "
                       "written to "
                       "the writing path.");
         }
 
         if (reading_worked) {
-            log_debug("Initialize %s interpolation done.", name.c_str());
+            Logging::Get("proposal.methods")->debug("Initialize %s interpolation done.", name.c_str());
             return interpolants;
         }
 
         if (just_use_readonly_path) {
-            log_fatal("The just_use_readonly_path option is enabled and the "
+            Logging::Get("proposal.methods")->critical("The just_use_readonly_path option is enabled and the "
                       "table is not "
                       "in the readonly path.");
         }
@@ -359,13 +359,13 @@ namespace Helper {
                 // parallel now just one is writing them and the other just
                 // saves them in memory
                 if (input.peek() == std::ifstream::traits_type::eof()) {
-                    log_info("file %s is empty! Another process is presumably "
+                    Logging::Get("proposal.methods")->info("file %s is empty! Another process is presumably "
                              "writing. "
                              "Save this table in memory!",
                         filename.str().c_str());
                     storing_failed = true;
                 } else {
-                    log_debug("%s tables will be read from file: %s",
+                    Logging::Get("proposal.methods")->debug("%s tables will be read from file: %s",
                         name.c_str(), filename.str().c_str());
 
                     for (const auto& builder : builder_container) {
@@ -377,7 +377,7 @@ namespace Helper {
 
                 input.close();
             } else {
-                log_debug("%s tables will be saved to file: %s", name.c_str(),
+                Logging::Get("proposal.methods")->debug("%s tables will be saved to file: %s", name.c_str(),
                     filename.str().c_str());
 
                 std::ofstream output;
@@ -397,7 +397,7 @@ namespace Helper {
                     }
                 } else {
                     storing_failed = true;
-                    log_warn(
+                    Logging::Get("proposal.methods")->warn(
                         "Can not open file %s for writing! Table will not be "
                         "stored!",
                         filename.str().c_str());
@@ -407,13 +407,13 @@ namespace Helper {
         }
 
         if (pathname.empty() || storing_failed) {
-            log_debug("%s tables will be stored in memomy!", name.c_str());
+            Logging::Get("proposal.methods")->debug("%s tables will be stored in memomy!", name.c_str());
 
             for (const auto& builder : builder_container)
                 interpolants.emplace_back(builder->build());
         }
 
-        log_debug("Initialize %s interpolation done.", name.c_str());
+        Logging::Get("proposal.methods")->debug("Initialize %s interpolation done.", name.c_str());
         return interpolants;
     }
 

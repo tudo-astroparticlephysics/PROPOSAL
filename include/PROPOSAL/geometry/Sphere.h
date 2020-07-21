@@ -37,19 +37,8 @@ namespace PROPOSAL {
 class Sphere : public Geometry
 {
 public:
-    Sphere();
     Sphere(const Vector3D position, double radius, double inner_radius);
-    Sphere(const Sphere&);
     Sphere(const nlohmann::json& config);
-
-    /* Geometry* clone() const override{ return new Sphere(*this); }; */
-    std::shared_ptr<const Geometry> create() const override{ return std::shared_ptr<const Geometry>( new Sphere(*this) ); }
-    void swap(Geometry&) override;
-
-    virtual ~Sphere() {}
-
-    // Operators
-    Sphere& operator=(const Geometry&) override;
 
     // Methods
     std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction) const override;

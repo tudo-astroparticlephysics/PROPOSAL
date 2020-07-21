@@ -8,14 +8,6 @@
 
 using namespace PROPOSAL;
 
-Box::Box()
-    : Geometry((std::string)("Box"))
-    , x_(0.0)
-    , y_(0.0)
-    , z_(0.0)
-{
-    // Do nothing here
-}
 
 Box::Box(const Vector3D position, double x, double y, double z)
     : Geometry("Box", position)
@@ -23,16 +15,6 @@ Box::Box(const Vector3D position, double x, double y, double z)
     , y_(100.0 * y)
     , z_(100.0 * z)
 {
-    // Do nothing here
-}
-
-Box::Box(const Box& box)
-    : Geometry(box)
-    , x_(box.x_)
-    , y_(box.y_)
-    , z_(box.z_)
-{
-    // Nothing to do here
 }
 
 Box::Box(const nlohmann::json& config)
@@ -54,42 +36,6 @@ Box::Box(const nlohmann::json& config)
     if(z_ < 0) throw std::logic_error("height must be > 0");
 }
 
-// ------------------------------------------------------------------------- //
-void Box::swap(Geometry& geometry)
-{
-    Box* box = dynamic_cast<Box*>(&geometry);
-    if (!box)
-    {
-        log_warn("Cannot swap Box!");
-        return;
-    }
-
-    Geometry::swap(*box);
-
-    std::swap(x_, box->x_);
-    std::swap(y_, box->y_);
-    std::swap(z_, box->z_);
-}
-
-//------------------------------------------------------------------------- //
-Box& Box::operator=(const Geometry& geometry)
-{
-    if (this != &geometry)
-    {
-        const Box* box = dynamic_cast<const Box*>(&geometry);
-        if (!box)
-        {
-            log_warn("Cannot assign Sphere!");
-            return *this;
-        }
-
-        Box tmp(*box);
-        swap(tmp);
-    }
-    return *this;
-}
-
-// ------------------------------------------------------------------------- //
 bool Box::compare(const Geometry& geometry) const
 {
     const Box* box = dynamic_cast<const Box*>(&geometry);
@@ -303,7 +249,7 @@ std::pair<double, double> Box::DistanceToBorder(const Vector3D& position, const 
 
     } else
     {
-        log_error("This point should nerver be reached... (-1/-1) is returned");
+        Logging::Get("proposal.geometry")->error("This point should nerver be reached... (-1/-1) is returned");
 
         distance.first  = -1;
         distance.second = -1;

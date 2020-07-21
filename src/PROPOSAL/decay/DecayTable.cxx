@@ -125,7 +125,7 @@ DecayChannel& DecayTable::SelectChannel(double rnd) const
         }
     }
 
-    log_fatal("No decay channel found. If your particle is stable, call \"SetStable\"!");
+    Logging::Get("proposal.decay")->error("No decay channel found. If your particle is stable, call \"SetStable\"!");
     return *channels_.begin()->second; // return first channel just to prevent warnings
 }
 

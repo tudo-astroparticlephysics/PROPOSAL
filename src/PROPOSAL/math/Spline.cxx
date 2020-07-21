@@ -15,7 +15,7 @@ using namespace PROPOSAL;
 
 Spline::Spline(std::vector<double> x, std::vector<double> y) : x_(x), y_(y) {
     if (x.size() != y.size())
-        log_error(
+        Logging::Get("proposal.spline")->error(
             "CalculateSpline: x and y (abscissa and ordinate) must have same "
             "dimension");
 }
