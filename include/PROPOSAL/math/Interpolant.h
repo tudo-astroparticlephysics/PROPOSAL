@@ -30,6 +30,7 @@
 #pragma once
 
 #include <vector>
+#include <sstream>
 // #include <cmath>
 
 #include <functional>
