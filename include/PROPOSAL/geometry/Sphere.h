@@ -37,8 +37,7 @@ namespace PROPOSAL {
 class Sphere : public Geometry
 {
 public:
-    Sphere(const Vector3D position, double radius, double inner_radius);
-    Sphere(const Vector3D position, double radius);
+    Sphere(const Vector3D position, double radius, double inner_radius = 0.);
     Sphere(const nlohmann::json& config);
 
     // Methods

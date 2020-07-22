@@ -44,7 +44,7 @@ std::ostream& operator<<(std::ostream& os, Geometry const& geometry)
  ******************************************************************************/
 
 Geometry::Geometry(const std::string name, const Vector3D position)
-    : position_(100. * position)
+    : position_(position)
     , name_(name)
     , hierarchy_(0)
 {

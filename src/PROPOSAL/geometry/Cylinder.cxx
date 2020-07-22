@@ -9,12 +9,13 @@
 using namespace PROPOSAL;
 
 
-Cylinder::Cylinder(const Vector3D position, double radius, double inner_radius, double z)
+Cylinder::Cylinder(const Vector3D position, double z, double radius, double inner_radius)
     : Geometry("Cylinder", position)
-    , radius_(100 * radius)
-    , inner_radius_(100 * inner_radius)
-    , z_(100 * z)
+    , radius_(radius)
+    , inner_radius_(inner_radius)
+    , z_(z)
 {
+    Logging::Get("proposal.geometry")->info("Order of function parameters for Cylinder constructor has been changed in vesion 7.");
     if (inner_radius_ > radius_)
     {
         Logging::Get("proposal.geometry")->error("Inner radius {} is greater then radius {} (will be swaped)", inner_radius_, radius_);
@@ -34,9 +35,9 @@ Cylinder::Cylinder(const nlohmann::json& config)
     assert(config["height"].is_number());
 
 
-    radius_ = config["outer_radius"].get<double>() * 100; // cm
-    inner_radius_ = config.value("inner_radius", 0) * 100; // cm
-    z_ = config["height"].get<double>() * 100; // cm
+    radius_ = config["outer_radius"].get<double>();
+    inner_radius_ = config.value("inner_radius", 0);
+    z_ = config["height"].get<double>();
 
     assert(inner_radius_>=0);
     assert(radius_>inner_radius_);

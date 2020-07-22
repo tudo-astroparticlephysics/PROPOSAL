@@ -11,9 +11,9 @@ using namespace PROPOSAL;
 
 Box::Box(const Vector3D position, double x, double y, double z)
     : Geometry("Box", position)
-    , x_(100.0 * x)
-    , y_(100.0 * y)
-    , z_(100.0 * z)
+    , x_(x)
+    , y_(y)
+    , z_(z)
 {
 }
 
@@ -27,9 +27,9 @@ Box::Box(const nlohmann::json& config)
     if(not config.at("height").is_number())
         throw std::invalid_argument("Height is not a number.");
 
-    x_ = config["length"].get<double>() * 100;
-    y_ = config["width"].get<double>() * 100;
-    z_ = config["height"].get<double>() * 100;
+    x_ = config["length"].get<double>();
+    y_ = config["width"].get<double>();
+    z_ = config["height"].get<double>();
 
     if(x_ < 0) throw std::logic_error("lenght must be > 0");
     if(y_ < 0) throw std::logic_error("width must be > 0");
