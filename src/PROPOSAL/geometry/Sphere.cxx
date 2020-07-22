@@ -21,6 +21,9 @@ Sphere::Sphere(const Vector3D position, double radius, double inner_radius)
     }
 }
 
+Sphere::Sphere(const Vector3D position, double radius)
+    : Sphere(position, radius, 0.) {}
+
 Sphere::Sphere(const nlohmann::json& config)
     : Geometry(config)
 {

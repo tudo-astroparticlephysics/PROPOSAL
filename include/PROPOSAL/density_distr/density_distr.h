@@ -106,6 +106,7 @@ namespace PROPOSAL {
 class Density_distr {
    public:
     Density_distr();
+    Density_distr(double);
     Density_distr(const Axis& axis, double);
     Density_distr(const nlohmann::json&);
     Density_distr(const Density_distr&);

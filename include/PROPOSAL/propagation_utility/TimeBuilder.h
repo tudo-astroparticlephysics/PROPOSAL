@@ -38,10 +38,11 @@ public:
     }
 
     double TimeElapsed(
-        double initial_energy, double final_energy, double) override
+        double initial_energy, double final_energy, double distance, double density) override
     {
+        (void)distance;
         assert(initial_energy >= final_energy);
-        return time_integral.Calculate(initial_energy, final_energy);
+        return time_integral.Calculate(initial_energy, final_energy) / density;
     }
 };
 
@@ -60,8 +61,9 @@ std::unique_ptr<Time> make_time(
 struct ApproximateTimeBuilder : public Time {
     ApproximateTimeBuilder() = default;
 
-    double TimeElapsed(double, double, double distance) override
+    double TimeElapsed(double, double, double distance, double density) override
     {
+        (void) density;
         assert(distance >= 0);
         return distance / SPEED;
     }

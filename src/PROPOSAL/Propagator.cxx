@@ -68,7 +68,7 @@ std::vector<DynamicData> Propagator::Propagate(
     auto rnd
         = std::bind(&RandomGenerator::RandomDouble, &RandomGenerator::Get());
 
-    auto sector_changed = false;
+    bool sector_changed;
     auto continue_propagation = true;
 
     // TODO: How to get accurate low information?
@@ -76,58 +76,52 @@ std::vector<DynamicData> Propagator::Propagate(
         = std::array<double, 3>{std::max(min_energy, p_def.mass), 0., 0.};
     while (continue_propagation) {
         auto& utility = get<UTILITY>(current_sector);
-        // DEBUG: rnd needs to be corrected by density (as a first
-        // approximation)
-        InteractionEnergy[Decay]
-            = utility.EnergyDecay(track.back().GetEnergy(), rnd);
+        auto& density = get<DENSITY_DISTR>(current_sector);
+
+        InteractionEnergy[Decay] = utility.EnergyDecay(track.back().GetEnergy(),
+                rnd, density->Evaluate(track.back().GetPosition()));
         InteractionEnergy[Stochastic]
             = utility.EnergyInteraction(track.back().GetEnergy(), rnd);
+
         std::cout << "Decay: " << InteractionEnergy[Decay] << ", " << "Stochastic: " << InteractionEnergy[Stochastic] << std::endl;
+
         auto next_interaction_type = maximize(InteractionEnergy);
         auto& energy_at_next_interaction
             = InteractionEnergy[next_interaction_type];
-        // DEBUG: return value is grammage
-        auto distance_to_next_interaction = utility.LengthContinuous(
+        auto grammage_to_next_interaction = utility.LengthContinuous(
                 track.back().GetEnergy(), energy_at_next_interaction);
-        // DEBUG: we need to make grammage out of max_distance_left to compare
-        // it in the next step (using density_distr->integrate)
+
         auto max_distance_left
             = max_distance - track.back().GetPropagatedDistance();
-        if (max_distance_left < distance_to_next_interaction) {
-            // DEBUG: This is grammage now
-            distance_to_next_interaction = max_distance_left;
+        auto max_grammage_left = density->Calculate(track.back().GetPosition(),
+                track.back().GetDirection(), max_distance_left);
+        if (max_grammage_left < grammage_to_next_interaction) {
+            grammage_to_next_interaction = max_grammage_left;
             next_interaction_type = MaxDistance;
-            energy_at_next_interaction
-                = utility.EnergyDistance(track.back().GetEnergy(),
-                    distance_to_next_interaction); // DEBUG: Insert
-                                                   // grammage here
+            energy_at_next_interaction = utility.EnergyDistance(
+                    track.back().GetEnergy(), grammage_to_next_interaction);
         }
+
         // TODO: Add new concept of smaller steps if approaching sector
-        auto approaching_sector_distance
-            = std::numeric_limits<double>::infinity(); // TODO(Maximilian): to
-                                                       // skip if condition ???
-        // DEBUG: both needs to be grammage
-        if (approaching_sector_distance < distance_to_next_interaction) {
-            // DEBUG: This is grammage now
-            distance_to_next_interaction = approaching_sector_distance;
+        auto approaching_sector_grammage = INF;
+        if (approaching_sector_grammage < grammage_to_next_interaction) {
+            grammage_to_next_interaction = approaching_sector_grammage;
             next_interaction_type = ApproachingSector;
-            // DEBUG: Insert grammage here
-            energy_at_next_interaction
-                = utility.EnergyDistance(track.back().GetEnergy(),
-                          distance_to_next_interaction);
+            energy_at_next_interaction = utility.EnergyDistance(
+                    track.back().GetEnergy(), grammage_to_next_interaction);
         }
 
         track.push_back(track.back());
-        // DEBUG: We know grammage, so we will pass grammage here
-        sector_changed
-            = AdvanceParticle(track.back(), energy_at_next_interaction,
-                distance_to_next_interaction, rnd, current_sector);
+        sector_changed = AdvanceParticle(track.back(),
+                energy_at_next_interaction, grammage_to_next_interaction,
+                max_distance_left, rnd, current_sector);
         if (!sector_changed) {
             switch (next_interaction_type) {
             case Stochastic: {
                 track.push_back(track.back());
-                DoStochasticInteraction(
-                        track.back(), utility, rnd);
+                DoStochasticInteraction(track.back(), utility, rnd);
+                if (track.back().GetEnergy() <= InteractionEnergy[MinimalE])
+                    continue_propagation = false;
                 break;
             }
             case Decay:
@@ -140,7 +134,7 @@ std::vector<DynamicData> Propagator::Propagate(
                 break;
             }
             case ApproachingSector: {
-                continue_propagation = true; //?
+                continue_propagation = true; //TODO: Find out how to handle this case
                 break;
             }
             }
@@ -149,8 +143,6 @@ std::vector<DynamicData> Propagator::Propagate(
             current_sector = ChooseCurrentSector(
                     track.back().GetPosition(), track.back().GetDirection());
         }
-        if (track.back().GetEnergy() <= InteractionEnergy[MinimalE])
-            continue_propagation = false;
     }
     return track;
 }
@@ -174,24 +166,27 @@ void Propagator::DoStochasticInteraction(DynamicData& p_cond,
 }
 
 bool Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
-    double advance_distance, std::function<double()> rnd, Sector& sector)
+        double advance_grammage, double max_distance_left,
+        std::function<double()> rnd, Sector& sector)
 {
-    assert(advance_distance > 0); // DEBUG: advance_distance is grammage now!
+    assert(advance_grammage > 0);
     auto sector_changed = false;
 
     // TODO: For NoScattering, these random numbers are not used
     auto rnd_scattering = std::array<double, 4>{ rnd(), rnd(), rnd(), rnd() };
 
     auto& utility = get<UTILITY>(sector);
+    auto& density = get<DENSITY_DISTR>(sector);
+    auto& geometry = get<GEOMETRY>(sector);
 
     Vector3D mean_direction, new_direction;
     std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
-        advance_distance, p_cond.GetEnergy(), E_f, p_cond.GetDirection(),
-        rnd_scattering); // DEBUG: advance_distance is grammage now (which
-                         // is ok because Scatter does want grammage now)
+        advance_grammage, p_cond.GetEnergy(), E_f, p_cond.GetDirection(),
+        rnd_scattering);
 
-    // DEBUG: Beforehand, we have to convert advance_distance (which is grammage
-    // now) to an actual distance using "Correct"
+    //TODO: Is max_distance_left an appropriate upper limit to pass here?
+    double advance_distance = density->Correct(p_cond.GetPosition(),
+            p_cond.GetDirection(), advance_grammage, max_distance_left);
     auto new_position
         = p_cond.GetPosition() + advance_distance * mean_direction;
 
@@ -200,47 +195,37 @@ bool Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
     // TODO: For hollow geometries, this can be problematic. We probably have to
     // remove them.
     // TODO: Catch behaviour for no defined sector
-    if (get<GEOMETRY>(sector)
+    if (geometry
         != get<GEOMETRY>(ChooseCurrentSector(new_position, new_direction))) {
         sector_changed = true;
-        double old_distance_to_border; // DEBUG this is still a distance
-        std::cout << "HIER" << std::endl;
+        double advance_distance_old;
+        std::cout << "Sector changed, varying propagation step..." << std::endl;
         do {
-            old_distance_to_border
-                = advance_distance; // DEBUG: This is a distance now
+            advance_distance_old = advance_distance;
             advance_distance = CalculateDistanceToBorder(p_cond.GetPosition(),
-                mean_direction, *get<GEOMETRY>(sector)); // DEBUG: Distance
-            std::cout << "H: " << old_distance_to_border << ", "
-                      << advance_distance << std::endl;
-            E_f = utility.EnergyDistance(p_cond.GetEnergy(),
-                advance_distance); // DEBUG: We need to turn the distance to
-                                   // grammage first (using integrate) so we can
-                                   // use EnergyDistance (which expects
-                                   // grammage)
-            std::tie(mean_direction, new_direction)
-                = utility.DirectionsScatter(advance_distance,
-                    p_cond.GetEnergy(), E_f, p_cond.GetDirection(),
-                    rnd_scattering); // DEBUG: This expects the grammage we
-                                     // calculated above
-            std::cout << std::setprecision(15)
-                      << "Step: " << old_distance_to_border << " vs "
-                      << advance_distance << std::endl;
-        } while (std::abs(old_distance_to_border - advance_distance)
-            > PARTICLE_POSITION_RESOLUTION); // DEBUG: This is both still
-                                             // distance
-        new_position = p_cond.GetPosition()
-            + advance_distance
-                * mean_direction; // DEBUG: This is still a distance
+                mean_direction, *geometry);
+            advance_grammage = density->Calculate(p_cond.GetPosition(),
+                    p_cond.GetDirection(), advance_distance);
+            std::cout << "Step: Old distance: " << advance_distance_old << ", new distance: " << advance_distance << std::endl;
+            E_f = utility.EnergyDistance(p_cond.GetEnergy(), advance_grammage);
+
+            std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
+                    advance_grammage, p_cond.GetEnergy(), E_f,
+                    p_cond.GetDirection(), rnd_scattering);
+
+            std::cout << "Step: Corrected distance: " << advance_distance << std::endl;
+        } while (std::abs(advance_distance_old - advance_distance)
+            > PARTICLE_POSITION_RESOLUTION);
+        std::cout << "Sufficient procession reached." << std::endl;
+        new_position = p_cond.GetPosition() + advance_distance * mean_direction;
     }
 
+    p_cond.SetTime(p_cond.GetTime() + utility.TimeElapsed(p_cond.GetEnergy(),
+            E_f, advance_distance, density->Evaluate(p_cond.GetPosition())));
     p_cond.SetPosition(new_position);
     p_cond.SetDirection(new_direction);
     p_cond.SetPropagatedDistance(p_cond.GetPropagatedDistance()
-        + advance_distance); // DEBUG: This is still a distance
-    p_cond.SetTime(p_cond.GetTime()
-        + utility.TimeElapsed(p_cond.GetEnergy(), E_f,
-              advance_distance)); // DEBUG: advance_distance is a distance; we
-                                  // need to correct the time for density
+        + advance_distance);
     p_cond.SetEnergy(utility.EnergyRandomize(p_cond.GetEnergy(), E_f, rnd));
     p_cond.SetType(InteractionType::ContinuousEnergyLoss);
 
@@ -250,11 +235,9 @@ bool Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
 double Propagator::CalculateDistanceToBorder(const Vector3D& position,
     const Vector3D& direction, const Geometry& current_geometry)
 {
-
     auto distance_border
         = current_geometry.DistanceToBorder(position, direction).first;
-    // TODO: These lines should be redundant as soon as the adaptive step size
-    // is implemented
+    // TODO: These lines should be redundant as soon as the adaptive step size is implemented
     for (auto& sector : sector_list) {
         auto& geometry = get<GEOMETRY>(sector);
         if (geometry->GetHierarchy() > current_geometry.GetHierarchy())

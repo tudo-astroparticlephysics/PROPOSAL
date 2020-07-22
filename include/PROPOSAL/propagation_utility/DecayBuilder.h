@@ -29,9 +29,9 @@ public:
     {
     }
 
-    double EnergyDecay(double energy, double rnd) override
+    double EnergyDecay(double energy, double rnd, double density) override
     {
-        auto rndd = -std::log(rnd);
+        auto rndd = -std::log(rnd) * density;
         auto rnddMin = decay_integral.Calculate(energy, lower_lim) / lifetime;
         if (rndd >= rnddMin)
             return lower_lim;

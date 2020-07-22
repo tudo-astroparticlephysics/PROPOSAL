@@ -28,7 +28,7 @@ public:
 
     static Interpolant1DBuilder::Definition interpol_def;
 
-    virtual double EnergyDecay(double, double) = 0;
+    virtual double EnergyDecay(double, double, double) = 0;
 };
 
 

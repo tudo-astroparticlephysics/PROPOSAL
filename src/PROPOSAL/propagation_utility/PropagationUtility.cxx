@@ -98,10 +98,10 @@ tuple<InteractionType, const Component*, double> PropagationUtility::EnergyStoch
 }
 
 double PropagationUtility::EnergyDecay(
-    double energy, std::function<double()> rnd)
+    double energy, std::function<double()> rnd, double density)
 {
     if (collection.decay_calc) {
-        return collection.decay_calc->EnergyDecay(energy, rnd());
+        return collection.decay_calc->EnergyDecay(energy, rnd(), density);
     }
     return 0; // no decay, e.g. particle is stable
 }
@@ -130,10 +130,10 @@ double PropagationUtility::EnergyDistance(
 }
 
 double PropagationUtility::TimeElapsed(
-    double initial_energy, double final_energy, double distance)
+    double initial_energy, double final_energy, double distance, double density)
 {
     return collection.time_calc->TimeElapsed(
-        initial_energy, final_energy, distance);
+        initial_energy, final_energy, distance, density);
 }
 
 tuple<Vector3D, Vector3D> PropagationUtility::DirectionsScatter(
