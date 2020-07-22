@@ -50,7 +50,7 @@ public:
 
     static Interpolant1DBuilder::Definition interpol_def;
 
-    template <typename Disp> double HighlandIntegral(Disp&&, double);
+    template <typename Disp> double HighlandIntegral(Disp&&, Cross, double);
 };
 
 template <class T>
@@ -90,12 +90,12 @@ T ScatteringHighlandIntegral<T, Cross, Enable>::BuildHighlandIntegral(
     Cross&& cross)
 {
     auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
-    auto higland_integral_func = [this, &disp](double energy) {
-        return FunctionToIntegral(disp, energy);
+    auto higland_integral_func = [this, &disp, &cross](double energy) {
+        return HighlandIntegral(disp, cross, energy);
     };
-    T decay_integral(higland_integral_func, disp.GetLowerLim(cross));
+    T decay_integral(higland_integral_func, CrossSectionVector::GetLowerLim(cross));
     if (typeid(T) == typeid(UtilityInterpolant)) {
-        auto hash = disp.GetHash(cross);
+        auto hash = CrossSectionVector::GetHash(cross);
         decay_integral.BuildTables("highland", hash, interpol_def);
     };
     return decay_integral;
@@ -104,11 +104,11 @@ T ScatteringHighlandIntegral<T, Cross, Enable>::BuildHighlandIntegral(
 template <class T, class Cross, class Enable>
 template <typename Disp>
 double ScatteringHighlandIntegral<T, Cross, Enable>::HighlandIntegral(
-    Disp&& disp, double energy)
+    Disp&& disp, Cross cross, double energy)
 {
     auto square_momentum = (energy - mass) * (energy + mass);
     auto aux = energy / square_momentum;
-    return disp.FunctionToIntegral(energy) * aux * aux;
+    return disp.FunctionToIntegral(cross, energy) * aux * aux;
 }
 
 template <class T, class Cross, class Enable>
@@ -120,13 +120,10 @@ double ScatteringHighlandIntegral<T, Cross, Enable>::CalculateTheta0(
         * std::sqrt(highland_integral.Calculate(ei, ef) / radiation_length)
         * std::abs(charge);
     aux *= std::max(1 + 0.038 * std::log(grammage / radiation_length), 0.0);
-    return std::min(aux, 1.f);
+    return std::min(aux, 1.0);
 }
 
-/* template <class T> */
-/* Interpolant1DBuilder::Definition ScatteringHighlandIntegral<T>::interpol_def(
- */
-/*     nullptr, 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
- */
+template <class T, class Cross, class Enable>
+Interpolant1DBuilder::Definition ScatteringHighlandIntegral<T, Cross, Enable>::interpol_def = {};
 
 } // namespace PROPOSAL
