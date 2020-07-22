@@ -67,7 +67,8 @@ public:
     ScatteringHighlandIntegral(
         const ParticleDef&, shared_ptr<const Medium>, Cross&&)
     {
-        throw std::invalid_argument("FUUU");
+        throw std::invalid_argument("CrossSectionVector needs to be passed "
+                                    "to use scattering_highland.");
     };
 
     bool compare(const Scattering&) const {};
