@@ -21,14 +21,20 @@ public:
     /* Propagator(const ParticleDef&, const std::string& config_file); */
     Propagator(const ParticleDef&, std::vector<Sector> sectors);
 
-    std::vector<DynamicData> Propagate(const DynamicData& initial_particle, double max_distance = 1e20, double min_energy = 0.);
+    std::vector<DynamicData> Propagate(const DynamicData& initial_particle,
+            double max_distance = 1e20, double min_energy = 0.);
 private:
-    void DoStochasticInteraction(DynamicData&, PropagationUtility&, std::function<double()>);
-    bool AdvanceParticle(DynamicData& p_cond, double advance_energy, double advance_distance,
+    void DoStochasticInteraction(DynamicData&, PropagationUtility&,
+            std::function<double()>);
+    bool AdvanceParticle(DynamicData& p_cond, double advance_energy,
+            double advance_grammage, double max_distance_left,
             std::function<double()> rnd, Sector& sector);
-    double CalculateDistanceToBorder(const Vector3D& particle_position, const Vector3D& particle_direction, const Geometry& current_geometry);
+    double CalculateDistanceToBorder(const Vector3D& particle_position,
+            const Vector3D& particle_direction,
+            const Geometry& current_geometry);
     int maximize(const std::array<double, 3>& InteractionEnergies);
-    Sector ChooseCurrentSector(const Vector3D& particle_position, const Vector3D& particle_direction);
+    Sector ChooseCurrentSector(const Vector3D& particle_position,
+            const Vector3D& particle_direction);
 
     //Global settings
     struct GlobalSettings{

@@ -7,8 +7,8 @@ using namespace PROPOSAL;
 
 Sphere::Sphere(const Vector3D position, double radius, double inner_radius)
     : Geometry("Sphere", position)
-    , radius_(100.0 * radius)
-    , inner_radius_(100.0 * inner_radius)
+    , radius_(radius)
+    , inner_radius_(inner_radius)
 {
     if (inner_radius_ > radius_)
     {
@@ -21,6 +21,7 @@ Sphere::Sphere(const Vector3D position, double radius, double inner_radius)
     }
 }
 
+
 Sphere::Sphere(const nlohmann::json& config)
     : Geometry(config)
 {
@@ -29,10 +30,8 @@ Sphere::Sphere(const nlohmann::json& config)
         throw std::invalid_argument("Outer radius is not a number.");
 
     config["outer_radius"].get_to(radius_);
-    radius_ *= 100;
 
     inner_radius_ = config.value("inner_radius", 0);
-    inner_radius_ *= 100;
     if(inner_radius_ < 0) throw std::logic_error("inner radius must be >= 0");
     if(radius_ < inner_radius_)
        throw std::logic_error("radius must be larger than inner radius");

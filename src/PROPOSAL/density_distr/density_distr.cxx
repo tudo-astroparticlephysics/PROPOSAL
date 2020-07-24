@@ -33,6 +33,7 @@ Density_distr::Density_distr(const nlohmann::json& config) {
     }
 }
 
+Density_distr::Density_distr(double massDensity) : axis_(CartesianAxis().clone()), massDensity_(massDensity) {}
 
 Density_distr::Density_distr(const Axis& axis, double massDensity) : axis_(axis.clone()), massDensity_(massDensity) {}
 
@@ -65,7 +66,7 @@ Axis::Axis(const nlohmann::json& config) {
     if(not config.contains("fp0")) throw std::invalid_argument("Axis: No fp0 found.");
     fAxis_ = Vector3D(config.at("origin"));
     fp0_ = Vector3D(config.at("fp0"));
-};
+}
 
 
 Axis::Axis(const Axis& axis) : fAxis_(axis.fAxis_), fp0_(axis.fp0_) {}

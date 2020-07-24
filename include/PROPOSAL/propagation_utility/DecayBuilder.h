@@ -29,9 +29,14 @@ public:
     {
     }
 
-    double EnergyDecay(double energy, double rnd) override
+    DecayBuilder<T, Cross>(Cross&& cross, const ParticleDef& p_def)
+        : DecayBuilder(cross, p_def.lifetime, p_def.mass)
     {
-        auto rndd = -std::log(rnd);
+    }
+
+    double EnergyDecay(double energy, double rnd, double density) override
+    {
+        auto rndd = -std::log(rnd) * density;
         auto rnddMin = decay_integral.Calculate(energy, lower_lim) / lifetime;
         if (rndd >= rnddMin)
             return lower_lim;
@@ -41,12 +46,12 @@ public:
 
 template <typename T>
 std::unique_ptr<Decay> make_decay(
-    T&& cross, double lifetime, double mass, bool interpolate = true)
+    T&& cross, const ParticleDef& p_def, bool interpolate = true)
 {
     if (interpolate)
         return PROPOSAL::make_unique<DecayBuilder<UtilityInterpolant, T>>(
-            std::forward<T>(cross), lifetime, mass);
+            std::forward<T>(cross), p_def);
     return PROPOSAL::make_unique<DecayBuilder<UtilityIntegral, T>>(
-            std::forward<T>(cross), lifetime, mass);
+            std::forward<T>(cross), p_def);
 }
 } // namespace PROPOSAL

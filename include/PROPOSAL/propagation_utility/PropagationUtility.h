@@ -63,12 +63,12 @@ public:
     // PropagationUtility(const PropagationUtility&);
 
     tuple<InteractionType, const Component*, double> EnergyStochasticloss(double, double);
-    double EnergyDecay(double, std::function<double()>);
+    double EnergyDecay(double, std::function<double()>, double);
     double EnergyInteraction(double, std::function<double()>);
     double EnergyRandomize(double, double, std::function<double()>);
     double EnergyDistance(double, double);
     double LengthContinuous(double, double);
-    double TimeElapsed(double, double, double);
+    double TimeElapsed(double, double, double, double);
 
     // TODO: return value doesn't tell what it include. Maybe it would be better
     // to give a tuple of two directions back. One is the mean over the

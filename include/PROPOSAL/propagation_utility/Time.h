@@ -10,6 +10,6 @@ struct Time {
 
     static Interpolant1DBuilder::Definition interpol_def;
 
-    virtual double TimeElapsed(double, double, double) = 0;
+    virtual double TimeElapsed(double, double, double, double) = 0;
 };
 }
