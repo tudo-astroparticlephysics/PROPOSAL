@@ -62,7 +62,7 @@ configure_file(
 )
 install(
     FILES ${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/include/PROPOSAL
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/PROPOSAL
 )
 target_include_directories(
     PROPOSAL PUBLIC
