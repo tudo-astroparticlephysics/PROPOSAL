@@ -14,8 +14,7 @@ namespace secondaries {
     using TCreateMethod = unique_ptr<Parametrization> (*)(ParticleDef, Medium);
 
     class DefaultFactory {
-        static std::unordered_map<InteractionType, TCreateMethod, InteractionType_hash> secondaries_map;
-
+        static std::unordered_map<InteractionType, TCreateMethod, InteractionType_hash>& secondaries_map();
     public:
         DefaultFactory() = delete;
 
@@ -26,9 +25,9 @@ namespace secondaries {
 
     template <typename T> bool DefaultFactory::Register(InteractionType type)
     {
-        auto it = secondaries_map.find(type);
-        if (it == secondaries_map.end()) {
-            secondaries_map[type] = [](ParticleDef p, Medium m) {
+        auto it = secondaries_map().find(type);
+        if (it == secondaries_map().end()) {
+            secondaries_map()[type] = [](ParticleDef p, Medium m) {
                 return unique_ptr<Parametrization>(
                     PROPOSAL::make_unique<T>(p, m));
             };
