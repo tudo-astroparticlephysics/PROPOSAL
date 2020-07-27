@@ -25,7 +25,7 @@ namespace secondaries {
 
     public:
         KelnerKokoulinPetrukhinMupairProduction(
-            const ParticleDef&, const Medium&);
+          const ParticleDef& p, const Medium& m) : p_def(p) {}
 
         double CalculateRho(double, double, const Component&, double) final;
         tuple<Vector3D, Vector3D> CalculateDirections(

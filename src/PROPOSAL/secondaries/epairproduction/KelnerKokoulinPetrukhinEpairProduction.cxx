@@ -13,11 +13,6 @@ using std::sqrt;
 
 using namespace PROPOSAL;
 
-secondaries::KelnerKokoulinPetrukhinEpairProduction::
-KelnerKokoulinPetrukhinEpairProduction(const ParticleDef& p, const Medium&)
-        : p_def(p), param(false) //TODO: set lpm to true when possible
-{
-}
 
 double secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateRho(
         double energy, double v, const Component& comp, double rnd)

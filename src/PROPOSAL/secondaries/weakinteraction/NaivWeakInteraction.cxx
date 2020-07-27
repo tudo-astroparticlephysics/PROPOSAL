@@ -6,11 +6,6 @@
 #include <stdexcept>
 
 using namespace PROPOSAL;
-secondaries::NaivWeakInteraction::NaivWeakInteraction(
-    const ParticleDef& p_def, const Medium&)
-    : weak_partner_type(p_def.weak_partner)
-{
-}
 
 vector<Loss::secondary_t>
 secondaries::NaivWeakInteraction::CalculateSecondaries(double,

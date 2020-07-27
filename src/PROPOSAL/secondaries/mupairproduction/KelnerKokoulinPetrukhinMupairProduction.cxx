@@ -14,11 +14,6 @@ using std::sqrt;
 
 using namespace PROPOSAL;
 
-secondaries::KelnerKokoulinPetrukhinMupairProduction::
-    KelnerKokoulinPetrukhinMupairProduction(const ParticleDef& p, const Medium&)
-    : p_def(p)
-{
-}
 
 double secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateRho(
     double energy, double v, const Component& comp, double rnd)

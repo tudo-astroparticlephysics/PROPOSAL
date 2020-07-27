@@ -20,7 +20,8 @@ namespace secondaries {
 
         static constexpr int n_rnd = 2;
 
-        NaivIonization(const ParticleDef&, const Medium&);
+        NaivIonization(const ParticleDef& p, const Medium& m) :
+            primary_particle_type(p.particle_type) {}
 
         double CalculateRho(double, double) final;
         tuple<Vector3D, Vector3D> CalculateDirections(
