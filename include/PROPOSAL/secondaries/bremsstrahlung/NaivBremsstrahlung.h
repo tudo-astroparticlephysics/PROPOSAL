@@ -14,7 +14,7 @@ namespace secondaries {
         const int primary_lepton_type;
 
     public:
-        NaivBremsstrahlung() = default;
+        NaivBremsstrahlung() = delete;
         NaivBremsstrahlung(ParticleDef p, Medium) :primary_lepton_type(p.particle_type) {};
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }

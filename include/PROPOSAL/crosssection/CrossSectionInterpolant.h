@@ -125,7 +125,7 @@ public:
         return rates;
     }
     inline double CalculateStochasticLoss(
-        const Component& comp, double energy, double rate)
+        const Component& comp, double energy, double rate) override
     {
         return CalculateStochasticLoss_impl(comp, energy, rate,
             typename param_t::base_param_t::component_wise{},

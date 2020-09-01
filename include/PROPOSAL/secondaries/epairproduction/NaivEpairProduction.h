@@ -24,11 +24,6 @@ namespace secondaries {
 
         NaivEpairProduction(ParticleDef, Medium){};
 
-        double CalculateRho(double, double, const Component&, double) final{};
-        tuple<Vector3D, Vector3D> CalculateDirections(
-            Vector3D, double, double, double) final{};
-        tuple<double, double> CalculateEnergy(double, double) final{};
-
         vector<Loss::secondary_t> CalculateSecondaries(
             double, Loss::secondary_t, const Component&, vector<double>) {
             auto sec = vector<Loss::secondary_t>{};

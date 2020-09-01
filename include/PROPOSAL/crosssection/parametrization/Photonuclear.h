@@ -127,10 +127,6 @@ public:
     using only_stochastic = std::false_type;
     using component_wise = std::true_type;
 
-    virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double) const
-        = 0;
-
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
     tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double) const noexcept override;

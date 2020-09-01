@@ -57,7 +57,7 @@ namespace crosssection {
 
         enum { V_MIN, V_MAX };
         virtual tuple<double, double> GetKinematicLimits(
-            const ParticleDef&, const Component&, double) const noexcept = 0;
+            const ParticleDef&, const Component&, double) const = 0;
 
         inline double FunctionToDNdxIntegral(const ParticleDef& p_def,
             const Component& comp, double energy, double v) const

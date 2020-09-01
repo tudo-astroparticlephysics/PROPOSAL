@@ -73,19 +73,6 @@ public:
     using only_stochastic = std::false_type;
     using component_wise = std::true_type;
 
-    // ----------------------------------------------------------------------------
-    /// @brief This is the calculation of the dSigma/dv
-    ///
-    /// \f[e_{Pair}=return = \rho N_Z z^2 \Big[ \int_{1-r_{max}}^{aux}
-    /// f(r)dr + \int^1_{aux} f(r) dr \Big]\f]
-    /// with \f$ aux=max(1-r_{Max}, ComputerPrecision)\f$ and \f$r_{max} =
-    /// \sqrt{1-\frac{4m_e}{E_p v}}\Big(1-\frac{6m_p^2}{E_p^2(1-v)}\Big)\f$
-    ///
-    // ----------------------------------------------------------------------------
-    virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double energy, double v) const
-        = 0;
-
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
     tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double energy) const noexcept override;

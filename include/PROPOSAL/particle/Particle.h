@@ -86,6 +86,7 @@ class UtilityDecorator;
 class DynamicData {
 public:
     DynamicData();
+    virtual ~DynamicData() = default;
     DynamicData(const int&);
     DynamicData(const int&, const Vector3D&, const Vector3D&, const double&,
         const double&, const double&, const double&);

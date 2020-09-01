@@ -249,7 +249,7 @@ double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
 
 template <typename Param, typename P, typename M>
 double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
-    const Component& comp, double energy, double rate, bool, std::true_type)
+    const Component&, double energy, double, bool, std::true_type)
 {
     return energy;
 }
