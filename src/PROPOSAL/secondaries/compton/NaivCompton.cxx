@@ -15,7 +15,7 @@ double secondaries::NaivCompton::CalculateRho(
     double primary_energy, double loss_energy)
 {
     return loss_energy / primary_energy;
-};
+}
 
 tuple<Vector3D, Vector3D> secondaries::NaivCompton::CalculateDirections(
     Vector3D primary_dir, double energy, double rho, double rnd)

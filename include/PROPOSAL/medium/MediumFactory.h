@@ -1,8 +1,8 @@
 #include <memory>
 #include <string>
 
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/json.hpp"
+#include "PROPOSAL/medium/Medium.h"
 
 namespace PROPOSAL {
 static std::map<const Medium_Type, std::shared_ptr<Medium>> Medium_Map{
@@ -24,9 +24,7 @@ static std::map<const Medium_Type, std::shared_ptr<Medium>> Medium_Map{
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-std::shared_ptr<Medium> CreateMedium(
-    Medium_Type type, double density_correction = 1.0);
-std::shared_ptr<Medium> CreateMedium(
-    std::string name, double density_correction = 1.0);
-std::shared_ptr<Medium> CreateMedium(const nlohmann::json&);
+std::unique_ptr<Medium> CreateMedium(Medium_Type type);
+std::unique_ptr<Medium> CreateMedium(std::string name);
+std::unique_ptr<Medium> CreateMedium(const nlohmann::json&);
 } // namespace PROPOSAL

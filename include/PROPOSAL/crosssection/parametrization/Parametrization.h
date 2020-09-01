@@ -53,11 +53,11 @@ namespace crosssection {
         virtual ~Parametrization() = default;
 
         virtual double DifferentialCrossSection(
-            const ParticleDef&, const Component&, double, double) const;
+            const ParticleDef&, const Component&, double, double) const = 0;
 
         enum { V_MIN, V_MAX };
         virtual tuple<double, double> GetKinematicLimits(
-            const ParticleDef&, const Component&, double) const noexcept;
+            const ParticleDef&, const Component&, double) const noexcept = 0;
 
         inline double FunctionToDNdxIntegral(const ParticleDef& p_def,
             const Component& comp, double energy, double v) const

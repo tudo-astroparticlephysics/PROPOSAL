@@ -31,7 +31,7 @@ double crosssection::MupairProduction::GetLowerEnergyLim(const ParticleDef& p_de
 }
 
 tuple<double, double> crosssection::MupairProduction::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy) const
+    const ParticleDef& p_def, const Component& , double energy) const
     noexcept
 {
     auto vmin = 2 * MMU / energy;

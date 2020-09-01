@@ -37,7 +37,7 @@
 #define MEDIUM_DEF(cls)                                                        \
     class cls : public Medium {                                                \
        public:                                                                 \
-        cls(double rho = 1.0);                                                 \
+        cls();                                                 \
     };
 
 namespace PROPOSAL {
@@ -53,7 +53,6 @@ class Medium {
    public:
     Medium() {}
     Medium(std::string name,
-           double rho,
            double I,
            double C,
            double a,
@@ -162,7 +161,7 @@ class Air : public Medium {
     static const double fraction_sum;
 
    public:
-    Air(double rho = 1.0);
+    Air();
     Air(const Medium& medium) : Medium(medium) {}
     virtual ~Air() {}
 };

@@ -24,7 +24,7 @@ double crosssection::WeakInteraction::GetLowerEnergyLim(const ParticleDef& p_def
     return p_def.mass;
 }
 tuple<double, double> crosssection::WeakInteraction::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy) const
+    const ParticleDef&, const Component&, double energy) const
     noexcept
 {
     double aux = (MP + MN) / 2; // for isoscalar targets

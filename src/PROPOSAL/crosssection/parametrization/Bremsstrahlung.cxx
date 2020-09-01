@@ -274,6 +274,7 @@ double crosssection::BremsCompleteScreening::CalculateParametrization(
     const ParticleDef& p_def, const Component& comp, double energy,
     double v) const
 {
+    (void)p_def;
     (void)energy;
 
     double aux = 0;

@@ -10,7 +10,7 @@ using namespace PROPOSAL;
 vector<Loss::secondary_t>
 secondaries::NaivWeakInteraction::CalculateSecondaries(double,
     Loss::secondary_t loss, const Component&,
-    vector<double> rnd)
+    vector<double>)
 {
     std::get<Loss::TYPE>(loss) = weak_partner_type;
     auto sec = vector<Loss::secondary_t>{ move(loss) };

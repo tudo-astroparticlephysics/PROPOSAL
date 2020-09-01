@@ -20,7 +20,7 @@ namespace secondaries {
 
         static constexpr int n_rnd = 2;
 
-        NaivIonization(const ParticleDef& p, const Medium& m) :
+        NaivIonization(const ParticleDef& p, const Medium&) :
             primary_particle_type(p.particle_type) {}
 
         double CalculateRho(double, double) final;

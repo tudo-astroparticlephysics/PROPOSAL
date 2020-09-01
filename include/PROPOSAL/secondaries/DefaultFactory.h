@@ -42,7 +42,7 @@ namespace secondaries {
     template <typename T> class RegisteredInDefault {
     protected:
         static bool s_registered;
-        RegisteredInDefault() { s_registered; }
+        RegisteredInDefault() { (void)s_registered; }
     };
 
     template <typename T>

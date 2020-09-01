@@ -24,7 +24,7 @@ namespace PROPOSAL {
 
         public:
             KelnerKokoulinPetrukhinEpairProduction(
-              const ParticleDef& p, const Medium& m) : p_def(p), param(false) {}
+              const ParticleDef& p, const Medium&) : param(false), p_def(p) {}
             //TODO: set lpm to true when possible
 
             double CalculateRho(double, double, const Component&, double) final;

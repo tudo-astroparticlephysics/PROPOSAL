@@ -15,7 +15,7 @@ namespace secondaries {
     public:
         static constexpr int n_rnd = 0;
 
-        NaivWeakInteraction(const ParticleDef& p, const Medium& m)
+        NaivWeakInteraction(const ParticleDef& p, const Medium&)
             : weak_partner_type(p.weak_partner) {}
 
         size_t RequiredRandomNumbers() const noexcept { return n_rnd; }

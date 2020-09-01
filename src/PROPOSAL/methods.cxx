@@ -295,7 +295,7 @@ namespace Helper {
                     Logging::Get("proposal.methods")->debug("%s tables will be read from file: %s",
                         name.c_str(), filename.str().c_str());
 
-                    for (const auto& builder : builder_container) {
+                    for (size_t i = 0; i < builder_container.size(); ++i) {
                         // TODO(mario): read check Tue 2017/09/05
                         interpolants.emplace_back(
                             unique_ptr<Interpolant>(new Interpolant()));
@@ -368,7 +368,7 @@ namespace Helper {
                     Logging::Get("proposal.methods")->debug("%s tables will be read from file: %s",
                         name.c_str(), filename.str().c_str());
 
-                    for (const auto& builder : builder_container) {
+                    for (size_t i=0; i<builder_container.size(); ++i) {
                         // TODO(mario): read check Tue 2017/09/05
                         interpolants.emplace_back(new Interpolant());
                         interpolants.back()->Load(input, binary_tables);

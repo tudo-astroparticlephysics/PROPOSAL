@@ -240,11 +240,11 @@ crosssection::IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(
 }
 
 tuple<double, double> crosssection::IonizBergerSeltzerBhabha::GetKinematicLimits(
-    const ParticleDef& p_def, const Medium& medium, double energy) const
+    const ParticleDef& p_def, const Medium&, double energy) const
     noexcept
 {
     auto v_min = 0.;
-    auto v_max = 1. - ME / energy;
+    auto v_max = 1. - p_def.mass / energy;
 
     if (v_max < 0)
         v_max = 0;
@@ -269,8 +269,8 @@ double crosssection::IonizBergerSeltzerBhabha::DifferentialCrossSection(
 
     double aux = 0;
 
-    double gamma = energy / ME;
-    double epsilon = (v * energy) / (energy - ME);
+    double gamma = energy / p_def.mass;
+    double epsilon = (v * energy) / (energy - p_def.mass);
     double betasquared = 1. - 1. / (gamma * gamma);
     double y = 1. / (gamma + 1.);
     double B1 = 2. - y * y;
@@ -361,11 +361,11 @@ crosssection::IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(
 }
 
 tuple<double, double> crosssection::IonizBergerSeltzerMoller::GetKinematicLimits(
-    const ParticleDef& p_def, const Medium& medium, double energy) const
+    const ParticleDef& p_def, const Medium&, double energy) const
     noexcept
 {
     auto v_min = 0.;
-    auto v_max = 0.5 * (1. - ME / energy);
+    auto v_max = 0.5 * (1. - p_def.mass / energy);
 
     if (v_max < 0)
         v_max = 0;
@@ -389,8 +389,8 @@ double crosssection::IonizBergerSeltzerMoller::DifferentialCrossSection(
 
     double aux = 0;
 
-    double gamma = energy / ME;
-    double epsilon = (v * energy) / (energy - ME);
+    double gamma = energy / p_def.mass;
+    double epsilon = (v * energy) / (energy - p_def.mass);
     double betasquared = 1. - 1. / (gamma * gamma);
 
     aux = std::pow(gamma - 1., 2.) / (gamma * gamma)

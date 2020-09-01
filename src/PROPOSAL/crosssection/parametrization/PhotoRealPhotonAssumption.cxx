@@ -118,7 +118,7 @@ PHOTO_PARAM_REAL_IMPL(BezrukovBugaev, RealPhotonAssumption)
 // eq. 21
 // ------------------------------------------------------------------------- //
 double crosssection::PhotoBezrukovBugaev::CalculateParametrization(
-    const Component& comp, double nu) const
+    const Component&, double nu) const
 {
     double aux;
 
@@ -173,7 +173,7 @@ double crosssection::PhotoRhode::MeasuredSgN(double e) const
     return interpolant_->InterpolateArray(e);
 }
 
-double crosssection::PhotoRhode::CalculateParametrization(const Component& comp, double nu) const
+double crosssection::PhotoRhode::CalculateParametrization(const Component&, double nu) const
 {
     if (nu <= 200.) {
         return MeasuredSgN(nu);

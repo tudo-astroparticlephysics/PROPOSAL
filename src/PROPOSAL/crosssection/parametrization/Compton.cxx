@@ -38,6 +38,7 @@ double crosssection::ComptonKleinNishina::DifferentialCrossSection(
     // Relativistischen Quantum Dynamic von Dirac", Zeitschrift für Physik, 52,
     // 853-868.
     assert(energy >= p_def.mass);
+    (void)p_def;
     auto kp = energy / ME;
     auto C1 = std::pow(kp, -2.);
     auto C2 = 1. - 2. * (1. + kp) * C1;

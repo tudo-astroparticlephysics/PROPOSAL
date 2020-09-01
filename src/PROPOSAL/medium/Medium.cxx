@@ -59,7 +59,6 @@ std::ostream& operator<<(std::ostream& os, Medium const& medium) {
  ******************************************************************************/
 
 Medium::Medium(std::string name,
-               double rho,
                double I,
                double C,
                double a,
@@ -146,7 +145,6 @@ void Medium::init() {
     double aux3 = 0;
 
     numComponents_ = components_.size();
-    // massDensity_ *= rho_;
 
     for (std::vector<Components::Component>::iterator iter =
              components_.begin();
@@ -237,10 +235,9 @@ void Medium::SetSumNucleons(double sumNucleons) { sumNucleons_ = sumNucleons; }
  *                              Different Media                               *
  ******************************************************************************/
 
-Water::Water(double rho)
+Water::Water()
     : Medium(
           "water",
-          rho,
           75.0,     // I
           -3.5017,  // C
           0.09116,  // a
@@ -252,10 +249,9 @@ Water::Water(double rho)
           {Components::Hydrogen(2),
            Components::Oxygen()}) {}
 
-Ice::Ice(double rho)
+Ice::Ice()
     : Medium(
           "ice",
-          rho,
           75.0,     // I
           -3.5017,  // C
           0.09116,  // a
@@ -267,9 +263,8 @@ Ice::Ice(double rho)
           {Components::Hydrogen(2),
            Components::Oxygen()}) {}
 
-Salt::Salt(double rho)
+Salt::Salt()
     : Medium("salt",
-             rho,
              // Calculated by ESTAR detabase
              // (it could be 185 eV by the method of reference below)
              175.3,    // I
@@ -282,10 +277,9 @@ Salt::Salt(double rho)
              2.323,    // Solid halite density
              {Components::Sodium(), Components::Chlorine()}) {}
 
-CalciumCarbonate::CalciumCarbonate(double rho)
+CalciumCarbonate::CalciumCarbonate()
     : Medium(
           "calciumcarbonate",
-          rho,
           136.4,    // I
           -3.7738,  // C
           0.08301,  // a
@@ -299,9 +293,8 @@ CalciumCarbonate::CalciumCarbonate(double rho)
            Components::Oxygen(3)}) {
 }
 
-StandardRock::StandardRock(double rho)
+StandardRock::StandardRock()
     : Medium("standardrock",
-             rho,
              136.4,    // I
              -3.7738,  // C
              0.08301,  // a
@@ -312,9 +305,8 @@ StandardRock::StandardRock(double rho)
              2.650,    // massDensity
              {Components::StandardRock()}) {}
 
-FrejusRock::FrejusRock(double rho)
+FrejusRock::FrejusRock()
     : Medium("frejusrock",
-             rho,
              149.0,   // I
              -5.053,  // C
              0.078,   // a
@@ -325,9 +317,8 @@ FrejusRock::FrejusRock(double rho)
              2.740,   // massDensity
              {Components::FrejusRock()}) {}
 
-Iron::Iron(double rho)
+Iron::Iron()
     : Medium("iron",
-             rho,
              286.0,    // I
              -4.2911,  // C
              0.14680,  // a
@@ -339,9 +330,8 @@ Iron::Iron(double rho)
              {Components::Iron()}) {
 }
 
-Hydrogen::Hydrogen(double rho)
+Hydrogen::Hydrogen()
     : Medium("hydrogen",
-             rho,
              21.8,     // I
              -3.0977,  // C
              0.13483,  // a
@@ -352,9 +342,8 @@ Hydrogen::Hydrogen(double rho)
              0.07080,  // massDensity
              {Components::Hydrogen()}) {}
 
-Lead::Lead(double rho)
+Lead::Lead()
     : Medium("lead",
-             rho,
              823.0,    // I
              -6.2018,  // C
              0.09359,  // a
@@ -366,10 +355,9 @@ Lead::Lead(double rho)
              {Components::Lead()}) {
 }
 
-Copper::Copper(double rho)
+Copper::Copper()
     : Medium(
           "copper",
-          rho,
           322.0,    // I
           -4.4190,  // C
           0.14339,  // a
@@ -380,10 +368,9 @@ Copper::Copper(double rho)
           8.960,    // massDensity
           {Components::Copper()}) {}
 
-Uranium::Uranium(double rho)
+Uranium::Uranium()
     : Medium(
           "uranium",
-          rho,
           890.0,    // I
           -5.8694,  // C
           0.19677,  // a
@@ -395,9 +382,8 @@ Uranium::Uranium(double rho)
           {Components::Uranium()}) {
 }
 
-Air::Air(double rho)
+Air::Air()
     : Medium("air",
-             rho,
              85.7,      // I
              -10.5961,  // C
              0.10914,   // a
@@ -410,10 +396,9 @@ Air::Air(double rho)
               Components::Oxygen(2 * 21.0),
               Components::Argon(0.9)}) {}
 
-Paraffin::Paraffin(double rho)
+Paraffin::Paraffin()
     : Medium(
           "paraffin",
-          rho,
           55.9,     // I
           -2.9551,  // C
           0.1209,   // a
@@ -425,9 +410,8 @@ Paraffin::Paraffin(double rho)
           {Components::Carbon(25.0),
            Components::Oxygen(52.0)}) {}
 
-AntaresWater::AntaresWater(double rho)
+AntaresWater::AntaresWater()
     : Medium("antareswater",
-             rho,
              75.0,     // I
              -3.5017,  // C
              0.09116,  // a
@@ -480,10 +464,9 @@ AntaresWater::AntaresWater(double rho)
 // chemical composition is normalized with respect to hydrogen: calculate a
 // total atomic weight that yields two hydrogen atoms; use this weight to
 // calculate the numbers of atoms for all other elements
-CascadiaBasinWater::CascadiaBasinWater(double rho)
+CascadiaBasinWater::CascadiaBasinWater()
     : Medium(
         "cascadiabasinwater",
-        rho,
         75.,       // I
         -3.5017,   // C
         0.09116,   // a

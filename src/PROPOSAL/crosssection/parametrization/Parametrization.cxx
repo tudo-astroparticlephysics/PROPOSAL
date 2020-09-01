@@ -18,17 +18,17 @@ crosssection::Parametrization::Parametrization(
 {
 }
 
-double crosssection::Parametrization::DifferentialCrossSection(
-    const ParticleDef&, const Component&, double, double) const
-{
-    throw std::logic_error("Not implemented error.");
-}
+/* double crosssection::Parametrization::DifferentialCrossSection( */
+/*     const ParticleDef&, const Component&, double, double) const */
+/* { */
+/*     throw std::logic_error("Not implemented error."); */
+/* } */
 
-tuple<double, double> crosssection::Parametrization::GetKinematicLimits(
-    const ParticleDef&, const Component&, double) const noexcept
-{
-    throw std::logic_error("Not implemented error.");
-}
+/* tuple<double, double> crosssection::Parametrization::GetKinematicLimits( */
+/*     const ParticleDef&, const Component&, double) const noexcept */
+/* { */
+/*     make_tuple(0,0); */
+/* } */
 
 size_t crosssection::Parametrization::GetHash() const noexcept
 {

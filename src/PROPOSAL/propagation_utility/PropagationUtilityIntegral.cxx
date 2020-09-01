@@ -15,18 +15,15 @@ using namespace PROPOSAL;
 UtilityIntegral::UtilityIntegral(
     std::function<double(double)> func, double lower_lim)
     : integral(IROMB, IMAXS, IPREC2)
-    , FunctionToIntegral(func)
     , lower_lim(lower_lim)
+    , FunctionToIntegral(func)
 {
 }
 
-void UtilityIntegral::BuildTables(const std::string str, size_t hash_digest,
-    Interpolant1DBuilder::Definition interpol_def)
+void UtilityIntegral::BuildTables(const std::string , size_t ,
+    Interpolant1DBuilder::Definition )
 {
-    (void)str;
-    (void)hash_digest;
-    (void)interpol_def;
-};
+}
 
 double UtilityIntegral::Calculate(double energy_initial, double energy_final)
 {
@@ -41,6 +38,7 @@ double UtilityIntegral::GetUpperLimit(double energy_initial, double rnd)
 
     assert(sum > rnd); // searched Energy is below lower_lim return lower_lim as
                        // a lower limit
+    (void)sum;
 
     return integral.GetUpperLimit();
 }

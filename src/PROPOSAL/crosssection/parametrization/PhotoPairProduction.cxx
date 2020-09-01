@@ -23,7 +23,7 @@ double crosssection::PhotoPairProduction::GetLowerEnergyLim(const ParticleDef&) 
 }
 
 tuple<double, double> crosssection::PhotoPairProduction::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy) const
+    const ParticleDef&, const Component&, double energy) const
     noexcept
 {
     // x is the integration variable here
@@ -35,7 +35,7 @@ tuple<double, double> crosssection::PhotoPairProduction::GetKinematicLimits(
 }
 
 double crosssection::PhotoPairTsai::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy, double x) const
+    const ParticleDef&, const Component& comp, double energy, double x) const
 {
     // Pair production and bremsstrahlung of chraged leptons, Yung-Su Tsai,
     // Review of Modern Physics, Vol. 46, No. 4, October 1974

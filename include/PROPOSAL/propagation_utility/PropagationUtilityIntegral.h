@@ -37,8 +37,8 @@ class UtilityIntegral {
     double last_partial_sum;
 
 protected:
-    double lower_lim;
     Integral integral;
+    double lower_lim;
 
 public:
     UtilityIntegral(std::function<double(double)>, double);

@@ -30,7 +30,7 @@ tuple<double, double> secondaries::NaivIonization::CalculateEnergy(
 }
 
 vector<Loss::secondary_t> secondaries::NaivIonization::CalculateSecondaries(
-    double primary_energy, Loss::secondary_t loss, const Component& comp,
+    double primary_energy, Loss::secondary_t loss, const Component&,
     vector<double> rnd)
 {
     auto rho = CalculateRho(primary_energy, get<Loss::ENERGY>(loss));
