@@ -71,11 +71,11 @@ public:
                                     "to use scattering_highland.");
     };
 
-    bool compare(const Scattering&) const {};
+    bool compare(const Scattering&) const {return false;};
     void print(std::ostream&) const {};
 
     RandomAngles CalculateRandomAngle(double grammage, double ei, double ef,
-        const std::array<double, 4>& rnd){};
+        const std::array<double, 4>& rnd){ return RandomAngles();};
 };
 
 template <class T, class Cross, class Enable>
