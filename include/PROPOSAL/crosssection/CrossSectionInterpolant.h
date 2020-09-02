@@ -81,6 +81,7 @@ public:
         , p_def(std::forward<P>(_p_def))     // needed TODO: Maximilian Sackel
         , medium(std::forward<M>(_medium))   // 2 Jun. 2020
         , cut(_cut)
+        , def(_def)
         , dndx_map(build_cross_section_dndx(param, p_def, medium, cut, true))
     {
         if (typename param_t::only_stochastic{} == true and cut != nullptr) {
@@ -295,14 +296,14 @@ double CrossSectionInterpolant<Param, P, M>::CalculateStochasticLoss_impl(
 
 template <typename Param, typename P, typename M>
 double CrossSectionInterpolant<Param, P, M>::CalculateStochasticLoss_impl(
-    const Component& comp, double energy, double rate, std::false_type, std::false_type)
+    const Component&, double energy, double rate, std::false_type, std::false_type)
 {
     return dndx_map[nullptr]->GetUpperLimit(energy, rate);
 }
 
 template <typename Param, typename P, typename M>
 double CrossSectionInterpolant<Param, P, M>::CalculateStochasticLoss_impl(
-    const Component& comp, double energy, double rate, bool, std::true_type)
+    const Component&, double energy, double, bool, std::true_type)
 {
     return energy;
 }

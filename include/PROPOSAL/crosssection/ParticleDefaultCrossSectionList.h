@@ -38,9 +38,10 @@ unique_ptr<crosssection_t<P, M>> make_crosssection(Param&& param, P&& p_def,
         param, std::forward<P>(p_def), std::forward<M>(medium), cuts);
 }
 template <typename P, typename M>
-crosssection_list_t<EMinusDef, M> GetStdCrossSections(P particle,
-    M&& medium, std::shared_ptr<const EnergyCutSettings> cut, bool interpolate=true)
+crosssection_list_t<EMinusDef, M> GetStdCrossSections(P particle, M&&,
+    std::shared_ptr<const EnergyCutSettings>, bool interpolate=true)
 {
+    (void)interpolate;
     std::cout << "name: " << particle.name << std::endl;
     throw std::logic_error("No default crosssection for this particle provided.");
 }

@@ -74,8 +74,8 @@ public:
     bool compare(const Scattering&) const {return false;};
     void print(std::ostream&) const {};
 
-    RandomAngles CalculateRandomAngle(double grammage, double ei, double ef,
-        const std::array<double, 4>& rnd){ return RandomAngles();};
+    RandomAngles CalculateRandomAngle(double, double, double,
+        const std::array<double, 4>&){ return RandomAngles();};
 };
 
 template <class T, class Cross, class Enable>
