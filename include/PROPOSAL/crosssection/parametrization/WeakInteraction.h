@@ -29,6 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
+#include "PROPOSAL/math/Interpolant.h"
 
 #include <memory>
 #include <unordered_map>

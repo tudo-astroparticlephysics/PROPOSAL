@@ -1,3 +1,5 @@
+#pragma once
+
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/secondaries/DefaultFactory.h"

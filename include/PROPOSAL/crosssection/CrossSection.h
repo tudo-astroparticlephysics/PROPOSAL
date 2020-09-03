@@ -54,9 +54,9 @@ template <class P, class M> struct CrossSection {
     virtual rates_t CalculatedNdx(double) = 0;
     virtual double CalculateStochasticLoss(const Component&, double, double)
         = 0;
+    virtual double GetLowerEnergyLim() const = 0;
 
     virtual size_t GetHash() const noexcept = 0;
-    virtual double GetLowerEnergyLim() const = 0;
     virtual InteractionType GetInteractionType() const noexcept = 0;
 };
 

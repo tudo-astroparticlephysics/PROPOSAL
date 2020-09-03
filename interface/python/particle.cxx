@@ -279,16 +279,19 @@ void init_particle(py::module& m) {
         .def_property_readonly("closest_approach_point", &Secondaries::GetClosestApproachPoint);
 
     py::enum_<InteractionType>(m_sub, "Interaction_Type")
-        .value("Particle", InteractionType::Particle)
-        .value("Brems", InteractionType::Brems)
-        .value("DeltaE", InteractionType::DeltaE)
-        .value("Epair", InteractionType::Epair)
-        .value("NuclInt", InteractionType::NuclInt)
-        .value("MuPair", InteractionType::MuPair)
-        .value("Hadrons", InteractionType::Hadrons)
-        .value("ContinuousEnergyLoss", InteractionType::ContinuousEnergyLoss)
-        .value("Compton", InteractionType::Compton)
-        .value("WeakInt", InteractionType::WeakInt);
+        .value("particle", InteractionType::Particle)
+        .value("brems",InteractionType::Brems)
+        .value("ioniz",InteractionType::Ioniz)
+        .value("epair",InteractionType::Epair)
+        .value("photonuclear",InteractionType::Photonuclear)
+        .value("mupair",InteractionType::MuPair)
+        .value("hadrons",InteractionType::Hadrons)
+        .value("continuousenergyloss",InteractionType::ContinuousEnergyLoss)
+        .value("weakint",InteractionType::WeakInt)
+        .value("compton",InteractionType::Compton)
+        .value("decay",InteractionType::Decay)
+        .value("annihilation",InteractionType::Annihilation)
+        .value("photopair",InteractionType::Photopair);
 
    py::enum_<ParticleType>(m_sub, "Particle_Type")
         .value("None", ParticleType::None)
