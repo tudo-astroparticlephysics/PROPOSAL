@@ -2,4 +2,4 @@
 
 using namespace PROPOSAL;
 
-Interpolant1DBuilder::Definition Interaction::interpol_def{};
+Interpolant1DBuilder::Definition Interaction::interpol_def(1000);

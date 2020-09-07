@@ -54,6 +54,8 @@ public:
     template <typename T> Interpolant1DBuilder(T&& def);
 
     struct Definition {
+        Definition() = default;
+        explicit Definition(int sampling_points) noexcept {max = sampling_points;}
         function<double(double)> function1d = nullptr;
         int max = 200;
         double xmin = 0;

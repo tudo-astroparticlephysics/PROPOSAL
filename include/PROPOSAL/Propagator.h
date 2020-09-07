@@ -26,13 +26,13 @@ public:
 private:
     void DoStochasticInteraction(DynamicData&, PropagationUtility&,
             std::function<double()>);
-    bool AdvanceParticle(DynamicData& p_cond, double advance_energy,
-            double advance_grammage, double max_distance_left,
-            std::function<double()> rnd, Sector& sector);
+    int AdvanceParticle(DynamicData& p_cond, double E_f, double max_distance,
+                         std::function<double()> rnd, Sector& current_sector);
     double CalculateDistanceToBorder(const Vector3D& particle_position,
             const Vector3D& particle_direction,
             const Geometry& current_geometry);
     int maximize(const std::array<double, 3>& InteractionEnergies);
+    int minimize(const std::array<double, 3>& AdvanceDistances);
     Sector ChooseCurrentSector(const Vector3D& particle_position,
             const Vector3D& particle_direction);
 
@@ -61,8 +61,11 @@ private:
         MinimalE = 0,
         Decay = 1,
         Stochastic = 2,
-        MaxDistance = 3,
-        ApproachingSector = 4
+    };
+    enum AdvancementType : int {
+        ReachedInteraction = 0,
+        ReachedMaxDistance = 1,
+        ReachedBorder = 2
     };
 
     std::vector<Sector> sector_list;
