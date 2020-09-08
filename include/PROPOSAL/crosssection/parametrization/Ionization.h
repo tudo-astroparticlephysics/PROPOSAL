@@ -58,7 +58,10 @@ namespace crosssection {
             const ParticleDef&, const Medium&, double, double) const;
         virtual double DifferentialCrossSection(
             const ParticleDef&, const Medium&, double, double) const = 0;
-
+        double DifferentialCrossSection(
+                const ParticleDef&, const Component&, double, double) const final;
+        tuple<double, double> GetKinematicLimits(
+                const ParticleDef&, const Component&, double) const final;
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
 
         double DifferentialCrossSection(

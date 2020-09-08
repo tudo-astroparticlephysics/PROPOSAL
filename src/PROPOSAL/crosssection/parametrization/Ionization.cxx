@@ -49,6 +49,18 @@ double crosssection::Ionization::Delta(const Medium& medium, double beta, double
     }
 }
 
+double crosssection::Ionization::DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double) const
+{
+    throw std::logic_error("Not implemented, Ionization requires medium.");
+}
+
+tuple<double, double> crosssection::Ionization::GetKinematicLimits(
+        const ParticleDef&, const Component&, double) const
+{
+    throw std::logic_error("Not implemented, Ionization requires medium.");
+}
+
 tuple<double, double> crosssection::IonizBetheBlochRossi::GetKinematicLimits(
     const ParticleDef& p_def, const Medium& medium, double energy) const
     noexcept

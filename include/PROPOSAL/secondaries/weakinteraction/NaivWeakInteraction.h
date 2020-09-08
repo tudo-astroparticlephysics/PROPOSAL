@@ -18,7 +18,7 @@ namespace secondaries {
         NaivWeakInteraction(const ParticleDef& p, const Medium&)
             : weak_partner_type(p.weak_partner) {}
 
-        size_t RequiredRandomNumbers() const noexcept { return n_rnd; }
+        size_t RequiredRandomNumbers() const noexcept override { return n_rnd; }
         vector<Loss::secondary_t> CalculateSecondaries(double,
             Loss::secondary_t, const Component&, vector<double>) override;
     };

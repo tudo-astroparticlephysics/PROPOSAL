@@ -65,8 +65,8 @@ public:
     using only_stochastic = std::false_type;
     using component_wise = std::true_type;
 
-    virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double) const;
+    double DifferentialCrossSection(
+        const ParticleDef&, const Component&, double, double) const override;
     virtual double CalculateParametrization(
         const ParticleDef&, const Component&, double, double) const
         = 0;
