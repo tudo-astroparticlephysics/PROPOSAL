@@ -63,17 +63,6 @@ namespace crosssection {
         tuple<double, double> GetKinematicLimits(
                 const ParticleDef&, const Component&, double) const final;
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-
-        double DifferentialCrossSection(
-            const ParticleDef&, const Component&, double, double) const final
-        {
-            throw std::logic_error("Ionization is not defined component wise.");
-        };
-        tuple<double, double> GetKinematicLimits(
-            const ParticleDef&, const Component&, double) const noexcept final
-        {
-            return std::make_tuple(0.f,0.f);
-        };
     };
 
     class IonizBetheBlochRossi : public Ionization {
