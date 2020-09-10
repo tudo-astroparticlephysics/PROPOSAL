@@ -60,9 +60,6 @@ public:
     bool operator!=(const Scattering& scattering) const;
     friend std::ostream& operator<<(std::ostream&, Scattering const&);
 
-    /* virtual Scattering* clone() const                          = 0; // virtual constructor idiom (used for deep copies) */
-    /* virtual Scattering* clone(const ParticleDef&, const PropagationUtility&) const = 0; // virtual constructor idiom (used for deep copies) */
-
 
     std::tuple<Vector3D, Vector3D> Scatter(double grammage, double ei, double ef, const Vector3D& old_direction, const std::array<double, 4>& rnd);
 

@@ -40,7 +40,7 @@ void init_decay(py::module& m) {
 
     py::class_<ManyBodyPhaseSpace, std::shared_ptr<ManyBodyPhaseSpace>,
                DecayChannel>(m_sub, "ManyBodyPhaseSpace")
-        .def(py::init<std::vector<const ParticleDef*>,
+        .def(py::init<std::vector<std::shared_ptr<const ParticleDef>>,
                       PROPOSAL::ManyBodyPhaseSpace::MatrixElementFunction>(),
              py::arg("particle_defs"), py::arg("matrix_element") = nullptr)
         .def_static("default_evaluate", &ManyBodyPhaseSpace::DefaultEvaluate,

@@ -106,7 +106,6 @@ void init_geometry(py::module& m) {
         )pbdoc");
 
     py::class_<Sphere, std::shared_ptr<Sphere>, Geometry>(m_sub, "Sphere")
-        .def(py::init<>())
         .def(py::init<Vector3D, double, double>())
         .def(py::init<const Sphere&>())
         .def_property("inner_radius", &Sphere::GetInnerRadius,
@@ -120,7 +119,6 @@ void init_geometry(py::module& m) {
             )pbdoc");
 
     py::class_<Box, std::shared_ptr<Box>, Geometry>(m_sub, "Box")
-        .def(py::init<>())
         .def(py::init<Vector3D, double, double, double>())
         .def(py::init<const Box&>())
         .def_property("width", &Box::GetX, &Box::SetX,
@@ -144,7 +142,6 @@ void init_geometry(py::module& m) {
                 cylinder without a bore is equal to a bore radius
                 equal to zero.
             )pbdoc")
-        .def(py::init<>())
         .def(py::init<Vector3D, double, double, double>())
         .def(py::init<const Cylinder&>())
         .def_property("inner_radius", &Cylinder::GetInnerRadius,
