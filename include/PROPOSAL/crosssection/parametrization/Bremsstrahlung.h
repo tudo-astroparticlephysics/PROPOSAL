@@ -29,6 +29,7 @@
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include <memory>
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 #define BREMSSTRAHLUNG_DEF(param)                                              \
     struct Brems##param : public Bremsstrahlung {                              \
@@ -64,6 +65,7 @@ public:
 
     using only_stochastic = std::false_type;
     using component_wise = std::true_type;
+    using base_param_t = Bremsstrahlung;
 
     double DifferentialCrossSection(
         const ParticleDef&, const Component&, double, double) const override;
@@ -95,6 +97,44 @@ public:
     double DifferentialCrossSection(
         const ParticleDef&, const Component&, double energy, double v) const override;
 };
+
+// Factory pattern functions
+
+template <typename P, typename M>
+using brems_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
+        EnergyCutSettings>, bool, bool);
+
+template <typename Param, typename P, typename M>
+cross_t_ptr<P, M> create_brems(P p_def, M medium,std::shared_ptr<const
+        EnergyCutSettings> cuts, bool lpm, bool interpol) {
+    auto param = Param(lpm);
+    return make_crosssection(param, p_def, medium, cuts, interpol);
+}
+
+template<typename P, typename M>
+static std::map<std::string, brems_func_ptr<P, M>> brems_map = {
+        {"KelnerKokoulinPetrukhin", create_brems<BremsKelnerKokoulinPetrukhin, P, M>},
+        {"PetrukhinShestakov", create_brems<BremsPetrukhinShestakov, P, M>},
+        {"CompleteScreening", create_brems<BremsCompleteScreening, P, M>},
+        {"AndreevBezrukovBugaev", create_brems<BremsAndreevBezrukovBugaev, P, M>},
+        {"SandrockSoedingreksoRhode", create_brems<BremsSandrockSoedingreksoRhode, P, M>},
+        {"ElectronScreening", create_brems<BremsElectronScreening, P, M>}
+};
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for bremsstrahlung");
+
+    std::string param_name = config["parametrization"];
+    auto it = brems_map<P, M>.find(param_name);
+    if (it == brems_map<P, M>.end())
+        throw std::logic_error("Unknown parametrization for bremsstrahlung");
+
+    bool lpm = config.value("lpm", true);
+    return it->second(p_def, medium, cuts, lpm, interpol);
+}
 
 } // namespace crosssection
 } // namespace PROPOSAL

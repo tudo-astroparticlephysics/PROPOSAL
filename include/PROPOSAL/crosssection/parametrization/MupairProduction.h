@@ -32,7 +32,7 @@
 #include <functional>
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-
+#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/math/Integral.h"
 
 #define MUPAIR_PARAM_INTEGRAL_DEC(param)                                       \
@@ -77,6 +77,38 @@ namespace crosssection {
     };
 
     MUPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
+// Factory pattern functions
+
+template <typename P, typename M>
+using mupair_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
+        EnergyCutSettings>, bool);
+
+template <typename Param, typename P, typename M>
+cross_t_ptr<P, M> create_mupair(P p_def, M medium,std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol) {
+    auto param = Param();
+    return make_crosssection(param, p_def, medium, cuts, interpol);
+}
+
+template<typename P, typename M>
+static std::map<std::string, mupair_func_ptr<P, M>> mupair_map = {
+        {"KelnerKokoulinPetrukhin", create_mupair<MupairKelnerKokoulinPetrukhin, P, M>},
+};
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_mupairproduction(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for mupairproduction");
+
+    std::string param_name = config["parametrization"];
+    auto it = mupair_map<P, M>.find(param_name);
+    if (it == mupair_map<P, M>.end())
+        throw std::logic_error("Unknown parametrization for mupairproduction");
+
+    return it->second(p_def, medium, cuts, interpol);
+}
+
 } // namespace crosssection
 } // namespace PROPOSAL
 

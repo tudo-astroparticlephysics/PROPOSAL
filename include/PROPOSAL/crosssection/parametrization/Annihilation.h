@@ -35,6 +35,7 @@
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -59,5 +60,36 @@ namespace crosssection {
         double DifferentialCrossSection(
             const ParticleDef&, const Component&, double, double) const final;
     };
+
+// Factory pattern functions
+
+template <typename P, typename M>
+using annih_func_ptr = cross_t_ptr<P, M>(*)(P, M, bool);
+
+template <typename Param, typename P, typename M>
+cross_t_ptr<P, M> create_annihi(P p_def, M medium, bool interpol) {
+    auto param = Param();
+    return make_crosssection(param, p_def, medium, nullptr, interpol);
+}
+
+template<typename P, typename M>
+static std::map<std::string, annih_func_ptr<P, M>> annih_map = {
+        {"AnnihilationHeitler", create_annihi<AnnihilationHeitler, P, M>}
+};
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_annihilation(P p_def, M medium, bool interpol,
+                                    const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for annihilation");
+
+    std::string param_name = config["parametrization"];
+    auto it = annih_map<P, M>.find(param_name);
+    if (it == annih_map<P, M>.end())
+        throw std::logic_error("Unknown parametrization for annihilation");
+
+    return it->second(p_def, medium, interpol);
+}
+
 } // namespace crosssection
 } // namespace PROPOSAL

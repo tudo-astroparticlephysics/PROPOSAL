@@ -52,7 +52,9 @@ private:
     /* static nlohmann::json ParseConfig(const std::string& config_file); */
     /* void InitializeSectorFromJSON(const ParticleDef&, const nlohmann::json&, GlobalSettings); */
     /* PropagationUtility CreateUtility(CrossSectionList, std::shared_ptr<Medium>, bool, bool, bool, std::string); */
-    /* CrossSectionList CreateCrossSectionList(const nlohmann::json&, std::shared_ptr<Medium>, std::shared_ptr<EnergyCutSettings>, bool); */
+    template <typename P, typename M>
+    crosssection_list_t<P, M> CreateCrossSectionList(P&&, M&&,shared_ptr<const
+            EnergyCutSettings>, bool, const nlohmann::json&);
 
     ParticleDef p_def;
     std::shared_ptr<InterpolationDef> interpol_def_global = nullptr;

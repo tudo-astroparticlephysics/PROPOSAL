@@ -1,15 +1,17 @@
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Secondaries.h"
+#include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 /* #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h" */
-/* #include "PROPOSAL/crosssection/factories/AnnihilationFactory.h" */
-/* #include "PROPOSAL/crosssection/factories/BremsstrahlungFactory.h" */
-/* #include "PROPOSAL/crosssection/factories/ComptonFactory.h" */
-/* #include "PROPOSAL/crosssection/factories/EpairProductionFactory.h" */
-/* #include "PROPOSAL/crosssection/factories/IonizationFactory.h" */
-/* #include "PROPOSAL/crosssection/factories/MupairProductionFactory.h" */
-/* #include "PROPOSAL/crosssection/factories/PhotoPairFactory.h" */
-/* #include "PROPOSAL/crosssection/factories/PhotonuclearFactory.h" */
-/* #include "PROPOSAL/crosssection/factories/WeakInteractionFactory.h" */
+#include "PROPOSAL/crosssection/parametrization/Annihilation.h"
+#include "PROPOSAL/crosssection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crosssection/parametrization/Compton.h"
+#include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/Ionization.h"
+#include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
+#include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 #include "PROPOSAL/geometry/GeometryFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/MediumFactory.h"
@@ -472,80 +474,48 @@ Sector Propagator::ChooseCurrentSector(
 /*     return def; */
 /* } */
 
-/* CrossSectionList Propagator::CreateCrossSectionList( */
-/*     const nlohmann::json& config_cross, std::shared_ptr<Medium> medium, */
-/*     std::shared_ptr<EnergyCutSettings> cuts, bool do_interpolation) */
-/* { */
-/*     CrossSectionList crosssections; */
-/*     std::shared_ptr<InterpolationDef> interpol_def = nullptr; */
-/*     if (do_interpolation) { */
-/*         interpol_def = interpol_def_global; */
-/*     } */
-/*     if (config_cross.contains("annihilation")) { */
-/*         AnnihilationFactory::Definition annihilation_def( */
-/*             config_cross["annihilation"]); */
-/*         crosssections.emplace_back( */
-/*             AnnihilationFactory::Get().CreateAnnihilation( */
-/*                 p_def, medium, annihilation_def, interpol_def)); */
-/*     } */
-/*     if (config_cross.contains("brems")) { */
-/*         BremsstrahlungFactory::Definition brems_def(config_cross["brems"]);
- */
-/*         crosssections.emplace_back( */
-/*             BremsstrahlungFactory::Get().CreateBremsstrahlung( */
-/*                 p_def, medium, cuts, brems_def, interpol_def)); */
-/*     } */
-/*     if (config_cross.contains("compton")) { */
-/*         ComptonFactory::Definition compton_def(config_cross["compton"]); */
-/*         crosssections.emplace_back(ComptonFactory::Get().CreateCompton( */
-/*             p_def, medium, cuts, compton_def, interpol_def)); */
-/*     } */
-/*     if (config_cross.contains("epair")) { */
-/*         EpairProductionFactory::Definition epair_def(config_cross["epair"]);
- */
-/*         crosssections.emplace_back( */
-/*             EpairProductionFactory::Get().CreateEpairProduction( */
-/*                 p_def, medium, cuts, epair_def, interpol_def)); */
-/*     } */
-/*     if (config_cross.contains("ioniz")) { */
-/*         IonizationFactory::Definition ioniz_def(config_cross["ioniz"]); */
-/*         crosssections.emplace_back(IonizationFactory::Get().CreateIonization(
- */
-/*             p_def, medium, cuts, ioniz_def, interpol_def)); */
-/*     } */
-/*     if (config_cross.contains("mupair")) { */
-/*         MupairProductionFactory::Definition
- * mupair_def(config_cross["mupair"]); */
-/*         crosssections.emplace_back( */
-/*             MupairProductionFactory::Get().CreateMupairProduction( */
-/*                 p_def, medium, cuts, mupair_def, interpol_def)); */
-/*     } */
-/*     if (config_cross.contains("photonuclear")) { */
-/*         PhotonuclearFactory::Definition photonuclear_def( */
-/*             config_cross["photonuclear"]); */
-/*         crosssections.emplace_back( */
-/*             PhotonuclearFactory::Get().CreatePhotonuclear( */
-/*                 p_def, medium, cuts, photonuclear_def, interpol_def)); */
-/*     } */
-/*     if (config_cross.contains("photopair")) { */
-/*         PhotoPairFactory::Definition
- * photopair_def(config_cross["photopair"]); */
-/*         crosssections.emplace_back(PhotoPairFactory::Get().CreatePhotoPair(
- */
-/*             p_def, medium, photopair_def, interpol_def)); */
-/*     } */
-/*     if (config_cross.contains("weak")) { */
-/*         WeakInteractionFactory::Definition weak_def(config_cross["weak"]); */
-/*         crosssections.emplace_back( */
-/*             WeakInteractionFactory::Get().CreateWeakInteraction( */
-/*                 p_def, medium, weak_def, interpol_def)); */
-/*     } */
-/*     if (crosssections.size() == 0) { */
-/*         throw std::invalid_argument( */
-/*             "No crosssections could be initialized for sector"); */
-/*     } */
-/*     return crosssections; */
-/* } */
+
+template <typename P, typename M>
+crosssection_list_t<P, M> Propagator::CreateCrossSectionList(
+        P&& p_def, M&& medium, shared_ptr<const EnergyCutSettings> cuts,
+        bool interpolate, const nlohmann::json& config) {
+    crosssection_list_t<P, M> cross;
+
+    if (config.contains("annihilation"))
+        cross.emplace_back(crosssection::make_annihilation(p_def, medium,
+                                         interpolate, config["annihilation"]));
+    if (config.contains("brems"))
+        cross.emplace_back(crosssection::make_bremsstrahlung(p_def, medium,
+                                         cuts, interpolate, config["brems"]));
+    if (config.contains("compton"))
+        cross.emplace_back(crosssection::make_compton(p_def, medium,
+                                         cuts, interpolate, config["compton"]));
+    if (config.contains("epair"))
+        cross.emplace_back(crosssection::make_epairproduction(p_def, medium,
+                                         cuts, interpolate, config["epair"]));
+    if (config.contains("ioniz"))
+        cross.emplace_back(crosssection::make_ionization(p_def, medium,
+                                         cuts, interpolate, config["ioniz"]));
+    if (config.contains("mupair"))
+        cross.emplace_back(crosssection::make_mupairproduction(p_def, medium,
+                                         cuts, interpolate, config["mupair"]));
+    if (config.contains("photo")) {
+        try { cross.emplace_back(crosssection::make_photonuclearreal(p_def, medium,
+                                 cuts, interpolate, config["photo"]));
+        } catch (std::invalid_argument &e) {
+            cross.emplace_back(crosssection::make_photonuclearQ2(p_def, medium,
+                               cuts, interpolate, config["photo"]));
+        }
+    }
+    if (config.contains("photopair"))
+        cross.emplace_back(crosssection::make_photopairproduction(p_def, medium,
+                           interpolate, config["photopair"]));
+    if(config.contains("weak"))
+        cross.emplace_back(crosssection::make_weakinteraction(p_def, medium,
+                                         interpolate, config["weak"]));
+
+    return cross;
+}
 
 Propagator::GlobalSettings::GlobalSettings(const nlohmann::json& config_global)
 {

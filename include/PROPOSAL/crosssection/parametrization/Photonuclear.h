@@ -30,9 +30,8 @@
 
 #include <cmath>
 #include <memory>
-
+#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-
 using std::shared_ptr;
 
 namespace PROPOSAL {
@@ -75,49 +74,6 @@ public:
     virtual const std::string& GetName() const { return name_; }
 };
 
-class ShadowEffect {
-public:
-    ShadowEffect() {}
-    virtual ~ShadowEffect() {}
-
-    virtual double CalculateShadowEffect(const Component&, double x, double nu)
-        = 0;
-
-    virtual const std::string& GetName() const = 0;
-    virtual size_t GetHash() const = 0;
-};
-
-class ShadowDuttaRenoSarcevicSeckel : public ShadowEffect {
-public:
-    ShadowDuttaRenoSarcevicSeckel()
-        : ShadowEffect()
-    {
-    }
-
-    double CalculateShadowEffect(const Component&, double x, double nu);
-
-    virtual const std::string& GetName() const { return name_; }
-    virtual size_t GetHash() const;
-
-private:
-    static const std::string name_;
-};
-
-class ShadowButkevichMikhailov : public ShadowEffect {
-public:
-    ShadowButkevichMikhailov()
-        : ShadowEffect()
-    {
-    }
-
-    double CalculateShadowEffect(const Component&, double x, double nu);
-
-    virtual const std::string& GetName() const { return name_; }
-    virtual size_t GetHash() const;
-
-private:
-    static const std::string name_;
-};
 
 class Photonuclear : public Parametrization {
 public:

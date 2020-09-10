@@ -31,6 +31,7 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -106,5 +107,40 @@ namespace crosssection {
         double FunctionToDEdxIntegral(
             const ParticleDef&, const Medium&, double, double) const final;
     };
+
+// Factory pattern functions
+
+template <typename P, typename M>
+using ioniz_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
+        EnergyCutSettings>, bool);
+
+template <typename Param, typename P, typename M>
+cross_t_ptr<P, M> create_ioniz(P p_def, M medium,std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol) {
+    auto param = Param(*cuts);
+    return make_crosssection(param, p_def, medium, cuts, interpol);
+}
+
+template<typename P, typename M>
+static std::map<std::string, ioniz_func_ptr<P, M>> ioniz_map = {
+        {"BetheBlochRossi", create_ioniz<IonizBetheBlochRossi, P, M>},
+        {"BergerSeltzerBhabha", create_ioniz<IonizBergerSeltzerBhabha, P, M>},
+        {"BergerSeltzerMoller", create_ioniz<IonizBergerSeltzerMoller, P, M>}
+};
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for ionization");
+
+    std::string param_name = config["parametrization"];
+    auto it = ioniz_map<P, M>.find(param_name);
+    if (it == ioniz_map<P, M>.end())
+        throw std::logic_error("Unknown parametrization for ionization");
+
+    return it->second(p_def, medium, cuts, interpol);
+}
+
 } // crosssection
 } // namespace PROPOSAL

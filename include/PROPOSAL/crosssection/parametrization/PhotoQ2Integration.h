@@ -44,6 +44,50 @@
 
 namespace PROPOSAL {
 namespace crosssection {
+class ShadowEffect {
+public:
+    ShadowEffect() {}
+    virtual ~ShadowEffect() {}
+
+    virtual double CalculateShadowEffect(const Component&, double x, double nu)
+        = 0;
+
+    virtual const std::string& GetName() const = 0;
+    virtual size_t GetHash() const = 0;
+};
+
+class ShadowDuttaRenoSarcevicSeckel : public ShadowEffect {
+public:
+    ShadowDuttaRenoSarcevicSeckel()
+        : ShadowEffect()
+    {
+    }
+
+    double CalculateShadowEffect(const Component&, double x, double nu);
+
+    virtual const std::string& GetName() const { return name_; }
+    virtual size_t GetHash() const;
+
+private:
+    static const std::string name_;
+};
+
+class ShadowButkevichMikhailov : public ShadowEffect {
+public:
+    ShadowButkevichMikhailov()
+        : ShadowEffect()
+    {
+    }
+
+    double CalculateShadowEffect(const Component&, double x, double nu);
+
+    virtual const std::string& GetName() const { return name_; }
+    virtual size_t GetHash() const;
+
+private:
+    static const std::string name_;
+};
+
 class PhotoQ2Integral : public Photonuclear {
 public:
     PhotoQ2Integral(shared_ptr<ShadowEffect>);
@@ -61,6 +105,58 @@ Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor91)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor97)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(ButkevichMikhailov)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(RenoSarcevicSu)
+
+// Factory pattern functions
+
+template <typename P, typename M>
+using photoQ2_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
+        EnergyCutSettings>, shared_ptr<ShadowEffect>, bool);
+
+template <typename Param, typename P, typename M>
+cross_t_ptr<P, M> create_photoQ2(P p_def, M medium,std::shared_ptr<const
+        EnergyCutSettings> cuts, shared_ptr<ShadowEffect> shadow, bool interpol) {
+    auto param = Param(shadow);
+    return make_crosssection(param, p_def, medium, cuts, interpol);
+}
+
+template<typename P, typename M>
+static std::map<std::string, photoQ2_func_ptr<P, M>> photoQ2_map = {
+        {"AbramowiczLevinLevyMaor91", create_photoQ2<PhotoAbramowiczLevinLevyMaor91, P, M>},
+        {"AbramowiczLevinLevyMaor97", create_photoQ2<PhotoAbramowiczLevinLevyMaor97, P, M>},
+        {"ButkevichMikhailov", create_photoQ2<PhotoButkevichMikhailov, P, M>},
+        {"RenoSarcevicSu", create_photoQ2<PhotoRenoSarcevicSu, P, M>}
+};
+
+using shadow_func_ptr = std::shared_ptr<ShadowEffect>(*)();
+
+template <typename Param>
+std::shared_ptr<ShadowEffect> create_shadow() {
+    return std::make_shared<Param>();
+}
+
+static std::map<std::string, shadow_func_ptr> shadow_map = {
+        {"DuttaRenoSarcevicSeckel", create_shadow<ShadowDuttaRenoSarcevicSeckel>},
+        {"ButkevichMikhailov", create_shadow<ShadowButkevichMikhailov>},
+};
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_photonuclearQ2(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for photonuclear");
+    std::string param_name = config["parametrization"];
+
+    auto it = photoQ2_map<P, M>.find(param_name);
+    if (it != photoQ2_map<P, M>.end()) {
+        std::string shadow_name = config.value("shadow", "ButkevichMikhailov");
+        auto it_shadow = shadow_map.find(shadow_name);
+        if(it_shadow == shadow_map.end())
+            throw std::logic_error("Shadow effect name unknown");
+        return it->second(p_def, medium, cuts, it_shadow->second(), interpol);
+    }
+    throw std::invalid_argument("Unknown parametrization for photonuclear");
+}
+
 } // namespace crosssection
 } // namespace PROPOSAL
 

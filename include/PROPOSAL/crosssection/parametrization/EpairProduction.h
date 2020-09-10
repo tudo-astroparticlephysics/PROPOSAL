@@ -33,6 +33,7 @@
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 using PROPOSAL::Components::Component;
 
@@ -105,6 +106,41 @@ EPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
 EPAIR_PARAM_INTEGRAL_DEC(SandrockSoedingreksoRhode)
 
 #undef EPAIR_PARAM_INTEGRAL_DEC
+
+// Factory pattern functions
+
+template <typename P, typename M>
+using epair_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
+        EnergyCutSettings>, bool, bool);
+
+template <typename Param, typename P, typename M>
+cross_t_ptr<P, M> create_epair(P p_def, M medium,std::shared_ptr<const
+        EnergyCutSettings> cuts, bool lpm, bool interpol) {
+    auto param = Param(lpm);
+    return make_crosssection(param, p_def, medium, cuts, interpol);
+}
+
+template<typename P, typename M>
+static std::map<std::string, epair_func_ptr<P, M>> epair_map = {
+        {"KelnerKokoulinPetrukhin", create_epair<EpairKelnerKokoulinPetrukhin, P, M>},
+        {"SandrockSoedingreksoRhode", create_epair<EpairSandrockSoedingreksoRhode, P, M>},
+};
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_epairproduction(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for epairproduction");
+
+    std::string param_name = config["parametrization"];
+    auto it = epair_map<P, M>.find(param_name);
+    if (it == epair_map<P, M>.end())
+        throw std::logic_error("Unknown parametrization for epairproduction");
+
+    bool lpm = config.value("lpm", true);
+    return it->second(p_def, medium, cuts, lpm, interpol);
+}
+
 } // namespace crosssection
 
 template <>

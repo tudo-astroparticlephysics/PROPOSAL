@@ -29,6 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 using PROPOSAL::Components::Component;
 
@@ -67,4 +68,38 @@ double integrate_dedx(Integral&, crosssection::Compton&, const ParticleDef&, con
 template <>
 double integrate_de2dx(Integral&, crosssection::Compton&, const ParticleDef&,
     const Component&, double, double, double);
+
+// Factory pattern functions
+
+namespace crosssection {
+    template<typename P, typename M>
+    using compt_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
+    EnergyCutSettings>, bool);
+
+    template<typename Param, typename P, typename M>
+    cross_t_ptr<P, M> create_compt(P p_def, M medium, std::shared_ptr<const
+    EnergyCutSettings> cuts, bool interpol) {
+        auto param = Param();
+        return make_crosssection(param, p_def, medium, cuts, interpol);
+    }
+
+    template<typename P, typename M>
+    static std::map<std::string, compt_func_ptr<P, M>> compt_map = {
+            {"KleinNishina", create_compt<ComptonKleinNishina, P, M>},
+    };
+
+    template<typename P, typename M>
+    cross_t_ptr<P, M> make_compton(P p_def, M medium, std::shared_ptr<const
+    EnergyCutSettings> cuts, bool interpol, const nlohmann::json &config) {
+        if (!config.contains("parametrization"))
+            throw std::logic_error("No parametrization passed for compton");
+
+        std::string param_name = config["parametrization"];
+        auto it = compt_map<P, M>.find(param_name);
+        if (it == compt_map<P, M>.end())
+            throw std::logic_error("Unknown parametrization for compton");
+
+        return it->second(p_def, medium, cuts, interpol);
+    }
+} // namespace crosssection
 } // namespace PROPOSAL

@@ -30,6 +30,7 @@
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -91,5 +92,36 @@ struct PhotoPairTsai : public PhotoPairProduction {
 
 /*     DeflectionAngles SampleAngles(const Component&, double, double) override; */
 /* }; */
+
+// Factory pattern functions
+
+template <typename P, typename M>
+using photopair_func_ptr = cross_t_ptr<P, M>(*)(P, M, bool);
+
+template <typename Param, typename P, typename M>
+cross_t_ptr<P, M> create_photopair(P p_def, M medium, bool interpol) {
+    auto param = Param();
+    return make_crosssection(param, p_def, medium, nullptr, interpol);
+}
+
+template<typename P, typename M>
+static std::map<std::string, photopair_func_ptr<P, M>> photopair_map = {
+        {"Tsai", create_photopair<PhotoPairTsai, P, M>}
+};
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_photopairproduction(P p_def, M medium, bool interpol,
+                                    const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for photopairproduction");
+
+    std::string param_name = config["parametrization"];
+    auto it = photopair_map<P, M>.find(param_name);
+    if (it == photopair_map<P, M>.end())
+        throw std::logic_error("Unknown parametrization for photopairproduction");
+
+    return it->second(p_def, medium, interpol);
+}
+
 } //namespace crosssection
 } // namespace PROPOSAL

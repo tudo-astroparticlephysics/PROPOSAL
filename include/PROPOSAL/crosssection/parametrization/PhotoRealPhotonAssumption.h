@@ -72,10 +72,47 @@ class PhotoRhode : public PhotoRealPhotonAssumption {
 
 public:
     PhotoRhode(bool hard_component);
-
+    using base_param_t = Photonuclear;
     double CalculateParametrization(const Component&, double nu) const override;
 };
 
-#undef Q2_PHOTO_PARAM_INTEGRAL_DEC
+#undef PHOTO_PARAM_REAL_DEC
+
+// Factory pattern functions
+
+template <typename P, typename M>
+using photoreal_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
+        EnergyCutSettings>, bool, bool);
+
+template <typename Param, typename P, typename M>
+cross_t_ptr<P, M> create_photoreal(P p_def, M medium,std::shared_ptr<const
+        EnergyCutSettings> cuts, bool hard_component, bool interpol) {
+    auto param = Param(hard_component);
+    return make_crosssection(param, p_def, medium, cuts, interpol);
+}
+
+template<typename P, typename M>
+static std::map<std::string, photoreal_func_ptr<P, M>> photoreal_map = {
+        {"Zeus", create_photoreal<PhotoZeus, P, M>},
+        {"BezrukovBugaev", create_photoreal<PhotoBezrukovBugaev, P, M>},
+        {"Kokoulin", create_photoreal<PhotoKokoulin, P, M>},
+        {"Rhode", create_photoreal<PhotoRhode, P, M>},
+};
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_photonuclearreal(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for photonuclear");
+    std::string param_name = config["parametrization"];
+
+    auto it = photoreal_map<P, M>.find(param_name);
+    if (it != photoreal_map<P, M>.end()) {
+        bool hard_component = config.value("hard_component", true);
+        return it->second(p_def, medium, cuts, hard_component, interpol);
+    }
+    throw std::invalid_argument("Unknown parametrization for photonuclear");
+}
+
 } // namespace crosssection
 } // namespace PROPOSAL

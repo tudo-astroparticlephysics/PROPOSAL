@@ -65,6 +65,9 @@ using crosssection_t
     = CrossSection<typename std::decay<P>::type, typename std::decay<M>::type>;
 
 template <typename P, typename M>
+using cross_t_ptr = std::unique_ptr<crosssection_t<P, M>>;
+
+template <typename P, typename M>
 using crosssection_list_t = std::vector<std::shared_ptr<crosssection_t<P, M>>>;
 
 } // namespace PROPOSAL
