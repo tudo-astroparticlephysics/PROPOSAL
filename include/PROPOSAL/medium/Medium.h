@@ -152,19 +152,7 @@ MEDIUM_DEF(Lead)
 MEDIUM_DEF(Copper)
 MEDIUM_DEF(Uranium)
 MEDIUM_DEF(Paraffin)
-
-class Air : public Medium {
-   public:
-    static const double fraction_N;
-    static const double fraction_O;
-    static const double fraction_Ar;
-    static const double fraction_sum;
-
-   public:
-    Air();
-    Air(const Medium& medium) : Medium(medium) {}
-    virtual ~Air() {}
-};
+MEDIUM_DEF(Air)
 
 // #<{(|
 // * initialize ANTARES water
