@@ -45,6 +45,7 @@ namespace Components {
     public:
         Component() = default;
         Component(std::string name, double charge, double atomicNum, double atomInMolecule);
+        virtual ~Component() = default;
 
         bool operator==(const Component&) const;
         bool operator!=(const Component&) const;
