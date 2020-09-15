@@ -1,7 +1,6 @@
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
-/* #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h" */
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/crosssection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crosssection/parametrization/Compton.h"
@@ -15,44 +14,20 @@
 #include "PROPOSAL/geometry/GeometryFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/MediumFactory.h"
-/* #include "PROPOSAL/scattering/ScatteringFactory.h" */
+#include "PROPOSAL/propagation_utility/InteractionBuilder.h"
+#include "PROPOSAL/propagation_utility/TimeBuilder.h"
+#include "PROPOSAL/propagation_utility/DecayBuilder.h"
+#include "PROPOSAL/propagation_utility/ContRandBuilder.h"
+#include "PROPOSAL/scattering/ScatteringFactory.h"
+#include "PROPOSAL/density_distr/density_distr.h"
 #include <fstream>
 #include "PROPOSAL/Logging.h"
 
 #include <iomanip>
 
 using namespace PROPOSAL;
-
-/* Propagator::Propagator(const ParticleDef& p_def, const std::string&
- * config_file) */
-/*     : Propagator(p_def, ParseConfig(config_file)) */
-/* { */
-/* } */
-
-/* Propagator::Propagator(const ParticleDef& p_def, const nlohmann::json&
- * config) */
-/*     : p_def(p_def) */
-/* { */
-/*     GlobalSettings global; */
-/*     if (config.contains("global")) { */
-/*         global = GlobalSettings(config["global"]); */
-/*     } */
-/*     if (config.contains("interpolation")) { */
-/*         interpol_def_global */
-/*             = std::make_shared<InterpolationDef>(config["interpolation"]); */
-/*     } else { */
-/*         interpol_def_global = std::make_shared<InterpolationDef>(); */
-/*     } */
-/*     if (config.contains("sectors")) { */
-/*         assert(config["sectors"].is_array()); */
-/*         for (const auto& json_sector : config.at("sectors")) { */
-/*             InitializeSectorFromJSON(p_def, json_sector, global); */
-/*         } */
-/*     } else { */
-/*         throw std::invalid_argument("No sector array found in json object");
- */
-/*     } */
-/* } */
+using std::make_shared;
+using std::string;
 
 Propagator::Propagator(const ParticleDef& p_def, std::vector<Sector> sectors)
     : p_def(p_def)
@@ -92,31 +67,6 @@ std::vector<DynamicData> Propagator::Propagate(
         auto next_interaction_type = maximize(InteractionEnergy);
         auto energy_at_next_interaction = InteractionEnergy[next_interaction_type];
 
-        /*
-        auto grammage_to_next_interaction = utility.LengthContinuous(
-                track.back().GetEnergy(), energy_at_next_interaction);
-
-        auto max_distance_left
-            = max_distance - track.back().GetPropagatedDistance();
-        auto max_grammage_left = density->Calculate(track.back().GetPosition(),
-                track.back().GetDirection(), max_distance_left);
-        if (max_grammage_left < grammage_to_next_interaction) {
-            grammage_to_next_interaction = max_grammage_left;
-            next_interaction_type = MaxDistance;
-            energy_at_next_interaction = utility.EnergyDistance(
-                    track.back().GetEnergy(), grammage_to_next_interaction);
-        }
-
-        // TODO: Add new concept of smaller steps if approaching sector
-        auto approaching_sector_grammage = INF;
-        if (approaching_sector_grammage < grammage_to_next_interaction) {
-            grammage_to_next_interaction = approaching_sector_grammage;
-            next_interaction_type = ApproachingSector;
-            energy_at_next_interaction = utility.EnergyDistance(
-                    track.back().GetEnergy(), grammage_to_next_interaction);
-        }
-        */
-
         track.push_back(track.back());
         advancement_type = AdvanceParticle(track.back(),
                                            energy_at_next_interaction,
@@ -142,11 +92,9 @@ std::vector<DynamicData> Propagator::Propagate(
                 break;
             case ReachedBorder :
                 current_sector = ChooseCurrentSector(track.back().GetPosition(), track.back().GetDirection());
-                std::cout << "Reached border" << std::endl;
                 break;
             case ReachedMaxDistance :
                 continue_propagation = false;
-                std::cout << "Reached max distance" << std::endl;
                 break;
         }
     }
@@ -215,7 +163,7 @@ int Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
     if(advancement_type != ReachedInteraction) {
         double advance_grammage;
         double control_distance;
-        std::cout << "AdvanceParticle can't reach interaction, varying propagation step..." << std::endl;
+        //std::cout << "AdvanceParticle can't reach interaction, varying propagation step..." << std::endl;
         do {
             advance_distance = AdvanceDistance[advancement_type];
             advance_grammage = density->Calculate(p_cond.GetPosition(),
@@ -238,10 +186,10 @@ int Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
                     p_cond.GetPosition(), mean_direction, *geometry);
             advancement_type = minimize(AdvanceDistance);
             control_distance = AdvanceDistance[advancement_type];
-            std::cout << "Step - old_distance: " << advance_distance << ", new distance: " << control_distance << ", advancement type " << advancement_type << std::endl;
+            //std::cout << "Step - old_distance: " << advance_distance << ", new distance: " << control_distance << ", advancement type " << advancement_type << std::endl;
         } while (std::abs(advance_distance - control_distance)
                  > PARTICLE_POSITION_RESOLUTION);
-        std::cout << "Difference negligible, use control_distance" << std::endl;
+        //std::cout << "Difference negligible, use control_distance" << std::endl;
         advance_distance = control_distance;
         new_position = p_cond.GetPosition() + advance_distance * mean_direction;
     }
@@ -314,226 +262,30 @@ Sector Propagator::ChooseCurrentSector(
 
 // Init methods
 
-/* nlohmann::json Propagator::ParseConfig(const std::string& config_file) */
-/* { */
-/*     nlohmann::json json_config; */
-/*     try { */
-/*         std::string expanded_config_file_path */
-/*             = Helper::ResolvePath(config_file, true); */
-/*         std::ifstream infilestream(expanded_config_file_path); */
-/*         infilestream >> json_config; */
-/*     } catch (const nlohmann::json::parse_error& e) { */
-/*         Logging::Get("proposal.propagator")->critical("Unable parse \"%s\" as json file", config_file.c_str()); */
-/*     } */
-/*     return json_config; */
-/* }; */
-
-/* void Propagator::InitializeSectorFromJSON(const ParticleDef& p_def, */
-/*     const nlohmann::json& json_sector, GlobalSettings global) */
-/* { */
-/*     bool do_interpolation */
-/*         = json_sector.value("do_interpolation", global.do_interpolation); */
-/*     bool do_exact_time = json_sector.value("exact_time",
- * global.do_exact_time); */
-/*     std::string scattering = json_sector.value("scattering",
- * global.scattering); */
-/*     std::shared_ptr<Medium> medium = global.medium; */
-/*     if (json_sector.contains("medium")) { */
-/*         medium = CreateMedium(json_sector["medium"]); */
-/*     } else if (medium == nullptr) { */
-/*         throw std::invalid_argument( */
-/*             "Neither a specific Sector medium nor a global medium is
- * defined."); */
-/*     } */
-/*     std::shared_ptr<EnergyCutSettings> cuts = global.cuts; */
-/*     if (json_sector.contains("cuts")) { */
-/*         cuts = std::make_shared<EnergyCutSettings>( */
-/*             EnergyCutSettings(json_sector["cuts"])); */
-/*     } else if (cuts == nullptr) { */
-/*         throw std::invalid_argument("Neither a specific Sector EnergyCut nor
- * a " */
-/*                                     "global EnergyCut is defined."); */
-/*     } */
-/*     CrossSectionList crosssections; */
-/*     if (json_sector.contains("CrossSections")) { */
-/*         crosssections = CreateCrossSectionList( */
-/*             json_sector["CrossSections"], medium, cuts, do_interpolation); */
-/*     } else if (global.cross != "") { */
-/*         crosssections = CreateCrossSectionList( */
-/*             global.cross, medium, cuts, do_interpolation); */
-/*     } else { */
-/*         crosssections = GetStdCrossSections(medium, cuts, p_def); */
-/*     } */
-/*     // Create Geometry and add them to sector_list with corresponding
- * geometries */
-/*     auto utility = CreateUtility(crosssections, medium, cuts->GetContRand(),
- */
-/*         do_interpolation, do_exact_time, scattering); */
-/*     if (json_sector.contains("geometries")) { */
-/*         assert(json_sector["geometries"].is_array()); */
-/*         nlohmann::json density_distr_default = { */
-/*             { "density_distr_type", "homogeneous" } */
-/*         }; // if no density_distr defined, fallback to homogeneous medium */
-/*         auto density_distr_sector */
-/*             = json_sector.value("density_distr", density_distr_default); */
-/*         for (const auto& json_geometry : json_sector.at("geometries")) { */
-/*             auto density_distr_json */
-/*                 = json_geometry.value("density_distr", density_distr_sector);
- */
-/*             sector_list.push_back(std::make_tuple(CreateGeometry(json_geometry),
- */
-/*                 utility, CreateDensityDistribution(density_distr_json))); */
-/*         } */
-/*     } else { */
-/*         throw std::invalid_argument( */
-/*             "At least one geometry must be defined for each sector"); */
-/*     } */
-/* } */
-
-/* PropagationUtility Propagator::CreateUtility(CrossSectionList crosssections,
- */
-/*     std::shared_ptr<Medium> medium, bool do_cont_rand, bool do_interpolation,
- */
-/*     bool do_exact_time, std::string scattering) */
-/* { */
-/*     PropagationUtility::Collection def; */
-/*     if (do_interpolation) { */
-/*         def.interaction_calc */
-/*             = std::make_shared<InteractionBuilder<UtilityInterpolant>>( */
-/*                 crosssections); */
-/*     } else { */
-/*         def.interaction_calc */
-/*             = std::make_shared<InteractionBuilder<UtilityIntegral>>( */
-/*                 crosssections); */
-/*     } */
-/*     if (do_interpolation) { */
-/*         def.displacement_calc */
-/*             = std::make_shared<DisplacementBuilder<UtilityInterpolant>>( */
-/*                 crosssections); */
-/*     } else { */
-/*         def.displacement_calc */
-/*             = std::make_shared<DisplacementBuilder<UtilityIntegral>>( */
-/*                 crosssections); */
-/*     } */
-/*     if (do_exact_time) { */
-/*         if (do_interpolation) { */
-/*             def.time_calc */
-/*                 = std::make_shared<ExactTimeBuilder<UtilityInterpolant>>( */
-/*                     crosssections, p_def); */
-/*         } else { */
-/*             def.time_calc =
- * std::make_shared<ExactTimeBuilder<UtilityIntegral>>( */
-/*                 crosssections, p_def); */
-/*         } */
-/*     } else { */
-/*         def.time_calc = std::make_shared<ApproximateTimeBuilder>(); */
-/*     } */
-/*     if (scattering != "" and scattering != "NoScattering") { */
-/*         if (do_interpolation) { */
-/*             // TODO: Making a shared_ptr out of a raw pointer is bad-practise
- */
-/*             // (and looks ugly), the underlying factory should be changed
- * (jm) */
-/*             auto aux = ScatteringFactory::Get().CreateScattering(scattering,
- */
-/*                 p_def, medium, interpol_def_global, */
-/*                 std::unique_ptr<CrossSectionList>( */
-/*                     new CrossSectionList(crosssections))); */
-/*             def.scattering = std::shared_ptr<Scattering>(aux); */
-/*         } else { */
-/*             auto aux = ScatteringFactory::Get().CreateScattering(scattering,
- */
-/*                 p_def, medium, */
-/*                 std::unique_ptr<CrossSectionList>( */
-/*                     new CrossSectionList(crosssections))); */
-/*             def.scattering = std::shared_ptr<Scattering>(aux); */
-/*         } */
-/*     } */
-/*     if (isfinite(p_def.lifetime)) { */
-/*         if (do_interpolation) { */
-/*             def.decay_calc =
- * std::make_shared<DecayBuilder<UtilityInterpolant>>( */
-/*                 crosssections, p_def); */
-/*         } else { */
-/*             def.decay_calc = std::make_shared<DecayBuilder<UtilityIntegral>>(
- */
-/*                 crosssections, p_def); */
-/*         } */
-/*     } */
-/*     if (do_cont_rand) { */
-/*         if (do_interpolation) { */
-/*             def.cont_rand */
-/*                 = std::make_shared<ContRandBuilder<UtilityInterpolant>>( */
-/*                     crosssections); */
-/*         } else { */
-/*             def.cont_rand =
- * std::make_shared<ContRandBuilder<UtilityIntegral>>( */
-/*                 crosssections); */
-/*         } */
-/*     } */
-/*     return def; */
-/* } */
-
-
-template <typename P, typename M>
-crosssection_list_t<P, M> Propagator::CreateCrossSectionList(
-        P&& p_def, M&& medium, shared_ptr<const EnergyCutSettings> cuts,
-        bool interpolate, const nlohmann::json& config) {
-    crosssection_list_t<P, M> cross;
-
-    if (config.contains("annihilation"))
-        cross.emplace_back(crosssection::make_annihilation(p_def, medium,
-                                         interpolate, config["annihilation"]));
-    if (config.contains("brems"))
-        cross.emplace_back(crosssection::make_bremsstrahlung(p_def, medium,
-                                         cuts, interpolate, config["brems"]));
-    if (config.contains("compton"))
-        cross.emplace_back(crosssection::make_compton(p_def, medium,
-                                         cuts, interpolate, config["compton"]));
-    if (config.contains("epair"))
-        cross.emplace_back(crosssection::make_epairproduction(p_def, medium,
-                                         cuts, interpolate, config["epair"]));
-    if (config.contains("ioniz"))
-        cross.emplace_back(crosssection::make_ionization(p_def, medium,
-                                         cuts, interpolate, config["ioniz"]));
-    if (config.contains("mupair"))
-        cross.emplace_back(crosssection::make_mupairproduction(p_def, medium,
-                                         cuts, interpolate, config["mupair"]));
-    if (config.contains("photo")) {
-        try { cross.emplace_back(crosssection::make_photonuclearreal(p_def, medium,
-                                 cuts, interpolate, config["photo"]));
-        } catch (std::invalid_argument &e) {
-            cross.emplace_back(crosssection::make_photonuclearQ2(p_def, medium,
-                               cuts, interpolate, config["photo"]));
-        }
+nlohmann::json Propagator::ParseConfig(const string& config_file)
+{
+    nlohmann::json json_config;
+    try {
+        string expanded_config_file_path
+            = Helper::ResolvePath(config_file, true);
+        std::ifstream infilestream(expanded_config_file_path);
+        infilestream >> json_config;
+    } catch (const nlohmann::json::parse_error& e) {
+        Logging::Get("proposal.propagator")->critical("Unable parse \"%s\" as json file", config_file.c_str());
     }
-    if (config.contains("photopair"))
-        cross.emplace_back(crosssection::make_photopairproduction(p_def, medium,
-                           interpolate, config["photopair"]));
-    if(config.contains("weak"))
-        cross.emplace_back(crosssection::make_weakinteraction(p_def, medium,
-                                         interpolate, config["weak"]));
-
-    return cross;
-}
+    return json_config;
+};
 
 Propagator::GlobalSettings::GlobalSettings(const nlohmann::json& config_global)
 {
-    if (config_global.contains("medium")) {
-        medium = CreateMedium(config_global);
-    }
-    if (config_global.contains("CrossSections")) {
-        cross = config_global["CrossSections"];
-    } else {
-        cross = "";
-    }
-    if (config_global.contains("cuts")) {
-        cuts = std::make_shared<EnergyCutSettings>(config_global["cuts"]);
-    }
-    // Read global propagation settings
+    if (config_global.contains("medium"))
+        medium = CreateMedium(config_global["medium"].get<std::string>());
+    cross = config_global.value("CrossSections", "");
+    if (config_global.contains("cuts"))
+        cuts = make_shared<EnergyCutSettings>(config_global["cuts"]);
     do_exact_time = config_global.value("exact_time", true);
     do_interpolation = config_global.value("do_interpolation", true);
-    scattering = config_global.value("scattering", "");
+    scattering = config_global.value("scattering", "NoScattering");
 }
 
 Propagator::GlobalSettings::GlobalSettings()
@@ -542,5 +294,5 @@ Propagator::GlobalSettings::GlobalSettings()
     cross = nullptr;
     do_exact_time = true;
     do_interpolation = true;
-    scattering = "";
+    scattering = "NoScattering";
 }

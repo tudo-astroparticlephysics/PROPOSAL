@@ -6,6 +6,7 @@
 #include "PROPOSAL/density_distr/density_homogeneous.h"
 #include "PROPOSAL/density_distr/density_polynomial.h"
 #include "PROPOSAL/density_distr/density_splines.h"
+#include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
 
@@ -131,7 +132,7 @@ double CartesianAxis::GetEffectiveDistance(const Vector3D& xi,
     return fAxis_ * direction;
 }
 
-std::shared_ptr<Density_distr> CreateDensityDistribution(const nlohmann::json& config) {
+std::shared_ptr<Density_distr> PROPOSAL::CreateDensityDistribution(const nlohmann::json& config) {
     if (config.contains("density_distr_type")){
         std::string density_distr_type = config["density_distr_type"];
         if (density_distr_type == "exponential") {

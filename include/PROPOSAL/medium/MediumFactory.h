@@ -1,3 +1,5 @@
+#pragma once
+
 #include <memory>
 #include <string>
 
@@ -24,7 +26,6 @@ static std::map<const Medium_Type, std::shared_ptr<Medium>> Medium_Map{
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-std::unique_ptr<Medium> CreateMedium(Medium_Type type);
-std::unique_ptr<Medium> CreateMedium(std::string name);
-std::unique_ptr<Medium> CreateMedium(const nlohmann::json&);
+std::shared_ptr<Medium> CreateMedium(Medium_Type type);
+std::shared_ptr<Medium> CreateMedium(std::string name);
 } // namespace PROPOSAL

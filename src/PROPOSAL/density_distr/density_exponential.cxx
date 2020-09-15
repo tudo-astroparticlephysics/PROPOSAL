@@ -2,7 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include "PROPOSAL/density_distr/density_exponential.h"
-
+#include "PROPOSAL/medium/Medium.h"
 using namespace PROPOSAL;
 
 Density_exponential::Density_exponential(const Axis& axis, double sigma, double massDensity)

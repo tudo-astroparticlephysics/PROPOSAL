@@ -2,7 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include "PROPOSAL/density_distr/density_homogeneous.h"
-
+#include "PROPOSAL/medium/Medium.h"
 using namespace PROPOSAL;
 
 Density_homogeneous::Density_homogeneous()

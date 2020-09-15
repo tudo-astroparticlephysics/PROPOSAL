@@ -115,6 +115,7 @@
 #include "PROPOSAL/Propagator.h"
 
 #include "PROPOSAL/propagation_utility/ContRand.h"
+#include "PROPOSAL/propagation_utility/ContRandBuilder.h"
 #include "PROPOSAL/propagation_utility/Decay.h"
 #include "PROPOSAL/propagation_utility/DecayBuilder.h"
 #include "PROPOSAL/propagation_utility/Displacement.h"

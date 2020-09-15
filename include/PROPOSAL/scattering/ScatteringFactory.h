@@ -48,29 +48,38 @@
 using std::make_shared;
 namespace PROPOSAL {
 
-enum class ScatteringType : int { Moliere, Highland, HighlandIntegral };
+enum class ScatteringType : int { NoScattering, Moliere, Highland, HighlandIntegral };
 
 static const std::unordered_map<std::string, ScatteringType> ScatteringTable
     = { { "moliere", ScatteringType::Moliere },
           { "highland", ScatteringType::Highland },
-          { "highland_integral", ScatteringType::HighlandIntegral } };
+          { "highland_integral", ScatteringType::HighlandIntegral },
+          { "NoScattering", ScatteringType::NoScattering }};
 
 template <typename Cross = std::nullptr_t>
 unique_ptr<Scattering> make_scattering(std::string const& name,
-    ParticleDef const& p_def, Medium const& medium, Cross&& cross = nullptr)
+    ParticleDef const& p_def, std::shared_ptr<Medium> medium,
+    Cross&& cross = nullptr, bool interpolate = true)
 {
-    auto m = make_shared<const Medium>(medium);
     auto it = ScatteringTable.find(name);
     if (it != ScatteringTable.end()) {
         switch (it->second) {
         case ScatteringType::HighlandIntegral:
-            return unique_ptr<Scattering>(
-                new ScatteringHighlandIntegral<UtilityInterpolant, Cross>(
-                    p_def, m, std::forward<Cross>(cross)));
+            if (interpolate) {
+                return unique_ptr<Scattering>(new
+                ScatteringHighlandIntegral<UtilityInterpolant, Cross>(
+                        p_def, medium, std::forward<Cross>(cross)));
+            } else {
+                return unique_ptr<Scattering>(new
+                ScatteringHighlandIntegral<UtilityIntegral, Cross>(
+                        p_def, medium, std::forward<Cross>(cross)));
+            }
         case ScatteringType::Highland:
-            return unique_ptr<Scattering>(new ScatteringHighland(p_def, m));
+            return unique_ptr<Scattering>(new ScatteringHighland(p_def, medium));
         case ScatteringType::Moliere:
-            return unique_ptr<Scattering>(new ScatteringMoliere(p_def, m));
+            return unique_ptr<Scattering>(new ScatteringMoliere(p_def, medium));
+        case ScatteringType::NoScattering:
+            return nullptr;
         default:
             throw std::out_of_range("This constructor is not provided.");
         }
