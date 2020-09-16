@@ -31,6 +31,7 @@
 #include "PROPOSAL/density_distr/density_distr.h"
 
 namespace PROPOSAL {
+class Medium;
 class Density_exponential : public Density_distr {
    public:
     Density_exponential(const Axis& axis, double sigma, double massDensity);

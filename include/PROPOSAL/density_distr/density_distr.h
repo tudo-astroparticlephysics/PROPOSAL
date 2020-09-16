@@ -30,7 +30,6 @@
 #include <functional>
 #include <string>
 #include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {

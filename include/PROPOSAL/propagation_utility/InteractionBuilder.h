@@ -21,7 +21,7 @@ public:
     T BuildInteractionIntegral(Cross& cross)
     {
         auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
-        auto interaction_func = [this, &cross, &disp](double energy) {
+        auto interaction_func = [this, cross, &disp](double energy) mutable {
             return FunctionToIntegral(cross, disp, energy);
         };
         T integral(interaction_func, lower_lim);

@@ -5,7 +5,7 @@
 #include <iostream>
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/density_distr/density_polynomial.h"
-
+#include "PROPOSAL/medium/Medium.h"
 using namespace PROPOSAL;
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%% Polynomial-Density %%%%%%%%%%%%%%%%%%%%

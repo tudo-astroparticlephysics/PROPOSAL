@@ -1,6 +1,7 @@
+#pragma once
+
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/Time.h"
-
 namespace PROPOSAL {
 template <typename T, typename Cross> class ExactTimeBuilder : public Time {
     double mass;
@@ -9,7 +10,7 @@ template <typename T, typename Cross> class ExactTimeBuilder : public Time {
     T BuildTimeIntegral(Cross&& cross)
     {
         auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
-        auto time_func = [this, &cross, &disp](double energy) {
+        auto time_func = [this, cross, &disp](double energy) mutable {
             return FunctionToIntegral(cross, disp, energy);
         };
         T time_integral(time_func, CrossSectionVector::GetLowerLim(cross));

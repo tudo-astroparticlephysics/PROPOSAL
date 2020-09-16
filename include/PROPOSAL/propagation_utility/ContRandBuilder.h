@@ -13,18 +13,18 @@ template <class T, class Cross> class ContRandBuilder : public ContRand {
         double sum = 0.0;
         for (const auto& crosssections : cross)
             sum += crosssections->CalculatedE2dx(energy);
-        return disp.FunctionToIntegral(energy) * sum;
+        return disp.FunctionToIntegral(cross, energy) * sum;
     }
 
     T BuildContRandIntegral(Cross&& cross)
     {
         auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
-        auto cont_rand_func = [this, &disp](double energy) {
-            return FunctionToIntegral(disp, energy);
+        auto cont_rand_func = [this, cross, &disp](double energy) mutable {
+            return FunctionToIntegral(cross, disp, energy);
         };
         T cont_rand_integral(cont_rand_func, lower_lim);
         if (typeid(T) == typeid(UtilityInterpolant)) {
-            auto hash = CrossSectinVector::GetHash(cross);
+            auto hash = CrossSectionVector::GetHash(cross);
             cont_rand_integral.BuildTables("contrand", hash, interpol_def);
         };
         return cont_rand_integral;
@@ -32,7 +32,7 @@ template <class T, class Cross> class ContRandBuilder : public ContRand {
 
 public:
     ContRandBuilder(Cross&& cross)
-        : lower_lim(CrossSectinVector::GetLowerLim(cross))
+        : lower_lim(CrossSectionVector::GetLowerLim(cross))
         , cont_rand_integral(BuildContRandIntegral(cross))
     {
     }
@@ -47,4 +47,14 @@ public:
             final_energy, std::sqrt(variance), rnd, lower_lim, initial_energy);
     }
 };
+
+template <typename T>
+std::unique_ptr<ContRand> make_contrand(T&& cross, bool interpolate = true)
+{
+    if (interpolate)
+        return PROPOSAL::make_unique<ContRandBuilder<UtilityInterpolant, T>>(
+            std::forward<T>(cross));
+    return PROPOSAL::make_unique<ContRandBuilder<UtilityIntegral, T>>(
+            std::forward<T>(cross));
+}
 } // namespace PROPOSAL

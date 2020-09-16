@@ -29,7 +29,7 @@
 #include "PROPOSAL/density_distr/density_distr.h"
 
 namespace PROPOSAL {
-
+class Medium;
 class Density_homogeneous : public Density_distr {
    public:
     Density_homogeneous();

@@ -11,7 +11,7 @@ template <class T, class Cross> class DecayBuilder : public Decay {
     T BuildDecayIntegral(Cross&& cross)
     {
         auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
-        auto decay_func = [this, &cross, &disp](double energy) {
+        auto decay_func = [this, cross, &disp](double energy) mutable {
             return FunctionToIntegral(cross, disp, energy);
         };
         T decay_integral(decay_func, CrossSectionVector::GetLowerLim(cross));

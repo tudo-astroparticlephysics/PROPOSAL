@@ -11,18 +11,18 @@
 
 
 namespace PROPOSAL {
-std::unique_ptr<Medium> CreateMedium(Medium_Type type)
+std::shared_ptr<Medium> CreateMedium(Medium_Type type)
 {
     auto searched_medium = Medium_Map.find(type);
     if (searched_medium == Medium_Map.end()) {
         throw std::invalid_argument("Medium not found.");
     }
-    throw std::invalid_argument("Medium not found.");
+    return searched_medium->second;
 }
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-std::unique_ptr<Medium> CreateMedium(std::string name)
+std::shared_ptr<Medium> CreateMedium(std::string name)
 {
     std::transform(name.begin(), name.end(), name.begin(),
         [](unsigned char c){ return std::tolower(c); });
@@ -33,19 +33,5 @@ std::unique_ptr<Medium> CreateMedium(std::string name)
         }
     }
     throw std::invalid_argument("Medium not found.");
-}
-} // namespace PROPOSAL
-
-namespace PROPOSAL{
-std::unique_ptr<Medium> CreateMedium(const nlohmann::json& config){
-    if (config.contains("name"))
-    {
-        std::string name;
-        config.at("name").get_to(name);
-        return CreateMedium(name);
-    }
-    else {
-        throw std::invalid_argument("Medium must be specified via parameter 'name'");
-    }
 }
 } // namespace PROPOSAL

@@ -3,7 +3,7 @@
 #include <functional>
 #include <iostream>
 #include "PROPOSAL/density_distr/density_splines.h"
-
+#include "PROPOSAL/medium/Medium.h"
 using namespace PROPOSAL;
 
 Density_splines::Density_splines(const Axis& axis, const Spline& splines, double massDensity)
