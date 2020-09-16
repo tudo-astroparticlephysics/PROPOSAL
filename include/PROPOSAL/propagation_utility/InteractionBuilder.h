@@ -11,17 +11,17 @@ template <class T, class Cross> class InteractionBuilder : public Interaction {
     T interaction_integral;
 
 public:
-    InteractionBuilder(Cross&& cross)
+    InteractionBuilder(Cross const& cross)
         : Interaction(CrossSectionVector::GetLowerLim(cross))
-        , cross_list(std::forward<Cross>(cross))
-        , interaction_integral(BuildInteractionIntegral(cross_list))
+        , cross_list(cross)
+        , interaction_integral(BuildInteractionIntegral(cross))
     {
     }
 
-    T BuildInteractionIntegral(Cross& cross)
+    T BuildInteractionIntegral(Cross const& cross)
     {
         auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
-        auto interaction_func = [this, cross, &disp](double energy) mutable {
+        auto interaction_func = [this, cross, disp](double energy) mutable {
             return FunctionToIntegral(cross, disp, energy);
         };
         T integral(interaction_func, lower_lim);
@@ -48,10 +48,10 @@ public:
     }
 
     enum { CROSS, COMP, RATE };
-    tuple<InteractionType, const Component*, double> TypeInteraction(
+    tuple<InteractionType, std::shared_ptr<Component>, double> TypeInteraction(
         double energy, double rnd) override
     {
-        using rates_t = tuple<cross_type*, const Component*, double>;
+        using rates_t = tuple<cross_type*, std::shared_ptr<Component>, double>;
         auto rates = std::vector<rates_t>();
         for (auto& c : cross_list) {
             auto rates_comp = c->CalculatedNdx(energy);
@@ -65,7 +65,7 @@ public:
             sum_of_rates -= std::get<RATE>(r);
             if (sum_of_rates < 0.f) {
                 auto loss = std::get<CROSS>(r)->CalculateStochasticLoss(
-                    *std::get<COMP>(r), energy, -sum_of_rates);
+                    std::get<COMP>(r), energy, -sum_of_rates);
                 return std::make_tuple(std::get<CROSS>(r)->GetInteractionType(),
                     std::get<COMP>(r), loss);
             }

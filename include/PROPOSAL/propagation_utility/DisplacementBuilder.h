@@ -26,9 +26,9 @@ class DisplacementBuilder : public Displacement {
     }
 
 public:
-    DisplacementBuilder(Cross&& cross)
+    DisplacementBuilder(Cross const& cross)
         : Displacement()
-        , disp_integral(BuildTrackIntegral(std::forward<Cross>(cross)))
+        , disp_integral(BuildTrackIntegral(cross))
     {
     }
 

@@ -41,7 +41,7 @@ public:
 
     enum { INTERACTION_TYPE, LOSS };
     virtual double EnergyInteraction(double, double) = 0;
-    virtual tuple<InteractionType, const Component*, double> TypeInteraction(
+    virtual tuple<InteractionType, std::shared_ptr<Component>, double> TypeInteraction(
         double, double)
         = 0; // ARGS: energy, rate
     virtual double MeanFreePath(double) = 0;

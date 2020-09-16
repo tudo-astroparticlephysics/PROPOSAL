@@ -153,7 +153,7 @@ private:
         def.displacement_calc = make_displacement(crosss, do_interpol);
         def.scattering = make_scattering(scatter, p_def, medium, crosss,
                                          do_interpol);
-        if (isfinite(p_def.lifetime))
+        if (std::isfinite(p_def.lifetime))
             def.decay_calc = make_decay(crosss, p_def, do_interpol);
         if (do_cont_rand)
             def.cont_rand = make_contrand(crosss, do_interpol);
