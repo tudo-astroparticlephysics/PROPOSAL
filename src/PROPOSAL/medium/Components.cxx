@@ -21,9 +21,9 @@ using namespace PROPOSAL::Components;
 
 #define COMPONENT_IMPL(cls, SYMBOL, NUCCHARGE, ATOMICNUM)                      \
     cls::cls(double atomInMolecule)                                            \
-        : Component(#SYMBOL, NUCCHARGE, ATOMICNUM, atomInMolecule)             \
-    {                                                                          \
-    }
+: Component(#SYMBOL, NUCCHARGE, ATOMICNUM, atomInMolecule)             \
+{                                                                          \
+}
 
 /******************************************************************************
  *                                  OStream                                    *
@@ -31,29 +31,10 @@ using namespace PROPOSAL::Components;
 
 namespace PROPOSAL {
 
-namespace Components {
+    namespace Components {
 
-    std::ostream& operator<<(std::ostream& os, Component const& component)
-    {
-        std::stringstream ss;
-        ss << " Component (" << &component << ") ";
-        os << Helper::Centered(60, ss.str()) << '\n';
 
-        os << component.GetName() << std::endl;
-        os << "AtomicNuc:"
-           << "\t\t" << component.GetAtomicNum() << std::endl;
-        os << "AtomInMolecule:"
-           << "\t\t" << component.GetAtomInMolecule() << std::endl;
-        os << "NucCharge:"
-           << "\t\t" << component.GetNucCharge() << std::endl;
-        os << "AverageNucleonWeight:"
-           << "\t" << component.GetAverageNucleonWeight() << std::endl;
-
-        os << Helper::Centered(60, "");
-        return os;
-    }
-
-} // namespace Components
+    } // namespace Components
 
 } // namespace PROPOSAL
 
@@ -62,15 +43,11 @@ namespace Components {
  ******************************************************************************/
 
 Component::Component(
-    std::string name, double nucCharge, double atomicNum, double atomInMolecule)
+        std::string name, double nucCharge, double atomicNum, double atomInMolecule)
     : name_(name)
     , nucCharge_(nucCharge)
     , atomicNum_(atomicNum)
-    , atomInMolecule_(atomInMolecule)
-    , logConstant_(0.0)
-    , bPrime_(0.0)
-    , averageNucleonWeight_(0.0)
-    , wood_saxon_(0.0)
+      , atomInMolecule_(atomInMolecule)
 {
     SetLogConstant();
     SetBPrime();
@@ -88,45 +65,53 @@ Component::Component(
     }
 }
 
-// ------------------------------------------------------------------------- //
-// Operators & swap
-// ------------------------------------------------------------------------- //
 
-// ------------------------------------------------------------------------- //
-bool Component::operator==(const Component& component) const
+namespace PROPOSAL{
+    namespace Components {
+bool operator==(Component const& lhs, Component const& rhs) noexcept
 {
-    if (typeid(*this) != typeid(component))
+    if (typeid(lhs) != typeid(rhs))
         return false;
-    if (name_ != component.name_)
+    else if (lhs.name_ != rhs.name_)
         return false;
-    else if (nucCharge_ != component.nucCharge_)
+    else if (lhs.nucCharge_ != rhs.nucCharge_)
         return false;
-    else if (atomicNum_ != component.atomicNum_)
+    else if (lhs.atomicNum_ != rhs.atomicNum_)
         return false;
-    else if (atomInMolecule_ != component.atomInMolecule_)
+    else if (lhs.atomInMolecule_ != rhs.atomInMolecule_)
         return false;
-    else if (logConstant_ != component.logConstant_)
+    else if (lhs.logConstant_ != rhs.logConstant_)
         return false;
-    else if (bPrime_ != component.bPrime_)
+    else if (lhs.bPrime_ != rhs.bPrime_)
         return false;
-    else if (averageNucleonWeight_ != component.averageNucleonWeight_)
+    else if (lhs.averageNucleonWeight_ != rhs.averageNucleonWeight_)
         return false;
-    else if (wood_saxon_ != component.wood_saxon_)
+    else if (lhs.wood_saxon_ != rhs.wood_saxon_)
         return false;
-    else
-        return true;
+    return true;
 }
 
-bool Component::operator!=(const Component& component) const
+std::ostream& operator<<(std::ostream& os, Component const& comp) noexcept
 {
-    return !(*this == component);
+    std::stringstream ss;
+    ss << " Component (" << &comp<< ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+    os << comp.GetName() << std::endl;
+    os << "AtomicNuc:" << "\t\t" << comp.GetAtomicNum() << std::endl;
+    os << "AtomInMolecule:" << "\t\t" << comp.GetAtomInMolecule() << std::endl;
+    os << "NucCharge:" << "\t\t" << comp.GetNucCharge() << std::endl;
+    os << "AverageNucleonWeight:" << "\t" << comp.GetAverageNucleonWeight() << std::endl;
+    os << Helper::Centered(60, "");
+    return os;
+}
+}
 }
 
 size_t Component::GetHash() const noexcept
 {
     size_t hash_digest = 0;
     hash_combine(hash_digest, nucCharge_, atomicNum_, atomInMolecule_,
-        logConstant_, bPrime_, averageNucleonWeight_, wood_saxon_);
+            logConstant_, bPrime_, averageNucleonWeight_, wood_saxon_);
     return hash_digest;
 }
 
@@ -139,104 +124,104 @@ void Component::SetLogConstant()
 {
     int z = std::round(nucCharge_);
     switch (z) {
-    case 1:
-        logConstant_ = 202.4;
-        break;
-    case 2:
-        logConstant_ = 151.9;
-        break;
-    case 3:
-        logConstant_ = 159.9;
-        break;
-    case 4:
-        logConstant_ = 172.3;
-        break;
-    case 5:
-        logConstant_ = 177.9;
-        break;
-    case 6:
-        logConstant_ = 178.3;
-        break;
-    case 7:
-        logConstant_ = 176.6;
-        break;
-    case 8:
-        logConstant_ = 173.4;
-        break;
-    case 9:
-        logConstant_ = 170.0;
-        break;
-    case 10:
-        logConstant_ = 165.8;
-        break;
-    case 11:
-        logConstant_ = 165.8;
-        break;
-    case 12:
-        logConstant_ = 167.1;
-        break;
-    case 13:
-        logConstant_ = 169.1;
-        break;
-    case 14:
-        logConstant_ = 170.8;
-        break;
-    case 15:
-        logConstant_ = 172.2;
-        break;
-    case 16:
-        logConstant_ = 173.4;
-        break;
-    case 17:
-        logConstant_ = 174.3;
-        break;
-    case 18:
-        logConstant_ = 174.8;
-        break;
-    case 19:
-        logConstant_ = 175.1;
-        break;
-    case 20:
-        logConstant_ = 175.6;
-        break;
-    case 21:
-        logConstant_ = 176.2;
-        break;
-    case 22:
-        logConstant_ = 176.8;
-        break;
-    case 26:
-        logConstant_ = 175.8;
-        break;
-    case 29:
-        logConstant_ = 173.1;
-        break;
-    case 32:
-        logConstant_ = 173.0;
-        break;
-    case 35:
-        logConstant_ = 173.5;
-        break;
-    case 42:
-        logConstant_ = 175.9;
-        break;
-    case 50:
-        logConstant_ = 177.4;
-        break;
-    case 53:
-        logConstant_ = 178.6;
-        break;
-    case 74:
-        logConstant_ = 177.6;
-        break;
-    case 82:
-        logConstant_ = 178.0;
-        break;
-    case 92:
-        logConstant_ = 179.8;
-        break;
-    default:
-        logConstant_ = 182.7;
+        case 1:
+            logConstant_ = 202.4;
+            break;
+        case 2:
+            logConstant_ = 151.9;
+            break;
+        case 3:
+            logConstant_ = 159.9;
+            break;
+        case 4:
+            logConstant_ = 172.3;
+            break;
+        case 5:
+            logConstant_ = 177.9;
+            break;
+        case 6:
+            logConstant_ = 178.3;
+            break;
+        case 7:
+            logConstant_ = 176.6;
+            break;
+        case 8:
+            logConstant_ = 173.4;
+            break;
+        case 9:
+            logConstant_ = 170.0;
+            break;
+        case 10:
+            logConstant_ = 165.8;
+            break;
+        case 11:
+            logConstant_ = 165.8;
+            break;
+        case 12:
+            logConstant_ = 167.1;
+            break;
+        case 13:
+            logConstant_ = 169.1;
+            break;
+        case 14:
+            logConstant_ = 170.8;
+            break;
+        case 15:
+            logConstant_ = 172.2;
+            break;
+        case 16:
+            logConstant_ = 173.4;
+            break;
+        case 17:
+            logConstant_ = 174.3;
+            break;
+        case 18:
+            logConstant_ = 174.8;
+            break;
+        case 19:
+            logConstant_ = 175.1;
+            break;
+        case 20:
+            logConstant_ = 175.6;
+            break;
+        case 21:
+            logConstant_ = 176.2;
+            break;
+        case 22:
+            logConstant_ = 176.8;
+            break;
+        case 26:
+            logConstant_ = 175.8;
+            break;
+        case 29:
+            logConstant_ = 173.1;
+            break;
+        case 32:
+            logConstant_ = 173.0;
+            break;
+        case 35:
+            logConstant_ = 173.5;
+            break;
+        case 42:
+            logConstant_ = 175.9;
+            break;
+        case 50:
+            logConstant_ = 177.4;
+            break;
+        case 53:
+            logConstant_ = 178.6;
+            break;
+        case 74:
+            logConstant_ = 177.6;
+            break;
+        case 82:
+            logConstant_ = 178.0;
+            break;
+        case 92:
+            logConstant_ = 179.8;
+            break;
+        default:
+            logConstant_ = 182.7;
     }
 }
 
@@ -245,11 +230,11 @@ void Component::SetBPrime()
 {
     int z = std::round(nucCharge_);
     switch (z) {
-    case 1:
-        bPrime_ = 446;
-        break;
-    default:
-        bPrime_ = 1429;
+        case 1:
+            bPrime_ = 446;
+            break;
+        default:
+            bPrime_ = 1429;
     }
 }
 
@@ -268,36 +253,36 @@ double Component::WoodSaxonPotential(double r0)
 }
 
 namespace PROPOSAL {
-double calculate_proton_massnumber_fraction(const component_list& comp_list) noexcept
-{
-    double charge = 0.;
-    double nucleons = 0.;
-    for (const auto& comp : comp_list) {
-        charge += comp.GetAtomInMolecule() * comp.GetNucCharge();
-        nucleons += comp.GetAtomInMolecule() * comp.GetAtomicNum();
+    double calculate_proton_massnumber_fraction(const component_list& comp_list) noexcept
+    {
+        double charge = 0.;
+        double nucleons = 0.;
+        for (const auto& comp : comp_list) {
+            charge += comp.GetAtomInMolecule() * comp.GetNucCharge();
+            nucleons += comp.GetAtomInMolecule() * comp.GetAtomicNum();
+        }
+        return charge / nucleons;
     }
-    return charge / nucleons;
-}
 } // namespace PROPOSAL
 
 /******************************************************************************
  *                            Different Components                             *
  ******************************************************************************/
 
-COMPONENT_IMPL(Hydrogen, H, 1, 1.00794)
-COMPONENT_IMPL(Carbon, C, 6, 12.0011)
-COMPONENT_IMPL(Nitrogen, N, 7, 14.0067)
-COMPONENT_IMPL(Oxygen, O, 8, 15.9994)
-COMPONENT_IMPL(Sodium, Na, 11, 22.989770)
-COMPONENT_IMPL(Magnesium, Mg, 12, 24.31)
-COMPONENT_IMPL(Sulfur, S, 16, 32.07)
-COMPONENT_IMPL(Chlorine, Cl, 17, 35.4527)
-COMPONENT_IMPL(Argon, Ar, 18, 39.948)
-COMPONENT_IMPL(Potassium, K, 19, 39.10)
-COMPONENT_IMPL(Calcium, Ca, 20, 40.08)
-COMPONENT_IMPL(Iron, Fe, 26, 55.845)
-COMPONENT_IMPL(Copper, Cu, 29, 63.546)
-COMPONENT_IMPL(Lead, Pb, 82, 207.2)
-COMPONENT_IMPL(Uranium, U, 92, 238.0289)
-COMPONENT_IMPL(StandardRock, StandardRock, 11, 22.0)
+    COMPONENT_IMPL(Hydrogen, H, 1, 1.00794)
+    COMPONENT_IMPL(Carbon, C, 6, 12.0011)
+    COMPONENT_IMPL(Nitrogen, N, 7, 14.0067)
+    COMPONENT_IMPL(Oxygen, O, 8, 15.9994)
+    COMPONENT_IMPL(Sodium, Na, 11, 22.989770)
+    COMPONENT_IMPL(Magnesium, Mg, 12, 24.31)
+    COMPONENT_IMPL(Sulfur, S, 16, 32.07)
+    COMPONENT_IMPL(Chlorine, Cl, 17, 35.4527)
+    COMPONENT_IMPL(Argon, Ar, 18, 39.948)
+    COMPONENT_IMPL(Potassium, K, 19, 39.10)
+    COMPONENT_IMPL(Calcium, Ca, 20, 40.08)
+    COMPONENT_IMPL(Iron, Fe, 26, 55.845)
+    COMPONENT_IMPL(Copper, Cu, 29, 63.546)
+    COMPONENT_IMPL(Lead, Pb, 82, 207.2)
+    COMPONENT_IMPL(Uranium, U, 92, 238.0289)
+    COMPONENT_IMPL(StandardRock, StandardRock, 11, 22.0)
 COMPONENT_IMPL(FrejusRock, FrejusRock, 10.12, 20.34)

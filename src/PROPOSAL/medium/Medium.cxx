@@ -125,7 +125,7 @@ bool Medium::operator==(const Medium& medium) const {
     else {
         bool Return = true;
         for (unsigned int i = 0; i < components_.size(); ++i) {
-            if (components_[i] != medium.components_[i]) {
+            if (!(components_[i] == medium.components_[i])) {
                 Return = false;
             }
         }

@@ -5,7 +5,7 @@
 
 namespace PROPOSAL {
 
-using dndx_map_t = unordered_map<const Component*, unique_ptr<CrossSectionDNDX>>;
+using dndx_map_t = unordered_map<std::shared_ptr<Component>, unique_ptr<CrossSectionDNDX>>;
 
 template <typename Param>
 dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
@@ -13,11 +13,17 @@ dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
     std::true_type)
 {
     auto m = dndx_map_t();
-    for (auto const& target : medium.GetComponents()) {
+    for (auto target : medium.GetComponents()) {
         if (interpol)
-            m[&target] = PROPOSAL::make_unique<CrossSectionDNDXInterpolant>(param, p_def, target, cut, InterpolationDef());
+            m.emplace(
+                    std::make_shared<Components::Component>(target),
+                    PROPOSAL::make_unique<CrossSectionDNDXInterpolant>(param, p_def, target, cut, InterpolationDef())
+            );
         else
-            m[&target] = PROPOSAL::make_unique<CrossSectionDNDXIntegral>(param, p_def, target, cut);
+            m.emplace(
+                    std::make_shared<Components::Component>(target),
+                    PROPOSAL::make_unique<CrossSectionDNDXIntegral>(param, p_def, target, cut)
+            );
     }
     return m;
 }
@@ -29,9 +35,9 @@ dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
 {
     auto m = dndx_map_t();
     if (interpol)
-        m[nullptr] = PROPOSAL::make_unique<CrossSectionDNDXInterpolant>(param, p_def, medium, cut, InterpolationDef());
+        m.emplace(nullptr, PROPOSAL::make_unique<CrossSectionDNDXInterpolant>(param, p_def, medium, cut, InterpolationDef()));
     else
-        m[nullptr] = PROPOSAL::make_unique<CrossSectionDNDXIntegral>(param, p_def, medium, cut);
+        m.emplace(nullptr, PROPOSAL::make_unique<CrossSectionDNDXIntegral>(param, p_def, medium, cut));
     return m;
 }
 

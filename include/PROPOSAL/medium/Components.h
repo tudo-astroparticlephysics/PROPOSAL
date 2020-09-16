@@ -30,6 +30,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #define COMPONENT_DEC(cls, ATOMS)                                              \
     class cls : public Component {                                             \
@@ -47,11 +48,9 @@ namespace Components {
         Component(std::string name, double charge, double atomicNum, double atomInMolecule);
         virtual ~Component() = default;
 
-        bool operator==(const Component&) const;
-        bool operator!=(const Component&) const;
-        friend std::ostream& operator<<(std::ostream&, Component const&);
+        friend bool operator==(Component const&, Component const&) noexcept;
+        friend std::ostream& operator<<(std::ostream&, Component const&) noexcept;
 
-        // Getter
         std::string GetName() const { return name_; }
         double GetNucCharge() const { return nucCharge_; }
         double GetAtomicNum() const { return atomicNum_; }
@@ -107,12 +106,18 @@ namespace Components {
         double atomInMolecule_; ///< number of atoms in a molecule
 
         // Calculated in constructor
-        double logConstant_;          ///< radiation logarithm constant B
-        double bPrime_;               ///< radiation logarithm constant bPrime
-        double averageNucleonWeight_; ///< average nucleon weight in a nucleus
-                                      ///< [MeV]
-        double wood_saxon_;           ///< Woods-Saxon potential factor
+        double logConstant_ = 0;            ///< radiation logarithm constant B
+        double bPrime_ = 0;                 ///< radiation logarithm constant bPrime
+        double averageNucleonWeight_ = 0;   ///< average nucleon weight in a nucleus
+                                            ///< [MeV]
+        double wood_saxon_ = 0;             ///< Woods-Saxon potential factor
     };
+
+    bool operator==(Component const&, Component const&) noexcept;
+    inline bool operator==(std::shared_ptr<Component> const& lhs, std::shared_ptr<Component> const& rhs) noexcept{
+        return *lhs == *rhs;
+    }
+
 
     COMPONENT_DEC(Hydrogen, 2.0)
     COMPONENT_DEC(Carbon, 1.0)
@@ -139,5 +144,24 @@ using component_list = std::vector<Components::Component>;
 double calculate_proton_massnumber_fraction(const component_list& comp_list) noexcept;
 
 } // namespace PROPOSAL
+
+namespace std
+{
+    template<>
+    struct hash<PROPOSAL::Components::Component>
+    {
+        std::size_t operator()(PROPOSAL::Components::Component const& comp) const noexcept{
+            return comp.GetHash();
+        }
+    };
+
+    template<>
+    struct hash<std::shared_ptr<PROPOSAL::Components::Component>>
+    {
+        std::size_t operator()(std::shared_ptr<PROPOSAL::Components::Component> const& comp) const noexcept{
+            return comp->GetHash();
+        }
+    };
+}
 
 #undef COMPONENT_DEC

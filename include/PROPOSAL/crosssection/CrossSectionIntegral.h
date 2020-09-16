@@ -66,11 +66,11 @@ class CrossSectionIntegral : public crosssection_t<P, M> {
     rates_t CalculatedNdx_impl(double energy, std::false_type);
 
     double CalculateStochasticLoss_impl(
-        const Component&, double, double, std::true_type, std::false_type);
+        std::shared_ptr<Component> const&, double, double, std::true_type, std::false_type);
     double CalculateStochasticLoss_impl(
-        const Component&, double, double, std::false_type, std::false_type);
+        std::shared_ptr<Component> const&, double, double, std::false_type, std::false_type);
     double CalculateStochasticLoss_impl(
-            const Component&, double, double, bool, std::true_type);
+            std::shared_ptr<Component> const&, double, double, bool, std::true_type);
 public:
     CrossSectionIntegral(Param&& _param, P&& _p_def, M&& _medium,
         shared_ptr<const EnergyCutSettings> _cut)
@@ -109,7 +109,7 @@ public:
             energy, typename param_t::base_param_t::component_wise{});
     }
     inline double CalculateStochasticLoss(
-        const Component& comp, double energy, double rate) override
+        std::shared_ptr<Component> const& comp, double energy, double rate) override
     {
         return CalculateStochasticLoss_impl(comp, energy, rate,
             typename param_t::base_param_t::component_wise{},
@@ -232,24 +232,24 @@ rates_t CrossSectionIntegral<Param, P, M>::CalculatedNdx_impl(
 
 template <typename Param, typename P, typename M>
 double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
-    const Component& comp, double energy, double rate, std::true_type, std::false_type)
+    std::shared_ptr<Component> const& comp, double energy, double rate, std::true_type, std::false_type)
 {
     auto weight_for_rate_in_medium = medium.GetSumNucleons()
-        / (comp.GetAtomInMolecule() * comp.GetAtomicNum());
-    return dndx_map[&comp]->GetUpperLimit(
+        / (comp->GetAtomInMolecule() * comp->GetAtomicNum());
+    return dndx_map[comp]->GetUpperLimit(
         energy, rate * weight_for_rate_in_medium);
 }
 
 template <typename Param, typename P, typename M>
 double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
-    const Component& comp, double energy, double rate, std::false_type, std::false_type)
+    std::shared_ptr<Component> const& comp, double energy, double rate, std::false_type, std::false_type)
 {
-    return dndx_map[&comp]->GetUpperLimit(energy, rate);
+    return dndx_map[comp]->GetUpperLimit(energy, rate);
 }
 
 template <typename Param, typename P, typename M>
 double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
-    const Component&, double energy, double, bool, std::true_type)
+    std::shared_ptr<Component> const&, double energy, double, bool, std::true_type)
 {
     return energy;
 }
