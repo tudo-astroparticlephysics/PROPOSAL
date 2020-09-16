@@ -48,10 +48,10 @@ public:
     }
 
     enum { CROSS, COMP, RATE };
-    tuple<InteractionType, std::shared_ptr<Component>, double> TypeInteraction(
+    tuple<InteractionType, std::shared_ptr<const Component>, double> TypeInteraction(
         double energy, double rnd) override
     {
-        using rates_t = tuple<cross_type*, std::shared_ptr<Component>, double>;
+        using rates_t = tuple<cross_type*, std::shared_ptr<const Component>, double>;
         auto rates = std::vector<rates_t>();
         for (auto& c : cross_list) {
             auto rates_comp = c->CalculatedNdx(energy);

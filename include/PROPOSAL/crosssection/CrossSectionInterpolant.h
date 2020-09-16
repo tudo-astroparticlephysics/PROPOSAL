@@ -63,11 +63,11 @@ class CrossSectionInterpolant : public crosssection_t<P, M> {
     dndx_map_t dndx_map;
 
     double CalculateStochasticLoss_impl(
-        std::shared_ptr<Component> const&, double, double, std::true_type, std::false_type);
+        std::shared_ptr<const Component> const&, double, double, std::true_type, std::false_type);
     double CalculateStochasticLoss_impl(
-        std::shared_ptr<Component> const&, double, double, std::false_type, std::false_type);
+        std::shared_ptr<const Component> const&, double, double, std::false_type, std::false_type);
     double CalculateStochasticLoss_impl(
-            std::shared_ptr<Component> const&, double, double, bool, std::true_type);
+            std::shared_ptr<const Component> const&, double, double, bool, std::true_type);
 protected:
     unique_ptr<Interpolant> dedx;
     unique_ptr<Interpolant> de2dx;
@@ -126,7 +126,7 @@ public:
         return rates;
     }
     inline double CalculateStochasticLoss(
-        std::shared_ptr<Component> const& comp, double energy, double rate) override
+        std::shared_ptr<const Component> const& comp, double energy, double rate) override
     {
         return CalculateStochasticLoss_impl(comp, energy, rate,
             typename param_t::base_param_t::component_wise{},
@@ -286,7 +286,7 @@ unique_ptr<Interpolant> build_de2dx(Param&& param, const ParticleDef& p_def,
 
 template <typename Param, typename P, typename M>
 double CrossSectionInterpolant<Param, P, M>::CalculateStochasticLoss_impl(
-    std::shared_ptr<Component> const& comp, double energy, double rate, std::true_type, std::false_type)
+    std::shared_ptr<const Component> const& comp, double energy, double rate, std::true_type, std::false_type)
 {
     auto weight_for_rate_in_medium = medium.GetSumNucleons()
         / (comp->GetAtomInMolecule() * comp->GetAtomicNum());
@@ -296,14 +296,14 @@ double CrossSectionInterpolant<Param, P, M>::CalculateStochasticLoss_impl(
 
 template <typename Param, typename P, typename M>
 double CrossSectionInterpolant<Param, P, M>::CalculateStochasticLoss_impl(
-    std::shared_ptr<Component> const&, double energy, double rate, std::false_type, std::false_type)
+    std::shared_ptr<const Component> const&, double energy, double rate, std::false_type, std::false_type)
 {
     return dndx_map[nullptr]->GetUpperLimit(energy, rate);
 }
 
 template <typename Param, typename P, typename M>
 double CrossSectionInterpolant<Param, P, M>::CalculateStochasticLoss_impl(
-    std::shared_ptr<Component> const&, double energy, double, bool, std::true_type)
+    std::shared_ptr<const Component> const&, double energy, double, bool, std::true_type)
 {
     return energy;
 }
