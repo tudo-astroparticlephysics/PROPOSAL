@@ -5,7 +5,7 @@
 
 namespace PROPOSAL {
 
-using dndx_map_t = unordered_map<std::shared_ptr<Component>, unique_ptr<CrossSectionDNDX>>;
+using dndx_map_t = unordered_map<std::shared_ptr<const Component>, unique_ptr<CrossSectionDNDX>>;
 
 template <typename Param>
 dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
@@ -16,12 +16,12 @@ dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
     for (auto target : medium.GetComponents()) {
         if (interpol)
             m.emplace(
-                    std::make_shared<Components::Component>(target),
+                    std::make_shared<const Components::Component>(target),
                     PROPOSAL::make_unique<CrossSectionDNDXInterpolant>(param, p_def, target, cut, InterpolationDef())
             );
         else
             m.emplace(
-                    std::make_shared<Components::Component>(target),
+                    std::make_shared<const Components::Component>(target),
                     PROPOSAL::make_unique<CrossSectionDNDXIntegral>(param, p_def, target, cut)
             );
     }

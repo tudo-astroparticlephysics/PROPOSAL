@@ -1,6 +1,9 @@
 
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/version.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/propagation_utility/Interaction.h"
+#include "PROPOSAL/propagation_utility/InteractionBuilder.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 
 #include "pyBindings.h"
@@ -99,6 +102,13 @@ PYBIND11_MODULE(proposal, m)
                     Returns:
                         float: v_cut
                 )pbdoc");
+
+    py::class_<Interaction, std::shared_ptr<Interaction>>(m, "Interaction")
+        .def("energy_interaction", py::vectorize(&Interaction::EnergyInteraction), py::arg("energy"), py::arg("random number"))
+        .def("type_interaction", &Interaction::TypeInteraction, py::arg("energy"), py::arg("random number"));
+
+
+    m.def("make_interaction", &make_interaction<const crosssection_list_t<ParticleDef, Medium>>);
 
     /* py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m, */
     /*     "InterpolationDef", */

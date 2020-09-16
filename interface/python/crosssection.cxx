@@ -93,7 +93,7 @@ void init_crosssection(py::module& m)
                 >>> cross.calculate_dEdx(1e6) # exmaple usage of the created crosssection class...
                 )pbdoc")
         /* .def("__str__", &py_print<CrossSectionContainer>) */
-        .def("calculate_dEdx", &CrossSectionContainer::CalculatedEdx,
+        .def("calculate_dEdx", py::vectorize(&CrossSectionContainer::CalculatedEdx),
             py::arg("energy"),
             R"pbdoc(
 
@@ -112,7 +112,7 @@ void init_crosssection(py::module& m)
                 energy (float): energy in MeV
 
                 )pbdoc")
-        .def("calculate_dE2dx", &CrossSectionContainer::CalculatedE2dx,
+        .def("calculate_dE2dx", py::vectorize(&CrossSectionContainer::CalculatedE2dx),
             py::arg("energy"),
             R"pbdoc(
 
@@ -133,9 +133,7 @@ void init_crosssection(py::module& m)
             energy (float): energy in MeV
 
             )pbdoc")
-        .def("calculate_dNdx",
-            (double (CrossSectionContainer::*)(double))
-                & CrossSectionContainer::CalculatedNdx,
+        .def("calculate_dNdx", &CrossSectionContainer::CalculatedNdx,
             py::arg("energy"),
             R"pbdoc(
 
@@ -158,9 +156,8 @@ void init_crosssection(py::module& m)
 
             )pbdoc")
         .def("calculate_stochastic_loss",
-            (double (CrossSectionContainer::*)(double, double, double))
-                & CrossSectionContainer::CalculateStochasticLoss,
-            py::arg("energy"), py::arg("rnd1"), py::arg("rnd2"),
+                &CrossSectionContainer::CalculateStochasticLoss,
+            py::arg("component"), py::arg("energy"), py::arg("rate"),
             R"pbdoc(
 
         Samples a stochastic energy loss for a particle of the energy E.

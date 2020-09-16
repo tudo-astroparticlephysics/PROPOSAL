@@ -43,7 +43,7 @@ namespace PROPOSAL {
 
 using Components::Component;
 
-using rates_t = std::unordered_map<std::shared_ptr<Component>, double>;
+using rates_t = std::unordered_map<std::shared_ptr<const Component>, double>;
 
 template <class P, class M> struct CrossSection {
     CrossSection() = default;
@@ -52,7 +52,7 @@ template <class P, class M> struct CrossSection {
     virtual double CalculatedEdx(double) = 0;
     virtual double CalculatedE2dx(double) = 0;
     virtual rates_t CalculatedNdx(double) = 0;
-    virtual double CalculateStochasticLoss(std::shared_ptr<Component> const&, double, double) = 0;
+    virtual double CalculateStochasticLoss(std::shared_ptr<const Component> const&, double, double) = 0;
     virtual double GetLowerEnergyLim() const = 0;
 
     virtual size_t GetHash() const noexcept = 0;
