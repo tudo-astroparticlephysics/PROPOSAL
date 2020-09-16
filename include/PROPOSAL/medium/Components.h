@@ -115,7 +115,11 @@ namespace Components {
 
     bool operator==(Component const&, Component const&) noexcept;
     inline bool operator==(std::shared_ptr<Component> const& lhs, std::shared_ptr<Component> const& rhs) noexcept{
-        return *lhs == *rhs;
+        if(lhs != nullptr and rhs != nullptr)
+            return *lhs == *rhs;
+        if(lhs == nullptr and rhs == nullptr)
+            return true;
+        return false;
     }
 
 
@@ -159,7 +163,9 @@ namespace std
     struct hash<std::shared_ptr<PROPOSAL::Components::Component>>
     {
         std::size_t operator()(std::shared_ptr<PROPOSAL::Components::Component> const& comp) const noexcept{
-            return comp->GetHash();
+            if (comp)
+                return comp->GetHash();
+            return 0;
         }
     };
 }

@@ -48,10 +48,10 @@ public:
     }
 
     enum { CROSS, COMP, RATE };
-    tuple<InteractionType, const Component*, double> TypeInteraction(
+    tuple<InteractionType, std::shared_ptr<Component>, double> TypeInteraction(
         double energy, double rnd) override
     {
-        using rates_t = tuple<cross_type*, const Component*, double>;
+        using rates_t = tuple<cross_type*, std::shared_ptr<Component>, double>;
         auto rates = std::vector<rates_t>();
         for (auto& c : cross_list) {
             auto rates_comp = c->CalculatedNdx(energy);
@@ -65,7 +65,7 @@ public:
             sum_of_rates -= std::get<RATE>(r);
             if (sum_of_rates < 0.f) {
                 auto loss = std::get<CROSS>(r)->CalculateStochasticLoss(
-                    *std::get<COMP>(r), energy, -sum_of_rates);
+                    std::get<COMP>(r), energy, -sum_of_rates);
                 return std::make_tuple(std::get<CROSS>(r)->GetInteractionType(),
                     std::get<COMP>(r), loss);
             }
