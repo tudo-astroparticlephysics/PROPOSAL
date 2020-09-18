@@ -17,7 +17,9 @@ protected:
             for (auto& r : rates)
                 total_rate += r.second;
         }
-        return disp.FunctionToIntegral(cross, energy) * total_rate;
+        if(total_rate > 0)
+            return disp.FunctionToIntegral(cross, energy) * total_rate;
+        return 0;
     }
 
     template <typename Cross>

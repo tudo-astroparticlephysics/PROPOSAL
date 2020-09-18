@@ -33,7 +33,9 @@ public:
     double Calculate(double energy, double v) override
     {
         auto integral_lim = GetIntegrationLimits(energy);
-        return dndx_integral(integral, energy, get<MIN>(integral_lim), v, 0);
+        if(get<MIN>(integral_lim) < v)
+            return dndx_integral(integral, energy, get<MIN>(integral_lim), v, 0);
+        return 0;
     }
 
     double GetUpperLimit(double energy, double rate) override
