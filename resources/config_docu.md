@@ -267,6 +267,7 @@ A density correction factor for the medium, specifying the density of the medium
 
 Every sector needs a geometry, described by an vector that defines its `origin` and a `shape`.
 All lengths PROPOSAL uses are in **centimeter**!
+(Unit of length in the setting below are in **meter**!)
 
 The following three shapes are available:
 - `"Sphere"`
