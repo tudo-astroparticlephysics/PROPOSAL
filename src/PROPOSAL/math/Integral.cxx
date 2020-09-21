@@ -343,19 +343,19 @@ Integral::Integral()
     int aux;
     if (romberg_ <= 0)
     {
-        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1", romberg_);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/0): romberg = {} must be > 0, setting to 1", romberg_);
         romberg_ = 1;
     }
 
     if (maxSteps_upper_limit_ <= 0)
     {
-        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps_upper_limit_);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/1): maxSteps = {} must be > 0, setting to 1", maxSteps_upper_limit_);
         maxSteps_upper_limit_ = 1;
     }
 
     if (precision_ <= 0)
     {
-        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6", precision_);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/2): precision = {} must be > 0, setting to 1.e-6", precision_);
         precision_ = 1.e-6;
     }
 
@@ -426,19 +426,19 @@ Integral::Integral(int romberg, int maxSteps, double precision)
     int aux;
     if (romberg <= 0)
     {
-        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1", romberg);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/0): romberg = {} must be > 0, setting to 1", romberg);
         romberg = 1;
     }
 
     if (maxSteps <= 0)
     {
-        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/1): maxSteps = {} must be > 0, setting to 1", maxSteps);
         maxSteps = 1;
     }
 
     if (precision <= 0)
     {
-        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6", precision);
+        Logging::Get("proposal.integral")->warn("Warning (in Integral/Integral/2): precision = {} must be > 0, setting to 1.e-6", precision);
         precision = 1.e-6;
     }
 
@@ -921,8 +921,8 @@ double Integral::RombergIntegrateClosed()
     }
 
     QuadpackResults q_results = qags();
-    Logging::Get("proposal.integral")->warn("Precision %e has not been reached after %i steps the value is %e!\nUsing now qags! value = %e, abserr = "
-             "%e, neval = %i, ier = %i",
+    Logging::Get("proposal.integral")->warn("Precision {} has not been reached after {} steps the value is {}!\nUsing now qags! value = {}, abserr = "
+             "{}, neval = {}, ier = {}",
              precision_,
              maxSteps_romberg_,
              value,
@@ -995,8 +995,8 @@ double Integral::RombergIntegrateOpened()
     }
 
     QuadpackResults q_results = qags();
-    Logging::Get("proposal.integral")->warn("Precision %e has not been reached after %i steps the value is %e!\nUsing now qags! value = %e, abserr = "
-             "%e, neval = %i, ier = %i",
+    Logging::Get("proposal.integral")->warn("Precision {} has not been reached after {} steps the value is {}!\nUsing now qags! value = {}, abserr = "
+             "{}, neval = {}, ier = {}",
              precision_,
              maxSteps_romberg_,
              value,
@@ -1044,8 +1044,8 @@ double Integral::RombergIntegrateOpened(double bigValue)
     }
 
     QuadpackResults q_results = qags();
-    Logging::Get("proposal.integral")->warn("Precision %e has not been reached after %i steps the value is %e!\nUsing now qags! value = %e, abserr = "
-             "%e, neval = %i, ier = %i",
+    Logging::Get("proposal.integral")->warn("Precision {} has not been reached after {} steps the value is {}!\nUsing now qags! value = {}, abserr = "
+             "{}, neval = {}, ier = {}",
              precision_,
              maxSteps_romberg_,
              value,
@@ -1313,7 +1313,7 @@ void Integral::RefineUpperLimit(double result)
 
     if (i == maxSteps_upper_limit_)
     {
-        Logging::Get("proposal.integral")->warn("Precision %f has not been reached after %i steps!", precision_, maxSteps_upper_limit_);
+        Logging::Get("proposal.integral")->warn("Precision {} has not been reached after {} steps!", precision_, maxSteps_upper_limit_);
     }
 
     randomX_ = currentX;
