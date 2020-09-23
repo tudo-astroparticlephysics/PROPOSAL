@@ -106,5 +106,5 @@ double EpairIntegral::CalculatedEdxWithoutMultiplier(double energy)
 // ------------------------------------------------------------------------- //
 double EpairIntegral::FunctionToDEdxIntegralReverse(double energy, double v)
 {
-    return (1 - v) * parametrization_->DifferentialCrossSection(energy, v);
+    return (1 - v) * parametrization_->DifferentialCrossSection(energy, 1 - v);
 }
