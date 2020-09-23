@@ -41,7 +41,7 @@ OPTION(ADD_PYTHON "Choose to compile the python wrapper library" ON)
 file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/src/PROPOSAL/*)
 add_library(PROPOSAL SHARED ${SRC_FILES})
 add_library(PROPOSAL::PROPOSAL ALIAS PROPOSAL)
-target_compile_features(PROPOSAL PUBLIC cxx_std_11)
+target_compile_features(PROPOSAL PUBLIC cxx_std_14)
 set_target_properties(PROPOSAL PROPERTIES CXX_EXTENSIONS OFF)
 target_include_directories(
     PROPOSAL PUBLIC
