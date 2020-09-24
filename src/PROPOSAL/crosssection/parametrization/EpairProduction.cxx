@@ -146,7 +146,7 @@ double integrate_dedx(Integral& integral, crosssection::EpairProduction& param,
         }
         auto func_reverse = [&, energy](double v) {
             return (1 - v)
-                * param.DifferentialCrossSection(p_def, comp, energy, v);
+                * param.DifferentialCrossSection(p_def, comp, energy, 1 - v);
         };
         sum += integral.Integrate(1 - v_max, r2, func_reverse, 2)
             + integral.Integrate(r2, 1 - r1, func_reverse, 4);
