@@ -185,7 +185,7 @@ Propagator::Propagator(
     std::shared_ptr<const Medium> med;
     std::shared_ptr<const Geometry> geo;
     std::array<std::pair<std::string, Sector::ParticleLocation::Enum>, 3> cuts {
-        std::make_pair("cuts_before", Sector::ParticleLocation::InfrontDetector),
+        std::make_pair("cuts_infront", Sector::ParticleLocation::InfrontDetector),
         std::make_pair("cuts_inside", Sector::ParticleLocation::InsideDetector),
         std::make_pair("cuts_behind", Sector::ParticleLocation::BehindDetector)
     };

@@ -18,15 +18,15 @@ An example for a configuration file can be found [here](config_docu.md).
 There is the option to set a `seed`, if the internal random number generator is used.
 The seed has no effect, if you use an external random number generator.
 
-If the Output of the Secondaries should not only include the stochastic energy losses (and the particles produced in an interaction or decay), but also the continuous energy losses, this can be set by the `continous_loss_output` parameter.
+If the Output of the Secondaries should not only include the stochastic energy losses (and the particles produced in an interaction or decay), but also the continuous energy losses, this can be set by the `do_continuous_energy_loss_output` parameter.
 
 When the Output should just contain the secondaries (energy losses or particles produced in an interaction or decay), that occurred inside the detector volume, and not the ones outside of the detector, this can be set with the `only_loss_inside_detector` parameter.
 
-| Keyword                     | Type    | Default   | Description |
-| --------------------------- | ------- | --------- | ----------- |
-| `seed`                      | Integer | `0`       | seed for the internal random number generator|
-| `continous_loss_output`     | Bool    | `False`   | Decides whether continuous losses should be emitted in the Output of Secondaries|
-| `only_loss_inside_detector` | Bool    | `False`   | Decides whether only secondaries created inside the detector should be included in the Output of Secondaries|
+| Keyword                            | Type    | Default   | Description |
+| ---------------------------------- | ------- | --------- | ----------- |
+| `seed`                             | Integer | `0`       | seed for the internal random number generator|
+| `do_continuous_energy_loss_output` | Bool    | `False`   | Decides whether continuous losses should be emitted in the Output of Secondaries|
+| `only_loss_inside_detector`        | Bool    | `False`   | Decides whether only secondaries created inside the detector should be included in the Output of Secondaries|
 
 ### Interpolation parameters ###
 The `interpolation` parameter is an own json-object.
