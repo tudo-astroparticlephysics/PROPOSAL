@@ -1,5 +1,6 @@
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/ContRand.h"
+#include "PROPOSAL/math/MathMethods.h"
 
 namespace PROPOSAL {
 template <class T> class ContRandBuilder : public ContRand {
@@ -22,7 +23,7 @@ template <class T> class ContRandBuilder : public ContRand {
     {
         auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
         auto cont_rand_func = [this, cross, disp](double energy) mutable {
-            return FunctionToIntegral(cross, disp, energy);
+            return FunctionToIntegral(cross, *disp, energy);
         };
         T cont_rand_integral(cont_rand_func, lower_lim);
         if (typeid(T) == typeid(UtilityInterpolant)) {
@@ -39,7 +40,6 @@ public:
         , cont_rand_integral(BuildContRandIntegral<Cross>(cross))
     {
     }
-
 
     double EnergyRandomize(
         double initial_energy, double final_energy, double rnd) override

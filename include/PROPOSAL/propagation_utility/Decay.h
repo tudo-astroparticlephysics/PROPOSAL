@@ -1,5 +1,6 @@
 #pragma once
 #include "PROPOSAL/math/InterpolantBuilder.h"
+#include "PROPOSAL/propagation_utility/Displacement.h"
 #include "PROPOSAL/Constants.h"
 #include <cmath>
 #include <cassert>
@@ -12,14 +13,14 @@ protected:
     double mass;
     double lower_lim;
 
-    template <typename Cross, typename Disp>
-    double FunctionToIntegral(Cross&& cross, Disp&& disp, double energy)
+    template <typename Cross>
+    double FunctionToIntegral(Cross&& cross, Displacement & disp, double energy)
     {
         assert(!std::isinf(lifetime));
         assert(energy >= mass);
         double square_momentum = (energy - mass) * (energy + mass);
         double aux = SPEED * std::sqrt(square_momentum) / mass;
-        return disp.FunctionToIntegral(cross, energy) / aux;
+        return disp.FunctionToIntegral(energy) / aux;
     }
 
 public:
