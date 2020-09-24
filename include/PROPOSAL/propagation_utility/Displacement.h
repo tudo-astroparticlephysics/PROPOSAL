@@ -12,24 +12,21 @@ using std::string;
 
 namespace PROPOSAL {
 
-struct Displacement {
-    static Interpolant1DBuilder::Definition interpol_def;
+class Displacement {
+protected:
+    using crossbase_list_t = std::vector<std::shared_ptr<CrossSectionBase>>;
+    crossbase_list_t cross_list;
 
-    Displacement() = default;
+public:
+    template <typename Cross>
+    Displacement(Cross&& cross) : cross_list(std::begin(cross), std::end(cross)) {}
     virtual ~Displacement() = default;
 
-    template <typename Cross> double FunctionToIntegral(Cross&&, double);
+    static Interpolant1DBuilder::Definition interpol_def;
+
+    double FunctionToIntegral(double);
     virtual double SolveTrackIntegral(double, double) = 0;
     virtual double UpperLimitTrackIntegral(double, double) = 0;
 };
 
-template <typename Cross>
-double Displacement::FunctionToIntegral(Cross&& cross, double energy)
-{
-    auto result = 0.0;
-    for (auto& cr : cross)
-        result += cr->CalculatedEdx(energy);
-
-    return -1.0 / result;
-}
 } // namespace PROPOSAL

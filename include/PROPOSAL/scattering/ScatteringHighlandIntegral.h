@@ -90,8 +90,8 @@ template <class T, class Cross, class Enable>
 T ScatteringHighlandIntegral<T, Cross, Enable>::BuildHighlandIntegral(
     Cross&& cross)
 {
-    auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
-    auto higland_integral_func = [this, &disp, &cross](double energy) {
+    auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
+    auto higland_integral_func = [this, disp, &cross](double energy) {
         return HighlandIntegral(disp, cross, energy);
     };
     T decay_integral(higland_integral_func, CrossSectionVector::GetLowerLim(cross));

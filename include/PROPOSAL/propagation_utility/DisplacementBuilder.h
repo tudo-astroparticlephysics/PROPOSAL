@@ -2,19 +2,18 @@
 #include "PROPOSAL/propagation_utility/Displacement.h"
 
 namespace PROPOSAL {
-template <typename T, typename Cross>
+template <typename T>
 class DisplacementBuilder : public Displacement {
-    using cross_list_t = typename std::decay<Cross>::type;
-
     T disp_integral;
 
-    T BuildTrackIntegral(cross_list_t cross)
+public:
+    T BuildTrackIntegral(crossbase_list_t const& cross)
     {
         if (cross.size() < 1)
             throw std::invalid_argument(
                 "at least one crosssection is required.");
-        auto disp_func = [this, cross](double energy) {
-            return FunctionToIntegral(cross, energy);
+        auto disp_func = [this](double energy) {
+            return FunctionToIntegral(energy);
         };
         auto low_lim = CrossSectionVector::GetLowerLim(cross);
         T integral(disp_func, low_lim);
@@ -25,19 +24,19 @@ class DisplacementBuilder : public Displacement {
         return integral;
     }
 
-public:
-    DisplacementBuilder(Cross const& cross)
-        : Displacement()
-        , disp_integral(BuildTrackIntegral(cross))
+    template <typename Cross>
+    DisplacementBuilder(Cross&& cross)
+        : Displacement(std::forward<Cross>(cross))
+        , disp_integral(BuildTrackIntegral(cross_list))
     {
     }
 
-    double SolveTrackIntegral(double upper_lim, double lower_lim) override
+    inline double SolveTrackIntegral(double upper_lim, double lower_lim) final
     {
         return disp_integral.Calculate(upper_lim, lower_lim);
     }
 
-    double UpperLimitTrackIntegral(double lower_lim, double sum) override
+    inline double UpperLimitTrackIntegral(double lower_lim, double sum) final
     {
         return disp_integral.GetUpperLimit(lower_lim, sum);
     }
@@ -48,8 +47,8 @@ std::unique_ptr<Displacement> make_displacement(T&& cross, bool interpolate)
 {
     if (interpolate)
         return PROPOSAL::make_unique<
-            DisplacementBuilder<UtilityInterpolant, T>>(std::forward<T>(cross));
-    return PROPOSAL::make_unique<DisplacementBuilder<UtilityIntegral, T>>(
+            DisplacementBuilder<UtilityInterpolant>>(std::forward<T>(cross));
+    return PROPOSAL::make_unique<DisplacementBuilder<UtilityIntegral>>(
         std::forward<T>(cross));
 }
 } // namespace PROPOSAL

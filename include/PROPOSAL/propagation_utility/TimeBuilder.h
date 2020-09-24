@@ -9,8 +9,8 @@ template <typename T, typename Cross> class ExactTimeBuilder : public Time {
 
     T BuildTimeIntegral(Cross&& cross)
     {
-        auto disp = DisplacementBuilder<UtilityIntegral, Cross>(cross);
-        auto time_func = [this, cross, &disp](double energy) mutable {
+        auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
+        auto time_func = [this, cross, disp](double energy) mutable {
             return FunctionToIntegral(cross, disp, energy);
         };
         T time_integral(time_func, CrossSectionVector::GetLowerLim(cross));

@@ -45,18 +45,28 @@ using Components::Component;
 
 using rates_t = std::unordered_map<std::shared_ptr<const Component>, double>;
 
-template <class P, class M> struct CrossSection {
-    CrossSection() = default;
-    virtual ~CrossSection() = default;
-
+struct CrossSectionBase {
     virtual double CalculatedEdx(double) = 0;
     virtual double CalculatedE2dx(double) = 0;
     virtual rates_t CalculatedNdx(double) = 0;
     virtual double CalculateStochasticLoss(std::shared_ptr<const Component> const&, double, double) = 0;
     virtual double GetLowerEnergyLim() const = 0;
-
     virtual size_t GetHash() const noexcept = 0;
     virtual InteractionType GetInteractionType() const noexcept = 0;
+};
+
+template <class P, class M> struct CrossSection : public CrossSectionBase{
+    CrossSection() = default;
+    virtual ~CrossSection() = default;
+
+    /* virtual double CalculatedEdx(double) = 0; */
+    /* virtual double CalculatedE2dx(double) = 0; */
+    /* virtual rates_t CalculatedNdx(double) = 0; */
+    /* virtual double CalculateStochasticLoss(std::shared_ptr<const Component> const&, double, double) = 0; */
+    /* virtual double GetLowerEnergyLim() const = 0; */
+
+    /* virtual size_t GetHash() const noexcept = 0; */
+    /* virtual InteractionType GetInteractionType() const noexcept = 0; */
 };
 
 template <typename P, typename M>

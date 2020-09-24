@@ -92,9 +92,11 @@ utility_def(utility.utility_def){
 tuple<InteractionType, std::shared_ptr<const Component>, double> PropagationUtility::EnergyStochasticloss(
     double energy, double rnd)
 {
-    auto return_val = collection.interaction_calc->TypeInteraction(energy, rnd);
-    std::get<2>(return_val) *= energy;
-    return return_val;
+    auto rates = collection.interaction_calc->Rates(energy);
+    auto loss = collection.interaction_calc->SampleLoss(energy, rates, rnd);
+
+    get<Interaction::FRACTIONAL_LOSS>(loss) *= energy;
+    return loss;
 }
 
 double PropagationUtility::EnergyDecay(
@@ -106,8 +108,8 @@ double PropagationUtility::EnergyDecay(
     return 0; // no decay, e.g. particle is stable
 }
 
-double PropagationUtility::EnergyInteraction(
-    double energy, std::function<double()> rnd)
+double PropagationUtility::EnergyInteraction(double energy,
+        std::function<double()> rnd)
 {
     return collection.interaction_calc->EnergyInteraction(energy, rnd());
 }
