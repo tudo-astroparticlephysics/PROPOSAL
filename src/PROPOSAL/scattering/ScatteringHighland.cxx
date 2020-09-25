@@ -26,7 +26,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 ScatteringHighland::ScatteringHighland(
-    const ParticleDef& particle_def, std::shared_ptr<const Medium> medium)
+    const ParticleDef& particle_def, Medium const& medium)
     : Scattering(particle_def)
     , medium_(medium)
     , charge(particle_def.charge)
@@ -55,7 +55,7 @@ bool ScatteringHighland::compare(const Scattering& scattering) const
 
     if (!scatteringHighland)
         return false;
-    else if (*medium_ == *scatteringHighland->medium_)
+    else if (medium_ == scatteringHighland->medium_)
         return true;
     else
         return false;
@@ -63,7 +63,7 @@ bool ScatteringHighland::compare(const Scattering& scattering) const
 
 void ScatteringHighland::print(std::ostream& os) const
 {
-    os << "Medium:\n" << *medium_ << '\n';
+    os << "Medium:\n" << medium_ << '\n';
 }
 
 // ------------------------------------------------------------------------- //
@@ -76,7 +76,7 @@ double ScatteringHighland::CalculateTheta0(double grammage, double ei, double ef
 
     // eq 6 of Lynch, Dahl
     // Nuclear Instruments and Methods in Physics Research Section B 58 (1991)
-    double y = grammage / medium_->GetRadiationLength();
+    double y = grammage / medium_.GetRadiationLength();
     double momentum_Sq = (ei - mass) * (ei + mass);
     double beta_p = momentum_Sq / ei; // beta * p = p^2/sqrt(p^2 + m^2)
     y = 13.6 * std::abs(charge) / (beta_p)*std::sqrt(y)

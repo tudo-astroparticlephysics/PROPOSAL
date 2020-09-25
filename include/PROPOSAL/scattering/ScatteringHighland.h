@@ -46,7 +46,7 @@ class Medium;
 class ScatteringHighland : public Scattering
 {
 public:
-    ScatteringHighland(const ParticleDef&, std::shared_ptr<const Medium>);
+    ScatteringHighland(const ParticleDef&, Medium const&);
     ScatteringHighland(const ParticleDef&, const ScatteringHighland&);
     ScatteringHighland(const ScatteringHighland&);
 
@@ -66,7 +66,7 @@ protected:
     RandomAngles CalculateRandomAngle(double grammage, double ei, double ef, const array<double, 4>& rnd) override;
     virtual double CalculateTheta0(double grammage, double ei, double ef);
 
-    std::shared_ptr<const Medium> medium_;
+    Medium medium_;
     double charge;
 };
 

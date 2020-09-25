@@ -34,17 +34,17 @@
 
 
 #include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/medium/Medium.h"
 
 using std::array;
 namespace PROPOSAL {
 
-class Medium;
 
 class ScatteringMoliere : public Scattering
 {
 public:
     // constructor
-    ScatteringMoliere(const ParticleDef&, std::shared_ptr<const Medium>);
+    ScatteringMoliere(const ParticleDef&, Medium const&);
     ScatteringMoliere(const ParticleDef&, const ScatteringMoliere&);
     ScatteringMoliere(const ScatteringMoliere&);
     ~ScatteringMoliere();
@@ -59,7 +59,7 @@ private:
 
     RandomAngles CalculateRandomAngle(double grammage, double ei, double ef, const array<double, 4>& rnd) override;
 
-    std::shared_ptr<const Medium> medium_;
+    Medium medium_;
 
     int numComp_; // number of components in medium
     double ZSq_A_average_;

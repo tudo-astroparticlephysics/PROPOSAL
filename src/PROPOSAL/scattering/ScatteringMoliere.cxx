@@ -99,10 +99,10 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double grammage
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, std::shared_ptr<const Medium> medium)
+ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, Medium const& medium)
     : Scattering(particle_def),
       medium_(medium),
-      numComp_(medium_->GetNumComponents()),
+      numComp_(medium_.GetNumComponents()),
       ZSq_A_average_(0.0),
       Zi_(numComp_),
       weight_ZZ_(numComp_),
@@ -119,7 +119,7 @@ ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, std::share
     double A_sum = 0.;
 
     for (int i = 0; i < numComp_; i++) {
-        Components::Component component = medium_->GetComponents().at(i);
+        Components::Component component = medium_.GetComponents().at(i);
         Zi_[i] = component.GetNucCharge();
         ki[i] = component.GetAtomInMolecule();
         Ai[i] = component.GetAtomicNum();
@@ -193,7 +193,7 @@ bool ScatteringMoliere::compare(const Scattering& scattering) const {
 
     if (!scatteringMoliere)
         return false;
-    else if (!(*medium_ == *scatteringMoliere->medium_))
+    else if (!(medium_ == scatteringMoliere->medium_))
         return false;
     else if (numComp_ != scatteringMoliere->numComp_)
         return false;
@@ -217,7 +217,7 @@ bool ScatteringMoliere::compare(const Scattering& scattering) const {
 
 void ScatteringMoliere::print(std::ostream& os) const
 {
-    os << "Medium:\n" << *medium_ << '\n';
+    os << "Medium:\n" << medium_ << '\n';
 }
 
 //----------------------------------------------------------------------------//
