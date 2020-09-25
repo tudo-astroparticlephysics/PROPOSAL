@@ -16,8 +16,10 @@
 
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #include "pyBindings.h"
+#include <type_traits>
 
 namespace py = pybind11;
 using namespace PROPOSAL;
@@ -28,10 +30,19 @@ template <typename T> void build_crosssection(py::module& m_sub)
         [](T& param, ParticleDef& p, Medium& m,
             shared_ptr<const EnergyCutSettings> c, bool i) {
             return std::shared_ptr<CrossSection<ParticleDef, Medium>>(
-                PROPOSAL::make_crosssection(param, p, m, c, i));
+                make_crosssection(param, p, m, c, i));
         },
-        py::arg("Parametrization"), py::arg("particle_def"), py::arg("target"),
+        py::arg("parametrization"), py::arg("particle_def"), py::arg("target"),
         py::arg("cuts"), py::arg("interpolate"));
+}
+
+template <typename T> void build_std_crosssection(py::module& m_sub)
+{
+    m_sub.def("make_std_crosssection",
+        [](T& p, Medium& m, shared_ptr<const EnergyCutSettings> c, bool i) {
+            return DefaultCrossSections<T>::template Get<std::false_type>(p, m, c, i);
+        },
+        py::arg("particle_def"), py::arg("target"), py::arg("cuts"), py::arg("interpolate"));
 }
 
 void init_crosssection(py::module& m)
@@ -179,7 +190,8 @@ void init_crosssection(py::module& m)
         stochatic energy loss is calculated.
 
             )pbdoc")
-        .def("lower_energy_lim", &CrossSectionContainer::GetLowerEnergyLim);
+        .def("lower_energy_lim", &CrossSectionContainer::GetLowerEnergyLim)
+        .def_property_readonly("type", &CrossSectionContainer::GetInteractionType);
 
     build_crosssection<crosssection::AnnihilationHeitler>(m_sub);
 
@@ -214,4 +226,13 @@ void init_crosssection(py::module& m)
     /* build_crosssection<crosssection::PhotoRhode>(m_sub); */
 
     build_crosssection<crosssection::WeakCooperSarkarMertsch>(m_sub);
+
+    build_std_crosssection<GammaDef>(m_sub);
+    build_std_crosssection<EMinusDef>(m_sub);
+    build_std_crosssection<EPlusDef>(m_sub);
+    build_std_crosssection<MuMinusDef>(m_sub);
+    build_std_crosssection<MuPlusDef>(m_sub);
+    build_std_crosssection<TauMinusDef>(m_sub);
+    build_std_crosssection<TauPlusDef>(m_sub);
+
 }

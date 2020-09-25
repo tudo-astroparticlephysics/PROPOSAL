@@ -4,6 +4,9 @@
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
+#include "PROPOSAL/propagation_utility/ContRandBuilder.h"
+#include "PROPOSAL/propagation_utility/TimeBuilder.h"
+#include "PROPOSAL/propagation_utility/DecayBuilder.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 
 #include "pyBindings.h"
@@ -43,7 +46,7 @@ PYBIND11_MODULE(proposal, m)
     py::class_<Vector3D, std::shared_ptr<Vector3D>>(m, "Vector3D")
         .def(py::init<>())
         .def(py::init<double, double, double>(), py::arg("x"), py::arg("y"),
-            py::arg("z"))
+                py::arg("z"))
         .def(py::init<const Vector3D&>())
         .def("__str__", &py_print<Vector3D>)
         .def(py::self + py::self)
@@ -63,13 +66,13 @@ PYBIND11_MODULE(proposal, m)
         .def("normalize", &Vector3D::normalise)
         .def("magnitude", &Vector3D::magnitude)
         .def("cartesian_from_spherical",
-            &Vector3D::CalculateCartesianFromSpherical)
+                &Vector3D::CalculateCartesianFromSpherical)
         .def("spherical_from_cartesian",
-            &Vector3D::CalculateSphericalCoordinates);
+                &Vector3D::CalculateSphericalCoordinates);
 
     py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings>>(m,
-        "EnergyCutSettings",
-        R"pbdoc(
+            "EnergyCutSettings",
+            R"pbdoc(
             Settings for the lower integration limit.
             Losses below the cut will be handeled continously and the
             other stochasticaly.
@@ -79,7 +82,7 @@ PYBIND11_MODULE(proposal, m)
                 \text{cut} = \begin{cases} e_\text{cut} & E * v_\text{cut} \geq e_\text{cut} \\ v_\text{cut} & \, \text{else} \end{cases}
         )pbdoc")
         .def(py::init<double, double, bool>(), py::arg("ecut"), py::arg("vcut"), py::arg("continuous_random"),
-            R"pbdoc(
+                R"pbdoc(
                     Set the cut values manualy.
 
                     Args:
@@ -87,187 +90,217 @@ PYBIND11_MODULE(proposal, m)
                         vcut (float): relativ energy cut.
                 )pbdoc")
         .def(py::init<const EnergyCutSettings&>())
-        .def("__str__", &py_print<EnergyCutSettings>)
-        .def_property_readonly("ecut", &EnergyCutSettings::GetEcut,
-            R"pbdoc(
+                                      .def("__str__", &py_print<EnergyCutSettings>)
+                                      .def_property_readonly("ecut", &EnergyCutSettings::GetEcut,
+                                              R"pbdoc(
                     Return set e_cut.
 
                     Returns:
                         float: e_cut
                 )pbdoc")
-        .def_property_readonly("vcut", &EnergyCutSettings::GetVcut,
-            R"pbdoc(
+                                      .def_property_readonly("vcut", &EnergyCutSettings::GetVcut,
+                                              R"pbdoc(
                     Return set v_cut.
 
                     Returns:
                         float: v_cut
                 )pbdoc");
 
-    py::class_<Interaction, std::shared_ptr<Interaction>>(m, "Interaction")
-        .def("energy_interaction", py::vectorize(&Interaction::EnergyInteraction), py::arg("energy"), py::arg("random number"))
-        .def("type_interaction", &Interaction::TypeInteraction, py::arg("energy"), py::arg("random number"));
+                                          py::class_<Interaction, std::shared_ptr<Interaction>>(m, "Interaction")
+                                          .def("energy_interaction", py::vectorize(&Interaction::EnergyInteraction),
+                                                  py::arg("energy"), py::arg("random number"))
+                                          .def("rates", &Interaction::Rates, py::arg("energy"))
+                                          .def("type_interaction", &Interaction::SampleLoss,
+                                                  py::arg("energy"), py::arg("rates"), py::arg("random number"))
+                                          .def("mean_free_path", &Interaction::MeanFreePath,
+                                                  py::arg("energy"));
 
 
-    m.def("make_interaction", &make_interaction<const crosssection_list_t<ParticleDef, Medium>>);
+    m.def("make_interaction", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
+            return shared_ptr<Interaction>(make_interaction(cross, interpolate));
+            });
 
-    /* py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m, */
-    /*     "InterpolationDef", */
+    py::class_<Displacement, std::shared_ptr<Displacement>>(m, "Displacement")
+        .def("solve_track_integral", py::vectorize(&Displacement::SolveTrackIntegral), py::arg("upper_lim"), py::arg("lower_lim"))
+        .def("upper_limit_track_integral", &Displacement::UpperLimitTrackIntegral, py::arg("energy"), py::arg("distance"));
+
+    m.def("make_displacement", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
+            return shared_ptr<Displacement>(make_displacement(cross, interpolate));
+            });
+
+    py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m,
+            "InterpolationDef",
+            R"pbdoc(
+                The set standard values have been optimized for performance
+                and accuracy. They should not be changed any further
+                without a good reason.
+                Example:
+                    For speed savings it makes sense to specify a path to
+                    the tables, to reuse build tables if possible.
+                    Sometimes it is usefull to look in the tables for a check.
+                    To do this binary tables can be diabled.
+                    >>> interpolDef = pp.InterpolationDef()
+                    >>> interpolDef.do_binary_tables = False
+                    >>> interpolDef.path_to_tables = "./custom/table/path"
+                    >>> interpolDef.path_to_tables_readonly = "./custom/table/path"
+            )pbdoc")
+        .def(py::init<>())
+        .def_readwrite("order_of_interpolation",
+                &InterpolationDef::order_of_interpolation,
+                R"pbdoc(
+                Order of Interpolation.
+            )pbdoc")
+        .def_readwrite_static("path_to_tables",
+                &InterpolationDef::path_to_tables,
+                R"pbdoc(
+                Path where tables can be written from memory to disk to
+                reuse it if possible.
+            )pbdoc")
+        .def_readwrite_static("path_to_tables_readonly",
+                &InterpolationDef::path_to_tables_readonly,
+                R"pbdoc(
+                Path where tables can be read from disk to avoid to rebuild
+                it.
+            )pbdoc")
+        .def_readwrite("max_node_energy", &InterpolationDef::max_node_energy,
+                R"pbdoc(
+                maximum energy that will be interpolated. Energies greater
+                than the value are extrapolated. Default: 1e14 MeV
+            )pbdoc")
+        .def_readwrite("nodes_cross_section",
+                &InterpolationDef::nodes_cross_section,
+                R"pbdoc(
+                number of nodes used by evaluation of cross section
+                integrals. Default: xxx
+            )pbdoc")
+        .def_readwrite("nodes_continous_randomization",
+                &InterpolationDef::nodes_continous_randomization,
+                R"pbdoc(
+                number of nodes used by evaluation of continous
+                randomization integrals. Default: xxx
+            )pbdoc")
+        .def_readwrite("nodes_propagate", &InterpolationDef::nodes_propagate,
+                R"pbdoc(
+                number of nodes used by evaluation of propagation
+                integrals. Default: xxx
+            )pbdoc")
+        .def_readwrite("do_binary_tables", &InterpolationDef::do_binary_tables,
+                R"pbdoc(
+                Should binary tables be used to store the data.
+                This will increase performance, but are not readable for a
+                crosscheck by human. Default: xxx
+            )pbdoc")
+        .def_readwrite("just_use_readonly_path",
+                &InterpolationDef::just_use_readonly_path,
+                R"pbdoc(
+                Just the readonly path to the interpolation tables is used.
+                This will stop the program, if the required table is not
+                in the readonly path. The (writable) path_to_tables will be
+                ignored. Default: xxx
+            )pbdoc");
+
+
+
+        py::class_<ContRand, std::shared_ptr<ContRand>>(m, "ContinuousRandomizer",
+            R"pbdoc(
+                If :math:`v_\text{cut}` is large, the spectrum is not continously any
+                more. Particles which has no stochastic loss crossing the medium has
+                all the same energy :math:`E_\text{peak}` after propagating through
+                the medium.  This produce a gap of size of minimal stochastic loss.
+                This effect can be reduced using continous randomization.
+
+                .. figure:: figures/mu_continuous.png
+                    :scale: 50%
+                    :align: center
+
+                    Propagate a muon with 100 TeV through 300 m Rock.
+
+                The average energy loss from continous energy losses, is
+                estimated by the energy-integral.
+
+                .. math::
+
+                    \int^{E_f}_{E_i} \frac{\sigma(E)}{-f(E)} d\text{E} = -\text{log}(\xi)
+
+                Since probability of a energy loss :math:`e_{lost} < e_{cut}`
+                at distance is finite, it produce fluctuations in average
+                energy losses.
+
+                This small losses can be added in form of a perturbation from
+                average energy loss.
+            )pbdoc")
+        .def("randomize", &ContRand::EnergyRandomize,
+                py::arg("initial_energy"), py::arg("final_energy"), py::arg("rand"),
+                R"pbdoc(
+                    Calculates the stochastical smering of the distribution based on
+                    the second momentum of the parametrizations, the final and intial
+                    energy.
+
+                    Note:
+                        A normal distribution with uppere defined variance will be
+                        asumed. The cumulative distibution function has the form:
+
+                        .. math::
+
+                            \text{cdf}(E) = \frac{1}{2} \left(1 + \text{erf} \left(
+                                \frac{E}{ \sqrt{ 2 \sigma^2 } } \right) \right)
+
+                        There will be sampled a deviation form mean energy :math:`a`
+                        between :math:`\text{cdf}(E_\text{i} - E_\text{f})` and
+                        :math:`\text{cdf}(E_\text{mass} - E_\text{f})` and finaly the
+                        energy updated.
+
+                        .. math::
+
+                            E_\text{f} = \sigma \cdot a + E_\text{f}
+
+                    Args:
+                        initial_energy (float): energy befor stochastical loss
+                        final_energy (float): energy after stochastical loss
+                        rand (float): random number between 0 and 1
+
+                    Returns:
+                        float: randomized final energy
+                )pbdoc");
+
+        m.def("make_contrand", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
+                return shared_ptr<ContRand>(make_contrand(cross, interpolate));
+                });
+
+        py::class_<Decay, std::shared_ptr<Decay>>(m, "Decay")
+            .def("energy_decay", &Decay::EnergyDecay, py::arg("energy"), py::arg("rnd"), py::arg("density"));
+
+        m.def("make_decay", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
+                return shared_ptr<Decay>(make_decay(cross, particle, interpolate));
+                });
+
+        py::class_<Time, std::shared_ptr<Time>>(m, "Time")
+            .def("Time", &Time::TimeElapsed, py::arg("initial_energy"), py::arg("final_energy"), py::arg("distance"), py::arg("density"));
+
+        m.def("make_time", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
+                return shared_ptr<Time>(make_time(cross, particle, interpolate));
+                });
+
+    /* .def(py::init<const Utility&, const InterpolationDef>(), */
+    /*     py::arg("utility"), py::arg("interpolation_def"), */
     /*     R"pbdoc( */
-    /*             The set standard values have been optimized for performance */
-    /*             and accuracy. They should not be changed any further */
-    /*             without a good reason. */
+        /*             Initalize a continous randomization calculator. */
+        /*             This may take some minutes because for all parametrization */
+        /*             the continous randomization interpolation tables have to be */
+        /*             build. */
 
-    /*             Example: */
-    /*                 For speed savings it makes sense to specify a path to */
-    /*                 the tables, to reuse build tables if possible. */
+        /*             Note: */
+        /*                 .. math:: */
 
-    /*                 Sometimes it is usefull to look in the tables for a check. */
-    /*                 To do this binary tables can be diabled. */
+        /*                     \langle ( \Delta ( \Delta E ) )^2 \rangle = */
+        /*                         \int^{e_\text{cut}}_{e_0} \frac{d\text{E}}{-f(E)} */
+        /*                         \left( \int_0^{e_{cut}} e^2 p(e;E) d\text{e} \right) */
 
-    /*                 >>> interpolDef = pp.InterpolationDef() */
-    /*                 >>> interpolDef.do_binary_tables = False */
-    /*                 >>> interpolDef.path_to_tables = "./custom/table/path" */
-    /*                 >>> interpolDef.path_to_tables_readonly = "./custom/table/path" */
-    /*         )pbdoc") */
-    /*     .def(py::init<>()) */
-    /*     .def_readwrite("order_of_interpolation", */
-    /*         &InterpolationDef::order_of_interpolation, */
-    /*         R"pbdoc( */
-    /*             Order of Interpolation. */
-    /*         )pbdoc") */
-    /*     .def_readwrite_static("path_to_tables", */
-    /*         &InterpolationDef::path_to_tables, */
-    /*         R"pbdoc( */
-    /*             Path where tables can be written from memory to disk to */
-    /*             reuse it if possible. */
-    /*         )pbdoc") */
-    /*     .def_readwrite_static("path_to_tables_readonly", */
-    /*         &InterpolationDef::path_to_tables_readonly, */
-    /*         R"pbdoc( */
-    /*             Path where tables can be read from disk to avoid to rebuild */
-    /*             it. */
-    /*         )pbdoc") */
-    /*     .def_readwrite("max_node_energy", &InterpolationDef::max_node_energy, */
-    /*         R"pbdoc( */
-    /*             maximum energy that will be interpolated. Energies greater */
-    /*             than the value are extrapolated. Default: 1e14 MeV */
-    /*         )pbdoc") */
-    /*     .def_readwrite("nodes_cross_section", */
-    /*         &InterpolationDef::nodes_cross_section, */
-    /*         R"pbdoc( */
-    /*             number of nodes used by evaluation of cross section */
-    /*             integrals. Default: xxx */
-    /*         )pbdoc") */
-    /*     .def_readwrite("nodes_continous_randomization", */
-    /*         &InterpolationDef::nodes_continous_randomization, */
-    /*         R"pbdoc( */
-    /*             number of nodes used by evaluation of continous */
-    /*             randomization integrals. Default: xxx */
-    /*         )pbdoc") */
-    /*     .def_readwrite("nodes_propagate", &InterpolationDef::nodes_propagate, */
-    /*         R"pbdoc( */
-    /*             number of nodes used by evaluation of propagation */
-    /*             integrals. Default: xxx */
-    /*         )pbdoc") */
-    /*     .def_readwrite("do_binary_tables", &InterpolationDef::do_binary_tables, */
-    /*         R"pbdoc( */
-    /*             Should binary tables be used to store the data. */
-    /*             This will increase performance, but are not readable for a */
-    /*             crosscheck by human. Default: xxx */
-    /*         )pbdoc") */
-    /*     .def_readwrite("just_use_readonly_path", */
-    /*         &InterpolationDef::just_use_readonly_path, */
-    /*         R"pbdoc( */
-    /*             Just the readonly path to the interpolation tables is used. */
-    /*             This will stop the program, if the required table is not */
-    /*             in the readonly path. The (writable) path_to_tables will be */
-    /*             ignored. Default: xxx */
-    /*         )pbdoc"); */
+        /*             Args: */
+        /*                 interpolation_def (interpolation_def): specify the number of interpolation points for cont-integral */
+        /*                 utility (utility): specify the parametrization and energy cuts */
+        /*         )pbdoc") */
 
-
-
-    /* py::class_<ContinuousRandomizer, std::shared_ptr<ContinuousRandomizer>>(m, */
-    /*     "ContinuousRandomizer", */
-    /*     R"pbdoc( */
-    /*     If :math:`v_\text{cut}` is large, the spectrum is not continously any */
-    /*     more. Particles which has no stochastic loss crossing the medium has */
-    /*     all the same energy :math:`E_\text{peak}` after propagating through */
-    /*     the medium.  This produce a gap of size of minimal stochastic loss. */
-    /*     This effect can be reduced using continous randomization. */
-
-    /*     .. figure:: figures/mu_continuous.png */
-    /*         :scale: 50% */
-    /*         :align: center */
-
-    /*         Propagate a muon with 100 TeV through 300 m Rock. */
-
-    /*     The average energy loss from continous energy losses, is */
-    /*     estimated by the energy-integral. */
-
-    /*     .. math:: */
-
-    /*         \int^{E_f}_{E_i} \frac{\sigma(E)}{-f(E)} d\text{E} = -\text{log}(\xi) */
-
-    /*     Since probability of a energy loss :math:`e_{lost} < e_{cut}` */
-    /*     at distance is finite, it produce fluctuations in average */
-    /*     energy losses. */
-
-    /*     This small losses can be added in form of a perturbation from */
-    /*     average energy loss. */
-
-    /* )pbdoc") */
-    /*     .def(py::init<const Utility&, const InterpolationDef>(), */
-    /*         py::arg("utility"), py::arg("interpolation_def"), */
-    /*         R"pbdoc( */
-    /*                 Initalize a continous randomization calculator. */
-    /*                 This may take some minutes because for all parametrization */
-    /*                 the continous randomization interpolation tables have to be */
-    /*                 build. */
-
-    /*                 Note: */
-    /*                     .. math:: */
-
-    /*                         \langle ( \Delta ( \Delta E ) )^2 \rangle = */
-    /*                             \int^{e_\text{cut}}_{e_0} \frac{d\text{E}}{-f(E)} */
-    /*                             \left( \int_0^{e_{cut}} e^2 p(e;E) d\text{e} \right) */
-
-    /*                 Args: */
-    /*                     interpolation_def (interpolation_def): specify the number of interpolation points for cont-integral */
-    /*                     utility (utility): specify the parametrization and energy cuts */
-    /*             )pbdoc") */
-    /*     .def("randomize", &ContinuousRandomizer::Randomize, */
-    /*         py::arg("initial_energy"), py::arg("final_energy"), py::arg("rand"), */
-    /*         R"pbdoc( */
-    /*                 Calculates the stochastical smering of the distribution based on */
-    /*                 the second momentum of the parametrizations, the final and intial */
-    /*                 energy. */
-
-    /*                 Note: */
-    /*                     A normal distribution with uppere defined variance will be */
-    /*                     asumed. The cumulative distibution function has the form: */
-
-    /*                     .. math:: */
-
-    /*                         \text{cdf}(E) = \frac{1}{2} \left(1 + \text{erf} \left( */
-    /*                             \frac{E}{ \sqrt{ 2 \sigma^2 } } \right) \right) */
-
-    /*                     There will be sampled a deviation form mean energy :math:`a` */
-    /*                     between :math:`\text{cdf}(E_\text{i} - E_\text{f})` and */
-    /*                     :math:`\text{cdf}(E_\text{mass} - E_\text{f})` and finaly the */
-    /*                     energy updated. */
-
-    /*                     .. math:: */
-
-    /*                         E_\text{f} = \sigma \cdot a + E_\text{f} */
-
-    /*                 Args: */
-    /*                     initial_energy (float): energy befor stochastical loss */
-    /*                     final_energy (float): energy after stochastical loss */
-    /*                     rand (float): random number between 0 and 1 */
-
-    /*                 Returns: */
-    /*                     float: randomized final energy */
-    /*             )pbdoc"); */
 
     /* py::enum_<Sector::ParticleLocation::Enum>(m, "ParticleLocation") */
     /*     .value("infront_detector", Sector::ParticleLocation::InfrontDetector) */

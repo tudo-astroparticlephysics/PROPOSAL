@@ -64,7 +64,7 @@ void init_parametrization(py::module& m)
             theoretical input influences the simulation.
             )pbdoc")
             .def("differential_crosssection",
-                    &crosssection::Parametrization::DifferentialCrossSection,
+                    py::overload_cast<ParticleDef const&, Components::Component const&, double, double>(&crosssection::Parametrization::DifferentialCrossSection,  py::const_),
                     py::arg("particle_def"), py::arg("component"), py::arg("energy"),
                     py::arg("v"),
                     R"pbdoc(
@@ -601,7 +601,13 @@ void init_parametrization(py::module& m)
                 >>> medium = proposal.medium.StandardRock(1.0)
                 >>> cuts = proposal.EnergyCutSettings(-1, -1)
                 >>> param = proposal.parametrization.ionization.BetheBlochRossi(mu, medium, cuts, multiplier)
-                )pbdoc");
+                )pbdoc")
+            .def("differential_crosssection",
+                    /* py::overload_cast<ParticleDef const&, Medium const&, double, double>(&crosssection::Ionization::DifferentialCrossSection), */
+                    py::overload_cast<ParticleDef const&, Medium const&, double, double>(&crosssection::Ionization::DifferentialCrossSection, py::const_ ),
+                    py::arg("particle_def"), py::arg("component"), py::arg("energy"),
+                    py::arg("v")
+                    );
 
             py::class_<crosssection::IonizBetheBlochRossi,
         std::shared_ptr<crosssection::IonizBetheBlochRossi>,
