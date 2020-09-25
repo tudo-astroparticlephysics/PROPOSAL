@@ -274,7 +274,7 @@ nlohmann::json Propagator::ParseConfig(const string& config_file)
         Logging::Get("proposal.propagator")->critical("Unable parse \"%s\" as json file", config_file.c_str());
     }
     return json_config;
-};
+}
 
 Propagator::GlobalSettings::GlobalSettings(const nlohmann::json& config_global)
 {

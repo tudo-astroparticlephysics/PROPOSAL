@@ -58,7 +58,7 @@ static const std::unordered_map<std::string, ScatteringType> ScatteringTable
 
 template <typename Cross = std::nullptr_t>
 unique_ptr<Scattering> make_scattering(std::string const& name,
-    ParticleDef const& p_def, std::shared_ptr<Medium> medium,
+    ParticleDef const& p_def, Medium const& medium,
     Cross&& cross = nullptr, bool interpolate = true)
 {
     auto it = ScatteringTable.find(name);

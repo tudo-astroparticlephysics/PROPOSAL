@@ -46,7 +46,7 @@ class ScatteringHighlandIntegral : public ScatteringHighland {
 
 public:
     ScatteringHighlandIntegral(
-        const ParticleDef&, shared_ptr<const Medium>, Cross&&);
+        const ParticleDef&, Medium const&, Cross&&);
 
     static Interpolant1DBuilder::Definition interpol_def;
 
@@ -65,7 +65,7 @@ class ScatteringHighlandIntegral<T, Cross,
     : public Scattering {
 public:
     ScatteringHighlandIntegral(
-        const ParticleDef&, shared_ptr<const Medium>, Cross&&)
+        const ParticleDef&, Medium const&, Cross&&)
     {
         throw std::invalid_argument("CrossSectionVector needs to be passed "
                                     "to use scattering_highland.");
@@ -80,7 +80,7 @@ public:
 
 template <class T, class Cross, class Enable>
 ScatteringHighlandIntegral<T, Cross, Enable>::ScatteringHighlandIntegral(
-    const ParticleDef& p_def, shared_ptr<const Medium> medium, Cross&& cross)
+    const ParticleDef& p_def, Medium const& medium, Cross&& cross)
     : ScatteringHighland(p_def, medium)
     , highland_integral(BuildHighlandIntegral(cross))
 {
@@ -116,7 +116,7 @@ template <class T, class Cross, class Enable>
 double ScatteringHighlandIntegral<T, Cross, Enable>::CalculateTheta0(
     double grammage, double ei, double ef)
 {
-    auto radiation_length = medium_->GetRadiationLength();
+    auto radiation_length = medium_.GetRadiationLength();
     auto aux = 13.6
         * std::sqrt(highland_integral.Calculate(ei, ef) / radiation_length)
         * std::abs(charge);

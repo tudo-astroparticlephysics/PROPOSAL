@@ -31,22 +31,12 @@
 #include <utility>
 #include <memory>
 #include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/Particle.h"
 
 namespace PROPOSAL {
 
 struct ParticleDef;
 class PropagationUtility;
-
-struct Directions : std::enable_shared_from_this<Directions>
-{
-    Directions() : u_(0,0,0), n_i_(0,0,0) {};
-    Directions(Vector3D u, Vector3D n_i) : u_(u), n_i_(n_i) {};
-
-    Vector3D u_;
-    Vector3D n_i_;
-};
 
 class Scattering
 {
@@ -62,7 +52,6 @@ public:
 
 
     std::tuple<Vector3D, Vector3D> Scatter(double grammage, double ei, double ef, const Vector3D& old_direction, const std::array<double, 4>& rnd);
-
 
 protected:
     Scattering& operator=(const Scattering&); // Undefined & not allowed
