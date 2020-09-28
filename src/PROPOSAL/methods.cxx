@@ -29,6 +29,13 @@ namespace PROPOSAL {
 
 std::string InterpolationDef::path_to_tables = "";
 std::string InterpolationDef::path_to_tables_readonly = "";
+int InterpolationDef::order_of_interpolation = 5;
+double InterpolationDef::max_node_energy = 1e14;
+int InterpolationDef::nodes_cross_section = 100;
+int InterpolationDef::nodes_continous_randomization = 200;
+int InterpolationDef::nodes_propagate = 1000;
+bool InterpolationDef::do_binary_tables = true;
+bool InterpolationDef::just_use_readonly_path = false;
 
 InterpolationDef::InterpolationDef(const nlohmann::json& config)
 {

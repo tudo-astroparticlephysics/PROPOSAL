@@ -83,29 +83,19 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest)
 
 
 struct InterpolationDef {
-    InterpolationDef()
-        : order_of_interpolation(5)
-        , max_node_energy(1e14)    // upper energy bound for Interpolation (MeV)
-        , nodes_cross_section(100) // number of interpolation in cross section
-        , nodes_continous_randomization(
-              200) // number of interpolation in continuous randomization
-        , nodes_propagate(1000) // number of interpolation in propagate
-        , do_binary_tables(true)
-        , just_use_readonly_path(false)
-    {
-    }
 
+    InterpolationDef() = default;
     InterpolationDef(const nlohmann::json&);
 
     static std::string path_to_tables;
     static std::string path_to_tables_readonly;
-    int order_of_interpolation;
-    double max_node_energy;
-    int nodes_cross_section;
-    int nodes_continous_randomization;
-    int nodes_propagate;
-    bool do_binary_tables;
-    bool just_use_readonly_path;
+    static int order_of_interpolation;
+    static double max_node_energy;
+    static int nodes_cross_section;
+    static int nodes_continous_randomization;
+    static int nodes_propagate;
+    static bool do_binary_tables;
+    static bool just_use_readonly_path;
 
     size_t GetHash() const;
 };

@@ -50,7 +50,10 @@ void init_crosssection(py::module& m)
     using CrossSectionContainer = CrossSection<ParticleDef, Medium>;
     py::module m_sub = m.def_submodule("crosssection");
 
-    py::class_<CrossSectionContainer, std::shared_ptr<CrossSectionContainer>>(
+    py::class_<CrossSectionBase, std::shared_ptr<CrossSectionBase>>(
+        m_sub, "CrossSectionBase");
+
+    py::class_<CrossSectionContainer, CrossSectionBase, std::shared_ptr<CrossSectionContainer>>(
         m_sub, "CrossSection",
         R"pbdoc(
 

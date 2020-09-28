@@ -122,7 +122,8 @@ PYBIND11_MODULE(proposal, m)
 
     py::class_<Displacement, std::shared_ptr<Displacement>>(m, "Displacement")
         .def("solve_track_integral", py::vectorize(&Displacement::SolveTrackIntegral), py::arg("upper_lim"), py::arg("lower_lim"))
-        .def("upper_limit_track_integral", &Displacement::UpperLimitTrackIntegral, py::arg("energy"), py::arg("distance"));
+        .def("upper_limit_track_integral", &Displacement::UpperLimitTrackIntegral, py::arg("energy"), py::arg("distance"))
+        .def("function_to_integral", &Displacement::FunctionToIntegral, py::arg("energy"));
 
     m.def("make_displacement", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
             return shared_ptr<Displacement>(make_displacement(cross, interpolate));
@@ -145,7 +146,7 @@ PYBIND11_MODULE(proposal, m)
                     >>> interpolDef.path_to_tables_readonly = "./custom/table/path"
             )pbdoc")
         .def(py::init<>())
-        .def_readwrite("order_of_interpolation",
+        .def_readwrite_static("order_of_interpolation",
                 &InterpolationDef::order_of_interpolation,
                 R"pbdoc(
                 Order of Interpolation.
@@ -162,35 +163,35 @@ PYBIND11_MODULE(proposal, m)
                 Path where tables can be read from disk to avoid to rebuild
                 it.
             )pbdoc")
-        .def_readwrite("max_node_energy", &InterpolationDef::max_node_energy,
+        .def_readwrite_static("max_node_energy", &InterpolationDef::max_node_energy,
                 R"pbdoc(
                 maximum energy that will be interpolated. Energies greater
                 than the value are extrapolated. Default: 1e14 MeV
             )pbdoc")
-        .def_readwrite("nodes_cross_section",
+        .def_readwrite_static("nodes_cross_section",
                 &InterpolationDef::nodes_cross_section,
                 R"pbdoc(
                 number of nodes used by evaluation of cross section
                 integrals. Default: xxx
             )pbdoc")
-        .def_readwrite("nodes_continous_randomization",
+        .def_readwrite_static("nodes_continous_randomization",
                 &InterpolationDef::nodes_continous_randomization,
                 R"pbdoc(
                 number of nodes used by evaluation of continous
                 randomization integrals. Default: xxx
             )pbdoc")
-        .def_readwrite("nodes_propagate", &InterpolationDef::nodes_propagate,
+        .def_readwrite_static("nodes_propagate", &InterpolationDef::nodes_propagate,
                 R"pbdoc(
                 number of nodes used by evaluation of propagation
                 integrals. Default: xxx
             )pbdoc")
-        .def_readwrite("do_binary_tables", &InterpolationDef::do_binary_tables,
+        .def_readwrite_static("do_binary_tables", &InterpolationDef::do_binary_tables,
                 R"pbdoc(
                 Should binary tables be used to store the data.
                 This will increase performance, but are not readable for a
                 crosscheck by human. Default: xxx
             )pbdoc")
-        .def_readwrite("just_use_readonly_path",
+        .def_readwrite_static("just_use_readonly_path",
                 &InterpolationDef::just_use_readonly_path,
                 R"pbdoc(
                 Just the readonly path to the interpolation tables is used.
