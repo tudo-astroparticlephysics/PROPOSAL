@@ -111,7 +111,7 @@ double integrate_dedx(Integral& integral, Param&& param,
     auto dEdx = [&param, &p_def, &medium, energy](double v) {
         return param.FunctionToDEdxIntegral(p_def, medium, energy, v);
     };
-    return integral.Integrate(v_min, v_max, dEdx, 4);
+    return integral.Integrate(v_min, v_max, dEdx, 2);
 }
 
 template <typename Param, typename M>
