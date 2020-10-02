@@ -26,9 +26,13 @@ public:
         shared_ptr<const EnergyCutSettings> _cut)
         : dndx_integral(
               [_param, _particle, _target](Integral& integral, double energy,
-                  double v_min, double v_max, double rate) {
-                  return integrate_dndx(integral, _param, _particle, _target,
-                      energy, v_min, v_max, rate);
+                  double v_min, double v_max, double rate) mutable {
+                  using param_t = typename std::decay<Param>::type;
+                  using base_param_ref_t = typename std::add_lvalue_reference<
+                          typename param_t::base_param_t>::type;
+                  return integrate_dndx(
+                          integral, reinterpret_cast<base_param_ref_t>(_param),
+                          _particle, _target, energy, v_min, v_max, rate);
               })
         , kinematic_limits([_param, _particle, _target](double energy) {
             return _param.GetKinematicLimits(_particle, _target, energy);

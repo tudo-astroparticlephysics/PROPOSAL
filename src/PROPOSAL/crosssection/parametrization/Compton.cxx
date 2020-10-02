@@ -63,7 +63,7 @@ double integrate_dndx(Integral& integral, crosssection::Compton& param,
         return exp(t)
             * param.FunctionToDNdxIntegral(p_def, comp, energy, 1 - exp(t));
     };
-    return integral.IntegrateWithRandomRatio(t_min, t_max, dNdx, 4, rnd);
+    return integral.IntegrateWithRandomRatio(t_min, t_max, dNdx, 3, rnd);
 }
 
 template <>
