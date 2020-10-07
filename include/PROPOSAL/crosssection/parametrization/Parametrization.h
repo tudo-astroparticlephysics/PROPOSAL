@@ -59,11 +59,6 @@ namespace crosssection {
         virtual tuple<double, double> GetKinematicLimits(
             const ParticleDef&, const Component&, double) const = 0;
 
-        inline double FunctionToDNdxIntegral(const ParticleDef& p_def,
-            const Component& comp, double energy, double v) const
-        {
-            return DifferentialCrossSection(p_def, comp, energy, v);
-        }
         inline double FunctionToDEdxIntegral(const ParticleDef& p_def,
             const Component& comp, double energy, double v) const
         {
@@ -86,7 +81,7 @@ double integrate_dndx(Integral& integral, P&& param, const ParticleDef& p_def,
     const M& medium, double energy, double v_min, double v_max, double rnd = 0)
 {
     auto dNdx = [&param, &p_def, &medium, energy](double v) {
-        return param.FunctionToDNdxIntegral(p_def, medium, energy, v);
+        return param.DifferentialCrossSection(p_def, medium, energy, v);
     };
     return integral.IntegrateWithRandomRatio(v_min, v_max, dNdx, 4, rnd);
 }
@@ -97,7 +92,7 @@ double calculate_upper_lim_dndx(Integral& integral, P&& param,
     double v_max, double rnd)
 {
     auto dNdx = [&param, &p_def, &medium, energy](double v) {
-        return param.FunctionToDNdxIntegral(p_def, medium, energy, v);
+        return param.DifferentialCrossSection(p_def, medium, energy, v);
     };
     return integral.IntegrateWithRandomRatio(v_min, v_max, dNdx, 4, rnd);
     return integral.GetUpperLimit();

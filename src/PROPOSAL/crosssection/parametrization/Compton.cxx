@@ -61,7 +61,7 @@ double integrate_dndx(Integral& integral, crosssection::Compton& param,
     auto t_max = std::log(1. - v_min);
     auto dNdx = [&param, &p_def, &comp, energy](double t) {
         return exp(t)
-            * param.FunctionToDNdxIntegral(p_def, comp, energy, 1 - exp(t));
+            * param.DifferentialCrossSection(p_def, comp, energy, 1 - exp(t));
     };
     return integral.IntegrateWithRandomRatio(t_min, t_max, dNdx, 3, rnd);
 }
@@ -103,7 +103,7 @@ double integrate_de2dx(Integral& integral, crosssection::Compton& param,
 /*     auto t_max = std::log(1. - v_max); */
 /*     auto dNdx = [&param, &p_def, &comp, energy](double t) { */
 /*         return exp(t) */
-/*             * param.FunctionToDNdxIntegral(p_def, comp, energy, 1 - exp(t)); */
+/*             * param.DifferentialCrossSection(p_def, comp, energy, 1 - exp(t)); */
 /*     }; */
 /*     integral.IntegrateWithRandomRatio(t_min, t_max, dNdx, 4, rnd); */
 /*     return integral.GetUpperLimit(); */

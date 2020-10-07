@@ -53,8 +53,6 @@ namespace crosssection {
         virtual tuple<double, double> GetKinematicLimits(
             const ParticleDef&, const Medium&, double) const noexcept
             = 0;
-        double FunctionToDNdxIntegral(
-            const ParticleDef&, const Medium&, double, double) const;
         double FunctionToDE2dxIntegral(
             const ParticleDef&, const Medium&, double, double) const;
         virtual double DifferentialCrossSection(

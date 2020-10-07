@@ -23,12 +23,6 @@ double crosssection::Ionization::GetLowerEnergyLim(const ParticleDef& p_def) con
     return p_def.mass;
 }
 
-double crosssection::Ionization::FunctionToDNdxIntegral(const ParticleDef& p_def,
-    const Medium& medium, double energy, double v) const
-{
-    return DifferentialCrossSection(p_def, medium, energy, v);
-}
-
 double crosssection::Ionization::FunctionToDE2dxIntegral(const ParticleDef& p_def,
     const Medium& medium, double energy, double v) const
 {
