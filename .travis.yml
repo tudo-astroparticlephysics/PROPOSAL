@@ -89,7 +89,12 @@ matrix:
 
 
 before_install:
-  - pyenv global system 3.7
+  - PYENV_VERSION=1.2.20
+  - PYTHON_VERSION=3.7.8
+  - git fetch
+  - pushd /opt/pyenv
+  - git checkout v$PYENV_VERSION
+  - pyenv install -v $PYTHON_VERSION
 
 install:
   - ci/install_cmake.sh
@@ -97,6 +102,7 @@ install:
   - cmake --version
 
 before_script:
+  - pyenv global $PYTHON_VERSION
   - mkdir build
   - cd build
   - cmake .. -DADD_PYTHON=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/proposal
