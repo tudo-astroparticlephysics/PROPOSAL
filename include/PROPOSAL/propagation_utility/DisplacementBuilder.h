@@ -6,7 +6,6 @@ template <typename T>
 class DisplacementBuilder : public Displacement {
     T disp_integral;
 
-public:
     T BuildTrackIntegral(crossbase_list_t const& cross)
     {
         if (cross.size() < 1)
@@ -24,6 +23,7 @@ public:
         return integral;
     }
 
+public:
     template <typename Cross>
     DisplacementBuilder(Cross&& cross)
         : Displacement(std::forward<Cross>(cross))
