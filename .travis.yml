@@ -97,6 +97,7 @@ install:
   - git fetch
   - git checkout v$PYENV_VERSION
   - pyenv install -v $PYTHON_VERSION
+  - popd
   - ci/install_cmake.sh
   - export PATH="$HOME/cmake/bin:$PATH"
   - cmake --version
