@@ -150,33 +150,9 @@ void init_parametrization(py::module& m)
             calculation of the countinous randomization.
 
                 )pbdoc")
-            .def("dNdx_integrand",
-                    &crosssection::Parametrization::FunctionToDNdxIntegral,
-                    py::arg("particle_def"), py::arg("component"), py::arg("energy"),
-                    py::arg("v"),
-                    R"pbdoc(
-            Calculate the value
-
-            .. math::
-
-                \frac{d\sigma}{dv}(E),
-
-            e.g. the differential crosssection in v for the current parametrization.
-            If the parametrization is given in a double-differential-crosssection
-            the crosssection will be integrated over all values but v.
-
-            Args:
-                energy (float): energy in MeV
-                v (float): fraction of energy that is transfered from the primary
-                    particle to secondary particles (or other forms of energy losses)
-
-            Return:
-                dNdx_integrand (float): returns the differential crosssection in v
-
-            PROPOSAL uses this function internally, for example to compare the
-            probabilities of the different possible interactions.
-
-                )pbdoc")
+            .def("kinematic_limits", &crosssection::Parametrization::GetKinematicLimits,
+                    py::arg("particle_def"), py::arg("component"), py::arg("energy")
+                )
             .def_property_readonly("hash", &crosssection::Parametrization::GetHash,
                     R"pbdoc(
 
@@ -607,9 +583,9 @@ void init_parametrization(py::module& m)
                     py::overload_cast<ParticleDef const&, Medium const&, double, double>(&crosssection::Ionization::DifferentialCrossSection, py::const_ ),
                     py::arg("particle_def"), py::arg("component"), py::arg("energy"),
                     py::arg("v")
-                    );
+                );
 
-            py::class_<crosssection::IonizBetheBlochRossi,
+    py::class_<crosssection::IonizBetheBlochRossi,
         std::shared_ptr<crosssection::IonizBetheBlochRossi>,
         crosssection::Ionization>(m_sub_ioniz, "BetheBlochRossi")
             .def(py::init<const EnergyCutSettings&>(), py::arg("energy_cuts"));

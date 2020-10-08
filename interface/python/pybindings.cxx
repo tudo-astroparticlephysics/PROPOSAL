@@ -104,26 +104,27 @@ PYBIND11_MODULE(proposal, m)
 
                     Returns:
                         float: v_cut
-                )pbdoc");
+                )pbdoc")
+        .def("cut", overload_cast_<double>()(&EnergyCutSettings::GetCut, py::const_))
+        .def("cut", overload_cast_<std::tuple<double, double> const&, double>()(&EnergyCutSettings::GetCut, py::const_));
 
-                                          py::class_<Interaction, std::shared_ptr<Interaction>>(m, "Interaction")
-                                          .def("energy_interaction", py::vectorize(&Interaction::EnergyInteraction),
-                                                  py::arg("energy"), py::arg("random number"))
-                                          .def("rates", &Interaction::Rates, py::arg("energy"))
-                                          .def("type_interaction", &Interaction::SampleLoss,
-                                                  py::arg("energy"), py::arg("rates"), py::arg("random number"))
-                                          .def("mean_free_path", &Interaction::MeanFreePath,
-                                                  py::arg("energy"));
+    py::class_<Interaction, std::shared_ptr<Interaction>>(m, "Interaction")
+    .def("energy_interaction", py::vectorize(&Interaction::EnergyInteraction),
+            py::arg("energy"), py::arg("random number"))
+    .def("rates", &Interaction::Rates, py::arg("energy"))
+    .def("sample_loss", &Interaction::SampleLoss,
+            py::arg("energy"), py::arg("rates"), py::arg("random number"))
+    .def("mean_free_path", py::vectorize(&Interaction::MeanFreePath),
+            py::arg("energy"));
 
-
-    m.def("make_interaction", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
-            return shared_ptr<Interaction>(make_interaction(cross, interpolate));
-            });
+     m.def("make_interaction", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
+             return shared_ptr<Interaction>(make_interaction(cross, interpolate));
+             });
 
     py::class_<Displacement, std::shared_ptr<Displacement>>(m, "Displacement")
         .def("solve_track_integral", py::vectorize(&Displacement::SolveTrackIntegral), py::arg("upper_lim"), py::arg("lower_lim"))
-        .def("upper_limit_track_integral", &Displacement::UpperLimitTrackIntegral, py::arg("energy"), py::arg("distance"))
-        .def("function_to_integral", &Displacement::FunctionToIntegral, py::arg("energy"));
+        .def("upper_limit_track_integral", py::vectorize(&Displacement::UpperLimitTrackIntegral), py::arg("energy"), py::arg("distance"))
+        .def("function_to_integral", py::vectorize(&Displacement::FunctionToIntegral), py::arg("energy"));
 
     m.def("make_displacement", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
             return shared_ptr<Displacement>(make_displacement(cross, interpolate));
@@ -230,7 +231,8 @@ PYBIND11_MODULE(proposal, m)
                 This small losses can be added in form of a perturbation from
                 average energy loss.
             )pbdoc")
-        .def("randomize", &ContRand::EnergyRandomize,
+        .def("variance", py::vectorize(&ContRand::Variance), py::arg("initial_energy"), py::arg("final_energy"))
+        .def("randomize", py::vectorize(&ContRand::EnergyRandomize),
                 py::arg("initial_energy"), py::arg("final_energy"), py::arg("rand"),
                 R"pbdoc(
                     Calculates the stochastical smering of the distribution based on
@@ -269,14 +271,14 @@ PYBIND11_MODULE(proposal, m)
                 });
 
         py::class_<Decay, std::shared_ptr<Decay>>(m, "Decay")
-            .def("energy_decay", &Decay::EnergyDecay, py::arg("energy"), py::arg("rnd"), py::arg("density"));
+            .def("energy_decay", py::vectorize(&Decay::EnergyDecay), py::arg("energy"), py::arg("rnd"), py::arg("density"));
 
         m.def("make_decay", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
                 return shared_ptr<Decay>(make_decay(cross, particle, interpolate));
                 });
 
         py::class_<Time, std::shared_ptr<Time>>(m, "Time")
-            .def("Time", &Time::TimeElapsed, py::arg("initial_energy"), py::arg("final_energy"), py::arg("distance"), py::arg("density"));
+            .def("elapsed", &Time::TimeElapsed, py::arg("initial_energy"), py::arg("final_energy"), py::arg("distance"), py::arg("density"));
 
         m.def("make_time", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
                 return shared_ptr<Time>(make_time(cross, particle, interpolate));

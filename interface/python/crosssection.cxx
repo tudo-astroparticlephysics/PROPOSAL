@@ -27,22 +27,22 @@ using namespace PROPOSAL;
 template <typename T> void build_crosssection(py::module& m_sub)
 {
     m_sub.def("make_crosssection",
-        [](T& param, ParticleDef& p, Medium& m,
-            shared_ptr<const EnergyCutSettings> c, bool i) {
+            [](T& param, ParticleDef& p, Medium& m,
+                shared_ptr<const EnergyCutSettings> c, bool i) {
             return std::shared_ptr<CrossSection<ParticleDef, Medium>>(
-                make_crosssection(param, p, m, c, i));
-        },
-        py::arg("parametrization"), py::arg("particle_def"), py::arg("target"),
-        py::arg("cuts"), py::arg("interpolate"));
+                    make_crosssection(param, p, m, c, i));
+            },
+            py::arg("parametrization"), py::arg("particle_def"), py::arg("target"),
+            py::arg("cuts"), py::arg("interpolate"));
 }
 
 template <typename T> void build_std_crosssection(py::module& m_sub)
 {
     m_sub.def("make_std_crosssection",
-        [](T& p, Medium& m, shared_ptr<const EnergyCutSettings> c, bool i) {
+            [](T& p, Medium& m, shared_ptr<const EnergyCutSettings> c, bool i) {
             return DefaultCrossSections<T>::template Get<std::false_type>(p, m, c, i);
-        },
-        py::arg("particle_def"), py::arg("target"), py::arg("cuts"), py::arg("interpolate"));
+            },
+            py::arg("particle_def"), py::arg("target"), py::arg("cuts"), py::arg("interpolate"));
 }
 
 void init_crosssection(py::module& m)
@@ -51,11 +51,13 @@ void init_crosssection(py::module& m)
     py::module m_sub = m.def_submodule("crosssection");
 
     py::class_<CrossSectionBase, std::shared_ptr<CrossSectionBase>>(
-        m_sub, "CrossSectionBase");
+            m_sub, "CrossSectionBase")
+        .def_property_readonly("lower_energy_lim", &CrossSectionContainer::GetLowerEnergyLim)
+        .def_property_readonly("type", &CrossSectionContainer::GetInteractionType);
 
     py::class_<CrossSectionContainer, CrossSectionBase, std::shared_ptr<CrossSectionContainer>>(
-        m_sub, "CrossSection",
-        R"pbdoc(
+            m_sub, "CrossSection",
+            R"pbdoc(
 
             Virtual class for crosssections. The crosssection class provides
             all mathematical methods to process the theoretical, differential
@@ -108,8 +110,8 @@ void init_crosssection(py::module& m)
                 )pbdoc")
         /* .def("__str__", &py_print<CrossSectionContainer>) */
         .def("calculate_dEdx", py::vectorize(&CrossSectionContainer::CalculatedEdx),
-            py::arg("energy"),
-            R"pbdoc(
+                py::arg("energy"),
+                R"pbdoc(
 
             Calculates the continous energy loss :math:`\langle \frac{dE}{dx} \rangle`,
             which equals to
@@ -127,8 +129,8 @@ void init_crosssection(py::module& m)
 
                 )pbdoc")
         .def("calculate_dE2dx", py::vectorize(&CrossSectionContainer::CalculatedE2dx),
-            py::arg("energy"),
-            R"pbdoc(
+                py::arg("energy"),
+                R"pbdoc(
 
         Calculates the value
 
@@ -148,8 +150,8 @@ void init_crosssection(py::module& m)
 
             )pbdoc")
         .def("calculate_dNdx", &CrossSectionContainer::CalculatedNdx,
-            py::arg("energy"),
-            R"pbdoc(
+                py::arg("energy"),
+                R"pbdoc(
 
         Calculates the total cross section
 
@@ -171,8 +173,8 @@ void init_crosssection(py::module& m)
             )pbdoc")
         .def("calculate_stochastic_loss",
                 &CrossSectionContainer::CalculateStochasticLoss,
-            py::arg("component"), py::arg("energy"), py::arg("rate"),
-            R"pbdoc(
+                py::arg("component"), py::arg("energy"), py::arg("rate"),
+                R"pbdoc(
 
         Samples a stochastic energy loss for a particle of the energy E.
 
@@ -192,11 +194,9 @@ void init_crosssection(py::module& m)
         to determine the component of the current medium for which the
         stochatic energy loss is calculated.
 
-            )pbdoc")
-        .def("lower_energy_lim", &CrossSectionContainer::GetLowerEnergyLim)
-        .def_property_readonly("type", &CrossSectionContainer::GetInteractionType);
+            )pbdoc");
 
-    build_crosssection<crosssection::AnnihilationHeitler>(m_sub);
+        build_crosssection<crosssection::AnnihilationHeitler>(m_sub);
 
     build_crosssection<crosssection::BremsPetrukhinShestakov>(m_sub);
     build_crosssection<crosssection::BremsKelnerKokoulinPetrukhin>(m_sub);
