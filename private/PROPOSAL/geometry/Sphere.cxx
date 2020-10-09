@@ -47,8 +47,8 @@ Sphere::Sphere(const nlohmann::json& config)
         throw std::invalid_argument("Outer radius is not a number.");
 
     config["outer_radius"].get_to(radius_);
-    radius_ *= 100;
-    inner_radius_ = config.value("inner_radius", 0);
+    radius_ *= 100;//cm
+    inner_radius_ = config.value("inner_radius", 0)*100;//cm
 
     if(inner_radius_ < 0) throw std::logic_error("inner radius must be >= 0");
     if(radius_ < inner_radius_)
