@@ -11,21 +11,15 @@ env:
     - GTEST_COLOR=1
     - CMAKE_VERSION=3.8.2
 
-matrix:
+jobs:
   include:
     - os: linux
       dist: xenial
       name: Python
       language: python
-      python: 3.6
-      addons: 
-        apt:
-          packages:
-            - g++-4.8
-      env:
-        - CC=gcc-4.8
-        - CXX=g++-4.8
-      before_script:
+      python: 3.8
+      before_install:
+      install:
         - pip install pytest
         - pip install .
       script:
@@ -89,21 +83,11 @@ matrix:
 
 
 before_install:
-
-install:
-  - PYENV_VERSION=1.2.20
-  - PYTHON_VERSION=3.7.8
-  - pushd $(pyenv root)
-  - git fetch
-  - git checkout v$PYENV_VERSION
-  - pyenv install -v $PYTHON_VERSION
-  - popd
   - ci/install_cmake.sh
   - export PATH="$HOME/cmake/bin:$PATH"
   - cmake --version
 
-before_script:
-  - pyenv global $PYTHON_VERSION
+install:
   - mkdir build
   - cd build
   - cmake .. -DADD_PYTHON=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/proposal
@@ -125,7 +109,7 @@ before_deploy:
 
 deploy:
   - provider: releases
-    api_key:
+    token:
       secure: nWVAw2ifn2zkdDkeLLKgXZgWRo/A9Z6LL+0J8xCscKay6Jn4dJ01ODyT+KJGbsKXHMMvalJXDgE7A8c5x6RN+ljq+sEr9FIvxwXmV0npsZhoRBoCmQPrQ8JQO1+fyKcNv60Os9UuPBSGCwdoZ5oXkIMFRSt7CmPKagkgaom8u9Zs3rkKtXN9TUW1I5MOxrXJZPLepd1Hx8ZS7cejcZ2tyovcn56uG/LOR0RJstU1KShNIP58B4iV+jaiqEJnd0rtzDoc8LND0vdEmuVSAphb/DXOhDa0greiIOiXsVYfcfXda1vb+Uo/kafznfYs+8PnqOwQqom0oE3n6CTY+ffsvSbJrn9UQoAaHaC2XwyLSSRyy+5mJB6nhCi+oBHg+bvWnCmYf2RizuHHqpKB3c3TA9iQt1lxlrzPtxibykSXFbFRv6NjCN+wfxinFnIO2hUczPzHDmwFRLM5bzuQZ4j8Q6dV5X8UBiws0wOmkSRL0H4PB7UldqiP/qAV2XYT6V4l5cpaDlVGUOlSTheK1gejpbvJw256ggTuYo9/hBWPPwniUGXbMTeMViqSRRY3X0r9hz/zxvt7oECJGmsy2YmeLi2LnKVKaRWhsrIavlD9A167dNtrrYgflwPbVwe84lYlO2vJxTqTEygeZqMkOsT0myBYQi03xesJ3IBtiCMWgME=
     file: $HOME/PROPOSAL-$TRAVIS_BRANCH.tar.gz
     on:
@@ -133,14 +117,14 @@ deploy:
       tags: true
       condition: $CXX = g++-9
   - provider: pypi
-    user: "__token__"
+    username: "__token__"
+    skip_existing: true
+    cleanup: false
+    distributions: sdist
     password:
       secure: "FRZVY+N0WkUkuaQT+9O9j6YKTAFVOkzBZ8//Aq/kjvhMtwCDEOCugqX6F2PIAQLX/Sa3u/1eP+Uy4Bo6W5j34dP3zXgCeeGw9r/PAvk9A2wd5EQ/OqrdubmDnErvFaMwGuLF3HuSN0rVsrrGb74a6Ka9/O8ygP/ykSdaMv3gqmZmSDbAUri8c8KXFAaZ6lw13sFPFnpf9vTQ4OBjGLnYK7blqCljfSF5wdAuExBF9f5EwHKMPofplGP6I748+y5Yw68SgF1Qg61sTa+mm/tOBHMfQNRCqP7I3oc6DRcp77kVm0EZAkcUNOwpleHr9awC8eBwBr29Ju6PRz9DE7sLCGPYuEm2UKXtDK+L5gy2+oanrU3kbS5/YZJqgP7iJxEmyGR9id/AY2qAe934tzV9CKCGn7z/+BAoF/LhP4TopIvZy1R/4gWBp9DwYTR8RAmCrsfOyHHRRKnUsFg0d7OiNpmROidNRq1lQxyK4Fog+C1mfgc5kM92Popkf/IM2zT/jLm2cfXYFvx0trb4SCmoLQ060Tb6XwkyjuJ8lxTwbkvAI6mYNVLlDPJKX44adDymaDks841N5oMvb0jRS8o5wl+DsVjUnG7+kpy6ErfXXo8rI+ovHnHDB+SoWw+NZSr+52MnBlk0jKlLVWBhGhzHIwAzNLFc4XUQ5cxrtkyUsaw="
     on:
       repo: tudo-astroparticlephysics/PROPOSAL
       tags: true
       branch: master
-      condition: $TRAVIS_PYTHON_VERSION = "3.6"
-      distributions: sdist
-      skip_existing: true
-      skip_cleanup: true
+      condition: $TRAVIS_PYTHON_VERSION = "3.8"
