@@ -3,10 +3,12 @@
 #include "PROPOSAL/version.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
+#include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
 #include "PROPOSAL/propagation_utility/ContRandBuilder.h"
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
 #include "PROPOSAL/propagation_utility/DecayBuilder.h"
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 
 #include "pyBindings.h"
@@ -105,21 +107,21 @@ PYBIND11_MODULE(proposal, m)
                     Returns:
                         float: v_cut
                 )pbdoc")
-        .def("cut", overload_cast_<double>()(&EnergyCutSettings::GetCut, py::const_))
-        .def("cut", overload_cast_<std::tuple<double, double> const&, double>()(&EnergyCutSettings::GetCut, py::const_));
+                                          .def("cut", overload_cast_<double>()(&EnergyCutSettings::GetCut, py::const_))
+                                          .def("cut", overload_cast_<std::tuple<double, double> const&, double>()(&EnergyCutSettings::GetCut, py::const_));
 
     py::class_<Interaction, std::shared_ptr<Interaction>>(m, "Interaction")
-    .def("energy_interaction", py::vectorize(&Interaction::EnergyInteraction),
-            py::arg("energy"), py::arg("random number"))
-    .def("rates", &Interaction::Rates, py::arg("energy"))
-    .def("sample_loss", &Interaction::SampleLoss,
-            py::arg("energy"), py::arg("rates"), py::arg("random number"))
-    .def("mean_free_path", py::vectorize(&Interaction::MeanFreePath),
-            py::arg("energy"));
+        .def("energy_interaction", py::vectorize(&Interaction::EnergyInteraction),
+                py::arg("energy"), py::arg("random number"))
+        .def("rates", &Interaction::Rates, py::arg("energy"))
+        .def("sample_loss", &Interaction::SampleLoss,
+                py::arg("energy"), py::arg("rates"), py::arg("random number"))
+        .def("mean_free_path", py::vectorize(&Interaction::MeanFreePath),
+                py::arg("energy"));
 
-     m.def("make_interaction", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
-             return shared_ptr<Interaction>(make_interaction(cross, interpolate));
-             });
+    m.def("make_interaction", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
+            return shared_ptr<Interaction>(make_interaction(cross, interpolate));
+            });
 
     py::class_<Displacement, std::shared_ptr<Displacement>>(m, "Displacement")
         .def("solve_track_integral", py::vectorize(&Displacement::SolveTrackIntegral), py::arg("upper_lim"), py::arg("lower_lim"))
@@ -204,7 +206,7 @@ PYBIND11_MODULE(proposal, m)
 
 
         py::class_<ContRand, std::shared_ptr<ContRand>>(m, "ContinuousRandomizer",
-            R"pbdoc(
+                R"pbdoc(
                 If :math:`v_\text{cut}` is large, the spectrum is not continously any
                 more. Particles which has no stochastic loss crossing the medium has
                 all the same energy :math:`E_\text{peak}` after propagating through
@@ -270,19 +272,40 @@ PYBIND11_MODULE(proposal, m)
                 return shared_ptr<ContRand>(make_contrand(cross, interpolate));
                 });
 
-        py::class_<Decay, std::shared_ptr<Decay>>(m, "Decay")
-            .def("energy_decay", py::vectorize(&Decay::EnergyDecay), py::arg("energy"), py::arg("rnd"), py::arg("density"));
+    py::class_<Decay, std::shared_ptr<Decay>>(m, "Decay")
+        .def("energy_decay", py::vectorize(&Decay::EnergyDecay), py::arg("energy"), py::arg("rnd"), py::arg("density"));
 
-        m.def("make_decay", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
-                return shared_ptr<Decay>(make_decay(cross, particle, interpolate));
-                });
+    m.def("make_decay", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
+            return shared_ptr<Decay>(make_decay(cross, particle, interpolate));
+            });
 
-        py::class_<Time, std::shared_ptr<Time>>(m, "Time")
-            .def("elapsed", &Time::TimeElapsed, py::arg("initial_energy"), py::arg("final_energy"), py::arg("distance"), py::arg("density"));
+    py::class_<Time, std::shared_ptr<Time>>(m, "Time")
+        .def("elapsed", &Time::TimeElapsed, py::arg("initial_energy"), py::arg("final_energy"), py::arg("distance"), py::arg("density"));
 
-        m.def("make_time", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
-                return shared_ptr<Time>(make_time(cross, particle, interpolate));
-                });
+    m.def("make_time", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
+            return shared_ptr<Time>(make_time(cross, particle, interpolate));
+            });
+
+    py::class_<PropagationUtility::Collection, std::shared_ptr<PropagationUtility::Collection>>(m, "PropagationUtilityCollection")
+        .def(py::init<>())
+        .def_readwrite("interaction", &PropagationUtility::Collection::interaction_calc)
+        .def_readwrite("displacement", &PropagationUtility::Collection::displacement_calc)
+        .def_readwrite("time", &PropagationUtility::Collection::time_calc)
+        .def_readwrite("scattering", &PropagationUtility::Collection::scattering)
+        .def_readwrite("decay", &PropagationUtility::Collection::decay_calc)
+        .def_readwrite("cont_rand", &PropagationUtility::Collection::cont_rand);
+
+    py::class_<PropagationUtility, std::shared_ptr<PropagationUtility>>(m, "PropagationUtility")
+        .def(py::init<PropagationUtility::Collection const&>(), py::arg("collection"))
+        .def("energy_stochasticloss", &PropagationUtility::EnergyStochasticloss)
+        .def("energy_decay", &PropagationUtility::EnergyDecay)
+        .def("energy_interaction", &PropagationUtility::EnergyInteraction)
+        .def("energy_randomize", &PropagationUtility::EnergyRandomize)
+        .def("energy_distance", &PropagationUtility::EnergyDistance)
+        .def("length_continuous", &PropagationUtility::LengthContinuous)
+        .def("length_continuous", &PropagationUtility::LengthContinuous)
+        .def("directions_scatter", &PropagationUtility::DirectionsScatter);
+
 
     /* .def(py::init<const Utility&, const InterpolationDef>(), */
     /*     py::arg("utility"), py::arg("interpolation_def"), */
@@ -444,11 +467,18 @@ PYBIND11_MODULE(proposal, m)
     /*     .def_static( */
     /*         "get", &RandomGenerator::Get, py::return_value_policy::reference); */
 
+    py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
+        .def(py::init<ParticleDef const&, std::vector<Sector>>())
+        .def(py::init<GammaDef, std::string const&>())
+        .def(py::init<EMinusDef, std::string const&>())
+        .def(py::init<EPlusDef, std::string const&>())
+        .def(py::init<MuMinusDef, std::string const&>())
+        .def(py::init<MuPlusDef, std::string const&>())
+        .def(py::init<TauMinusDef, std::string const&>())
+        .def(py::init<TauPlusDef, std::string const&>())
+        .def("propagate", &Propagator::Propagate, py::arg("initial_particle"),
+                py::arg("max_distance"), py::arg("min_energy"));
 
-    /* py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator") */
-    /*     .def(py::init<const ParticleDef&, const std::vector<Sector::Definition>&, std::shared_ptr<const Geometry>>(), */
-    /*         py::arg("particle_def"), py::arg("sector_defs"), */
-    /*         py::arg("detector")) */
     /*     .def( */
     /*         py::init<const ParticleDef&, const std::vector<Sector::Definition>&, */
     /*             std::shared_ptr<const Geometry>, const InterpolationDef&>(), */

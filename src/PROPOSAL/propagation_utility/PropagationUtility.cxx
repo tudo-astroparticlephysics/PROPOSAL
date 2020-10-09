@@ -72,7 +72,7 @@ bool PropagationUtility::Collection::operator==(const Collection& lhs)
     return true;
 }
 
-PropagationUtility::PropagationUtility(PropagationUtility::Collection collect)
+PropagationUtility::PropagationUtility(PropagationUtility::Collection const& collect)
     : collection(collect)
 {
     if (collect.interaction_calc == nullptr

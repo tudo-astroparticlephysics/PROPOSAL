@@ -261,22 +261,24 @@ void init_particle(py::module& m) {
                 Propagated distance of primary particle.
             )pbdoc");
 
-    py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries",
-            R"pbdoc(List of secondaries)pbdoc")
-        .def("Query", overload_cast_<const int&>()(&Secondaries::Query, py::const_), py::arg("Interaction"))
-        .def("Query", overload_cast_<const std::string&>()(&Secondaries::Query, py::const_), py::arg("Interaction"))
-        .def("decay", &Secondaries::DoDecay)
-        .def_property_readonly("particles", &Secondaries::GetSecondaries)
-        .def_property_readonly("number_of_particles", &Secondaries::GetNumberOfParticles)
-        .def_property_readonly("position", &Secondaries::GetPosition)
-        .def_property_readonly("direction", &Secondaries::GetDirection)
-        .def_property_readonly("parent_particle_energy", &Secondaries::GetParentParticleEnergy)
-        .def_property_readonly("energy", &Secondaries::GetEnergy)
-        .def_property_readonly("time", &Secondaries::GetTime)
-        .def_property_readonly("propagated_distance", &Secondaries::GetPropagatedDistance)
-        .def_property_readonly("entry_point", &Secondaries::GetEntryPoint)
-        .def_property_readonly("exit_point", &Secondaries::GetExitPoint)
-        .def_property_readonly("closest_approach_point", &Secondaries::GetClosestApproachPoint);
+    py::class_<std::vector<DynamicData>>(m, "Secondaries");
+
+    /* py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries", */
+    /*         R"pbdoc(List of secondaries)pbdoc") */
+    /*     .def("Query", overload_cast_<const int&>()(&Secondaries::Query, py::const_), py::arg("Interaction")) */
+    /*     .def("Query", overload_cast_<const std::string&>()(&Secondaries::Query, py::const_), py::arg("Interaction")) */
+    /*     .def("decay", &Secondaries::DoDecay) */
+    /*     .def_property_readonly("particles", &Secondaries::GetSecondaries) */
+    /*     .def_property_readonly("number_of_particles", &Secondaries::GetNumberOfParticles) */
+    /*     .def_property_readonly("position", &Secondaries::GetPosition) */
+    /*     .def_property_readonly("direction", &Secondaries::GetDirection) */
+    /*     .def_property_readonly("parent_particle_energy", &Secondaries::GetParentParticleEnergy) */
+    /*     .def_property_readonly("energy", &Secondaries::GetEnergy) */
+    /*     .def_property_readonly("time", &Secondaries::GetTime) */
+    /*     .def_property_readonly("propagated_distance", &Secondaries::GetPropagatedDistance) */
+    /*     .def_property_readonly("entry_point", &Secondaries::GetEntryPoint) */
+    /*     .def_property_readonly("exit_point", &Secondaries::GetExitPoint) */
+    /*     .def_property_readonly("closest_approach_point", &Secondaries::GetClosestApproachPoint); */
 
     py::enum_<InteractionType>(m_sub, "Interaction_Type")
         .value("particle", InteractionType::Particle)

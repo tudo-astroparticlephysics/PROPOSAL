@@ -50,7 +50,7 @@ public:
 
     static Interpolant1DBuilder::Definition interpol_def;
 
-    template <typename Disp> double HighlandIntegral(Disp&&, Cross, double);
+    double HighlandIntegral(Displacement&, Cross, double);
 };
 
 template <class T>
@@ -92,7 +92,7 @@ T ScatteringHighlandIntegral<T, Cross, Enable>::BuildHighlandIntegral(
 {
     auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
     auto higland_integral_func = [this, disp, &cross](double energy) {
-        return HighlandIntegral(disp, cross, energy);
+        return HighlandIntegral(*disp, cross, energy);
     };
     T decay_integral(higland_integral_func, CrossSectionVector::GetLowerLim(cross));
     if (typeid(T) == typeid(UtilityInterpolant)) {
@@ -103,13 +103,12 @@ T ScatteringHighlandIntegral<T, Cross, Enable>::BuildHighlandIntegral(
 }
 
 template <class T, class Cross, class Enable>
-template <typename Disp>
 double ScatteringHighlandIntegral<T, Cross, Enable>::HighlandIntegral(
-    Disp&& disp, Cross cross, double energy)
+    Displacement& disp, Cross cross, double energy)
 {
     auto square_momentum = (energy - mass) * (energy + mass);
     auto aux = energy / square_momentum;
-    return disp.FunctionToIntegral(cross, energy) * aux * aux;
+    return disp.FunctionToIntegral(energy) * aux * aux;
 }
 
 template <class T, class Cross, class Enable>

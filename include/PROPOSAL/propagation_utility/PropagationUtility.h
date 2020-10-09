@@ -59,7 +59,7 @@ public:
         std::shared_ptr<ContRand> cont_rand;
     };
 
-    PropagationUtility(Collection collection);
+    PropagationUtility(Collection const& collection);
     // PropagationUtility(const PropagationUtility&);
 
     tuple<InteractionType, std::shared_ptr<const Component>, double> EnergyStochasticloss(double, double);

@@ -21,6 +21,7 @@
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 #include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/scattering/ScatteringFactory.h"
 
 using std::get;
 using std::make_shared;
@@ -56,7 +57,7 @@ public:
     template <typename P>
     Propagator(P&& p_def, const string& config_file)
     : Propagator(p_def, ParseConfig(config_file)) {}
-    Propagator(const ParticleDef&, std::vector<Sector> sectors);
+    Propagator(ParticleDef const&, std::vector<Sector> sectors);
 
     std::vector<DynamicData> Propagate(const DynamicData& initial_particle,
             double max_distance = 1e20, double min_energy = 0.);
