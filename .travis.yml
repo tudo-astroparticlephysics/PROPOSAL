@@ -118,13 +118,13 @@ deploy:
       condition: $CXX = g++-9
   - provider: pypi
     user: "__token__"
+    skip_existing: true
+    skip_cleanup: true
+    distributions: sdist
     password:
       secure: "FRZVY+N0WkUkuaQT+9O9j6YKTAFVOkzBZ8//Aq/kjvhMtwCDEOCugqX6F2PIAQLX/Sa3u/1eP+Uy4Bo6W5j34dP3zXgCeeGw9r/PAvk9A2wd5EQ/OqrdubmDnErvFaMwGuLF3HuSN0rVsrrGb74a6Ka9/O8ygP/ykSdaMv3gqmZmSDbAUri8c8KXFAaZ6lw13sFPFnpf9vTQ4OBjGLnYK7blqCljfSF5wdAuExBF9f5EwHKMPofplGP6I748+y5Yw68SgF1Qg61sTa+mm/tOBHMfQNRCqP7I3oc6DRcp77kVm0EZAkcUNOwpleHr9awC8eBwBr29Ju6PRz9DE7sLCGPYuEm2UKXtDK+L5gy2+oanrU3kbS5/YZJqgP7iJxEmyGR9id/AY2qAe934tzV9CKCGn7z/+BAoF/LhP4TopIvZy1R/4gWBp9DwYTR8RAmCrsfOyHHRRKnUsFg0d7OiNpmROidNRq1lQxyK4Fog+C1mfgc5kM92Popkf/IM2zT/jLm2cfXYFvx0trb4SCmoLQ060Tb6XwkyjuJ8lxTwbkvAI6mYNVLlDPJKX44adDymaDks841N5oMvb0jRS8o5wl+DsVjUnG7+kpy6ErfXXo8rI+ovHnHDB+SoWw+NZSr+52MnBlk0jKlLVWBhGhzHIwAzNLFc4XUQ5cxrtkyUsaw="
     on:
       repo: tudo-astroparticlephysics/PROPOSAL
       tags: true
       branch: master
-      condition: $TRAVIS_PYTHON_VERSION = "3.6"
-      distributions: sdist
-      skip_existing: true
-      skip_cleanup: true
+      condition: $TRAVIS_PYTHON_VERSION = "3.8"
