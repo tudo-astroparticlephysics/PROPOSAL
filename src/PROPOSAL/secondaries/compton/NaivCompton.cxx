@@ -53,7 +53,7 @@ vector<Loss::secondary_t> secondaries::NaivCompton::CalculateSecondaries(
     sec.emplace_back(static_cast<int>(ParticleType::Gamma),
         get<Loss::POSITION>(loss), get<GAMMA>(secondary_dir),
         get<GAMMA>(secondary_energy), 0.);
-    sec.emplace_back(static_cast<int>(ParticleType::Gamma),
+    sec.emplace_back(static_cast<int>(ParticleType::EMinus),
         get<Loss::POSITION>(loss), get<ELECTRON>(secondary_dir),
         get<ELECTRON>(secondary_energy), 0.);
     return sec;
