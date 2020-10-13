@@ -104,6 +104,7 @@ class EpairProductionRhoIntegral : public EpairProduction {
 
 EPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
 EPAIR_PARAM_INTEGRAL_DEC(SandrockSoedingreksoRhode)
+EPAIR_PARAM_INTEGRAL_DEC(ForElectronPositron)
 
 #undef EPAIR_PARAM_INTEGRAL_DEC
 
@@ -124,6 +125,7 @@ template<typename P, typename M>
 static std::map<std::string, epair_func_ptr<P, M>> epair_map = {
         {"KelnerKokoulinPetrukhin", create_epair<EpairKelnerKokoulinPetrukhin, P, M>},
         {"SandrockSoedingreksoRhode", create_epair<EpairSandrockSoedingreksoRhode, P, M>},
+        {"ForElectronPositron", create_epair<EpairForElectronPositron, P, M>},
 };
 
 template<typename P, typename M>

@@ -203,6 +203,7 @@ double crosssection::EpairProductionRhoIntegral::DifferentialCrossSection(
 
 EPAIR_PARAM_INTEGRAL_IMPL(KelnerKokoulinPetrukhin)
 EPAIR_PARAM_INTEGRAL_IMPL(SandrockSoedingreksoRhode)
+EPAIR_PARAM_INTEGRAL_IMPL(ForElectronPositron)
 
 // ------------------------------------------------------------------------- //
 double crosssection::EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
@@ -493,6 +494,81 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
 
     if (aux < 0.0) {
         aux = 0.0;
+    }
+
+    return aux;
+}
+
+// ------------------------------------------------------------------------- //
+double crosssection::EpairForElectronPositron::FunctionToIntegral(
+        const ParticleDef& p_def, const Component& comp, double energy, double v,
+        double rho) const
+{
+    // Adaptation of the direct muon pair production cross section of muons.
+    // Nuclear formfactor effects have been removed as they are negligible for electrons.
+    // Based on the parametrization of Kelner/Kokoulin/Petrukhin
+    // Physics of Atomic Nuclei, Vol. 63, No. 9, 2000, pp. 1603-1611. Translated from Yadernaya Fizika, Vol. 63, 2000, pp. 1690-1698
+    // Original Russian Text Copyright 2000 by Kel'ner, Kokoulin, Petukhin
+    // DOI: 10.1134/1.1312894
+
+
+    double aux, aux1, aux2, r2, rMax, Z3, xi, beta;
+    double phi, U, U_max, X, Y;
+    auto medium_charge = comp.GetNucCharge();
+    auto medium_log_constant = comp.GetLogConstant();
+    //double medium_log_constant = 183; // According to the paper, B is set to 183
+
+    r2          = rho * rho;
+    rMax        = 1 - 2 * ME / (v * energy);
+    Z3          = std::pow(medium_charge, -1. / 3);
+    aux         = v / 2;
+    xi          = aux * aux * (1 - r2) / (1 - v);
+    beta        = (v * v) / (2 * (1 - v));
+
+    //Phi Calculation (18)
+    aux     = (2 + r2) * (1 + beta) + xi * (3 + r2);
+    aux     *= std::log(1 + 1. / xi);
+
+    aux1    = (1 + r2) * (1 + 1.5 * beta) - 1. / xi * (1 + 2 * beta) * (1 - r2);
+    aux1    *= std::log(1 + xi);
+    aux2    = -1 - 3 * r2 + beta * (1 - 2 * r2);
+
+    phi     = aux + aux1 + aux2;
+
+    //X Calculation (22)
+    Y       = 12 * std::sqrt(ME / energy); //(21)
+    aux     = medium_log_constant * Z3;
+    aux1    = 2 * SQRTE * std::pow(ME, 2) * medium_log_constant * Z3 * (1 + xi) * (1 + Y);
+    aux2    = ME * energy * v * (1 - r2);
+
+    U       = aux / (1 + aux1 / aux2);
+
+    aux2    = ME * energy * v * (1 - rMax * rMax);
+    U_max   = aux / (1 + aux1 / aux2);
+
+    X       = 1 + U - U_max;
+
+    //Combine results
+    aux     = ALPHA * RE * p_def.charge * medium_charge;
+    aux     *= 2 * aux * phi * (1 - v) / (1.5 * PI * v); //Factor 2: Similar to factor 2 from EPairProduction, probably from symmetry in Rho
+
+    if (X > 0)
+    {
+        aux *= std::log(X);
+    }
+    else
+    {
+        aux = 0;
+    }
+
+    if (aux < 0)
+    {
+        aux = 0;
+    }
+
+    if (lpm_) {
+        throw logic_error("some work to do!");
+        /* aux *= lpm(energy, v, rho2, beta, xi); */
     }
 
     return aux;
