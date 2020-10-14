@@ -46,6 +46,7 @@ using Components::Component;
 using rates_t = std::unordered_map<std::shared_ptr<const Component>, double>;
 
 struct CrossSectionBase {
+    virtual ~CrossSectionBase() = default;
     virtual double CalculatedEdx(double) = 0;
     virtual double CalculatedE2dx(double) = 0;
     virtual rates_t CalculatedNdx(double) = 0;
