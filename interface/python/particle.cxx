@@ -48,7 +48,7 @@ void init_particle(py::module& m) {
     )pbdoc";
 
     py::class_<ParticleDef, std::shared_ptr<ParticleDef>>(m_sub, "ParticleDef")
-        .def(py::init<>())
+        // .def(py::init<>())
         .def(py::init<std::string, double, double, double, double,
                       const HardComponentTables::VecType&, const DecayTable&,
                       const int, const int>(),

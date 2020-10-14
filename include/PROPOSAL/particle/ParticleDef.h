@@ -148,7 +148,7 @@ struct ParticleDef {
     const int particle_type;
     const int weak_partner;
 
-    ParticleDef();
+    // ParticleDef();
     ParticleDef(std::string name, double mass, double low, double lifetime,
         double charge, const HardComponentTables::VecType& table,
         const DecayTable&, const int, const int);
@@ -165,7 +165,7 @@ struct ParticleDef {
     friend std::ostream& operator<<(std::ostream&, ParticleDef const&);
 
 private:
-    ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
+    // ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
 
     /* std::unordered_map<size_t, std::vector<shared_ptr<CrossSection>>> */
     /*     cross_sections; */

@@ -116,18 +116,18 @@ const HardComponentTables::VecType HardComponentTables::EmptyTable;
  *                                ParticleDef                                 *
  ******************************************************************************/
 
-ParticleDef::ParticleDef()
-    : name("")
-    , mass(0.0)
-    , low(0.0)
-    , lifetime(0.0)
-    , charge(0.0)
-    , hard_component_table(HardComponentTables::EmptyTable)
-    , decay_table()
-    , particle_type(static_cast<int>(ParticleType::None))
-    , weak_partner(static_cast<int>(ParticleType::None))
-{
-}
+// ParticleDef::ParticleDef()
+//     : name("")
+//     , mass(0.0)
+//     , low(0.0)
+//     , lifetime(0.0)
+//     , charge(0.0)
+//     , hard_component_table(HardComponentTables::EmptyTable)
+//     , decay_table()
+//     , particle_type(static_cast<int>(ParticleType::None))
+//     , weak_partner(static_cast<int>(ParticleType::None))
+// {
+// }
 
 ParticleDef::ParticleDef(std::string name, double mass, double low,
     double lifetime, double charge, const HardComponentTables::VecType& table,
