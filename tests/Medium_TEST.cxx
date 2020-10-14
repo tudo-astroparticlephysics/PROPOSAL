@@ -5,7 +5,7 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 
-#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
+#include "PROPOSAL/density_distr/density_homogeneous.h"
 
 using namespace PROPOSAL;
 
