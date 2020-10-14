@@ -104,7 +104,7 @@ T ScatteringHighlandIntegral<T, Cross, Enable>::BuildHighlandIntegral(
 
 template <class T, class Cross, class Enable>
 double ScatteringHighlandIntegral<T, Cross, Enable>::HighlandIntegral(
-    Displacement& disp, Cross cross, double energy)
+    Displacement& disp, Cross, double energy)
 {
     auto square_momentum = (energy - mass) * (energy + mass);
     auto aux = energy / square_momentum;

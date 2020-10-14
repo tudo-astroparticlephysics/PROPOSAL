@@ -3,8 +3,8 @@
 #include "gtest/gtest.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/crosssection/IonizIntegral.h"
-#include "PROPOSAL/crosssection/parametrization/Ionization.h"
+// #include "PROPOSAL/crosssection/IonizIntegral.h"
+// #include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 
@@ -209,33 +209,33 @@ TEST(IntegralValue, IntegrateWithLogSubstitution)
     }
 }
 
-TEST(QUADPACK, RombergIntegrationFailure)
-{
-    double precision = 1e-4;
-    IonizIntegral Ioniz_Int(IonizBetheBlochRossi(MuMinusDef::Get(), std::make_shared<const Ice>(), EnergyCutSettings(), 1.0));
+// TEST(QUADPACK, RombergIntegrationFailure)
+// {
+//     double precision = 1e-4;
+//     IonizIntegral Ioniz_Int(IonizBetheBlochRossi(MuMinusDef::Get(), std::make_shared<const Ice>(), EnergyCutSettings(), 1.0));
 
-    // --------------------------------------------------------------------- //
-    // Problematic energy for romberg integration
-    // --------------------------------------------------------------------- //
+//     // --------------------------------------------------------------------- //
+//     // Problematic energy for romberg integration
+//     // --------------------------------------------------------------------- //
 
-    double energy = 146.768; // 0.274374 + 4.63716e-10
-    double result = 2.9065825764284159;
+//     double energy = 146.768; // 0.274374 + 4.63716e-10
+//     double result = 2.9065825764284159;
 
-    double dEdx = Ioniz_Int.CalculatedEdx(energy);
+//     double dEdx = Ioniz_Int.CalculatedEdx(energy);
 
-    ASSERT_NEAR(dEdx, result, result * precision);
+//     ASSERT_NEAR(dEdx, result, result * precision);
 
-    // --------------------------------------------------------------------- //
-    // Problematic energy for gnu scientific lib gauss_quadrature integration
-    // --------------------------------------------------------------------- //
+//     // --------------------------------------------------------------------- //
+//     // Problematic energy for gnu scientific lib gauss_quadrature integration
+//     // --------------------------------------------------------------------- //
 
-    energy = 142.58; // 0.287524 - 1.01164e-8
-    result = 3.0734340510841172;
+//     energy = 142.58; // 0.287524 - 1.01164e-8
+//     result = 3.0734340510841172;
 
-    dEdx = Ioniz_Int.CalculatedEdx(energy);
+//     dEdx = Ioniz_Int.CalculatedEdx(energy);
 
-    ASSERT_NEAR(dEdx, result, result * precision);
-}
+//     ASSERT_NEAR(dEdx, result, result * precision);
+// }
 
 int main(int argc, char** argv)
 {

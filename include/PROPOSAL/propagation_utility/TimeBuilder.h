@@ -24,7 +24,7 @@ template <typename T> class ExactTimeBuilder : public Time {
     }
 
     template <typename Cross>
-    double FunctionToIntegral(Cross const& cross, Displacement& disp, double energy)
+    double FunctionToIntegral(Cross const&, Displacement& disp, double energy)
     {
         assert(energy > mass);
         auto square_momentum = (energy - mass) * (energy + mass);

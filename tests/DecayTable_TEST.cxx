@@ -10,8 +10,12 @@
 
 using namespace PROPOSAL;
 
-ParticleDef mu  = MuMinusDef::Get();
-ParticleDef tau = TauMinusDef::Get();
+ParticleDef mu  = MuMinusDef();
+ParticleDef tau = TauMinusDef();
+ParticleDef eminus = EMinusDef();
+ParticleDef nue = NuMuDef();
+ParticleDef nuebar = NuEBarDef();
+
 
 TEST(Comparison, Comparison_equal)
 {
@@ -19,8 +23,8 @@ TEST(Comparison, Comparison_equal)
     DecayTable B;
     EXPECT_TRUE(A == B);
 
-    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
-    LeptonicDecayChannel y(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel x(eminus, nue, nuebar);
+    LeptonicDecayChannel y(eminus, nue, nuebar);
     TwoBodyPhaseSpace z(mu, tau);
 
     A.addChannel(0.5, x);
@@ -42,8 +46,8 @@ TEST(Comparison, Comparison_not_equal)
     DecayTable B;
     EXPECT_TRUE(A == B);
 
-    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
-    LeptonicDecayChannel y(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel x(eminus, nue, nuebar);
+    LeptonicDecayChannel y(eminus, nue, nuebar);
     TwoBodyPhaseSpace z(mu, tau);
     TwoBodyPhaseSpace u(mu, mu);
 
@@ -83,7 +87,7 @@ TEST(Assignment, Operator)
     DecayTable A;
     DecayTable B;
 
-    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel x(eminus, nue, nuebar);
     TwoBodyPhaseSpace y(mu, tau);
 
     A.addChannel(1.0, x);
@@ -109,7 +113,7 @@ TEST(Assignment, Swap)
     DecayTable B;
     EXPECT_TRUE(A == B);
 
-    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel x(eminus, nue, nuebar);
     TwoBodyPhaseSpace y(mu, tau);
 
     A.addChannel(1.0, x);
@@ -127,10 +131,10 @@ TEST(SelectChannel, Muon)
 {
 
     // Leptinic decay channel in muon case
-    ParticleDef mu_def = MuMinusDef::Get();
+    ParticleDef mu_def = MuMinusDef();
     DecayChannel& dc_muon = mu_def.decay_table.SelectChannel(0.5);
 
-    LeptonicDecayChannel leptonic_channel(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel leptonic_channel(eminus, nue, nuebar);
 
     EXPECT_TRUE(dc_muon == leptonic_channel);
 }
@@ -138,7 +142,7 @@ TEST(SelectChannel, Muon)
 TEST(SelectChannel, Electron)
 {
     // Leptinic decay channel in electron case
-    ParticleDef electron_def = EMinusDef::Get();
+    ParticleDef electron_def = EMinusDef();
     DecayChannel& dc_electron = electron_def.decay_table.SelectChannel(0.5);
 
     StableChannel stable_channel;
@@ -149,7 +153,7 @@ TEST(SelectChannel, Electron)
 TEST(SelectChannel, Tau)
 {
     // tauon decay channels
-    ParticleDef tau_def = TauMinusDef::Get();
+    ParticleDef tau_def = TauMinusDef();
 
     int leptonic_count = 0;
     int twobody_count  = 0;

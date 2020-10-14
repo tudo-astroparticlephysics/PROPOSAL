@@ -14,7 +14,7 @@ protected:
     double lower_lim;
 
     template <typename Cross>
-    double FunctionToIntegral(Cross&& cross, Displacement & disp, double energy)
+    double FunctionToIntegral(Cross const&, Displacement & disp, double energy)
     {
         assert(!std::isinf(lifetime));
         assert(energy >= mass);
