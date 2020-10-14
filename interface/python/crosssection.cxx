@@ -196,7 +196,7 @@ void init_crosssection(py::module& m)
 
             )pbdoc");
 
-        build_crosssection<crosssection::AnnihilationHeitler>(m_sub);
+    build_crosssection<crosssection::AnnihilationHeitler>(m_sub);
 
     build_crosssection<crosssection::BremsPetrukhinShestakov>(m_sub);
     build_crosssection<crosssection::BremsKelnerKokoulinPetrukhin>(m_sub);
@@ -237,5 +237,6 @@ void init_crosssection(py::module& m)
     build_std_crosssection<MuPlusDef>(m_sub);
     build_std_crosssection<TauMinusDef>(m_sub);
     build_std_crosssection<TauPlusDef>(m_sub);
+
 
 }

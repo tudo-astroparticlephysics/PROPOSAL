@@ -26,6 +26,7 @@ void init_parametrization(py::module& m);
 void init_crosssection(py::module& m);
 void init_scattering(py::module& m);
 void init_math(py::module&);
+void init_secondaries(py::module&);
 
 PYBIND11_MODULE(proposal, m)
 {
@@ -42,6 +43,7 @@ PYBIND11_MODULE(proposal, m)
     init_crosssection(m);
     init_scattering(m);
     init_math(m);
+    init_secondaries(m);
 
     m.attr("__version__") = &PROPOSAL_VERSION;
 

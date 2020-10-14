@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/secondaries/DefaultFactory.h"
+#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 
 namespace PROPOSAL {
 namespace secondaries {

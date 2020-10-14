@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/secondaries/compton/Compton.h"
-#include "PROPOSAL/secondaries/DefaultFactory.h"
+#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 
 #include <vector>
 
