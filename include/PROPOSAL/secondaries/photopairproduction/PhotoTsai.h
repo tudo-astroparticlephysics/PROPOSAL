@@ -3,7 +3,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/secondaries/DefaultFactory.h"
+#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 #include "PROPOSAL/secondaries/photopairproduction/PhotopairProduction.h"
 
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"

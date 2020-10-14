@@ -1,11 +1,10 @@
-
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/secondaries/DefaultFactory.h"
+#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 #include "PROPOSAL/secondaries/annihilation/Annihilation.h"
 
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"

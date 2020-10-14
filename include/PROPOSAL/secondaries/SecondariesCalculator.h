@@ -2,7 +2,7 @@
 
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/secondaries/DefaultFactory.h"
+#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 #include "PROPOSAL/secondaries/Parametrization.h"
 
 #include <memory>
@@ -45,8 +45,6 @@ public:
         Loss::secondary_t loss,
         const Component& comp,
         vector<double> rnd);
-
-    size_t requiredRandomNumbers(InteractionType);
 };
 
 template <typename TypeList>

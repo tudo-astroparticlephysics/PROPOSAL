@@ -19,35 +19,19 @@ namespace secondaries {
         DefaultFactory() = delete;
 
         template <typename T> static bool Register(InteractionType type);
-        static unique_ptr<Parametrization> Create(
-            const InteractionType& type, ParticleDef p, Medium m);
+        static unique_ptr<Parametrization> Create(InteractionType const& type, ParticleDef p, Medium m);
     };
 
     template <typename T> bool DefaultFactory::Register(InteractionType type)
     {
         auto it = secondaries_map().find(type);
-        if (it == secondaries_map().end()) {
-            secondaries_map()[type] = [](ParticleDef p, Medium m) {
-                return unique_ptr<Parametrization>(
-                    PROPOSAL::make_unique<T>(p, m));
-            };
-            return true;
-        }
-        std::ostringstream s;
-        s << "Not two secondary builder with same interaction type ("
-          << Type_Interaction_Name_Map.find(type)->second << ") can be added.";
-        throw std::logic_error(s.str());
+        if (it != secondaries_map().end())
+            return false;
+        secondaries_map()[type] = [](ParticleDef p, Medium m) {
+            return unique_ptr<Parametrization>( PROPOSAL::make_unique<T>(p, m));
+        };
+        return true;
     }
-
-    template <typename T> class RegisteredInDefault {
-    protected:
-        static bool s_registered;
-        RegisteredInDefault() { (void)s_registered; }
-    };
-
-    template <typename T>
-    bool RegisteredInDefault<T>::s_registered
-        = DefaultFactory::Register<T>(T::type);
 
 } // namespace crosssection
 } // namespace PROPOSAL
