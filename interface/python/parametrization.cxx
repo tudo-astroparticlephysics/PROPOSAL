@@ -238,9 +238,13 @@ void init_parametrization(py::module& m)
 
             * SandrockSoedingreksoRhode
 
+            * ForElectronPositron
+
             * KelnerKokoulinPetrukhinInterpolant
 
             * SandrockSoedingreksoRhodeInterpolant
+
+            * ForElectronPositronInterpolant
 
             Example:
                 To create a electron pair production parametrization
@@ -258,10 +262,12 @@ void init_parametrization(py::module& m)
             .def("function_to_integral",
                     &crosssection::EpairProductionRhoIntegral::FunctionToIntegral);
 
-    EPAIR_DEF(m_sub_epair, KelnerKokoulinPetrukhin)
+        EPAIR_DEF(m_sub_epair, KelnerKokoulinPetrukhin)
         EPAIR_DEF(m_sub_epair, SandrockSoedingreksoRhode)
+        EPAIR_DEF(m_sub_epair, ForElectronPositron)
 
-        // --------------------------------------------------------------------- //
+
+    // --------------------------------------------------------------------- //
         // Annihilation
         // --------------------------------------------------------------------- //
 
