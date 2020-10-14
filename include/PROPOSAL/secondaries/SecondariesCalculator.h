@@ -12,45 +12,39 @@
 using std::vector;
 
 namespace PROPOSAL {
+
 class SecondariesCalculator {
     using param_ptr = unique_ptr<secondaries::Parametrization>;
+
     std::unordered_map<InteractionType, param_ptr, InteractionType_hash> secondary_generator;
 
 public:
     SecondariesCalculator() = default;
 
-    template <typename ParamList> SecondariesCalculator(ParamList&& param_list)
+    template <typename T>
+    SecondariesCalculator(T const& interaction_types, ParticleDef const& p, Medium const& m)
     {
-        for (auto&& p : param_list)
-            addInteraction(move(p));
-    }
-
-    template <typename TypeList>
-    SecondariesCalculator(
-        TypeList type_list, const ParticleDef& p, const Medium& m)
-    {
-       for (auto& t : type_list)
+       for (auto& t : interaction_types)
             addInteraction(secondaries::DefaultFactory::Create(t, p, m));
     }
 
-    template <typename Param> void addInteraction(Param&& p)
+    inline void addInteraction(param_ptr&& p)
     {
-        secondary_generator[p->GetInteractionType()] = move(p);
+        secondary_generator[p->GetInteractionType()] = std::move(p);
     }
 
-    size_t RequiredRandomNumbers(InteractionType) const noexcept;
+    inline size_t RequiredRandomNumbers(InteractionType type) const noexcept
+    {
+        return secondary_generator.find(type)->second->RequiredRandomNumbers();
+    }
 
-    vector<Loss::secondary_t> CalculateSecondaries(
-        double primary_energy,
-        Loss::secondary_t loss,
-        const Component& comp,
-        vector<double> rnd);
+    std::vector<Loss::secondary_t> CalculateSecondaries(double, Loss::secondary_t, Component const&, std::vector<double>);
 };
 
 template <typename TypeList>
-std::unique_ptr<SecondariesCalculator> make_secondaries(TypeList&& list, const ParticleDef& p, const Medium& m)
+std::unique_ptr<SecondariesCalculator> make_secondaries(TypeList&& list, ParticleDef const& p, Medium const& m)
 {
     return PROPOSAL::make_unique<SecondariesCalculator>(std::forward<TypeList>(list), p, m);
 }
 
-}
+} // namespace PROPOSAL
