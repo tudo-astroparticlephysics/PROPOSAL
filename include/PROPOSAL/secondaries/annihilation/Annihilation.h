@@ -10,7 +10,7 @@ namespace PROPOSAL {
 namespace secondaries {
     struct Annihilation : public secondaries::Parametrization {
         Annihilation() = default;
-        ~Annihilation() = default;
+        virtual ~Annihilation() = default;
 
         virtual double CalculateRho(double, double, const Component&) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(
@@ -21,7 +21,7 @@ namespace secondaries {
         static constexpr InteractionType type
             = PROPOSAL::InteractionType::Annihilation;
 
-        InteractionType GetInteractionType() const noexcept { return type; };
+        InteractionType GetInteractionType() const noexcept final { return type; };
     };
 } // namespace secondaries
 } // namespace PROPOSAL
