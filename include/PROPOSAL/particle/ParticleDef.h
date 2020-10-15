@@ -148,7 +148,7 @@ struct ParticleDef {
     const int particle_type;
     const int weak_partner;
 
-    // ParticleDef();
+    ParticleDef();
     ParticleDef(std::string name, double mass, double low, double lifetime,
         double charge, const HardComponentTables::VecType& table,
         const DecayTable&, const int, const int);
