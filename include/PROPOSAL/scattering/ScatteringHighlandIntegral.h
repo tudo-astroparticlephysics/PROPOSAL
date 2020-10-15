@@ -33,7 +33,6 @@
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/scattering/ScatteringHighland.h"
 
-using std::shared_ptr;
 
 namespace PROPOSAL {
 
@@ -61,7 +60,7 @@ struct is_null_pointer
 template <class T, class Cross>
 class ScatteringHighlandIntegral<T, Cross,
     typename std::enable_if<
-        is_null_pointer<typename decay<Cross>::type>::value>::type>
+        is_null_pointer<typename std::decay<Cross>::type>::value>::type>
     : public Scattering {
 public:
     ScatteringHighlandIntegral(

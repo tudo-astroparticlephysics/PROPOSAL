@@ -32,6 +32,7 @@
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h" 
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -131,8 +132,20 @@ cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
     if (!config.contains("parametrization"))
         throw std::logic_error("No parametrization passed for ionization");
-
     std::string param_name = config["parametrization"];
+    
+    auto it = ioniz_map<P, M>.find(param_name);
+    if (it == ioniz_map<P, M>.end())
+        throw std::logic_error("Unknown parametrization for ionization");
+
+    return it->second(p_def, medium, cuts, interpol);
+    // return make_ionization(p_def, medium, cuts, interpol, param_name);
+}
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, const std::string& param_name){
+
     auto it = ioniz_map<P, M>.find(param_name);
     if (it == ioniz_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for ionization");

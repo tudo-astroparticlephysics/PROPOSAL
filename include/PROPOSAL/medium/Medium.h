@@ -51,7 +51,7 @@ class Medium {
     // class Builder;
 
    public:
-    Medium() {}
+    // Medium() {}
     Medium(std::string name,
            double I,
            double C,
@@ -65,6 +65,7 @@ class Medium {
 
     // Operators
     bool operator==(const Medium& medium) const;
+    bool operator!=(const Medium& medium) const;
     friend std::ostream& operator<<(std::ostream& os, Medium const& medium);
 
     // ----------------------------------------------------------------- //

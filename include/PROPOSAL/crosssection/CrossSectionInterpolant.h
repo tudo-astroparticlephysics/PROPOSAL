@@ -40,19 +40,17 @@
 
 #include "PROPOSAL/particle/ParticleDef.h"
 
-using std::get;
-using std::unordered_map;
 
 namespace PROPOSAL {
 
 template <typename Param, typename P, typename M>
 class CrossSectionInterpolant : public crosssection_t<P, M> {
 
-    using param_t = typename decay<Param>::type;
-    using particle_t = typename decay<P>::type;
-    using medium_t = typename decay<M>::type;
+    using param_t = typename std::decay<Param>::type;
+    using particle_t = typename std::decay<P>::type;
+    using medium_t = typename std::decay<M>::type;
     using base_param_ref_t =
-        typename add_lvalue_reference<typename param_t::base_param_t>::type;
+        typename std::add_lvalue_reference<typename param_t::base_param_t>::type;
 
     param_t param;
     particle_t p_def;
@@ -76,7 +74,7 @@ protected:
 public:
     CrossSectionInterpolant(Param&& _param, P&& _p_def, M&& _medium,
         shared_ptr<const EnergyCutSettings> _cut, const InterpolationDef& _def)
-        : CrossSection<typename decay<P>::type, typename decay<M>::type>()
+        : CrossSection<typename std::decay<P>::type, typename std::decay<M>::type>()
         , param(std::forward<Param>(_param)) // only for back transformation
         , p_def(std::forward<P>(_p_def))     // needed TODO: Maximilian Sackel
         , medium(std::forward<M>(_medium))   // 2 Jun. 2020
@@ -97,7 +95,15 @@ public:
                                 medium, *cut, def, 0);
         }
     }
-
+    std::vector<std::shared_ptr<const Component>> GetTargets() const noexcept final
+    {
+        std::vector<std::shared_ptr<const Component>> targets;
+        for (auto& dndx : dndx_map)
+        {
+            targets.emplace_back(dndx.first);
+        }
+        return targets;
+    }
     inline double CalculatedEdx(double energy) override
     {
         if (dedx == nullptr)
@@ -111,19 +117,49 @@ public:
             return 0;
         return de2dx->Interpolate(energy);
     }
-    inline rates_t CalculatedNdx(double energy) override
+    // inline rates_t CalculatedNdx(double energy) override
+    // {
+    //     auto rates = rates_t();
+    //     for (auto& dndx : dndx_map) {
+    //         //TODO: dNdx interpolant results for individual components can become negative for small energies
+    //         // Instead of clipping these values to zero, the interpolant should be revised (jm)
+    //         rates[dndx.first] = std::max(dndx.second->Calculate(energy), 0.);
+    //         if (dndx.first)
+    //             rates[dndx.first] /= medium.GetSumNucleons()
+    //                 / (dndx.first->GetAtomInMolecule()
+    //                       * dndx.first->GetAtomicNum());
+    //     }
+    //     return rates;
+    // }
+    inline double CalculatedNdx(double energy, std::shared_ptr<const Component> comp_ptr) override
     {
-        auto rates = rates_t();
-        for (auto& dndx : dndx_map) {
-            //TODO: dNdx interpolant results for individual components can become negative for small energies
-            // Instead of clipping these values to zero, the interpolant should be revised (jm)
-            rates[dndx.first] = std::max(dndx.second->Calculate(energy), 0.);
-            if (dndx.first)
-                rates[dndx.first] /= medium.GetSumNucleons()
-                    / (dndx.first->GetAtomInMolecule()
-                          * dndx.first->GetAtomicNum());
+        //TODO: dNdx interpolant results for individual components can become negative for small energies
+        // Instead of clipping these values to zero, the interpolant should be revised (jm)
+        if (comp_ptr == nullptr)
+        {
+            double dndx_all = 0.;
+            double tmp;
+            for (auto& dndx : dndx_map) {
+                tmp = std::max(dndx.second->Calculate(energy), 0.);
+                if (dndx.first)
+                    tmp /= medium.GetSumNucleons()
+                        / (dndx.first->GetAtomInMolecule()
+                              * dndx.first->GetAtomicNum());
+
+                dndx_all += tmp;
+            }
+
+            return dndx_all;
         }
-        return rates;
+        else
+        {
+            double dndx = std::max(dndx_map[comp_ptr]->Calculate(energy), 0.);
+            if (comp_ptr)
+                dndx /= medium.GetSumNucleons()
+                    / (comp_ptr->GetAtomInMolecule()
+                          * comp_ptr->GetAtomicNum());
+            return dndx;
+        }
     }
     inline double CalculateStochasticLoss(
         std::shared_ptr<const Component> const& comp, double energy, double rate) override
@@ -161,7 +197,7 @@ unique_ptr<Interpolant> build_dedx(Param&& param, const ParticleDef& p_def,
     interpol_def.function1d
         = [&integral, &param, &p_def, &medium, &cut](double energy) {
               return calculate_dedx(param, integral, p_def, medium, cut, energy,
-                  typename decay<Param>::type::component_wise{});
+                  typename std::decay<Param>::type::component_wise{});
           };
     interpol_def.max = def.nodes_cross_section;
     interpol_def.xmin = param.GetLowerEnergyLim(p_def);
@@ -186,7 +222,7 @@ unique_ptr<Interpolant> build_de2dx(Param&& param, const ParticleDef& p_def,
     interpol_def.function1d
         = [&integral, &param, &p_def, &medium, &cut](double energy) {
               return calculate_de2dx(param, integral, p_def, medium, cut,
-                  energy, typename decay<Param>::type::component_wise{});
+                  energy, typename std::decay<Param>::type::component_wise{});
           };
     interpol_def.max = def.nodes_continous_randomization;
     interpol_def.xmin = param.GetLowerEnergyLim(p_def);

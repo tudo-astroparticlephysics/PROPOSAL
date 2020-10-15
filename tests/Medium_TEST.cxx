@@ -11,8 +11,8 @@ using namespace PROPOSAL;
 
 TEST(Comparison, Comparison_equal)
 {
-    std::unique_ptr<Medium> A(new AntaresWater(0.3));
-    std::unique_ptr<Medium> B(new AntaresWater(0.3));
+    std::unique_ptr<Medium> A(new AntaresWater());
+    std::unique_ptr<Medium> B(new AntaresWater());
     EXPECT_TRUE(*A == *B);
 
     Components::Oxygen a;
@@ -35,15 +35,15 @@ TEST(Comparison, Comparison_equal)
 TEST(Comparison, Comparison_not_equal)
 {
     AntaresWater A;
-    AntaresWater B(0.3);
+    AntaresWater B;
     EXPECT_TRUE(A != B);
 
-    std::unique_ptr<Medium> C(new AntaresWater(0.3));
-    std::unique_ptr<Medium> D(new Ice(0.3));
+    std::unique_ptr<Medium> C(new AntaresWater());
+    std::unique_ptr<Medium> D(new Ice());
     EXPECT_TRUE(*C != *D);
 
-    std::unique_ptr<Medium> E(new Water(0.3));
-    std::unique_ptr<Medium> F(new Water(1.0));
+    std::unique_ptr<Medium> E(new Water());
+    std::unique_ptr<Medium> F(new Water());
     EXPECT_TRUE(*E != *F);
 
     std::shared_ptr<const Medium> G = CreateMedium("WaTeR");
@@ -54,12 +54,8 @@ TEST(Comparison, Comparison_not_equal)
     EXPECT_TRUE(a != b);
 
     std::unique_ptr<Components::Component> c(new Components::Oxygen());
-    std::unique_ptr<Components::Component> d(new Components::Oxygen(2.0));
+    std::unique_ptr<Components::Component> d(new Components::Iron());
     EXPECT_TRUE(*c != *d);
-
-    std::unique_ptr<Components::Component> e(new Components::Magnesium());
-    std::unique_ptr<Components::Component> f(new Components::Iron());
-    EXPECT_TRUE(*e != *f);
 }
 
 TEST(Assignment, Copyconstructor)
@@ -84,7 +80,7 @@ TEST(Assignment, AssignmentOperator)
     EXPECT_TRUE(a == b);
 
     std::unique_ptr<Components::Component> c(new Components::Hydrogen());
-    std::unique_ptr<Components::Component> d(new Components::Hydrogen(2.0));
+    std::unique_ptr<Components::Component> d(new Components::Hydrogen());
     *c                       = *d;
 
     EXPECT_TRUE(*c == *d);
@@ -96,7 +92,7 @@ TEST(Assignment, AssignmentOperator)
     EXPECT_TRUE(A == B);
 
     std::unique_ptr<Medium> C(new Water());
-    std::unique_ptr<Medium> D(new Water(2.0));
+    std::unique_ptr<Medium> D(new Water());
     *D        = *C;
 
     EXPECT_TRUE(*D == *C);
@@ -110,56 +106,56 @@ TEST(Assignment, AssignmentOperator)
 
 TEST(Assignment, Copyconstructor2)
 {
-    Uranium A(1.3);
+    Uranium A;
     Uranium B(A);
 
     EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment, Swap)
-{
-    Water A;
-    Water B;
-    EXPECT_TRUE(A == B);
-    Medium* C = new AntaresWater(0.3);
-    Medium* D = new AntaresWater(0.3);
-    EXPECT_TRUE(*C == *D);
-    Medium* E = new Water();
-    EXPECT_TRUE(A == *E);
+// TEST(Assignment, Swap)
+// {
+//     Water A;
+//     Water B;
+//     EXPECT_TRUE(A == B);
+//     Medium* C = new AntaresWater();
+//     Medium* D = new AntaresWater();
+//     EXPECT_TRUE(*C == *D);
+//     Medium* E = new Water();
+//     EXPECT_TRUE(A == *E);
 
-    A.swap(*C);
-    EXPECT_TRUE(A == *D);
-    EXPECT_TRUE(B == *C);
-    A.swap(*C);
-    C->swap(*E);
-    EXPECT_TRUE(A == *C);
+//     A.swap(*C);
+//     EXPECT_TRUE(A == *D);
+//     EXPECT_TRUE(B == *C);
+//     A.swap(*C);
+//     C->swap(*E);
+//     EXPECT_TRUE(A == *C);
 
-    Medium* X = new Ice(0.3);
-    Medium* Y = new Copper(0.3);
+//     Medium* X = new Ice();
+//     Medium* Y = new Copper();
 
-    X->swap(*Y);
+//     X->swap(*Y);
 
-    Copper Z(0.3);
-    EXPECT_TRUE(*X == Z);
-}
+//     Copper Z();
+//     EXPECT_TRUE(*X == Z);
+// }
 
-TEST(Density_distr, Evaluate)
-{
-    Water A;
-    Water B;
+// TEST(Density_distr, Evaluate)
+// {
+//     Water A;
+//     Water B;
 
-    double corr_faktor = 1.0;
-    Density_homogeneous dens_hom(corr_faktor);
-    A.SetDensityDistribution(dens_hom);
-    B.SetDensityDistribution(dens_hom);
+//     double corr_faktor = 1.0;
+//     Density_homogeneous dens_hom(corr_faktor);
+//     A.SetDensityDistribution(dens_hom);
+//     B.SetDensityDistribution(dens_hom);
 
-    Vector3D test_point (2,1,0);
+//     Vector3D test_point (2,1,0);
 
-    double DensA = A.GetDensityDistribution().Evaluate(test_point);
-    double DensB = B.GetDensityDistribution().Evaluate(test_point);
+//     double DensA = A.GetDensityDistribution().Evaluate(test_point);
+//     double DensB = B.GetDensityDistribution().Evaluate(test_point);
 
-    EXPECT_TRUE(DensA == DensB);
-}
+//     EXPECT_TRUE(DensA == DensB);
+// }
 
 int main(int argc, char** argv)
 {

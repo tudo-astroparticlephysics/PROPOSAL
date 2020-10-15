@@ -49,6 +49,7 @@ namespace Components {
         virtual ~Component() = default;
 
         friend bool operator==(Component const&, Component const&) noexcept;
+        bool operator!=(const Component&) const;
         friend std::ostream& operator<<(std::ostream&, Component const&) noexcept;
 
         std::string GetName() const { return name_; }

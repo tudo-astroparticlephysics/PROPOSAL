@@ -2,11 +2,11 @@
 #include "cmath"
 #include "gtest/gtest.h"
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/medium/Medium.h"
+// #include "PROPOSAL/medium/Medium.h"
 // #include "PROPOSAL/crosssection/IonizIntegral.h"
 // #include "PROPOSAL/crosssection/parametrization/Ionization.h"
-#include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/EnergyCutSettings.h"
+// #include "PROPOSAL/particle/ParticleDef.h"
+// #include "PROPOSAL/EnergyCutSettings.h"
 
 using namespace PROPOSAL;
 

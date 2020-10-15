@@ -151,6 +151,7 @@ void init_crosssection(py::module& m)
             )pbdoc")
         .def("calculate_dNdx", &CrossSectionContainer::CalculatedNdx,
                 py::arg("energy"),
+                py::arg("component"),
                 R"pbdoc(
 
         Calculates the total cross section
