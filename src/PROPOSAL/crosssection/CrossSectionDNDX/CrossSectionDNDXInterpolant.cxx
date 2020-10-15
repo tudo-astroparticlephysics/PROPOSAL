@@ -42,7 +42,7 @@ unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx1d(
     //TODO: this may be unnecessary as soon as we have a more efficient implementation of the (2d) interpolation (jm)
     interpol_def.function1d = [this](double energy) {
         auto integral_lim = GetIntegrationLimits(energy);
-        return CrossSectionDNDXIntegral::Calculate(energy, get<MAX>(integral_lim));
+        return dndx->Interpolate(energy, 1.);
     };
     return Helper::InitializeInterpolation("dNdx1d",
          make_unique<Interpolant1DBuilder>(interpol_def), hash_cross_section,
