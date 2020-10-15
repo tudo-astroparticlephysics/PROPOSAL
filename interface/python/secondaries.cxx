@@ -1,6 +1,6 @@
 #include "PROPOSAL/secondaries/Parametrization.h"
 
-#include "PROPOSAL/secondaries/annihilation/SingleDifferentialAnnihilation.h"
+#include "PROPOSAL/secondaries/annihilation/NaivAnnihilation.h"
 #include "PROPOSAL/secondaries/bremsstrahlung/NaivBremsstrahlung.h"
 #include "PROPOSAL/secondaries/compton/NaivCompton.h"
 #include "PROPOSAL/secondaries/epairproduction/KelnerKokoulinPetrukhinEpairProduction.h"
@@ -27,7 +27,7 @@ void init_secondaries(py::module& m)
         .def("calculate_secondaries", &secondaries::Parametrization::CalculateSecondaries);
 
     py::class_<secondaries::Annihilation, secondaries::Parametrization, std::shared_ptr<secondaries::Annihilation>>(m_sub, "Annihilation");
-    py::class_<secondaries::SingleDifferentialAnnihilation, secondaries::Annihilation, std::shared_ptr<secondaries::SingleDifferentialAnnihilation>>(m_sub, "SingleDifferentialAnnihilation");
+    py::class_<secondaries::HeitlerAnnihilation, secondaries::Annihilation, std::shared_ptr<secondaries::HeitlerAnnihilation>>(m_sub, "HeitlerAnnihilation");
 
     py::class_<secondaries::Bremsstrahlung, secondaries::Parametrization, std::shared_ptr<secondaries::Bremsstrahlung>>(m_sub, "Bremsstrahlung");
     py::class_<secondaries::NaivBremsstrahlung, secondaries::Bremsstrahlung, std::shared_ptr<secondaries::NaivBremsstrahlung>>(m_sub, "NaivBremsstrahlung");
