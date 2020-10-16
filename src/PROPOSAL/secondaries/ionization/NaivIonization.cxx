@@ -21,7 +21,7 @@ tuple<Vector3D, Vector3D> secondaries::NaivIonization::CalculateDirections(
 tuple<double, double> secondaries::NaivIonization::CalculateEnergy(
     double energy, double v)
 {
-    return make_tuple(energy * v, energy * (1 - v));
+    return make_tuple(energy * (1 - v), energy * v);
 }
 
 vector<Loss::secondary_t> secondaries::NaivIonization::CalculateSecondaries(
