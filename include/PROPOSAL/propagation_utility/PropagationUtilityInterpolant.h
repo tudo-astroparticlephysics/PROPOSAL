@@ -37,8 +37,6 @@
 #include <memory>
 #include <string>
 
-using std::string;
-
 namespace PROPOSAL {
 class Integral;
 class Interpolant;
@@ -55,7 +53,7 @@ class UtilityInterpolant : public UtilityIntegral {
 
 public:
     UtilityInterpolant(std::function<double(double)>, double);
-    void BuildTables(const string, size_t, Interpolant1DBuilder::Definition);
+    void BuildTables(const std::string, size_t, Interpolant1DBuilder::Definition);
 
     double Calculate(double, double);
     double GetUpperLimit(double, double);

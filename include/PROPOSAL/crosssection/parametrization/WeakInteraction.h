@@ -30,13 +30,12 @@
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/math/Interpolant.h"
 
 #include <memory>
 #include <unordered_map>
 #include <vector>
-
-using std::unordered_map;
 
 namespace PROPOSAL {
 class Interpolant;
@@ -51,16 +50,16 @@ namespace crosssection {
         using component_wise = std::true_type;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-        tuple<double, double> GetKinematicLimits(const ParticleDef&,
+        std::tuple<double, double> GetKinematicLimits(const ParticleDef&,
             const Component&, double) const noexcept override;
     };
 
     class WeakCooperSarkarMertsch : public WeakInteraction {
-        unordered_map<bool,
-            tuple<std::shared_ptr<Interpolant>,
+        std::unordered_map<bool,
+            std::tuple<std::shared_ptr<Interpolant>,
                 std::shared_ptr<const Interpolant>>>
             interpolant_;
-        tuple<Interpolant, Interpolant> BuildContribution(
+        std::tuple<Interpolant, Interpolant> BuildContribution(
             bool is_decayable) const;
 
     public:
@@ -90,16 +89,23 @@ static std::map<std::string, weak_func_ptr<P, M>> weak_map = {
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_weakinteraction(P p_def, M medium, bool interpol,
-                                    const nlohmann::json& config){
-    if (!config.contains("parametrization"))
-        throw std::logic_error("No parametrization passed for weak interaction");
+                                    const std::string& param_name){
 
-    std::string param_name = config["parametrization"];
     auto it = weak_map<P, M>.find(param_name);
     if (it == weak_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for weak interaction");
 
     return it->second(p_def, medium, interpol);
+}
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_weakinteraction(P p_def, M medium, bool interpol,
+                                    const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for weak interaction");
+    std::string param_name = config["parametrization"];
+
+    return make_weakinteraction(p_def, medium, interpol, param_name);
 }
 
 } // namespace crosssection

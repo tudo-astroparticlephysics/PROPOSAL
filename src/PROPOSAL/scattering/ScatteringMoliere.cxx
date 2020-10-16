@@ -20,7 +20,7 @@ using namespace PROPOSAL;
 Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double grammage,
                                                                  double ei,
                                                                  double ef,
-                                                                 const array<double, 4>& rnd) {
+                                                                 const std::array<double, 4>& rnd) {
     (void)ef;
 
     double momentum_Sq = (ei - mass) * (ei + mass);

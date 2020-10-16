@@ -39,7 +39,6 @@
 #include "PROPOSAL/propagation_utility/Time.h"
 #include "PROPOSAL/scattering/Scattering.h"
 
-using std::tuple;
 namespace PROPOSAL {
 
 class PropagationUtility {
@@ -62,7 +61,7 @@ public:
     PropagationUtility(Collection const& collection);
     // PropagationUtility(const PropagationUtility&);
 
-    tuple<InteractionType, std::shared_ptr<const Component>, double> EnergyStochasticloss(double, double);
+    std::tuple<InteractionType, std::shared_ptr<const Component>, double> EnergyStochasticloss(double, double);
     double EnergyDecay(double, std::function<double()>, double);
     double EnergyInteraction(double, std::function<double()>);
     double EnergyRandomize(double, double, std::function<double()>);
@@ -76,7 +75,7 @@ public:
     // there could be a possible access with the position of the object stored
     // in an enum.
 
-    tuple<Vector3D, Vector3D> DirectionsScatter(
+    std::tuple<Vector3D, Vector3D> DirectionsScatter(
         double, double, double, const Vector3D&, const std::array<double, 4>&);
     // std::pair<double, double> DirectionDeflect(CrossSection&, double, double);
 

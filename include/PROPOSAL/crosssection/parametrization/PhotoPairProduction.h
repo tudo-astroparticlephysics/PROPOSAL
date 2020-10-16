@@ -31,6 +31,7 @@
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -43,7 +44,7 @@ public:
     using component_wise = std::true_type;
 
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-    tuple<double, double> GetKinematicLimits(
+    std::tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double) const noexcept override;
 };
 
@@ -111,16 +112,23 @@ static std::map<std::string, photopair_func_ptr<P, M>> photopair_map = {
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_photopairproduction(P p_def, M medium, bool interpol,
-                                    const nlohmann::json& config){
-    if (!config.contains("parametrization"))
-        throw std::logic_error("No parametrization passed for photopairproduction");
+                                    const std::string& param_name){
 
-    std::string param_name = config["parametrization"];
     auto it = photopair_map<P, M>.find(param_name);
     if (it == photopair_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for photopairproduction");
 
     return it->second(p_def, medium, interpol);
+}
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_photopairproduction(P p_def, M medium, bool interpol,
+                                    const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for photopairproduction");
+    std::string param_name = config["parametrization"];
+
+    return make_photopairproduction(p_def, medium, interpol, param_name);
 }
 
 } //namespace crosssection

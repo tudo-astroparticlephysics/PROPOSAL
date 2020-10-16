@@ -4,11 +4,8 @@
 #include "PROPOSAL/crosssection/CrossSectionVector.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-#include <string>
 #include <utility>
 #include <vector>
-
-using std::string;
 
 namespace PROPOSAL {
 

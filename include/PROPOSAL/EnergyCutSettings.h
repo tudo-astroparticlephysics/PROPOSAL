@@ -36,8 +36,6 @@
 using std::get;
 using std::max;
 using std::min;
-using std::shared_ptr;
-using std::tuple;
 
 namespace PROPOSAL {
 
@@ -68,9 +66,9 @@ public:
         assert(energy > 0);
         return std::min(ecut_ / energy, vcut_);
     }
-    inline double GetCut(const tuple<double, double>& lim, double energy) const
+    inline double GetCut(const std::tuple<double, double>& lim, double energy) const
     {
-        return min(max(get<0>(lim), GetCut(energy)), get<1>(lim));
+        return std::min(std::max(get<0>(lim), GetCut(energy)), get<1>(lim));
     }
     size_t GetHash() const noexcept;
     double GetEcut() const noexcept { return ecut_; }

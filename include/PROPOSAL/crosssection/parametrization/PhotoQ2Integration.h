@@ -31,6 +31,7 @@
 #include <functional>
 
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/methods.h"
 
@@ -141,20 +142,29 @@ static std::map<std::string, shadow_func_ptr> shadow_map = {
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_photonuclearQ2(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, const std::string& param_name,
+        const std::string& shadow_name){
+
+    auto it = photoQ2_map<P, M>.find(param_name);
+    if (it == photoQ2_map<P, M>.end())
+        throw std::invalid_argument("Unknown parametrization for photonuclear");
+
+    auto it_shadow = shadow_map.find(shadow_name);
+    if(it_shadow == shadow_map.end())
+        throw std::logic_error("Shadow effect name unknown");
+    return it->second(p_def, medium, cuts, it_shadow->second(), interpol);
+}
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_photonuclearQ2(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
     if (!config.contains("parametrization"))
         throw std::logic_error("No parametrization passed for photonuclear");
-    std::string param_name = config["parametrization"];
 
-    auto it = photoQ2_map<P, M>.find(param_name);
-    if (it != photoQ2_map<P, M>.end()) {
-        std::string shadow_name = config.value("shadow", "ButkevichMikhailov");
-        auto it_shadow = shadow_map.find(shadow_name);
-        if(it_shadow == shadow_map.end())
-            throw std::logic_error("Shadow effect name unknown");
-        return it->second(p_def, medium, cuts, it_shadow->second(), interpol);
-    }
-    throw std::invalid_argument("Unknown parametrization for photonuclear");
+    std::string param_name = config["parametrization"];
+    std::string shadow_name = config.value("shadow", "ButkevichMikhailov");
+
+    return make_photonuclearQ2(p_def, medium, cuts, interpol, param_name, shadow_name);
 }
 
 } // namespace crosssection

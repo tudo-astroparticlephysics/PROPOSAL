@@ -55,7 +55,7 @@ public:
         }
     }
     template <typename P>
-    Propagator(P&& p_def, const string& config_file)
+    Propagator(P&& p_def, const std::string& config_file)
     : Propagator(p_def, ParseConfig(config_file)) {}
     Propagator(ParticleDef const&, std::vector<Sector> sectors);
 
@@ -95,7 +95,7 @@ private:
         bool do_interpolation
                 = json_sector.value("do_interpolation", global.do_interpolation);
         bool do_exact_time = json_sector.value("exact_time", global.do_exact_time);
-        string scattering = json_sector.value("scattering", global.scattering);
+        std::string scattering = json_sector.value("scattering", global.scattering);
         std::shared_ptr<Medium> medium = global.medium;
         if (json_sector.contains("medium")) {
             medium = CreateMedium(json_sector["medium"].get<std::string>());
@@ -147,7 +147,7 @@ private:
     template<typename CrossVec>
     PropagationUtility::Collection CreateUtility(
             CrossVec&& crosss, std::shared_ptr<Medium> medium, bool do_cont_rand,
-            bool do_interpol, bool do_exact_time, string scatter)
+            bool do_interpol, bool do_exact_time, std::string scatter)
     {
         PropagationUtility::Collection def;
         def.interaction_calc = make_interaction(crosss, do_interpol);

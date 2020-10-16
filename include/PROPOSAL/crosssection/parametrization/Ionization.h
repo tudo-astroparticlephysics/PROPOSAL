@@ -32,7 +32,7 @@
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/CrossSectionBuilder.h" 
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -51,7 +51,7 @@ namespace crosssection {
 
         virtual double FunctionToDEdxIntegral(
             const ParticleDef&, const Medium&, double, double) const = 0;
-        virtual tuple<double, double> GetKinematicLimits(
+        virtual std::tuple<double, double> GetKinematicLimits(
             const ParticleDef&, const Medium&, double) const noexcept
             = 0;
         double FunctionToDE2dxIntegral(
@@ -60,7 +60,7 @@ namespace crosssection {
             const ParticleDef&, const Medium&, double, double) const = 0;
         double DifferentialCrossSection(
                 const ParticleDef&, const Component&, double, double) const final;
-        tuple<double, double> GetKinematicLimits(
+        std::tuple<double, double> GetKinematicLimits(
                 const ParticleDef&, const Component&, double) const final;
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
     };
@@ -75,7 +75,7 @@ namespace crosssection {
         IonizBetheBlochRossi(const EnergyCutSettings&);
         using base_param_t = Ionization;
 
-        tuple<double, double> GetKinematicLimits(
+        std::tuple<double, double> GetKinematicLimits(
             const ParticleDef&, const Medium&, double) const noexcept final;
         double DifferentialCrossSection(
             const ParticleDef&, const Medium&, double, double) const final;
@@ -87,7 +87,7 @@ namespace crosssection {
         IonizBergerSeltzerBhabha(const EnergyCutSettings&);
         using base_param_t = Ionization;
 
-        tuple<double, double> GetKinematicLimits(
+        std::tuple<double, double> GetKinematicLimits(
             const ParticleDef&, const Medium&, double) const noexcept final;
         double DifferentialCrossSection(
             const ParticleDef&, const Medium&, double, double) const final;
@@ -99,7 +99,7 @@ namespace crosssection {
         IonizBergerSeltzerMoller(const EnergyCutSettings&);
         using base_param_t = Ionization;
 
-        tuple<double, double> GetKinematicLimits(
+        std::tuple<double, double> GetKinematicLimits(
             const ParticleDef&, const Medium&, double) const noexcept final;
         double DifferentialCrossSection(
             const ParticleDef&, const Medium&, double, double) const final;
@@ -133,13 +133,8 @@ cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
     if (!config.contains("parametrization"))
         throw std::logic_error("No parametrization passed for ionization");
     std::string param_name = config["parametrization"];
-    
-    auto it = ioniz_map<P, M>.find(param_name);
-    if (it == ioniz_map<P, M>.end())
-        throw std::logic_error("Unknown parametrization for ionization");
 
-    return it->second(p_def, medium, cuts, interpol);
-    // return make_ionization(p_def, medium, cuts, interpol, param_name);
+    return make_ionization(p_def, medium, cuts, interpol, param_name);
 }
 
 template<typename P, typename M>

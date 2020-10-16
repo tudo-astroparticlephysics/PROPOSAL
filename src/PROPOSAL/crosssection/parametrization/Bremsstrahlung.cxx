@@ -37,7 +37,7 @@ double crosssection::Bremsstrahlung::GetLowerEnergyLim(
     return p_def.mass;
 }
 
-tuple<double, double> crosssection::Bremsstrahlung::GetKinematicLimits(
+std::tuple<double, double> crosssection::Bremsstrahlung::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy) const
     noexcept
 {
