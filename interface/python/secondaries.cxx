@@ -1,6 +1,6 @@
 #include "PROPOSAL/secondaries/Parametrization.h"
 
-#include "PROPOSAL/secondaries/annihilation/NaivAnnihilation.h"
+#include "PROPOSAL/secondaries/annihilation/HeitlerAnnihilation.h"
 #include "PROPOSAL/secondaries/bremsstrahlung/NaivBremsstrahlung.h"
 #include "PROPOSAL/secondaries/compton/NaivCompton.h"
 #include "PROPOSAL/secondaries/epairproduction/KelnerKokoulinPetrukhinEpairProduction.h"
