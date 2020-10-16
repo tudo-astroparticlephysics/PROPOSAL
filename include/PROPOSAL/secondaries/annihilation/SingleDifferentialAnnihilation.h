@@ -4,14 +4,10 @@
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 #include "PROPOSAL/secondaries/annihilation/Annihilation.h"
-
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
-/* #include <unordered_map> */
 
 using PROPOSAL::Components::Component;
-/* using std::unordered_map; */
 using std::array;
 using std::vector;
 

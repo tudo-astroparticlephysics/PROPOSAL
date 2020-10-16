@@ -64,10 +64,6 @@ Vector3D::Vector3D(const nlohmann::json& config)
     config[0].get_to(cartesian_.x_);
     config[1].get_to(cartesian_.y_);
     config[2].get_to(cartesian_.z_);
-
-    cartesian_.x_ *= 100; // cm
-    cartesian_.y_ *= 100; // cm
-    cartesian_.z_ *= 100; // cm
 }
 
 // destructor
