@@ -51,7 +51,7 @@ class Medium {
     // class Builder;
 
    public:
-    // Medium() {}
+    Medium() {}
     Medium(std::string name,
            double I,
            double C,
