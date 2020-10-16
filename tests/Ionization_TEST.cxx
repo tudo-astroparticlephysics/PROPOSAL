@@ -2,12 +2,10 @@
 #include "gtest/gtest.h"
 
 #include <fstream>
-// #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
-// #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
@@ -231,7 +229,7 @@ TEST(Ionization, Test_Stochastic_Loss)
     std::string parametrization;
     double energy;
     double rate;
-    double rnd1, rnd2;
+    double rnd;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
@@ -239,7 +237,7 @@ TEST(Ionization, Test_Stochastic_Loss)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >>
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >>
             stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
@@ -255,10 +253,11 @@ TEST(Ionization, Test_Stochastic_Loss)
         auto components = medium->GetComponents();
         for (auto comp : components)
         {
-            auto tmp = std::make_shared<const Component>(comp);
-            rate = cross->CalculatedNdx(energy, tmp);
+            auto comp_ptr = std::make_shared<const Component>(comp);
+            // first calculate the complete rate, then sample the loss to a rate
+            rate = cross->CalculatedNdx(energy, comp_ptr);
             stochastic_loss_new = cross->CalculateStochasticLoss(
-                tmp, energy, rate);
+                comp_ptr, energy, rnd*rate);
 
             ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
         }
@@ -327,8 +326,6 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
     double dNdx_stored;
     double dNdx_new;
 
-    // InterpolationDef InterpolDef;
-
     while (in.good())
     {
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
@@ -367,17 +364,15 @@ TEST(Ionization, Test_of_e_interpol)
     std::string parametrization;
     double energy;
     double rate;
-    double rnd1, rnd2;
+    double rnd;
     double stochastic_loss_stored;
     double stochastic_loss_new;
-
-    // InterpolationDef InterpolDef;
 
     RandomGenerator::Get().SetSeed(0);
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >>
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >>
             stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
@@ -393,10 +388,11 @@ TEST(Ionization, Test_of_e_interpol)
         auto components = medium->GetComponents();
         for (auto comp : components)
         {
-            auto tmp = std::make_shared<const Component>(comp);
-            rate = cross->CalculatedNdx(energy, tmp);
+            auto comp_ptr = std::make_shared<const Component>(comp);
+            // first calculate the complete rate, then sample the loss to a rate
+            rate = cross->CalculatedNdx(energy, comp_ptr);
             stochastic_loss_new = cross->CalculateStochasticLoss(
-                tmp, energy, rate);
+                comp_ptr, energy, rnd*rate);
 
             ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
         }
