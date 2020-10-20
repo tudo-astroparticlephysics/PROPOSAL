@@ -23,7 +23,7 @@ double crosssection::WeakInteraction::GetLowerEnergyLim(const ParticleDef& p_def
 {
     return p_def.mass;
 }
-tuple<double, double> crosssection::WeakInteraction::GetKinematicLimits(
+std::tuple<double, double> crosssection::WeakInteraction::GetKinematicLimits(
     const ParticleDef&, const Component&, double energy) const
     noexcept
 {
@@ -39,7 +39,7 @@ crosssection::WeakCooperSarkarMertsch::WeakCooperSarkarMertsch()
 {
 }
 
-tuple<Interpolant, Interpolant> crosssection::WeakCooperSarkarMertsch::BuildContribution(
+std::tuple<Interpolant, Interpolant> crosssection::WeakCooperSarkarMertsch::BuildContribution(
     bool is_decayable) const
 {
     // Initialize interpolant for particles (remember crossing symmetry rules)

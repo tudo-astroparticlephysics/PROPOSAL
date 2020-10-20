@@ -16,7 +16,7 @@ using v_trafo_t = std::function<double(double, double, double)>;
 class CrossSectionDNDX {
 protected:
     function<double(Integral&, double, double, double, double)> dndx_integral;
-    function<tuple<double, double>(double)> kinematic_limits;
+    function<std::tuple<double, double>(double)> kinematic_limits;
     shared_ptr<const EnergyCutSettings> cut;
     size_t hash_cross_section;
 
@@ -53,7 +53,7 @@ public:
     virtual double GetUpperLimit(double energy, double rate) = 0;
 
     enum { MIN, MAX };
-    inline tuple<double, double> GetIntegrationLimits(double energy)
+    inline std::tuple<double, double> GetIntegrationLimits(double energy)
     {
         auto kin_lim = kinematic_limits(energy);
         if (cut) {

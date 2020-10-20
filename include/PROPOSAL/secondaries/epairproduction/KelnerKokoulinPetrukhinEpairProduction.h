@@ -9,6 +9,7 @@
 using PROPOSAL::Components::Component;
 using std::array;
 using std::unique_ptr;
+using std::tuple;
 
 namespace PROPOSAL {
     namespace secondaries {

@@ -30,7 +30,7 @@ double crosssection::MupairProduction::GetLowerEnergyLim(const ParticleDef& p_de
     return p_def.mass + 2.f * MMU;
 }
 
-tuple<double, double> crosssection::MupairProduction::GetKinematicLimits(
+std::tuple<double, double> crosssection::MupairProduction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& , double energy) const
     noexcept
 {

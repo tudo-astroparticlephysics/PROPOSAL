@@ -22,7 +22,7 @@ double crosssection::PhotoPairProduction::GetLowerEnergyLim(const ParticleDef&) 
     return 2 * ME;
 }
 
-tuple<double, double> crosssection::PhotoPairProduction::GetKinematicLimits(
+std::tuple<double, double> crosssection::PhotoPairProduction::GetKinematicLimits(
     const ParticleDef&, const Component&, double energy) const
     noexcept
 {

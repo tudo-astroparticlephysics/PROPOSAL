@@ -3,6 +3,8 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/secondaries/Parametrization.h"
 
+using std::tuple;
+
 namespace PROPOSAL {
 namespace secondaries {
     struct Ionization : public secondaries::Parametrization {
