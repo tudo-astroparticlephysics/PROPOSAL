@@ -20,7 +20,7 @@ struct ContRand {
     {}
     virtual ~ContRand() = default;
 
-    static Interpolant1DBuilder::Definition interpol_def;
+    static std::unique_ptr<Interpolant1DBuilder::Definition> interpol_def;
 
     double FunctionToIntegral(Displacement&, double);
 

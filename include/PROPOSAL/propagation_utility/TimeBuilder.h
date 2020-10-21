@@ -17,8 +17,13 @@ template <typename T> class ExactTimeBuilder : public Time {
         };
         T time_integral(time_func, CrossSectionVector::GetLowerLim(cross));
         if (typeid(T) == typeid(UtilityInterpolant)) {
-            auto hash = CrossSectionVector::GetHash(cross);
-            time_integral.BuildTables("time", hash, interpol_def);
+            auto hash_digest = (size_t)0;
+            hash_combine(hash_digest, CrossSectionVector::GetHash(cross), interpol_def->GetHash());
+
+            if(not interpol_def)
+                interpol_def = std::make_unique<Interpolant1DBuilder::Definition>();
+
+            time_integral.BuildTables("time", hash_digest, *interpol_def);
         };
         return time_integral;
     }

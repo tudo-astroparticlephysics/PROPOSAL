@@ -29,40 +29,13 @@ namespace PROPOSAL {
 
 std::string InterpolationDef::path_to_tables = "";
 std::string InterpolationDef::path_to_tables_readonly = "";
-int InterpolationDef::order_of_interpolation = 5;
-double InterpolationDef::max_node_energy = 1e14;
-int InterpolationDef::nodes_cross_section = 100;
-int InterpolationDef::nodes_continous_randomization = 200;
-int InterpolationDef::nodes_propagate = 1000;
 bool InterpolationDef::do_binary_tables = true;
 bool InterpolationDef::just_use_readonly_path = false;
 
 InterpolationDef::InterpolationDef(const nlohmann::json& config)
 {
-    nodes_propagate = config.value("nodes_propagate", 1000);
-    nodes_continous_randomization
-        = config.value("nodes_continous_randomization", 200);
-    nodes_cross_section = config.value("nodes_cross_section", 100);
-    max_node_energy = config.value("max_node_energy", 1e14);
     do_binary_tables = config.value("do_binary_tables", true);
     just_use_readonly_path = config.value("just_use_readonly_path", false);
-    order_of_interpolation = config.value("order_of_interpolation", 5);
-
-    if (!(nodes_propagate > 3))
-        throw std::invalid_argument(
-            "At least 3 nodes are required for qubic splines");
-    if (!(nodes_continous_randomization > 4))
-        throw std::invalid_argument(
-            "At least 3 nodes are required for qubic splines");
-    if (!(nodes_cross_section > 4))
-        throw std::invalid_argument(
-            "At least 3 nodes are required for qubic splines");
-    if (!(max_node_energy > 0))
-        throw std::invalid_argument("max_node_energy must be larger than "
-                                    "highest primary particle energy.");
-    if (!(order_of_interpolation > 1))
-        throw std::invalid_argument(
-            "Order of interpolation must be larger than one.");
 
     if (not config.contains("path_to_tables")) {
         Logging::Get("proposal.methods")->warn("No valid writable path to interpolation tables found. Save "
@@ -109,16 +82,6 @@ InterpolationDef::InterpolationDef(const nlohmann::json& config)
                                   "'path_to_tables_readonly'. Expected a "
                                   "string or a list of strings.");
     };
-}
-
-// ------------------------------------------------------------------------- //
-size_t InterpolationDef::GetHash() const
-{
-    size_t seed = 0;
-    hash_combine(seed, order_of_interpolation, max_node_energy,
-        nodes_cross_section, nodes_continous_randomization, nodes_propagate);
-
-    return seed;
 }
 
 namespace Helper {
@@ -244,44 +207,39 @@ namespace Helper {
 
     // -------------------------------------------------------------------------
     // //
-    std::unique_ptr<Interpolant> InitializeInterpolation(std::string name,
-        unique_ptr<InterpolantBuilder> builder, size_t hash_digest,
-        const InterpolationDef& interpolation_def)
-    {
-        // Simple wrapper for inizializing one Interpolant only
-        Helper::InterpolantBuilderContainer builder_container;
-        builder_container.push_back(std::move(builder));
-        auto return_vec = InitializeInterpolation(
-            name, builder_container, hash_digest, interpolation_def);
-        return std::move(return_vec.at(0));
-    }
+    /* std::unique_ptr<Interpolant> InitializeInterpolation(std::string name, */
+    /*     unique_ptr<InterpolantBuilder> builder, size_t hash_digest, */
+    /*     const InterpolationDef& interpolation_def) */
+    /* { */
+    /*     // Simple wrapper for inizializing one Interpolant only */
+    /*     Helper::InterpolantBuilderContainer builder_container; */
+    /*     builder_container.push_back(std::move(builder)); */
+    /*     auto return_vec = InitializeInterpolation( */
+    /*         name, builder_container, hash_digest, interpolation_def); */
+    /*     return std::move(return_vec.at(0)); */
+    /* } */
 
-    std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(
-        std::string name, const InterpolantBuilderContainer& builder_container,
-        size_t hash_digest, const InterpolationDef& interpolation_def)
+    std::unique_ptr<Interpolant> InitializeInterpolation( std::string name,
+            InterpolantBuilder const& builder, size_t hash_digest)
     {
-        std::vector<std::unique_ptr<Interpolant>> interpolants;
 
         bool storing_failed = false;
         bool reading_worked = false;
-        bool binary_tables = interpolation_def.do_binary_tables;
-        bool just_use_readonly_path = interpolation_def.just_use_readonly_path;
-        std::string pathname;
         std::stringstream filename;
 
         // ---------------------------------------------------------------------
         // // first check the reading paths if one of the reading paths already
         // has the required tables
 
-        pathname = ResolvePath(InterpolationDef::path_to_tables_readonly, true);
+        auto pathname = ResolvePath(InterpolationDef::path_to_tables_readonly, true);
         if (!pathname.empty()) {
             filename << pathname << "/" << name << "_" << hash_digest;
-            if (!binary_tables) {
+            if (!InterpolationDef::do_binary_tables) {
                 filename << ".txt";
             }
             if (FileExist(filename.str())) {
                 std::ifstream input;
-                if (binary_tables) {
+                if (InterpolationDef::do_binary_tables) {
                     input.open(filename.str().c_str(), std::ios::binary);
                 } else {
                     input.open(filename.str().c_str());
@@ -298,20 +256,12 @@ namespace Helper {
                              "writing. "
                              "Try another reading path or write in memory!",
                         filename.str().c_str());
-                } else {
-                    Logging::Get("proposal.methods")->debug("%s tables will be read from file: %s",
-                        name.c_str(), filename.str().c_str());
-
-                    for (size_t i = 0; i < builder_container.size(); ++i) {
-                        // TODO(mario): read check Tue 2017/09/05
-                        interpolants.emplace_back(
-                            unique_ptr<Interpolant>(new Interpolant()));
-                        interpolants.back()->Load(input, binary_tables);
-                    }
-                    reading_worked = true;
                 }
+                Logging::Get("proposal.methods")->debug("%s tables will be read from file: %s", name.c_str(), filename.str().c_str());
 
-                input.close();
+                auto interpolant = std::make_unique<Interpolant>();
+                if(interpolant->Load(input, InterpolationDef::do_binary_tables))
+                    return interpolant;
 
             } else {
                 Logging::Get("proposal.methods")->debug("In the readonly path to the interpolation tables, "
@@ -325,12 +275,7 @@ namespace Helper {
                       "the writing path.");
         }
 
-        if (reading_worked) {
-            Logging::Get("proposal.methods")->debug("Initialize %s interpolation done.", name.c_str());
-            return interpolants;
-        }
-
-        if (just_use_readonly_path) {
+        if (InterpolationDef::just_use_readonly_path) {
             Logging::Get("proposal.methods")->critical("The just_use_readonly_path option is enabled and the "
                       "table is not "
                       "in the readonly path.");
@@ -347,7 +292,7 @@ namespace Helper {
         filename.clear();
         filename << pathname << "/" << name << "_" << hash_digest;
 
-        if (!binary_tables) {
+        if (!InterpolationDef::do_binary_tables) {
             filename << ".txt";
         }
 
@@ -355,7 +300,7 @@ namespace Helper {
             if (FileExist(filename.str())) {
                 std::ifstream input;
 
-                if (binary_tables) {
+                if (InterpolationDef::do_binary_tables) {
                     input.open(filename.str().c_str(), std::ios::binary);
                 } else {
                     input.open(filename.str().c_str());
@@ -375,11 +320,9 @@ namespace Helper {
                     Logging::Get("proposal.methods")->debug("%s tables will be read from file: %s",
                         name.c_str(), filename.str().c_str());
 
-                    for (size_t i=0; i<builder_container.size(); ++i) {
-                        // TODO(mario): read check Tue 2017/09/05
-                        interpolants.emplace_back(new Interpolant());
-                        interpolants.back()->Load(input, binary_tables);
-                    }
+                    auto interpol = make_unique<Interpolant>();
+                    if(interpol->Load(input, InterpolationDef::do_binary_tables))
+                        return interpol;
                 }
 
                 input.close();
@@ -389,7 +332,7 @@ namespace Helper {
 
                 std::ofstream output;
 
-                if (binary_tables) {
+                if (InterpolationDef::do_binary_tables) {
                     output.open(filename.str().c_str(), std::ios::binary);
                 } else {
                     output.open(filename.str().c_str());
@@ -398,10 +341,10 @@ namespace Helper {
                 if (output.good()) {
                     output.precision(16);
 
-                    for (const auto& builder : builder_container) {
-                        interpolants.emplace_back(builder->build());
-                        interpolants.back()->Save(output, binary_tables);
-                    }
+                    auto interpolant = builder.build();
+                    if(interpolant->Save(output, InterpolationDef::do_binary_tables))
+                        return interpolant;
+
                 } else {
                     storing_failed = true;
                     Logging::Get("proposal.methods")->warn(
@@ -416,13 +359,179 @@ namespace Helper {
         if (pathname.empty() || storing_failed) {
             Logging::Get("proposal.methods")->debug("%s tables will be stored in memomy!", name.c_str());
 
-            for (const auto& builder : builder_container)
-                interpolants.emplace_back(builder->build());
+            return builder.build();
         }
 
-        Logging::Get("proposal.methods")->debug("Initialize %s interpolation done.", name.c_str());
-        return interpolants;
+        throw std::logic_error("Never get here");
     }
+
+    /* std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation( */
+    /*     std::string name, const InterpolantBuilderContainer& builder_container, */
+    /*     size_t hash_digest, const InterpolationDef& interpolation_def) */
+    /* { */
+    /*     std::vector<std::unique_ptr<Interpolant>> interpolants; */
+
+    /*     bool storing_failed = false; */
+    /*     bool reading_worked = false; */
+    /*     bool binary_tables = interpolation_def.do_binary_tables; */
+    /*     bool just_use_readonly_path = interpolation_def.just_use_readonly_path; */
+    /*     std::string pathname; */
+    /*     std::stringstream filename; */
+
+    /*     // --------------------------------------------------------------------- */
+    /*     // // first check the reading paths if one of the reading paths already */
+    /*     // has the required tables */
+
+    /*     pathname = ResolvePath(InterpolationDef::path_to_tables_readonly, true); */
+    /*     if (!pathname.empty()) { */
+    /*         filename << pathname << "/" << name << "_" << hash_digest; */
+    /*         if (!binary_tables) { */
+    /*             filename << ".txt"; */
+    /*         } */
+    /*         if (FileExist(filename.str())) { */
+    /*             std::ifstream input; */
+    /*             if (binary_tables) { */
+    /*                 input.open(filename.str().c_str(), std::ios::binary); */
+    /*             } else { */
+    /*                 input.open(filename.str().c_str()); */
+    /*             } */
+
+    /*             // check if file is empty */
+    /*             // this happens if multiple instances tries to load/create the */
+    /*             // tables in parallel and another process already starts to */
+    /*             // write this table now just hand over to writing process where */
+    /*             // it might saves them in memory if the other instance is still */
+    /*             // writing them down in the same path */
+    /*             if (input.peek() == std::ifstream::traits_type::eof()) { */
+    /*                 Logging::Get("proposal.methods")->info("file %s is empty! Another process is presumably " */
+    /*                          "writing. " */
+    /*                          "Try another reading path or write in memory!", */
+    /*                     filename.str().c_str()); */
+    /*             } else { */
+    /*                 Logging::Get("proposal.methods")->debug("%s tables will be read from file: %s", */
+    /*                     name.c_str(), filename.str().c_str()); */
+
+    /*                 for (size_t i = 0; i < builder_container.size(); ++i) { */
+    /*                     // TODO(mario): read check Tue 2017/09/05 */
+    /*                     interpolants.emplace_back( */
+    /*                         unique_ptr<Interpolant>(new Interpolant())); */
+    /*                     interpolants.back()->Load(input, binary_tables); */
+    /*                 } */
+    /*                 reading_worked = true; */
+    /*             } */
+
+    /*             input.close(); */
+
+    /*         } else { */
+    /*             Logging::Get("proposal.methods")->debug("In the readonly path to the interpolation tables, " */
+    /*                       "the file %s " */
+    /*                       "does not Exist", */
+    /*                 filename.str().c_str()); */
+    /*         } */
+    /*     } else { */
+    /*         Logging::Get("proposal.methods")->debug("No reading path was given, now the tables are read or " */
+    /*                   "written to " */
+    /*                   "the writing path."); */
+    /*     } */
+
+    /*     if (reading_worked) { */
+    /*         Logging::Get("proposal.methods")->debug("Initialize %s interpolation done.", name.c_str()); */
+    /*         return interpolants; */
+    /*     } */
+
+    /*     if (just_use_readonly_path) { */
+    /*         Logging::Get("proposal.methods")->critical("The just_use_readonly_path option is enabled and the " */
+    /*                   "table is not " */
+    /*                   "in the readonly path."); */
+    /*     } */
+
+    /*     // --------------------------------------------------------------------- */
+    /*     // // if none of the reading paths has the required interpolation table */
+    /*     // the interpolation tables will be written in the path for writing */
+
+    /*     pathname = ResolvePath(InterpolationDef::path_to_tables); */
+
+    /*     // clear the stringstream */
+    /*     filename.str(std::string()); */
+    /*     filename.clear(); */
+    /*     filename << pathname << "/" << name << "_" << hash_digest; */
+
+    /*     if (!binary_tables) { */
+    /*         filename << ".txt"; */
+    /*     } */
+
+    /*     if (!pathname.empty()) { */
+    /*         if (FileExist(filename.str())) { */
+    /*             std::ifstream input; */
+
+    /*             if (binary_tables) { */
+    /*                 input.open(filename.str().c_str(), std::ios::binary); */
+    /*             } else { */
+    /*                 input.open(filename.str().c_str()); */
+    /*             } */
+
+    /*             // check if file is empty */
+    /*             // this happens if multiple instances try to write the tables in */
+    /*             // parallel now just one is writing them and the other just */
+    /*             // saves them in memory */
+    /*             if (input.peek() == std::ifstream::traits_type::eof()) { */
+    /*                 Logging::Get("proposal.methods")->info("file %s is empty! Another process is presumably " */
+    /*                          "writing. " */
+    /*                          "Save this table in memory!", */
+    /*                     filename.str().c_str()); */
+    /*                 storing_failed = true; */
+    /*             } else { */
+    /*                 Logging::Get("proposal.methods")->debug("%s tables will be read from file: %s", */
+    /*                     name.c_str(), filename.str().c_str()); */
+
+    /*                 for (size_t i=0; i<builder_container.size(); ++i) { */
+    /*                     // TODO(mario): read check Tue 2017/09/05 */
+    /*                     interpolants.emplace_back(new Interpolant()); */
+    /*                     interpolants.back()->Load(input, binary_tables); */
+    /*                 } */
+    /*             } */
+
+    /*             input.close(); */
+    /*         } else { */
+    /*             Logging::Get("proposal.methods")->debug("%s tables will be saved to file: %s", name.c_str(), */
+    /*                 filename.str().c_str()); */
+
+    /*             std::ofstream output; */
+
+    /*             if (binary_tables) { */
+    /*                 output.open(filename.str().c_str(), std::ios::binary); */
+    /*             } else { */
+    /*                 output.open(filename.str().c_str()); */
+    /*             } */
+
+    /*             if (output.good()) { */
+    /*                 output.precision(16); */
+
+    /*                 for (const auto& builder : builder_container) { */
+    /*                     interpolants.emplace_back(builder->build()); */
+    /*                     interpolants.back()->Save(output, binary_tables); */
+    /*                 } */
+    /*             } else { */
+    /*                 storing_failed = true; */
+    /*                 Logging::Get("proposal.methods")->warn( */
+    /*                     "Can not open file %s for writing! Table will not be " */
+    /*                     "stored!", */
+    /*                     filename.str().c_str()); */
+    /*             } */
+    /*             output.close(); */
+    /*         } */
+    /*     } */
+
+    /*     if (pathname.empty() || storing_failed) { */
+    /*         Logging::Get("proposal.methods")->debug("%s tables will be stored in memomy!", name.c_str()); */
+
+    /*         for (const auto& builder : builder_container) */
+    /*             interpolants.emplace_back(builder->build()); */
+    /*     } */
+
+    /*     Logging::Get("proposal.methods")->debug("Initialize %s interpolation done.", name.c_str()); */
+    /*     return interpolants; */
+    /* } */
 
 } // namespace Helper
 

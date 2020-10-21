@@ -16,8 +16,13 @@ template <class T, class Cross> class DecayBuilder : public Decay {
         };
         T decay_integral(decay_func, CrossSectionVector::GetLowerLim(cross));
         if (typeid(T) == typeid(UtilityInterpolant)) {
-            auto hash = CrossSectionVector::GetHash(cross);
-            decay_integral.BuildTables("decay", hash, interpol_def);
+            auto hash_digest = (size_t)0;
+            hash_combine(hash_digest, CrossSectionVector::GetHash(cross), interpol_def->GetHash());
+
+            if(not interpol_def)
+                interpol_def = std::make_unique<Interpolant1DBuilder::Definition>();
+
+            decay_integral.BuildTables("decay", hash_digest, *interpol_def);
         };
         return decay_integral;
     }

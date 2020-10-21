@@ -15,11 +15,12 @@ protected:
     crossbase_list_t cross_list;
 
 public:
+    Displacement() = default;
     template <typename Cross>
     Displacement(Cross&& cross) : cross_list(std::begin(cross), std::end(cross)) {}
     virtual ~Displacement() = default;
 
-    static Interpolant1DBuilder::Definition interpol_def;
+    static std::unique_ptr<Interpolant1DBuilder::Definition> interpol_def;
 
     double FunctionToIntegral(double);
     virtual double SolveTrackIntegral(double, double) = 0;

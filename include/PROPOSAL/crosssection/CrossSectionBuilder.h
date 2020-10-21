@@ -1,5 +1,5 @@
 
- #pragma once 
+ #pragma once
 
  #include "PROPOSAL/crosssection/CrossSection.h"
  #include "PROPOSAL/crosssection/CrossSectionIntegral.h"
@@ -14,7 +14,7 @@ std::unique_ptr<crosssection_t<P, M>> make_crosssection(Param&& param, P&& p_def
 {
     if (interpolate)
         return PROPOSAL::make_unique<CrossSectionInterpolant<Param, P, M>>(
-            param, std::forward<P>(p_def), std::forward<M>(medium), cuts, InterpolationDef());
+            param, std::forward<P>(p_def), std::forward<M>(medium), cuts);
     return PROPOSAL::make_unique<CrossSectionIntegral<Param, P, M>>(
         param, std::forward<P>(p_def), std::forward<M>(medium), cuts);
 }

@@ -1,4 +1,6 @@
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionInterpolantBase.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
@@ -54,6 +56,13 @@ void init_crosssection(py::module& m)
             m_sub, "CrossSectionBase")
         .def_property_readonly("lower_energy_lim", &CrossSectionContainer::GetLowerEnergyLim)
         .def_property_readonly("type", &CrossSectionContainer::GetInteractionType);
+
+    py::class_<CrossSectionInterpolantBase, std::shared_ptr<CrossSectionInterpolantBase>>(
+            m_sub, "CrossSectionInterpolantBase")
+        .def(py::init<>())
+        .def_property("dNdx_def", &CrossSectionInterpolantBase::GetDNdxDef, &CrossSectionInterpolantBase::SetDNdxDef)
+        .def_property("dEdx_def", &CrossSectionInterpolantBase::GetDEdxDef, &CrossSectionInterpolantBase::SetDEdxDef)
+        .def_property("dE2dx_def", &CrossSectionInterpolantBase::GetDE2dxDef, &CrossSectionInterpolantBase::SetDE2dxDef);
 
     py::class_<CrossSectionContainer, CrossSectionBase, std::shared_ptr<CrossSectionContainer>>(
             m_sub, "CrossSection",
@@ -238,6 +247,5 @@ void init_crosssection(py::module& m)
     build_std_crosssection<MuPlusDef>(m_sub);
     build_std_crosssection<TauMinusDef>(m_sub);
     build_std_crosssection<TauPlusDef>(m_sub);
-
 
 }

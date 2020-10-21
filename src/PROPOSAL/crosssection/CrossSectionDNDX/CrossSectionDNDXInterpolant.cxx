@@ -23,30 +23,48 @@ double retransform_relativ_loss(double v_cut, double v_max, double v)
 }
 }
 
-unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx(
-    Interpolant2DBuilder::Definition interpol_def, const InterpolationDef& def)
+
+unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx(crosssection::Parametrization const& param, ParticleDef const& p_def)
 {
-    interpol_def.function2d = [this](double energy, double v) {
+    if(not dNdx_def)
+        dNdx_def = std::make_unique<Interpolant2DBuilder::Definition>();
+
+    dNdx_def->xmin = param.GetLowerEnergyLim(p_def);
+    dNdx_def->isLog = true;
+    dNdx_def->rationalY = true;
+    dNdx_def->x2min = 0.0;
+    dNdx_def->x2max = 1.0;
+    dNdx_def->function2d = [this](double energy, double v) {
         auto integral_lim = GetIntegrationLimits(energy);
         v = transform_relativ_loss(get<MIN>(integral_lim), get<MAX>(integral_lim), v);
         return CrossSectionDNDXIntegral::Calculate(energy, v);
     };
-    return Helper::InitializeInterpolation("dNdx",
-        make_unique<Interpolant2DBuilder>(interpol_def), hash_cross_section,
-        def);
+
+    auto hash_digest = (size_t)0;
+    hash_combine(hash_digest, hash_cross_section, dNdx_def->GetHash());
+
+    return Helper::InitializeInterpolation("dNdx", Interpolant2DBuilder(*dNdx_def), hash_digest);
 }
 
-unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx1d(
-    Interpolant1DBuilder::Definition interpol_def, const InterpolationDef& def)
+unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx1d(crosssection::Parametrization const& param, ParticleDef const& p_def)
 {
-    //TODO: this may be unnecessary as soon as we have a more efficient implementation of the (2d) interpolation (jm)
-    interpol_def.function1d = [this](double energy) {
+    if(not dNdx_def)
+        dNdx_def = std::make_unique<Interpolant2DBuilder::Definition>();
+
+    dNdx_def->xmin = param.GetLowerEnergyLim(p_def);
+    dNdx_def->isLog = true;
+    dNdx_def->rationalY = true;
+    //TODO: this may be unnecessary as soon as we have a more efficient
+    //      implementation of the (2d) interpolation (jm)
+    dNdx_def->function1d = [this](double energy) {
         // auto integral_lim = GetIntegrationLimits(energy);
         return dndx->Interpolate(energy, 1.);
     };
-    return Helper::InitializeInterpolation("dNdx1d",
-         make_unique<Interpolant1DBuilder>(interpol_def), hash_cross_section,
-         def);
+
+    auto hash_digest = (size_t)0;
+    hash_combine(hash_digest, hash_cross_section, dNdx_def->GetHash());
+
+    return Helper::InitializeInterpolation("dNdx1d", Interpolant1DBuilder(*dNdx_def), hash_cross_section);
 }
 
 double CrossSectionDNDXInterpolant::Calculate(double energy)
@@ -66,40 +84,4 @@ double CrossSectionDNDXInterpolant::GetUpperLimit(double energy, double rate)
     auto integral_lim = GetIntegrationLimits(energy);
     auto v = dndx->FindLimit(energy, rate);
     return transform_relativ_loss(get<MIN>(integral_lim), get<MAX>(integral_lim), v);
-}
-
-namespace PROPOSAL {
-    Interpolant2DBuilder::Definition build_dndx_interpol_def(
-            const crosssection::Parametrization &param, const ParticleDef &p_def,
-            const InterpolationDef &def) {
-        Interpolant2DBuilder::Definition interpol_def;
-        interpol_def.max1 = def.nodes_cross_section;
-        interpol_def.x1min = param.GetLowerEnergyLim(p_def);
-        interpol_def.x1max = def.max_node_energy;
-        interpol_def.max2 = def.nodes_cross_section;
-        interpol_def.x2min = 0.0;
-        interpol_def.x2max = 1.0;
-        interpol_def.romberg1 = def.order_of_interpolation;
-        interpol_def.isLog1 = true;
-        interpol_def.romberg2 = def.order_of_interpolation;
-        interpol_def.rombergY = def.order_of_interpolation;
-        interpol_def.rationalY = true;
-        return interpol_def;
-    }
-}
-
-namespace PROPOSAL {
-    Interpolant1DBuilder::Definition build_dndx1d_interpol_def(
-            const crosssection::Parametrization &param, const ParticleDef &p_def,
-            const InterpolationDef &def) {
-        Interpolant1DBuilder::Definition interpol_def;
-        interpol_def.max = def.nodes_cross_section;
-        interpol_def.xmin = param.GetLowerEnergyLim(p_def);
-        interpol_def.xmax = def.max_node_energy;
-        interpol_def.romberg = def.order_of_interpolation;
-        interpol_def.isLog = true;
-        interpol_def.rombergY = def.order_of_interpolation;
-        interpol_def.rationalY = true;
-        return interpol_def;
-    }
 }

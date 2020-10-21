@@ -17,8 +17,13 @@ public:
         };
         I integral(interaction_func, lower_lim);
         if (typeid(I) == typeid(UtilityInterpolant)) {
-            auto hash = CrossSectionVector::GetHash(cross_list);
-            integral.BuildTables("interaction", hash, interpol_def);
+            auto hash_digest = (size_t)0;
+            hash_combine(hash_digest, CrossSectionVector::GetHash(cross_list), interpol_def->GetHash());
+
+            if(not interpol_def)
+                interpol_def = std::make_unique<Interpolant1DBuilder::Definition>();
+
+            integral.BuildTables("interaction", hash_digest, *interpol_def);
         };
         return integral;
     }

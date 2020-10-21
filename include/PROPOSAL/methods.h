@@ -83,21 +83,13 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest)
 
 
 struct InterpolationDef {
-
-    InterpolationDef() = default;
-    InterpolationDef(const nlohmann::json&);
-
     static std::string path_to_tables;
     static std::string path_to_tables_readonly;
-    static int order_of_interpolation;
-    static double max_node_energy;
-    static int nodes_cross_section;
-    static int nodes_continous_randomization;
-    static int nodes_propagate;
     static bool do_binary_tables;
     static bool just_use_readonly_path;
 
-    size_t GetHash() const;
+    InterpolationDef() = default;
+    InterpolationDef(const nlohmann::json&);
 };
 
 class Parametrization;
@@ -172,12 +164,11 @@ namespace Helper {
     /// @return vector of unique_ptr to created interpolants
     // ----------------------------------------------------------------------------
 
-    std::unique_ptr<Interpolant> InitializeInterpolation(
-        std::string, unique_ptr<InterpolantBuilder>, size_t,
-        const InterpolationDef&);
+    /* std::unique_ptr<Interpolant> InitializeInterpolation( */
+    /*     std::string, unique_ptr<InterpolantBuilder>, size_t, */
+    /*     const InterpolationDef&); */
 
-    std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation(std::string,
-        const InterpolantBuilderContainer&, size_t, const InterpolationDef&);
+    std::unique_ptr<Interpolant> InitializeInterpolation(std::string, InterpolantBuilder const&, size_t);
 
     // ----------------------------------------------------------------------------
     /// @brief Simple map structure where keys and values can be used for
