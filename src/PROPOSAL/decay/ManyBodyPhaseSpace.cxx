@@ -5,7 +5,6 @@
 #include <cmath>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
@@ -104,10 +103,10 @@ bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
 }
 
 // ------------------------------------------------------------------------- //
-Secondaries ManyBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
+std::vector<DynamicData> ManyBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
 {
     // Create vector for decay products
-    Secondaries products;
+    std::vector<DynamicData> products;
 
     for (auto p : daughters_) {
         products.emplace_back(p->particle_type, p_condition.GetPosition(), p_condition.GetDirection(), p_condition.GetEnergy(), p_condition.GetParentParticleEnergy(), p_condition.GetTime(), 0);
@@ -125,10 +124,10 @@ Secondaries ManyBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicDat
         {
             // precalculated kinematics
             kinematics = CalculateKinematics(params.normalization, p_def.mass);
-            GenerateEvent(products.GetModifyableSecondaries(), kinematics);
+            GenerateEvent(products, kinematics);
             // sample product states with rejection sampling
             weight_ref = params.weight_min + RandomGenerator::Get().RandomDouble() * (params.weight_max - params.weight_min);
-            weight_sample = kinematics.weight * matrix_element_(p_condition, products.GetSecondaries());
+            weight_sample = kinematics.weight * matrix_element_(p_condition, products);
 
         } while(weight_ref > weight_sample);
     }
@@ -136,7 +135,7 @@ Secondaries ManyBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicDat
     {
         // precalculated kinematics
         kinematics = CalculateKinematics(params.normalization, p_def.mass);
-        GenerateEvent(products.GetModifyableSecondaries(), kinematics);
+        GenerateEvent(products, kinematics);
     }
 
     // Boost all products in Lab frame (the reason, why the boosting goes in the negative direction of the particle)
@@ -251,7 +250,7 @@ void ManyBodyPhaseSpace::EstimateMaxWeight(PhaseSpaceParameters& params, const P
 void ManyBodyPhaseSpace::SampleEstimateMaxWeight(PhaseSpaceParameters& params, const ParticleDef& parent_def)
 {
     // Create vector for decay products
-    Secondaries products;
+    std::vector<DynamicData> products;
 
     for (auto d : daughters_) {
         products.emplace_back(d->particle_type);
@@ -267,8 +266,8 @@ void ManyBodyPhaseSpace::SampleEstimateMaxWeight(PhaseSpaceParameters& params, c
     for (int i = 0; i < broad_phase_statistic_; ++i)
     {
         kinematics = CalculateKinematics(params.normalization, parent_def.mass);
-        GenerateEvent(products.GetModifyableSecondaries(), kinematics);
-        result = kinematics.weight * matrix_element_(particle, products.GetSecondaries());
+        GenerateEvent(products, kinematics);
+        result = kinematics.weight * matrix_element_(particle, products);
 
         if (result < params.weight_min)
         {

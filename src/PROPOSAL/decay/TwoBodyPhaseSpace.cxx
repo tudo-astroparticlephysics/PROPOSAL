@@ -3,7 +3,6 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/Secondaries.h"
 
 using namespace PROPOSAL;
 
@@ -39,9 +38,9 @@ bool TwoBodyPhaseSpace::compare(const DecayChannel& channel) const
         return true;
 }
 
-Secondaries TwoBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
+std::vector<DynamicData> TwoBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
 {
-    Secondaries products;
+    std::vector<DynamicData> products;
     products.emplace_back(first_daughter_.particle_type, p_condition.GetPosition(), p_condition.GetDirection(), p_condition.GetEnergy(), p_condition.GetParentParticleEnergy(), p_condition.GetTime(), 0);
     products.emplace_back(second_daughter_.particle_type, p_condition.GetPosition(), p_condition.GetDirection(), p_condition.GetEnergy(), p_condition.GetParentParticleEnergy(), p_condition.GetTime(), 0);
 

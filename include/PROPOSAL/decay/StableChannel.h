@@ -31,7 +31,6 @@
 
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/Secondaries.h"
 
 
 namespace PROPOSAL {
@@ -46,7 +45,7 @@ public:
     DecayChannel* clone() const { return new StableChannel(*this); }
 
 
-    Secondaries Decay(const ParticleDef&, const DynamicData&);
+    std::vector<DynamicData> Decay(const ParticleDef&, const DynamicData&);
 
     const std::string& GetName() const { return name_; }
 
