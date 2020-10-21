@@ -44,7 +44,7 @@ public:
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() const { return new LeptonicDecayChannelApprox(*this); }
 
-    Secondaries Decay(const ParticleDef&, const DynamicData&);
+    std::vector<DynamicData> Decay(const ParticleDef&, const DynamicData&);
 
     const std::string& GetName() const { return name_; }
 

@@ -127,6 +127,30 @@ bool Geometry::IsBehind(const Vector3D& position, const Vector3D& direction) con
     return is_behind;
 }
 
+// ------------------------------------------------------------------------- //
+bool Geometry::IsEntering(const Vector3D &position, const Vector3D &direction) const {
+    auto dist_forward = DistanceToBorder(position, direction);
+    auto dist_backward = DistanceToBorder(position, -direction);
+    if (dist_forward.first >= 0 and dist_forward.second == -1) {
+        if (dist_backward.first == -1 and dist_backward.second == -1) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// ------------------------------------------------------------------------- //
+bool Geometry::IsLeaving(const Vector3D &position, const Vector3D &direction) const {
+    auto dist_forward = DistanceToBorder(position, direction);
+    auto dist_backward = DistanceToBorder(position, -direction);
+    if (dist_forward.first == -1 and dist_forward.second == -1) {
+        if (dist_backward.first >= 0 and dist_backward.second == -1) {
+            return true;
+        }
+    }
+    return false;
+}
+
 Geometry::ParticleLocation::Enum Geometry::GetLocation(const Vector3D& position, const Vector3D& direction) const {
     if(IsInfront(position, direction))
         return Geometry::ParticleLocation::InfrontGeometry;

@@ -63,6 +63,7 @@ package_add_test(UnitTest_Photonuclear Photonuclear_TEST.cxx)
 package_add_test(UnitTest_PhotoPair PhotoPair_TEST.cxx)
 package_add_test(UnitTest_WeakInteraction WeakInteraction_TEST.cxx)
 # propagation tests
+package_add_test(UnitTest_Secondaries Secondaries_TEST.cxx)
 # package_add_test(UnitTest_ContinuousRandomization ContinuousRandomization_TEST.cxx)
 # package_add_test(UnitTest_Propagation Propagation_TEST.cxx)
 # package_add_test(UnitTest_Scattering Scattering_TEST.cxx)

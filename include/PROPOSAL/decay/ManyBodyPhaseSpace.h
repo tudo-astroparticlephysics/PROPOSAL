@@ -79,7 +79,7 @@ public:
     ///
     /// @return Vector of particles, the decay products
     // ----------------------------------------------------------------------------
-    Secondaries Decay(const ParticleDef& p_def, const DynamicData& p_condition);
+    std::vector<DynamicData> Decay(const ParticleDef& p_def, const DynamicData& p_condition);
 
     // ----------------------------------------------------------------------------
     /// @brief Evalutate the matrix element of this channel

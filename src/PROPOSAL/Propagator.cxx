@@ -35,13 +35,14 @@ Propagator::Propagator(const ParticleDef& p_def, std::vector<Sector> sectors)
 {
 }
 
-std::vector<DynamicData> Propagator::Propagate(
+Secondaries Propagator::Propagate(
     const DynamicData& initial_particle, double max_distance, double min_energy)
 {
-    auto track = std::vector<DynamicData>{ initial_particle };
+    Secondaries track(std::make_shared<ParticleDef>(p_def), sector_list);
+    track.push_back(initial_particle);
     track.back().SetType(p_def.particle_type);
 
-    auto current_sector = ChooseCurrentSector(
+    auto current_sector = GetCurrentSector(
             track.back().GetPosition(), track.back().GetDirection());
     auto rnd
         = std::bind(&RandomGenerator::RandomDouble, &RandomGenerator::Get());
@@ -91,7 +92,7 @@ std::vector<DynamicData> Propagator::Propagate(
                 }
                 break;
             case ReachedBorder :
-                current_sector = ChooseCurrentSector(track.back().GetPosition(), track.back().GetDirection());
+                current_sector = GetCurrentSector(track.back().GetPosition(), track.back().GetDirection());
                 break;
             case ReachedMaxDistance :
                 continue_propagation = false;
@@ -238,7 +239,7 @@ int Propagator::minimize(const std::array<double, 3>& AdvanceDistances)
 }
 
 
-Sector Propagator::ChooseCurrentSector(
+Sector Propagator::GetCurrentSector(
     const Vector3D& position, const Vector3D& direction)
 {
     auto potential_sec = std::vector<Sector*>{};

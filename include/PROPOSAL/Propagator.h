@@ -30,6 +30,8 @@ namespace PROPOSAL {
 using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
     std::shared_ptr<const Density_distr>>;
 
+class Secondaries;
+
 class Propagator
 {
 public:
@@ -59,8 +61,10 @@ public:
     : Propagator(p_def, ParseConfig(config_file)) {}
     Propagator(ParticleDef const&, std::vector<Sector> sectors);
 
-    std::vector<DynamicData> Propagate(const DynamicData& initial_particle,
+    Secondaries Propagate(const DynamicData& initial_particle,
             double max_distance = 1e20, double min_energy = 0.);
+    enum {GEOMETRY, UTILITY, DENSITY_DISTR};
+
 private:
     void DoStochasticInteraction(DynamicData&, PropagationUtility&,
             std::function<double()>);
@@ -71,9 +75,8 @@ private:
             const Geometry& current_geometry);
     int maximize(const std::array<double, 3>& InteractionEnergies);
     int minimize(const std::array<double, 3>& AdvanceDistances);
-    Sector ChooseCurrentSector(const Vector3D& particle_position,
-            const Vector3D& particle_direction);
-
+    Sector GetCurrentSector(const Vector3D& particle_position,
+                            const Vector3D& particle_direction);
     //Global settings
     struct GlobalSettings{
         GlobalSettings();
@@ -210,7 +213,6 @@ private:
 
     ParticleDef p_def;
     std::shared_ptr<InterpolationDef> interpol_def_global = nullptr;
-    enum {GEOMETRY, UTILITY, DENSITY_DISTR};
     enum Type : int {
         MinimalE = 0,
         Decay = 1,

@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include "PROPOSAL/Secondaries.h"
 #include <string>
 #include <vector>
 
@@ -38,6 +37,7 @@ namespace PROPOSAL {
 class Vector3D;
 class DynamicData;
 class Particle;
+struct ParticleDef;
 
 class DecayChannel
 {
@@ -58,7 +58,7 @@ public:
     // Public methods
     // --------------------------------------------------------------------- //
 
-    virtual Secondaries Decay(const ParticleDef&, const DynamicData&) = 0;
+    virtual std::vector<DynamicData> Decay(const ParticleDef&, const DynamicData&) = 0;
 
     // ----------------------------------------------------------------------------
     /// @brief Boost the particle along a direction
@@ -89,7 +89,7 @@ public:
     /// @param betagamma = beta*gamma = p/m
     // ----------------------------------------------------------------------------
     /* static void Boost(const DecayProducts&, const Vector3D& direction, double gamma, double betagamma); */
-    static void Boost(Secondaries&, const Vector3D& direction, double gamma, double betagamma);
+    static void Boost(std::vector<DynamicData>&, const Vector3D& direction, double gamma, double betagamma);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the momentum in a two-body-phase-space decay
