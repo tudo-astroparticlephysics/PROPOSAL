@@ -10,7 +10,7 @@ import numpy as np
 if __name__ == "__main__":
 
     mu = pp.particle.MuMinusDef()
-    medium = pp.medium.StandardRock(1.0)  # With densitiy correction
+    medium = pp.medium.StandardRock(1.0)  # With density correction
     cuts = pp.EnergyCutSettings(-1, -1)  # ecut, vcut
 
     dEdx_brems = []
