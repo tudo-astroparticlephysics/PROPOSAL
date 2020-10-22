@@ -73,9 +73,9 @@ private:
     static const std::string name_;
 };
 
-class ShadowButkevichMikhailov : public ShadowEffect {
+class ShadowButkevichMikheyev : public ShadowEffect {
 public:
-    ShadowButkevichMikhailov()
+    ShadowButkevichMikheyev()
         : ShadowEffect()
     {
     }
@@ -104,7 +104,7 @@ public:
 
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor91)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor97)
-Q2_PHOTO_PARAM_INTEGRAL_DEC(ButkevichMikhailov)
+Q2_PHOTO_PARAM_INTEGRAL_DEC(ButkevichMikheyev)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(RenoSarcevicSu)
 
 // Factory pattern functions
@@ -124,7 +124,7 @@ template<typename P, typename M>
 static std::map<std::string, photoQ2_func_ptr<P, M>> photoQ2_map = {
         {"AbramowiczLevinLevyMaor91", create_photoQ2<PhotoAbramowiczLevinLevyMaor91, P, M>},
         {"AbramowiczLevinLevyMaor97", create_photoQ2<PhotoAbramowiczLevinLevyMaor97, P, M>},
-        {"ButkevichMikhailov", create_photoQ2<PhotoButkevichMikhailov, P, M>},
+        {"ButkevichMikheyev", create_photoQ2<PhotoButkevichMikheyev, P, M>},
         {"RenoSarcevicSu", create_photoQ2<PhotoRenoSarcevicSu, P, M>}
 };
 
@@ -137,7 +137,7 @@ std::shared_ptr<ShadowEffect> create_shadow() {
 
 static std::map<std::string, shadow_func_ptr> shadow_map = {
         {"DuttaRenoSarcevicSeckel", create_shadow<ShadowDuttaRenoSarcevicSeckel>},
-        {"ButkevichMikhailov", create_shadow<ShadowButkevichMikhailov>},
+        {"ButkevichMikheyev", create_shadow<ShadowButkevichMikheyev>},
 };
 
 template<typename P, typename M>
@@ -162,7 +162,7 @@ cross_t_ptr<P, M> make_photonuclearQ2(P p_def, M medium, std::shared_ptr<const
         throw std::logic_error("No parametrization passed for photonuclear");
 
     std::string param_name = config["parametrization"];
-    std::string shadow_name = config.value("shadow", "ButkevichMikhailov");
+    std::string shadow_name = config.value("shadow", "ButkevichMikheyev");
 
     return make_photonuclearQ2(p_def, medium, cuts, interpol, param_name, shadow_name);
 }
