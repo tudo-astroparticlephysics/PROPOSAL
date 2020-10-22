@@ -37,6 +37,9 @@ Continuous integration is setup on travis and tests several version of gcc and c
 
 PROPOSAL is now a C++11 library using pybind11 Python bindings!
 
+This version is the latest not using C++14 or more modern methods.
+The next release will make use of C++14 methods.
+
 
 ## How to cite PROPOSAL?
 
@@ -73,6 +76,7 @@ and our zenodo entry of the version you use
             van Santen, Jacob and
             Menne, Thorben and
             Sandrock, Alexander and
+            Kuo, Chung-Yun and
             Kopper, Claudio and
             Krings, Kai and
             Olivas, Alex},
