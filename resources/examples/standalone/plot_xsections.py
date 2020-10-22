@@ -38,7 +38,7 @@ if __name__ == "__main__":
         medium,
         cuts,
         1.0,
-        parametrization.photonuclear.ShadowButkevichMikhailov(),
+        parametrization.photonuclear.ShadowButkevichMikheyev(),
         interpolation_def
     )
 
@@ -65,7 +65,7 @@ if __name__ == "__main__":
             medium,
             cuts,
             1.0,
-            parametrization.photonuclear.ShadowButkevichMikhailov(),
+            parametrization.photonuclear.ShadowButkevichMikheyev(),
             interpolation_def
         ),
         interpolation_def

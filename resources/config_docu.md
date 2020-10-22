@@ -143,11 +143,11 @@ There the cross section is first integrated over the photon momentum.
 The available parametrizations using this approach are:
 - `"PhotoAbramowiczLevinLevyMaor91"` by Abramowicz Levin Levy Maor [Phys. Let. B269 (1991), 465](https://doi.org/10.1016/0370-2693(91)90202-2)
 - `"PhotoAbramowiczLevinLevyMaor97"` by Abramowicz Levin Levy Maor [arXiv::hep-ph/9712415](https://arxiv.org/abs/hep-ph/9712415)
-- `"PhotoButkevichMikhailov"` [JETP 95 (2002), 11](https://doi.org/10.1134/1.1499897)
+- `"PhotoButkevichMikheyev"` [JETP 95 (2002), 11](https://doi.org/10.1134/1.1499897)
 - `"PhotoRenoSarcevicSu"` [Astrop. Phys. 24 (2005), 107](https://doi.org/10.1016/j.astropartphys.2005.06.002) (which uses the parametrization of ALLM97, but with corrections for spin 0 particles and should therefore only be selected for spin 0 particles like sTau)
 
 For these parametrizations the parametrization of the shadowing factor can be chosen from one of the following parametrizations (only affecting the nuclear interaction parametrizations with momentum integration):
-- `"ShadowButkevichMikhailov"` from their calculation of nuclear interaction
+- `"ShadowButkevichMikheyev"` from their calculation of nuclear interaction
 - `"ShadowDuttaRenoSarcevicSeckel"` by Dutta, Reno, Sarcevic, Seckel [Phys. Rev. D63 (2001), 094020](https://doi.org/10.1103/PhysRevD.63.094020)
 
 The **LPM effect** (Landau-Pomeranschuk-Migdal), suppressing the bremsstrahlung and the pair production at high energies and the Ter-Mikaelian effect, suppress low bremsstrahlung energy losses, can also be incorporated.
@@ -175,7 +175,7 @@ The **weak interaction** (charged current interaction of a charged lepton, per d
 | `ioniz`                  | String | `"IonizBetheBlochRossi"` | Ionization parametrization |
 | `photo`                  | String | `"PhotoAbramowiczLevinLevyMaor97"` | Nuclear interaction parametrization |
 | `photo_hard_component`   | Bool   | `True`     | Including the hard components |
-| `photo_shadow`           | String | `"ShadowButkevichMikhailov"` | Shadowing parametrization |
+| `photo_shadow`           | String | `"ShadowButkevichMikheyev"` | Shadowing parametrization |
 | `lpm`                    | Bool   | `True`     | Incorporate the LPM-effect and TM-effect |
 | `annihilation`           | String | `"None"` | Annihilation parametrization |
 | `mupair`                 | String | `"None"` | Muon pair production parametrization |

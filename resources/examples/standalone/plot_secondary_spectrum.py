@@ -314,7 +314,7 @@ def plot_theory_curve():
     energy_cuts = pp.EnergyCutSettings(500, -1)
     multiplier = 1.
     lpm = False
-    shadow_effect = pp.parametrization.photonuclear.ShadowButkevichMikhailov()
+    shadow_effect = pp.parametrization.photonuclear.ShadowButkevichMikheyev()
     add_pertubative = True
     interpolation_def = pp.InterpolationDef()
     interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
