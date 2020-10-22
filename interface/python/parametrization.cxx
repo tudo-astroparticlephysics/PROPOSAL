@@ -407,7 +407,7 @@ void init_parametrization(py::module& m)
 
             The following parametrizations are currently implemented:
 
-            * ShadowButkevichMikhailov
+            * ShadowButkevichMikheyev
 
             * ShadowDuttaRenoSarcevicSeckel
 
@@ -435,9 +435,9 @@ void init_parametrization(py::module& m)
                 m_sub_photo, "ShadowDuttaRenoSarcevicSeckel")
             .def(py::init<>());
 
-    py::class_<crosssection::ShadowButkevichMikhailov,
-        std::shared_ptr<crosssection::ShadowButkevichMikhailov>,
-        crosssection::ShadowEffect>(m_sub_photo, "ShadowButkevichMikhailov")
+    py::class_<crosssection::ShadowButkevichMikheyev,
+        std::shared_ptr<crosssection::ShadowButkevichMikheyev>,
+        crosssection::ShadowEffect>(m_sub_photo, "ShadowButkevichMikheyev")
             .def(py::init<>());
 
     // Real Photon
@@ -513,7 +513,7 @@ void init_parametrization(py::module& m)
 
             * AbramowiczLevinLevyMaor97
 
-            * ButkevichMikhailov
+            * ButkevichMikheyev
 
             * RenoSarcevicSu
 
@@ -521,7 +521,7 @@ void init_parametrization(py::module& m)
 
             * AbramowiczLevinLevyMaor97Interpolant
 
-            * ButkevichMikhailovInterpolant
+            * ButkevichMikheyevInterpolant
 
             * RenoSarcevicSuInterpolant
 
@@ -533,7 +533,7 @@ void init_parametrization(py::module& m)
                 >>> mu = proposal.particle.MuMinusDef.get()
                 >>> medium = proposal.medium.StandardRock(1.0)
                 >>> cuts = proposal.EnergyCutSettings(-1, -1)
-                >>> shadow = proposal.parametrization.photonuclear.ShadowButkevichMikhailov()
+                >>> shadow = proposal.parametrization.photonuclear.ShadowButkevichMikheyev()
                 >>> interpol = proposal.InterpolationDef
                 >>> param = proposal.parametrization.photonuclear.RenoSarcevicSuInterpolant(mu, medium, cuts, 1.0, shadow, interpol)
                 )pbdoc");
@@ -546,7 +546,7 @@ void init_parametrization(py::module& m)
 
             PHOTO_Q2_DEF(m_sub_photo, AbramowiczLevinLevyMaor91)
             PHOTO_Q2_DEF(m_sub_photo, AbramowiczLevinLevyMaor97)
-            PHOTO_Q2_DEF(m_sub_photo, ButkevichMikhailov)
+            PHOTO_Q2_DEF(m_sub_photo, ButkevichMikheyev)
             PHOTO_Q2_DEF(m_sub_photo, RenoSarcevicSu)
 
             // --------------------------------------------------------------------- //
