@@ -87,16 +87,11 @@ public:
         }
 
         if (cut != nullptr) {
-
-            if(not dEdx_def)
-                dEdx_def = std::make_unique<Interpolant1DBuilder::Definition>();
-            if(not dE2dx_def)
-                dE2dx_def = std::make_unique<Interpolant1DBuilder::Definition>();
             // Only for a defined EnergyCut, dEdx and dE2dx return non-zero values
             dedx = build_dedx(reinterpret_cast<base_param_ref_t>(param), p_def,
-                              medium, *cut, *dEdx_def);
+                              medium, *cut, dEdx_def);
             de2dx = build_de2dx(reinterpret_cast<base_param_ref_t>(param), p_def,
-                                medium, *cut, *dE2dx_def);
+                                medium, *cut, dE2dx_def);
         }
     }
     std::vector<std::shared_ptr<const Component>> GetTargets() const noexcept final

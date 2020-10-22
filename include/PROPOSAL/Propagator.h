@@ -22,6 +22,7 @@
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
+#include "PROPOSAL/Secondaries.h"
 
 using std::get;
 using std::make_shared;
@@ -30,7 +31,7 @@ namespace PROPOSAL {
 using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
     std::shared_ptr<const Density_distr>>;
 
-class Secondaries;
+/* class Secondaries; */
 
 class Propagator
 {

@@ -18,12 +18,9 @@ class DisplacementBuilder : public Displacement {
         T integral(disp_func, low_lim);
         if (typeid(T) == typeid(UtilityInterpolant)) {
             auto hash_digest = (size_t)0;
-            hash_combine(hash_digest, CrossSectionVector::GetHash(cross), interpol_def->GetHash());
+            hash_combine(hash_digest, CrossSectionVector::GetHash(cross), interpol_def.GetHash());
 
-            if(not interpol_def)
-                interpol_def = std::make_unique<Interpolant1DBuilder::Definition>();
-
-            integral.BuildTables("displacement", hash_digest, *interpol_def);
+            integral.BuildTables("displacement", hash_digest, interpol_def);
         };
         return integral;
     }
