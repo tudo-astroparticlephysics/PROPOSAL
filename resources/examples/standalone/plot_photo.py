@@ -97,7 +97,7 @@ if __name__ == "__main__":
         )
 
     ax.set_xlabel(r'$E$ / MeV')
-    ax.set_ylabel(r'energyloss per energy / $\rm{g}^{-1} \rm{cm}^2$')
+    ax.set_ylabel(r'energyloss per energy / $\rm{cm}^{-1}$')
 
     ax.legend(loc='best')
 

@@ -88,7 +88,7 @@ if __name__ == "__main__":
             label="".join([c for c in param.name[1:] if c.isupper()])
         )
 
-    ax.set_ylabel(r'dEdx / $\rm{MeV}\rm{g}^{-1} \rm{cm}^2$')
+    ax.set_ylabel(r'dEdx / $\rm{MeV} \rm{cm}^{-1}$')
 
     ax.legend(loc='best')
 
