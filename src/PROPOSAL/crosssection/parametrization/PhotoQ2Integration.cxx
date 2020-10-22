@@ -59,7 +59,7 @@ double crosssection::PhotoQ2Integral::DifferentialCrossSection(const ParticleDef
 
 Q2_PHOTO_PARAM_INTEGRAL_IMPL(AbramowiczLevinLevyMaor91)
 Q2_PHOTO_PARAM_INTEGRAL_IMPL(AbramowiczLevinLevyMaor97)
-Q2_PHOTO_PARAM_INTEGRAL_IMPL(ButkevichMikhailov)
+Q2_PHOTO_PARAM_INTEGRAL_IMPL(ButkevichMikheyev)
 Q2_PHOTO_PARAM_INTEGRAL_IMPL(RenoSarcevicSu)
 
 // ------------------------------------------------------------------------- //
@@ -358,7 +358,7 @@ double crosssection::PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
 // Butkevich Mikheyev Parametrization
 // JETP 95 (2002), 11
 // ------------------------------------------------------------------------- //
-double crosssection::PhotoButkevichMikhailov::FunctionToQ2Integral(const ParticleDef& p_def,
+double crosssection::PhotoButkevichMikheyev::FunctionToQ2Integral(const ParticleDef& p_def,
     const Component& comp, double energy, double v, double Q2) const
 {
 
@@ -603,7 +603,7 @@ double crosssection::PhotoRenoSarcevicSu::FunctionToQ2Integral(const ParticleDef
 
 const std::string crosssection::ShadowDuttaRenoSarcevicSeckel::name_
     = "ShadowDuttaRenoSarcevicSeckel";
-const std::string crosssection::ShadowButkevichMikhailov::name_ = "ShadowButkevichMikhailov";
+const std::string crosssection::ShadowButkevichMikheyev::name_ = "ShadowButkevichMikheyev";
 
 // ------------------------------------------------------------------------- //
 // Dutta, Reno, Sarcevic, Seckel
@@ -640,7 +640,7 @@ size_t crosssection::ShadowDuttaRenoSarcevicSeckel::GetHash() const
 // Butkevich, Mikheyev
 // JETP 95 (2002), 11
 // ------------------------------------------------------------------------- //
-double crosssection::ShadowButkevichMikhailov::CalculateShadowEffect(
+double crosssection::ShadowButkevichMikheyev::CalculateShadowEffect(
     const Component& comp, double x, double nu)
 {
     if (comp.GetNucCharge() == 1)
@@ -693,10 +693,10 @@ double crosssection::ShadowButkevichMikhailov::CalculateShadowEffect(
     return G;
 }
 
-size_t crosssection::ShadowButkevichMikhailov::GetHash() const
+size_t crosssection::ShadowButkevichMikheyev::GetHash() const
 {
     size_t seed = 0;
-    hash_combine(seed, std::string("ShadowButkevichMikhailov"));
+    hash_combine(seed, std::string("ShadowButkevichMikheyev"));
 
     return seed;
 }
