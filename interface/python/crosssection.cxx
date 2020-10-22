@@ -59,10 +59,9 @@ void init_crosssection(py::module& m)
 
     py::class_<CrossSectionInterpolantBase, std::shared_ptr<CrossSectionInterpolantBase>>(
             m_sub, "CrossSectionInterpolantBase")
-        .def(py::init<>())
-        .def_property("dNdx_def", &CrossSectionInterpolantBase::GetDNdxDef, &CrossSectionInterpolantBase::SetDNdxDef)
-        .def_property("dEdx_def", &CrossSectionInterpolantBase::GetDEdxDef, &CrossSectionInterpolantBase::SetDEdxDef)
-        .def_property("dE2dx_def", &CrossSectionInterpolantBase::GetDE2dxDef, &CrossSectionInterpolantBase::SetDE2dxDef);
+        .def_readwrite_static("dNdx_def", &CrossSectionInterpolantBase::dNdx_def)
+        .def_readwrite_static("dEdx_def", &CrossSectionInterpolantBase::dEdx_def)
+        .def_readwrite_static("dE2dx_def", &CrossSectionInterpolantBase::dE2dx_def);
 
     py::class_<CrossSectionContainer, CrossSectionBase, std::shared_ptr<CrossSectionContainer>>(
             m_sub, "CrossSection",

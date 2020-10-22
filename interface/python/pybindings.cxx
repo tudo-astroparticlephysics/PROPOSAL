@@ -130,7 +130,7 @@ PYBIND11_MODULE(proposal, m)
         .def("solve_track_integral", py::vectorize(&Displacement::SolveTrackIntegral), py::arg("upper_lim"), py::arg("lower_lim"))
         .def("upper_limit_track_integral", py::vectorize(&Displacement::UpperLimitTrackIntegral), py::arg("energy"), py::arg("distance"))
         .def("function_to_integral", py::vectorize(&Displacement::FunctionToIntegral), py::arg("energy"))
-        .def_property_static("interpol_def", [](){return *Displacement::interpol_def;}, [](Interpolant1DBuilder::Definition def){Displacement::interpol_def = std::make_unique<Interpolant1DBuilder::Definition>(def);});
+        .def_readwrite_static("interpol_def", &Displacement::interpol_def);
 
     m.def("make_displacement", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
             return shared_ptr<Displacement>(make_displacement(cross, interpolate));
@@ -445,17 +445,16 @@ PYBIND11_MODULE(proposal, m)
     /*     .def_static( */
     /*         "get", &RandomGenerator::Get, py::return_value_policy::reference); */
 
-    py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
-        .def(py::init<ParticleDef const&, std::vector<Sector>>())
-        .def(py::init<GammaDef, std::string const&>())
-        .def(py::init<EMinusDef, std::string const&>())
-        .def(py::init<EPlusDef, std::string const&>())
-        .def(py::init<MuMinusDef, std::string const&>())
-        .def(py::init<MuPlusDef, std::string const&>())
-        .def(py::init<TauMinusDef, std::string const&>())
-        .def(py::init<TauPlusDef, std::string const&>())
-        .def("propagate", &Propagator::Propagate, py::arg("initial_particle"),
-                py::arg("max_distance"), py::arg("min_energy"));
+    /* py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator") */
+    /*     .def(py::init<ParticleDef const&, std::vector<Sector>>()) */
+    /*     .def(py::init<GammaDef, std::string const&>()) */
+    /*     .def(py::init<EMinusDef, std::string const&>()) */
+    /*     .def(py::init<EPlusDef, std::string const&>()) */
+    /*     .def(py::init<MuMinusDef, std::string const&>()) */
+    /*     .def(py::init<MuPlusDef, std::string const&>()) */
+    /*     .def(py::init<TauMinusDef, std::string const&>()) */
+    /*     .def(py::init<TauPlusDef, std::string const&>()) */
+    /*     .def("propagate", &Propagator::Propagate, py::arg("initial_particle"), py::arg("max_distance"), py::arg("min_energy")); */
 
     /*     .def( */
     /*         py::init<const ParticleDef&, const std::vector<Sector::Definition>&, */
