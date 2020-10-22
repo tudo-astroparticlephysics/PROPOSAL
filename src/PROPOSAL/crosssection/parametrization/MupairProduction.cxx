@@ -114,6 +114,8 @@ double crosssection::MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
 
     U = aux / (1 + aux1 / aux2);
 
+    xi      = v * v * (1 - rMax * rMax)/(4 * (1 - v));
+    aux1 = (1 + rMax * rMax) * (1 + 1.5 * beta) - 1. / xi * (1 + 2 * beta) * (1 - rMax * rMax);
     aux2 = ME * energy * v * (1 - rMax * rMax);
     U_max = aux / (1 + aux1 / aux2);
 
