@@ -2,7 +2,7 @@
 
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/secondaries/DefaultFactory.h"
+#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 #include "PROPOSAL/secondaries/Parametrization.h"
 
 #include <memory>
@@ -12,47 +12,70 @@
 using std::vector;
 
 namespace PROPOSAL {
+
+//!
+//! Class to store different secondaries parametrization and produce secondaries
+//! for different interactiontypes. Take into account that different particle
+//! make use of the same secondary calculator with different parameters.
+//!
 class SecondariesCalculator {
     using param_ptr = unique_ptr<secondaries::Parametrization>;
+
+    //!
+    //! Storage of the associated secondary calculator to the corresponding
+    //! interaction type.
+    //!
     std::unordered_map<InteractionType, param_ptr, InteractionType_hash> secondary_generator;
 
 public:
+    //!
+    //! Empty secondaries calculator. Parametrization has to be added by
+    //! addInteraction.
+    //!
     SecondariesCalculator() = default;
 
-    template <typename ParamList> SecondariesCalculator(ParamList&& param_list)
+    //!
+    //! Initalize secondary calculator with a bunch of interaction types for a
+    //! specific particle and medium.
+    //!
+    template <typename T>
+    SecondariesCalculator(T const& interaction_types, ParticleDef const& p, Medium const& m)
     {
-        for (auto&& p : param_list)
-            addInteraction(move(p));
-    }
-
-    template <typename TypeList>
-    SecondariesCalculator(
-        TypeList type_list, const ParticleDef& p, const Medium& m)
-    {
-       for (auto& t : type_list)
+       for (auto& t : interaction_types)
             addInteraction(secondaries::DefaultFactory::Create(t, p, m));
     }
 
-    template <typename Param> void addInteraction(Param&& p)
+    //!
+    //! Transfer ownership of a secondary calculator parametrization, to the
+    //! secondary calculator.
+    //!
+    inline void addInteraction(param_ptr&& p)
     {
-        secondary_generator[p->GetInteractionType()] = move(p);
+        secondary_generator[p->GetInteractionType()] = std::move(p);
     }
 
-    size_t RequiredRandomNumbers(InteractionType) const noexcept;
+    //!
+    //! Returns number required for calculation of a specific interactiontype.
+    //!
+    inline size_t RequiredRandomNumbers(InteractionType type) const noexcept
+    {
+        return secondary_generator.find(type)->second->RequiredRandomNumbers();
+    }
 
-    vector<Loss::secondary_t> CalculateSecondaries(
-        double primary_energy,
-        Loss::secondary_t loss,
-        const Component& comp,
-        vector<double> rnd);
-
-    size_t requiredRandomNumbers(InteractionType);
+    //!
+    //! Calculates the secondary particle for a given loss. Initial particle is
+    //! treated as a loss and returned as the first particle of the secondaries.
+    //!
+    std::vector<Loss::secondary_t> CalculateSecondaries(double, Loss::secondary_t, Component const&, std::vector<double>);
 };
 
+//!
+//! Produces a SecondariesCalculator.
+//!
 template <typename TypeList>
-std::unique_ptr<SecondariesCalculator> make_secondaries(TypeList&& list, const ParticleDef& p, const Medium& m)
+std::unique_ptr<SecondariesCalculator> make_secondaries(TypeList&& list, ParticleDef const& p, Medium const& m)
 {
     return PROPOSAL::make_unique<SecondariesCalculator>(std::forward<TypeList>(list), p, m);
 }
 
-}
+} // namespace PROPOSAL

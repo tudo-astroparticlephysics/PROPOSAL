@@ -2,7 +2,7 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/secondaries/DefaultFactory.h"
+#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 #include "PROPOSAL/secondaries/ionization/Ionization.h"
 
 /* #include <unordered_map> */
@@ -23,7 +23,6 @@ namespace secondaries {
         NaivIonization(const ParticleDef& p, const Medium&) :
             primary_particle_type(p.particle_type) {}
 
-        double CalculateRho(double, double) final;
         tuple<Vector3D, Vector3D> CalculateDirections(
             Vector3D, double, double, double) final;
         tuple<double, double> CalculateEnergy(double, double) final;

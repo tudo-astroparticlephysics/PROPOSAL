@@ -4,11 +4,8 @@
 #include "PROPOSAL/crosssection/CrossSectionVector.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-#include <string>
 #include <utility>
 #include <vector>
-
-using std::string;
 
 namespace PROPOSAL {
 
@@ -18,6 +15,7 @@ protected:
     crossbase_list_t cross_list;
 
 public:
+    Displacement() = default;
     template <typename Cross>
     Displacement(Cross&& cross) : cross_list(std::begin(cross), std::end(cross)) {}
     virtual ~Displacement() = default;

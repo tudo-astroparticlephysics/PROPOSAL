@@ -2,4 +2,4 @@
 
 using namespace PROPOSAL;
 
-Interpolant1DBuilder::Definition Time::interpol_def(1000);
+std::unique_ptr<Interpolant1DBuilder::Definition> Time::interpol_def = nullptr;

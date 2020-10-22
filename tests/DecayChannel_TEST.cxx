@@ -30,43 +30,46 @@ ParticleDef getParticleDef(const std::string& name)
 {
     if (name == "MuMinus")
     {
-        return MuMinusDef::Get();
+        return MuMinusDef();
     } else if (name == "TauMinus")
     {
-        return TauMinusDef::Get();
+        return TauMinusDef();
     } else if (name == "EMinus")
     {
-        return EMinusDef::Get();
+        return EMinusDef();
     } else if (name == "NuMu")
     {
-        return NuMuBarDef::Get();
+        return NuMuBarDef();
     } else if (name == "NuEBar"){
-        return NuEBarDef::Get();
+        return NuEBarDef();
     } else if (name == "NuTau"){
-        return NuTauDef::Get();
+        return NuTauDef();
     } else{
         std::cout << "Unknown return particle";
-        return MuMinusDef::Get();
+        return MuMinusDef();
     }
 }
 
 const std::string testfile_dir = "bin/TestFiles/";
 
-ParticleDef mu  = MuMinusDef::Get();
-ParticleDef tau = TauMinusDef::Get();
+ParticleDef mu  = MuMinusDef();
+ParticleDef tau = TauMinusDef();
+ParticleDef eminus = EMinusDef();
+ParticleDef nue = NuMuDef();
+ParticleDef nuebar = NuEBarDef();
 
 TEST(Comparison, Comparison_equal)
 {
-    LeptonicDecayChannel A(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
-    LeptonicDecayChannel B(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel A(eminus, nue, nuebar);
+    LeptonicDecayChannel B(eminus, nue, nuebar);
     EXPECT_TRUE(A == B);
 
     TwoBodyPhaseSpace C(mu, tau);
     TwoBodyPhaseSpace D(mu, tau);
     EXPECT_TRUE(C == D);
 
-    DecayChannel* E = new LeptonicDecayChannel(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
-    DecayChannel* F = new LeptonicDecayChannel(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    DecayChannel* E = new LeptonicDecayChannel(eminus, nue, nuebar);
+    DecayChannel* F = new LeptonicDecayChannel(eminus, nue, nuebar);
 
     EXPECT_TRUE(*E == *F);
     delete E;
@@ -82,11 +85,11 @@ TEST(Comparison, Comparison_equal)
 
 TEST(Comparison, Comparison_not_equal)
 {
-    LeptonicDecayChannel A(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel A(eminus, nue, nuebar);
     TwoBodyPhaseSpace B(mu, tau);
     EXPECT_TRUE(A != B);
 
-    DecayChannel* E = new LeptonicDecayChannel(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    DecayChannel* E = new LeptonicDecayChannel(eminus, nue, nuebar);
     DecayChannel* F = new TwoBodyPhaseSpace(mu, tau);
 
     EXPECT_TRUE(*E != *F);
@@ -103,14 +106,14 @@ TEST(Comparison, Comparison_not_equal)
 
 TEST(Assignment, Copyconstructor)
 {
-    LeptonicDecayChannel A(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel A(eminus, nue, nuebar);
     DecayChannel* B = A.clone();
 
     EXPECT_TRUE(A == *B);
 
     delete B;
 
-    DecayChannel* C = new LeptonicDecayChannel(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    DecayChannel* C = new LeptonicDecayChannel(eminus, nue, nuebar);
     DecayChannel* D = C->clone();
 
     EXPECT_TRUE(*C == *D);
@@ -170,7 +173,6 @@ TEST(DecaySpectrum, MuMinus_Rest){
     std::vector<int> prod_2(NUM_bins, 0);
 
     double aux_energy, energy_sum;
-    ParticleDef aux_def;
 
     init_particle.SetEnergy(init_energy);
 
@@ -278,7 +280,11 @@ TEST(DecaySpectrum, MuMinus_Rest){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //skip comment
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::vector<const ParticleDef*> daughters{&p0, &p1, &p2};
+    std::vector<std::shared_ptr<const ParticleDef>> daughters = {
+        std::make_shared<ParticleDef>(p0),
+        std::make_shared<ParticleDef>(p1),
+        std::make_shared<ParticleDef>(p2),
+    };
 
     ManyBodyPhaseSpace many_body(daughters, matrix_element_evaluate);
 
@@ -367,7 +373,6 @@ TEST(DecaySpectrum, MuMinus_Energy){
     std::vector<int> prod_2(NUM_bins, 0);
 
     double aux_energy, energy_sum;
-    ParticleDef aux_def;
 
     init_particle.SetEnergy(init_energy);
 
@@ -476,7 +481,11 @@ TEST(DecaySpectrum, MuMinus_Energy){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //skip comment
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::vector<const ParticleDef*> daughters{&p0, &p1, &p2};
+    std::vector<std::shared_ptr<const ParticleDef>> daughters = {
+        std::make_shared<ParticleDef>(p0),
+        std::make_shared<ParticleDef>(p1),
+        std::make_shared<ParticleDef>(p2),
+    };
 
     ManyBodyPhaseSpace many_body(daughters, matrix_element_evaluate);
 
@@ -564,7 +573,6 @@ TEST(DecaySpectrum, TauMinus_Rest){
     std::vector<int> prod_2(NUM_bins, 0);
 
     double aux_energy, energy_sum;
-    ParticleDef aux_def;
 
     init_particle.SetEnergy(init_energy);
 
@@ -672,7 +680,11 @@ TEST(DecaySpectrum, TauMinus_Rest){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //skip comment
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::vector<const ParticleDef*> daughters{&p0, &p1, &p2};
+    std::vector<std::shared_ptr<const ParticleDef>> daughters = {
+        std::make_shared<ParticleDef>(p0),
+        std::make_shared<ParticleDef>(p1),
+        std::make_shared<ParticleDef>(p2),
+    };
 
     ManyBodyPhaseSpace many_body(daughters, matrix_element_evaluate);
 
@@ -761,7 +773,6 @@ TEST(DecaySpectrum, TauMinus_energy){
     std::vector<int> prod_2(NUM_bins, 0);
 
     double aux_energy, energy_sum;
-    ParticleDef aux_def;
 
     init_particle.SetEnergy(init_energy);
 
@@ -869,7 +880,11 @@ TEST(DecaySpectrum, TauMinus_energy){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //skip comment
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::vector<const ParticleDef*> daughters{&p0, &p1, &p2};
+    std::vector<std::shared_ptr<const ParticleDef>> daughters = {
+        std::make_shared<ParticleDef>(p0),
+        std::make_shared<ParticleDef>(p1),
+        std::make_shared<ParticleDef>(p2),
+    };
 
     ManyBodyPhaseSpace many_body(daughters, matrix_element_evaluate);
 

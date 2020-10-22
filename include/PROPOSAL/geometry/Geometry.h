@@ -64,7 +64,9 @@ public:
 
     bool IsBehind(const Vector3D& position, const Vector3D& direction) const;
 
+    bool IsEntering(const Vector3D& position, const Vector3D& direction) const;
 
+    bool IsLeaving(const Vector3D& position, const Vector3D& direction) const;
 
     /*!
      * This function calculates the distance of the particle position

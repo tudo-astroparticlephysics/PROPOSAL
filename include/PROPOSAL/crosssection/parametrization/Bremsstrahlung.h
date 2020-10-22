@@ -30,6 +30,7 @@
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include <memory>
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 
 #define BREMSSTRAHLUNG_DEF(param)                                              \
     struct Brems##param : public Bremsstrahlung {                              \
@@ -74,7 +75,7 @@ public:
         = 0;
 
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-    tuple<double, double> GetKinematicLimits(
+    std::tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double) const noexcept override;
     size_t GetHash() const noexcept override;
 };
@@ -123,17 +124,25 @@ static std::map<std::string, brems_func_ptr<P, M>> brems_map = {
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, bool lpm, std::string param_name){
+
+    auto it = brems_map<P, M>.find(param_name);
+    if (it == brems_map<P, M>.end())
+        throw std::logic_error("Unknown parametrization for bremsstrahlung");
+
+    return it->second(p_def, medium, cuts, lpm, interpol);
+}
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
     if (!config.contains("parametrization"))
         throw std::logic_error("No parametrization passed for bremsstrahlung");
 
     std::string param_name = config["parametrization"];
-    auto it = brems_map<P, M>.find(param_name);
-    if (it == brems_map<P, M>.end())
-        throw std::logic_error("Unknown parametrization for bremsstrahlung");
-
     bool lpm = config.value("lpm", true);
-    return it->second(p_def, medium, cuts, lpm, interpol);
+
+    return make_bremsstrahlung(p_def, medium, cuts, interpol, lpm, param_name);
 }
 
 } // namespace crosssection

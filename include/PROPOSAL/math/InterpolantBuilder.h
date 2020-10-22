@@ -30,11 +30,6 @@
 
 #include <functional>
 #include <memory>
-#include <type_traits>
-
-using std::function;
-using std::remove_reference;
-using std::unique_ptr;
 
 namespace PROPOSAL {
 class Interpolant;
@@ -46,18 +41,13 @@ public:
     InterpolantBuilder() = default;
     virtual ~InterpolantBuilder() = default;
 
-    virtual unique_ptr<Interpolant> build() = 0;
+    virtual std::unique_ptr<Interpolant> build() const = 0;
 };
 
-class Interpolant1DBuilder : public InterpolantBuilder {
-public:
-    template <typename T> Interpolant1DBuilder(T&& def);
-
+struct Interpolant1DBuilder : public InterpolantBuilder {
     struct Definition {
-        Definition() = default;
-        explicit Definition(int sampling_points) noexcept {max = sampling_points;}
-        function<double(double)> function1d = nullptr;
-        int max = 200;
+        std::function<double(double)> function1d = nullptr;
+        int nodes = 200;
         double xmin = 0;
         double xmax = 1.e14;
         int romberg = 5;
@@ -68,55 +58,41 @@ public:
         bool rationalY = false;
         bool relativeY = false;
         bool logSubst = false;
+
+        size_t GetHash() ;
     };
-    unique_ptr<Interpolant> build() override;
+
+    Interpolant1DBuilder() = default;
+    Interpolant1DBuilder(Interpolant1DBuilder::Definition);
+
+    std::unique_ptr<Interpolant> build() const override;
 
 private:
-    unique_ptr<Definition> builder_def;
+    std::unique_ptr<Definition> def;
 };
 
-class Interpolant2DBuilder : public InterpolantBuilder {
+struct Interpolant2DBuilder : public Interpolant1DBuilder {
 
-public:
-    template <typename T> Interpolant2DBuilder(T&& def);
-
-    struct Definition {
-        function<double(double, double)> function2d = nullptr;
-        int max1 = 1.0;
-        double x1min = 1.0;
-        double x1max = 1.0;
-        int max2 = 1.0;
+    struct Definition : public Interpolant1DBuilder::Definition {
+        std::function<double(double, double)> function2d = nullptr;
+        int nodes2 = 1.0;
         double x2min = 1.0;
         double x2max = 1.0;
-        int romberg1 = 1;
-        bool rational1 = false;
-        bool relative1 = false;
-        bool isLog1 = false;
         int romberg2 = 1;
         bool rational2 = false;
         bool relative2 = false;
         bool isLog2 = false;
-        int rombergY = 1;
-        bool rationalY = false;
-        bool relativeY = false;
-        bool logSubst = false;
+
+        size_t GetHash() ;
     };
 
-    unique_ptr<Interpolant> build() override;
+    Interpolant2DBuilder() = default;
+    Interpolant2DBuilder(Interpolant2DBuilder::Definition def);
+
+    std::unique_ptr<Interpolant> build() const final;
 
 private:
-    unique_ptr<Definition> builder_def;
+    std::unique_ptr<Definition> def;
 };
 
-template <typename T>
-Interpolant1DBuilder::Interpolant1DBuilder(T&& def)
-    : builder_def(new Definition(def))
-{
-}
-
-template <typename T>
-Interpolant2DBuilder::Interpolant2DBuilder(T&& def)
-    : builder_def(new Definition(def))
-{
-}
 } // namespace PROPOSAL

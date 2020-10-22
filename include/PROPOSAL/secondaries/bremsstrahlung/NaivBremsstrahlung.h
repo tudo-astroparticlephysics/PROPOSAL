@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/secondaries/bremsstrahlung/Bremsstrahlung.h"
-#include "PROPOSAL/secondaries/DefaultFactory.h"
+#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 
 using std::array;
 using std::vector;

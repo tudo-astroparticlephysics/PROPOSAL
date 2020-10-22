@@ -36,7 +36,6 @@
 #include "PROPOSAL/scattering/Scattering.h"
 #include "PROPOSAL/medium/Medium.h"
 
-using std::array;
 namespace PROPOSAL {
 
 
@@ -57,7 +56,7 @@ private:
     bool compare(const Scattering&) const override;
     void print(std::ostream&) const override;
 
-    RandomAngles CalculateRandomAngle(double grammage, double ei, double ef, const array<double, 4>& rnd) override;
+    RandomAngles CalculateRandomAngle(double grammage, double ei, double ef, const std::array<double, 4>& rnd) override;
 
     Medium medium_;
 

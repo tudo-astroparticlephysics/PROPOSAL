@@ -33,9 +33,7 @@ void UtilityInterpolant::BuildTables(std::string name, size_t hash,
     };
     interpol_def.function1d = utility_func;
     interpol_def.xmin = lower_lim;
-    auto builder = make_unique<Interpolant1DBuilder>(interpol_def);
-    interpolant_ = InitializeInterpolation(
-        name, std::move(builder), hash, InterpolationDef());
+    interpolant_ = InitializeInterpolation(name, Interpolant1DBuilder(interpol_def), hash);
 }
 
 double UtilityInterpolant::Calculate(double energy_initial, double energy_final)

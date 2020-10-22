@@ -10,6 +10,7 @@
 using std::get;
 using std::logic_error;
 using std::make_tuple;
+using std::tuple;
 using namespace PROPOSAL;
 
 crosssection::Ionization::Ionization(const EnergyCutSettings& cuts)

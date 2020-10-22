@@ -20,7 +20,7 @@ double crosssection::Compton::GetLowerEnergyLim(const ParticleDef&) const noexce
     return ME;
 }
 
-tuple<double, double> crosssection::Compton::GetKinematicLimits(
+std::tuple<double, double> crosssection::Compton::GetKinematicLimits(
     const ParticleDef&, const Component&, double energy) const noexcept
 {
     assert(energy > 0);

@@ -36,8 +36,6 @@
 #include <unordered_map>
 #include <vector>
 
-using std::add_lvalue_reference;
-using std::decay;
 
 namespace PROPOSAL {
 
@@ -46,13 +44,15 @@ using Components::Component;
 using rates_t = std::unordered_map<std::shared_ptr<const Component>, double>;
 
 struct CrossSectionBase {
+    virtual ~CrossSectionBase() = default;
     virtual double CalculatedEdx(double) = 0;
     virtual double CalculatedE2dx(double) = 0;
-    virtual rates_t CalculatedNdx(double) = 0;
+    virtual double CalculatedNdx(double, std::shared_ptr<const Component> = nullptr) = 0;
     virtual double CalculateStochasticLoss(std::shared_ptr<const Component> const&, double, double) = 0;
     virtual double GetLowerEnergyLim() const = 0;
     virtual size_t GetHash() const noexcept = 0;
     virtual InteractionType GetInteractionType() const noexcept = 0;
+    virtual std::vector<std::shared_ptr<const Component>> GetTargets() const noexcept = 0;
 };
 
 template <class P, class M> struct CrossSection : public CrossSectionBase{

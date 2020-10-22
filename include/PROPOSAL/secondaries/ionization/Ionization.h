@@ -3,6 +3,8 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/secondaries/Parametrization.h"
 
+using std::tuple;
+
 namespace PROPOSAL {
 namespace secondaries {
     struct Ionization : public secondaries::Parametrization {
@@ -12,7 +14,6 @@ namespace secondaries {
         static constexpr InteractionType type = PROPOSAL::InteractionType::Ioniz;
         InteractionType GetInteractionType() const noexcept { return type; };
 
-        virtual double CalculateRho(double, double) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(
             Vector3D, double, double, double)
             = 0;

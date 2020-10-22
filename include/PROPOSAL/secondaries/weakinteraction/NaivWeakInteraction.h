@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/secondaries/weakinteraction/WeakInteraction.h"
+#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 
 using std::array;
 using std::vector;

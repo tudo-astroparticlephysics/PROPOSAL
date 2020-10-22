@@ -134,6 +134,11 @@ bool Medium::operator==(const Medium& medium) const {
     }
 }
 
+bool Medium::operator!=(const Medium& medium) const
+{
+    return !(*this == medium);
+}
+
 // ------------------------------------------------------------------------- //
 //                                   Methods
 // ------------------------------------------------------------------------- //

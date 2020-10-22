@@ -30,6 +30,7 @@
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 
 using PROPOSAL::Components::Component;
 
@@ -44,7 +45,7 @@ public:
     using component_wise = std::true_type;
 
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-    tuple<double, double> GetKinematicLimits(
+    std::tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double) const noexcept override;
 };
 
@@ -90,16 +91,23 @@ namespace crosssection {
 
     template<typename P, typename M>
     cross_t_ptr<P, M> make_compton(P p_def, M medium, std::shared_ptr<const
-    EnergyCutSettings> cuts, bool interpol, const nlohmann::json &config) {
-        if (!config.contains("parametrization"))
-            throw std::logic_error("No parametrization passed for compton");
+    EnergyCutSettings> cuts, bool interpol, const std::string& param_name) {
 
-        std::string param_name = config["parametrization"];
         auto it = compt_map<P, M>.find(param_name);
         if (it == compt_map<P, M>.end())
             throw std::logic_error("Unknown parametrization for compton");
 
         return it->second(p_def, medium, cuts, interpol);
+    }
+
+    template<typename P, typename M>
+    cross_t_ptr<P, M> make_compton(P p_def, M medium, std::shared_ptr<const
+    EnergyCutSettings> cuts, bool interpol, const nlohmann::json &config) {
+        if (!config.contains("parametrization"))
+            throw std::logic_error("No parametrization passed for compton");
+        std::string param_name = config["parametrization"];
+
+        return make_compton(p_def, medium, cuts, interpol, param_name);
     }
 } // namespace crosssection
 } // namespace PROPOSAL

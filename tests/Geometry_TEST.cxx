@@ -14,70 +14,66 @@
 
 using namespace PROPOSAL;
 
+Vector3D posi = Vector3D(0,0,0);
+double rad_i = 0;
+double rad_o = 1e3;
+double x_len = 1;
+double y_len = 1;
+double z_len = 1;
+
 TEST(Comparison, Comparison_equal)
 {
-    Sphere A;
-    Sphere B;
+    Sphere A(posi, rad_o, rad_i);
+    Sphere B(posi, rad_o, rad_i);
     EXPECT_TRUE(A == B);
 
-    Sphere* C = new Sphere();
-    Sphere* D = new Sphere();
+    Sphere* C = new Sphere(posi, rad_o, rad_i);
+    Sphere* D = new Sphere(posi, rad_o, rad_i);
     EXPECT_TRUE(*C == *D);
-
-    Geometry* E = new Sphere();
-    Geometry* F = new Sphere();
-    EXPECT_TRUE(*E == *F);
 
     delete C;
     delete D;
-    delete E;
-    delete F;
 }
 
 TEST(Comparison, Comparison_not_equal)
 {
-    Sphere A;
-    Box B;
+    Sphere A(posi, rad_o, rad_i);
+    Box B(posi, x_len, y_len, z_len);
     EXPECT_TRUE(A != B);
 
-    Sphere* C = new Sphere();
-    Box* D    = new Box();
+    Sphere* C = new Sphere(posi, rad_o, rad_i);
+    Box* D    = new Box(posi, x_len, y_len, z_len);
     EXPECT_TRUE(*C != *D);
-
-    Geometry* E = new Sphere();
-    Geometry* F = new Box();
-    EXPECT_TRUE(*E != *F);
 
     delete C;
     delete D;
-    delete E;
-    delete F;
 }
 
 TEST(Assignment, Copyconstructor)
 {
-    Sphere A;
+    Sphere A(posi, rad_o, rad_i);
     Sphere B = A;
 
     EXPECT_TRUE(A == B);
 
-    Geometry* C = new Sphere();
-    Geometry* D = new Box();
+    Geometry* C = new Sphere(posi, rad_o, rad_i);
+    Geometry* D = new Box(posi, x_len, y_len, z_len);
 
     *D = *C;
 
     EXPECT_FALSE(*C == *D);
 
-    Geometry* E = new Sphere(Vector3D(1.0, 0.0, 0.0), 20.0, 10.0);
+    auto E = std::make_shared<Sphere>(Vector3D(1.0, 0.0, 0.0), 20.0, 10.0);
+    auto F = ::std::make_shared<Sphere>(posi, rad_o, rad_i);
 
-    *C = *E;
+    *F = *E;
 
-    EXPECT_TRUE(*C == *E);
+    EXPECT_TRUE(*E == *F);
 }
 
 TEST(Assignment, Copyconstructor2)
 {
-    Sphere A;
+    Sphere A(posi, rad_o, rad_i);
     Sphere B(A);
 
     EXPECT_TRUE(A == B);
@@ -85,7 +81,7 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Assignment, Operator)
 {
-    Sphere A;
+    Sphere A(posi, rad_o, rad_i);
     Sphere B(Vector3D(0.0, 0.0, 0.0), 2.0, 1.0);
 
     EXPECT_TRUE(A != B);
@@ -95,24 +91,9 @@ TEST(Assignment, Operator)
     EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment, Swap)
-{
-    Sphere A;
-    Sphere B;
-    EXPECT_TRUE(A == B);
-    Geometry* C = new Sphere(Vector3D(1.0, 2.0, 3.0), 4.0, 3.0);
-    Geometry* D = new Sphere(Vector3D(1.0, 2.0, 3.0), 4.0, 3.0);
-
-    EXPECT_TRUE(*C == *D);
-
-    A.swap(*C);
-    EXPECT_TRUE(A == *D);
-    EXPECT_TRUE(B == *C);
-}
-
 TEST(DistanceToClosestApproach, Method)
 {
-    Sphere A;
+    Sphere A(posi, rad_o, rad_i);
     Vector3D position = Vector3D(1, -1, 0);
     Vector3D direction = Vector3D(0, 1, 0);
     direction.CalculateSphericalCoordinates();
@@ -124,7 +105,6 @@ TEST(DistanceToClosestApproach, Method)
 
 TEST(IsInside, Box)
 {
-
     Vector3D particle_position(0, 0, 0);
     Vector3D particle_direction(0, 0, 0);
 
@@ -172,9 +152,7 @@ TEST(IsInside, Box)
                                                   (2 * rnd_y0 - 1) * 0.5 * (big_width_y - width_y),
                                                   (2 * rnd_z0 - 1) * 0.5 * (big_height - height));
 
-        // The values are divided by 100 to convert the units...
-        // Init functions expects m but here everthing is in cm
-        Box A(0.01 * position_geometry, width_x / 100, width_y / 100, height / 100);
+        Box A(position_geometry, width_x, width_y, height);
 
         volumia_ratio = width_x * width_y * height / (big_width_x * big_width_y * big_height);
         for (int j = 0; j < number_particles; j++)
@@ -217,9 +195,7 @@ TEST(IsInside, Box)
     }
     // Check what happens if particles are on the border of the box
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Box A(Vector3D(0, 0, 0), width_x / 100, width_y / 100, height / 100);
+    Box A(Vector3D(0, 0, 0), width_x, width_y, height);
 
     // Particle is on the top surface.
     // Theta 0° - 90° means particle is moving outside
@@ -399,9 +375,7 @@ TEST(IsInside, Cylinder)
 
         inner_radius = radius * rnd_inner_radius;
 
-        // The values are divided by 100 to convert the units...
-        // Init functions expects m but here everthing is in cm
-        Cylinder A(0.01 * position_geometry, radius / 100, inner_radius / 100, height / 100);
+        Cylinder A(position_geometry, height, radius, inner_radius);
 
         volumia_ratio =
             height * PI * (pow(radius, 2) - pow(inner_radius, 2)) / (big_width_x * big_width_y * big_height);
@@ -448,9 +422,7 @@ TEST(IsInside, Cylinder)
 
     // Test borders
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Sphere B(Vector3D(0, 0, 0), radius / 100, 0);
+    Sphere B(Vector3D(0, 0, 0), radius, 0);
 
     double cos;
 
@@ -483,9 +455,7 @@ TEST(IsInside, Cylinder)
     // The value of phi does not matter
     particle_position.SetCartesianCoordinates(0, 0, 0.5 * height);
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Cylinder C(Vector3D(0, 0, 0), radius / 100, 0, height / 100);
+    Cylinder C(Vector3D(0, 0, 0), height, radius, 0);
 
     for (int i = 0; i < 1e4; i++)
     {
@@ -527,9 +497,7 @@ TEST(IsInside, Cylinder)
     // Test inner border
     inner_radius = 5;
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Cylinder A(Vector3D(0, 0, 0), radius / 100, inner_radius / 100, height / 100);
+    Cylinder A(Vector3D(0, 0, 0), height, radius, inner_radius);
 
     excluded = 0;
 
@@ -608,9 +576,7 @@ TEST(IsInside, Sphere)
 
         inner_radius = radius * rnd_inner_radius;
 
-        // The values are divided by 100 to convert the units...
-        // Init functions expects m but here everthing is in cm
-        Sphere A(0.01 * position_geometry, radius / 100, inner_radius / 100);
+        Sphere A(position_geometry, radius, inner_radius);
 
         volumia_ratio =
             (4. / 3. * PI * (pow(radius, 3) - pow(inner_radius, 3))) / (big_width_x * big_width_y * big_height);
@@ -651,9 +617,7 @@ TEST(IsInside, Sphere)
 
     // Test borders
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Sphere A(Vector3D(0, 0, 0), radius / 100, 0);
+    Sphere A(Vector3D(0, 0, 0), radius);
 
     double cos;
 
@@ -682,9 +646,7 @@ TEST(IsInside, Sphere)
     // Test inner border
     inner_radius = 5;
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Sphere B(Vector3D(0, 0, 0), radius / 100, inner_radius / 100);
+    Sphere B(Vector3D(0, 0, 0), radius, inner_radius);
 
     excluded = 0;
 
@@ -741,9 +703,7 @@ TEST(DistanceTo, Sphere)
             rnd_inner_radius = RandomGenerator::Get().RandomDouble();
             inner_radius     = radius * rnd_inner_radius;
 
-            // The values are divided by 100 to convert the units...
-            // Init functions expects m but here everthing is in cm
-            Sphere A(Vector3D(0, 0, 0), radius / 100, inner_radius / 100);
+            Sphere A(Vector3D(0, 0, 0), radius, inner_radius);
 
             rnd_phi   = RandomGenerator::Get().RandomDouble();
             rnd_theta = RandomGenerator::Get().RandomDouble();
@@ -836,9 +796,7 @@ TEST(DistanceTo, Cylinder)
             rnd_inner_radius = RandomGenerator::Get().RandomDouble();
             inner_radius     = radius * rnd_inner_radius;
 
-            // The values are divided by 100 to convert the units...
-            // Init functions expects m but here everthing is in cm
-            Cylinder A(Vector3D(0, 0, 0), radius / 100, inner_radius / 100, height / 100);
+            Cylinder A(Vector3D(0, 0, 0), height, radius, inner_radius);
 
             rnd_phi = RandomGenerator::Get().RandomDouble();
 
@@ -903,9 +861,7 @@ TEST(DistanceTo, Cylinder)
     // One test for inner_radius =0
     inner_radius = 0;
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Cylinder B(Vector3D(0, 0, 0), radius / 100, inner_radius / 100, height / 100);
+    Cylinder B(Vector3D(0, 0, 0), height, radius, inner_radius);
 
     // Chose particle location and angle
 
@@ -926,9 +882,7 @@ TEST(DistanceTo, Cylinder)
 
     inner_radius = 6;
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Cylinder A(Vector3D(0, 0, 0), radius / 100, inner_radius / 100, height / 100);
+    Cylinder A(Vector3D(0, 0, 0), height, radius, inner_radius);
 
     for (int j = 0; j < number_particles; j++)
     {
@@ -1063,9 +1017,7 @@ TEST(DistanceTo, Box)
     {
         rnd_phi = RandomGenerator::Get().RandomDouble();
 
-        // The values are divided by 100 to convert the units...
-        // Init functions expects m but here everthing is in cm
-        Box A(Vector3D(0, 0, 0), width / 100, width / 100, height / 100);
+        Box A(Vector3D(0, 0, 0), width, width, height);
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, 0.5 * PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -1123,7 +1075,7 @@ TEST(DistanceTo, Box)
         }
     }
 
-    Box A(Vector3D(0, 0, 0), width / 100, width / 100, height / 100);
+    Box A(Vector3D(0, 0, 0), width, width, height);
 
     for (int i = 0; i < number_particles; i++)
     {

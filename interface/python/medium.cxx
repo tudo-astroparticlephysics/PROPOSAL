@@ -66,7 +66,7 @@ void init_medium(py::module& m) {
 				>>> air = proposal.medium.Air(correction_factor)
 				)pbdoc")
         .def("__str__", &py_print<Medium>)
-        .def(py::init<>())
+        // .def(py::init<>())
         .def(py::init<
                  std::string,  double, double, double, double, double,
                  double, double, double,

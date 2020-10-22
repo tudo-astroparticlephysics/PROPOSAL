@@ -6,7 +6,7 @@
 namespace PROPOSAL {
 class Interaction {
 protected:
-    using rate_t = tuple<std::shared_ptr<CrossSectionBase>, std::shared_ptr<const Component>, double>;
+    using rate_t = std::tuple<std::shared_ptr<CrossSectionBase>, std::shared_ptr<const Component>, double>;
     using loss_t = std::tuple<InteractionType, std::shared_ptr<const Component>, double>;
     using crossbase_list_t = std::vector<std::shared_ptr<CrossSectionBase>>;
 
@@ -23,7 +23,7 @@ public:
     {}
     virtual ~Interaction() = default;
 
-    static Interpolant1DBuilder::Definition interpol_def;
+    static std::unique_ptr<Interpolant1DBuilder::Definition> interpol_def;
 
     virtual double EnergyInteraction(double, double) = 0;
 

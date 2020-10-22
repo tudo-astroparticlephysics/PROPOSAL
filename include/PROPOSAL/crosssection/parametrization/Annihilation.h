@@ -36,6 +36,7 @@
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -48,7 +49,7 @@ namespace crosssection {
         using only_stochastic = std::true_type;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-        tuple<double, double> GetKinematicLimits(const ParticleDef&,
+        std::tuple<double, double> GetKinematicLimits(const ParticleDef&,
             const Component&, double) const noexcept override;
     };
 
@@ -79,16 +80,23 @@ static std::map<std::string, annih_func_ptr<P, M>> annih_map = {
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_annihilation(P p_def, M medium, bool interpol,
-                                    const nlohmann::json& config){
-    if (!config.contains("parametrization"))
-        throw std::logic_error("No parametrization passed for annihilation");
+                                    const std::string& param_name){
 
-    std::string param_name = config["parametrization"];
     auto it = annih_map<P, M>.find(param_name);
     if (it == annih_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for annihilation");
 
     return it->second(p_def, medium, interpol);
+}
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_annihilation(P p_def, M medium, bool interpol,
+                                    const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for annihilation");
+    std::string param_name = config["parametrization"];
+
+    return make_annihilation(p_def, medium, interpol, param_name);
 }
 
 } // namespace crosssection

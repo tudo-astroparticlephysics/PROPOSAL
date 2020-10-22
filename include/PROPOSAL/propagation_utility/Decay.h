@@ -14,7 +14,7 @@ protected:
     double lower_lim;
 
     template <typename Cross>
-    double FunctionToIntegral(Cross&& cross, Displacement & disp, double energy)
+    double FunctionToIntegral(Cross const&, Displacement & disp, double energy)
     {
         assert(!std::isinf(lifetime));
         assert(energy >= mass);
@@ -27,7 +27,7 @@ public:
     Decay(double, double, double);
     virtual ~Decay() = default;
 
-    static Interpolant1DBuilder::Definition interpol_def;
+    static std::unique_ptr<Interpolant1DBuilder::Definition> interpol_def;
 
     virtual double EnergyDecay(double, double, double) = 0;
 };

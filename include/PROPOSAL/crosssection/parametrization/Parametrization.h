@@ -37,8 +37,6 @@
 #include <type_traits>
 
 using PROPOSAL::Components::Component;
-using std::string;
-using std::tuple;
 
 namespace PROPOSAL {
 class Medium;
@@ -47,16 +45,16 @@ namespace crosssection {
 
     struct Parametrization {
         const InteractionType interaction_type;
-        const string name;
+        const std::string name;
 
-        Parametrization(InteractionType, const string&);
+        Parametrization(InteractionType, const std::string&);
         virtual ~Parametrization() = default;
 
         virtual double DifferentialCrossSection(
             const ParticleDef&, const Component&, double, double) const = 0;
 
         enum { V_MIN, V_MAX };
-        virtual tuple<double, double> GetKinematicLimits(
+        virtual std::tuple<double, double> GetKinematicLimits(
             const ParticleDef&, const Component&, double) const = 0;
 
         inline double FunctionToDEdxIntegral(const ParticleDef& p_def,

@@ -34,7 +34,7 @@ double crosssection::EpairProduction::GetLowerEnergyLim(const ParticleDef& p_def
 {
     return p_def.mass + 2.f * ME;
 }
-tuple<double, double> crosssection::EpairProduction::GetKinematicLimits(
+std::tuple<double, double> crosssection::EpairProduction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy) const
     noexcept
 {

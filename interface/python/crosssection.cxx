@@ -1,4 +1,6 @@
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionInterpolantBase.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
@@ -54,6 +56,12 @@ void init_crosssection(py::module& m)
             m_sub, "CrossSectionBase")
         .def_property_readonly("lower_energy_lim", &CrossSectionContainer::GetLowerEnergyLim)
         .def_property_readonly("type", &CrossSectionContainer::GetInteractionType);
+
+    py::class_<CrossSectionInterpolantBase, std::shared_ptr<CrossSectionInterpolantBase>>(
+            m_sub, "CrossSectionInterpolantBase")
+        .def_readwrite_static("dNdx_def", &CrossSectionInterpolantBase::dNdx_def)
+        .def_readwrite_static("dEdx_def", &CrossSectionInterpolantBase::dEdx_def)
+        .def_readwrite_static("dE2dx_def", &CrossSectionInterpolantBase::dE2dx_def);
 
     py::class_<CrossSectionContainer, CrossSectionBase, std::shared_ptr<CrossSectionContainer>>(
             m_sub, "CrossSection",
@@ -151,6 +159,7 @@ void init_crosssection(py::module& m)
             )pbdoc")
         .def("calculate_dNdx", &CrossSectionContainer::CalculatedNdx,
                 py::arg("energy"),
+                py::arg("component"),
                 R"pbdoc(
 
         Calculates the total cross section
@@ -196,7 +205,7 @@ void init_crosssection(py::module& m)
 
             )pbdoc");
 
-        build_crosssection<crosssection::AnnihilationHeitler>(m_sub);
+    build_crosssection<crosssection::AnnihilationHeitler>(m_sub);
 
     build_crosssection<crosssection::BremsPetrukhinShestakov>(m_sub);
     build_crosssection<crosssection::BremsKelnerKokoulinPetrukhin>(m_sub);

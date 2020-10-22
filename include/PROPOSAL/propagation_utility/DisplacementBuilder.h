@@ -17,8 +17,10 @@ class DisplacementBuilder : public Displacement {
         auto low_lim = CrossSectionVector::GetLowerLim(cross);
         T integral(disp_func, low_lim);
         if (typeid(T) == typeid(UtilityInterpolant)) {
-            auto hash = CrossSectionVector::GetHash(cross);
-            integral.BuildTables("displacement", hash, interpol_def);
+            auto hash_digest = (size_t)0;
+            hash_combine(hash_digest, CrossSectionVector::GetHash(cross), interpol_def.GetHash());
+
+            integral.BuildTables("displacement", hash_digest, interpol_def);
         };
         return integral;
     }

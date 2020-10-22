@@ -29,9 +29,9 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include <memory>
 #include <unordered_map>
-using std::unordered_map;
 
 #define PHOTO_PARAM_REAL_DEC(param, parent)                                    \
     class Photo##param : public Photo##parent {                                \
@@ -48,7 +48,7 @@ namespace crosssection {
 class PhotoRealPhotonAssumption : public Photonuclear {
 protected:
     bool hard_component_;
-    unordered_map<size_t, std::shared_ptr<RealPhoton>> hard_component_map;
+    std::unordered_map<size_t, std::shared_ptr<RealPhoton>> hard_component_map;
 
 public:
     PhotoRealPhotonAssumption(bool hard_component);
@@ -101,17 +101,25 @@ static std::map<std::string, photoreal_func_ptr<P, M>> photoreal_map = {
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_photonuclearreal(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, const std::string& param_name,
+        bool hard_component){
+
+    auto it = photoreal_map<P, M>.find(param_name);
+    if (it == photoreal_map<P, M>.end())
+        throw std::invalid_argument("Unknown parametrization for photonuclear");
+
+    return it->second(p_def, medium, cuts, hard_component, interpol);
+}
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_photonuclearreal(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
     if (!config.contains("parametrization"))
         throw std::logic_error("No parametrization passed for photonuclear");
     std::string param_name = config["parametrization"];
+    bool hard_component = config.value("hard_component", true);
 
-    auto it = photoreal_map<P, M>.find(param_name);
-    if (it != photoreal_map<P, M>.end()) {
-        bool hard_component = config.value("hard_component", true);
-        return it->second(p_def, medium, cuts, hard_component, interpol);
-    }
-    throw std::invalid_argument("Unknown parametrization for photonuclear");
+    return make_photonuclearreal(p_def, medium, cuts, interpol, param_name, hard_component);
 }
 
 } // namespace crosssection

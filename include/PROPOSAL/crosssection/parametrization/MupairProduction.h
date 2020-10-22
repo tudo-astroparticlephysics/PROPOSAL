@@ -33,6 +33,7 @@
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/math/Integral.h"
 
 #define MUPAIR_PARAM_INTEGRAL_DEC(param)                                       \
@@ -62,7 +63,7 @@ namespace crosssection {
             double energy, double v, double r) const = 0;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-        tuple<double, double> GetKinematicLimits(const ParticleDef&,
+        std::tuple<double, double> GetKinematicLimits(const ParticleDef&,
             const Component&, double) const noexcept override;
     };
 
@@ -97,16 +98,23 @@ static std::map<std::string, mupair_func_ptr<P, M>> mupair_map = {
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_mupairproduction(P p_def, M medium, std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
-    if (!config.contains("parametrization"))
-        throw std::logic_error("No parametrization passed for mupairproduction");
+        EnergyCutSettings> cuts, bool interpol, const std::string& param_name){
 
-    std::string param_name = config["parametrization"];
     auto it = mupair_map<P, M>.find(param_name);
     if (it == mupair_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for mupairproduction");
 
     return it->second(p_def, medium, cuts, interpol);
+}
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_mupairproduction(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for mupairproduction");
+    std::string param_name = config["parametrization"];
+
+    return make_mupairproduction(p_def, medium, cuts, interpol, param_name);
 }
 
 } // namespace crosssection

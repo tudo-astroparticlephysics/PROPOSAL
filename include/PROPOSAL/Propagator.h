@@ -22,6 +22,7 @@
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
+#include "PROPOSAL/Secondaries.h"
 
 using std::get;
 using std::make_shared;
@@ -29,6 +30,8 @@ namespace PROPOSAL {
 
 using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
     std::shared_ptr<const Density_distr>>;
+
+/* class Secondaries; */
 
 class Propagator
 {
@@ -55,12 +58,14 @@ public:
         }
     }
     template <typename P>
-    Propagator(P&& p_def, const string& config_file)
+    Propagator(P&& p_def, const std::string& config_file)
     : Propagator(p_def, ParseConfig(config_file)) {}
     Propagator(ParticleDef const&, std::vector<Sector> sectors);
 
-    std::vector<DynamicData> Propagate(const DynamicData& initial_particle,
+    Secondaries Propagate(const DynamicData& initial_particle,
             double max_distance = 1e20, double min_energy = 0.);
+    enum {GEOMETRY, UTILITY, DENSITY_DISTR};
+
 private:
     void DoStochasticInteraction(DynamicData&, PropagationUtility&,
             std::function<double()>);
@@ -71,9 +76,8 @@ private:
             const Geometry& current_geometry);
     int maximize(const std::array<double, 3>& InteractionEnergies);
     int minimize(const std::array<double, 3>& AdvanceDistances);
-    Sector ChooseCurrentSector(const Vector3D& particle_position,
-            const Vector3D& particle_direction);
-
+    Sector GetCurrentSector(const Vector3D& particle_position,
+                            const Vector3D& particle_direction);
     //Global settings
     struct GlobalSettings{
         GlobalSettings();
@@ -95,7 +99,7 @@ private:
         bool do_interpolation
                 = json_sector.value("do_interpolation", global.do_interpolation);
         bool do_exact_time = json_sector.value("exact_time", global.do_exact_time);
-        string scattering = json_sector.value("scattering", global.scattering);
+        std::string scattering = json_sector.value("scattering", global.scattering);
         std::shared_ptr<Medium> medium = global.medium;
         if (json_sector.contains("medium")) {
             medium = CreateMedium(json_sector["medium"].get<std::string>());
@@ -147,7 +151,7 @@ private:
     template<typename CrossVec>
     PropagationUtility::Collection CreateUtility(
             CrossVec&& crosss, std::shared_ptr<Medium> medium, bool do_cont_rand,
-            bool do_interpol, bool do_exact_time, string scatter)
+            bool do_interpol, bool do_exact_time, std::string scatter)
     {
         PropagationUtility::Collection def;
         def.interaction_calc = make_interaction(crosss, do_interpol);
@@ -210,7 +214,6 @@ private:
 
     ParticleDef p_def;
     std::shared_ptr<InterpolationDef> interpol_def_global = nullptr;
-    enum {GEOMETRY, UTILITY, DENSITY_DISTR};
     enum Type : int {
         MinimalE = 0,
         Decay = 1,

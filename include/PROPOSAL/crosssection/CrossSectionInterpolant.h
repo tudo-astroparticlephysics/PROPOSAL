@@ -31,34 +31,32 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionInterpolantBase.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/methods.h"
 
-#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/particle/ParticleDef.h"
 
-using std::get;
-using std::unordered_map;
 
 namespace PROPOSAL {
 
 template <typename Param, typename P, typename M>
-class CrossSectionInterpolant : public crosssection_t<P, M> {
+class CrossSectionInterpolant : public crosssection_t<P, M>, public CrossSectionInterpolantBase {
 
-    using param_t = typename decay<Param>::type;
-    using particle_t = typename decay<P>::type;
-    using medium_t = typename decay<M>::type;
+    using param_t = typename std::decay<Param>::type;
+    using particle_t = typename std::decay<P>::type;
+    using medium_t = typename std::decay<M>::type;
     using base_param_ref_t =
-        typename add_lvalue_reference<typename param_t::base_param_t>::type;
+        typename std::add_lvalue_reference<typename param_t::base_param_t>::type;
 
     param_t param;
     particle_t p_def;
     medium_t medium;
     shared_ptr<const EnergyCutSettings> cut;
-    InterpolationDef def;
+
 
     dndx_map_t dndx_map;
 
@@ -75,13 +73,12 @@ protected:
 
 public:
     CrossSectionInterpolant(Param&& _param, P&& _p_def, M&& _medium,
-        shared_ptr<const EnergyCutSettings> _cut, const InterpolationDef& _def)
-        : CrossSection<typename decay<P>::type, typename decay<M>::type>()
+        shared_ptr<const EnergyCutSettings> _cut)
+        : CrossSection<typename std::decay<P>::type, typename std::decay<M>::type>()
         , param(std::forward<Param>(_param)) // only for back transformation
         , p_def(std::forward<P>(_p_def))     // needed TODO: Maximilian Sackel
         , medium(std::forward<M>(_medium))   // 2 Jun. 2020
         , cut(_cut)
-        , def(_def)
         , dndx_map(build_cross_section_dndx(param, p_def, medium, cut, true))
     {
         if (typename param_t::only_stochastic{} == true and cut != nullptr) {
@@ -92,12 +89,20 @@ public:
         if (cut != nullptr) {
             // Only for a defined EnergyCut, dEdx and dE2dx return non-zero values
             dedx = build_dedx(reinterpret_cast<base_param_ref_t>(param), p_def,
-                              medium, *cut, def, 0);
+                              medium, *cut, dEdx_def);
             de2dx = build_de2dx(reinterpret_cast<base_param_ref_t>(param), p_def,
-                                medium, *cut, def, 0);
+                                medium, *cut, dE2dx_def);
         }
     }
-
+    std::vector<std::shared_ptr<const Component>> GetTargets() const noexcept final
+    {
+        std::vector<std::shared_ptr<const Component>> targets;
+        for (auto& dndx : dndx_map)
+        {
+            targets.emplace_back(dndx.first);
+        }
+        return targets;
+    }
     inline double CalculatedEdx(double energy) override
     {
         if (dedx == nullptr)
@@ -111,19 +116,49 @@ public:
             return 0;
         return de2dx->Interpolate(energy);
     }
-    inline rates_t CalculatedNdx(double energy) override
+    // inline rates_t CalculatedNdx(double energy) override
+    // {
+    //     auto rates = rates_t();
+    //     for (auto& dndx : dndx_map) {
+    //         //TODO: dNdx interpolant results for individual components can become negative for small energies
+    //         // Instead of clipping these values to zero, the interpolant should be revised (jm)
+    //         rates[dndx.first] = std::max(dndx.second->Calculate(energy), 0.);
+    //         if (dndx.first)
+    //             rates[dndx.first] /= medium.GetSumNucleons()
+    //                 / (dndx.first->GetAtomInMolecule()
+    //                       * dndx.first->GetAtomicNum());
+    //     }
+    //     return rates;
+    // }
+    inline double CalculatedNdx(double energy, std::shared_ptr<const Component> comp_ptr) override
     {
-        auto rates = rates_t();
-        for (auto& dndx : dndx_map) {
-            //TODO: dNdx interpolant results for individual components can become negative for small energies
-            // Instead of clipping these values to zero, the interpolant should be revised (jm)
-            rates[dndx.first] = std::max(dndx.second->Calculate(energy), 0.);
-            if (dndx.first)
-                rates[dndx.first] /= medium.GetSumNucleons()
-                    / (dndx.first->GetAtomInMolecule()
-                          * dndx.first->GetAtomicNum());
+        //TODO: dNdx interpolant results for individual components can become negative for small energies
+        // Instead of clipping these values to zero, the interpolant should be revised (jm)
+        if (comp_ptr == nullptr)
+        {
+            double dndx_all = 0.;
+            double tmp;
+            for (auto& dndx : dndx_map) {
+                tmp = std::max(dndx.second->Calculate(energy), 0.);
+                if (dndx.first)
+                    tmp /= medium.GetSumNucleons()
+                        / (dndx.first->GetAtomInMolecule()
+                              * dndx.first->GetAtomicNum());
+
+                dndx_all += tmp;
+            }
+
+            return dndx_all;
         }
-        return rates;
+        else
+        {
+            double dndx = std::max(dndx_map[comp_ptr]->Calculate(energy), 0.);
+            if (comp_ptr)
+                dndx /= medium.GetSumNucleons()
+                    / (comp_ptr->GetAtomInMolecule()
+                          * comp_ptr->GetAtomicNum());
+            return dndx;
+        }
     }
     inline double CalculateStochasticLoss(
         std::shared_ptr<const Component> const& comp, double energy, double rate) override
@@ -136,7 +171,7 @@ public:
     {
         auto hash_digest = size_t{ 0 };
         hash_combine(hash_digest, param.GetHash(), p_def.GetHash(),
-            medium.GetHash(), def.GetHash());
+            medium.GetHash());
         if (cut != nullptr)
             hash_combine(hash_digest, cut->GetHash());
         return hash_digest;
@@ -151,138 +186,40 @@ public:
     }
 };
 
+
 template <typename Param>
 unique_ptr<Interpolant> build_dedx(Param&& param, const ParticleDef& p_def,
-    const Medium& medium, const EnergyCutSettings& cut,
-    const InterpolationDef& def, size_t hash)
+    const Medium& medium, const EnergyCutSettings& cut, Interpolant1DBuilder::Definition& def)
 {
     Integral integral;
-    Interpolant1DBuilder::Definition interpol_def;
-    interpol_def.function1d
+    def.function1d
         = [&integral, &param, &p_def, &medium, &cut](double energy) {
               return calculate_dedx(param, integral, p_def, medium, cut, energy,
-                  typename decay<Param>::type::component_wise{});
+                  typename std::decay<Param>::type::component_wise{});
           };
-    interpol_def.max = def.nodes_cross_section;
-    interpol_def.xmin = param.GetLowerEnergyLim(p_def);
-    interpol_def.xmax = def.max_node_energy;
-    interpol_def.romberg = def.order_of_interpolation;
-    interpol_def.rational = true;
-    interpol_def.isLog = true;
-    interpol_def.rombergY = def.order_of_interpolation;
-    interpol_def.logSubst = true;
+    def.xmin = param.GetLowerEnergyLim(p_def);
+    def.rational = true;
+    def.logSubst = true;
+    auto hash = def.GetHash();
     hash_combine(hash, param.GetHash(), cut.GetHash());
-    return Helper::InitializeInterpolation(
-        "dEdx", make_unique<Interpolant1DBuilder>(interpol_def), hash, def);
+    return Helper::InitializeInterpolation("dEdx", Interpolant1DBuilder(def), hash);
 }
 
 template <typename Param>
 unique_ptr<Interpolant> build_de2dx(Param&& param, const ParticleDef& p_def,
-    const Medium& medium, const EnergyCutSettings& cut,
-    const InterpolationDef& def, size_t hash)
+    const Medium& medium, const EnergyCutSettings& cut, Interpolant1DBuilder::Definition& def)
 {
     Integral integral;
-    Interpolant1DBuilder::Definition interpol_def;
-    interpol_def.function1d
+    def.function1d
         = [&integral, &param, &p_def, &medium, &cut](double energy) {
               return calculate_de2dx(param, integral, p_def, medium, cut,
-                  energy, typename decay<Param>::type::component_wise{});
+                  energy, typename std::decay<Param>::type::component_wise{});
           };
-    interpol_def.max = def.nodes_continous_randomization;
-    interpol_def.xmin = param.GetLowerEnergyLim(p_def);
-    interpol_def.xmax = def.max_node_energy;
-    interpol_def.romberg = def.order_of_interpolation;
-    interpol_def.isLog = true;
-    interpol_def.rombergY = def.order_of_interpolation;
-    auto builder = make_unique<Interpolant1DBuilder>(interpol_def);
+    def.xmin = param.GetLowerEnergyLim(p_def);
+    auto hash = def.GetHash();
     hash_combine(hash, param.GetHash(), cut.GetHash());
-    return Helper::InitializeInterpolation(
-        "dE2dx", std::move(builder), hash, def);
+    return Helper::InitializeInterpolation("dE2dx", Interpolant1DBuilder(def), hash);
 }
-
-/* using dndx_func_t = function<double(double, double)>; */
-
-/* template <typename Param> */
-/* unordered_map<const Component*, dndx_func_t> build_dndx_functions(Param&&
- * param, */
-/*     const ParticleDef& p_def, const Medium& medium, */
-/*     const EnergyCutSettings& cut, std::true_type) */
-/* { */
-/*     unordered_map<const Component*, dndx_func_t> dndx_functions; */
-/*     for (const auto& comp : medium.GetComponents()) { */
-/*         dndx_functions[&comp] */
-/*             = [&param, &p_def, &comp, &cut](double energy, double v) { */
-/*                   Integral integral; */
-/*                   auto lim = param.GetKinematicLimits(p_def, comp, energy);
- */
-/*                   auto v_cut = cut.GetCut(lim, energy); */
-/*                   v = transform_relativ_loss( */
-/*                       v_cut, get<Parametrization::V_MAX>(lim), v); */
-/*                   return integrate_dndx( */
-/*                       integral, param, p_def, comp, energy, v_cut, v); */
-/*               }; */
-/*     } */
-/*     return dndx_functions; */
-/* } */
-
-/* template <typename Param> */
-/* unordered_map<const Component*, dndx_func_t> build_dndx_functions(Param&&
- * param, */
-/*     const ParticleDef& p_def, const Medium& medium, */
-/*     const EnergyCutSettings& cut, std::false_type) */
-/* { */
-/*     Integral integral; */
-/*     unordered_map<const Component*, dndx_func_t> dndx_functions; */
-/*     auto dndx_func = [&param, &p_def, &medium, &cut](double energy, double v)
- * { */
-/*         Integral integral; */
-/*         auto lim = param.GetKinematicLimits(p_def, medium, energy); */
-/*         auto v_cut = cut.GetCut(lim, energy); */
-/*         v = transform_relativ_loss(v_cut, get<Parametrization::V_MAX>(lim),
- * v); */
-/*         return integrate_dndx(integral, param, p_def, medium, energy, v_cut,
- * v); */
-/*     }; */
-/*     dndx_functions[nullptr] = dndx_func; */
-/*     return dndx_functions; */
-/* } */
-
-/* template <typename Param> */
-/* unordered_map<const Component*, unique_ptr<Interpolant>> build_dndx( */
-/*     Param&& param, const ParticleDef& p_def, const Medium& medium, */
-/*     const EnergyCutSettings& cut, const InterpolationDef& def, size_t hash)
- */
-/* { */
-/*     Interpolant2DBuilder::Definition interpol_def; */
-/*     interpol_def.max1 = def.nodes_cross_section; */
-/*     interpol_def.x1min = param.GetLowerEnergyLim(p_def); */
-/*     interpol_def.x1max = def.max_node_energy; */
-/*     interpol_def.max2 = def.nodes_cross_section; */
-/*     interpol_def.x2min = 0.0; */
-/*     interpol_def.x2max = 1.0; */
-/*     interpol_def.romberg1 = def.order_of_interpolation; */
-/*     interpol_def.isLog1 = true; */
-/*     interpol_def.romberg2 = def.order_of_interpolation; */
-/*     interpol_def.rombergY = def.order_of_interpolation; */
-/*     interpol_def.rationalY = true; */
-
-/*     using param_t = typename decay<Param>::type; */
-/*     unordered_map<const Component*, dndx_func_t> dndx_functions */
-/*         = build_dndx_functions( */
-/*             param, p_def, medium, cut, typename param_t::component_wise{});
- */
-
-/*     unordered_map<const Component*, unique_ptr<Interpolant>> dndx_interpol;
- */
-/*     for (const auto& dndx_func : dndx_functions) { */
-/*         interpol_def.function2d = dndx_func.second; */
-/*         auto builder = make_unique<Interpolant2DBuilder>(interpol_def); */
-/*         hash_combine(hash, param.GetHash(), cut.GetHash()); */
-/*         dndx_interpol[dndx_func.first] = Helper::InitializeInterpolation( */
-/*             "dNdx", std::move(builder), hash, def); */
-/*     } */
-/*     return dndx_interpol; */
-/* } */
 
 template <typename Param, typename P, typename M>
 double CrossSectionInterpolant<Param, P, M>::CalculateStochasticLoss_impl(

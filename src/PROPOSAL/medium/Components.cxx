@@ -119,6 +119,13 @@ size_t Component::GetHash() const noexcept
 // Methods
 // ------------------------------------------------------------------------- //
 
+
+bool Component::operator!=(const Component& component) const
+{
+    return !(*this == component);
+}
+
+
 // ------------------------------------------------------------------------- //
 void Component::SetLogConstant()
 {

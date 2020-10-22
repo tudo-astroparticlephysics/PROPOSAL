@@ -38,17 +38,22 @@
 namespace PROPOSAL {
 
 class Geometry;
+class PropagationUtility;
+class Density_distr;
+
+using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
+            std::shared_ptr<const Density_distr>>;
 
 class Secondaries {
 
 public:
-    Secondaries();
-    Secondaries(std::shared_ptr<ParticleDef>);
+    Secondaries(std::shared_ptr<ParticleDef>, std::vector<Sector>);
 
     void reserve(size_t number_secondaries);
     void clear() { secondaries_.clear(); };
 
     DynamicData& operator[](std::size_t idx) { return secondaries_[idx]; };
+    DynamicData& back() { return secondaries_.back(); };
 
     void push_back(const DynamicData& continuous_loss);
     void emplace_back(const int& type);
@@ -77,26 +82,19 @@ public:
         return secondaries_;
     };
     unsigned int GetNumberOfParticles() const { return secondaries_.size(); };
-    Secondaries GetOnlyLostInsideDetector() const;
 
-    // TODO: Prelimary, see note below
-    double GetELost() const;
-    DynamicData GetEntryPoint() const;
-    DynamicData GetExitPoint() const;
-    DynamicData GetClosestApproachPoint() const;
-    void SetEntryPoint(const DynamicData& entry_point);
-    void SetExitPoint(const DynamicData& exit_point);
-    void SetClosestApproachPoint(const DynamicData& closest_approach_point);
+    double GetELost(const Geometry&) const;
+    std::unique_ptr<DynamicData> GetEntryPoint(const Geometry& geometry) const;
+    std::unique_ptr<DynamicData> GetExitPoint(const Geometry& geometry) const;
+    std::unique_ptr<DynamicData> GetClosestApproachPoint(const Geometry& geometry) const;
 
 private:
+    DynamicData RePropagate(const DynamicData&, const Vector3D&, double) const;
+    Sector GetCurrentSector(const Vector3D&, const Vector3D&) const;
+
     std::vector<DynamicData> secondaries_;
     std::shared_ptr<ParticleDef> primary_def_;
-
-    // TODO: Entry and Exit point must not necessary be saved.
-    // It can be calculated by a given structure
-    std::unique_ptr<DynamicData> entry_point_;
-    std::unique_ptr<DynamicData> exit_point_;
-    std::unique_ptr<DynamicData> closest_approach_point_;
+    std::vector<Sector> sectors_;
 };
 
 } // namespace PROPOSAL

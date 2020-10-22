@@ -2,15 +2,13 @@
 
 using namespace PROPOSAL;
 
-Interpolant1DBuilder::Definition Interaction::interpol_def(1000);
+std::unique_ptr<Interpolant1DBuilder::Definition> Interaction::interpol_def = nullptr;
 
 double Interaction::FunctionToIntegral(Displacement& disp, double energy)
 {
-    auto total_rate = 0.f;
+    auto total_rate = 0.;
     for (auto& c : cross_list) {
-        auto rates = c->CalculatedNdx(energy);
-        for (auto& r : rates)
-            total_rate += r.second;
+        total_rate += c->CalculatedNdx(energy);
     }
     if(total_rate > 0)
         return disp.FunctionToIntegral(energy) * total_rate;
@@ -19,11 +17,9 @@ double Interaction::FunctionToIntegral(Displacement& disp, double energy)
 
 double Interaction::MeanFreePath(double energy)
 {
-    auto total_rate = 0.f;
+    auto total_rate = 0.;
     for (auto& c : cross_list) {
-        auto rates = c->CalculatedNdx(energy);
-        for (auto& r : rates)
-            total_rate += r.second;
+        total_rate += c->CalculatedNdx(energy);
     }
     return 1 / total_rate;
 }
@@ -33,7 +29,7 @@ Interaction::loss_t Interaction::SampleLoss(double energy, std::vector<rate_t> c
     auto sampled_rate = rnd * std::accumulate(rates.begin(), rates.end(), 0., [](double a, rate_t r) { return a + std::get<RATE>(r); });
     for (auto& r : rates) {
         sampled_rate -= std::get<RATE>(r);
-        if (sampled_rate < 0.f) {
+        if (sampled_rate < 0.) {
             auto loss = std::get<CROSS>(r)->CalculateStochasticLoss(
                     std::get<COMP>(r), energy, -sampled_rate);
             return std::make_tuple( std::get<CROSS>(r)->GetInteractionType(),
@@ -46,9 +42,12 @@ Interaction::loss_t Interaction::SampleLoss(double energy, std::vector<rate_t> c
 std::vector<Interaction::rate_t> Interaction::Rates(double energy){
     auto rates = std::vector<rate_t>();
     for (auto& c : cross_list) {
-        auto rates_comp = c->CalculatedNdx(energy);
-        for (auto& r : rates_comp)
-            rates.emplace_back(c, r.first, r.second);
+        auto comp_list = c->GetTargets();
+        for (auto comp : comp_list)
+        {
+            auto rates_comp = c->CalculatedNdx(energy, comp);
+            rates.emplace_back(c, comp, rates_comp);
+        }
     }
     return rates;
 }

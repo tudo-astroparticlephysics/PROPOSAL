@@ -32,7 +32,6 @@
 #include <memory>
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-using std::shared_ptr;
 
 namespace PROPOSAL {
 class Interpolant;
@@ -61,7 +60,7 @@ public:
 
 class HardComponent : public RealPhoton {
     static std::vector<double> x;
-    std::vector<shared_ptr<Interpolant>> interpolant_;
+    std::vector<std::shared_ptr<Interpolant>> interpolant_;
 
     static const std::string name_;
 
@@ -84,7 +83,7 @@ public:
     using component_wise = std::true_type;
 
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-    tuple<double, double> GetKinematicLimits(
+    std::tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double) const noexcept override;
 };
 

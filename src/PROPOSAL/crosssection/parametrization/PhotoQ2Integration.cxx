@@ -710,7 +710,7 @@ double crosssection::Photonuclear::GetLowerEnergyLim(const ParticleDef& p_def) c
     return p_def.mass;
 }
 
-tuple<double, double> crosssection::Photonuclear::GetKinematicLimits(
+std::tuple<double, double> crosssection::Photonuclear::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy) const noexcept
 {
     auto v_min

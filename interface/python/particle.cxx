@@ -48,7 +48,7 @@ void init_particle(py::module& m) {
     )pbdoc";
 
     py::class_<ParticleDef, std::shared_ptr<ParticleDef>>(m_sub, "ParticleDef")
-        .def(py::init<>())
+        // .def(py::init<>())
         .def(py::init<std::string, double, double, double, double,
                       const HardComponentTables::VecType&, const DecayTable&,
                       const int, const int>(),
@@ -261,10 +261,10 @@ void init_particle(py::module& m) {
                 Propagated distance of primary particle.
             )pbdoc");
 
-    py::class_<std::vector<DynamicData>>(m, "Secondaries");
+    /* py::class_<std::vector<DynamicData>>(m, "Secondaries"); */
 
     /* py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries", */
-    /*         R"pbdoc(List of secondaries)pbdoc") */
+    /*         R"pbdoc(List of secondaries)pbdoc"); */
     /*     .def("Query", overload_cast_<const int&>()(&Secondaries::Query, py::const_), py::arg("Interaction")) */
     /*     .def("Query", overload_cast_<const std::string&>()(&Secondaries::Query, py::const_), py::arg("Interaction")) */
     /*     .def("decay", &Secondaries::DoDecay) */

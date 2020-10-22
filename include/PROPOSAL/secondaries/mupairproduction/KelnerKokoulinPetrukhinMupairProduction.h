@@ -4,6 +4,7 @@
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/secondaries/mupairproduction/MupairProduction.h"
+#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 /* #include <unordered_map> */
 
 using PROPOSAL::Components::Component;

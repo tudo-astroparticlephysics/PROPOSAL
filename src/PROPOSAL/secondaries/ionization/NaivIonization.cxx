@@ -11,11 +11,6 @@ using std::sqrt;
 using namespace PROPOSAL;
 
 
-double secondaries::NaivIonization::CalculateRho(
-    double primary_energy, double loss_energy)
-{
-    return loss_energy / primary_energy;
-}
 
 tuple<Vector3D, Vector3D> secondaries::NaivIonization::CalculateDirections(
     Vector3D dir, double, double, double)
@@ -24,19 +19,19 @@ tuple<Vector3D, Vector3D> secondaries::NaivIonization::CalculateDirections(
 }
 
 tuple<double, double> secondaries::NaivIonization::CalculateEnergy(
-    double energy, double rho)
+    double energy, double v)
 {
-    return make_tuple(energy * (1 - rho), energy * rho);
+    return make_tuple(energy * (1 - v), energy * v);
 }
 
 vector<Loss::secondary_t> secondaries::NaivIonization::CalculateSecondaries(
     double primary_energy, Loss::secondary_t loss, const Component&,
     vector<double> rnd)
 {
-    auto rho = CalculateRho(primary_energy, get<Loss::ENERGY>(loss));
-    auto secondary_energy = CalculateEnergy(get<Loss::ENERGY>(loss), rho);
+    auto v = std::get<Loss::ENERGY>(loss) / primary_energy;
+    auto secondary_energy = CalculateEnergy(primary_energy, v);
     auto secondary_dir = CalculateDirections(
-        get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), rho, rnd[1]);
+        get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), v, rnd[1]);
     auto sec = std::vector<Loss::secondary_t>();
     sec.emplace_back(primary_particle_type, get<Loss::POSITION>(loss),
         get<0>(secondary_dir), get<0>(secondary_energy), 0.);

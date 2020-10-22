@@ -23,7 +23,7 @@ double crosssection::Annihilation::GetLowerEnergyLim(
     return p_def.mass * 2.f;
 }
 
-tuple<double, double> crosssection::Annihilation::GetKinematicLimits(
+std::tuple<double, double> crosssection::Annihilation::GetKinematicLimits(
     const ParticleDef& p_def, const Component&, double energy) const noexcept
 {
     // Limits according to simple 2->2 body interactions
