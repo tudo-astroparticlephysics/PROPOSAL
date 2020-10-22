@@ -33,7 +33,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 //     EnergyCutSettings ecuts;
 //     double multiplier   = 1.;
 //     bool hard_component = true;
-//     ShadowButkevichMikhailov shadow;
+//     ShadowButkevichMikheyev shadow;
 //     InterpolationDef InterpolDef;
 
 //     PhotoKokoulin* PhotoReal_A   = new PhotoKokoulin(particle_def, medium, ecuts, multiplier, hard_component);
@@ -94,7 +94,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 //     double multiplier_1 = 1.;
 //     double multiplier_2 = 2.;
 //     bool hard_component = true;
-//     ShadowButkevichMikhailov shadow_1;
+//     ShadowButkevichMikheyev shadow_1;
 //     ShadowDuttaRenoSarcevicSeckel shadow_2;
 //     InterpolationDef InterpolDef;
 
@@ -141,7 +141,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 //     EXPECT_TRUE(PhotoReal_A != PhotoQ2_A);
 
 //     PhotoAbramowiczLevinLevyMaor91 param_Q2_2(mu_def, medium_1, ecuts_1, multiplier_1, shadow_1);
-//     PhotoButkevichMikhailov param_Q2_3(mu_def, medium_1, ecuts_1, multiplier_1, shadow_1);
+//     PhotoButkevichMikheyev param_Q2_3(mu_def, medium_1, ecuts_1, multiplier_1, shadow_1);
 //     PhotoRenoSarcevicSu param_Q2_4(mu_def, medium_1, ecuts_1, multiplier_1, shadow_1);
 //     EXPECT_TRUE(PhotoQ2_A != param_Q2_2);
 //     EXPECT_TRUE(PhotoQ2_A != param_Q2_3);
@@ -168,7 +168,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 //     EnergyCutSettings ecuts;
 //     double multiplier   = 1.;
 //     bool hard_component = true;
-//     ShadowButkevichMikhailov shadow;
+//     ShadowButkevichMikheyev shadow;
 //     InterpolationDef InterpolDef;
 
 //     PhotoKokoulin PhotoReal_A(particle_def, medium, ecuts, multiplier, hard_component);
@@ -204,7 +204,7 @@ const std::string testfile_dir = "bin/TestFiles/";
 //     EnergyCutSettings ecuts;
 //     double multiplier   = 1.;
 //     bool hard_component = true;
-//     ShadowButkevichMikhailov shadow;
+//     ShadowButkevichMikheyev shadow;
 //     InterpolationDef InterpolDef;
 
 //     PhotoKokoulin PhotoReal_A(particle_def, medium, ecuts, multiplier, hard_component);
