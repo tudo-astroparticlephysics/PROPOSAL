@@ -543,6 +543,8 @@ double crosssection::EpairForElectronPositron::FunctionToIntegral(
 
     U       = aux / (1 + aux1 / aux2);
 
+    xi      = v * v * (1 - rMax * rMax)/(4 * (1 - v));
+    aux1    = 2 * SQRTE * std::pow(ME, 2) * medium_log_constant * Z3 * (1 + xi) * (1 + Y);
     aux2    = ME * energy * v * (1 - rMax * rMax);
     U_max   = aux / (1 + aux1 / aux2);
 
