@@ -2,7 +2,7 @@
 
 using namespace PROPOSAL;
 
-std::unique_ptr<Interpolant1DBuilder::Definition> Interaction::interpol_def = nullptr;
+Interpolant1DBuilder::Definition Interaction::interpol_def = {};
 
 double Interaction::FunctionToIntegral(Displacement& disp, double energy)
 {

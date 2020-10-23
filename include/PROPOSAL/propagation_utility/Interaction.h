@@ -23,7 +23,7 @@ public:
     {}
     virtual ~Interaction() = default;
 
-    static std::unique_ptr<Interpolant1DBuilder::Definition> interpol_def;
+    static Interpolant1DBuilder::Definition interpol_def;
 
     virtual double EnergyInteraction(double, double) = 0;
 

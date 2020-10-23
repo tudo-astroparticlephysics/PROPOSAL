@@ -27,7 +27,7 @@ public:
     Decay(double, double, double);
     virtual ~Decay() = default;
 
-    static std::unique_ptr<Interpolant1DBuilder::Definition> interpol_def;
+    static Interpolant1DBuilder::Definition interpol_def;
 
     virtual double EnergyDecay(double, double, double) = 0;
 };

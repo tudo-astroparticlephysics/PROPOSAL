@@ -10,4 +10,4 @@ Decay::Decay(double lifetime, double mass, double lower_lim)
 {
 }
 
-std::unique_ptr<Interpolant1DBuilder::Definition> Decay::interpol_def = nullptr;
+Interpolant1DBuilder::Definition Decay::interpol_def = {};

@@ -120,7 +120,7 @@ PYBIND11_MODULE(proposal, m)
                 py::arg("energy"), py::arg("rates"), py::arg("random number"))
         .def("mean_free_path", py::vectorize(&Interaction::MeanFreePath),
                 py::arg("energy"))
-        .def_property_static("interpol_def", [](){return *Interaction::interpol_def;}, [](Interpolant1DBuilder::Definition def){Interaction::interpol_def = std::make_unique<Interpolant1DBuilder::Definition>(def);});
+        .def_readwrite_static("interpol_def", &Interaction::interpol_def);
 
     m.def("make_interaction", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
             return shared_ptr<Interaction>(make_interaction(cross, interpolate));
@@ -242,7 +242,7 @@ PYBIND11_MODULE(proposal, m)
                     Returns:
                         float: randomized final energy
                 )pbdoc")
-        .def_property_static("interpol_def", [](){return *ContRand::interpol_def;}, [](Interpolant1DBuilder::Definition def){ContRand::interpol_def = std::make_unique<Interpolant1DBuilder::Definition>(def);});
+        .def_readwrite_static("interpol_def", &ContRand::interpol_def);
 
         m.def("make_contrand", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
                 return shared_ptr<ContRand>(make_contrand(cross, interpolate));
@@ -250,7 +250,7 @@ PYBIND11_MODULE(proposal, m)
 
     py::class_<Decay, std::shared_ptr<Decay>>(m, "Decay")
         .def("energy_decay", py::vectorize(&Decay::EnergyDecay), py::arg("energy"), py::arg("rnd"), py::arg("density"))
-        .def_property_static("interpol_def", [](){return *Decay::interpol_def;}, [](Interpolant1DBuilder::Definition def){Decay::interpol_def = std::make_unique<Interpolant1DBuilder::Definition>(def);});
+        .def_readwrite_static("interpol_def", &Decay::interpol_def);
 
     m.def("make_decay", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
             return shared_ptr<Decay>(make_decay(cross, particle, interpolate));
@@ -258,7 +258,7 @@ PYBIND11_MODULE(proposal, m)
 
     py::class_<Time, std::shared_ptr<Time>>(m, "Time")
         .def("elapsed", &Time::TimeElapsed, py::arg("initial_energy"), py::arg("final_energy"), py::arg("distance"), py::arg("density"))
-        .def_property_static("interpol_def", [](){return *Time::interpol_def;}, [](Interpolant1DBuilder::Definition def){Time::interpol_def = std::make_unique<Interpolant1DBuilder::Definition>(def);});
+        .def_readwrite_static("interpol_def", &Time::interpol_def);
 
     m.def("make_time", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
             return shared_ptr<Time>(make_time(cross, particle, interpolate));
