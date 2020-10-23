@@ -73,5 +73,55 @@ TEST(SecondaryVector, EntryPointExitPoint)
     auto sphere = Sphere(Vector3D(0, 0, 10000), 1000);
     EXPECT_TRUE(secondaries.GetEntryPoint(sphere)->GetPropagatedDistance() == 9000);
     EXPECT_TRUE(secondaries.GetExitPoint(sphere)->GetPropagatedDistance() == 11000);
+}
 
+TEST(SecondaryVector, EntryPointExitPointRePropagation)
+{
+    auto prop = GetPropagator();
+
+    Vector3D position(0, 0, 0);
+    Vector3D direction(0, 0, 1);
+    auto energy = 1e8; // MeV
+    auto init_state = DynamicData(13, position, direction, energy, energy, 0., 0.);
+
+    auto secondaries = prop->Propagate(init_state, 1e5);
+
+    auto sphere = Sphere(Vector3D(0, 0, 5e4), 500);
+    auto entry_point = secondaries.GetEntryPoint(sphere);
+    auto exit_point = secondaries.GetExitPoint(sphere);
+    int i = 0;
+    while (secondaries[i].GetPropagatedDistance() < entry_point->GetPropagatedDistance() ) {
+        i++;
+    }
+    auto sec_i = secondaries[i-1];
+    auto sec_f = secondaries[i];
+
+    EXPECT_TRUE(sec_i.GetEnergy() > entry_point->GetEnergy());
+    EXPECT_TRUE(sec_i.GetTime() < entry_point->GetTime());
+    EXPECT_TRUE(sec_i.GetPropagatedDistance() < entry_point->GetPropagatedDistance());
+    EXPECT_TRUE(sphere.IsInfront(sec_i.GetPosition(), sec_i.GetDirection()));
+
+    EXPECT_TRUE(sec_f.GetEnergy() < entry_point->GetEnergy());
+    EXPECT_TRUE(sec_f.GetTime() > entry_point->GetTime());
+    EXPECT_TRUE(sec_f.GetPropagatedDistance() > entry_point->GetPropagatedDistance());
+    EXPECT_FALSE(sphere.IsInfront(sec_f.GetPosition(), sec_f.GetDirection()));
+    EXPECT_TRUE(entry_point->GetPropagatedDistance() == sphere.GetPosition().GetZ() - sphere.GetRadius());
+
+    while (secondaries[i].GetPropagatedDistance() < exit_point->GetPropagatedDistance()) {
+        i++;
+    }
+
+    sec_i = secondaries[i-1]; // point before exit point
+    sec_f = secondaries[i]; // points after exit point
+
+    EXPECT_TRUE(sec_i.GetEnergy() > exit_point->GetEnergy());
+    EXPECT_TRUE(sec_i.GetTime() < exit_point->GetTime());
+    EXPECT_TRUE(sec_i.GetPropagatedDistance() < exit_point->GetPropagatedDistance());
+    EXPECT_FALSE(sphere.IsBehind(sec_i.GetPosition(), sec_i.GetDirection()));
+
+    EXPECT_TRUE(sec_f.GetEnergy() < exit_point->GetEnergy());
+    EXPECT_TRUE(sec_f.GetTime() > exit_point->GetTime());
+    EXPECT_TRUE(sec_f.GetPropagatedDistance() > exit_point->GetPropagatedDistance());
+    EXPECT_TRUE(sphere.IsBehind(sec_f.GetPosition(), sec_f.GetDirection()));
+    EXPECT_TRUE(exit_point->GetPropagatedDistance() == sphere.GetPosition().GetZ() + sphere.GetRadius());
 }

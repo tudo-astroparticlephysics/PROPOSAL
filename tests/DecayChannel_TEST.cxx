@@ -186,9 +186,9 @@ TEST(DecaySpectrum, MuMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = lep_approx.Decay(init_particle_def, init_particle);
+        auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -239,9 +239,9 @@ TEST(DecaySpectrum, MuMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = lep.Decay(init_particle_def, init_particle);
+        auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -297,9 +297,9 @@ TEST(DecaySpectrum, MuMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = many_body.Decay(init_particle_def, init_particle);
+        auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -386,9 +386,9 @@ TEST(DecaySpectrum, MuMinus_Energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = lep_approx.Decay(init_particle_def, init_particle);
+        auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -440,9 +440,9 @@ TEST(DecaySpectrum, MuMinus_Energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = lep.Decay(init_particle_def, init_particle);
+        auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -498,9 +498,9 @@ TEST(DecaySpectrum, MuMinus_Energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = many_body.Decay(init_particle_def, init_particle);
+        auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -586,9 +586,9 @@ TEST(DecaySpectrum, TauMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = lep_approx.Decay(init_particle_def, init_particle);
+        auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -639,9 +639,9 @@ TEST(DecaySpectrum, TauMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = lep.Decay(init_particle_def, init_particle);
+        auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -697,9 +697,9 @@ TEST(DecaySpectrum, TauMinus_Rest){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = many_body.Decay(init_particle_def, init_particle);
+        auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -786,9 +786,9 @@ TEST(DecaySpectrum, TauMinus_energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = lep_approx.Decay(init_particle_def, init_particle);
+        auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -839,9 +839,9 @@ TEST(DecaySpectrum, TauMinus_energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = lep.Decay(init_particle_def, init_particle);
+        auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -897,9 +897,9 @@ TEST(DecaySpectrum, TauMinus_energy){
         init_particle.SetPosition(Vector3D(0, 0, -1));
         init_particle.SetEnergy(init_energy);
         init_particle.SetPropagatedDistance(0);
-        Secondaries aux = many_body.Decay(init_particle_def, init_particle);
+        auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux.GetSecondaries()){
+        for(DynamicData particle : aux){
             aux_energy = particle.GetEnergy();
             if(particle.GetType() == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;

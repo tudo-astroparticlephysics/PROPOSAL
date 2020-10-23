@@ -275,8 +275,8 @@ DynamicData Secondaries::RePropagate(const DynamicData &init,
     auto advance_grammage = density->Calculate(init.GetPosition(), direction,
                                                displacement);
     auto E_f = utility.EnergyDistance(init.GetEnergy(), advance_grammage);
-    auto new_time = utility.TimeElapsed(init.GetEnergy(), E_f, displacement,
-                                        density->Evaluate(init.GetPosition()));
+    auto new_time = init.GetTime() + utility.TimeElapsed(
+            init.GetEnergy(), E_f,displacement, density->Evaluate(init.GetPosition()));
     auto new_position = init.GetPosition() + direction * displacement;
     auto new_propagated_distance = init.GetPropagatedDistance() + displacement;
     return DynamicData((int)InteractionType::ContinuousEnergyLoss, new_position,
@@ -287,7 +287,7 @@ DynamicData Secondaries::RePropagate(const DynamicData &init,
 Sector Secondaries::GetCurrentSector(const Vector3D& position,
                                      const Vector3D& direction) const
 {
-    //TODO: this is essentially a dublicate of Propagator::GetCurrentSector
+    //TODO: this is essentially a duplicate of Propagator::GetCurrentSector
     auto potential_sec = std::vector<Sector const*>{};
     for (auto& sector : sectors_) {
         if (get<Propagator::GEOMETRY>(sector)->IsInside(position, direction))
