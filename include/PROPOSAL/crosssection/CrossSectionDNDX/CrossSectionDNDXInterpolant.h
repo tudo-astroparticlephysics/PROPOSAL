@@ -11,7 +11,7 @@ using std::unique_ptr;
 
 namespace PROPOSAL {
 namespace crosssection{
-    class Parametrization;
+    struct Parametrization;
 }
 struct ParticleDef;
 
