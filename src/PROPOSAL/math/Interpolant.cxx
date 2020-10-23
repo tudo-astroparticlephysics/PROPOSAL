@@ -1643,25 +1643,25 @@ void Interpolant::InitInterpolant(int max,
 
     if (romberg <= 0)
     {
-        Logging::Get("proposal.interpolant")->warn("romberg = %i must be > 0! setting to 1!", romberg);
+        Logging::Get("proposal.interpolant")->warn("romberg = {} must be > 0! setting to 1!", romberg);
         romberg = 1;
     }
 
     if (romberg > max)
     {
-        Logging::Get("proposal.interpolant")->warn("romberg = %i must be <= max = %i! setting to %i!", romberg, max, max);
+        Logging::Get("proposal.interpolant")->warn("romberg = {} must be <= max = {}! setting to {}!", romberg, max, max);
         romberg = max;
     }
 
     if (rombergY <= 0)
     {
-        Logging::Get("proposal.interpolant")->warn("rombergY = %i must be > 0! setting to 1!", rombergY);
+        Logging::Get("proposal.interpolant")->warn("rombergY = {} must be > 0! setting to 1!", rombergY);
         rombergY = 1;
     }
 
     if (rombergY > max)
     {
-        Logging::Get("proposal.interpolant")->warn("rombergY = %i must be < %i! setting to %i!", rombergY, max, max);
+        Logging::Get("proposal.interpolant")->warn("rombergY = {} must be <= {}! setting to {}!", rombergY, max, max);
         rombergY = max;
     }
 
