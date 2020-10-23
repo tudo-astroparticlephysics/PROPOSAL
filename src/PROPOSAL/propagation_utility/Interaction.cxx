@@ -2,7 +2,7 @@
 
 using namespace PROPOSAL;
 
-Interpolant1DBuilder::Definition Interaction::interpol_def = {};
+Interpolant1DBuilder::Definition Interaction::interpol_def = {1000};
 
 double Interaction::FunctionToIntegral(Displacement& disp, double energy)
 {

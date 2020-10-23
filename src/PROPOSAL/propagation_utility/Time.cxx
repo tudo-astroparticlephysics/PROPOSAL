@@ -2,4 +2,4 @@
 
 using namespace PROPOSAL;
 
-Interpolant1DBuilder::Definition Time::interpol_def = {};
+Interpolant1DBuilder::Definition Time::interpol_def = {1000};
