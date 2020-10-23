@@ -2,7 +2,7 @@
 
 using namespace PROPOSAL;
 
-Interpolant1DBuilder::Definition ContRand::interpol_def = {};
+Interpolant1DBuilder::Definition ContRand::interpol_def = {200};
 
 double ContRand::FunctionToIntegral(Displacement& disp, double energy)
 {

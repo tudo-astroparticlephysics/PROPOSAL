@@ -10,4 +10,4 @@ Decay::Decay(double lifetime, double mass, double lower_lim)
 {
 }
 
-Interpolant1DBuilder::Definition Decay::interpol_def = {};
+Interpolant1DBuilder::Definition Decay::interpol_def = {1000};

@@ -36,8 +36,7 @@ class Interpolant;
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-class InterpolantBuilder {
-public:
+struct InterpolantBuilder {
     InterpolantBuilder() = default;
     virtual ~InterpolantBuilder() = default;
 
@@ -46,18 +45,19 @@ public:
 
 struct Interpolant1DBuilder : public InterpolantBuilder {
     struct Definition {
-        std::function<double(double)> function1d = nullptr;
-        int nodes = 200;
+        int nodes = 100;
+        int romberg = 5;
+        int rombergY = 5;
+        bool logSubst = false;
+        bool isLog = true;
+        bool rational = false;
+        bool rationalY = false;
+        bool relative = false;
+        bool relativeY = false;
         double xmin = 0;
         double xmax = 1.e14;
-        int romberg = 5;
-        bool rational = false;
-        bool relative = false;
-        bool isLog = true;
-        int rombergY = 5;
-        bool rationalY = false;
-        bool relativeY = false;
-        bool logSubst = false;
+
+        std::function<double(double)> function1d = nullptr;
 
         size_t GetHash() ;
     };
@@ -74,14 +74,15 @@ private:
 struct Interpolant2DBuilder : public Interpolant1DBuilder {
 
     struct Definition : public Interpolant1DBuilder::Definition {
-        std::function<double(double, double)> function2d = nullptr;
-        int nodes2 = 1.0;
-        double x2min = 1.0;
-        double x2max = 1.0;
-        int romberg2 = 1;
+        int nodes2 = 100;
+        int romberg2 = 5;
+        bool isLog2 = false;
         bool rational2 = false;
         bool relative2 = false;
-        bool isLog2 = false;
+        double x2min = 0.0;
+        double x2max = 1.0;
+
+        std::function<double(double, double)> function2d = nullptr;
 
         size_t GetHash() ;
     };
