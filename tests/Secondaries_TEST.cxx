@@ -30,7 +30,8 @@ std::shared_ptr<Propagator> GetPropagator() {
 
         auto sector1 = std::make_tuple(world, prop_utility, density_distr);
         auto sector2 = std::make_tuple(sphere, prop_utility, density_distr);
-        auto prop = Propagator(p_def, {sector1, sector2});
+        std::vector<Sector> sec_vec = {sector1, sector2};
+        auto prop = Propagator(p_def, sec_vec);
         ptr = std::make_shared<Propagator>(prop);
     }
     return ptr;
