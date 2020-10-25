@@ -40,10 +40,10 @@ Secondaries Propagator::Propagate(
 {
     Secondaries track(std::make_shared<ParticleDef>(p_def), sector_list);
     track.push_back(initial_particle);
-    track.back().SetType(p_def.particle_type);
+    track.back().type = (int)InteractionType::ContinuousEnergyLoss;
 
     auto current_sector = GetCurrentSector(
-            track.back().GetPosition(), track.back().GetDirection());
+            track.back().position, track.back().direction);
     auto rnd
         = std::bind(&RandomGenerator::RandomDouble, &RandomGenerator::Get());
 
@@ -58,10 +58,10 @@ Secondaries Propagator::Propagate(
         auto &utility = get<UTILITY>(current_sector);
         auto &density = get<DENSITY_DISTR>(current_sector);
 
-        InteractionEnergy[Decay] = utility.EnergyDecay(track.back().GetEnergy(),
-                                                       rnd, density->Evaluate(track.back().GetPosition()));
+        InteractionEnergy[Decay] = utility.EnergyDecay(track.back().energy,
+                                                       rnd, density->Evaluate(track.back().position));
         InteractionEnergy[Stochastic]
-                = utility.EnergyInteraction(track.back().GetEnergy(), rnd);
+                = utility.EnergyInteraction(track.back().energy, rnd);
 
         //std::cout << "Decay: " << InteractionEnergy[Decay] << ", " << "Stochastic: " << InteractionEnergy[Stochastic] << std::endl;
 
@@ -78,12 +78,12 @@ Secondaries Propagator::Propagate(
                     case Stochastic:
                         track.push_back(track.back());
                         DoStochasticInteraction(track.back(), utility, rnd);
-                        if (track.back().GetEnergy() <= InteractionEnergy[MinimalE])
+                        if (track.back().energy <= InteractionEnergy[MinimalE])
                             continue_propagation = false;
                         break;
                     case Decay:
                         track.push_back(track.back());
-                        track.back().SetType(InteractionType::Decay);
+                        track.back().type = (int)InteractionType::Decay;
                         continue_propagation = false;
                         break;
                     case MinimalE:
@@ -92,7 +92,7 @@ Secondaries Propagator::Propagate(
                 }
                 break;
             case ReachedBorder :
-                current_sector = GetCurrentSector(track.back().GetPosition(), track.back().GetDirection());
+                current_sector = GetCurrentSector(track.back().position, track.back().direction);
                 break;
             case ReachedMaxDistance :
                 continue_propagation = false;
@@ -109,15 +109,15 @@ void Propagator::DoStochasticInteraction(DynamicData& p_cond,
     std::shared_ptr<const Component> comp;
     double loss_energy;
     std::tie(loss_type, comp, loss_energy)
-        = utility.EnergyStochasticloss(p_cond.GetEnergy(), rnd());
+        = utility.EnergyStochasticloss(p_cond.energy, rnd());
 
     /* auto deflection_angles = stochastic_cross->StochasticDeflection( */
     /*     p_cond.GetEnergy(), loss_energy); // TODO: ugly */
     /* p_cond.DeflectDirection( */
     /*     get<0>(deflection_angles), get<1>(deflection_angles)); */
 
-    p_cond.SetEnergy(p_cond.GetEnergy() - loss_energy);
-    p_cond.SetType(loss_type);
+    p_cond.energy = p_cond.energy - loss_energy;
+    p_cond.type = (int)loss_type;
 }
 
 int Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
@@ -133,30 +133,30 @@ int Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
     auto& density = get<DENSITY_DISTR>(current_sector);
     auto& geometry = get<GEOMETRY>(current_sector);
 
-    auto grammage_next_interaction = utility.LengthContinuous(p_cond.GetEnergy(), E_f);
-    auto max_distance_left = max_distance - p_cond.GetPropagatedDistance();
+    auto grammage_next_interaction = utility.LengthContinuous(p_cond.energy, E_f);
+    auto max_distance_left = max_distance - p_cond.propagated_distance;
     assert(max_distance_left > 0);
 
     Vector3D mean_direction, new_direction;
     std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
-            grammage_next_interaction, p_cond.GetEnergy(), E_f, p_cond.GetDirection(),
+            grammage_next_interaction, p_cond.energy, E_f, p_cond.direction,
         rnd_scattering);
 
     double distance_next_interaction;
     try {
-        distance_next_interaction = density->Correct(p_cond.GetPosition(),
+        distance_next_interaction = density->Correct(p_cond.position,
                   mean_direction, grammage_next_interaction, max_distance_left);
     } catch (const DensityException&) {
         Logging::Get("proposal.propagator")->debug("Interaction point exceeds "
                      "maximum propagation distance or lies in infinity.");
         distance_next_interaction = INF;
     }
-    auto new_position = p_cond.GetPosition() + distance_next_interaction * mean_direction;
+    auto new_position = p_cond.position + distance_next_interaction * mean_direction;
 
     auto AdvanceDistance = std::array<double, 3>{0., 0., 0.};
     AdvanceDistance[ReachedInteraction] = distance_next_interaction;
     AdvanceDistance[ReachedMaxDistance] = max_distance_left;
-    AdvanceDistance[ReachedBorder] = CalculateDistanceToBorder(p_cond.GetPosition(), mean_direction, *geometry);
+    AdvanceDistance[ReachedBorder] = CalculateDistanceToBorder(p_cond.position, mean_direction, *geometry);
 
     int advancement_type = minimize(AdvanceDistance);
     double advance_distance = AdvanceDistance[advancement_type];
@@ -167,24 +167,24 @@ int Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
         //std::cout << "AdvanceParticle can't reach interaction, varying propagation step..." << std::endl;
         do {
             advance_distance = AdvanceDistance[advancement_type];
-            advance_grammage = density->Calculate(p_cond.GetPosition(),
-                                       p_cond.GetDirection(), advance_distance);
-            E_f = utility.EnergyDistance(p_cond.GetEnergy(), advance_grammage);
+            advance_grammage = density->Calculate(p_cond.position,
+                                       p_cond.direction, advance_distance);
+            E_f = utility.EnergyDistance(p_cond.energy, advance_grammage);
 
             std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
-                    advance_grammage, p_cond.GetEnergy(), E_f,
-                    p_cond.GetDirection(), rnd_scattering);
+                    advance_grammage, p_cond.energy, E_f,
+                    p_cond.direction, rnd_scattering);
 
             try {
                 AdvanceDistance[ReachedInteraction] = density->Correct(
-                        p_cond.GetPosition(), mean_direction,
+                        p_cond.position, mean_direction,
                         grammage_next_interaction, max_distance_left);
             } catch (const DensityException&) {
                 AdvanceDistance[ReachedInteraction] = INF;
             }
 
             AdvanceDistance[ReachedBorder] = CalculateDistanceToBorder(
-                    p_cond.GetPosition(), mean_direction, *geometry);
+                    p_cond.position, mean_direction, *geometry);
             advancement_type = minimize(AdvanceDistance);
             control_distance = AdvanceDistance[advancement_type];
             //std::cout << "Step - old_distance: " << advance_distance << ", new distance: " << control_distance << ", advancement type " << advancement_type << std::endl;
@@ -192,17 +192,16 @@ int Propagator::AdvanceParticle(DynamicData& p_cond, double E_f,
                  > PARTICLE_POSITION_RESOLUTION);
         //std::cout << "Difference negligible, use control_distance" << std::endl;
         advance_distance = control_distance;
-        new_position = p_cond.GetPosition() + advance_distance * mean_direction;
+        new_position = p_cond.position + advance_distance * mean_direction;
     }
 
-    p_cond.SetTime(p_cond.GetTime() + utility.TimeElapsed(p_cond.GetEnergy(),
-            E_f, advance_distance, density->Evaluate(p_cond.GetPosition())));
-    p_cond.SetPosition(new_position);
-    p_cond.SetDirection(new_direction);
-    p_cond.SetPropagatedDistance(p_cond.GetPropagatedDistance()
-        + advance_distance);
-    p_cond.SetEnergy(utility.EnergyRandomize(p_cond.GetEnergy(), E_f, rnd));
-    p_cond.SetType(InteractionType::ContinuousEnergyLoss);
+    p_cond.time =  p_cond.time + utility.TimeElapsed(p_cond.energy, E_f,
+                   advance_distance, density->Evaluate(p_cond.position));
+    p_cond.position = new_position;
+    p_cond.direction = new_direction;
+    p_cond.propagated_distance = p_cond.propagated_distance + advance_distance;
+    p_cond.energy = utility.EnergyRandomize(p_cond.energy, E_f, rnd);
+    p_cond.type = (int)InteractionType::ContinuousEnergyLoss;
 
     return advancement_type;
 }

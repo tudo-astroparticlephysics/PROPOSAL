@@ -18,8 +18,8 @@ namespace secondaries {
         NaivBremsstrahlung(ParticleDef p, Medium) :primary_lepton_type(p.particle_type) {};
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
-        vector<Loss::secondary_t> CalculateSecondaries(
-            double, Loss::secondary_t, const Component&, vector<double>);
+        vector<DynamicData> CalculateSecondaries(StochasticLoss, const Component&,
+                                                 vector<double>&);
     };
 } // namespace secondaries
 } // namespace PROPOSAL

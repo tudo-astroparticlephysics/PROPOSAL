@@ -56,10 +56,8 @@ public:
     DynamicData& back() { return secondaries_.back(); };
 
     void push_back(const DynamicData& continuous_loss);
-    void emplace_back(const int& type);
-    void emplace_back(const int& type, const Vector3D& position,
-        const Vector3D& direction, const double& energy,
-        const double& parent_particle_energy, const double& time,
+    void emplace_back(const ParticleType& type, const Vector3D& position,
+        const Vector3D& direction, const double& energy, const double& time,
         const double& distance);
 
     void append(Secondaries& secondaries);
@@ -73,7 +71,6 @@ public:
     std::vector<Vector3D> GetPosition() const;
     std::vector<Vector3D> GetDirection() const;
     std::vector<double> GetEnergy() const;
-    std::vector<double> GetParentParticleEnergy() const;
     std::vector<double> GetTime() const;
     std::vector<double> GetPropagatedDistance() const;
     std::vector<DynamicData> GetSecondaries() const { return secondaries_; };

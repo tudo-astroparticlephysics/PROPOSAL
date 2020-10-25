@@ -37,6 +37,7 @@
 
 namespace PROPOSAL {
 enum class InteractionType : int {
+    Undefined = 0,
     Particle = 1000000001,
     Brems = 1000000002,
     Ioniz = 1000000003,
@@ -81,55 +82,28 @@ static const std::unordered_map<InteractionType, std::string,
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-class UtilityDecorator;
 
-class DynamicData {
+struct DynamicData {
 public:
     DynamicData();
+    DynamicData(const Vector3D&, const Vector3D&, const double&,
+                const double&, const double&);
+    DynamicData(const ParticleType&, const Vector3D&, const Vector3D&, const double&,
+                const double&, const double&);
     virtual ~DynamicData() = default;
-    DynamicData(const int&);
-    DynamicData(const int&, const Vector3D&, const Vector3D&, const double&,
-        const double&, const double&, const double&);
 
     friend std::ostream& operator<<(std::ostream&, DynamicData const&);
-    DynamicData& operator=(const DynamicData&);
-    bool operator==(const DynamicData&) const;
-    bool operator!=(const DynamicData&) const;
 
-    // --------------------------------------------------------------------- //
-    // Getter & Setter
-    // --------------------------------------------------------------------- //
+    int type;
+    Vector3D position;  //!< position coordinates [cm]
+    Vector3D direction; //!< direction vector, angles in [rad]
+    double energy;                 //!< energy [MeV]
+    double time;                   //!< age [sec]
+    double propagated_distance;    //!< propagation distance [cm]
 
-    // Setter
-    void SetPosition(const Vector3D& position) { position_ = position; }
-    void SetDirection(const Vector3D& direction) { direction_ = direction; }
-
-    void SetParentParticleEnergy(double parent_particle_energy)
-    {
-        parent_particle_energy_ = parent_particle_energy;
-    }
-    void SetTime(double time) { time_ = time; }
-    void SetPropagatedDistance(double prop_dist)
-    {
-        propagated_distance_ = prop_dist;
-    }
-    void SetType(InteractionType type) { type_ = static_cast<int>(type); }
-    void SetType(int type) { type_ = type; }
-
-    // Getter
-    int GetType() const { return type_; }
-
-    Vector3D GetPosition() const { return position_; }
-    Vector3D GetDirection() const { return direction_; }
-
-    void SetEnergy(double energy);
+    void SetType(ParticleType particle_type) { type = static_cast<int>(particle_type); }
     void SetMomentum(double momentum);
-
-    double GetEnergy() const { return energy_; }
     double GetMomentum() const;
-    double GetParentParticleEnergy() const { return parent_particle_energy_; }
-    double GetTime() const { return time_; }
-    double GetPropagatedDistance() const { return propagated_distance_; }
     std::string GetName() const;
 
     // Deflect the direction of a particle by cosphi_deflect with an azimuth of
@@ -139,21 +113,29 @@ public:
 protected:
     virtual void print(std::ostream&) const {}
 
-    int type_;
-
-    Vector3D position_;  //!< position coordinates [cm]
-    Vector3D direction_; //!< direction vector, angles in [rad]
-
-    double energy_;                 //!< energy [MeV]
-    double parent_particle_energy_; //!< energy of the parent particle
-    double time_;                   //!< age [sec]
-    double propagated_distance_;    //!< propagation distance [cm]
-
-    std::shared_ptr<UtilityDecorator> utility_decorator;
 };
 
 struct Loss {
-    enum { TYPE, POSITION, DIRECTION, ENERGY, TIME };
-    using secondary_t = std::tuple<int, Vector3D, Vector3D, double, double>;
+    Loss(int type, double loss_energy) : type(type), loss_energy(loss_energy){};
+    int type;
+    double loss_energy;
+};
+
+struct StochasticLoss : public Loss {
+    StochasticLoss(int, double, Vector3D, Vector3D, double, double, double);
+    Vector3D position;
+    Vector3D direction;
+    double time;
+    double propagated_distance;
+    double parent_particle_energy;
+};
+
+struct ContinuousLoss : public Loss {
+    ContinuousLoss(std::pair<double, double>, std::pair<Vector3D, Vector3D>,
+            std::pair<Vector3D, Vector3D>, std::pair<double, double>);
+    std::pair<double, double> energies;
+    std::pair<Vector3D, Vector3D> positions;
+    std::pair<Vector3D, Vector3D> directions;
+    std::pair<double, double> times;
 };
 } // namespace PROPOSAL

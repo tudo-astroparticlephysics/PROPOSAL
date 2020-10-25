@@ -114,12 +114,11 @@ std::vector<DynamicData> LeptonicDecayChannelApprox::Decay(const ParticleDef& p_
 
 
     // Sample directions For the massive letpon
-    DynamicData massive_lepton(massive_lepton_.particle_type,
-                               p_condition.GetPosition(),
+    DynamicData massive_lepton((ParticleType)massive_lepton_.particle_type,
+                               p_condition.position,
                                GenerateRandomDirection(),
                                lepton_energy,
-                               p_condition.GetEnergy(),
-                               p_condition.GetTime(),
+                               p_condition.time,
                                0.);
 
     // Sample directions For the massless letpon
@@ -131,23 +130,21 @@ std::vector<DynamicData> LeptonicDecayChannelApprox::Decay(const ParticleDef& p_
     Vector3D direction = GenerateRandomDirection();
     direction.CalculateSphericalCoordinates();
 
-    DynamicData neutrino(neutrino_.particle_type,
-                         p_condition.GetPosition(),
+    DynamicData neutrino((ParticleType)neutrino_.particle_type,
+                         p_condition.position,
                          direction,
                          momentum_neutrinos,
-                         p_condition.GetEnergy(),
-                         p_condition.GetTime(),
+                         p_condition.time,
                          0.);
 
     Vector3D opposite_direction = -direction;
     opposite_direction.CalculateSphericalCoordinates();
 
-    DynamicData anti_neutrino(anti_neutrino_.particle_type,
-                              p_condition.GetPosition(),
+    DynamicData anti_neutrino((ParticleType)anti_neutrino_.particle_type,
+                              p_condition.position,
                               opposite_direction,
                               momentum_neutrinos,
-                              p_condition.GetEnergy(),
-                              p_condition.GetTime(),
+                              p_condition.time,
                               0.);
 
     // Boost neutrinos to lepton frame
@@ -156,8 +153,8 @@ std::vector<DynamicData> LeptonicDecayChannelApprox::Decay(const ParticleDef& p_
     double betagamma = lepton_momentum / virtual_mass;
 
 
-    Boost(neutrino, massive_lepton.GetDirection(), gamma, betagamma);
-    Boost(anti_neutrino, massive_lepton.GetDirection(), gamma, betagamma);
+    Boost(neutrino, massive_lepton.direction, gamma, betagamma);
+    Boost(anti_neutrino, massive_lepton.direction, gamma, betagamma);
 
 
     std::vector<DynamicData> secondaries;
@@ -167,9 +164,9 @@ std::vector<DynamicData> LeptonicDecayChannelApprox::Decay(const ParticleDef& p_
 
     // Get Momentum is not defined for pseudo particle decay, so it must be
     // calculated manually
-    double primary_momentum = std::sqrt(std::max((p_condition.GetEnergy() + p_def.mass) * (p_condition.GetEnergy() - p_def.mass), 0.0));
+    double primary_momentum = std::sqrt(std::max((p_condition.energy + p_def.mass) * (p_condition.energy - p_def.mass), 0.0));
     // Boost all products in Lab frame (the reason, why the boosting goes in the negative direction of the particle)
-    Boost(secondaries, -p_condition.GetDirection(), p_condition.GetEnergy()/p_def.mass, primary_momentum/p_def.mass);
+    Boost(secondaries, -p_condition.direction, p_condition.energy/p_def.mass, primary_momentum/p_def.mass);
 
     return secondaries;
 }

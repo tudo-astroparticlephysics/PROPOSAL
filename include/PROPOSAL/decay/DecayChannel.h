@@ -35,7 +35,7 @@
 namespace PROPOSAL {
 
 class Vector3D;
-class DynamicData;
+struct DynamicData;
 class Particle;
 struct ParticleDef;
 

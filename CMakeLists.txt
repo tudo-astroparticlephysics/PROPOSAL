@@ -156,3 +156,6 @@ install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/PROPOSALConfigVersion.cmake"
     DESTINATION lib/cmake/PROPOSAL
 )
+
+add_executable(example example.cxx)
+target_link_libraries(example PRIVATE PROPOSAL)

@@ -16,7 +16,7 @@ using namespace PROPOSAL;
 
 
 double secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateRho(
-    double energy, double v, const Component& comp, double rnd)
+    double energy, double v, const Component& comp, double rnd1, double rnd2)
 {
     auto rho_max = 1 - 2 * MMU / (v * energy);
     if (rho_max < 0)
@@ -25,8 +25,13 @@ double secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateRho(
         [&](double rho) {
             return param.FunctionToIntegral(p_def, comp, energy, v, rho);
         },
-        3, rnd);
-    return integral.GetUpperLimit();
+        3, rnd1);
+    auto rho_tmp = integral.GetUpperLimit();
+    if (rnd2 < 0.5) {
+        return rho_tmp;
+    } else {
+        return -rho_tmp;
+    }
 }
 
 tuple<Vector3D, Vector3D>
@@ -45,28 +50,28 @@ secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateEnergy(
     return make_tuple(energy_1, energy_2);
 }
 
-vector<Loss::secondary_t>
+vector<DynamicData>
 secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateSecondaries(
-    double initial_energy, Loss::secondary_t loss, const Component& comp,
-    vector<double> rnd)
+    StochasticLoss loss, const Component& comp, vector<double> &rnd)
 {
-    auto v = get<Loss::ENERGY>(loss) / initial_energy;
-    auto rho = CalculateRho(initial_energy, v, comp, rnd[0]);
-    auto secondary_energy = CalculateEnergy(get<Loss::ENERGY>(loss), rho);
+    auto v = loss.loss_energy / loss.parent_particle_energy;
+    auto rho = CalculateRho(loss.parent_particle_energy, v, comp, rnd[0], rnd[1]);
+    auto secondary_energies = CalculateEnergy(loss.loss_energy, rho);
     auto secondary_dir = CalculateDirections(
-        get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), rho, rnd[1]);
-    auto sec = std::vector<Loss::secondary_t>();
+        loss.direction, loss.loss_energy, rho, rnd[2]);
 
-    std::get<Loss::TYPE>(loss) = p_def.particle_type;
-    std::get<Loss::ENERGY>(loss)
-            = initial_energy - std::get<Loss::ENERGY>(loss);
-    sec.emplace_back(loss);
+    auto sec = std::vector<DynamicData>();
 
-    sec.emplace_back(static_cast<int>(ParticleType::MuMinus),
-        get<Loss::POSITION>(loss), get<0>(secondary_dir),
-        get<0>(secondary_energy), 0.);
-    sec.emplace_back(static_cast<int>(ParticleType::MuPlus),
-        get<Loss::POSITION>(loss), get<1>(secondary_dir),
-        get<1>(secondary_energy), 0.);
+    sec.emplace_back(static_cast<ParticleType>(p_def.particle_type),
+                     loss.position, loss.direction,
+                     loss.parent_particle_energy - loss.loss_energy,
+                     loss.time, loss.propagated_distance);
+
+    sec.emplace_back(ParticleType::MuMinus, loss.position, get<0>(secondary_dir),
+                     get<0>(secondary_energies), loss.time, 0.);
+
+    sec.emplace_back(ParticleType::MuPlus, loss.position, get<1>(secondary_dir),
+                     get<1>(secondary_energies), loss.time, 0.);
+
     return sec;
 }

@@ -29,17 +29,11 @@ void Secondaries::push_back(const DynamicData& continuous_loss)
     secondaries_.push_back(continuous_loss);
 }
 
-void Secondaries::emplace_back(const int& type, const Vector3D& position,
-    const Vector3D& direction, const double& energy,
-    const double& parent_particle_energy, const double& time,
+void Secondaries::emplace_back(const ParticleType& type, const Vector3D& position,
+    const Vector3D& direction, const double& energy, const double& time,
     const double& distance)
 {
-    secondaries_.emplace_back(type, position, direction, energy,
-        parent_particle_energy, time, distance);
-}
-void Secondaries::emplace_back(const int& type)
-{
-    secondaries_.emplace_back(type);
+    secondaries_.emplace_back(type, position, direction, energy, time, distance);
 }
 
 // void Secondaries::push_back(const Particle& particle, const int&
@@ -67,7 +61,7 @@ Secondaries Secondaries::Query(const int& interaction_type) const
 {
     Secondaries sec(primary_def_, sectors_);
     for (auto i : secondaries_) {
-        if (interaction_type == i.GetType())
+        if (interaction_type == i.type)
             sec.push_back(i);
     }
     return sec;
@@ -87,7 +81,7 @@ Secondaries Secondaries::Query(const Geometry& geometry) const
 {
     Secondaries sec(primary_def_, sectors_);
     for (auto i : secondaries_) {
-        if (geometry.IsInside(i.GetPosition(), i.GetDirection()))
+        if (geometry.IsInside(i.position, i.direction))
             sec.push_back(i);
     }
     return sec;
@@ -96,11 +90,10 @@ Secondaries Secondaries::Query(const Geometry& geometry) const
 void Secondaries::DoDecay()
 {
     for (auto it = secondaries_.begin(); it != secondaries_.end();) {
-        if (it->GetType() == static_cast<int>(InteractionType::Decay)) {
-            DynamicData decaying_particle(primary_def_->particle_type,
-                it->GetPosition(), it->GetDirection(), it->GetEnergy(),
-                it->GetParentParticleEnergy(), it->GetTime(),
-                it->GetPropagatedDistance());
+        if (it->type == static_cast<int>(InteractionType::Decay)) {
+            DynamicData decaying_particle(static_cast<ParticleType>(primary_def_->particle_type),
+                it->position, it->direction, it->energy, it->time,
+                it->propagated_distance);
             double random_ch = RandomGenerator::Get().RandomDouble();
             auto products
                 = primary_def_->decay_table.SelectChannel(random_ch).Decay(
@@ -121,7 +114,7 @@ std::vector<Vector3D> Secondaries::GetPosition() const
 {
     std::vector<Vector3D> vec;
     for (auto i : secondaries_)
-        vec.emplace_back(i.GetPosition());
+        vec.emplace_back(i.position);
     return vec;
 }
 
@@ -129,7 +122,7 @@ std::vector<Vector3D> Secondaries::GetDirection() const
 {
     std::vector<Vector3D> vec;
     for (auto i : secondaries_)
-        vec.emplace_back(i.GetDirection());
+        vec.emplace_back(i.direction);
     return vec;
 }
 
@@ -137,23 +130,17 @@ std::vector<double> Secondaries::GetEnergy() const
 {
     std::vector<double> vec;
     for (auto i : secondaries_)
-        vec.emplace_back(i.GetEnergy());
+        vec.emplace_back(i.energy);
     return vec;
 }
 
-std::vector<double> Secondaries::GetParentParticleEnergy() const
-{
-    std::vector<double> vec;
-    for (auto i : secondaries_)
-        vec.emplace_back(i.GetParentParticleEnergy());
-    return vec;
-}
+
 
 std::vector<double> Secondaries::GetTime() const
 {
     std::vector<double> vec;
     for (auto i : secondaries_)
-        vec.emplace_back(i.GetTime());
+        vec.emplace_back(i.time);
     return vec;
 }
 
@@ -161,7 +148,7 @@ std::vector<double> Secondaries::GetPropagatedDistance() const
 {
     std::vector<double> vec;
     for (auto i : secondaries_)
-        vec.emplace_back(i.GetPropagatedDistance());
+        vec.emplace_back(i.propagated_distance);
     return vec;
 }
 
@@ -169,23 +156,23 @@ double Secondaries::GetELost(const Geometry& geometry) const
 {
     auto entry_point = GetEntryPoint(geometry);
     auto exit_point = GetExitPoint(geometry);
-    return entry_point->GetEnergy() - exit_point->GetEnergy();
+    return entry_point->energy - exit_point->energy;
 }
 
 std::unique_ptr<DynamicData> Secondaries::GetEntryPoint(
         const Geometry& geometry) const
 {
-    auto pos_0 = secondaries_.front().GetPosition();
-    auto dir_0 = secondaries_.front().GetDirection();
+    auto pos_0 = secondaries_.front().position;
+    auto dir_0 = secondaries_.front().direction;
     if (geometry.IsEntering(pos_0, dir_0))
         return std::make_unique<DynamicData>(secondaries_.front());
     if (geometry.IsInside(pos_0, dir_0))
         return nullptr; // track starts in geometry
 
     for (unsigned int i = 0; i < secondaries_.size() - 1; i++) {
-        auto pos_i = secondaries_.at(i).GetPosition();
-        auto pos_f = secondaries_.at(i+1).GetPosition();
-        auto dir_i = secondaries_.at(i).GetDirection();
+        auto pos_i = secondaries_.at(i).position;
+        auto pos_f = secondaries_.at(i+1).position;
+        auto dir_i = secondaries_.at(i).direction;
         auto dist_i_f = (pos_f - pos_i).magnitude();
 
         auto distance = geometry.DistanceToBorder(pos_i, dir_i).first;
@@ -202,17 +189,17 @@ std::unique_ptr<DynamicData> Secondaries::GetEntryPoint(
 std::unique_ptr<DynamicData> Secondaries::GetExitPoint(
         const Geometry &geometry) const
 {
-    auto pos_end = secondaries_.back().GetPosition();
-    auto dir_end = secondaries_.back().GetDirection();
+    auto pos_end = secondaries_.back().position;
+    auto dir_end = secondaries_.back().direction;
     if (geometry.IsLeaving(pos_end, dir_end))
         return std::make_unique<DynamicData>(secondaries_.back());
     if (geometry.IsInside(pos_end, dir_end))
         return nullptr; // track ends inside geometry
 
     for (auto i = secondaries_.size() - 1; i > 0; i--) {
-        auto pos_i = secondaries_.at(i-1).GetPosition();
-        auto pos_f = secondaries_.at(i).GetPosition();
-        auto dir_i = secondaries_.at(i-1).GetDirection();
+        auto pos_i = secondaries_.at(i-1).position;
+        auto pos_f = secondaries_.at(i).position;
+        auto dir_i = secondaries_.at(i-1).direction;
         auto dist_i_f = (pos_f - pos_i).magnitude();
 
         auto distance = geometry.DistanceToBorder(pos_f, -dir_i).first;
@@ -225,8 +212,8 @@ std::unique_ptr<DynamicData> Secondaries::GetExitPoint(
         }
     }
 
-    auto pos_0 = secondaries_.front().GetPosition();
-    auto dir_0 = secondaries_.front().GetDirection();
+    auto pos_0 = secondaries_.front().position;
+    auto dir_0 = secondaries_.front().direction;
     if (geometry.IsLeaving(pos_0, dir_0))
         return std::make_unique<DynamicData>(secondaries_.front());
 
@@ -236,16 +223,16 @@ std::unique_ptr<DynamicData> Secondaries::GetExitPoint(
 std::unique_ptr<DynamicData> Secondaries::GetClosestApproachPoint(const Geometry& geometry) const
 {
     for (unsigned int i = 0; i < secondaries_.size(); i++) {
-        auto sec_pos = secondaries_.at(i).GetPosition();
-        auto sec_dir = secondaries_.at(i).GetDirection();
+        auto sec_pos = secondaries_.at(i).position;
+        auto sec_dir = secondaries_.at(i).direction;
         if (geometry.DistanceToClosestApproach(sec_pos, sec_dir) <= 0.) {
             if(std::abs(geometry.DistanceToClosestApproach(sec_pos, sec_dir))
                         < PARTICLE_POSITION_RESOLUTION)
                 return std::make_unique<DynamicData>(secondaries_.at(i));
             if (i == 0)
                 return std::make_unique<DynamicData>(secondaries_.front());
-            auto prev_pos = secondaries_.at(i-1).GetPosition();
-            auto prev_dir = secondaries_.at(i-1).GetDirection();
+            auto prev_pos = secondaries_.at(i-1).position;
+            auto prev_dir = secondaries_.at(i-1).direction;
             auto direction = sec_pos - prev_pos;
             direction.normalise();
             auto displacement = geometry.DistanceToClosestApproach(prev_pos,
@@ -262,8 +249,8 @@ DynamicData Secondaries::RePropagate(const DynamicData &init,
                                      const Vector3D& direction,
                                      double displacement) const
 {
-    auto current_sector = GetCurrentSector(init.GetPosition(),
-                                           init.GetDirection());
+    auto current_sector = GetCurrentSector(init.position,
+                                           init.direction);
     auto& utility = get<Propagator::UTILITY>(current_sector);
     auto& density = get<Propagator::DENSITY_DISTR>(current_sector);
 
@@ -272,16 +259,15 @@ DynamicData Secondaries::RePropagate(const DynamicData &init,
                      "for sectors where continuous randomization is activated "
                      "can lead to inconsistent results!");
     }
-    auto advance_grammage = density->Calculate(init.GetPosition(), direction,
+    auto advance_grammage = density->Calculate(init.position, direction,
                                                displacement);
-    auto E_f = utility.EnergyDistance(init.GetEnergy(), advance_grammage);
-    auto new_time = init.GetTime() + utility.TimeElapsed(
-            init.GetEnergy(), E_f,displacement, density->Evaluate(init.GetPosition()));
-    auto new_position = init.GetPosition() + direction * displacement;
-    auto new_propagated_distance = init.GetPropagatedDistance() + displacement;
-    return DynamicData((int)InteractionType::ContinuousEnergyLoss, new_position,
-                       direction, E_f, init.GetParentParticleEnergy(), new_time,
-                       new_propagated_distance);
+    auto E_f = utility.EnergyDistance(init.energy, advance_grammage);
+    auto new_time = init.time + utility.TimeElapsed(
+            init.energy, E_f,displacement, density->Evaluate(init.position));
+    auto new_position = init.position + direction * displacement;
+    auto new_propagated_distance = init.propagated_distance + displacement;
+    return DynamicData((ParticleType)primary_def_->particle_type, new_position,
+                       direction, E_f, new_time, new_propagated_distance);
 }
 
 Sector Secondaries::GetCurrentSector(const Vector3D& position,

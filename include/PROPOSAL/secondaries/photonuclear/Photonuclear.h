@@ -20,15 +20,18 @@ namespace secondaries {
             = PROPOSAL::InteractionType::Photonuclear;
         InteractionType GetInteractionType() const noexcept { return type; }
 
-        vector<Loss::secondary_t> CalculateSecondaries(double primary_energy,
-            Loss::secondary_t loss, const Component&, vector<double>)
+        vector<DynamicData> CalculateSecondaries(StochasticLoss loss, const Component&,
+                                                 vector<double>&)
         {
             std::cout << "a hadronic interaction modell must be called."
                       << std::endl;
+            //TODO: Treatment for hadronic interactions
+            /*
             std::get<Loss::TYPE>(loss) = primary_particle_type;
             std::get<Loss::ENERGY>(loss)
                 = primary_energy - std::get<Loss::ENERGY>(loss);
-            return std::vector<Loss::secondary_t>{loss};
+            */
+            return std::vector<DynamicData>{};
         };
     };
 } // namespace secondaries

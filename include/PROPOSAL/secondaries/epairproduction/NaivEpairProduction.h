@@ -24,9 +24,9 @@ namespace secondaries {
 
         NaivEpairProduction(ParticleDef, Medium){};
 
-        vector<Loss::secondary_t> CalculateSecondaries(
-            double, Loss::secondary_t, const Component&, vector<double>) {
-            auto sec = vector<Loss::secondary_t>{};
+        vector<DynamicData> CalculateSecondaries(StochasticLoss, const Component&,
+                                                 vector<double>&) {
+            auto sec = vector<DynamicData>{};
             return sec;
         };
     };

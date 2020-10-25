@@ -28,8 +28,8 @@ namespace secondaries {
         tuple<double, double> CalculateEnergy(double, double) final;
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
-        vector<Loss::secondary_t> CalculateSecondaries(
-            double, Loss::secondary_t, const Component&, vector<double>) final;
+        vector<DynamicData> CalculateSecondaries(StochasticLoss, const Component&,
+                                                 vector<double>&) final;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

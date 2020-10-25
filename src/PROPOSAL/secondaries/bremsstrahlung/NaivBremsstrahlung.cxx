@@ -7,13 +7,24 @@
 
 using namespace PROPOSAL;
 
-vector<Loss::secondary_t> secondaries::NaivBremsstrahlung::CalculateSecondaries(
-    double primary_energy, Loss::secondary_t loss, const Component&, vector<double>)
+vector<DynamicData> secondaries::NaivBremsstrahlung::CalculateSecondaries(
+    StochasticLoss loss, const Component&, vector<double>&)
 {
-    auto primary_lepton = loss;
-    std::get<Loss::ENERGY>(primary_lepton) = primary_energy - std::get<Loss::ENERGY>(loss);
-    std::get<Loss::TYPE>(primary_lepton) = primary_lepton_type;
-    std::get<Loss::TYPE>(loss) = static_cast<int>(PROPOSAL::ParticleType::Gamma);
-    auto sec = vector<Loss::secondary_t>{ move(primary_lepton), move(loss) };
+    auto primary_lepton = DynamicData();
+    primary_lepton.energy = loss.parent_particle_energy - loss.loss_energy;
+    primary_lepton.type = primary_lepton_type;
+    primary_lepton.time = loss.time;
+    primary_lepton.position = loss.position;
+    primary_lepton.direction = loss.direction;
+    primary_lepton.propagated_distance = 0.;
+
+    auto brems_photon = DynamicData();
+    brems_photon.energy = loss.loss_energy;
+    brems_photon.SetType(PROPOSAL::ParticleType::Gamma);
+    brems_photon.time = loss.time;
+    brems_photon.position = loss.position;
+    brems_photon.direction = loss.direction;
+
+    auto sec = vector<DynamicData>{ primary_lepton, brems_photon};
     return sec;
 }
