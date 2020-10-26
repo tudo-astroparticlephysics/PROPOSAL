@@ -21,75 +21,28 @@ Secondaries::Secondaries(std::shared_ptr<ParticleDef> p_def,
 
 void Secondaries::reserve(size_t number_secondaries)
 {
-    secondaries_.reserve(number_secondaries);
+    track_.reserve(number_secondaries);
+    types_.reserve(number_secondaries);
 }
 
-void Secondaries::push_back(const DynamicData& continuous_loss)
+void Secondaries::push_back(const DynamicData& point, const InteractionType& type)
 {
-    secondaries_.push_back(continuous_loss);
+    track_.push_back(point);
+    types_.push_back(type);
 }
 
-void Secondaries::emplace_back(const ParticleType& type, const Vector3D& position,
+void Secondaries::emplace_back(const ParticleType& particle_type, const Vector3D& position,
     const Vector3D& direction, const double& energy, const double& time,
-    const double& distance)
+    const double& distance, const InteractionType& interaction_type)
 {
-    secondaries_.emplace_back(type, position, direction, energy, time, distance);
-}
-
-// void Secondaries::push_back(const Particle& particle, const int&
-// interaction_type, const double& energy_loss)
-// {
-//     DynamicData data(interaction_type);
-
-//     data.SetEnergy(energy_loss);
-//     data.SetPosition(particle.GetPosition());
-//     data.SetDirection(particle.GetDirection());
-//     data.SetTime(particle.GetTime());
-//     data.SetParentParticleEnergy(particle.GetEnergy());
-//     data.SetPropagatedDistance(particle.GetPropagatedDistance());
-
-//     secondaries_.push_back(data);
-// }
-
-void Secondaries::append(Secondaries& secondaries)
-{
-    secondaries_.insert(secondaries_.end(), secondaries.secondaries_.begin(),
-        secondaries.secondaries_.end());
-}
-
-Secondaries Secondaries::Query(const int& interaction_type) const
-{
-    Secondaries sec(primary_def_, sectors_);
-    for (auto i : secondaries_) {
-        if (interaction_type == i.type)
-            sec.push_back(i);
-    }
-    return sec;
-}
-
-Secondaries Secondaries::Query(const std::string& interaction_type) const
-{
-    Secondaries sec(primary_def_, sectors_);
-    for (auto i : secondaries_) {
-        if (interaction_type == i.GetName())
-            sec.push_back(i);
-    }
-    return sec;
-}
-
-Secondaries Secondaries::Query(const Geometry& geometry) const
-{
-    Secondaries sec(primary_def_, sectors_);
-    for (auto i : secondaries_) {
-        if (geometry.IsInside(i.position, i.direction))
-            sec.push_back(i);
-    }
-    return sec;
+    track_.emplace_back(particle_type, position, direction, energy, time,
+                        distance);
+    types_.emplace_back(interaction_type);
 }
 
 void Secondaries::DoDecay()
 {
-    for (auto it = secondaries_.begin(); it != secondaries_.end();) {
+    for (auto it = track_.begin(); it != track_.end();) {
         if (it->type == static_cast<int>(InteractionType::Decay)) {
             DynamicData decaying_particle(static_cast<ParticleType>(primary_def_->particle_type),
                 it->position, it->direction, it->energy, it->time,
@@ -98,10 +51,10 @@ void Secondaries::DoDecay()
             auto products
                 = primary_def_->decay_table.SelectChannel(random_ch).Decay(
                     *primary_def_, decaying_particle);
-            it = secondaries_.erase(it); // delete old decay
+            it = track_.erase(it); // delete old decay
             for (auto p : products) {
                 // and insert decayparticles inplace of old decay
-                it = secondaries_.insert(it, std::move(p));
+                it = track_.insert(it, std::move(p));
                 it++;
             }
         } else {
@@ -110,44 +63,53 @@ void Secondaries::DoDecay()
     }
 }
 
-std::vector<Vector3D> Secondaries::GetPosition() const
+std::vector<DynamicData> Secondaries::GetTrack(const Geometry& geometry) const
+{
+    std::vector<DynamicData> vec;
+    for (auto i : track_) {
+        if (geometry.IsInside(i.position, i.direction))
+            vec.push_back(i);
+    }
+    return vec;
+}
+
+
+std::vector<Vector3D> Secondaries::GetTrackPositions() const
 {
     std::vector<Vector3D> vec;
-    for (auto i : secondaries_)
+    for (auto i : track_)
         vec.emplace_back(i.position);
     return vec;
 }
 
-std::vector<Vector3D> Secondaries::GetDirection() const
+std::vector<Vector3D> Secondaries::GetTrackDirections() const
 {
     std::vector<Vector3D> vec;
-    for (auto i : secondaries_)
+    for (auto i : track_)
         vec.emplace_back(i.direction);
     return vec;
 }
 
-std::vector<double> Secondaries::GetEnergy() const
+std::vector<double> Secondaries::GetTrackEnergies() const
 {
     std::vector<double> vec;
-    for (auto i : secondaries_)
+    for (auto i : track_)
         vec.emplace_back(i.energy);
     return vec;
 }
 
-
-
-std::vector<double> Secondaries::GetTime() const
+std::vector<double> Secondaries::GetTrackTimes() const
 {
     std::vector<double> vec;
-    for (auto i : secondaries_)
+    for (auto i : track_)
         vec.emplace_back(i.time);
     return vec;
 }
 
-std::vector<double> Secondaries::GetPropagatedDistance() const
+std::vector<double> Secondaries::GetTrackPropagatedDistances() const
 {
     std::vector<double> vec;
-    for (auto i : secondaries_)
+    for (auto i : track_)
         vec.emplace_back(i.propagated_distance);
     return vec;
 }
@@ -162,24 +124,24 @@ double Secondaries::GetELost(const Geometry& geometry) const
 std::unique_ptr<DynamicData> Secondaries::GetEntryPoint(
         const Geometry& geometry) const
 {
-    auto pos_0 = secondaries_.front().position;
-    auto dir_0 = secondaries_.front().direction;
+    auto pos_0 = track_.front().position;
+    auto dir_0 = track_.front().direction;
     if (geometry.IsEntering(pos_0, dir_0))
-        return std::make_unique<DynamicData>(secondaries_.front());
+        return std::make_unique<DynamicData>(track_.front());
     if (geometry.IsInside(pos_0, dir_0))
         return nullptr; // track starts in geometry
 
-    for (unsigned int i = 0; i < secondaries_.size() - 1; i++) {
-        auto pos_i = secondaries_.at(i).position;
-        auto pos_f = secondaries_.at(i+1).position;
-        auto dir_i = secondaries_.at(i).direction;
+    for (unsigned int i = 0; i < track_.size() - 1; i++) {
+        auto pos_i = track_.at(i).position;
+        auto pos_f = track_.at(i+1).position;
+        auto dir_i = track_.at(i).direction;
         auto dist_i_f = (pos_f - pos_i).magnitude();
 
         auto distance = geometry.DistanceToBorder(pos_i, dir_i).first;
         if (distance <= dist_i_f and distance >= 0) {
             if ( dist_i_f - distance < GEOMETRY_PRECISION)
-                return std::make_unique<DynamicData>(secondaries_.at(i+1));
-            auto entry_point = RePropagate(secondaries_.at(i), dir_i, distance);
+                return std::make_unique<DynamicData>(track_.at(i+1));
+            auto entry_point = RePropagate(track_.at(i), dir_i, distance);
             return std::make_unique<DynamicData>(entry_point);
         }
     }
@@ -189,60 +151,60 @@ std::unique_ptr<DynamicData> Secondaries::GetEntryPoint(
 std::unique_ptr<DynamicData> Secondaries::GetExitPoint(
         const Geometry &geometry) const
 {
-    auto pos_end = secondaries_.back().position;
-    auto dir_end = secondaries_.back().direction;
+    auto pos_end = track_.back().position;
+    auto dir_end = track_.back().direction;
     if (geometry.IsLeaving(pos_end, dir_end))
-        return std::make_unique<DynamicData>(secondaries_.back());
+        return std::make_unique<DynamicData>(track_.back());
     if (geometry.IsInside(pos_end, dir_end))
         return nullptr; // track ends inside geometry
 
-    for (auto i = secondaries_.size() - 1; i > 0; i--) {
-        auto pos_i = secondaries_.at(i-1).position;
-        auto pos_f = secondaries_.at(i).position;
-        auto dir_i = secondaries_.at(i-1).direction;
+    for (auto i = track_.size() - 1; i > 0; i--) {
+        auto pos_i = track_.at(i-1).position;
+        auto pos_f = track_.at(i).position;
+        auto dir_i = track_.at(i-1).direction;
         auto dist_i_f = (pos_f - pos_i).magnitude();
 
         auto distance = geometry.DistanceToBorder(pos_f, -dir_i).first;
         if (distance <= dist_i_f and distance >= 0) {
             if ( dist_i_f - distance < GEOMETRY_PRECISION)
-                return std::make_unique<DynamicData>(secondaries_.at(i-1));
-            auto exit_point = RePropagate(secondaries_.at(i-1), dir_i,
+                return std::make_unique<DynamicData>(track_.at(i-1));
+            auto exit_point = RePropagate(track_.at(i-1), dir_i,
                                           dist_i_f - distance);
             return std::make_unique<DynamicData>(exit_point);
         }
     }
 
-    auto pos_0 = secondaries_.front().position;
-    auto dir_0 = secondaries_.front().direction;
+    auto pos_0 = track_.front().position;
+    auto dir_0 = track_.front().direction;
     if (geometry.IsLeaving(pos_0, dir_0))
-        return std::make_unique<DynamicData>(secondaries_.front());
+        return std::make_unique<DynamicData>(track_.front());
 
     return nullptr; // No exit point found
 }
 
 std::unique_ptr<DynamicData> Secondaries::GetClosestApproachPoint(const Geometry& geometry) const
 {
-    for (unsigned int i = 0; i < secondaries_.size(); i++) {
-        auto sec_pos = secondaries_.at(i).position;
-        auto sec_dir = secondaries_.at(i).direction;
+    for (unsigned int i = 0; i < track_.size(); i++) {
+        auto sec_pos = track_.at(i).position;
+        auto sec_dir = track_.at(i).direction;
         if (geometry.DistanceToClosestApproach(sec_pos, sec_dir) <= 0.) {
             if(std::abs(geometry.DistanceToClosestApproach(sec_pos, sec_dir))
                         < PARTICLE_POSITION_RESOLUTION)
-                return std::make_unique<DynamicData>(secondaries_.at(i));
+                return std::make_unique<DynamicData>(track_.at(i));
             if (i == 0)
-                return std::make_unique<DynamicData>(secondaries_.front());
-            auto prev_pos = secondaries_.at(i-1).position;
-            auto prev_dir = secondaries_.at(i-1).direction;
+                return std::make_unique<DynamicData>(track_.front());
+            auto prev_pos = track_.at(i-1).position;
+            auto prev_dir = track_.at(i-1).direction;
             auto direction = sec_pos - prev_pos;
             direction.normalise();
             auto displacement = geometry.DistanceToClosestApproach(prev_pos,
                                                                    prev_dir);
-            auto closest_approach = RePropagate(secondaries_.at(i-1), direction,
+            auto closest_approach = RePropagate(track_.at(i-1), direction,
                                                 displacement);
             return std::make_unique<DynamicData>(closest_approach);
         }
     }
-    return std::make_unique<DynamicData>(secondaries_.back());
+    return std::make_unique<DynamicData>(track_.back());
 }
 
 DynamicData Secondaries::RePropagate(const DynamicData &init,
@@ -291,4 +253,115 @@ Sector Secondaries::GetCurrentSector(const Vector3D& position,
             });
 
     return **highest_sector_iter;
+}
+
+std::vector<StochasticLoss> Secondaries::GetStochasticLosses() const
+{
+    assert(track_.size() == types_.size());
+
+    std::vector<StochasticLoss> losses;
+    for (unsigned int i=1; i<track_.size(); i++) {
+        auto interaction_type = types_[i];
+        if (interaction_type != InteractionType::ContinuousEnergyLoss and
+                interaction_type != InteractionType::Decay) {
+            losses.emplace_back(static_cast<int>(interaction_type),
+                                track_[i-1].energy - track_[i].energy,
+                                track_[i].position, track_[i].direction,
+                                track_[i].time, track_[i].propagated_distance,
+                                track_[i-1].energy);
+        }
+    }
+    return losses;
+}
+
+std::vector<StochasticLoss> Secondaries::GetStochasticLosses(const Geometry& geometry) const
+{
+    assert(track_.size() == types_.size());
+
+    std::vector<StochasticLoss> losses;
+    for (unsigned int i=1; i<track_.size(); i++) {
+        if (geometry.IsInside(track_[i].position, track_[i].direction)) {
+            auto interaction_type = types_[i];
+            if (interaction_type != InteractionType::ContinuousEnergyLoss and
+               interaction_type != InteractionType::Decay) {
+                losses.emplace_back(static_cast<int>(interaction_type),
+                                    track_[i-1].energy - track_[i].energy,
+                                    track_[i].position, track_[i].direction,
+                                    track_[i].time, track_[i].propagated_distance,
+                                    track_[i-1].energy);
+            }
+        }
+    }
+    return losses;
+}
+
+std::vector<StochasticLoss> Secondaries::GetStochasticLosses(const InteractionType& type) const
+{
+    assert(track_.size() == types_.size());
+
+    std::vector<StochasticLoss> losses;
+    for (unsigned int i=1; i<track_.size(); i++) {
+        auto interaction_type = types_[i];
+        if (interaction_type == type) {
+            losses.emplace_back(static_cast<int>(interaction_type),
+                                track_[i-1].energy - track_[i].energy,
+                                track_[i].position, track_[i].direction,
+                                track_[i].time, track_[i].propagated_distance,
+                                track_[i-1].energy);
+        }
+    }
+    return losses;
+}
+
+std::vector<StochasticLoss> Secondaries::GetStochasticLosses(
+        const std::string& interaction_type) const
+{
+    auto it = std::find_if(Type_Interaction_Name_Map.begin(), Type_Interaction_Name_Map.end(),
+                           [&interaction_type](const std::pair<InteractionType, std::string> &p) {
+        return p.second == interaction_type;
+    });
+    if (it == Type_Interaction_Name_Map.end())
+        Logging::Get("proposal.secondaries")->critical("Could not find interaction type {}", interaction_type);
+
+    return GetStochasticLosses(it->first);
+}
+
+std::vector<ContinuousLoss> Secondaries::GetContinuousLosses() const
+{
+    assert(track_.size() == types_.size());
+
+    std::vector<ContinuousLoss> losses;
+    for (unsigned int i=1; i<track_.size(); i++) {
+        if (types_[i] == InteractionType::ContinuousEnergyLoss) {
+            losses.emplace_back(
+                    std::make_pair(track_[i-1].energy, track_[i].energy),
+                    std::make_pair(track_[i-1].position, track_[i].position),
+                    std::make_pair(track_[i-1].direction, track_[i].direction),
+                    std::make_pair(track_[i-1].time, track_[i].time)
+                    );
+        }
+    }
+    return losses;
+}
+
+std::vector<ContinuousLoss> Secondaries::GetContinuousLosses(const Geometry& geometry) const
+{
+    assert(track_.size() == types_.size());
+
+    //TODO: At the moment, part of the continuous losses may be missing if
+    // the track points are not exactly on the geometry border
+    std::vector<ContinuousLoss> losses;
+    for (unsigned int i=1; i<track_.size(); i++) {
+        if (geometry.IsInside(track_[i].position, track_[i].direction)) {
+            if (types_[i] == InteractionType::ContinuousEnergyLoss) {
+                losses.emplace_back(
+                        std::make_pair(track_[i-1].energy, track_[i].energy),
+                        std::make_pair(track_[i-1].position, track_[i].position),
+                        std::make_pair(track_[i-1].direction, track_[i].direction),
+                        std::make_pair(track_[i-1].time, track_[i].time)
+                        );
+            }
+        }
+    }
+    return losses;
 }

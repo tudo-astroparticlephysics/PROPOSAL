@@ -67,7 +67,7 @@ public:
     enum {GEOMETRY, UTILITY, DENSITY_DISTR};
 
 private:
-    void DoStochasticInteraction(DynamicData&, PropagationUtility&,
+    InteractionType DoStochasticInteraction(DynamicData&, PropagationUtility&,
             std::function<double()>);
     int AdvanceParticle(DynamicData& p_cond, double E_f, double max_distance,
                          std::function<double()> rnd, Sector& current_sector);
