@@ -281,7 +281,6 @@ PYBIND11_MODULE(proposal, m)
         .def("energy_randomize", &PropagationUtility::EnergyRandomize)
         .def("energy_distance", &PropagationUtility::EnergyDistance)
         .def("length_continuous", &PropagationUtility::LengthContinuous)
-        .def("length_continuous", &PropagationUtility::LengthContinuous)
         .def("directions_scatter", &PropagationUtility::DirectionsScatter);
 
 
@@ -306,136 +305,6 @@ PYBIND11_MODULE(proposal, m)
         /*         )pbdoc") */
 
 
-    /* py::enum_<Sector::ParticleLocation::Enum>(m, "ParticleLocation") */
-    /*     .value("infront_detector", Sector::ParticleLocation::InfrontDetector) */
-    /*     .value("inside_detector", Sector::ParticleLocation::InsideDetector) */
-    /*     .value("behind_detector", Sector::ParticleLocation::BehindDetector); */
-
-    /* py::class_<Sector::Definition, std::shared_ptr<Sector::Definition>>(m, */
-    /*     "SectorDefinition", */
-    /*     R"pbdoc( */
-    /*             Sector definition is a container that collects all important */
-    /*             settings for propagation through a sector. There could for */
-    /*             example specify the used cross sections or the energy cut */
-    /*             settings. */
-
-    /*             An example for multiple SectorDefinitions is the standard */
-    /*             implementation of propagation. Three sectors are generated, */
-    /*             which differ in the energy cut settings, to reduce computing */
-    /*             power without a measurable loss of accuracy. Infront of the */
-    /*             detector energy cut will be like :math:`v_\text{cut} = 0.05`. */
-    /*             Inside the detector the energy cut :math:`e_\text{cut} = 500 */
-    /*             \text{MeV}` is chosen so that particles below the detector */
-    /*             resolution are statistically sampled. Outside of the detector no */
-    /*             cuts are made to find a decay point of the particle in first */
-    /*             approximation. */
-    /*         )pbdoc") */
-    /*     .def(py::init<>()) */
-    /*     .def("__str__", &py_print<Sector::Definition>) */
-    /*     .def_readwrite("cut_settings", &Sector::Definition::cut_settings, */
-    /*         R"pbdoc( */
-    /*                 Definition of the :meth:`EnergyCutSettings` */
-    /*             )pbdoc") */
-    /*     .def_property("medium", &Sector::Definition::GetMedium, */
-    /*         &Sector::Definition::SetMedium, */
-    /*         R"pbdoc( */
-    /*                 Definition of the :meth:`~proposal.medium.Medium` */
-    /*             )pbdoc") */
-    /*     .def_property("geometry", &Sector::Definition::GetGeometry, */
-    /*         &Sector::Definition::SetGeometry, */
-    /*         R"pbdoc( */
-    /*                 Definiton of the :meth:`~proposal.geometry.Geometry` */
-    /*             )pbdoc") */
-    /*     .def_readwrite("do_stochastic_loss_weighting", */
-    /*         &Sector::Definition::do_stochastic_loss_weighting, */
-    /*         R"pbdoc( */
-    /*                 Boolean value whether the probability of producing a */
-    /*                 stochastic loss should be adjusted with a factor, */
-    /*                 defaults to False. */
-    /*             )pbdoc") */
-    /*     .def_readwrite("stochastic_loss_weighting", */
-    /*         &Sector::Definition::stochastic_loss_weighting, */
-    /*         R"pbdoc( */
-    /*                 Factor used to scale the probability of producing a */
-    /*                 stochastic loss, defaults to 1.0. */
-    /*             )pbdoc") */
-    /*     .def_readwrite("stopping_decay", &Sector::Definition::stopping_decay, */
-    /*         R"pbdoc( */
-
-    /*             )pbdoc") */
-    /*     .def_readwrite("do_continuous_randomization", */
-    /*         &Sector::Definition::do_continuous_randomization, */
-    /*         R"pbdoc( */
-    /*                 Boolean if continous randomization should be done if */
-    /*                 interpolation if is used, defaults to true. */
-    /*             )pbdoc") */
-    /*     .def_readwrite("do_continuous_energy_loss_output", */
-    /*         &Sector::Definition::do_continuous_energy_loss_output, */
-    /*         R"pbdoc( */
-
-    /*             )pbdoc") */
-    /*     .def_readwrite("do_exact_time_calculation", */
-    /*         &Sector::Definition::do_exact_time_calculation, */
-    /*         R"pbdoc( */
-    /*                 Boolean if particle speed could be approach by the speed */
-    /*                 of light or should be calculated by solving the track */
-    /*                 integral, defaults to false. */
-
-    /*                 If the energy is in the order of the rest energy of the */
-    /*                 particle, the assumption that the particle moves at the */
-    /*                 speed of light becomes increasingly worse. Than it make */
-    /*                 sense to calculate the time integral. */
-
-    /*                 .. math:: */
-
-    /*                         t_\text{f} = t_\text{i} + \int_{x_\text{i}}^{x_\text{f}} */
-    /*                             \frac{ \text{dx} }{ v(x) } */
-    /*             )pbdoc") */
-    /*     .def_readwrite("scattering_model", */
-    /*         &Sector::Definition::scattering_model, */
-    /*         R"pbdoc( */
-    /*                 Definition of the scattering modell of type :meth:`~proposal.scattering.ScatteringModel` */
-    /*                 or deactivate scattering. */
-
-    /*                 Example: */
-    /*                     Deactivating scattering can be achieved with: */
-
-    /*                     >>> sec = proposal.SectorDefinition() */
-    /*                     >>> sec.scattering_model = proposal.scattering.ScatteringModel.NoScattering */
-    /*             )pbdoc") */
-    /*     .def_readwrite("particle_location", &Sector::Definition::location, */
-    /*         R"pbdoc( */
-    /*                 Definition of the relationship of the sectors to each */
-    /*                 other of type :meth:`ParticleLocation`. */
-    /*             )pbdoc") */
-    /*     .def_readwrite("crosssection_defs", &Sector::Definition::utility_def, */
-    /*         R"pbdoc( */
-    /*                 Definition of the crosssection of type :meth:`~proposal.UtilityDefinition` */
-    /*             )pbdoc"); */
-
-    /* py::class_<Sector, std::shared_ptr<Sector>>(m, "Sector", R"pbdoc( */
-    /*         A sector is characterized by its homogeneous attitudes. */
-    /*         Within a sector there are no boundaries to consider. */
-    /*     )pbdoc") */
-    /*     .def(py::init<ParticleDef&, const Sector::Definition&>(), */
-    /*         py::arg("particle_def"), py::arg("sector_definition")) */
-    /*     .def(py::init<ParticleDef&, const Sector::Definition&, */
-    /*              const InterpolationDef&>(), */
-    /*         py::arg("particle_def"), py::arg("sector_definition"), */
-    /*         py::arg("interpolation_def")) */
-    /*     .def("energy_decay", &Sector::EnergyDecay, py::arg("initial_energy"), */
-    /*         py::arg("rnd")) */
-    /*     .def("energy_interaction", &Sector::EnergyInteraction, */
-    /*         py::arg("initial_energy"), py::arg("rnd")) */
-    /*     .def("energy_minimal", &Sector::EnergyMinimal, */
-    /*         py::arg("initial_energy"), py::arg("cut")) */
-    /*     .def("energy_distance", &Sector::EnergyDistance, */
-    /*         py::arg("initial_energy"), py::arg("distance")) */
-    /*     .def("make_stochastic_loss", &Sector::MakeStochasticLoss, */
-    /*         py::arg("minimal_energy")) */
-    /*     .def("propagate", &Sector::Propagate, */
-    /*         py::arg("particle_condition"), py::arg("max_distance"), py::arg("min_energy")); */
-
     /* py::class_<RandomGenerator, std::unique_ptr<RandomGenerator, py::nodelete>>( */
     /*     m, "RandomGenerator") */
     /*     .def("random_double", &RandomGenerator::RandomDouble) */
@@ -445,113 +314,16 @@ PYBIND11_MODULE(proposal, m)
     /*     .def_static( */
     /*         "get", &RandomGenerator::Get, py::return_value_policy::reference); */
 
-    /* py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator") */
-    /*     .def(py::init<ParticleDef const&, std::vector<Sector>>()) */
-    /*     .def(py::init<GammaDef, std::string const&>()) */
-    /*     .def(py::init<EMinusDef, std::string const&>()) */
-    /*     .def(py::init<EPlusDef, std::string const&>()) */
-    /*     .def(py::init<MuMinusDef, std::string const&>()) */
-    /*     .def(py::init<MuPlusDef, std::string const&>()) */
-    /*     .def(py::init<TauMinusDef, std::string const&>()) */
-    /*     .def(py::init<TauPlusDef, std::string const&>()) */
-    /*     .def("propagate", &Propagator::Propagate, py::arg("initial_particle"), py::arg("max_distance"), py::arg("min_energy")); */
-
-    /*     .def( */
-    /*         py::init<const ParticleDef&, const std::vector<Sector::Definition>&, */
-    /*             std::shared_ptr<const Geometry>, const InterpolationDef&>(), */
-    /*         py::arg("particle_def"), py::arg("sector_defs"), */
-    /*         py::arg("detector"), py::arg("interpolation_def"), R"pbdoc( */
-    /*                 Function Docstring. */
-
-    /*                 Args: */
-    /*                     particle_def (proposal.particle.ParticleDef): definition of the particle to propagate describing the basic properties. */
-    /*                     sector_defs (List[proposal.SectorDefinition]): list of the sectors describing the environment around the detector. */
-    /*                     detector (proposal.geometry.Geometry): geometry of the detector. */
-    /*                     interpolation_def (proposal.InterpolationDef): definition of the Interpolation tables like path to store them, etc. */
-    /*             )pbdoc") */
-    /*     .def(py::init<const ParticleDef&, */
-    /*              const std::vector<Sector::Definition>&, std::shared_ptr<const Geometry>>(), */
-    /*         py::arg("particle_def"), py::arg("sector_defs"), */
-    /*         py::arg("detector")) */
-    /*     .def(py::init<const ParticleDef&, const std::string&>(), */
-    /*         py::arg("particle_def"), py::arg("config_file")) */
-    /*     .def("propagate", &Propagator::Propagate, */
-    /*         py::arg("particle_condition"), */
-    /*         py::arg("max_distance_cm") = 1e20, */
-    /*         py::arg("minimal_energy") = 0., */
-    /*         py::return_value_policy::reference, */
-    /*         R"pbdoc( */
-    /*                 Propagate a particle through sectors and produce stochastic */
-    /*                 losses, untill propagated distance is reached. */
-
-    /*                 Args: */
-    /*                     max_distance_cm (float): Maximum distance a particle is */
-    /*                         propagated before it is considered lost. */
-
-    /*                 Returns: */
-    /*                     list(DynamicData): list of stochastic losses parameters */
-    /*                     list(list): list of stochastic losses parameters */
-
-    /*                 Example: */
-    /*                     Propagate 1000 particle with an inital energy of 100 */
-    /*                     Tev and save the losses in daughters. */
-
-    /*                     >>> for i in range(int(1e3)): */
-    /*                     >>>   mu.energy = 1e8 */
-    /*                     >>>   mu.propagated_distance = 0 */
-    /*                     >>>   mu.position = pp.Vector3D(0, 0, 0) */
-    /*                     >>>   mu.direction = pp.Vector3D(0, 0, -1) */
-    /*                     >>>   daughters = prop.propagate() */
-
-    /*                 Further basic condition are set at the next point of */
-    /*                 interaction during generation. */
-    /*                 The aim is to introduce forced stochastic losses */
-    /*                 so that the particle can be propagated through homogeneous */
-    /*                 sectors. */
-    /*                 A more percise description of propagation through a */
-    /*                 homoegenous sector can be found in ???. */
-
-    /*                 .. figure:: figures/sector.png */
-    /*                     :height: 200px */
-    /*                     :align: center */
-
-    /*                     If the next interaction point is outside the actuell */
-    /*                     sector, the particle is forced to an interaction at the */
-    /*                     sector boundary. Thus it can be assumed that the */
-    /*                     particle is porpagated by a homogeneous medium. */
-
-    /*                 The propagated particle will be forced to interact in the */
-    /*                 closest point to the dector center. */
-    /*                 This will be stored in the closest_approach variable of */
-    /*                 the propagated particle. */
-
-    /*                 The propagation terminate if the maximal distance is */
-    /*                 reached. */
-    /*                 The energy loss of the particle (e_lost) in the detector */
-    /*                 will be calculated and the produced secondary particles */
-    /*                 returned. */
-    /*             )pbdoc") */
-    /*     .def_property_readonly("particle_def", &Propagator::GetParticleDef, */
-    /*         R"pbdoc( */
-    /*                 Get the internal particle definition to use its properties. */
-
-    /*                 Returns: */
-    /*                     ParticleDefinition: the definition of the propagated particle. */
-    /*             )pbdoc") */
-    /*     .def_property_readonly("sector", &Propagator::GetCurrentSector, */
-    /*         R"pbdoc( */
-    /*                 "Get the current sector" */
-
-    /*                 Returns: */
-    /*                     Sector: the current sector, where the particle is at the moment. */
-    /*             )pbdoc") */
-    /*     .def_property_readonly("detector", &Propagator::GetDetector, */
-    /*         R"pbdoc( */
-    /*                 Get the detector geometry. */
-
-    /*                 Returns: */
-    /*                     Geometry: the geometry of the detector. */
-    /*             )pbdoc"); */
+    py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
+        .def(py::init<ParticleDef const&, std::vector<Sector>>())
+        .def(py::init<GammaDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<EMinusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<EPlusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<MuMinusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<MuPlusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<TauMinusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<TauPlusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def("propagate", &Propagator::Propagate, py::arg("initial_particle"), py::arg("max_distance") = 1.e20, py::arg("min_energy") = 0.);
 
 
     /* py::class_<PropagatorService, std::shared_ptr<PropagatorService>>( */
@@ -564,14 +336,3 @@ PYBIND11_MODULE(proposal, m)
     /*         py::arg("propagator")); */
 }
 
-// #undef COMPONENT_DEF
-// #undef MEDIUM_DEF
-// #undef AXIS_DEF
-// #undef BREMS_DEF
-// #undef PHOTO_REAL_DEF
-// #undef PHOTO_Q2_DEF
-// #undef PHOTO_Q2_INTERPOL_DEF
-// #undef EPAIR_DEF
-// #undef EPAIR_INTERPOL_DEF
-// #undef MUPAIR_DEF
-// #undef MUPAIR_INTERPOL_DEF
