@@ -316,13 +316,13 @@ PYBIND11_MODULE(proposal, m)
 
     py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
         .def(py::init<ParticleDef const&, std::vector<Sector>>())
-        .def(py::init<GammaDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<EMinusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<EPlusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<MuMinusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<MuPlusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<TauMinusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<TauPlusDef, std::string const&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<GammaDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<EMinusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<EPlusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<MuMinusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<MuPlusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<TauMinusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<TauPlusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
         .def("propagate", &Propagator::Propagate, py::arg("initial_particle"), py::arg("max_distance") = 1.e20, py::arg("min_energy") = 0.);
 
 

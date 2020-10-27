@@ -215,6 +215,7 @@ void init_particle(py::module& m) {
         .def(py::init<const Vector3D&, const Vector3D&, const double&, const double&, const double&>(),
                 py::arg("position"), py::arg("direction"), py::arg("energy"),
                 py::arg("time"), py::arg("propagated_distance"))
+        .def(py::init<>())
         .def(py::init<const ParticleType&, const Vector3D&, const Vector3D&, const double&, const double&, const double&>(),
              py::arg("particle_type"), py::arg("position"), py::arg("direction"),
              py::arg("energy"), py::arg("time"), py::arg("propagated_distance"))
