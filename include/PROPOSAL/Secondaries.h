@@ -34,11 +34,11 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 namespace PROPOSAL {
 
-class Geometry;
-class PropagationUtility;
 class Density_distr;
 
 using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
@@ -73,8 +73,9 @@ public:
     std::vector<double> GetTrackEnergies() const;
     std::vector<double> GetTrackTimes() const;
     std::vector<double> GetTrackPropagatedDistances() const;
-    std::vector<InteractionType> GetTypes() const { return types_; };
+    std::vector<InteractionType> GetTrackTypes() const { return types_; };
     unsigned int GetTrackLength() const { return track_.size(); };
+    std::vector<DynamicData> GetDecayProducts() const;
 
     // Loss functions
 
@@ -85,8 +86,6 @@ public:
 
     std::vector<ContinuousLoss> GetContinuousLosses() const;
     std::vector<ContinuousLoss> GetContinuousLosses(const Geometry&) const;
-
-    void DoDecay();
 
 private:
     DynamicData RePropagate(const DynamicData&, const Vector3D&, double) const;

@@ -40,27 +40,25 @@ void Secondaries::emplace_back(const ParticleType& particle_type, const Vector3D
     types_.emplace_back(interaction_type);
 }
 
-void Secondaries::DoDecay()
+std::vector<DynamicData> Secondaries::GetDecayProducts() const
 {
-    for (auto it = track_.begin(); it != track_.end();) {
-        if (it->type == static_cast<int>(InteractionType::Decay)) {
-            DynamicData decaying_particle(static_cast<ParticleType>(primary_def_->particle_type),
-                it->position, it->direction, it->energy, it->time,
-                it->propagated_distance);
+    assert(track_.size() == types_.size());
+
+    //TODO: Is this necessary, or do we assume that there is only one decay at the end of the vector?
+    std::vector<DynamicData> decay_products;
+    for (unsigned int i=0; i<track_.size(); i++) {
+        if (types_[i] == InteractionType::Decay) {
+            DynamicData decaying_particle = track_[i];
             double random_ch = RandomGenerator::Get().RandomDouble();
             auto products
                 = primary_def_->decay_table.SelectChannel(random_ch).Decay(
                     *primary_def_, decaying_particle);
-            it = track_.erase(it); // delete old decay
             for (auto p : products) {
-                // and insert decayparticles inplace of old decay
-                it = track_.insert(it, std::move(p));
-                it++;
+                decay_products.emplace_back(p);
             }
-        } else {
-            it++;
         }
     }
+    return decay_products;
 }
 
 std::vector<DynamicData> Secondaries::GetTrack(const Geometry& geometry) const
