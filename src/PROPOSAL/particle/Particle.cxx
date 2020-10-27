@@ -18,7 +18,6 @@ using namespace PROPOSAL;
 
 namespace PROPOSAL {
 
-// ------------------------------------------------------------------------- //
 std::ostream& operator<<(std::ostream& os, DynamicData const& data)
 {
     std::stringstream ss;
@@ -41,10 +40,6 @@ std::ostream& operator<<(std::ostream& os, DynamicData const& data)
 }
 
 } // namespace PROPOSAL
-
-/******************************************************************************
- *                              Dynamic Particle                              *
- ******************************************************************************/
 
 DynamicData::DynamicData()
     : type(0)
@@ -80,7 +75,29 @@ DynamicData::DynamicData(const ParticleType& type, const Vector3D& position,
 {
 }
 
-// ------------------------------------------------------------------------- //
+bool DynamicData::operator==(const DynamicData& dynamic_data) const
+{
+    if (type != dynamic_data.type)
+        return false;
+    if (position != dynamic_data.position)
+        return false;
+    if (direction != dynamic_data.direction)
+        return false;
+    if (energy != dynamic_data.energy)
+        return false;
+    if (time != dynamic_data.time)
+        return false;
+    if (propagated_distance != dynamic_data.propagated_distance)
+        return false;
+
+    return true;
+}
+
+bool DynamicData::operator!=(const DynamicData& dynamic_data) const
+{
+    return !(*this == dynamic_data);
+}
+
 std::string DynamicData::GetName() const
 {
     auto p_search = Type_Particle_Map.find(static_cast<ParticleType>(type));

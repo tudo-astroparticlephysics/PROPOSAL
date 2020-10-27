@@ -91,7 +91,8 @@ public:
     DynamicData(const ParticleType&, const Vector3D&, const Vector3D&, const double&,
                 const double&, const double&);
     virtual ~DynamicData() = default;
-
+    bool operator==(const DynamicData&) const;
+    bool operator!=(const DynamicData&) const;
     friend std::ostream& operator<<(std::ostream&, DynamicData const&);
 
     int type;
