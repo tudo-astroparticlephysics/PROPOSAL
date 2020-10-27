@@ -20,8 +20,8 @@ double matrix_element_evaluate(const DynamicData& p_condition, const std::vector
     DynamicData numu = products.at(1);
     DynamicData nuebar = products.at(2);
 
-    double p1 = p_condition.GetEnergy() * nuebar.GetEnergy() - (p_condition.GetMomentum() * p_condition.GetDirection()) * (nuebar.GetMomentum() * nuebar.GetDirection());
-    double p2 = electron.GetEnergy() * numu.GetEnergy() - (electron.GetMomentum() * electron.GetDirection()) * (numu.GetMomentum() * numu.GetDirection());
+    double p1 = p_condition.energy * nuebar.energy - (p_condition.GetMomentum() * p_condition.direction) * (nuebar.GetMomentum() * nuebar.direction);
+    double p2 = electron.energy * numu.energy - (electron.GetMomentum() * electron.direction) * (numu.GetMomentum() * numu.direction);
 
     return 64 * G_F*G_F * p1 * p2;
 }
@@ -161,7 +161,8 @@ TEST(DecaySpectrum, MuMinus_Rest){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    DynamicData init_particle(init_particle_def.particle_type);
+    DynamicData init_particle;
+    init_particle.type = init_particle_def.particle_type;
 
     ParticleDef p0  = getParticleDef(particleDecay0);
     ParticleDef p1  = getParticleDef(particleDecay1);
@@ -174,29 +175,29 @@ TEST(DecaySpectrum, MuMinus_Rest){
 
     double aux_energy, energy_sum;
 
-    init_particle.SetEnergy(init_energy);
+    init_particle.energy = init_energy;
 
     double v_max = ( std::pow(init_particle_def.mass,2 ) + pow(p0.mass,2))/(2 * init_particle_def.mass);
-    double gamma = init_particle.GetEnergy() / init_particle_def.mass;
+    double gamma = init_particle.energy / init_particle_def.mass;
     double betagamma = init_particle.GetMomentum() / init_particle_def.mass;
     double max_energy = gamma * v_max + betagamma * std::sqrt( std::pow(v_max, 2) - std::pow(p0.mass,2));
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.direction = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0.;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -235,21 +236,21 @@ TEST(DecaySpectrum, MuMinus_Rest){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.direction = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -293,21 +294,21 @@ TEST(DecaySpectrum, MuMinus_Rest){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.direction = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -361,7 +362,8 @@ TEST(DecaySpectrum, MuMinus_Energy){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    DynamicData init_particle(init_particle_def.particle_type);
+    DynamicData init_particle;
+    init_particle.type = init_particle_def.particle_type;
 
     ParticleDef p0  = getParticleDef(particleDecay0);
     ParticleDef p1  = getParticleDef(particleDecay1);
@@ -374,29 +376,29 @@ TEST(DecaySpectrum, MuMinus_Energy){
 
     double aux_energy, energy_sum;
 
-    init_particle.SetEnergy(init_energy);
+    init_particle.energy = init_energy;
 
     double v_max = ( std::pow(init_particle_def.mass,2 ) + pow(p0.mass,2))/(2 * init_particle_def.mass);
-    double gamma = init_particle.GetEnergy() / init_particle_def.mass;
+    double gamma = init_particle.energy / init_particle_def.mass;
     double betagamma = init_particle.GetMomentum() / init_particle_def.mass;
     double max_energy = gamma * v_max + betagamma * std::sqrt( std::pow(v_max, 2) - std::pow(p0.mass,2));
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -436,21 +438,21 @@ TEST(DecaySpectrum, MuMinus_Energy){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.direction = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -494,21 +496,21 @@ TEST(DecaySpectrum, MuMinus_Energy){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.direction = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -561,7 +563,8 @@ TEST(DecaySpectrum, TauMinus_Rest){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    DynamicData init_particle(init_particle_def.particle_type);
+    DynamicData init_particle;
+    init_particle.type = init_particle_def.particle_type;
 
     ParticleDef p0  = getParticleDef(particleDecay0);
     ParticleDef p1  = getParticleDef(particleDecay1);
@@ -574,29 +577,29 @@ TEST(DecaySpectrum, TauMinus_Rest){
 
     double aux_energy, energy_sum;
 
-    init_particle.SetEnergy(init_energy);
+    init_particle.energy = init_energy;
 
     double v_max = ( std::pow(init_particle_def.mass,2 ) + pow(p0.mass,2))/(2 * init_particle_def.mass);
-    double gamma = init_particle.GetEnergy() / init_particle_def.mass;
+    double gamma = init_particle.energy / init_particle_def.mass;
     double betagamma = init_particle.GetMomentum() / init_particle_def.mass;
     double max_energy = gamma * v_max + betagamma * std::sqrt( std::pow(v_max, 2) - std::pow(p0.mass,2));
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.direction = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -635,21 +638,21 @@ TEST(DecaySpectrum, TauMinus_Rest){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.direction = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -693,21 +696,21 @@ TEST(DecaySpectrum, TauMinus_Rest){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.direction = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -761,7 +764,8 @@ TEST(DecaySpectrum, TauMinus_energy){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    DynamicData init_particle(init_particle_def.particle_type);
+    DynamicData init_particle;
+    init_particle.type = init_particle_def.particle_type;
 
     ParticleDef p0  = getParticleDef(particleDecay0);
     ParticleDef p1  = getParticleDef(particleDecay1);
@@ -774,29 +778,29 @@ TEST(DecaySpectrum, TauMinus_energy){
 
     double aux_energy, energy_sum;
 
-    init_particle.SetEnergy(init_energy);
+    init_particle.energy = init_energy;
 
     double v_max = ( std::pow(init_particle_def.mass,2 ) + pow(p0.mass,2))/(2 * init_particle_def.mass);
-    double gamma = init_particle.GetEnergy() / init_particle_def.mass;
+    double gamma = init_particle.energy / init_particle_def.mass;
     double betagamma = init_particle.GetMomentum() / init_particle_def.mass;
     double max_energy = gamma * v_max + betagamma * std::sqrt( std::pow(v_max, 2) - std::pow(p0.mass,2));
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.direction = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -835,21 +839,21 @@ TEST(DecaySpectrum, TauMinus_energy){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.direction = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
@@ -893,21 +897,21 @@ TEST(DecaySpectrum, TauMinus_energy){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.SetDirection(Vector3D(0, 0, -1));
-        init_particle.SetPosition(Vector3D(0, 0, -1));
-        init_particle.SetEnergy(init_energy);
-        init_particle.SetPropagatedDistance(0);
+        init_particle.direction = Vector3D(0, 0, -1);
+        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.energy = init_energy;
+        init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
         for(DynamicData particle : aux){
-            aux_energy = particle.GetEnergy();
-            if(particle.GetType() == p0.particle_type) {
+            aux_energy = particle.energy;
+            if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p1.particle_type) {
+            else if(particle.type == p1.particle_type) {
                 prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             }
-            else if(particle.GetType() == p2.particle_type) {
+            else if(particle.type == p2.particle_type) {
                 prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
             } else {
                 FAIL() << "Unknown return particle";
