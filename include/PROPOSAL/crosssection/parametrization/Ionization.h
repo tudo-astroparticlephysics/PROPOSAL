@@ -63,6 +63,8 @@ namespace crosssection {
         std::tuple<double, double> GetKinematicLimits(
                 const ParticleDef&, const Component&, double) const final;
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
+
+        virtual bool dEdx_integration() const = 0;
     };
 
     class IonizBetheBlochRossi : public Ionization {
@@ -81,6 +83,11 @@ namespace crosssection {
             const ParticleDef&, const Medium&, double, double) const final;
         double FunctionToDEdxIntegral(
             const ParticleDef&, const Medium&, double, double) const final;
+
+        // dEdx_integration needs to be specified for each Ionization
+        // parametrization, specifying wether CrossSectionIntegral should
+        // integrate over FunctionToDEdxIntegral() or not
+        bool dEdx_integration() const final {return true; };
     };
 
     struct IonizBergerSeltzerBhabha : public Ionization {
@@ -93,6 +100,8 @@ namespace crosssection {
             const ParticleDef&, const Medium&, double, double) const final;
         double FunctionToDEdxIntegral(
             const ParticleDef&, const Medium&, double, double) const final;
+
+        bool dEdx_integration() const final {return false; };
     };
 
     struct IonizBergerSeltzerMoller : public Ionization {
@@ -105,6 +114,8 @@ namespace crosssection {
             const ParticleDef&, const Medium&, double, double) const final;
         double FunctionToDEdxIntegral(
             const ParticleDef&, const Medium&, double, double) const final;
+
+        bool dEdx_integration() const final {return false; };
     };
 
 // Factory pattern functions
