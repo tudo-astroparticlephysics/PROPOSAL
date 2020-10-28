@@ -68,6 +68,9 @@ public:
     std::vector<DynamicData> GetTrack() const { return track_; };
     std::vector<DynamicData> GetTrack(const Geometry&) const;
 
+    DynamicData GetStateForEnergy(double) const;
+    DynamicData GetStateForDistance(double) const;
+
     std::vector<Vector3D> GetTrackPositions() const;
     std::vector<Vector3D> GetTrackDirections() const;
     std::vector<double> GetTrackEnergies() const;
@@ -88,7 +91,8 @@ public:
     std::vector<ContinuousLoss> GetContinuousLosses(const Geometry&) const;
 
 private:
-    DynamicData RePropagate(const DynamicData&, const Vector3D&, double) const;
+    DynamicData RePropagateDistance(const DynamicData&, double) const;
+    DynamicData RePropagateEnergy(const DynamicData&, double, double) const;
     Sector GetCurrentSector(const Vector3D&, const Vector3D&) const;
 
     std::vector<DynamicData> track_;

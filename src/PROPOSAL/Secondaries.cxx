@@ -72,6 +72,42 @@ std::vector<DynamicData> Secondaries::GetTrack(const Geometry& geometry) const
 }
 
 
+DynamicData Secondaries::GetStateForEnergy(double energy) const
+{
+    if (energy >= track_.front().energy)
+        return track_.front();
+
+    for (unsigned int i=1; i<track_.size(); i++) {
+        if (track_[i].energy < energy) {
+            if (types_[i] == InteractionType::ContinuousEnergyLoss) {
+                return RePropagateEnergy(
+                        track_[i-1], track_[i-1].energy - energy,
+                        track_[i-1].propagated_distance - track_[i].propagated_distance);
+            } else {
+                return track_[i-1];
+            }
+        }
+    }
+
+    return track_.back();
+}
+
+DynamicData Secondaries::GetStateForDistance(double propagated_distance) const
+{
+    if (track_.front().propagated_distance >= propagated_distance)
+        return track_.front();
+
+    for (unsigned int i=1; i<track_.size(); i++) {
+        if (track_[i].propagated_distance > propagated_distance) {
+            return RePropagateDistance(
+                    track_[i-1],
+                    propagated_distance - track_[i-1].propagated_distance);
+        }
+    }
+
+    return track_.back();
+}
+
 std::vector<Vector3D> Secondaries::GetTrackPositions() const
 {
     std::vector<Vector3D> vec;
@@ -139,7 +175,7 @@ std::unique_ptr<DynamicData> Secondaries::GetEntryPoint(
         if (distance <= dist_i_f and distance >= 0) {
             if ( dist_i_f - distance < GEOMETRY_PRECISION)
                 return std::make_unique<DynamicData>(track_.at(i+1));
-            auto entry_point = RePropagate(track_.at(i), dir_i, distance);
+            auto entry_point = RePropagateDistance(track_.at(i), distance);
             return std::make_unique<DynamicData>(entry_point);
         }
     }
@@ -166,8 +202,8 @@ std::unique_ptr<DynamicData> Secondaries::GetExitPoint(
         if (distance <= dist_i_f and distance >= 0) {
             if ( dist_i_f - distance < GEOMETRY_PRECISION)
                 return std::make_unique<DynamicData>(track_.at(i-1));
-            auto exit_point = RePropagate(track_.at(i-1), dir_i,
-                                          dist_i_f - distance);
+            auto exit_point = RePropagateDistance(track_.at(i-1),
+                                                  dist_i_f - distance);
             return std::make_unique<DynamicData>(exit_point);
         }
     }
@@ -193,21 +229,49 @@ std::unique_ptr<DynamicData> Secondaries::GetClosestApproachPoint(const Geometry
                 return std::make_unique<DynamicData>(track_.front());
             auto prev_pos = track_.at(i-1).position;
             auto prev_dir = track_.at(i-1).direction;
-            auto direction = sec_pos - prev_pos;
-            direction.normalise();
             auto displacement = geometry.DistanceToClosestApproach(prev_pos,
                                                                    prev_dir);
-            auto closest_approach = RePropagate(track_.at(i-1), direction,
-                                                displacement);
+            auto closest_approach = RePropagateDistance(track_.at(i-1),
+                                                        displacement);
             return std::make_unique<DynamicData>(closest_approach);
         }
     }
     return std::make_unique<DynamicData>(track_.back());
 }
 
-DynamicData Secondaries::RePropagate(const DynamicData &init,
-                                     const Vector3D& direction,
-                                     double displacement) const
+DynamicData Secondaries::RePropagateEnergy(const DynamicData& init,
+                                           double energy_lost,
+                                           double max_distance) const
+{
+    std::cout << init.energy << ", " << init.propagated_distance << std::endl;
+    auto current_sector = GetCurrentSector(init.position,
+                                           init.direction);
+    auto& utility = get<Propagator::UTILITY>(current_sector);
+    auto& density = get<Propagator::DENSITY_DISTR>(current_sector);
+
+    if (utility.collection.cont_rand != nullptr) {
+        Logging::Get("proposal.secondaries")->warn("Calcuating specific points "
+                                                   "for sectors where continuous randomization is activated "
+                                                   "can lead to inconsistent results!");
+    }
+    auto advance_grammage = utility.LengthContinuous(init.energy,
+                                                     init.energy - energy_lost);
+    auto displacement = density->Correct(init.position, init.direction,
+                                         advance_grammage, max_distance);
+
+    auto E_f = init.energy - energy_lost;
+    auto new_time = init.time + utility.TimeElapsed(
+            init.energy, E_f, displacement ,density->Evaluate(init.position));
+    auto new_position = init.position + init.direction * displacement;
+    auto new_propagated_distance = init.propagated_distance + displacement;
+    std::cout << E_f << ", " << new_propagated_distance << std::endl;
+
+    return DynamicData((ParticleType)primary_def_->particle_type, new_position,
+                       init.direction, E_f, new_time, new_propagated_distance);
+}
+
+DynamicData Secondaries::RePropagateDistance(const DynamicData &init,
+                                             double displacement) const
 {
     auto current_sector = GetCurrentSector(init.position,
                                            init.direction);
@@ -219,15 +283,15 @@ DynamicData Secondaries::RePropagate(const DynamicData &init,
                      "for sectors where continuous randomization is activated "
                      "can lead to inconsistent results!");
     }
-    auto advance_grammage = density->Calculate(init.position, direction,
+    auto advance_grammage = density->Calculate(init.position, init.direction,
                                                displacement);
     auto E_f = utility.EnergyDistance(init.energy, advance_grammage);
     auto new_time = init.time + utility.TimeElapsed(
             init.energy, E_f,displacement, density->Evaluate(init.position));
-    auto new_position = init.position + direction * displacement;
+    auto new_position = init.position + init.direction * displacement;
     auto new_propagated_distance = init.propagated_distance + displacement;
     return DynamicData((ParticleType)primary_def_->particle_type, new_position,
-                       direction, E_f, new_time, new_propagated_distance);
+                       init.direction, E_f, new_time, new_propagated_distance);
 }
 
 Sector Secondaries::GetCurrentSector(const Vector3D& position,

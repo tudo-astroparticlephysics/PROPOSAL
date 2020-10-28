@@ -1,6 +1,7 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Constants.h"
 
 #include <sstream>
 #include <stdexcept>
@@ -49,7 +50,18 @@ EnergyCutSettings::EnergyCutSettings(const nlohmann::json& config)
     double ecut, vcut;
     bool cont_rand;
 
-    config.at("e_cut").get_to(ecut);
+    if(config["e_cut"].is_string()) {
+        std::string setting = config["e_cut"];
+        std::transform(setting.begin(), setting.end(), setting.begin(), ::tolower);
+        if (setting == "inf" or setting == "infinity") {
+            ecut = INF;
+        } else {
+            throw std::invalid_argument("e_cut must be numerical "
+                                        "value or 'inf' / 'infinity'");
+        }
+    } else {
+        config.at("e_cut").get_to(ecut);
+    }
     config.at("v_cut").get_to(vcut);
     config.at("cont_rand").get_to(cont_rand);
 
