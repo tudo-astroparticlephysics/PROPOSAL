@@ -37,6 +37,7 @@ namespace PROPOSAL{
 std::shared_ptr<Geometry> CreateGeometry(const nlohmann::json& config){
     if (config.contains("shape")){
         std::string shape = config["shape"];
+        std::transform(shape.begin(), shape.end(), shape.begin(), ::tolower);
         if (shape == "sphere") {
             return std::make_shared<Sphere>(config);
         } else if (shape == "box") {

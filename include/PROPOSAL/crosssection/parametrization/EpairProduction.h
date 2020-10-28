@@ -124,16 +124,17 @@ cross_t_ptr<P, M> create_epair(P p_def, M medium,std::shared_ptr<const
 
 template<typename P, typename M>
 static std::map<std::string, epair_func_ptr<P, M>> epair_map = {
-        {"KelnerKokoulinPetrukhin", create_epair<EpairKelnerKokoulinPetrukhin, P, M>},
-        {"SandrockSoedingreksoRhode", create_epair<EpairSandrockSoedingreksoRhode, P, M>},
-        {"ForElectronPositron", create_epair<EpairForElectronPositron, P, M>},
+        {"kelnerkokoulinpetrukhin", create_epair<EpairKelnerKokoulinPetrukhin, P, M>},
+        {"sandrocksoedingreksorhode", create_epair<EpairSandrockSoedingreksoRhode, P, M>},
+        {"forelectronpositron", create_epair<EpairForElectronPositron, P, M>},
 };
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_epairproduction(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, bool lpm, const std::string& param_name){
-
-    auto it = epair_map<P, M>.find(param_name);
+    std::string name = param_name;
+    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
+    auto it = epair_map<P, M>.find(name);
     if (it == epair_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for epairproduction");
 

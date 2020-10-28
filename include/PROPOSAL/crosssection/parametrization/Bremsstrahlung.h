@@ -114,19 +114,20 @@ cross_t_ptr<P, M> create_brems(P p_def, M medium,std::shared_ptr<const
 
 template<typename P, typename M>
 static std::map<std::string, brems_func_ptr<P, M>> brems_map = {
-        {"KelnerKokoulinPetrukhin", create_brems<BremsKelnerKokoulinPetrukhin, P, M>},
-        {"PetrukhinShestakov", create_brems<BremsPetrukhinShestakov, P, M>},
-        {"CompleteScreening", create_brems<BremsCompleteScreening, P, M>},
-        {"AndreevBezrukovBugaev", create_brems<BremsAndreevBezrukovBugaev, P, M>},
-        {"SandrockSoedingreksoRhode", create_brems<BremsSandrockSoedingreksoRhode, P, M>},
-        {"ElectronScreening", create_brems<BremsElectronScreening, P, M>}
+        {"kelnerkokoulinpetrukhin", create_brems<BremsKelnerKokoulinPetrukhin, P, M>},
+        {"petrukhinshestakov", create_brems<BremsPetrukhinShestakov, P, M>},
+        {"completescreening", create_brems<BremsCompleteScreening, P, M>},
+        {"andreevbezrukovbugaev", create_brems<BremsAndreevBezrukovBugaev, P, M>},
+        {"sandrocksoedingreksorhode", create_brems<BremsSandrockSoedingreksoRhode, P, M>},
+        {"electronscreening", create_brems<BremsElectronScreening, P, M>}
 };
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, bool lpm, std::string param_name){
-
-    auto it = brems_map<P, M>.find(param_name);
+    std::string name = param_name;
+    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
+    auto it = brems_map<P, M>.find(name);
     if (it == brems_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for bremsstrahlung");
 

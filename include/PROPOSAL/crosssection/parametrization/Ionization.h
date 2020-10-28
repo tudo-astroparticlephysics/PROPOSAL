@@ -122,9 +122,9 @@ cross_t_ptr<P, M> create_ioniz(P p_def, M medium,std::shared_ptr<const
 
 template<typename P, typename M>
 static std::map<std::string, ioniz_func_ptr<P, M>> ioniz_map = {
-        {"BetheBlochRossi", create_ioniz<IonizBetheBlochRossi, P, M>},
-        {"BergerSeltzerBhabha", create_ioniz<IonizBergerSeltzerBhabha, P, M>},
-        {"BergerSeltzerMoller", create_ioniz<IonizBergerSeltzerMoller, P, M>}
+        {"betheblochrossi", create_ioniz<IonizBetheBlochRossi, P, M>},
+        {"bergerseltzerbhabha", create_ioniz<IonizBergerSeltzerBhabha, P, M>},
+        {"bergerseltzermoller", create_ioniz<IonizBergerSeltzerMoller, P, M>}
 };
 
 template<typename P, typename M>
@@ -140,8 +140,9 @@ cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
 template<typename P, typename M>
 cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, const std::string& param_name){
-
-    auto it = ioniz_map<P, M>.find(param_name);
+    std::string name = param_name;
+    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
+    auto it = ioniz_map<P, M>.find(name);
     if (it == ioniz_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for ionization");
 

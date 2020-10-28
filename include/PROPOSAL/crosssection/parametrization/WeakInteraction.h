@@ -84,14 +84,15 @@ cross_t_ptr<P, M> create_weak(P p_def, M medium, bool interpol) {
 
 template<typename P, typename M>
 static std::map<std::string, weak_func_ptr<P, M>> weak_map = {
-        {"CooperSarkarMertsch", create_weak<WeakCooperSarkarMertsch, P, M>}
+        {"coopersarkarmertsch", create_weak<WeakCooperSarkarMertsch, P, M>}
 };
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_weakinteraction(P p_def, M medium, bool interpol,
                                     const std::string& param_name){
-
-    auto it = weak_map<P, M>.find(param_name);
+    std::string name = param_name;
+    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
+    auto it = weak_map<P, M>.find(name);
     if (it == weak_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for weak interaction");
 
