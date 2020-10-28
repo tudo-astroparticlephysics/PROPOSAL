@@ -62,15 +62,15 @@ public:
     : Propagator(p_def, ParseConfig(config_file)) {}
     Propagator(ParticleDef const&, std::vector<Sector> sectors);
 
-    Secondaries Propagate(const DynamicData& initial_particle,
+    Secondaries Propagate(const ParticleState& initial_particle,
             double max_distance = 1e20, double min_energy = 0.);
     enum {GEOMETRY, UTILITY, DENSITY_DISTR};
 
 private:
-    InteractionType DoStochasticInteraction(DynamicData&, PropagationUtility&,
-            std::function<double()>);
-    int AdvanceParticle(DynamicData& p_cond, double E_f, double max_distance,
-                         std::function<double()> rnd, Sector& current_sector);
+    InteractionType DoStochasticInteraction(ParticleState&, PropagationUtility&,
+                                            std::function<double()>);
+    int AdvanceParticle(ParticleState& p_cond, double E_f, double max_distance,
+                        std::function<double()> rnd, Sector& current_sector);
     double CalculateDistanceToBorder(const Vector3D& particle_position,
             const Vector3D& particle_direction,
             const Geometry& current_geometry);

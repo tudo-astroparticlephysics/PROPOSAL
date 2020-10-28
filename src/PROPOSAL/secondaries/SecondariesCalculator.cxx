@@ -2,7 +2,7 @@
 
 using namespace PROPOSAL;
 
-std::vector<DynamicData> SecondariesCalculator::CalculateSecondaries(
+std::vector<ParticleState> SecondariesCalculator::CalculateSecondaries(
         StochasticLoss loss, const Component& comp, vector<double> &rnd)
 {
     auto type = static_cast<InteractionType>(loss.type);

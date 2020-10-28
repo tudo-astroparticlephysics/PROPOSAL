@@ -20,8 +20,8 @@ namespace secondaries {
             : weak_partner_type(p.weak_partner) {}
 
         size_t RequiredRandomNumbers() const noexcept override { return n_rnd; }
-        vector<DynamicData> CalculateSecondaries(StochasticLoss, const Component&,
-                                                 vector<double>&) override;
+        vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
+                                                   vector<double>&) override;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

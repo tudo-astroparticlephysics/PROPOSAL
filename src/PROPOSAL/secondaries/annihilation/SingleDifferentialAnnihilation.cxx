@@ -53,7 +53,7 @@ secondaries::SingleDifferentialAnnihilation::CalculateEnergy(
     return make_tuple(energy_1, energy_2);
 }
 
-vector<DynamicData>
+vector<ParticleState>
 secondaries::SingleDifferentialAnnihilation::CalculateSecondaries(
         StochasticLoss loss, const Component& comp, vector<double> &rnd)
 {
@@ -61,7 +61,7 @@ secondaries::SingleDifferentialAnnihilation::CalculateSecondaries(
     auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, rho);
     auto secondary_dir = CalculateDirections(
             loss.direction, loss.parent_particle_energy, rho, rnd[1]);
-    auto sec = std::vector<DynamicData>();
+    auto sec = std::vector<ParticleState>();
     sec.emplace_back(ParticleType::Gamma, loss.position, get<0>(secondary_dir),
             get<0>(secondary_energies), loss.time, 0.);
     sec.emplace_back(ParticleType::Gamma, loss.position, get<1>(secondary_dir),

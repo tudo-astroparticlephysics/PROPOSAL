@@ -158,7 +158,7 @@ tuple<double, double> secondaries::PhotoTsai::CalculateEnergy(
     return make_tuple(energy * rho, energy * (1 - rho));
 }
 
-vector<DynamicData> secondaries::PhotoTsai::CalculateSecondaries(
+vector<ParticleState> secondaries::PhotoTsai::CalculateSecondaries(
     StochasticLoss loss, const Component& comp, vector<double> &rnd)
 {
     auto rho = CalculateRho(loss.parent_particle_energy, rnd[0], comp);
@@ -167,7 +167,7 @@ vector<DynamicData> secondaries::PhotoTsai::CalculateSecondaries(
     auto secondary_dir = CalculateDirections(
         loss.direction, loss.parent_particle_energy, rho, comp, rnd);
 
-    auto sec = std::vector<DynamicData>();
+    auto sec = std::vector<ParticleState>();
     sec.emplace_back(ParticleType::EMinus, loss.position, get<0>(secondary_dir),
                      get<0>(secondary_energies), loss.time, 0.);
     sec.emplace_back(ParticleType::EPlus, loss.position, get<1>(secondary_dir),

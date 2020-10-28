@@ -96,7 +96,7 @@ double LeptonicDecayChannelApprox::FindRoot(double min, double parent_mass, doub
 }
 
 // ------------------------------------------------------------------------- //
-std::vector<DynamicData> LeptonicDecayChannelApprox::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
+std::vector<ParticleState> LeptonicDecayChannelApprox::Decay(const ParticleDef& p_def, const ParticleState& p_condition)
 {
 
     // Sample energy from decay rate
@@ -114,12 +114,12 @@ std::vector<DynamicData> LeptonicDecayChannelApprox::Decay(const ParticleDef& p_
 
 
     // Sample directions For the massive letpon
-    DynamicData massive_lepton((ParticleType)massive_lepton_.particle_type,
-                               p_condition.position,
-                               GenerateRandomDirection(),
-                               lepton_energy,
-                               p_condition.time,
-                               0.);
+    ParticleState massive_lepton((ParticleType)massive_lepton_.particle_type,
+                                 p_condition.position,
+                                 GenerateRandomDirection(),
+                                 lepton_energy,
+                                 p_condition.time,
+                                 0.);
 
     // Sample directions For the massless letpon
     double energy_neutrinos   = p_def.mass - lepton_energy;
@@ -130,22 +130,22 @@ std::vector<DynamicData> LeptonicDecayChannelApprox::Decay(const ParticleDef& p_
     Vector3D direction = GenerateRandomDirection();
     direction.CalculateSphericalCoordinates();
 
-    DynamicData neutrino((ParticleType)neutrino_.particle_type,
-                         p_condition.position,
-                         direction,
-                         momentum_neutrinos,
-                         p_condition.time,
-                         0.);
+    ParticleState neutrino((ParticleType)neutrino_.particle_type,
+                           p_condition.position,
+                           direction,
+                           momentum_neutrinos,
+                           p_condition.time,
+                           0.);
 
     Vector3D opposite_direction = -direction;
     opposite_direction.CalculateSphericalCoordinates();
 
-    DynamicData anti_neutrino((ParticleType)anti_neutrino_.particle_type,
-                              p_condition.position,
-                              opposite_direction,
-                              momentum_neutrinos,
-                              p_condition.time,
-                              0.);
+    ParticleState anti_neutrino((ParticleType)anti_neutrino_.particle_type,
+                                p_condition.position,
+                                opposite_direction,
+                                momentum_neutrinos,
+                                p_condition.time,
+                                0.);
 
     // Boost neutrinos to lepton frame
     // double beta = lepton_momentum / energy_neutrinos;
@@ -157,7 +157,7 @@ std::vector<DynamicData> LeptonicDecayChannelApprox::Decay(const ParticleDef& p_
     Boost(anti_neutrino, massive_lepton.direction, gamma, betagamma);
 
 
-    std::vector<DynamicData> secondaries;
+    std::vector<ParticleState> secondaries;
     secondaries.push_back(massive_lepton);
     secondaries.push_back(neutrino);
     secondaries.push_back(anti_neutrino);

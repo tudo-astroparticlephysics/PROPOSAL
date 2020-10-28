@@ -39,7 +39,7 @@ tuple<double, double> secondaries::NaivCompton::CalculateEnergy(
     return make_tuple(energy * (1 - v), energy * v);
 }
 
-vector<DynamicData> secondaries::NaivCompton::CalculateSecondaries(
+vector<ParticleState> secondaries::NaivCompton::CalculateSecondaries(
         StochasticLoss loss, const Component&, vector<double> &rnd)
 {
     auto v = loss.loss_energy /  loss.parent_particle_energy;
@@ -47,7 +47,7 @@ vector<DynamicData> secondaries::NaivCompton::CalculateSecondaries(
     auto secondary_dir = CalculateDirections(loss.direction, loss.loss_energy,
                                              v, rnd[1]);
 
-    auto sec = std::vector<DynamicData>();
+    auto sec = std::vector<ParticleState>();
     sec.emplace_back(ParticleType::Gamma, loss.position,
                      get<GAMMA>(secondary_dir), get<GAMMA>(secondary_energies),
                              loss.time, 0.);

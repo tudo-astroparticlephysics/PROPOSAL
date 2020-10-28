@@ -38,9 +38,9 @@ bool TwoBodyPhaseSpace::compare(const DecayChannel& channel) const
         return true;
 }
 
-std::vector<DynamicData> TwoBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
+std::vector<ParticleState> TwoBodyPhaseSpace::Decay(const ParticleDef& p_def, const ParticleState& p_condition)
 {
-    std::vector<DynamicData> products;
+    std::vector<ParticleState> products;
     products.emplace_back((ParticleType)first_daughter_.particle_type, p_condition.position, p_condition.direction, p_condition.energy, p_condition.time, 0);
     products.emplace_back((ParticleType)second_daughter_.particle_type, p_condition.position, p_condition.direction, p_condition.energy, p_condition.time, 0);
 

@@ -52,24 +52,24 @@ public:
     // Operational functions to fill and access track
     void reserve(size_t number_secondaries);
     void clear() { track_.clear(); types_.clear(); };
-    void push_back(const DynamicData& point, const InteractionType& type);
+    void push_back(const ParticleState& point, const InteractionType& type);
     void emplace_back(const ParticleType& particle_type, const Vector3D& position,
         const Vector3D& direction, const double& energy, const double& time,
         const double& distance, const InteractionType& interaction_type);
-    const DynamicData& back() const {return track_.back(); }
-    const DynamicData& operator[](std::size_t idx) { return track_[idx]; };
+    const ParticleState& back() const {return track_.back(); }
+    const ParticleState& operator[](std::size_t idx) { return track_[idx]; };
 
     // Track functions
     double GetELost(const Geometry&) const;
-    std::unique_ptr<DynamicData> GetEntryPoint(const Geometry&) const;
-    std::unique_ptr<DynamicData> GetExitPoint(const Geometry&) const;
-    std::unique_ptr<DynamicData> GetClosestApproachPoint(const Geometry&) const;
+    std::unique_ptr<ParticleState> GetEntryPoint(const Geometry&) const;
+    std::unique_ptr<ParticleState> GetExitPoint(const Geometry&) const;
+    std::unique_ptr<ParticleState> GetClosestApproachPoint(const Geometry&) const;
 
-    std::vector<DynamicData> GetTrack() const { return track_; };
-    std::vector<DynamicData> GetTrack(const Geometry&) const;
+    std::vector<ParticleState> GetTrack() const { return track_; };
+    std::vector<ParticleState> GetTrack(const Geometry&) const;
 
-    DynamicData GetStateForEnergy(double) const;
-    DynamicData GetStateForDistance(double) const;
+    ParticleState GetStateForEnergy(double) const;
+    ParticleState GetStateForDistance(double) const;
 
     std::vector<Vector3D> GetTrackPositions() const;
     std::vector<Vector3D> GetTrackDirections() const;
@@ -78,7 +78,7 @@ public:
     std::vector<double> GetTrackPropagatedDistances() const;
     std::vector<InteractionType> GetTrackTypes() const { return types_; };
     unsigned int GetTrackLength() const { return track_.size(); };
-    std::vector<DynamicData> GetDecayProducts() const;
+    std::vector<ParticleState> GetDecayProducts() const;
 
     // Loss functions
 
@@ -91,11 +91,11 @@ public:
     std::vector<ContinuousLoss> GetContinuousLosses(const Geometry&) const;
 
 private:
-    DynamicData RePropagateDistance(const DynamicData&, double) const;
-    DynamicData RePropagateEnergy(const DynamicData&, double, double) const;
+    ParticleState RePropagateDistance(const ParticleState&, double) const;
+    ParticleState RePropagateEnergy(const ParticleState&, double, double) const;
     Sector GetCurrentSector(const Vector3D&, const Vector3D&) const;
 
-    std::vector<DynamicData> track_;
+    std::vector<ParticleState> track_;
     std::vector<InteractionType> types_;
     std::shared_ptr<ParticleDef> primary_def_;
     std::vector<Sector> sectors_;

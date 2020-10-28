@@ -83,17 +83,17 @@ static const std::unordered_map<InteractionType, std::string,
 
 namespace PROPOSAL {
 
-struct DynamicData {
+struct ParticleState {
 public:
-    DynamicData();
-    DynamicData(const Vector3D&, const Vector3D&, const double&,
-                const double&, const double&);
-    DynamicData(const ParticleType&, const Vector3D&, const Vector3D&, const double&,
-                const double&, const double&);
-    virtual ~DynamicData() = default;
-    bool operator==(const DynamicData&) const;
-    bool operator!=(const DynamicData&) const;
-    friend std::ostream& operator<<(std::ostream&, DynamicData const&);
+    ParticleState();
+    ParticleState(const Vector3D&, const Vector3D&, const double&,
+                  const double&, const double&);
+    ParticleState(const ParticleType&, const Vector3D&, const Vector3D&, const double&,
+                  const double&, const double&);
+    virtual ~ParticleState() = default;
+    bool operator==(const ParticleState&) const;
+    bool operator!=(const ParticleState&) const;
+    friend std::ostream& operator<<(std::ostream&, ParticleState const&);
 
     int type;
     Vector3D position;  //!< position coordinates [cm]

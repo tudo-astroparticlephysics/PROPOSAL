@@ -46,7 +46,7 @@ public:
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() const { return new TwoBodyPhaseSpace(*this); }
 
-    std::vector<DynamicData> Decay(const ParticleDef& p_def, const DynamicData& p_condition);
+    std::vector<ParticleState> Decay(const ParticleDef& p_def, const ParticleState& p_condition);
 
     const std::string& GetName() const { return name_; }
 

@@ -144,7 +144,7 @@ using namespace PROPOSAL;
 int main(){
     ParticleDef mu_def = MuMinusDef::Get();
     Propagator prop(mu_def, "resources/configuration/config.json");
-    DynamicData mu(mu_def.particle_type);
+    ParticleState mu(mu_def.particle_type);
 
     mu.SetEnergy(9e6);
     mu.SetPosition(Vector3D(0, 0, 0))
@@ -216,7 +216,7 @@ prop = pp.Propagator(
 	  config_file="path/to/config.json"
 )
 
-mu = pp.particle.DynamicData(mu_def.particle_type)
+mu = pp.particle.ParticleState(mu_def.particle_type)
 
 mu.energy = 9e6
 mu.direction = pp.Vector3D(0, 0, -1)

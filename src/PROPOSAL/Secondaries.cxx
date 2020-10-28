@@ -25,7 +25,7 @@ void Secondaries::reserve(size_t number_secondaries)
     types_.reserve(number_secondaries);
 }
 
-void Secondaries::push_back(const DynamicData& point, const InteractionType& type)
+void Secondaries::push_back(const ParticleState& point, const InteractionType& type)
 {
     track_.push_back(point);
     types_.push_back(type);
@@ -40,15 +40,15 @@ void Secondaries::emplace_back(const ParticleType& particle_type, const Vector3D
     types_.emplace_back(interaction_type);
 }
 
-std::vector<DynamicData> Secondaries::GetDecayProducts() const
+std::vector<ParticleState> Secondaries::GetDecayProducts() const
 {
     assert(track_.size() == types_.size());
 
     //TODO: Is this necessary, or do we assume that there is only one decay at the end of the vector?
-    std::vector<DynamicData> decay_products;
+    std::vector<ParticleState> decay_products;
     for (unsigned int i=0; i<track_.size(); i++) {
         if (types_[i] == InteractionType::Decay) {
-            DynamicData decaying_particle = track_[i];
+            ParticleState decaying_particle = track_[i];
             double random_ch = RandomGenerator::Get().RandomDouble();
             auto products
                 = primary_def_->decay_table.SelectChannel(random_ch).Decay(
@@ -61,9 +61,9 @@ std::vector<DynamicData> Secondaries::GetDecayProducts() const
     return decay_products;
 }
 
-std::vector<DynamicData> Secondaries::GetTrack(const Geometry& geometry) const
+std::vector<ParticleState> Secondaries::GetTrack(const Geometry& geometry) const
 {
-    std::vector<DynamicData> vec;
+    std::vector<ParticleState> vec;
     for (auto i : track_) {
         if (geometry.IsInside(i.position, i.direction))
             vec.push_back(i);
@@ -72,7 +72,7 @@ std::vector<DynamicData> Secondaries::GetTrack(const Geometry& geometry) const
 }
 
 
-DynamicData Secondaries::GetStateForEnergy(double energy) const
+ParticleState Secondaries::GetStateForEnergy(double energy) const
 {
     if (energy >= track_.front().energy)
         return track_.front();
@@ -92,7 +92,7 @@ DynamicData Secondaries::GetStateForEnergy(double energy) const
     return track_.back();
 }
 
-DynamicData Secondaries::GetStateForDistance(double propagated_distance) const
+ParticleState Secondaries::GetStateForDistance(double propagated_distance) const
 {
     if (track_.front().propagated_distance >= propagated_distance)
         return track_.front();
@@ -155,13 +155,13 @@ double Secondaries::GetELost(const Geometry& geometry) const
     return entry_point->energy - exit_point->energy;
 }
 
-std::unique_ptr<DynamicData> Secondaries::GetEntryPoint(
+std::unique_ptr<ParticleState> Secondaries::GetEntryPoint(
         const Geometry& geometry) const
 {
     auto pos_0 = track_.front().position;
     auto dir_0 = track_.front().direction;
     if (geometry.IsEntering(pos_0, dir_0))
-        return std::make_unique<DynamicData>(track_.front());
+        return std::make_unique<ParticleState>(track_.front());
     if (geometry.IsInside(pos_0, dir_0))
         return nullptr; // track starts in geometry
 
@@ -174,21 +174,21 @@ std::unique_ptr<DynamicData> Secondaries::GetEntryPoint(
         auto distance = geometry.DistanceToBorder(pos_i, dir_i).first;
         if (distance <= dist_i_f and distance >= 0) {
             if ( dist_i_f - distance < GEOMETRY_PRECISION)
-                return std::make_unique<DynamicData>(track_.at(i+1));
+                return std::make_unique<ParticleState>(track_.at(i + 1));
             auto entry_point = RePropagateDistance(track_.at(i), distance);
-            return std::make_unique<DynamicData>(entry_point);
+            return std::make_unique<ParticleState>(entry_point);
         }
     }
     return nullptr; // No entry point found
 }
 
-std::unique_ptr<DynamicData> Secondaries::GetExitPoint(
+std::unique_ptr<ParticleState> Secondaries::GetExitPoint(
         const Geometry &geometry) const
 {
     auto pos_end = track_.back().position;
     auto dir_end = track_.back().direction;
     if (geometry.IsLeaving(pos_end, dir_end))
-        return std::make_unique<DynamicData>(track_.back());
+        return std::make_unique<ParticleState>(track_.back());
     if (geometry.IsInside(pos_end, dir_end))
         return nullptr; // track ends inside geometry
 
@@ -201,22 +201,22 @@ std::unique_ptr<DynamicData> Secondaries::GetExitPoint(
         auto distance = geometry.DistanceToBorder(pos_f, -dir_i).first;
         if (distance <= dist_i_f and distance >= 0) {
             if ( dist_i_f - distance < GEOMETRY_PRECISION)
-                return std::make_unique<DynamicData>(track_.at(i-1));
+                return std::make_unique<ParticleState>(track_.at(i - 1));
             auto exit_point = RePropagateDistance(track_.at(i-1),
                                                   dist_i_f - distance);
-            return std::make_unique<DynamicData>(exit_point);
+            return std::make_unique<ParticleState>(exit_point);
         }
     }
 
     auto pos_0 = track_.front().position;
     auto dir_0 = track_.front().direction;
     if (geometry.IsLeaving(pos_0, dir_0))
-        return std::make_unique<DynamicData>(track_.front());
+        return std::make_unique<ParticleState>(track_.front());
 
     return nullptr; // No exit point found
 }
 
-std::unique_ptr<DynamicData> Secondaries::GetClosestApproachPoint(const Geometry& geometry) const
+std::unique_ptr<ParticleState> Secondaries::GetClosestApproachPoint(const Geometry& geometry) const
 {
     for (unsigned int i = 0; i < track_.size(); i++) {
         auto sec_pos = track_.at(i).position;
@@ -224,24 +224,24 @@ std::unique_ptr<DynamicData> Secondaries::GetClosestApproachPoint(const Geometry
         if (geometry.DistanceToClosestApproach(sec_pos, sec_dir) <= 0.) {
             if(std::abs(geometry.DistanceToClosestApproach(sec_pos, sec_dir))
                         < PARTICLE_POSITION_RESOLUTION)
-                return std::make_unique<DynamicData>(track_.at(i));
+                return std::make_unique<ParticleState>(track_.at(i));
             if (i == 0)
-                return std::make_unique<DynamicData>(track_.front());
+                return std::make_unique<ParticleState>(track_.front());
             auto prev_pos = track_.at(i-1).position;
             auto prev_dir = track_.at(i-1).direction;
             auto displacement = geometry.DistanceToClosestApproach(prev_pos,
                                                                    prev_dir);
             auto closest_approach = RePropagateDistance(track_.at(i-1),
                                                         displacement);
-            return std::make_unique<DynamicData>(closest_approach);
+            return std::make_unique<ParticleState>(closest_approach);
         }
     }
-    return std::make_unique<DynamicData>(track_.back());
+    return std::make_unique<ParticleState>(track_.back());
 }
 
-DynamicData Secondaries::RePropagateEnergy(const DynamicData& init,
-                                           double energy_lost,
-                                           double max_distance) const
+ParticleState Secondaries::RePropagateEnergy(const ParticleState& init,
+                                             double energy_lost,
+                                             double max_distance) const
 {
     std::cout << init.energy << ", " << init.propagated_distance << std::endl;
     auto current_sector = GetCurrentSector(init.position,
@@ -266,12 +266,12 @@ DynamicData Secondaries::RePropagateEnergy(const DynamicData& init,
     auto new_propagated_distance = init.propagated_distance + displacement;
     std::cout << E_f << ", " << new_propagated_distance << std::endl;
 
-    return DynamicData((ParticleType)primary_def_->particle_type, new_position,
-                       init.direction, E_f, new_time, new_propagated_distance);
+    return ParticleState((ParticleType)primary_def_->particle_type, new_position,
+                         init.direction, E_f, new_time, new_propagated_distance);
 }
 
-DynamicData Secondaries::RePropagateDistance(const DynamicData &init,
-                                             double displacement) const
+ParticleState Secondaries::RePropagateDistance(const ParticleState &init,
+                                               double displacement) const
 {
     auto current_sector = GetCurrentSector(init.position,
                                            init.direction);
@@ -290,8 +290,8 @@ DynamicData Secondaries::RePropagateDistance(const DynamicData &init,
             init.energy, E_f,displacement, density->Evaluate(init.position));
     auto new_position = init.position + init.direction * displacement;
     auto new_propagated_distance = init.propagated_distance + displacement;
-    return DynamicData((ParticleType)primary_def_->particle_type, new_position,
-                       init.direction, E_f, new_time, new_propagated_distance);
+    return ParticleState((ParticleType)primary_def_->particle_type, new_position,
+                         init.direction, E_f, new_time, new_propagated_distance);
 }
 
 Sector Secondaries::GetCurrentSector(const Vector3D& position,

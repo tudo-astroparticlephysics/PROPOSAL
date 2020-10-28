@@ -206,8 +206,8 @@ void init_particle(py::module& m) {
     PARTICLE_DEF(m_sub, SMPMinus)
     PARTICLE_DEF(m_sub, SMPPlus)
 
-    py::class_<DynamicData, std::shared_ptr<DynamicData>>(m_sub, "DynamicData",
-                                                          R"pbdoc(
+    py::class_<ParticleState, std::shared_ptr<ParticleState>>(m_sub, "ParticleState",
+                                                              R"pbdoc(
                 Dynamic data objects store information about particle states,
                 for example the intial particle state for the propagator,
                 specific states during propagation or secondary particles.
@@ -219,38 +219,38 @@ void init_particle(py::module& m) {
         .def(py::init<const ParticleType&, const Vector3D&, const Vector3D&, const double&, const double&, const double&>(),
              py::arg("particle_type"), py::arg("position"), py::arg("direction"),
              py::arg("energy"), py::arg("time"), py::arg("propagated_distance"))
-        .def(py::init<const DynamicData&>())
-        .def("__str__", &py_print<DynamicData>)
-        .def_readwrite("type", &DynamicData::type,
+        .def(py::init<const ParticleState&>())
+        .def("__str__", &py_print<ParticleState>)
+        .def_readwrite("type", &ParticleState::type,
                                R"pbdoc(
                 Type of Dynamic Data. Describes the ParticleType of instance.
             )pbdoc")
-        .def_property_readonly("name", &DynamicData::GetName,
+        .def_property_readonly("name", &ParticleState::GetName,
                                R"pbdoc(
                 Name of Particle of instance.
             )pbdoc")
-        .def_readwrite("position", &DynamicData::position,
+        .def_readwrite("position", &ParticleState::position,
                       R"pbdoc(
                 Position of particle (in cm).
             )pbdoc")
-        .def_readwrite("direction", &DynamicData::direction,
+        .def_readwrite("direction", &ParticleState::direction,
                       R"pbdoc(
                 Direction of particle.
             )pbdoc")
-        .def_readwrite("energy", &DynamicData::energy,
+        .def_readwrite("energy", &ParticleState::energy,
                       R"pbdoc(
                 Energy of particle in MeV.
             )pbdoc")
-        .def_property("momentum", &DynamicData::GetMomentum,
-                      &DynamicData::SetMomentum,
+        .def_property("momentum", &ParticleState::GetMomentum,
+                      &ParticleState::SetMomentum,
                       R"pbdoc(
                 Momentum of particle in MeV
             )pbdoc")
-        .def_readwrite("time", &DynamicData::time,
+        .def_readwrite("time", &ParticleState::time,
                       R"pbdoc(
                 Time (in sec) since beginning of propagation the particle.
             )pbdoc")
-        .def_readwrite("propagated_distance", &DynamicData::propagated_distance,
+        .def_readwrite("propagated_distance", &ParticleState::propagated_distance,
                       R"pbdoc(
                 Propagated distance of primary particle.
             )pbdoc");

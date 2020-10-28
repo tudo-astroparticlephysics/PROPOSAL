@@ -44,7 +44,7 @@ TEST(SecondaryVector, EntryPointExitPoint)
     Vector3D position(0, 0, 0);
     Vector3D direction(0, 0, 1);
     auto energy = 1e8; // MeV
-    auto init_state = DynamicData(position, direction, energy, 0., 0.);
+    auto init_state = ParticleState(position, direction, energy, 0., 0.);
 
     auto secondaries = prop->Propagate(init_state, 50000);
 
@@ -82,7 +82,7 @@ TEST(SecondaryVector, EntryPointExitPointRePropagation)
     Vector3D position(0, 0, 0);
     Vector3D direction(0, 0, 1);
     auto energy = 1e8; // MeV
-    auto init_state = DynamicData(position, direction, energy, 0., 0.);
+    auto init_state = ParticleState(position, direction, energy, 0., 0.);
 
     auto secondaries = prop->Propagate(init_state, 1e5);
 

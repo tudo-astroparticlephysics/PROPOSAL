@@ -12,13 +12,13 @@
 
 using namespace PROPOSAL;
 
-double matrix_element_evaluate(const DynamicData& p_condition, const std::vector<DynamicData>& products)
+double matrix_element_evaluate(const ParticleState& p_condition, const std::vector<ParticleState>& products)
 {
     double G_F = 1.1663787*1e-2; // MeV
 
-    DynamicData electron = products.at(0);
-    DynamicData numu = products.at(1);
-    DynamicData nuebar = products.at(2);
+    ParticleState electron = products.at(0);
+    ParticleState numu = products.at(1);
+    ParticleState nuebar = products.at(2);
 
     double p1 = p_condition.energy * nuebar.energy - (p_condition.GetMomentum() * p_condition.direction) * (nuebar.GetMomentum() * nuebar.direction);
     double p2 = electron.energy * numu.energy - (electron.GetMomentum() * electron.direction) * (numu.GetMomentum() * numu.direction);
@@ -161,7 +161,7 @@ TEST(DecaySpectrum, MuMinus_Rest){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    DynamicData init_particle;
+    ParticleState init_particle;
     init_particle.type = init_particle_def.particle_type;
 
     ParticleDef p0  = getParticleDef(particleDecay0);
@@ -189,7 +189,7 @@ TEST(DecaySpectrum, MuMinus_Rest){
         init_particle.propagated_distance = 0.;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -242,7 +242,7 @@ TEST(DecaySpectrum, MuMinus_Rest){
         init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -300,7 +300,7 @@ TEST(DecaySpectrum, MuMinus_Rest){
         init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -362,7 +362,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    DynamicData init_particle;
+    ParticleState init_particle;
     init_particle.type = init_particle_def.particle_type;
 
     ParticleDef p0  = getParticleDef(particleDecay0);
@@ -390,7 +390,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
         init_particle.propagated_distance = 0;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -444,7 +444,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
         init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -502,7 +502,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
         init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -563,7 +563,7 @@ TEST(DecaySpectrum, TauMinus_Rest){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    DynamicData init_particle;
+    ParticleState init_particle;
     init_particle.type = init_particle_def.particle_type;
 
     ParticleDef p0  = getParticleDef(particleDecay0);
@@ -591,7 +591,7 @@ TEST(DecaySpectrum, TauMinus_Rest){
         init_particle.propagated_distance = 0;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -644,7 +644,7 @@ TEST(DecaySpectrum, TauMinus_Rest){
         init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -702,7 +702,7 @@ TEST(DecaySpectrum, TauMinus_Rest){
         init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -764,7 +764,7 @@ TEST(DecaySpectrum, TauMinus_energy){
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     ParticleDef init_particle_def = getParticleDef(particleName);
-    DynamicData init_particle;
+    ParticleState init_particle;
     init_particle.type = init_particle_def.particle_type;
 
     ParticleDef p0  = getParticleDef(particleDecay0);
@@ -792,7 +792,7 @@ TEST(DecaySpectrum, TauMinus_energy){
         init_particle.propagated_distance = 0;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -845,7 +845,7 @@ TEST(DecaySpectrum, TauMinus_energy){
         init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
@@ -903,7 +903,7 @@ TEST(DecaySpectrum, TauMinus_energy){
         init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);
         energy_sum = 0;
-        for(DynamicData particle : aux){
+        for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
                 prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;

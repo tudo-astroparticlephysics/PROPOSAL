@@ -18,10 +18,10 @@ using namespace PROPOSAL;
 
 namespace PROPOSAL {
 
-std::ostream& operator<<(std::ostream& os, DynamicData const& data)
+std::ostream& operator<<(std::ostream& os, ParticleState const& data)
 {
     std::stringstream ss;
-    ss << " DynamicData (" << &data << ") ";
+    ss << " ParticleState (" << &data << ") ";
     os << Helper::Centered(60, ss.str()) << '\n';
 
     os << "type: " << data.type << '\n';
@@ -41,7 +41,7 @@ std::ostream& operator<<(std::ostream& os, DynamicData const& data)
 
 } // namespace PROPOSAL
 
-DynamicData::DynamicData()
+ParticleState::ParticleState()
     : type(0)
     , position(Vector3D())
     , direction(Vector3D())
@@ -51,9 +51,9 @@ DynamicData::DynamicData()
 {
 }
 
-DynamicData::DynamicData(const Vector3D& position, const Vector3D& direction,
-                         const double& energy, const double& time,
-                         const double& distance)
+ParticleState::ParticleState(const Vector3D& position, const Vector3D& direction,
+                             const double& energy, const double& time,
+                             const double& distance)
     : type(static_cast<int>(ParticleType::None))
     , position(position)
     , direction(direction)
@@ -63,9 +63,9 @@ DynamicData::DynamicData(const Vector3D& position, const Vector3D& direction,
 {
 }
 
-DynamicData::DynamicData(const ParticleType& type, const Vector3D& position,
-    const Vector3D& direction, const double& energy, const double& time,
-    const double& distance)
+ParticleState::ParticleState(const ParticleType& type, const Vector3D& position,
+                             const Vector3D& direction, const double& energy, const double& time,
+                             const double& distance)
     : type(static_cast<int>(type))
     , position(position)
     , direction(direction)
@@ -75,7 +75,7 @@ DynamicData::DynamicData(const ParticleType& type, const Vector3D& position,
 {
 }
 
-bool DynamicData::operator==(const DynamicData& dynamic_data) const
+bool ParticleState::operator==(const ParticleState& dynamic_data) const
 {
     if (type != dynamic_data.type)
         return false;
@@ -93,12 +93,12 @@ bool DynamicData::operator==(const DynamicData& dynamic_data) const
     return true;
 }
 
-bool DynamicData::operator!=(const DynamicData& dynamic_data) const
+bool ParticleState::operator!=(const ParticleState& dynamic_data) const
 {
     return !(*this == dynamic_data);
 }
 
-std::string DynamicData::GetName() const
+std::string ParticleState::GetName() const
 {
     auto p_search = Type_Particle_Map.find(static_cast<ParticleType>(type));
     if (p_search != Type_Particle_Map.end()) {
@@ -114,7 +114,7 @@ std::string DynamicData::GetName() const
     return "Not found.";
 }
 
-void DynamicData::SetMomentum(double momentum)
+void ParticleState::SetMomentum(double momentum)
 {
     auto particle = Type_Particle_Map.find(static_cast<ParticleType>(type));
     if (particle != Type_Particle_Map.end())
@@ -124,7 +124,7 @@ void DynamicData::SetMomentum(double momentum)
         energy = momentum;
 }
 
-double DynamicData::GetMomentum() const
+double ParticleState::GetMomentum() const
 {
     auto particle = Type_Particle_Map.find(static_cast<ParticleType>(type));
     if (particle != Type_Particle_Map.end())
@@ -133,7 +133,7 @@ double DynamicData::GetMomentum() const
     return energy;
 }
 
-void DynamicData::DeflectDirection(double cosphi_deflect, double theta_deflect)
+void ParticleState::DeflectDirection(double cosphi_deflect, double theta_deflect)
 {
 
     auto old_direction = direction;

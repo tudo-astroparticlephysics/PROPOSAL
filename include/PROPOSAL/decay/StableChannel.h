@@ -45,7 +45,7 @@ public:
     DecayChannel* clone() const { return new StableChannel(*this); }
 
 
-    std::vector<DynamicData> Decay(const ParticleDef&, const DynamicData&);
+    std::vector<ParticleState> Decay(const ParticleDef&, const ParticleState&);
 
     const std::string& GetName() const { return name_; }
 

@@ -36,12 +36,12 @@ Propagator::Propagator(const ParticleDef& p_def, std::vector<Sector> sectors)
 }
 
 Secondaries Propagator::Propagate(
-    const DynamicData& initial_particle, double max_distance, double min_energy)
+        const ParticleState& initial_particle, double max_distance, double min_energy)
 {
     Secondaries track(std::make_shared<ParticleDef>(p_def), sector_list);
 
     track.push_back(initial_particle, InteractionType::ContinuousEnergyLoss);
-    auto state = DynamicData(initial_particle);
+    auto state = ParticleState(initial_particle);
 
     auto current_sector = GetCurrentSector(state.position, state.direction);
     auto rnd
@@ -103,8 +103,8 @@ Secondaries Propagator::Propagate(
     return track;
 }
 
-InteractionType Propagator::DoStochasticInteraction(DynamicData& p_cond,
-    PropagationUtility& utility, std::function<double()> rnd)
+InteractionType Propagator::DoStochasticInteraction(ParticleState& p_cond,
+                                                    PropagationUtility& utility, std::function<double()> rnd)
 {
     InteractionType loss_type;
     std::shared_ptr<const Component> comp;
@@ -121,8 +121,8 @@ InteractionType Propagator::DoStochasticInteraction(DynamicData& p_cond,
     return loss_type;
 }
 
-int Propagator::AdvanceParticle(DynamicData& state, double E_f,
-        double max_distance, std::function<double()> rnd, Sector& current_sector)
+int Propagator::AdvanceParticle(ParticleState& state, double E_f,
+                                double max_distance, std::function<double()> rnd, Sector& current_sector)
 {
     assert(max_distance > 0);
     assert(E_f >= 0);

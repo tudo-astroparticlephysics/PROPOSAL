@@ -66,8 +66,8 @@ public:
     //! Calculates the secondary particle for a given loss. Initial particle is
     //! treated as a loss and returned as the first particle of the secondaries.
     //!
-    std::vector<DynamicData> CalculateSecondaries(StochasticLoss, Component const&,
-                                                  std::vector<double>&);
+    std::vector<ParticleState> CalculateSecondaries(StochasticLoss, Component const&,
+                                                    std::vector<double>&);
 };
 
 //!

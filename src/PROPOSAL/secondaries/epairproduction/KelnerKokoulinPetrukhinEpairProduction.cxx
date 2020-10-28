@@ -57,7 +57,7 @@ secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateEnergy(
     return make_tuple(energy_1, energy_2);
 }
 
-vector<DynamicData>
+vector<ParticleState>
 secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateSecondaries(
         StochasticLoss loss, const Component& comp, vector<double> &rnd)
 {
@@ -67,7 +67,7 @@ secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateSecondaries(
     auto secondary_dir = CalculateDirections(loss.direction, loss.loss_energy,
                                              rho, rnd[2]);
 
-    auto sec = std::vector<DynamicData>();
+    auto sec = std::vector<ParticleState>();
     sec.emplace_back(static_cast<const ParticleType>(p_def.particle_type),
                      loss.position, loss.direction,
                      loss.parent_particle_energy - loss.loss_energy, loss.time,

@@ -16,14 +16,14 @@ TEST(Comparison, Comparison_equal)
     direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
     direction.CalculateCartesianFromSpherical();
 
-    DynamicData A;
-    DynamicData B;
+    ParticleState A;
+    ParticleState B;
     EXPECT_TRUE(A == B);
 
-    DynamicData* C = new DynamicData();
+    ParticleState* C = new ParticleState();
     C->position = position;
     C->direction = direction;
-    DynamicData* D = new DynamicData();
+    ParticleState* D = new ParticleState();
     D->position = position;
     D->direction = direction;
 
@@ -33,7 +33,7 @@ TEST(Comparison, Comparison_equal)
 
     position    = Vector3D();
     direction   = Vector3D();
-    DynamicData* E = new DynamicData();
+    ParticleState* E = new ParticleState();
     E->position = position;
     E->direction = direction;
     EXPECT_TRUE(A == *E);
@@ -44,16 +44,16 @@ TEST(Comparison, Comparison_not_equal)
     direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
     direction.CalculateCartesianFromSpherical();
 
-    DynamicData A;
-    DynamicData B;
+    ParticleState A;
+    ParticleState B;
     A.SetType(ParticleType::EMinus);
     B.SetType(ParticleType::MuMinus);
     EXPECT_TRUE(A != B);
 
-    DynamicData* C = new DynamicData();
+    ParticleState* C = new ParticleState();
     C->position = position;
     C->direction = direction;
-    DynamicData* D = new DynamicData();
+    ParticleState* D = new ParticleState();
 
     D->position = position;
     D->direction = direction;
@@ -63,8 +63,8 @@ TEST(Comparison, Comparison_not_equal)
 
 TEST(Assignment, Copyconstructor)
 {
-    DynamicData A;
-    DynamicData B = A;
+    ParticleState A;
+    ParticleState B = A;
 
     EXPECT_TRUE(A == B);
 }
@@ -73,11 +73,11 @@ TEST(Assignment, Copyconstructor2)
 {
     direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
     direction.CalculateCartesianFromSpherical();
-    DynamicData A;
+    ParticleState A;
     A.SetType(ParticleType::TauMinus);
     A.position = position;
     A.direction = direction;
-    DynamicData B(A);
+    ParticleState B(A);
 
     EXPECT_TRUE(A == B);
 }
@@ -88,7 +88,7 @@ TEST(Deflection, Deflection)
     Vector3D direction_B(0., -1./SQRT2, 1./SQRT2);
     Vector3D direction_C(1./3., 2./3., -2./3.);
     Vector3D direction_tmp(1., 0., 0.);
-    DynamicData particle;
+    ParticleState particle;
     particle.SetType(ParticleType::MuMinus);
     double cosangle;
 

@@ -7,13 +7,13 @@
 
 using namespace PROPOSAL;
 
-vector<DynamicData>
+vector<ParticleState>
 secondaries::NaivWeakInteraction::CalculateSecondaries(StochasticLoss loss,
                                                        const Component&,
                                                        vector<double>&)
 {
     // TODO: Treatment of hadronic parts of interaction
-    auto sec = std::vector<DynamicData>();
+    auto sec = std::vector<ParticleState>();
     sec.emplace_back(static_cast<ParticleType>(weak_partner_type),
                      loss.position, loss.direction, loss.loss_energy, loss.time,
                      0.);
