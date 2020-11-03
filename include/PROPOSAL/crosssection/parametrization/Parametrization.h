@@ -86,13 +86,13 @@ double integrate_dndx(Integral& integral, P&& param, const ParticleDef& p_def,
 
 template <typename P, typename M>
 double calculate_upper_lim_dndx(Integral& integral, P&& param,
-    const ParticleDef& p_def, M&& medium, double energy, double v_min,
+    const ParticleDef& p_def, const M& medium, double energy, double v_min,
     double v_max, double rnd)
 {
     auto dNdx = [&param, &p_def, &medium, energy](double v) {
         return param.DifferentialCrossSection(p_def, medium, energy, v);
     };
-    return integral.IntegrateWithRandomRatio(v_min, v_max, dNdx, 4, rnd);
+    integral.IntegrateWithRandomRatio(v_min, v_max, dNdx, 4, rnd);
     return integral.GetUpperLimit();
 }
 

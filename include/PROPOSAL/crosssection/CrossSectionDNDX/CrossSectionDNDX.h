@@ -16,6 +16,7 @@ using v_trafo_t = std::function<double(double, double, double)>;
 class CrossSectionDNDX {
 protected:
     function<double(Integral&, double, double, double, double)> dndx_integral;
+    function<double(Integral&, double, double, double, double)> dndx_upper_limit;
     function<std::tuple<double, double>(double)> kinematic_limits;
     shared_ptr<const EnergyCutSettings> cut;
     size_t hash_cross_section;
@@ -33,7 +34,17 @@ public:
                   return integrate_dndx(
                           integral, reinterpret_cast<base_param_ref_t>(_param),
                           _particle, _target, energy, v_min, v_max, rate);
-              })
+              }),
+          dndx_upper_limit(
+                  [_param, _particle, _target](Integral& integral, double energy,
+                                               double v_min, double v_max, double rnd) mutable {
+                      using param_t = typename std::decay<Param>::type;
+                      using base_param_ref_t = typename std::add_lvalue_reference<
+                              typename param_t::base_param_t>::type;
+                      return calculate_upper_lim_dndx(
+                              integral, reinterpret_cast<base_param_ref_t>(_param),
+                              _particle, _target, energy, v_min, v_max, rnd);
+                  })
         , kinematic_limits([_param, _particle, _target](double energy) {
             return _param.GetKinematicLimits(_particle, _target, energy);
         })

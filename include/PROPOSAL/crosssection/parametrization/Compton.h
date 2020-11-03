@@ -70,6 +70,11 @@ template <>
 double integrate_de2dx(Integral&, crosssection::Compton&, const ParticleDef&,
     const Component&, double, double, double);
 
+template <>
+double calculate_upper_lim_dndx(Integral&, crosssection::Compton&,
+                                const ParticleDef&, const Component&,
+                                double, double, double, double);
+
 // Factory pattern functions
 
 namespace crosssection {

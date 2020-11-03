@@ -238,9 +238,6 @@ template <typename Param, typename P, typename M>
 double CrossSectionIntegral<Param, P, M>::CalculatedNdx_impl(
     double energy, std::false_type, std::shared_ptr<const Component>)
 {
-    // rates_t rates;
-    // rates[nullptr] = dndx_map[nullptr]->Calculate(energy);
-    // return rates;
     return dndx_map[nullptr]->Calculate(energy);
 }
 
@@ -248,6 +245,7 @@ template <typename Param, typename P, typename M>
 double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
     std::shared_ptr<const Component> const& comp, double energy, double rate, std::true_type, std::false_type)
 {
+    assert (rate > 0);
     auto weight_for_rate_in_medium = medium.GetSumNucleons()
         / (comp->GetAtomInMolecule() * comp->GetAtomicNum());
     return dndx_map[comp]->GetUpperLimit(
@@ -258,6 +256,7 @@ template <typename Param, typename P, typename M>
 double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
     std::shared_ptr<const Component> const& comp, double energy, double rate, std::false_type, std::false_type)
 {
+    assert (rate > 0);
     return dndx_map[comp]->GetUpperLimit(energy, rate);
 }
 
@@ -265,6 +264,6 @@ template <typename Param, typename P, typename M>
 double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
     std::shared_ptr<const Component> const&, double energy, double, bool, std::true_type)
 {
-    return energy;
+    return 1;
 }
 } // namepace PROPOSAL

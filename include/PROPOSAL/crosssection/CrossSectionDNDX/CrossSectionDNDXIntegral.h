@@ -41,9 +41,8 @@ public:
     double GetUpperLimit(double energy, double rate) override
     {
         auto integral_lim = GetIntegrationLimits(energy);
-        dndx_integral(integral, energy, get<MIN>(integral_lim),
-            get<MAX>(integral_lim), -rate);
-        auto v = integral.GetUpperLimit();
+        auto v = dndx_upper_limit(integral, energy, get<MIN>(integral_lim),
+                                  get<MAX>(integral_lim), -rate);
         return v;
     }
 };

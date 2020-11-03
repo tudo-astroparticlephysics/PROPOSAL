@@ -94,18 +94,17 @@ double integrate_de2dx(Integral& integral, crosssection::Compton& param,
     return integral.Integrate(t_min, t_max, dE2dx, 2);
 }
 
-/* template <> */
-/* double calculate_upper_lim_dndx(Integral& integral, crosssection::Compton& param, */
-/*     const ParticleDef& p_def, const Component& comp, double energy, */
-/*     double v_min, double v_max, double rnd) */
-/* { */
-/*     auto t_min = std::log(1. - v_min); */
-/*     auto t_max = std::log(1. - v_max); */
-/*     auto dNdx = [&param, &p_def, &comp, energy](double t) { */
-/*         return exp(t) */
-/*             * param.DifferentialCrossSection(p_def, comp, energy, 1 - exp(t)); */
-/*     }; */
-/*     integral.IntegrateWithRandomRatio(t_min, t_max, dNdx, 4, rnd); */
-/*     return integral.GetUpperLimit(); */
-/* } */
+template <>
+double calculate_upper_lim_dndx(Integral& integral, crosssection::Compton& param,
+    const ParticleDef& p_def, const Component& comp, double energy,
+    double v_min, double v_max, double rnd)
+{
+    auto t_min = std::log(1. - v_min);
+    auto t_max = std::log(1. - v_max);
+    auto dNdx = [&param, &p_def, &comp, energy](double t) {
+        return exp(t) * param.DifferentialCrossSection(p_def, comp, energy, 1 - exp(t));
+    };
+    integral.IntegrateWithRandomRatio(t_min, t_max, dNdx, 3, rnd);
+    return 1. - std::exp(integral.GetUpperLimit());
+}
 } // namespace PROPOSAL
