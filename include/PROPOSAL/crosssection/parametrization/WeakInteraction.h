@@ -55,12 +55,10 @@ namespace crosssection {
     };
 
     class WeakCooperSarkarMertsch : public WeakInteraction {
-        std::unordered_map<bool,
-            std::tuple<std::shared_ptr<Interpolant>,
-                std::shared_ptr<const Interpolant>>>
-            interpolant_;
-        std::tuple<Interpolant, Interpolant> BuildContribution(
-            bool is_decayable) const;
+        std::pair<std::shared_ptr<Interpolant>,
+                std::shared_ptr<Interpolant>> interpolants_particle;
+        std::pair<std::shared_ptr<Interpolant>,
+                std::shared_ptr<Interpolant>> interpolants_antiparticle;
 
     public:
         WeakCooperSarkarMertsch();

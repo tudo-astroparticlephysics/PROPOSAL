@@ -37,23 +37,19 @@ std::tuple<double, double> crosssection::WeakInteraction::GetKinematicLimits(
 crosssection::WeakCooperSarkarMertsch::WeakCooperSarkarMertsch()
     : crosssection::WeakInteraction()
 {
+    auto interpolant_particle_p = std::make_shared<Interpolant>(
+            energies, y_nubar_p, sigma_nubar_p, IROMB, false, false, IROMB, false, false);
+    auto interpolant_particle_n = std::make_shared<Interpolant>(
+            energies, y_nubar_n, sigma_nubar_n, IROMB, false, false, IROMB, false, false);
+    interpolants_particle = std::make_pair(interpolant_particle_p, interpolant_particle_n);
+
+    auto interpolant_antiparticle_p = std::make_shared<Interpolant>(
+            energies, y_nu_p, sigma_nu_p, IROMB, false, false, IROMB, false, false);
+    auto interpolant_antiparticle_n = std::make_shared<Interpolant>(
+            energies, y_nu_n, sigma_nu_n, IROMB, false, false, IROMB, false, false);
+    interpolants_antiparticle = std::make_pair(interpolant_antiparticle_p, interpolant_antiparticle_n);
 }
 
-std::tuple<Interpolant, Interpolant> crosssection::WeakCooperSarkarMertsch::BuildContribution(
-    bool is_decayable) const
-{
-    // Initialize interpolant for particles (remember crossing symmetry rules)
-    if (!is_decayable)
-        return make_tuple(Interpolant(energies, y_nubar_p, sigma_nubar_p, IROMB,
-                              false, false, IROMB, false, false),
-            Interpolant(energies, y_nubar_n, sigma_nubar_n, IROMB, false, false,
-                IROMB, false, false));
-
-    return make_tuple(Interpolant(energies, y_nu_p, sigma_nu_p, IROMB, false,
-                          false, IROMB, false, false),
-        Interpolant(energies, y_nu_n, sigma_nu_n, IROMB, false, false, IROMB,
-            false, false));
-}
 
 double crosssection::WeakCooperSarkarMertsch::DifferentialCrossSection(
     const ParticleDef& p_def, const Component& comp, double energy,
@@ -62,15 +58,24 @@ double crosssection::WeakCooperSarkarMertsch::DifferentialCrossSection(
     auto log10_energy = std::log10(energy);
     const auto& nuclear_charge = comp.GetNucCharge();
     const auto& nuclear_number = comp.GetAtomicNum();
-    auto contributions = BuildContribution(p_def.lifetime > 0);
-    auto proton_contr = nuclear_charge
-        * std::get<0>(contributions).InterpolateArray(log10_energy, v);
-    auto neutron_contr = (nuclear_number - nuclear_charge)
-        * std::get<1>(contributions).InterpolateArray(log10_energy, v);
-    auto mean_contr = (proton_contr + neutron_contr) / nuclear_number;
 
-    assert(mean_contr > 0);
+    double proton_contr = nuclear_charge;
+    double neutron_contr = (nuclear_number - nuclear_charge);
+    if (p_def.charge < 0.) {
+        proton_contr *= interpolants_particle.first->InterpolateArray(
+                log10_energy, v);
+        neutron_contr *= interpolants_particle.second->InterpolateArray(
+                log10_energy, v);
+    } else {
+        proton_contr *= interpolants_antiparticle.first->InterpolateArray(
+                log10_energy, v);
+        neutron_contr *= interpolants_antiparticle.second->InterpolateArray(
+                log10_energy, v);
+    }
+
+    auto mean_contr = (proton_contr + neutron_contr) / nuclear_number;
+    //assert(mean_contr > 0);
 
     // factor 1e-36: conversion from pb to cm^2
-    return NA / comp.GetAtomicNum() * 1e-36 * mean_contr;
+    return NA / comp.GetAtomicNum() * 1e-36 * std::max(mean_contr, 0.);
 }
