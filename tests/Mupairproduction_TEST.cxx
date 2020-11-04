@@ -6,6 +6,7 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/secondaries/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
 
 using namespace PROPOSAL;
 
@@ -171,9 +172,6 @@ TEST(Mupairproduction, Test_of_dEdx)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double ecut;
@@ -185,9 +183,13 @@ TEST(Mupairproduction, Test_of_dEdx)
     double dEdx_stored;
     double dEdx_new;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dEdx_stored)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dEdx_stored;
+        parametrization.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -199,9 +201,11 @@ TEST(Mupairproduction, Test_of_dEdx)
             false,
             parametrization);
 
-        dEdx_new = cross->CalculatedEdx(energy);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
+        std::cout << energy << ", " << particleName << ", " << ecut << ", " << vcut << std::endl;
+        std::cout << "ratio: " << dEdx_new / dEdx_stored << std::endl;
+        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
     }
 }
 
@@ -210,9 +214,6 @@ TEST(Mupairproduction, Test_of_dNdx)
     std::string filename = testfile_dir + "Mupair_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
 
     std::string particleName;
     std::string mediumName;
@@ -225,9 +226,13 @@ TEST(Mupairproduction, Test_of_dNdx)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dNdx_stored)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dNdx_stored;
+        parametrization.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -239,9 +244,9 @@ TEST(Mupairproduction, Test_of_dNdx)
             false,
             parametrization);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
     }
 }
 
@@ -251,9 +256,6 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double ecut;
@@ -262,18 +264,21 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
     double multiplier;
     double energy;
     std::string parametrization;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(0);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> rnd >>
-        stochastic_loss_stored;
+        parametrization.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -285,84 +290,83 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
             false,
             parametrization);
 
-        auto components = medium->GetComponents();
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
+
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * (1. - rnd2)) {
+                double rate_new = dNdx_for_comp * rnd1;
+                if (ecut == INF and vcut == 1 ) {
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                } else {
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    break;
+                }
+            }
         }
     }
 }
 
-// TEST(Mupairproduction, Test_Calculate_Rho)
-// {
-// std::string filename = testfile_dir + "Mupair_rho.txt";
-// std::ifstream in{filename};
-// EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+TEST(Mupairproduction, Test_Calculate_Rho)
+{
+std::string filename = testfile_dir + "Mupair_rho.txt";
+std::ifstream in{filename};
+EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-// char firstLine[256];
-// in.getline(firstLine, 256);
+std::string particleName;
+std::string mediumName;
+double ecut;
+double vcut;
+double v;
+double multiplier;
+double energy;
+std::string parametrization;
+double rnd1, rnd2;
+double E1_stored;
+double E2_stored;
+double E1_new;
+double E2_new;
 
-// std::string particleName;
-// std::string mediumName;
-// double ecut;
-// double vcut;
-// double v;
-// double multiplier;
-// double energy;
-// std::string parametrization;
-// double rnd1, rnd2;
-// double E1_stored;
-// double E2_stored;
-// double E1_new;
-// double E2_new;
-
-// double rho;
+double rho;
 
 
-// std::cout.precision(16);
-// RandomGenerator::Get().SetSeed(0);
+std::cout.precision(16);
+RandomGenerator::Get().SetSeed(0);
 
-// while (in.good())
-// {
-// in >> particleName >> mediumName >> ecut >> vcut >> v >> multiplier >> energy >> parametrization >> rnd1 >>
-// rnd2 >> E1_stored >> E2_stored;
+while (in >> particleName >> mediumName >> ecut >> vcut >> v >> multiplier >> energy >> parametrization >> rnd1 >> rnd2 >> E1_stored >> E2_stored)
+{
+    if (vcut == -1)
+        vcut = 1;
+    if (ecut == -1)
+        ecut = INF;
 
+ParticleDef particle_def = getParticleDef(particleName);
+std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
 
-// ParticleDef particle_def = getParticleDef(particleName);
-// std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-// EnergyCutSettings ecuts(ecut, vcut);
+auto fac = secondaries::KelnerKokoulinPetrukhinMupairProduction(particle_def, *medium);
+rho = fac.CalculateRho(energy, v, medium->GetComponents().front(), rnd1);
 
-// MupairProductionFactory::Definition mupair_def;
-// mupair_def.multiplier      = multiplier;
-// mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
+if (rnd2 < 0.5)
+    rho = -rho;
+E1_new = 0.5 * v * energy * (1 + rho);
+E2_new = 0.5 * v * energy * (1 - rho);
 
-// CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, medium, ecuts, mupair_def);
-
-// rho = mupair->GetParametrization().Calculaterho(energy, v, rnd1, rnd2);
-// E1_new = 0.5 * v * energy * (1 + rho);
-// E2_new = 0.5 * v * energy * (1 - rho);
-
-// ASSERT_NEAR(E1_new, E1_stored, 1E-6 * E1_stored);
-// ASSERT_NEAR(E2_new, E2_stored, 1E-6 * E2_stored);
-
-// delete mupair;
-// }
-// }
+ASSERT_NEAR(E1_new, E1_stored, 1E-6 * E1_stored);
+ASSERT_NEAR(E2_new, E2_stored, 1E-6 * E2_stored);
+}
+}
 
 TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 {
     std::string filename = testfile_dir + "Mupair_dEdx_interpol.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
 
     std::string particleName;
     std::string mediumName;
@@ -375,21 +379,25 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
     double dEdx_stored;
     double dEdx_new;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dEdx_stored)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dEdx_stored;
+        parametrization.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
-            ParticleDef particle_def = getParticleDef(particleName);
-            auto medium = CreateMedium(mediumName);
-            auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        ParticleDef particle_def = getParticleDef(particleName);
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-            auto cross = crosssection::make_mupairproduction(particle_def,
+        auto cross = crosssection::make_mupairproduction(particle_def,
                 *medium,
                 ecuts,
                 true,
                 parametrization);
 
-        dEdx_new = cross->CalculatedEdx(energy);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
     }
@@ -401,9 +409,6 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double ecut;
@@ -415,9 +420,13 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dNdx_stored)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dNdx_stored;
+        parametrization.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -429,7 +438,7 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
             true,
             parametrization);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
     }
@@ -441,9 +450,6 @@ TEST(Mupairproduction, Test_of_e_interpol)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double ecut;
@@ -452,17 +458,20 @@ TEST(Mupairproduction, Test_of_e_interpol)
     double multiplier;
     double energy;
     std::string parametrization;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
     RandomGenerator::Get().SetSeed(0);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>  energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>  energy >> parametrization >> rnd >>
-        stochastic_loss_stored;
+        parametrization.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -474,16 +483,24 @@ TEST(Mupairproduction, Test_of_e_interpol)
             true,
             parametrization);
 
-        auto components = medium->GetComponents();
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
+
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * (1. - rnd2)) {
+                double rate_new = dNdx_for_comp * rnd1;
+                if (ecut == INF and vcut == 1 ) {
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                } else {
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    break;
+                }
+            }
         }
     }
 }

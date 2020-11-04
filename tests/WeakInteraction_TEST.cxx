@@ -159,16 +159,11 @@ ParticleDef getParticleDef(const std::string& name)
 // }
 
 
-
-
 TEST(WeakInteraction, Test_of_dNdx)
 {
     std::string filename = "bin/TestFiles/Weak_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
 
     std::string particleName;
     std::string mediumName;
@@ -178,10 +173,9 @@ TEST(WeakInteraction, Test_of_dNdx)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
     {
-        in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
-
+        parametrization.erase(0,4);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -190,7 +184,7 @@ TEST(WeakInteraction, Test_of_dNdx)
             false,
             parametrization);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
     }
@@ -202,27 +196,22 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double multiplier;
     double energy;
     std::string parametrization;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(0);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
     {
-        in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd >>
-        stochastic_loss_stored;
-
+        parametrization.erase(0,4);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -231,16 +220,20 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
             false,
             parametrization);
 
-        auto components = medium->GetComponents();
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
+
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * (1. - rnd2)) {
+                double rate_new = dNdx_for_comp * rnd1;
+                stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                break;
+            }
         }
     }
 }
@@ -252,9 +245,6 @@ TEST(WeakInteraction, Test_of_dNdx_Interpolant)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double multiplier;
@@ -263,10 +253,9 @@ TEST(WeakInteraction, Test_of_dNdx_Interpolant)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
     {
-        in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
-
+        parametrization.erase(0,4);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -275,7 +264,7 @@ TEST(WeakInteraction, Test_of_dNdx_Interpolant)
             true,
             parametrization);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
     }
@@ -287,26 +276,21 @@ TEST(WeakInteraction, Test_of_e_interpol)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double multiplier;
     double energy;
     std::string parametrization;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
     RandomGenerator::Get().SetSeed(0);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
     {
-        in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd >>
-        stochastic_loss_stored;
-
+        parametrization.erase(0,4);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -315,16 +299,19 @@ TEST(WeakInteraction, Test_of_e_interpol)
             true,
             parametrization);
 
-        auto components = medium->GetComponents();
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum >= dNdx_full * rnd1) {
+                double rnd_new = (sum + dNdx_for_comp * (rnd2 - 1.)) / dNdx_full;
+                stochastic_loss_new = cross->CalculateStochasticLoss(comp, energy, rnd_new * dNdx_full);
+                ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                break;
+            }
         }
     }
 }

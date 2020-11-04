@@ -255,10 +255,13 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization >> hard_component)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization >>
-            hard_component;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -271,9 +274,9 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
             parametrization,
             hard_component);
 
-        dEdx_new = cross->CalculatedEdx(energy);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
     }
 }
 
@@ -297,10 +300,13 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization >> hard_component)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization >>
-            hard_component;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -313,7 +319,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
             parametrization,
             hard_component);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
@@ -334,17 +340,20 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
     std::string parametrization;
     bool hard_component;
     double energy;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization >> hard_component)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >>
-            stochastic_loss_stored >> parametrization >> hard_component;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -357,16 +366,24 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
             parametrization,
             hard_component);
 
-        auto components = medium->GetComponents();
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
+
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * (1. - rnd2)) {
+                double rate_new = dNdx_for_comp * rnd1;
+                if (ecut == INF and vcut == 1 ) {
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                } else {
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    break;
+                }
+            }
         }
     }
 }
@@ -391,10 +408,13 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization >> hard_component)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization >>
-            hard_component;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -407,9 +427,9 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
             parametrization,
             hard_component);
 
-        dEdx_new = cross->CalculatedEdx(energy);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
     }
 }
 
@@ -433,10 +453,13 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization >> hard_component)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization >>
-            hard_component;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -449,7 +472,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
             parametrization,
             hard_component);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
@@ -470,17 +493,20 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
     std::string parametrization;
     bool hard_component;
     double energy;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization >> hard_component)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >>
-            stochastic_loss_stored >> parametrization >> hard_component;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -493,16 +519,24 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
             parametrization,
             hard_component);
 
-        auto components = medium->GetComponents();
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
+
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * (1. - rnd2)) {
+                double rate_new = dNdx_for_comp * rnd1;
+                if (ecut == INF and vcut == 1 ) {
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                } else {
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    break;
+                }
+            }
         }
     }
 }
@@ -529,10 +563,14 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization >> shadowing)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization >>
-            shadowing;
+        parametrization.erase(0,5);
+        shadowing.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -545,7 +583,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
             parametrization,
             shadowing);
 
-        dEdx_new = cross->CalculatedEdx(energy);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
     }
@@ -571,10 +609,14 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization >> shadowing)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization >>
-            shadowing;
+        parametrization.erase(0,5);
+        shadowing.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -587,7 +629,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
             parametrization,
             shadowing);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
@@ -608,17 +650,21 @@ TEST(PhotoQ2Integration, Test_of_e)
     std::string parametrization;
     std::string shadowing;
     double energy;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization >> shadowing)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd>>
-            stochastic_loss_stored >> parametrization >> shadowing;
+        parametrization.erase(0,5);
+        shadowing.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -631,16 +677,24 @@ TEST(PhotoQ2Integration, Test_of_e)
             parametrization,
             shadowing);
 
-        auto components = medium->GetComponents();
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
+
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * (1. - rnd2)) {
+                double rate_new = dNdx_for_comp * rnd1;
+                if (ecut == INF and vcut == 1 ) {
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                } else {
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    break;
+                }
+            }
         }
     }
 }
@@ -665,10 +719,14 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization >> shadowing)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization >>
-            shadowing;
+        parametrization.erase(0,5);
+        shadowing.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -681,7 +739,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
             parametrization,
             shadowing);
 
-        dEdx_new = cross->CalculatedEdx(energy);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
     }
@@ -707,10 +765,14 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization >> shadowing)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization >>
-            shadowing;
+        parametrization.erase(0,5);
+        shadowing.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -723,7 +785,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
             parametrization,
             shadowing);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
@@ -744,17 +806,21 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
     std::string parametrization;
     std::string shadowing;
     double energy;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization >> shadowing)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >>
-            stochastic_loss_stored >> parametrization >> shadowing;
+        parametrization.erase(0,5);
+        shadowing.erase(0,6);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -767,16 +833,24 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
             parametrization,
             shadowing);
 
-        auto components = medium->GetComponents();
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
+
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * (1. - rnd2)) {
+                double rate_new = dNdx_for_comp * rnd1;
+                if (ecut == INF and vcut == 1 ) {
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                } else {
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    break;
+                }
+            }
         }
     }
 }

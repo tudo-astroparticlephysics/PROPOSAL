@@ -194,9 +194,6 @@ TEST(PhotoPair, Test_of_dNdx)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double multiplier;
@@ -205,10 +202,11 @@ TEST(PhotoPair, Test_of_dNdx)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in.good())
-    {
-        in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
+    std::cout.precision(16);
 
+    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
+    {
+        parametrization.erase(0,9);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -217,9 +215,9 @@ TEST(PhotoPair, Test_of_dNdx)
             false,
             parametrization);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
     }
 }
 
@@ -229,9 +227,6 @@ TEST(PhotoPair, Test_of_dNdx_Interpolant)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double multiplier;
@@ -240,10 +235,9 @@ TEST(PhotoPair, Test_of_dNdx_Interpolant)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
     {
-        in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
-
+        parametrization.erase(0,9);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -252,9 +246,9 @@ TEST(PhotoPair, Test_of_dNdx_Interpolant)
             true,
             parametrization);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
     }
 }
 

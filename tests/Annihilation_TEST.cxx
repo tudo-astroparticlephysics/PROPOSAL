@@ -135,10 +135,6 @@ TEST(Annihilation, Test_of_dNdx) {
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double multiplier;
@@ -147,10 +143,8 @@ TEST(Annihilation, Test_of_dNdx) {
     double dNdx_stored;
     double dNdx_new;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
     {
-        in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
-
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -159,9 +153,13 @@ TEST(Annihilation, Test_of_dNdx) {
             false,
             parametrization);
 
-        dNdx_new = cross->CalculatedNdx(energy);
-
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        if (energy <= particle_def.mass) {
+            EXPECT_DEATH(cross->CalculatedNdx(energy), "");
+            continue;
+        }
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
+        dNdx_new *= medium->GetComponents().size(); // This has (probably) been a mistake in the old PROPOSAL version
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
     }
 }
 
@@ -172,26 +170,21 @@ TEST(Annihilation, Test_Stochastic_Loss)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double multiplier;
     double energy;
     std::string parametrization;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(0);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
     {
-        in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd >>
-        stochastic_loss_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -201,16 +194,24 @@ TEST(Annihilation, Test_Stochastic_Loss)
             false,
             parametrization);
 
-        auto components = medium->GetComponents();
+        if (energy <= particle_def.mass) {
+            EXPECT_DEATH(cross->CalculatedNdx(energy), "");
+            continue;
+        }
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
+
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * (1. - rnd2)) {
+                double rate_new = dNdx_for_comp * rnd1;
+                stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                break;
+            }
         }
     }
 }
@@ -222,9 +223,6 @@ TEST(Annihilation, Test_of_dNdx_Interpolant)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double multiplier;
@@ -233,10 +231,8 @@ TEST(Annihilation, Test_of_dNdx_Interpolant)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
     {
-        in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
-
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -245,9 +241,9 @@ TEST(Annihilation, Test_of_dNdx_Interpolant)
             true,
             parametrization);
 
-        dNdx_new = cross->CalculatedNdx(energy);
-
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
+        dNdx_new *= medium->GetComponents().size(); // This has (probably) been a mistake in the old PROPOSAL version
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-4 * dNdx_stored); // 1e-10 -> 1e-4
     }
 }
 
@@ -257,26 +253,20 @@ TEST(Annihilation, Test_of_e_interpol)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string particleName;
     std::string mediumName;
     double multiplier;
     double energy;
     std::string parametrization;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
     RandomGenerator::Get().SetSeed(0);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
     {
-        in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd >>
-        stochastic_loss_stored;
-
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -285,16 +275,20 @@ TEST(Annihilation, Test_of_e_interpol)
             true,
             parametrization);
 
-        auto components = medium->GetComponents();
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
+
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * (1. - rnd2)) {
+                double rate_new = dNdx_for_comp * rnd1;
+                stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                break;
+            }
         }
     }
 }

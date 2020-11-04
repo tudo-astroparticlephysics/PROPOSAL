@@ -115,9 +115,6 @@ TEST(Compton, Test_of_dEdx)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string mediumName;
     double ecut;
     double vcut;
@@ -130,10 +127,14 @@ TEST(Compton, Test_of_dEdx)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization)
     {
-        in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >>
-        parametrization;
+        parametrization.erase(0,7);
+
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
@@ -145,7 +146,7 @@ TEST(Compton, Test_of_dEdx)
             false,
             parametrization);
 
-        dEdx_new = cross->CalculatedEdx(energy);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
     }
@@ -156,9 +157,6 @@ TEST(Compton, Test_of_dNdx)
     std::string filename = testfile_dir + "Compton_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
 
     std::string mediumName;
     double ecut;
@@ -172,10 +170,14 @@ TEST(Compton, Test_of_dNdx)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization)
     {
-        in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >>
-        parametrization;
+        parametrization.erase(0,7);
+
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
@@ -187,7 +189,7 @@ TEST(Compton, Test_of_dNdx)
             false,
             parametrization);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
@@ -199,9 +201,6 @@ TEST(Compton, Test_of_e)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string mediumName;
     double ecut;
     double vcut;
@@ -209,8 +208,8 @@ TEST(Compton, Test_of_e)
     double multiplier;
     std::string parametrization;
     double energy;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
@@ -218,10 +217,14 @@ TEST(Compton, Test_of_e)
 
     RandomGenerator::Get().SetSeed(0);
 
-    while (in.good())
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization)
     {
-        in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >>
-        stochastic_loss_stored >> parametrization;
+        parametrization.erase(0,7);
+
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
@@ -233,16 +236,24 @@ TEST(Compton, Test_of_e)
             false,
             parametrization);
 
-        auto components = medium->GetComponents();
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
+
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * (1. - rnd2)) {
+                double rate_new = dNdx_for_comp * rnd1;
+                if (ecut == INF and vcut == 1 ) {
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                } else {
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    break;
+                }
+            }
         }
     }
 }
@@ -252,9 +263,6 @@ TEST(Compton, Test_of_dEdx_Interpolant)
     std::string filename = testfile_dir + "Compton_dEdx_interpol.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
 
     std::string mediumName;
     double ecut;
@@ -268,10 +276,14 @@ TEST(Compton, Test_of_dEdx_Interpolant)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization)
     {
-        in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >>
-        parametrization;
+        parametrization.erase(0,7);
+
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
@@ -283,7 +295,7 @@ TEST(Compton, Test_of_dEdx_Interpolant)
             false,
             parametrization);
 
-        dEdx_new = cross->CalculatedEdx(energy);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
     }
@@ -307,9 +319,14 @@ TEST(Compton, Test_of_dNdx_Interpolant)
 
     std::cout.precision(16);
 
-    while (in.good())
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization)
     {
-        in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
+        parametrization.erase(0,7);
+
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
@@ -321,9 +338,9 @@ TEST(Compton, Test_of_dNdx_Interpolant)
             false,
             parametrization);
 
-        dNdx_new = cross->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
 }
 
@@ -333,9 +350,6 @@ TEST(Compton, Test_of_e_Interpolant)
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
     std::string mediumName;
     double ecut;
     double vcut;
@@ -343,8 +357,8 @@ TEST(Compton, Test_of_e_Interpolant)
     double multiplier;
     std::string parametrization;
     double energy;
-    double rnd;
-    double rate;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
@@ -352,10 +366,14 @@ TEST(Compton, Test_of_e_Interpolant)
 
     RandomGenerator::Get().SetSeed(0);
 
-    while (in.good())
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization)
     {
-        in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> 
-            stochastic_loss_stored >> parametrization;
+        parametrization.erase(0,7);
+
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
@@ -367,16 +385,24 @@ TEST(Compton, Test_of_e_Interpolant)
             false,
             parametrization);
 
-        auto components = medium->GetComponents();
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = cross->GetTargets();
+        double sum = 0;
+
         for (auto comp : components)
         {
-            auto comp_ptr = std::make_shared<const Component>(comp);
-            // first calculate the complete rate, then sample the loss to a rate
-            rate = cross->CalculatedNdx(energy, comp_ptr);
-            stochastic_loss_new = cross->CalculateStochasticLoss(
-                comp_ptr, energy, rnd*rate);
-
-            ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * (1. - rnd2)) {
+                double rate_new = dNdx_for_comp * rnd1;
+                if (ecut == INF and vcut == 1 ) {
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                } else {
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    break;
+                }
+            }
         }
     }
 }
