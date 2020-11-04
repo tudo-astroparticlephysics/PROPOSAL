@@ -242,7 +242,7 @@ template <typename Param, typename P, typename M>
 double CrossSectionInterpolant<Param, P, M>::CalculateStochasticLoss_impl(
     std::shared_ptr<const Component> const&, double energy, double, bool, std::true_type)
 {
-    return energy;
+    return 1;
 }
 
 } // namespace PROPOSAL
