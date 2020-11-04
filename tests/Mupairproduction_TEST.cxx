@@ -350,10 +350,8 @@ std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
 
 auto fac = secondaries::KelnerKokoulinPetrukhinMupairProduction(particle_def, *medium);
-rho = fac.CalculateRho(energy, v, medium->GetComponents().front(), rnd1);
+rho = fac.CalculateRho(energy, v, medium->GetComponents().front(), rnd1, rnd2);
 
-if (rnd2 < 0.5)
-    rho = -rho;
 E1_new = 0.5 * v * energy * (1 + rho);
 E2_new = 0.5 * v * energy * (1 - rho);
 
