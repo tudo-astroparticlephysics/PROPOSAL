@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <map>
 #include <memory>
 #include <stdexcept>
@@ -61,7 +62,10 @@ unique_ptr<Scattering> make_scattering(std::string const& name,
     ParticleDef const& p_def, Medium const& medium,
     Cross&& cross = nullptr, bool interpolate = true)
 {
-    auto it = ScatteringTable.find(name);
+    std::string name_lower = name;
+    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
+
+    auto it = ScatteringTable.find(name_lower);
     if (it != ScatteringTable.end()) {
         switch (it->second) {
         case ScatteringType::HighlandIntegral:

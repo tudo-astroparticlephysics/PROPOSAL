@@ -107,14 +107,15 @@ cross_t_ptr<P, M> create_photopair(P p_def, M medium, bool interpol) {
 
 template<typename P, typename M>
 static std::map<std::string, photopair_func_ptr<P, M>> photopair_map = {
-        {"Tsai", create_photopair<PhotoPairTsai, P, M>}
+        {"tsai", create_photopair<PhotoPairTsai, P, M>}
 };
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_photopairproduction(P p_def, M medium, bool interpol,
                                     const std::string& param_name){
-
-    auto it = photopair_map<P, M>.find(param_name);
+    std::string name = param_name;
+    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
+    auto it = photopair_map<P, M>.find(name);
     if (it == photopair_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for photopairproduction");
 

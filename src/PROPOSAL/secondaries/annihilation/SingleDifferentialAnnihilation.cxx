@@ -53,21 +53,18 @@ secondaries::SingleDifferentialAnnihilation::CalculateEnergy(
     return make_tuple(energy_1, energy_2);
 }
 
-vector<Loss::secondary_t>
+vector<ParticleState>
 secondaries::SingleDifferentialAnnihilation::CalculateSecondaries(
-    double primary_energy, Loss::secondary_t loss, const Component& comp,
-    vector<double> rnd)
+        StochasticLoss loss, const Component& comp, vector<double> &rnd)
 {
-    auto rho = CalculateRho(primary_energy, rnd[0], comp);
-    auto secondary_energy = CalculateEnergy(primary_energy, rho);
+    auto rho = CalculateRho(loss.parent_particle_energy, rnd[0], comp);
+    auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, rho);
     auto secondary_dir = CalculateDirections(
-        get<Loss::DIRECTION>(loss), primary_energy, rho, rnd[1]);
-    auto sec = std::vector<Loss::secondary_t>();
-    sec.emplace_back(static_cast<int>(ParticleType::Gamma),
-        get<Loss::POSITION>(loss), get<0>(secondary_dir),
-        get<0>(secondary_energy), 0.);
-    sec.emplace_back(static_cast<int>(ParticleType::Gamma),
-        get<Loss::POSITION>(loss), get<1>(secondary_dir),
-        get<1>(secondary_energy), 0.);
+            loss.direction, loss.parent_particle_energy, rho, rnd[1]);
+    auto sec = std::vector<ParticleState>();
+    sec.emplace_back(ParticleType::Gamma, loss.position, get<0>(secondary_dir),
+            get<0>(secondary_energies), loss.time, 0.);
+    sec.emplace_back(ParticleType::Gamma, loss.position, get<1>(secondary_dir),
+            get<1>(secondary_energies), loss.time, 0.);
     return sec;
 }

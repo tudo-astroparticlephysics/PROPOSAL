@@ -206,79 +206,109 @@ void init_particle(py::module& m) {
     PARTICLE_DEF(m_sub, SMPMinus)
     PARTICLE_DEF(m_sub, SMPPlus)
 
-    py::class_<DynamicData, std::shared_ptr<DynamicData>>(m_sub, "DynamicData",
-                                                          R"pbdoc(
-                Interaction will be stored in form of Dynamic Data.
-                It is used as an array with all important values for
-                secondary particles. Secondary particles are not propagated.
+    py::class_<ParticleState, std::shared_ptr<ParticleState>>(m_sub, "ParticleState",
+                                                              R"pbdoc(
+                Dynamic data objects store information about particle states,
+                for example the intial particle state for the propagator,
+                specific states during propagation or secondary particles.
             )pbdoc")
-        .def(py::init<const int&>())
-        .def(py::init<const DynamicData&>())
-        .def("__str__", &py_print<DynamicData>)
-        .def_property_readonly("type", &DynamicData::GetType,
+        .def(py::init<const Vector3D&, const Vector3D&, const double&, const double&, const double&>(),
+                py::arg("position"), py::arg("direction"), py::arg("energy"),
+                py::arg("time"), py::arg("propagated_distance"))
+        .def(py::init<>())
+        .def(py::init<const ParticleType&, const Vector3D&, const Vector3D&, const double&, const double&, const double&>(),
+             py::arg("particle_type"), py::arg("position"), py::arg("direction"),
+             py::arg("energy"), py::arg("time"), py::arg("propagated_distance"))
+        .def(py::init<const ParticleState&>())
+        .def("__str__", &py_print<ParticleState>)
+        .def_readwrite("type", &ParticleState::type,
                                R"pbdoc(
-                Type of Dynamic Data. Can be an Interaction Type
-                or a Particle Type.
+                Type of Dynamic Data. Describes the ParticleType of instance.
             )pbdoc")
-        .def_property_readonly("name", &DynamicData::GetName,
+        .def_property_readonly("name", &ParticleState::GetName,
                                R"pbdoc(
-                Name of Particle or interaction.
+                Name of Particle of instance.
             )pbdoc")
-        .def_property("position", &DynamicData::GetPosition,
-                      &DynamicData::SetPosition,
+        .def_readwrite("position", &ParticleState::position,
                       R"pbdoc(
-                Place of Interaction.
+                Position of particle (in cm).
             )pbdoc")
-        .def_property("direction", &DynamicData::GetDirection,
-                      &DynamicData::SetDirection,
+        .def_readwrite("direction", &ParticleState::direction,
                       R"pbdoc(
-                Direction of particle after interaction.
+                Direction of particle.
             )pbdoc")
-        .def_property("energy", &DynamicData::GetEnergy,
-                      &DynamicData::SetEnergy,
+        .def_readwrite("energy", &ParticleState::energy,
                       R"pbdoc(
-                Energy of secondary particle.
+                Energy of particle in MeV.
             )pbdoc")
-        .def_property("momentum", &DynamicData::GetMomentum,
-                      &DynamicData::SetMomentum,
+        .def_property("momentum", &ParticleState::GetMomentum,
+                      &ParticleState::SetMomentum,
                       R"pbdoc(
-                Momentum of primary particle in MeV
+                Momentum of particle in MeV
             )pbdoc")
-        .def_property("parent_particle_energy",
-                      &DynamicData::GetParentParticleEnergy,
-                      &DynamicData::SetParentParticleEnergy,
+        .def_readwrite("time", &ParticleState::time,
                       R"pbdoc(
-                Energy of primary particle after interaction.
+                Time (in sec) since beginning of propagation the particle.
             )pbdoc")
-        .def_property("time", &DynamicData::GetTime, &DynamicData::SetTime,
-                      R"pbdoc(
-                Time since beginning of propagation the primary particle.
-            )pbdoc")
-        .def_property("propagated_distance",
-                      &DynamicData::GetPropagatedDistance,
-                      &DynamicData::SetPropagatedDistance,
+        .def_readwrite("propagated_distance", &ParticleState::propagated_distance,
                       R"pbdoc(
                 Propagated distance of primary particle.
             )pbdoc");
 
-    /* py::class_<std::vector<DynamicData>>(m, "Secondaries"); */
+    py::class_<Loss, std::shared_ptr<Loss>>(m_sub, "Loss", R"pbdoc(
+                Loss objects are the base class for energy losses (stochastic
+                and continuous losses) in PROPOSAL. They are defined by their
+                type and energy. More specific information are stored in the
+                derived classes.
+            )pbdoc")
+            .def(py::init<const int&, const double&>(),
+                    py::arg("type"), py::arg("loss_energy"))
+            .def_readwrite("type", &Loss::type)
+            .def_readwrite("loss_energy", &Loss::loss_energy);
 
-    /* py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries", */
-    /*         R"pbdoc(List of secondaries)pbdoc"); */
-    /*     .def("Query", overload_cast_<const int&>()(&Secondaries::Query, py::const_), py::arg("Interaction")) */
-    /*     .def("Query", overload_cast_<const std::string&>()(&Secondaries::Query, py::const_), py::arg("Interaction")) */
-    /*     .def("decay", &Secondaries::DoDecay) */
-    /*     .def_property_readonly("particles", &Secondaries::GetSecondaries) */
-    /*     .def_property_readonly("number_of_particles", &Secondaries::GetNumberOfParticles) */
-    /*     .def_property_readonly("position", &Secondaries::GetPosition) */
-    /*     .def_property_readonly("direction", &Secondaries::GetDirection) */
-    /*     .def_property_readonly("parent_particle_energy", &Secondaries::GetParentParticleEnergy) */
-    /*     .def_property_readonly("energy", &Secondaries::GetEnergy) */
-    /*     .def_property_readonly("time", &Secondaries::GetTime) */
-    /*     .def_property_readonly("propagated_distance", &Secondaries::GetPropagatedDistance) */
-    /*     .def_property_readonly("entry_point", &Secondaries::GetEntryPoint) */
-    /*     .def_property_readonly("exit_point", &Secondaries::GetExitPoint) */
-    /*     .def_property_readonly("closest_approach_point", &Secondaries::GetClosestApproachPoint); */
+    py::class_<StochasticLoss, Loss, std::shared_ptr<StochasticLoss>>(m_sub, "StochasticLoss")
+            .def(py::init<const int&, const double&, const Vector3D&, const Vector3D&, const double&, const double&, const double &>(),
+                 py::arg("type"), py::arg("loss_energy"), py::arg("position"),
+                 py::arg("direction"), py::arg("time"),
+                 py::arg("propagated_distance"),
+                 py::arg("parent_particle_energy"))
+            .def_readwrite("position", &StochasticLoss::position)
+            .def_readwrite("direction", &StochasticLoss::direction)
+            .def_readwrite("time", &StochasticLoss::time)
+            .def_readwrite("propagated_distance", &StochasticLoss::propagated_distance)
+            .def_readwrite("parent_particle_energy", &StochasticLoss::parent_particle_energy);
+
+    py::class_<ContinuousLoss, Loss, std::shared_ptr<ContinuousLoss>>(m_sub, "ContinuousLoss")
+            .def(py::init<const std::pair<double, double>&, const std::pair<Vector3D, Vector3D>&, const std::pair<Vector3D, Vector3D>&, const std::pair<double, double>&>(),
+                    py::arg("energies"), py::arg("positions"), py::arg("directions"), py::arg("times"))
+            .def_readwrite("energies", &ContinuousLoss::energies)
+            .def_readwrite("positions", &ContinuousLoss::positions)
+            .def_readwrite("directions", &ContinuousLoss::directions)
+            .def_readwrite("times", &ContinuousLoss::times);
+
+    py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries", R"pbdoc(Output of Propagator.)pbdoc")
+            .def("ELost", &Secondaries::GetELost)
+            .def("entry_point", &Secondaries::GetEntryPoint)
+            .def("exit_point", &Secondaries::GetExitPoint)
+            .def("closest_approach_point", &Secondaries::GetClosestApproachPoint)
+            .def("track", overload_cast_<>()(&Secondaries::GetTrack, py::const_))
+            .def("track", overload_cast_<const Geometry&>()(&Secondaries::GetTrack, py::const_))
+            .def("get_state_for_energy", &Secondaries::GetStateForEnergy)
+            .def("get_state_for_distance", &Secondaries::GetStateForDistance)
+            .def("track_positions", &Secondaries::GetTrackPositions)
+            .def("track_directions", &Secondaries::GetTrackDirections)
+            .def("track_energies", &Secondaries::GetTrackEnergies)
+            .def("track_times", &Secondaries::GetTrackTimes)
+            .def("track_propagated_distances", &Secondaries::GetTrackPropagatedDistances)
+            .def("track_types", &Secondaries::GetTrackTypes)
+            .def("track_length", &Secondaries::GetTrackLength)
+            .def("stochastic_losses", overload_cast_<>()(&Secondaries::GetStochasticLosses, py::const_))
+            .def("stochastic_losses", overload_cast_<const Geometry&>()(&Secondaries::GetStochasticLosses, py::const_))
+            .def("stochastic_losses", overload_cast_<const InteractionType&>()(&Secondaries::GetStochasticLosses, py::const_))
+            .def("stochastic_losses", overload_cast_<const std::string&>()(&Secondaries::GetStochasticLosses, py::const_))
+            .def("continuous_losses", overload_cast_<>()(&Secondaries::GetContinuousLosses, py::const_))
+            .def("continuous_losses", overload_cast_<const Geometry&>()(&Secondaries::GetContinuousLosses, py::const_))
+            .def("decay_products", &Secondaries::GetDecayProducts);
 
     py::enum_<InteractionType>(m_sub, "Interaction_Type")
         .value("particle", InteractionType::Particle)

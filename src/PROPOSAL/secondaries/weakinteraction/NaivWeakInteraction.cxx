@@ -7,12 +7,15 @@
 
 using namespace PROPOSAL;
 
-vector<Loss::secondary_t>
-secondaries::NaivWeakInteraction::CalculateSecondaries(double,
-    Loss::secondary_t loss, const Component&,
-    vector<double>)
+vector<ParticleState>
+secondaries::NaivWeakInteraction::CalculateSecondaries(StochasticLoss loss,
+                                                       const Component&,
+                                                       vector<double>&)
 {
-    std::get<Loss::TYPE>(loss) = weak_partner_type;
-    auto sec = vector<Loss::secondary_t>{ move(loss) };
+    // TODO: Treatment of hadronic parts of interaction
+    auto sec = std::vector<ParticleState>();
+    sec.emplace_back(static_cast<ParticleType>(weak_partner_type),
+                     loss.position, loss.direction, loss.loss_energy, loss.time,
+                     0.);
     return sec;
 }

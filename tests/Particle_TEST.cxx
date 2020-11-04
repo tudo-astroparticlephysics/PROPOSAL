@@ -16,26 +16,26 @@ TEST(Comparison, Comparison_equal)
     direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
     direction.CalculateCartesianFromSpherical();
 
-    DynamicData A;
-    DynamicData B;
+    ParticleState A;
+    ParticleState B;
     EXPECT_TRUE(A == B);
 
-    DynamicData* C = new DynamicData(TauMinusDef().particle_type);
-    C->SetPosition(position);
-    C->SetDirection(direction);
-    DynamicData* D = new DynamicData(TauMinusDef().particle_type);
-    D->SetPosition(position);
-    D->SetDirection(direction);
+    ParticleState* C = new ParticleState();
+    C->position = position;
+    C->direction = direction;
+    ParticleState* D = new ParticleState();
+    D->position = position;
+    D->direction = direction;
 
-    C->SetEnergy(1e6);
-    D->SetEnergy(1e6);
+    C->energy = 1e6;
+    D->energy = 1e6;
     EXPECT_TRUE(*C == *D);
 
     position    = Vector3D();
     direction   = Vector3D();
-    DynamicData* E = new DynamicData(0);
-    E->SetPosition(position);
-    E->SetDirection(direction);
+    ParticleState* E = new ParticleState();
+    E->position = position;
+    E->direction = direction;
     EXPECT_TRUE(A == *E);
 }
 
@@ -44,25 +44,27 @@ TEST(Comparison, Comparison_not_equal)
     direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
     direction.CalculateCartesianFromSpherical();
 
-    DynamicData A;
-    DynamicData B(TauMinusDef().particle_type);
+    ParticleState A;
+    ParticleState B;
+    A.SetType(ParticleType::EMinus);
+    B.SetType(ParticleType::MuMinus);
     EXPECT_TRUE(A != B);
 
-    DynamicData* C = new DynamicData(TauMinusDef().particle_type);
-    C->SetPosition(position);
-    C->SetDirection(direction);
-    DynamicData* D = new DynamicData(TauMinusDef().particle_type);
+    ParticleState* C = new ParticleState();
+    C->position = position;
+    C->direction = direction;
+    ParticleState* D = new ParticleState();
 
-    D->SetPosition(position);
-    D->SetDirection(direction);
-    D->SetEnergy(1e6);
+    D->position = position;
+    D->direction = direction;
+    D->energy = 1e6;
     EXPECT_TRUE(*C != *D);
 }
 
 TEST(Assignment, Copyconstructor)
 {
-    DynamicData A;
-    DynamicData B = A;
+    ParticleState A;
+    ParticleState B = A;
 
     EXPECT_TRUE(A == B);
 }
@@ -71,10 +73,11 @@ TEST(Assignment, Copyconstructor2)
 {
     direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
     direction.CalculateCartesianFromSpherical();
-    DynamicData A(TauMinusDef().particle_type);
-    A.SetPosition(position);
-    A.SetDirection(direction);
-    DynamicData B(A);
+    ParticleState A;
+    A.SetType(ParticleType::TauMinus);
+    A.position = position;
+    A.direction = direction;
+    ParticleState B(A);
 
     EXPECT_TRUE(A == B);
 }
@@ -85,7 +88,8 @@ TEST(Deflection, Deflection)
     Vector3D direction_B(0., -1./SQRT2, 1./SQRT2);
     Vector3D direction_C(1./3., 2./3., -2./3.);
     Vector3D direction_tmp(1., 0., 0.);
-    DynamicData particle(MuMinusDef().particle_type);
+    ParticleState particle;
+    particle.SetType(ParticleType::MuMinus);
     double cosangle;
 
     std::vector<double> cos_phi_list{-1, -0.8, -0.2, 0., 0.2, 0.8, 1.};
@@ -93,21 +97,21 @@ TEST(Deflection, Deflection)
 
     for(auto const& cos_phi: cos_phi_list){
         for(auto const& theta: theta_list){
-            particle.SetDirection(direction_A);
+            particle.direction = direction_A;
             particle.DeflectDirection(cos_phi, theta);
-            direction_tmp = particle.GetDirection();
+            direction_tmp = particle.direction;
             cosangle = scalar_product(direction_A, direction_tmp);
             ASSERT_NEAR(cos_phi, cosangle, 1e-8);
 
-            particle.SetDirection(direction_B);
+            particle.direction = direction_B;
             particle.DeflectDirection(cos_phi, theta);
-            direction_tmp = particle.GetDirection();
+            direction_tmp = particle.direction;
             cosangle = scalar_product(direction_B, direction_tmp);
             ASSERT_NEAR(cos_phi, cosangle, 1e-8);
 
-            particle.SetDirection(direction_C);
+            particle.direction = direction_C;
             particle.DeflectDirection(cos_phi, theta);
-            direction_tmp = particle.GetDirection();
+            direction_tmp = particle.direction;
             cosangle = scalar_product(direction_C, direction_tmp);
             ASSERT_NEAR(cos_phi, cosangle, 1e-8);
         }

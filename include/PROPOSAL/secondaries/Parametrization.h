@@ -17,10 +17,8 @@ namespace secondaries {
 
         virtual size_t RequiredRandomNumbers() const noexcept = 0;
         virtual InteractionType GetInteractionType() const noexcept = 0;
-        virtual vector<Loss::secondary_t> CalculateSecondaries(
-            double primary_energy, Loss::secondary_t, const Component&,
-            vector<double> rnd)
-            = 0;
+        virtual vector<ParticleState> CalculateSecondaries(StochasticLoss,
+                                                           const Component&, vector<double> &rnd) = 0;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

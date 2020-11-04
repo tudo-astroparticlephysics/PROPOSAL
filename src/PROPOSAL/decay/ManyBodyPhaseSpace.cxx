@@ -103,13 +103,13 @@ bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
 }
 
 // ------------------------------------------------------------------------- //
-std::vector<DynamicData> ManyBodyPhaseSpace::Decay(const ParticleDef& p_def, const DynamicData& p_condition)
+std::vector<ParticleState> ManyBodyPhaseSpace::Decay(const ParticleDef& p_def, const ParticleState& p_condition)
 {
     // Create vector for decay products
-    std::vector<DynamicData> products;
+    std::vector<ParticleState> products;
 
     for (auto p : daughters_) {
-        products.emplace_back(p->particle_type, p_condition.GetPosition(), p_condition.GetDirection(), p_condition.GetEnergy(), p_condition.GetParentParticleEnergy(), p_condition.GetTime(), 0);
+        products.emplace_back((ParticleType)p->particle_type, p_condition.position, p_condition.direction, p_condition.energy, p_condition.time, 0);
     }
 
     // prefactor for the phase space density
@@ -139,23 +139,23 @@ std::vector<DynamicData> ManyBodyPhaseSpace::Decay(const ParticleDef& p_def, con
     }
 
     // Boost all products in Lab frame (the reason, why the boosting goes in the negative direction of the particle)
-    Boost(products, -p_condition.GetDirection(), p_condition.GetEnergy()/p_def.mass, p_condition.GetMomentum() / p_def.mass);
+    Boost(products, -p_condition.direction, p_condition.energy/p_def.mass, p_condition.GetMomentum() / p_def.mass);
 
     return products;
 }
 
 // ------------------------------------------------------------------------- //
-void ManyBodyPhaseSpace::GenerateEvent(std::vector<DynamicData>& products, const PhaseSpaceKinematics& kinematics)
+void ManyBodyPhaseSpace::GenerateEvent(std::vector<ParticleState>& products, const PhaseSpaceKinematics& kinematics)
 {
     // Calculate first momentum in R2
     Vector3D direction = GenerateRandomDirection();
 
-    products[1].SetDirection(direction);
+    products[1].direction = direction;
     products[1].SetMomentum(kinematics.momenta[0]);
 
     Vector3D opposite_direction = -direction;
     opposite_direction.CalculateSphericalCoordinates();
-    products[0].SetDirection(opposite_direction);
+    products[0].direction = opposite_direction;
     products[0].SetMomentum(kinematics.momenta[0]);
 
     // Correct the previous momenta
@@ -163,7 +163,7 @@ void ManyBodyPhaseSpace::GenerateEvent(std::vector<DynamicData>& products, const
     {
         double momentum = kinematics.momenta[i-1];
 
-        products[i].SetDirection(GenerateRandomDirection());
+        products[i].direction = GenerateRandomDirection();
         products[i].SetMomentum(momentum);
 
         // Boost previous particles to new frame
@@ -176,13 +176,13 @@ void ManyBodyPhaseSpace::GenerateEvent(std::vector<DynamicData>& products, const
         for (unsigned int s = 0; s < i; ++s)
         {
             // Boost in -p_i direction
-            Boost(products[s], products[i].GetDirection(), gamma, betagamma);
+            Boost(products[s], products[i].direction, gamma, betagamma);
         }
     }
 }
 
 // ------------------------------------------------------------------------- //
-double ManyBodyPhaseSpace::DefaultEvaluate(const DynamicData& p_condition, const std::vector<DynamicData>& products)
+double ManyBodyPhaseSpace::DefaultEvaluate(const ParticleState& p_condition, const std::vector<ParticleState>& products)
 {
     (void) p_condition;
     (void) products;
@@ -191,7 +191,7 @@ double ManyBodyPhaseSpace::DefaultEvaluate(const DynamicData& p_condition, const
 }
 
 // ------------------------------------------------------------------------- //
-double ManyBodyPhaseSpace::Evaluate(const DynamicData& p_condition, const std::vector<DynamicData>& products)
+double ManyBodyPhaseSpace::Evaluate(const ParticleState& p_condition, const std::vector<ParticleState>& products)
 {
     return matrix_element_(p_condition, products);
 }
@@ -250,16 +250,18 @@ void ManyBodyPhaseSpace::EstimateMaxWeight(PhaseSpaceParameters& params, const P
 void ManyBodyPhaseSpace::SampleEstimateMaxWeight(PhaseSpaceParameters& params, const ParticleDef& parent_def)
 {
     // Create vector for decay products
-    std::vector<DynamicData> products;
+    std::vector<ParticleState> products;
 
     for (auto d : daughters_) {
-        products.emplace_back(d->particle_type);
+        products.emplace_back();
+        products.back().type = d->particle_type;
     }
 
     // precalculated kinematics
     PhaseSpaceKinematics kinematics;
-    DynamicData particle(parent_def.particle_type);
-    particle.SetEnergy(parent_def.mass);
+    ParticleState particle;
+    particle.type = parent_def.particle_type;
+    particle.energy = parent_def.mass;
 
     double result = 0.0;
 

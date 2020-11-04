@@ -158,20 +158,19 @@ tuple<double, double> secondaries::PhotoTsai::CalculateEnergy(
     return make_tuple(energy * rho, energy * (1 - rho));
 }
 
-vector<Loss::secondary_t> secondaries::PhotoTsai::CalculateSecondaries(
-    double primary_energy, Loss::secondary_t loss, const Component& comp, vector<double> rnd)
+vector<ParticleState> secondaries::PhotoTsai::CalculateSecondaries(
+    StochasticLoss loss, const Component& comp, vector<double> &rnd)
 {
-    auto rho = CalculateRho(primary_energy, rnd[0], comp);
-    auto secondary_energy
-        = CalculateEnergy(primary_energy, rho, rnd[1]);
+    auto rho = CalculateRho(loss.parent_particle_energy, rnd[0], comp);
+    auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, rho,
+                                            rnd[1]);
     auto secondary_dir = CalculateDirections(
-        get<Loss::DIRECTION>(loss), primary_energy, rho, comp, rnd);
-    auto sec = std::vector<Loss::secondary_t>();
-    sec.emplace_back(static_cast<int>(ParticleType::EMinus),
-        get<Loss::POSITION>(loss), get<0>(secondary_dir),
-        get<0>(secondary_energy), 0.);
-    sec.emplace_back(static_cast<int>(ParticleType::EPlus),
-        get<Loss::POSITION>(loss), get<1>(secondary_dir),
-        get<1>(secondary_energy), 0.);
+        loss.direction, loss.parent_particle_energy, rho, comp, rnd);
+
+    auto sec = std::vector<ParticleState>();
+    sec.emplace_back(ParticleType::EMinus, loss.position, get<0>(secondary_dir),
+                     get<0>(secondary_energies), loss.time, 0.);
+    sec.emplace_back(ParticleType::EPlus, loss.position, get<1>(secondary_dir),
+                     get<1>(secondary_energies), loss.time, 0.);
     return sec;
 }

@@ -18,14 +18,14 @@ namespace secondaries {
         static constexpr int n_rnd = 1;
 
         double CalculateRho(double, double) final;
-        enum { GAMMA, ELECTRON };
+        enum { GAMMA, EMINUS };
         tuple<Vector3D, Vector3D> CalculateDirections(
             Vector3D, double, double, double) final;
         tuple<double, double> CalculateEnergy(double, double) final;
 
         size_t RequiredRandomNumbers() const noexcept { return n_rnd; }
-        vector<Loss::secondary_t> CalculateSecondaries(
-            double, Loss::secondary_t, const Component&, vector<double>);
+        vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
+                                                   vector<double>&);
     };
 } // namespace secondaries
 } // namespace PROPOSAL

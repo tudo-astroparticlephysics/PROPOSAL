@@ -49,15 +49,15 @@ std::ostream& operator<<(std::ostream& os, DecayChannel const& channel)
 } // namespace PROPOSAL
 
 // ------------------------------------------------------------------------- //
-void DecayChannel::Boost(DynamicData& particle, const Vector3D& direction_unnormalized, double gamma, double betagamma)
+void DecayChannel::Boost(ParticleState& particle, const Vector3D& direction_unnormalized, double gamma, double betagamma)
 {
     Vector3D direction = direction_unnormalized;
     direction.normalise();
 
-    Vector3D momentum_vec(particle.GetMomentum() * particle.GetDirection());
+    Vector3D momentum_vec(particle.GetMomentum() * particle.direction);
 
     double direction_correction =
-        (gamma - 1.0) * scalar_product(momentum_vec, direction) - betagamma * particle.GetEnergy();
+        (gamma - 1.0) * scalar_product(momentum_vec, direction) - betagamma * particle.energy;
 
     momentum_vec = momentum_vec + direction_correction * direction;
 
@@ -66,11 +66,11 @@ void DecayChannel::Boost(DynamicData& particle, const Vector3D& direction_unnorm
 
     momentum_vec.normalise();
     momentum_vec.CalculateSphericalCoordinates();
-    particle.SetDirection(momentum_vec);
+    particle.direction = momentum_vec;
 }
 
 // ------------------------------------------------------------------------- //
-void DecayChannel::Boost(std::vector<DynamicData>& secondaries, const Vector3D& direction, double gamma, double betagamma)
+void DecayChannel::Boost(std::vector<ParticleState>& secondaries, const Vector3D& direction, double gamma, double betagamma)
 {
     for (auto& p : secondaries)
     {

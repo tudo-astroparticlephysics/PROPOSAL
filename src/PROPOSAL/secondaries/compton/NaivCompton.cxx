@@ -39,20 +39,20 @@ tuple<double, double> secondaries::NaivCompton::CalculateEnergy(
     return make_tuple(energy * (1 - v), energy * v);
 }
 
-vector<Loss::secondary_t> secondaries::NaivCompton::CalculateSecondaries(
-    double primary_energy, Loss::secondary_t loss, const Component&,
-    vector<double> rnd)
+vector<ParticleState> secondaries::NaivCompton::CalculateSecondaries(
+        StochasticLoss loss, const Component&, vector<double> &rnd)
 {
-    auto v = get<Loss::ENERGY>(loss) /primary_energy;
-    auto secondary_energy = CalculateEnergy(primary_energy, v);
-    auto secondary_dir = CalculateDirections(
-            get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), v, rnd[1]);
-    auto sec = std::vector<Loss::secondary_t>();
-    sec.emplace_back(static_cast<int>(ParticleType::Gamma),
-        get<Loss::POSITION>(loss), get<GAMMA>(secondary_dir),
-        get<GAMMA>(secondary_energy), 0.);
-    sec.emplace_back(static_cast<int>(ParticleType::EMinus),
-        get<Loss::POSITION>(loss), get<ELECTRON>(secondary_dir),
-        get<ELECTRON>(secondary_energy), 0.);
+    auto v = loss.loss_energy /  loss.parent_particle_energy;
+    auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, v);
+    auto secondary_dir = CalculateDirections(loss.direction, loss.loss_energy,
+                                             v, rnd[1]);
+
+    auto sec = std::vector<ParticleState>();
+    sec.emplace_back(ParticleType::Gamma, loss.position,
+                     get<GAMMA>(secondary_dir), get<GAMMA>(secondary_energies),
+                             loss.time, 0.);
+    sec.emplace_back(ParticleType::EMinus, loss.position,
+                     get<EMINUS>(secondary_dir), get<EMINUS>(secondary_energies),
+                             loss.time, 0.);
     return sec;
 }

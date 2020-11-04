@@ -22,7 +22,7 @@ namespace secondaries {
         Integral integral;
         ParticleDef p_def;
 
-        static constexpr int n_rnd = 2;
+        static constexpr int n_rnd = 3;
 
     public:
         KelnerKokoulinPetrukhinMupairProduction(
@@ -31,14 +31,14 @@ namespace secondaries {
         {
         }
 
-        double CalculateRho(double, double, const Component&, double) final;
+        double CalculateRho(double, double, const Component&, double, double) final;
         tuple<Vector3D, Vector3D> CalculateDirections(
             Vector3D, double, double, double) final;
         tuple<double, double> CalculateEnergy(double, double) final;
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
-        vector<Loss::secondary_t> CalculateSecondaries(
-            double, Loss::secondary_t, const Component&, vector<double>) final;
+        vector<ParticleState> CalculateSecondaries(
+                StochasticLoss, const Component&, vector<double>&) final;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

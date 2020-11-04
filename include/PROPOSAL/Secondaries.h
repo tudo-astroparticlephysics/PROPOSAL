@@ -34,11 +34,11 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 namespace PROPOSAL {
 
-class Geometry;
-class PropagationUtility;
 class Density_distr;
 
 using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
@@ -49,50 +49,54 @@ class Secondaries {
 public:
     Secondaries(std::shared_ptr<ParticleDef>, std::vector<Sector>);
 
+    // Operational functions to fill and access track
     void reserve(size_t number_secondaries);
-    void clear() { secondaries_.clear(); };
+    void clear() { track_.clear(); types_.clear(); };
+    void push_back(const ParticleState& point, const InteractionType& type);
+    void emplace_back(const ParticleType& particle_type, const Vector3D& position,
+        const Vector3D& direction, const double& energy, const double& time,
+        const double& distance, const InteractionType& interaction_type);
+    const ParticleState& back() const {return track_.back(); }
+    const ParticleState& operator[](std::size_t idx) { return track_[idx]; };
 
-    DynamicData& operator[](std::size_t idx) { return secondaries_[idx]; };
-    DynamicData& back() { return secondaries_.back(); };
-
-    void push_back(const DynamicData& continuous_loss);
-    void emplace_back(const int& type);
-    void emplace_back(const int& type, const Vector3D& position,
-        const Vector3D& direction, const double& energy,
-        const double& parent_particle_energy, const double& time,
-        const double& distance);
-
-    void append(Secondaries& secondaries);
-
-    Secondaries Query(const int&) const;
-    Secondaries Query(const std::string&) const;
-    Secondaries Query(const Geometry& geometry) const;
-
-    void DoDecay();
-
-    std::vector<Vector3D> GetPosition() const;
-    std::vector<Vector3D> GetDirection() const;
-    std::vector<double> GetEnergy() const;
-    std::vector<double> GetParentParticleEnergy() const;
-    std::vector<double> GetTime() const;
-    std::vector<double> GetPropagatedDistance() const;
-    std::vector<DynamicData> GetSecondaries() const { return secondaries_; };
-    std::vector<DynamicData>& GetModifyableSecondaries()
-    {
-        return secondaries_;
-    };
-    unsigned int GetNumberOfParticles() const { return secondaries_.size(); };
-
+    // Track functions
     double GetELost(const Geometry&) const;
-    std::unique_ptr<DynamicData> GetEntryPoint(const Geometry& geometry) const;
-    std::unique_ptr<DynamicData> GetExitPoint(const Geometry& geometry) const;
-    std::unique_ptr<DynamicData> GetClosestApproachPoint(const Geometry& geometry) const;
+    std::unique_ptr<ParticleState> GetEntryPoint(const Geometry&) const;
+    std::unique_ptr<ParticleState> GetExitPoint(const Geometry&) const;
+    std::unique_ptr<ParticleState> GetClosestApproachPoint(const Geometry&) const;
+
+    std::vector<ParticleState> GetTrack() const { return track_; };
+    std::vector<ParticleState> GetTrack(const Geometry&) const;
+
+    ParticleState GetStateForEnergy(double) const;
+    ParticleState GetStateForDistance(double) const;
+
+    std::vector<Vector3D> GetTrackPositions() const;
+    std::vector<Vector3D> GetTrackDirections() const;
+    std::vector<double> GetTrackEnergies() const;
+    std::vector<double> GetTrackTimes() const;
+    std::vector<double> GetTrackPropagatedDistances() const;
+    std::vector<InteractionType> GetTrackTypes() const { return types_; };
+    unsigned int GetTrackLength() const { return track_.size(); };
+    std::vector<ParticleState> GetDecayProducts() const;
+
+    // Loss functions
+
+    std::vector<StochasticLoss> GetStochasticLosses() const;
+    std::vector<StochasticLoss> GetStochasticLosses(const Geometry&) const;
+    std::vector<StochasticLoss> GetStochasticLosses(const InteractionType&) const;
+    std::vector<StochasticLoss> GetStochasticLosses(const std::string&) const;
+
+    std::vector<ContinuousLoss> GetContinuousLosses() const;
+    std::vector<ContinuousLoss> GetContinuousLosses(const Geometry&) const;
 
 private:
-    DynamicData RePropagate(const DynamicData&, const Vector3D&, double) const;
+    ParticleState RePropagateDistance(const ParticleState&, double) const;
+    ParticleState RePropagateEnergy(const ParticleState&, double, double) const;
     Sector GetCurrentSector(const Vector3D&, const Vector3D&) const;
 
-    std::vector<DynamicData> secondaries_;
+    std::vector<ParticleState> track_;
+    std::vector<InteractionType> types_;
     std::shared_ptr<ParticleDef> primary_def_;
     std::vector<Sector> sectors_;
 };

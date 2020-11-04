@@ -29,9 +29,9 @@ bool StableChannel::compare(const DecayChannel& channel) const
         return true;
 }
 
-std::vector<DynamicData> StableChannel::Decay(const ParticleDef&, const DynamicData&)
+std::vector<ParticleState> StableChannel::Decay(const ParticleDef&, const ParticleState&)
 {
     // return empty vector;
-    std::vector<DynamicData> vec;
+    std::vector<ParticleState> vec;
     return vec;
 }

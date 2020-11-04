@@ -21,147 +21,130 @@ Secondaries::Secondaries(std::shared_ptr<ParticleDef> p_def,
 
 void Secondaries::reserve(size_t number_secondaries)
 {
-    secondaries_.reserve(number_secondaries);
+    track_.reserve(number_secondaries);
+    types_.reserve(number_secondaries);
 }
 
-void Secondaries::push_back(const DynamicData& continuous_loss)
+void Secondaries::push_back(const ParticleState& point, const InteractionType& type)
 {
-    secondaries_.push_back(continuous_loss);
+    track_.push_back(point);
+    types_.push_back(type);
 }
 
-void Secondaries::emplace_back(const int& type, const Vector3D& position,
-    const Vector3D& direction, const double& energy,
-    const double& parent_particle_energy, const double& time,
-    const double& distance)
+void Secondaries::emplace_back(const ParticleType& particle_type, const Vector3D& position,
+    const Vector3D& direction, const double& energy, const double& time,
+    const double& distance, const InteractionType& interaction_type)
 {
-    secondaries_.emplace_back(type, position, direction, energy,
-        parent_particle_energy, time, distance);
-}
-void Secondaries::emplace_back(const int& type)
-{
-    secondaries_.emplace_back(type);
+    track_.emplace_back(particle_type, position, direction, energy, time,
+                        distance);
+    types_.emplace_back(interaction_type);
 }
 
-// void Secondaries::push_back(const Particle& particle, const int&
-// interaction_type, const double& energy_loss)
-// {
-//     DynamicData data(interaction_type);
-
-//     data.SetEnergy(energy_loss);
-//     data.SetPosition(particle.GetPosition());
-//     data.SetDirection(particle.GetDirection());
-//     data.SetTime(particle.GetTime());
-//     data.SetParentParticleEnergy(particle.GetEnergy());
-//     data.SetPropagatedDistance(particle.GetPropagatedDistance());
-
-//     secondaries_.push_back(data);
-// }
-
-void Secondaries::append(Secondaries& secondaries)
+std::vector<ParticleState> Secondaries::GetDecayProducts() const
 {
-    secondaries_.insert(secondaries_.end(), secondaries.secondaries_.begin(),
-        secondaries.secondaries_.end());
-}
+    assert(track_.size() == types_.size());
 
-Secondaries Secondaries::Query(const int& interaction_type) const
-{
-    Secondaries sec(primary_def_, sectors_);
-    for (auto i : secondaries_) {
-        if (interaction_type == i.GetType())
-            sec.push_back(i);
-    }
-    return sec;
-}
-
-Secondaries Secondaries::Query(const std::string& interaction_type) const
-{
-    Secondaries sec(primary_def_, sectors_);
-    for (auto i : secondaries_) {
-        if (interaction_type == i.GetName())
-            sec.push_back(i);
-    }
-    return sec;
-}
-
-Secondaries Secondaries::Query(const Geometry& geometry) const
-{
-    Secondaries sec(primary_def_, sectors_);
-    for (auto i : secondaries_) {
-        if (geometry.IsInside(i.GetPosition(), i.GetDirection()))
-            sec.push_back(i);
-    }
-    return sec;
-}
-
-void Secondaries::DoDecay()
-{
-    for (auto it = secondaries_.begin(); it != secondaries_.end();) {
-        if (it->GetType() == static_cast<int>(InteractionType::Decay)) {
-            DynamicData decaying_particle(primary_def_->particle_type,
-                it->GetPosition(), it->GetDirection(), it->GetEnergy(),
-                it->GetParentParticleEnergy(), it->GetTime(),
-                it->GetPropagatedDistance());
+    //TODO: Is this necessary, or do we assume that there is only one decay at the end of the vector?
+    std::vector<ParticleState> decay_products;
+    for (unsigned int i=0; i<track_.size(); i++) {
+        if (types_[i] == InteractionType::Decay) {
+            ParticleState decaying_particle = track_[i];
             double random_ch = RandomGenerator::Get().RandomDouble();
             auto products
                 = primary_def_->decay_table.SelectChannel(random_ch).Decay(
                     *primary_def_, decaying_particle);
-            it = secondaries_.erase(it); // delete old decay
             for (auto p : products) {
-                // and insert decayparticles inplace of old decay
-                it = secondaries_.insert(it, std::move(p));
-                it++;
+                decay_products.emplace_back(p);
             }
-        } else {
-            it++;
         }
     }
+    return decay_products;
 }
 
-std::vector<Vector3D> Secondaries::GetPosition() const
+std::vector<ParticleState> Secondaries::GetTrack(const Geometry& geometry) const
+{
+    std::vector<ParticleState> vec;
+    for (auto i : track_) {
+        if (geometry.IsInside(i.position, i.direction))
+            vec.push_back(i);
+    }
+    return vec;
+}
+
+
+ParticleState Secondaries::GetStateForEnergy(double energy) const
+{
+    if (energy >= track_.front().energy)
+        return track_.front();
+
+    for (unsigned int i=1; i<track_.size(); i++) {
+        if (track_[i].energy < energy) {
+            if (types_[i] == InteractionType::ContinuousEnergyLoss) {
+                return RePropagateEnergy(
+                        track_[i-1], track_[i-1].energy - energy,
+                        track_[i-1].propagated_distance - track_[i].propagated_distance);
+            } else {
+                return track_[i-1];
+            }
+        }
+    }
+
+    return track_.back();
+}
+
+ParticleState Secondaries::GetStateForDistance(double propagated_distance) const
+{
+    if (track_.front().propagated_distance >= propagated_distance)
+        return track_.front();
+
+    for (unsigned int i=1; i<track_.size(); i++) {
+        if (track_[i].propagated_distance > propagated_distance) {
+            return RePropagateDistance(
+                    track_[i-1],
+                    propagated_distance - track_[i-1].propagated_distance);
+        }
+    }
+
+    return track_.back();
+}
+
+std::vector<Vector3D> Secondaries::GetTrackPositions() const
 {
     std::vector<Vector3D> vec;
-    for (auto i : secondaries_)
-        vec.emplace_back(i.GetPosition());
+    for (auto i : track_)
+        vec.emplace_back(i.position);
     return vec;
 }
 
-std::vector<Vector3D> Secondaries::GetDirection() const
+std::vector<Vector3D> Secondaries::GetTrackDirections() const
 {
     std::vector<Vector3D> vec;
-    for (auto i : secondaries_)
-        vec.emplace_back(i.GetDirection());
+    for (auto i : track_)
+        vec.emplace_back(i.direction);
     return vec;
 }
 
-std::vector<double> Secondaries::GetEnergy() const
+std::vector<double> Secondaries::GetTrackEnergies() const
 {
     std::vector<double> vec;
-    for (auto i : secondaries_)
-        vec.emplace_back(i.GetEnergy());
+    for (auto i : track_)
+        vec.emplace_back(i.energy);
     return vec;
 }
 
-std::vector<double> Secondaries::GetParentParticleEnergy() const
+std::vector<double> Secondaries::GetTrackTimes() const
 {
     std::vector<double> vec;
-    for (auto i : secondaries_)
-        vec.emplace_back(i.GetParentParticleEnergy());
+    for (auto i : track_)
+        vec.emplace_back(i.time);
     return vec;
 }
 
-std::vector<double> Secondaries::GetTime() const
+std::vector<double> Secondaries::GetTrackPropagatedDistances() const
 {
     std::vector<double> vec;
-    for (auto i : secondaries_)
-        vec.emplace_back(i.GetTime());
-    return vec;
-}
-
-std::vector<double> Secondaries::GetPropagatedDistance() const
-{
-    std::vector<double> vec;
-    for (auto i : secondaries_)
-        vec.emplace_back(i.GetPropagatedDistance());
+    for (auto i : track_)
+        vec.emplace_back(i.propagated_distance);
     return vec;
 }
 
@@ -169,101 +152,129 @@ double Secondaries::GetELost(const Geometry& geometry) const
 {
     auto entry_point = GetEntryPoint(geometry);
     auto exit_point = GetExitPoint(geometry);
-    return entry_point->GetEnergy() - exit_point->GetEnergy();
+    return entry_point->energy - exit_point->energy;
 }
 
-std::unique_ptr<DynamicData> Secondaries::GetEntryPoint(
+std::unique_ptr<ParticleState> Secondaries::GetEntryPoint(
         const Geometry& geometry) const
 {
-    auto pos_0 = secondaries_.front().GetPosition();
-    auto dir_0 = secondaries_.front().GetDirection();
+    auto pos_0 = track_.front().position;
+    auto dir_0 = track_.front().direction;
     if (geometry.IsEntering(pos_0, dir_0))
-        return std::make_unique<DynamicData>(secondaries_.front());
+        return std::make_unique<ParticleState>(track_.front());
     if (geometry.IsInside(pos_0, dir_0))
         return nullptr; // track starts in geometry
 
-    for (unsigned int i = 0; i < secondaries_.size() - 1; i++) {
-        auto pos_i = secondaries_.at(i).GetPosition();
-        auto pos_f = secondaries_.at(i+1).GetPosition();
-        auto dir_i = secondaries_.at(i).GetDirection();
+    for (unsigned int i = 0; i < track_.size() - 1; i++) {
+        auto pos_i = track_.at(i).position;
+        auto pos_f = track_.at(i+1).position;
+        auto dir_i = track_.at(i).direction;
         auto dist_i_f = (pos_f - pos_i).magnitude();
 
         auto distance = geometry.DistanceToBorder(pos_i, dir_i).first;
         if (distance <= dist_i_f and distance >= 0) {
             if ( dist_i_f - distance < GEOMETRY_PRECISION)
-                return std::make_unique<DynamicData>(secondaries_.at(i+1));
-            auto entry_point = RePropagate(secondaries_.at(i), dir_i, distance);
-            return std::make_unique<DynamicData>(entry_point);
+                return std::make_unique<ParticleState>(track_.at(i + 1));
+            auto entry_point = RePropagateDistance(track_.at(i), distance);
+            return std::make_unique<ParticleState>(entry_point);
         }
     }
     return nullptr; // No entry point found
 }
 
-std::unique_ptr<DynamicData> Secondaries::GetExitPoint(
+std::unique_ptr<ParticleState> Secondaries::GetExitPoint(
         const Geometry &geometry) const
 {
-    auto pos_end = secondaries_.back().GetPosition();
-    auto dir_end = secondaries_.back().GetDirection();
+    auto pos_end = track_.back().position;
+    auto dir_end = track_.back().direction;
     if (geometry.IsLeaving(pos_end, dir_end))
-        return std::make_unique<DynamicData>(secondaries_.back());
+        return std::make_unique<ParticleState>(track_.back());
     if (geometry.IsInside(pos_end, dir_end))
         return nullptr; // track ends inside geometry
 
-    for (auto i = secondaries_.size() - 1; i > 0; i--) {
-        auto pos_i = secondaries_.at(i-1).GetPosition();
-        auto pos_f = secondaries_.at(i).GetPosition();
-        auto dir_i = secondaries_.at(i-1).GetDirection();
+    for (auto i = track_.size() - 1; i > 0; i--) {
+        auto pos_i = track_.at(i-1).position;
+        auto pos_f = track_.at(i).position;
+        auto dir_i = track_.at(i-1).direction;
         auto dist_i_f = (pos_f - pos_i).magnitude();
 
         auto distance = geometry.DistanceToBorder(pos_f, -dir_i).first;
         if (distance <= dist_i_f and distance >= 0) {
             if ( dist_i_f - distance < GEOMETRY_PRECISION)
-                return std::make_unique<DynamicData>(secondaries_.at(i-1));
-            auto exit_point = RePropagate(secondaries_.at(i-1), dir_i,
-                                          dist_i_f - distance);
-            return std::make_unique<DynamicData>(exit_point);
+                return std::make_unique<ParticleState>(track_.at(i - 1));
+            auto exit_point = RePropagateDistance(track_.at(i-1),
+                                                  dist_i_f - distance);
+            return std::make_unique<ParticleState>(exit_point);
         }
     }
 
-    auto pos_0 = secondaries_.front().GetPosition();
-    auto dir_0 = secondaries_.front().GetDirection();
+    auto pos_0 = track_.front().position;
+    auto dir_0 = track_.front().direction;
     if (geometry.IsLeaving(pos_0, dir_0))
-        return std::make_unique<DynamicData>(secondaries_.front());
+        return std::make_unique<ParticleState>(track_.front());
 
     return nullptr; // No exit point found
 }
 
-std::unique_ptr<DynamicData> Secondaries::GetClosestApproachPoint(const Geometry& geometry) const
+std::unique_ptr<ParticleState> Secondaries::GetClosestApproachPoint(const Geometry& geometry) const
 {
-    for (unsigned int i = 0; i < secondaries_.size(); i++) {
-        auto sec_pos = secondaries_.at(i).GetPosition();
-        auto sec_dir = secondaries_.at(i).GetDirection();
+    for (unsigned int i = 0; i < track_.size(); i++) {
+        auto sec_pos = track_.at(i).position;
+        auto sec_dir = track_.at(i).direction;
         if (geometry.DistanceToClosestApproach(sec_pos, sec_dir) <= 0.) {
             if(std::abs(geometry.DistanceToClosestApproach(sec_pos, sec_dir))
                         < PARTICLE_POSITION_RESOLUTION)
-                return std::make_unique<DynamicData>(secondaries_.at(i));
+                return std::make_unique<ParticleState>(track_.at(i));
             if (i == 0)
-                return std::make_unique<DynamicData>(secondaries_.front());
-            auto prev_pos = secondaries_.at(i-1).GetPosition();
-            auto prev_dir = secondaries_.at(i-1).GetDirection();
-            auto direction = sec_pos - prev_pos;
-            direction.normalise();
+                return std::make_unique<ParticleState>(track_.front());
+            auto prev_pos = track_.at(i-1).position;
+            auto prev_dir = track_.at(i-1).direction;
             auto displacement = geometry.DistanceToClosestApproach(prev_pos,
                                                                    prev_dir);
-            auto closest_approach = RePropagate(secondaries_.at(i-1), direction,
-                                                displacement);
-            return std::make_unique<DynamicData>(closest_approach);
+            auto closest_approach = RePropagateDistance(track_.at(i-1),
+                                                        displacement);
+            return std::make_unique<ParticleState>(closest_approach);
         }
     }
-    return std::make_unique<DynamicData>(secondaries_.back());
+    return std::make_unique<ParticleState>(track_.back());
 }
 
-DynamicData Secondaries::RePropagate(const DynamicData &init,
-                                     const Vector3D& direction,
-                                     double displacement) const
+ParticleState Secondaries::RePropagateEnergy(const ParticleState& init,
+                                             double energy_lost,
+                                             double max_distance) const
 {
-    auto current_sector = GetCurrentSector(init.GetPosition(),
-                                           init.GetDirection());
+    std::cout << init.energy << ", " << init.propagated_distance << std::endl;
+    auto current_sector = GetCurrentSector(init.position,
+                                           init.direction);
+    auto& utility = get<Propagator::UTILITY>(current_sector);
+    auto& density = get<Propagator::DENSITY_DISTR>(current_sector);
+
+    if (utility.collection.cont_rand != nullptr) {
+        Logging::Get("proposal.secondaries")->warn("Calcuating specific points "
+                                                   "for sectors where continuous randomization is activated "
+                                                   "can lead to inconsistent results!");
+    }
+    auto advance_grammage = utility.LengthContinuous(init.energy,
+                                                     init.energy - energy_lost);
+    auto displacement = density->Correct(init.position, init.direction,
+                                         advance_grammage, max_distance);
+
+    auto E_f = init.energy - energy_lost;
+    auto new_time = init.time + utility.TimeElapsed(
+            init.energy, E_f, displacement ,density->Evaluate(init.position));
+    auto new_position = init.position + init.direction * displacement;
+    auto new_propagated_distance = init.propagated_distance + displacement;
+    std::cout << E_f << ", " << new_propagated_distance << std::endl;
+
+    return ParticleState((ParticleType)primary_def_->particle_type, new_position,
+                         init.direction, E_f, new_time, new_propagated_distance);
+}
+
+ParticleState Secondaries::RePropagateDistance(const ParticleState &init,
+                                               double displacement) const
+{
+    auto current_sector = GetCurrentSector(init.position,
+                                           init.direction);
     auto& utility = get<Propagator::UTILITY>(current_sector);
     auto& density = get<Propagator::DENSITY_DISTR>(current_sector);
 
@@ -272,16 +283,15 @@ DynamicData Secondaries::RePropagate(const DynamicData &init,
                      "for sectors where continuous randomization is activated "
                      "can lead to inconsistent results!");
     }
-    auto advance_grammage = density->Calculate(init.GetPosition(), direction,
+    auto advance_grammage = density->Calculate(init.position, init.direction,
                                                displacement);
-    auto E_f = utility.EnergyDistance(init.GetEnergy(), advance_grammage);
-    auto new_time = init.GetTime() + utility.TimeElapsed(
-            init.GetEnergy(), E_f,displacement, density->Evaluate(init.GetPosition()));
-    auto new_position = init.GetPosition() + direction * displacement;
-    auto new_propagated_distance = init.GetPropagatedDistance() + displacement;
-    return DynamicData((int)InteractionType::ContinuousEnergyLoss, new_position,
-                       direction, E_f, init.GetParentParticleEnergy(), new_time,
-                       new_propagated_distance);
+    auto E_f = utility.EnergyDistance(init.energy, advance_grammage);
+    auto new_time = init.time + utility.TimeElapsed(
+            init.energy, E_f,displacement, density->Evaluate(init.position));
+    auto new_position = init.position + init.direction * displacement;
+    auto new_propagated_distance = init.propagated_distance + displacement;
+    return ParticleState((ParticleType)primary_def_->particle_type, new_position,
+                         init.direction, E_f, new_time, new_propagated_distance);
 }
 
 Sector Secondaries::GetCurrentSector(const Vector3D& position,
@@ -305,4 +315,115 @@ Sector Secondaries::GetCurrentSector(const Vector3D& position,
             });
 
     return **highest_sector_iter;
+}
+
+std::vector<StochasticLoss> Secondaries::GetStochasticLosses() const
+{
+    assert(track_.size() == types_.size());
+
+    std::vector<StochasticLoss> losses;
+    for (unsigned int i=1; i<track_.size(); i++) {
+        auto interaction_type = types_[i];
+        if (interaction_type != InteractionType::ContinuousEnergyLoss and
+                interaction_type != InteractionType::Decay) {
+            losses.emplace_back(static_cast<int>(interaction_type),
+                                track_[i-1].energy - track_[i].energy,
+                                track_[i].position, track_[i].direction,
+                                track_[i].time, track_[i].propagated_distance,
+                                track_[i-1].energy);
+        }
+    }
+    return losses;
+}
+
+std::vector<StochasticLoss> Secondaries::GetStochasticLosses(const Geometry& geometry) const
+{
+    assert(track_.size() == types_.size());
+
+    std::vector<StochasticLoss> losses;
+    for (unsigned int i=1; i<track_.size(); i++) {
+        if (geometry.IsInside(track_[i].position, track_[i].direction)) {
+            auto interaction_type = types_[i];
+            if (interaction_type != InteractionType::ContinuousEnergyLoss and
+               interaction_type != InteractionType::Decay) {
+                losses.emplace_back(static_cast<int>(interaction_type),
+                                    track_[i-1].energy - track_[i].energy,
+                                    track_[i].position, track_[i].direction,
+                                    track_[i].time, track_[i].propagated_distance,
+                                    track_[i-1].energy);
+            }
+        }
+    }
+    return losses;
+}
+
+std::vector<StochasticLoss> Secondaries::GetStochasticLosses(const InteractionType& type) const
+{
+    assert(track_.size() == types_.size());
+
+    std::vector<StochasticLoss> losses;
+    for (unsigned int i=1; i<track_.size(); i++) {
+        auto interaction_type = types_[i];
+        if (interaction_type == type) {
+            losses.emplace_back(static_cast<int>(interaction_type),
+                                track_[i-1].energy - track_[i].energy,
+                                track_[i].position, track_[i].direction,
+                                track_[i].time, track_[i].propagated_distance,
+                                track_[i-1].energy);
+        }
+    }
+    return losses;
+}
+
+std::vector<StochasticLoss> Secondaries::GetStochasticLosses(
+        const std::string& interaction_type) const
+{
+    auto it = std::find_if(Type_Interaction_Name_Map.begin(), Type_Interaction_Name_Map.end(),
+                           [&interaction_type](const std::pair<InteractionType, std::string> &p) {
+        return p.second == interaction_type;
+    });
+    if (it == Type_Interaction_Name_Map.end())
+        Logging::Get("proposal.secondaries")->critical("Could not find interaction type {}", interaction_type);
+
+    return GetStochasticLosses(it->first);
+}
+
+std::vector<ContinuousLoss> Secondaries::GetContinuousLosses() const
+{
+    assert(track_.size() == types_.size());
+
+    std::vector<ContinuousLoss> losses;
+    for (unsigned int i=1; i<track_.size(); i++) {
+        if (types_[i] == InteractionType::ContinuousEnergyLoss) {
+            losses.emplace_back(
+                    std::make_pair(track_[i-1].energy, track_[i].energy),
+                    std::make_pair(track_[i-1].position, track_[i].position),
+                    std::make_pair(track_[i-1].direction, track_[i].direction),
+                    std::make_pair(track_[i-1].time, track_[i].time)
+                    );
+        }
+    }
+    return losses;
+}
+
+std::vector<ContinuousLoss> Secondaries::GetContinuousLosses(const Geometry& geometry) const
+{
+    assert(track_.size() == types_.size());
+
+    //TODO: At the moment, part of the continuous losses may be missing if
+    // the track points are not exactly on the geometry border
+    std::vector<ContinuousLoss> losses;
+    for (unsigned int i=1; i<track_.size(); i++) {
+        if (geometry.IsInside(track_[i].position, track_[i].direction)) {
+            if (types_[i] == InteractionType::ContinuousEnergyLoss) {
+                losses.emplace_back(
+                        std::make_pair(track_[i-1].energy, track_[i].energy),
+                        std::make_pair(track_[i-1].position, track_[i].position),
+                        std::make_pair(track_[i-1].direction, track_[i].direction),
+                        std::make_pair(track_[i-1].time, track_[i].time)
+                        );
+            }
+        }
+    }
+    return losses;
 }

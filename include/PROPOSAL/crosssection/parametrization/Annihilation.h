@@ -75,14 +75,16 @@ cross_t_ptr<P, M> create_annihi(P p_def, M medium, bool interpol) {
 
 template<typename P, typename M>
 static std::map<std::string, annih_func_ptr<P, M>> annih_map = {
-        {"AnnihilationHeitler", create_annihi<AnnihilationHeitler, P, M>}
+        {"annihilationheitler", create_annihi<AnnihilationHeitler, P, M>}
 };
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_annihilation(P p_def, M medium, bool interpol,
                                     const std::string& param_name){
 
-    auto it = annih_map<P, M>.find(param_name);
+    std::string name = param_name;
+    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
+    auto it = annih_map<P, M>.find(name);
     if (it == annih_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for annihilation");
 

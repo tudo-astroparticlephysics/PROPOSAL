@@ -18,22 +18,20 @@ using namespace PROPOSAL;
 
 namespace PROPOSAL {
 
-// ------------------------------------------------------------------------- //
-std::ostream& operator<<(std::ostream& os, DynamicData const& data)
+std::ostream& operator<<(std::ostream& os, ParticleState const& data)
 {
     std::stringstream ss;
-    ss << " DynamicData (" << &data << ") ";
+    ss << " ParticleState (" << &data << ") ";
     os << Helper::Centered(60, ss.str()) << '\n';
 
-    os << "type: " << data.GetType() << '\n';
+    os << "type: " << data.type << '\n';
     os << "position:" << '\n';
-    os << data.position_ << '\n';
+    os << data.position << '\n';
     os << "direction:" << '\n';
-    os << data.direction_ << '\n';
-    os << "energy: " << data.energy_ << '\n';
-    os << "parent_particle_energy: " << data.parent_particle_energy_ << '\n';
-    os << "time: " << data.time_ << '\n';
-    os << "propagated distance: " << data.propagated_distance_ << '\n';
+    os << data.direction << '\n';
+    os << "energy: " << data.energy << '\n';
+    os << "time: " << data.time << '\n';
+    os << "propagated distance: " << data.propagated_distance << '\n';
 
     data.print(os);
 
@@ -43,97 +41,72 @@ std::ostream& operator<<(std::ostream& os, DynamicData const& data)
 
 } // namespace PROPOSAL
 
-/******************************************************************************
- *                              Dynamic Particle                              *
- ******************************************************************************/
-
-DynamicData::DynamicData()
-    : type_(0)
-    , position_(Vector3D())
-    , direction_(Vector3D())
-    , energy_(0)
-    , parent_particle_energy_(0)
-    , time_(0)
-    , propagated_distance_(0)
+ParticleState::ParticleState()
+    : type(0)
+    , position(Vector3D())
+    , direction(Vector3D())
+    , energy(0)
+    , time(0)
+    , propagated_distance(0)
 {
 }
 
-DynamicData::DynamicData(const int& type)
-    : type_(type)
-    , position_(Vector3D())
-    , direction_(Vector3D())
-    , energy_(0)
-    , parent_particle_energy_(0)
-    , time_(0)
-    , propagated_distance_(0)
+ParticleState::ParticleState(const Vector3D& position, const Vector3D& direction,
+                             const double& energy, const double& time,
+                             const double& distance)
+    : type(static_cast<int>(ParticleType::None))
+    , position(position)
+    , direction(direction)
+    , energy(energy)
+    , time(time)
+    , propagated_distance(distance)
 {
 }
 
-DynamicData::DynamicData(const int& type, const Vector3D& position,
-    const Vector3D& direction, const double& energy,
-    const double& parent_particle_energy, const double& time,
-    const double& distance)
-    : type_(type)
-    , position_(position)
-    , direction_(direction)
-    , energy_(energy)
-    , parent_particle_energy_(parent_particle_energy)
-    , time_(time)
-    , propagated_distance_(distance)
+ParticleState::ParticleState(const ParticleType& type, const Vector3D& position,
+                             const Vector3D& direction, const double& energy, const double& time,
+                             const double& distance)
+    : type(static_cast<int>(type))
+    , position(position)
+    , direction(direction)
+    , energy(energy)
+    , time(time)
+    , propagated_distance(distance)
 {
 }
 
-DynamicData& DynamicData::operator=(const DynamicData& data)
+bool ParticleState::operator==(const ParticleState& dynamic_data) const
 {
-    if (this != &data) {
-        type_ = data.type_;
-        position_ = data.position_;
-        direction_ = data.direction_;
-        energy_ = data.energy_;
-        parent_particle_energy_ = data.parent_particle_energy_;
-        time_ = data.time_;
-        propagated_distance_ = data.propagated_distance_;
-    }
-    return *this;
-}
-
-// ------------------------------------------------------------------------- //
-bool DynamicData::operator==(const DynamicData& dynamic_data) const
-{
-    if (type_ != dynamic_data.type_)
+    if (type != dynamic_data.type)
         return false;
-    if (position_ != dynamic_data.position_)
+    if (position != dynamic_data.position)
         return false;
-    if (direction_ != dynamic_data.direction_)
+    if (direction != dynamic_data.direction)
         return false;
-    if (energy_ != dynamic_data.energy_)
+    if (energy != dynamic_data.energy)
         return false;
-    if (parent_particle_energy_ != dynamic_data.parent_particle_energy_)
+    if (time != dynamic_data.time)
         return false;
-    if (time_ != dynamic_data.time_)
-        return false;
-    if (propagated_distance_ != dynamic_data.propagated_distance_)
+    if (propagated_distance != dynamic_data.propagated_distance)
         return false;
 
     return true;
 }
 
-// ------------------------------------------------------------------------- //
-bool DynamicData::operator!=(const DynamicData& dynamic_data) const
+bool ParticleState::operator!=(const ParticleState& dynamic_data) const
 {
     return !(*this == dynamic_data);
 }
 
-// ------------------------------------------------------------------------- //
-std::string DynamicData::GetName() const
+std::string ParticleState::GetName() const
 {
-    auto p_search = Type_Particle_Map.find(static_cast<ParticleType>(type_));
+    auto p_search = Type_Particle_Map.find(static_cast<ParticleType>(type));
     if (p_search != Type_Particle_Map.end()) {
         return p_search->second.name;
     }
 
     auto i_search
-        = Type_Interaction_Name_Map.find(static_cast<InteractionType>(type_));
+        = Type_Interaction_Name_Map.find(static_cast<InteractionType>(type));
     if (i_search != Type_Interaction_Name_Map.end()) {
         return i_search->second;
     }
@@ -141,39 +114,29 @@ std::string DynamicData::GetName() const
     return "Not found.";
 }
 
-void DynamicData::SetEnergy(double energy)
+void ParticleState::SetMomentum(double momentum)
 {
-    auto particle = Type_Particle_Map.find(static_cast<ParticleType>(type_));
+    auto particle = Type_Particle_Map.find(static_cast<ParticleType>(type));
     if (particle != Type_Particle_Map.end())
-        energy_ = std::max(energy, particle->second.mass);
-    else
-        energy_ = energy;
-}
-
-// ------------------------------------------------------------------------- //
-void DynamicData::SetMomentum(double momentum)
-{
-    auto particle = Type_Particle_Map.find(static_cast<ParticleType>(type_));
-    if (particle != Type_Particle_Map.end())
-        energy_ = std::sqrt(momentum * momentum
+        energy = std::sqrt(momentum * momentum
             + particle->second.mass * particle->second.mass);
     else
-        energy_ = momentum;
+        energy = momentum;
 }
 
-double DynamicData::GetMomentum() const
+double ParticleState::GetMomentum() const
 {
-    auto particle = Type_Particle_Map.find(static_cast<ParticleType>(type_));
+    auto particle = Type_Particle_Map.find(static_cast<ParticleType>(type));
     if (particle != Type_Particle_Map.end())
-        return std::sqrt((energy_ + particle->second.mass)
-            * (energy_ - particle->second.mass));
-    return energy_;
+        return std::sqrt((energy + particle->second.mass)
+            * (energy - particle->second.mass));
+    return energy;
 }
 
-void DynamicData::DeflectDirection(double cosphi_deflect, double theta_deflect)
+void ParticleState::DeflectDirection(double cosphi_deflect, double theta_deflect)
 {
 
-    auto old_direction = GetDirection();
+    auto old_direction = direction;
 
     old_direction.CalculateSphericalCoordinates();
     auto sinphi_deflect = std::sqrt(
@@ -197,5 +160,24 @@ void DynamicData::DeflectDirection(double cosphi_deflect, double theta_deflect)
         tz * old_direction + tx * rotate_vector_x + ty * rotate_vector_y);
     new_direction.CalculateSphericalCoordinates();
 
-    direction_ = new_direction;
+    direction = new_direction;
 }
+
+StochasticLoss::StochasticLoss(int type, double loss_energy, Vector3D position,
+                               Vector3D direction, double time,
+                               double propagated_distance,
+                               double parent_particle_energy) : Loss(type, loss_energy),
+                               position(position), direction(direction), time(time),
+                               propagated_distance(propagated_distance),
+                               parent_particle_energy(parent_particle_energy) {}
+
+ContinuousLoss::ContinuousLoss(std::pair<double, double> energies,
+                               std::pair<Vector3D, Vector3D> positions,
+                               std::pair<Vector3D, Vector3D> directions,
+                               std::pair<double, double> times)
+                               : Loss((int)InteractionType::ContinuousEnergyLoss,
+                                      std::abs(energies.second - energies.first)),
+                                      energies(energies),
+                                      positions(positions),
+                                      directions(directions),
+                                      times(times) {}

@@ -59,7 +59,7 @@ public:
     };
 
     typedef std::unordered_map<ParticleDef, PhaseSpaceParameters> ParameterMap;
-    typedef std::function<double(const DynamicData&, const std::vector<DynamicData>&)> MatrixElementFunction;
+    typedef std::function<double(const ParticleState&, const std::vector<ParticleState>&)> MatrixElementFunction;
     typedef std::function<void(PhaseSpaceParameters&, const ParticleDef&)> EstimateFunction;
 
 public:
@@ -79,7 +79,7 @@ public:
     ///
     /// @return Vector of particles, the decay products
     // ----------------------------------------------------------------------------
-    std::vector<DynamicData> Decay(const ParticleDef& p_def, const DynamicData& p_condition);
+    std::vector<ParticleState> Decay(const ParticleDef& p_def, const ParticleState& p_condition);
 
     // ----------------------------------------------------------------------------
     /// @brief Evalutate the matrix element of this channel
@@ -90,14 +90,14 @@ public:
     ///
     /// @return matrix element
     // ----------------------------------------------------------------------------
-    static double DefaultEvaluate(const DynamicData&, const std::vector<DynamicData>&);
+    static double DefaultEvaluate(const ParticleState&, const std::vector<ParticleState>&);
 
     // ----------------------------------------------------------------------------
     /// @brief Evalutate the matrix element of this channel
     ///
     /// @return matrix element
     // ----------------------------------------------------------------------------
-    double Evaluate(const DynamicData&, const std::vector<DynamicData>&);
+    double Evaluate(const ParticleState&, const std::vector<ParticleState>&);
 
     // ----------------------------------------------------------------------------
     /// @brief Sets the uniform flag
@@ -126,7 +126,7 @@ private:
     ///
     /// @return Vector of particles, the decay products
     // ----------------------------------------------------------------------------
-    void GenerateEvent(std::vector<DynamicData>& products, const PhaseSpaceKinematics& kinematics);
+    void GenerateEvent(std::vector<ParticleState>& products, const PhaseSpaceKinematics& kinematics);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the normalization of the phase space density

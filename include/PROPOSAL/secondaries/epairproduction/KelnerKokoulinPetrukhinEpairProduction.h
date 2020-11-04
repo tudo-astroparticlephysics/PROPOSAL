@@ -20,9 +20,9 @@ namespace PROPOSAL {
             crosssection::EpairKelnerKokoulinPetrukhin param;
             Integral integral;
             ParticleDef p_def;
-            static constexpr int n_rnd = 2;
+            static constexpr int n_rnd = 3;
 
-            double CalculateRho(double, double, const Component&, double);
+            double CalculateRho(double, double, const Component&, double, double);
             tuple<Vector3D, Vector3D> CalculateDirections(
                     Vector3D, double, double, double);
             tuple<double, double> CalculateEnergy(double, double);
@@ -33,8 +33,8 @@ namespace PROPOSAL {
             //TODO: set lpm to true when possible
 
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
-            vector<Loss::secondary_t> CalculateSecondaries(
-                    double, Loss::secondary_t, const Component&, vector<double>) final;
+            vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
+                                                       vector<double>&) final;
         };
     } // namespace secondaries
 } // namespace PROPOSAL

@@ -24,19 +24,19 @@ tuple<double, double> secondaries::NaivIonization::CalculateEnergy(
     return make_tuple(energy * (1 - v), energy * v);
 }
 
-vector<Loss::secondary_t> secondaries::NaivIonization::CalculateSecondaries(
-    double primary_energy, Loss::secondary_t loss, const Component&,
-    vector<double> rnd)
+vector<ParticleState> secondaries::NaivIonization::CalculateSecondaries(
+    StochasticLoss loss, const Component&, vector<double> &rnd)
 {
-    auto v = std::get<Loss::ENERGY>(loss) / primary_energy;
-    auto secondary_energy = CalculateEnergy(primary_energy, v);
-    auto secondary_dir = CalculateDirections(
-        get<Loss::DIRECTION>(loss), get<Loss::ENERGY>(loss), v, rnd[1]);
-    auto sec = std::vector<Loss::secondary_t>();
-    sec.emplace_back(primary_particle_type, get<Loss::POSITION>(loss),
-        get<0>(secondary_dir), get<0>(secondary_energy), 0.);
-    sec.emplace_back(static_cast<int>(ParticleType::EMinus),
-        get<Loss::POSITION>(loss), get<1>(secondary_dir),
-        get<1>(secondary_energy), 0.);
+    auto v = loss.loss_energy / loss.parent_particle_energy;
+    auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, v);
+    auto secondary_dir = CalculateDirections( loss.direction, loss.loss_energy,
+                                              v, rnd[1]);
+
+    auto sec = std::vector<ParticleState>();
+    sec.emplace_back(static_cast<ParticleType>(primary_particle_type),
+                     loss.position, get<0>(secondary_dir),
+                     get<0>(secondary_energies), loss.time, 0.);
+    sec.emplace_back(ParticleType::EMinus, loss.position, get<1>(secondary_dir),
+                     get<1>(secondary_energies), loss.time, 0.);
     return sec;
 }

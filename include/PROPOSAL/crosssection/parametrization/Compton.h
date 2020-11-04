@@ -91,14 +91,15 @@ namespace crosssection {
 
     template<typename P, typename M>
     static std::map<std::string, compt_func_ptr<P, M>> compt_map = {
-            {"KleinNishina", create_compt<ComptonKleinNishina, P, M>},
+            {"kleinnishina", create_compt<ComptonKleinNishina, P, M>},
     };
 
     template<typename P, typename M>
     cross_t_ptr<P, M> make_compton(P p_def, M medium, std::shared_ptr<const
     EnergyCutSettings> cuts, bool interpol, const std::string& param_name) {
-
-        auto it = compt_map<P, M>.find(param_name);
+        std::string name = param_name;
+        std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
+        auto it = compt_map<P, M>.find(name);
         if (it == compt_map<P, M>.end())
             throw std::logic_error("Unknown parametrization for compton");
 

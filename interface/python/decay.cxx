@@ -20,8 +20,8 @@ void init_decay(py::module& m) {
         .def("__eq__", &DecayChannel::operator==)
         .def("__ne__", &DecayChannel::operator!=)
         .def("decay", &DecayChannel::Decay, "Decay the given particle")
-        .def_static("boost", overload_cast_<DynamicData&, const Vector3D&, double, double>()(&DecayChannel::Boost))
-        .def_static("boost", overload_cast_<std::vector<DynamicData>&, const Vector3D&, double, double>()(&DecayChannel::Boost));
+        .def_static("boost", overload_cast_<ParticleState&, const Vector3D&, double, double>()(&DecayChannel::Boost))
+        .def_static("boost", overload_cast_<std::vector<ParticleState>&, const Vector3D&, double, double>()(&DecayChannel::Boost));
 
     py::class_<LeptonicDecayChannelApprox,
                std::shared_ptr<LeptonicDecayChannelApprox>, DecayChannel>(

@@ -93,18 +93,19 @@ cross_t_ptr<P, M> create_photoreal(P p_def, M medium,std::shared_ptr<const
 
 template<typename P, typename M>
 static std::map<std::string, photoreal_func_ptr<P, M>> photoreal_map = {
-        {"Zeus", create_photoreal<PhotoZeus, P, M>},
-        {"BezrukovBugaev", create_photoreal<PhotoBezrukovBugaev, P, M>},
-        {"Kokoulin", create_photoreal<PhotoKokoulin, P, M>},
-        {"Rhode", create_photoreal<PhotoRhode, P, M>},
+        {"zeus", create_photoreal<PhotoZeus, P, M>},
+        {"bezrukovbugaev", create_photoreal<PhotoBezrukovBugaev, P, M>},
+        {"kokoulin", create_photoreal<PhotoKokoulin, P, M>},
+        {"rhode", create_photoreal<PhotoRhode, P, M>},
 };
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_photonuclearreal(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, const std::string& param_name,
         bool hard_component){
-
-    auto it = photoreal_map<P, M>.find(param_name);
+    std::string name = param_name;
+    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
+    auto it = photoreal_map<P, M>.find(name);
     if (it == photoreal_map<P, M>.end())
         throw std::invalid_argument("Unknown parametrization for photonuclear");
 

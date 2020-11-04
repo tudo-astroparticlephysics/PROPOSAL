@@ -93,14 +93,15 @@ cross_t_ptr<P, M> create_mupair(P p_def, M medium,std::shared_ptr<const
 
 template<typename P, typename M>
 static std::map<std::string, mupair_func_ptr<P, M>> mupair_map = {
-        {"KelnerKokoulinPetrukhin", create_mupair<MupairKelnerKokoulinPetrukhin, P, M>},
+        {"kelnerkokoulinpetrukhin", create_mupair<MupairKelnerKokoulinPetrukhin, P, M>},
 };
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_mupairproduction(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, const std::string& param_name){
-
-    auto it = mupair_map<P, M>.find(param_name);
+    std::string name = param_name;
+    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
+    auto it = mupair_map<P, M>.find(name);
     if (it == mupair_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for mupairproduction");
 
