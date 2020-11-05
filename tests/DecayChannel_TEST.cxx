@@ -384,7 +384,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
     double max_energy = gamma * v_max + betagamma * std::sqrt( std::pow(v_max, 2) - std::pow(p0.mass,2));
 
     for(int i=0; i<statistic; i++){
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Vector3D(0, 0, -1);
         init_particle.position = Vector3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;

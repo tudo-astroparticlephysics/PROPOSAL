@@ -98,7 +98,7 @@ double LeptonicDecayChannelApprox::FindRoot(double min, double parent_mass, doub
 // ------------------------------------------------------------------------- //
 std::vector<ParticleState> LeptonicDecayChannelApprox::Decay(const ParticleDef& p_def, const ParticleState& p_condition)
 {
-
+    assert (p_condition.direction.magnitude() > 0);
     // Sample energy from decay rate
     double emax       = (p_def.mass * p_def.mass + massive_lepton_.mass * massive_lepton_.mass) / (2 * p_def.mass);
     double x_min      = massive_lepton_.mass / emax;

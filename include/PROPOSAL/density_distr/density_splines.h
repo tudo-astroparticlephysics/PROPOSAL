@@ -47,7 +47,6 @@ class Density_splines : public Density_distr {
     Density_splines(const nlohmann::json&);
 
     ~Density_splines() {
-        delete axis_;
         delete spline_;
         delete integrated_spline_;
     }

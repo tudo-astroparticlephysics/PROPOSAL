@@ -28,7 +28,7 @@ TEST(ContinuousRandomization, Constructor) {
     auto p_def = MuMinusDef();
     auto medium = Ice();
     auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, true);
-    auto cross = GetStdCrossSections(p_def, medium, cuts, true);
+    auto cross = GetStdCrossSections(p_def, medium, cuts, false);
     auto cont_rand = make_contrand(cross, false);
 }
 
