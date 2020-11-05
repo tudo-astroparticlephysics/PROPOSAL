@@ -225,9 +225,9 @@ void init_particle(py::module& m) {
                                R"pbdoc(
                 Type of Dynamic Data. Describes the ParticleType of instance.
             )pbdoc")
-        .def_property_readonly("name", &ParticleState::GetName,
+        .def_property_readonly("particle_def", &ParticleState::GetParticleDef,
                                R"pbdoc(
-                Name of Particle of instance.
+                Get corresponding particle_def to ParticleState.
             )pbdoc")
         .def_readwrite("position", &ParticleState::position,
                       R"pbdoc(

@@ -105,7 +105,7 @@ public:
     void SetType(ParticleType particle_type) { type = static_cast<int>(particle_type); }
     void SetMomentum(double momentum);
     double GetMomentum() const;
-    std::string GetName() const;
+    ParticleDef GetParticleDef() const;
 
     // Deflect the direction of a particle by cosphi_deflect with an azimuth of
     // theta_deflect

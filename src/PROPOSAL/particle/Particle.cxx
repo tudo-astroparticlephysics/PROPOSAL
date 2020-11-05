@@ -98,20 +98,14 @@ bool ParticleState::operator!=(const ParticleState& dynamic_data) const
     return !(*this == dynamic_data);
 }
 
-std::string ParticleState::GetName() const
+ParticleDef ParticleState::GetParticleDef() const
 {
     auto p_search = Type_Particle_Map.find(static_cast<ParticleType>(type));
     if (p_search != Type_Particle_Map.end()) {
-        return p_search->second.name;
+        return p_search->second;
     }
 
-    auto i_search
-        = Type_Interaction_Name_Map.find(static_cast<InteractionType>(type));
-    if (i_search != Type_Interaction_Name_Map.end()) {
-        return i_search->second;
-    }
-
-    return "Not found.";
+    throw std::invalid_argument("Particle def for ParticleType not found.");
 }
 
 void ParticleState::SetMomentum(double momentum)

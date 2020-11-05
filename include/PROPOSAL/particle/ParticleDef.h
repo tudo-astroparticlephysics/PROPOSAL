@@ -323,8 +323,7 @@ PROPOSAL_MAKE_HASHABLE(PROPOSAL::ParticleDef, t.mass, t.lifetime, t.charge)
 #undef PARTICLE_DEF
 
 namespace PROPOSAL {
-static const std::unordered_map<ParticleType, const ParticleDef&,
-    ParticleType_hash>
+static const std::unordered_map<ParticleType, const ParticleDef, ParticleType_hash>
     Type_Particle_Map{
         { ParticleType::EMinus, EMinusDef() },
         { ParticleType::EPlus, EPlusDef() },
