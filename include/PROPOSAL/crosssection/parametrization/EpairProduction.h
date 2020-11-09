@@ -40,36 +40,27 @@ using PROPOSAL::Components::Component;
 
 #define EPAIR_PARAM_INTEGRAL_DEC(param)                                        \
     struct Epair##param : public EpairProductionRhoIntegral {                  \
-        Epair##param(bool lpm);                                                \
+        Epair##param(bool lpm = false);                                        \
+        Epair##param(bool lpm, const ParticleDef&, const Medium&, double       \
+        density_correction = 1.0);                                             \
         using base_param_t = EpairProduction;                                  \
                                                                                \
         double FunctionToIntegral(const ParticleDef&, const Component&,        \
-            double energy, double v, double lpm) const;                              \
+            double energy, double v, double r) const;                          \
     };
 
 namespace PROPOSAL {
 namespace crosssection {
+class EpairLPM;
 class EpairProduction : public Parametrization {
 
 protected:
-    // ----------------------------------------------------------------------------
-    /// @brief Landau Pomeranchuk Migdal effect
-    ///
-    /// Landau Pomeranchuk Migdal effect evaluation,
-    /// if the Landau Pomeranchuk Migdal effect is considered in
-    /// the calculation, function is modified by a factor
-    /// \f[lpm=return=\frac{(1+b)(A+(1+r^2)B)+b(C+(1+r^2)D)+(1-r^2)E}{[(2+r^2)(1+b)
-    /// +x(3+r^2)]\ln\Big(1+\frac{1}{x}\Big)+\frac{1-r^2-b}{1+x}-(3+r^2)}\f]
-    // ----------------------------------------------------------------------------
-    double lpm(const ParticleDef&, const Medium&, double energy, double v,
-        double r2, double b, double x);
-
-    bool init_lpm_effect_;
-    bool lpm_;
-    double eLpm_;
+    std::shared_ptr<EpairLPM> lpm_;
 
 public:
-    EpairProduction(bool);
+    EpairProduction(bool lpm = false);
+    EpairProduction(bool lpm, const ParticleDef&, const Medium&,
+                    double density_correction = 1.0);
     virtual ~EpairProduction() = default;
 
     using only_stochastic = std::false_type;
@@ -83,7 +74,9 @@ public:
 
 class EpairProductionRhoIntegral : public EpairProduction {
     public:
-    EpairProductionRhoIntegral(bool);
+    EpairProductionRhoIntegral(bool lpm = false);
+    EpairProductionRhoIntegral(bool lpm, const ParticleDef&, const Medium&,
+                               double density_correction = 1.0);
     virtual ~EpairProductionRhoIntegral() = default;
 
     double DifferentialCrossSection(
@@ -109,16 +102,31 @@ EPAIR_PARAM_INTEGRAL_DEC(ForElectronPositron)
 
 #undef EPAIR_PARAM_INTEGRAL_DEC
 
+class EpairLPM {
+public:
+    EpairLPM(const ParticleDef&, const Medium&, double density_correction=1.0);
+    double suppression_factor(double E, double v, double r2, double beta,
+                              double xi) const;
+
+private:
+    double mass_;
+    double charge_;
+    double mol_density_;
+    double density_correction_;
+    double eLpm_;
+};
+
 // Factory pattern functions
 
 template <typename P, typename M>
 using epair_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
-        EnergyCutSettings>, bool, bool);
+        EnergyCutSettings>, bool, bool, double);
 
 template <typename Param, typename P, typename M>
 cross_t_ptr<P, M> create_epair(P p_def, M medium,std::shared_ptr<const
-        EnergyCutSettings> cuts, bool lpm, bool interpol) {
-    auto param = Param(lpm);
+        EnergyCutSettings> cuts, bool lpm, bool interpol,
+        double density_correction = 1.0) {
+    auto param = Param(lpm, p_def, medium, density_correction);
     return make_crosssection(param, p_def, medium, cuts, interpol);
 }
 
@@ -131,26 +139,29 @@ static std::map<std::string, epair_func_ptr<P, M>> epair_map = {
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_epairproduction(P p_def, M medium, std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol, bool lpm, const std::string& param_name){
+        EnergyCutSettings> cuts, bool interpol, bool lpm,
+        const std::string& param_name, double density_correction = 1.0){
     std::string name = param_name;
     std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
     auto it = epair_map<P, M>.find(name);
     if (it == epair_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for epairproduction");
 
-    return it->second(p_def, medium, cuts, lpm, interpol);
+    return it->second(p_def, medium, cuts, lpm, interpol, density_correction);
 }
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_epairproduction(P p_def, M medium, std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
+        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config,
+        double density_correction = 1.0){
     if (!config.contains("parametrization"))
         throw std::logic_error("No parametrization passed for epairproduction");
 
     std::string param_name = config["parametrization"];
     bool lpm = config.value("lpm", true);
 
-    return make_epairproduction(p_def, medium, cuts, interpol, lpm, param_name);
+    return make_epairproduction(p_def, medium, cuts, interpol, lpm, param_name,
+                                density_correction);
 }
 
 } // namespace crosssection

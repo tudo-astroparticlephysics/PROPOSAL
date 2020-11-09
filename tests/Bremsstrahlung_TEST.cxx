@@ -182,9 +182,6 @@ TEST(Bremsstrahlung, Test_of_dEdx)
         if (ecut == -1)
             ecut = INF;
 
-        if (lpm)
-            continue; // DEBUG as long as lpm is not finished
-
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
@@ -230,9 +227,6 @@ TEST(Bremsstrahlung, Test_of_dNdx)
             vcut = 1;
         if (ecut == -1)
             ecut = INF;
-
-        if (lpm)
-            continue; // DEBUG as long as lpm is not finished
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -282,9 +276,6 @@ TEST(Bremsstrahlung, Test_of_e)
             vcut = 1;
         if (ecut == -1)
             ecut = INF;
-
-        if (lpm)
-            continue; // DEBUG as long as lpm is not finished
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -348,9 +339,6 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
         if (ecut == -1)
             ecut = INF;
 
-        if (lpm)
-            continue; // DEBUG as long as lpm is not finished
-
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
@@ -397,9 +385,6 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
             vcut = 1;
         if (ecut == -1)
             ecut = INF;
-
-        if (lpm)
-            continue; // DEBUG as long as lpm is not finished
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -450,9 +435,6 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
             vcut = 1;
         if (ecut == -1)
             ecut = INF;
-
-        if (lpm)
-            continue; // DEBUG as long as lpm is not finished
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);

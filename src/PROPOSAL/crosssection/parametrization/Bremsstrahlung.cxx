@@ -10,24 +10,36 @@
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/medium/Medium.h"
 
 #define BREMSSTRAHLUNG_IMPL(param)                                             \
     crosssection::Brems##param::Brems##param(bool lpm)                         \
-        : crosssection::Bremsstrahlung(lpm)                                    \
-    {                                                                          \
-    }
+        : crosssection::Bremsstrahlung() {                                     \
+            if (lpm)                                                           \
+                throw std::invalid_argument("Missing particle_def and medium " \
+                       "for Bremsstrahlung constructor with lpm=true");        \
+            lpm_ = nullptr;                                                    \
+        }                                                                      \
+    crosssection::Brems##param::Brems##param(bool lpm, const ParticleDef& p,   \
+                                             const Medium& medium,             \
+                                             double density_correction)        \
+        : crosssection::Bremsstrahlung() {                                     \
+            if (lpm) {                                                         \
+                lpm_ = std::make_shared<BremsLPM>(p, medium, *this,            \
+                                                  density_correction);         \
+            } else {                                                           \
+                lpm_ = nullptr;                                                \
+            }                                                                  \
+        }
 
 using std::logic_error;
 using std::make_tuple;
 using namespace PROPOSAL;
 
-crosssection::Bremsstrahlung::Bremsstrahlung(bool lpm)
+crosssection::Bremsstrahlung::Bremsstrahlung()
     : Parametrization(InteractionType::Brems, "Brems")
     , lorenz_(false) // TODO(mario): make it use to enable Mon 2017/09/04
     , lorenz_cut_(1e6)
-    , init_lpm_effect_(true)
-    , lpm_(lpm)
-    , eLpm_(0)
 {
 }
 
@@ -76,90 +88,10 @@ double crosssection::Bremsstrahlung::DifferentialCrossSection(
     aux *= aux * (ALPHA / v) * result;
 
     if (lpm_) {
-        throw logic_error("some work to do!");
-        // aux *= lpm(p_def, comp, 0, energy, v);
+        aux *= lpm_->suppression_factor(energy, v, comp);
     }
 
     return NA / comp.GetAtomicNum() * aux;
-}
-
-double crosssection::Bremsstrahlung::lpm(const ParticleDef& p_def,
-    const Component& comp, double total_loss, double energy, double v)
-{
-    if (init_lpm_effect_) {
-        lpm_ = false;
-        init_lpm_effect_ = false;
-
-        eLpm_ = ALPHA * (p_def.mass);
-        eLpm_ *= eLpm_ / (4 * PI * ME * RE * total_loss);
-
-        lpm_ = true;
-    }
-
-    double G, fi, xi, ps, Gamma, s1;
-
-    const double fi1 = 1.54954;
-    const double G1 = 0.710390;
-    const double G2 = 0.904912;
-
-    double Z3 = std::pow(comp.GetNucCharge(), -1. / 3);
-
-    double Dn = 1.54 * std::pow(comp.GetAtomicNum(), 0.27);
-    s1 = ME * Dn / (p_def.mass * Z3 * comp.GetLogConstant());
-    s1 *= s1 * SQRT2;
-
-    // Calc xi(s') from Stanev, Vankow, Streitmatter, Ellsworth, Bowen
-    // Phys. Rev. D 25 (1982), 1291
-    double sp = std::sqrt(eLpm_ * v / (8 * energy * (1 - v)));
-    double h = std::log(sp) / std::log(s1);
-
-    if (sp < s1) {
-        xi = 2;
-    } else if (sp < 1) {
-        xi = 1 + h - 0.08 * (1 - h) * (1 - (1 - h) * (1 - h)) / std::log(s1);
-    } else {
-        xi = 1;
-    }
-
-    Gamma = RE * ME / (ALPHA * p_def.mass * v);
-    throw std::logic_error("Changes are required!!!");
-    /* Gamma = 1 */
-    /*     + 4 * PI * medium_->GetMolDensity() *  medium_->GetSumCharge() * RE
-     */
-    /*         * Gamma * Gamma; */
-    double s = sp / std::sqrt(xi) * Gamma;
-    double s2 = s * s;
-
-    if (s < fi1) {
-        // Stanev et al.,  Phys. Rev. D 25 (1982), 1291 (eq. 14d)
-        fi = 1
-            - std::exp(-6 * s * (1 + (3 - PI) * s)
-                  + s2 * s / (0.623 + 0.796 * s + 0.658 * s2));
-    } else {
-        fi = 1
-            - 0.012 / (s2 * s2); // Migdal, Phys. Rev. 103 (1956), 1811 (eq. 48)
-    }
-
-    if (s < G1) {
-        //  Stanev et al.,  Phys. Rev. D 25 (1982), 1291 (eq. 15d)
-        ps = 1
-            - std::exp(-4 * s
-                  - 8 * s2
-                      / (1 + 3.936 * s + 4.97 * s2 - 0.05 * s2 * s
-                            + 7.50 * s2 * s2));
-        // Klein, Rev. Mod. Phys. 71 (1999), 1501 (eq. 77)
-        G = 3 * ps - 2 * fi;
-    } else if (s < G2) {
-        G = 36 * s2 / (36 * s2 + 1);
-    } else {
-        G = 1
-            - 0.022 / (s2 * s2); // Migdal, Phys. Rev. 103 (1956), 1811 (eq. 48)
-    }
-
-    return ((xi / 3)
-               * ((v * v) * G / (Gamma * Gamma)
-                     + 2 * (1 + (1 - v) * (1 - v)) * fi / Gamma))
-        / ((4. / 3) * (1 - v) + v * v);
 }
 
 size_t crosssection::Bremsstrahlung::GetHash() const noexcept
@@ -483,10 +415,28 @@ double crosssection::BremsSandrockSoedingreksoRhode::CalculateParametrization(
 // ------------------------------------------------------------------------- //
 
 crosssection::BremsElectronScreening::BremsElectronScreening(bool lpm)
-    : Bremsstrahlung(lpm)
+    : Bremsstrahlung()
     , interpolant_(new Interpolant(
           A_logZ, A_energies, A_correction, 2, false, false, 2, false, false))
 {
+    if (lpm)
+        throw std::invalid_argument("Missing particle_def and medium for "
+                                    "Bremsstrahlung constructor with lpm=true");
+    lpm_ = nullptr;
+}
+
+crosssection::BremsElectronScreening::BremsElectronScreening(
+        bool lpm, const ParticleDef& p_def, const Medium& medium,
+        double density_correction)
+        : Bremsstrahlung()
+        , interpolant_(new Interpolant(
+              A_logZ, A_energies, A_correction, 2, false, false, 2, false, false))
+{
+    if (lpm) {
+        lpm_ = std::make_shared<BremsLPM>(p_def, medium, *this, density_correction);
+    } else {
+        lpm_ = nullptr;
+    }
 }
 
 double crosssection::BremsElectronScreening::DifferentialCrossSection(
@@ -499,8 +449,7 @@ double crosssection::BremsElectronScreening::DifferentialCrossSection(
     aux *= aux * (ALPHA / v) * result;
 
     if (lpm_) {
-        throw logic_error("some work to do!");
-        /* aux *= lpm(p_def, comp, 0, energy, v); */
+        aux *= lpm_->suppression_factor(energy, v, comp);
     }
 
     return NA / comp.GetAtomicNum() * aux;
@@ -589,3 +538,93 @@ double crosssection::BremsElectronScreening::CalculateParametrization(
 }
 
 #undef BREMSSTRAHLUNG_IMPL
+
+crosssection::BremsLPM::BremsLPM(const ParticleDef& p_def, const Medium& medium,
+                                 const Bremsstrahlung& param, double density_correction)
+    : mass_(p_def.mass),
+      mol_density_(medium.GetMolDensity()),
+      mass_density_(medium.GetMassDensity()),
+      sum_charge_(medium.GetSumCharge()),
+      density_correction_(density_correction)
+      {
+            double upper_energy = 1e14;
+            Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
+            auto components = medium.GetComponents();
+
+            double sum = 0.;
+            for (auto comp : components) {
+                auto limits = param.GetKinematicLimits(p_def, comp, upper_energy);
+                double contribution = 0;
+                contribution += integral_temp.Integrate(std::get<0>(limits), std::get<1>(limits), [&param, &p_def, &comp, &upper_energy](double v) {return param.FunctionToDEdxIntegral(p_def, comp, upper_energy, v);}, 2.);
+                double weight_for_loss_in_medium = medium.GetSumNucleons()
+                                                 / (comp.GetAtomInMolecule() * comp.GetAtomicNum());
+                sum += contribution / weight_for_loss_in_medium;
+            }
+            sum = sum * (mass_density_ * density_correction_);
+            eLpm_ = ALPHA * mass_;
+            eLpm_ *= eLpm_ / (4. * PI * ME * RE * sum );
+      }
+
+double crosssection::BremsLPM::suppression_factor(double energy, double v, const Component& comp) const {
+    double G, fi, xi, ps, Gamma, s1;
+
+    const double fi1 = 1.54954;
+    const double G1 = 0.710390;
+    const double G2 = 0.904912;
+    double Z3 = std::pow(comp.GetNucCharge(), -1. / 3);
+
+    double Dn = 1.54 * std::pow(comp.GetAtomicNum(), 0.27);
+    s1 = ME * Dn / (mass_ * Z3 * comp.GetLogConstant());
+    s1 *= s1 * SQRT2;
+
+    // Calc xi(s') from Stanev, Vankow, Streitmatter, Ellsworth, Bowen
+    // Phys. Rev. D 25 (1982), 1291
+    double sp = std::sqrt(eLpm_ * v / (8 * energy * (1 - v)));
+    double h = std::log(sp) / std::log(s1);
+
+    if (sp < s1) {
+        xi = 2;
+    } else if (sp < 1) {
+        xi = 1 + h - 0.08 * (1 - h) * (1 - (1 - h) * (1 - h)) / std::log(s1);
+    } else {
+        xi = 1;
+    }
+
+    Gamma = RE * ME / (ALPHA * mass_ * v);
+    Gamma = 1
+            + 4 * PI * sum_charge_ * RE
+              * Gamma * Gamma * mol_density_ * density_correction_;
+    double s = sp / std::sqrt(xi) * Gamma;
+    double s2 = s * s;
+
+    if (s < fi1) {
+        // Stanev et al.,  Phys. Rev. D 25 (1982), 1291 (eq. 14d)
+        fi = 1
+             - std::exp(-6 * s * (1 + (3 - PI) * s)
+                        + s2 * s / (0.623 + 0.796 * s + 0.658 * s2));
+    } else {
+        fi = 1
+             - 0.012 / (s2 * s2); // Migdal, Phys. Rev. 103 (1956), 1811 (eq. 48)
+    }
+
+    if (s < G1) {
+        //  Stanev et al.,  Phys. Rev. D 25 (1982), 1291 (eq. 15d)
+        ps = 1
+             - std::exp(-4 * s
+                        - 8 * s2
+                          / (1 + 3.936 * s + 4.97 * s2 - 0.05 * s2 * s
+                             + 7.50 * s2 * s2));
+        // Klein, Rev. Mod. Phys. 71 (1999), 1501 (eq. 77)
+        G = 3 * ps - 2 * fi;
+    } else if (s < G2) {
+        G = 36 * s2 / (36 * s2 + 1);
+    } else {
+        G = 1
+            - 0.022 / (s2 * s2); // Migdal, Phys. Rev. 103 (1956), 1811 (eq. 48)
+    }
+
+    return ((xi / 3)
+            * ((v * v) * G / (Gamma * Gamma)
+               + 2 * (1 + (1 - v) * (1 - v)) * fi / Gamma))
+           / ((4. / 3) * (1 - v) + v * v);
+}

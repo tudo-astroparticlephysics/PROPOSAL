@@ -13,7 +13,11 @@
 
 #define EPAIR_PARAM_INTEGRAL_IMPL(param)                                       \
     crosssection::Epair##param::Epair##param(bool lpm)                         \
-        : EpairProductionRhoIntegral(lpm)                                      \
+        : EpairProductionRhoIntegral(lpm) {}                                   \
+    crosssection::Epair##param::Epair##param(bool lpm, const ParticleDef& p,   \
+                                             const Medium& medium,             \
+                                             double density_distribution)      \
+        : EpairProductionRhoIntegral(lpm, p, medium, density_distribution)     \
     {                                                                          \
     }
 
@@ -23,10 +27,23 @@ using std::make_tuple;
 
 crosssection::EpairProduction::EpairProduction(bool lpm)
     : Parametrization(InteractionType::Epair, "Epair")
-    , init_lpm_effect_(true)
-    , lpm_(lpm)
-    , eLpm_(0)
 {
+    if (lpm)
+        throw std::invalid_argument("Missing particle_def and medium for Epair "
+                                    "constructor with lpm=true");
+    lpm_ = nullptr;
+}
+
+crosssection::EpairProduction::EpairProduction(bool lpm, const ParticleDef& p,
+                                               const Medium& medium,
+                                               double density_correction)
+        : Parametrization(InteractionType::Epair, "Epair")
+{
+    if (lpm) {
+        lpm_ = std::make_shared<EpairLPM>(p, medium, density_correction);
+    } else {
+        lpm_ = nullptr;
+    }
 }
 
 double crosssection::EpairProduction::GetLowerEnergyLim(const ParticleDef& p_def) const
@@ -55,63 +72,6 @@ size_t crosssection::EpairProduction::GetHash() const noexcept
     hash_combine(seed, lpm_);
 
     return seed;
-}
-
-// ------------------------------------------------------------------------- //
-// LPM Supression by Polityko, Takahashi, Kato, Yamada, Misaki
-// J. Phys. G: Nucl Part. Phys. 28 (2002) 427
-// ------------------------------------------------------------------------- //
-
-double crosssection::EpairProduction::lpm(const ParticleDef& p_def, const Medium& medium,
-    double energy, double v, double r2, double b, double x)
-{
-    if (init_lpm_effect_) {
-        init_lpm_effect_ = false;
-        double sum = 0;
-
-        for (const auto& component : medium.GetComponents()) {
-            sum += component.GetNucCharge() * component.GetNucCharge()
-                * std::log(3.25 * component.GetLogConstant()
-                      * std::pow(component.GetNucCharge(), -1. / 3));
-        }
-
-        // eq. 29
-        eLpm_ = p_def.mass / (ME * RE);
-        throw std::logic_error("need further thoughts");
-        /* eLpm_ *= (eLpm_ * eLpm_) * ALPHA * p_def.mass */
-        /*     / (2 * PI * medium_->GetMolDensity() * p_def.charge */
-        /* * p_def.charge * sum); */
-    }
-
-    // Ternovskii functions calculated in appendix (eq. A.2)
-    double A, B, C, D, E, s;
-    double s36, s6, d1, d2, atan_, log1, log2;
-
-    s = 0.25 * std::sqrt(eLpm_ / (energy * v * (1 - r2))); // eq. 29
-    s6 = 6 * s;
-    atan_ = s6 * (x + 1);
-
-    if (atan_ > 1 / COMPUTER_PRECISION) {
-        return 1;
-    }
-
-    s36 = 36 * s * s;
-    d1 = s6 / (s6 + 1);
-    d2 = s36 / (s36 + 1);
-    atan_ = std::atan(atan_) - PI / 2;
-    log1 = std::log((s36 * (1 + x) * (1 + x) + 1) / (s36 * x * x));
-    log2 = std::log((s6 * (1 + x) + 1) / (s6 * x));
-    A = 0.5 * d2 * (1 + 2 * d2 * x) * log1 - d2
-        + 6 * d2 * s * (1 + ((s36 - 1) / (s36 + 1)) * x) * atan_;
-    B = d1 * (1 + d1 * x) * log2 - d1;
-    C = -d2 * d2 * x * log1 + d2 - (d2 * d2 * (s36 - 1) / (6 * s)) * x * atan_;
-    D = d1 - d1 * d1 * x * log2;
-    E = -s6 * atan_;
-
-    return ((1 + b) * (A + (1 + r2) * B) + b * (C + (1 + r2) * D)
-               + (1 - r2) * E)
-        / (((2 + r2) * (1 + b) + x * (3 + r2)) * std::log(1 + 1 / x)
-              + (1 - r2 - b) / (1 + x) - (3 + r2));
 }
 
 namespace PROPOSAL {
@@ -162,6 +122,13 @@ double integrate_dedx(Integral& integral, crosssection::EpairProduction& param,
 // ------------------------------------------------------------------------- //
 crosssection::EpairProductionRhoIntegral::EpairProductionRhoIntegral(bool lpm)
     : crosssection::EpairProduction(lpm)
+{
+}
+
+crosssection::EpairProductionRhoIntegral::EpairProductionRhoIntegral(
+        bool lpm, const ParticleDef& p_def, const Medium& medium,
+        double density_correction )
+        : crosssection::EpairProduction(lpm, p_def, medium, density_correction)
 {
 }
 
@@ -309,8 +276,7 @@ double crosssection::EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
     aux *= (1 - v) / v * (diagram_e + aux1 * aux1 * diagram_mu);
 
     if (lpm_) {
-        throw logic_error("some work to do!");
-        /* aux *= lpm(energy, v, r2, beta, xi); */
+        aux *= lpm_->suppression_factor(energy, v, r2, beta, xi);
     }
 
     if (aux < 0) {
@@ -488,8 +454,7 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
     double aux = diagram_e + diagram_mu;
 
     if (lpm_) {
-        throw logic_error("some work to do!");
-        /* aux *= lpm(energy, v, rho2, beta, xi); */
+        aux *= lpm_->suppression_factor(energy, v, rho2, beta, xi);
     }
 
     if (aux < 0.0) {
@@ -569,11 +534,69 @@ double crosssection::EpairForElectronPositron::FunctionToIntegral(
     }
 
     if (lpm_) {
-        throw logic_error("some work to do!");
-        /* aux *= lpm(energy, v, rho2, beta, xi); */
+        aux *= lpm_->suppression_factor(energy, v, r2, beta, xi);
     }
 
     return aux;
 }
 
 #undef EPAIR_PARAM_INTEGRAL_IMPL
+
+crosssection::EpairLPM::EpairLPM(const ParticleDef& p_def, const Medium& medium,
+                                 double density_correction)
+    : mass_(p_def.mass),
+      charge_(p_def.charge),
+      mol_density_(medium.GetMolDensity()),
+      density_correction_(density_correction)
+    {
+        double sum = 0.;
+        auto components = medium.GetComponents();
+
+        for (auto comp : components) {
+            sum += comp.GetNucCharge() * comp.GetNucCharge() * std::log(
+                    3.25 * comp.GetLogConstant() * std::pow(
+                            comp.GetNucCharge(), -1. / 3));
+        }
+        eLpm_ = mass_ / (ME * RE);
+        eLpm_ *= (eLpm_ * eLpm_) * ALPHA * mass_ /
+                 (2 * PI * mol_density_ * density_correction *
+                 charge_ * charge_ * sum);
+}
+
+// ------------------------------------------------------------------------- //
+// LPM Supression by Polityko, Takahashi, Kato, Yamada, Misaki
+// J. Phys. G: Nucl Part. Phys. 28 (2002) 427
+// ------------------------------------------------------------------------- //
+
+double crosssection::EpairLPM::suppression_factor(double energy, double v,
+                                                  double r2, double b,
+                                                  double x) const {
+    // Ternovskii functions calculated in appendix (eq. A.2)
+    double A, B, C, D, E, s;
+    double s36, s6, d1, d2, atan_, log1, log2;
+
+    s     = 0.25 * std::sqrt(eLpm_ / (energy * v * (1 - r2))); // eq. 29
+    s6    = 6 * s;
+    atan_ = s6 * (x + 1);
+
+    if (atan_ > 1 / COMPUTER_PRECISION)
+    {
+        return 1;
+    }
+
+    s36   = 36 * s * s;
+    d1    = s6 / (s6 + 1);
+    d2    = s36 / (s36 + 1);
+    atan_ = std::atan(atan_) - PI / 2;
+    log1  = std::log((s36 * (1 + x) * (1 + x) + 1) / (s36 * x * x));
+    log2  = std::log((s6 * (1 + x) + 1) / (s6 * x));
+    A     = 0.5 * d2 * (1 + 2 * d2 * x) * log1 - d2 + 6 * d2 * s * (1 + ((s36 - 1) / (s36 + 1)) * x) * atan_;
+    B     = d1 * (1 + d1 * x) * log2 - d1;
+    C     = -d2 * d2 * x * log1 + d2 - (d2 * d2 * (s36 - 1) / (6 * s)) * x * atan_;
+    D     = d1 - d1 * d1 * x * log2;
+    E     = -s6 * atan_;
+
+    return ((1 + b) * (A + (1 + r2) * B) + b * (C + (1 + r2) * D) + (1 - r2) * E) /
+           (((2 + r2) * (1 + b) + x * (3 + r2)) * std::log(1 + 1 / x) + (1 - r2 - b) / (1 + x) - (3 + r2));
+
+}
