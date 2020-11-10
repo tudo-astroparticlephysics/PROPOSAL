@@ -14,9 +14,12 @@
 
 #define BREMS_DEF(module, cls)                                                 \
     py::class_<crosssection::Brems##cls,                                       \
-    std::shared_ptr<crosssection::Brems##cls>,                             \
-    crosssection::Bremsstrahlung>(module, #cls)                            \
-    .def(py::init<bool>(), py::arg("lpm_effect"));
+    std::shared_ptr<crosssection::Brems##cls>,                                 \
+    crosssection::Bremsstrahlung>(module, #cls)                                \
+    .def(py::init<bool>(), py::arg("lpm") = false)                             \
+    .def(py::init<bool, const ParticleDef&, const Medium&, double>(),          \
+    py::arg("lpm"), py::arg("particle_def"), py::arg("medium"),                \
+    py::arg("density_correction") = 1.0);
 
 #define PHOTO_REAL_DEF(module, cls, parent)                                    \
     py::class_<crosssection::Photo##cls,                                       \
@@ -33,9 +36,12 @@
 
 #define EPAIR_DEF(module, cls)                                                 \
     py::class_<crosssection::Epair##cls,                                       \
-    std::shared_ptr<crosssection::Epair##cls>,                             \
-    crosssection::EpairProductionRhoIntegral>(module, #cls)                \
-    .def(py::init<bool>(), py::arg("lpm_effect"));
+    std::shared_ptr<crosssection::Epair##cls>,                                 \
+    crosssection::EpairProductionRhoIntegral>(module, #cls)                    \
+    .def(py::init<bool>(), py::arg("lpm_effect") = false)                      \
+    .def(py::init<bool, const ParticleDef&, const Medium&, double>(),           \
+    py::arg("lpm"), py::arg("particle_def"), py::arg("medium"),                \
+    py::arg("density_correction") = 1.0);
 
 #define MUPAIR_DEF(module, cls)                                                \
     py::class_<crosssection::Mupair##cls,                                      \
@@ -208,6 +214,16 @@ void init_parametrization(py::module& m)
             BREMS_DEF(m_sub_brems, SandrockSoedingreksoRhode)
             BREMS_DEF(m_sub_brems, ElectronScreening)
 
+            py::class_<crosssection::BremsLPM, std::shared_ptr<crosssection::BremsLPM>>(m_sub_brems, "brems_lpm")
+                    .def(py::init<const ParticleDef&, const Medium&,
+                         const crosssection::Bremsstrahlung&, double>(),
+                         py::arg("particle_def"), py::arg("medium"),
+                         py::arg("bremsstrahlung"),
+                         py::arg("density_correction") = 1.0)
+                    .def("supression_factor",
+                         &crosssection::BremsLPM::suppression_factor,
+                         py::arg("energy"), py::arg("v"), py::arg("component"));
+
             // ---------------------------------------------------------------------
             // // Epair
             // ---------------------------------------------------------------------
@@ -266,6 +282,14 @@ void init_parametrization(py::module& m)
         EPAIR_DEF(m_sub_epair, SandrockSoedingreksoRhode)
         EPAIR_DEF(m_sub_epair, ForElectronPositron)
 
+    py::class_<crosssection::EpairLPM, std::shared_ptr<crosssection::EpairLPM>>(m_sub_epair, "epair_lpm")
+            .def(py::init<const ParticleDef&, const Medium&, double>(),
+                 py::arg("particle_def"), py::arg("medium"),
+                 py::arg("density_correction") = 1.0)
+            .def("supression_factor",
+                 &crosssection::EpairLPM::suppression_factor,
+                 py::arg("energy"), py::arg("v"), py::arg("r2"),
+                 py::arg("beta"), py::arg("xi"));
 
     // --------------------------------------------------------------------- //
         // Annihilation
