@@ -161,9 +161,9 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
 
     int advancement_type = minimize(AdvanceDistance);
     double advance_distance = AdvanceDistance[advancement_type];
+    double advance_grammage = grammage_next_interaction;
 
     if(advancement_type != ReachedInteraction) {
-        double advance_grammage;
         double control_distance;
         //std::cout << "AdvanceParticle can't reach interaction, varying propagation step..." << std::endl;
         do {
@@ -193,11 +193,13 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
                  > PARTICLE_POSITION_RESOLUTION);
         //std::cout << "Difference negligible, use control_distance" << std::endl;
         advance_distance = control_distance;
+        advance_grammage = density->Calculate(state.position, mean_direction,
+                                              advance_distance);
         new_position = state.position + advance_distance * mean_direction;
     }
 
     state.time =  state.time + utility.TimeElapsed(state.energy, E_f,
-                   advance_distance, density->Evaluate(state.position));
+                   advance_grammage, density->Evaluate(state.position));
     state.position = new_position;
     state.direction = new_direction;
     state.propagated_distance = state.propagated_distance + advance_distance;

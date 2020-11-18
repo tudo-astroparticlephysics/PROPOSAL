@@ -106,7 +106,8 @@ void init_geometry(py::module& m) {
         )pbdoc");
 
     py::class_<Sphere, std::shared_ptr<Sphere>, Geometry>(m_sub, "Sphere")
-        .def(py::init<Vector3D, double, double>())
+        .def(py::init<Vector3D, double, double>(), py::arg("position"),
+             py::arg("radius"), py::arg("inner_radius") = 0.)
         .def(py::init<const Sphere&>())
         .def_property("inner_radius", &Sphere::GetInnerRadius,
                       &Sphere::SetInnerRadius,

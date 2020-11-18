@@ -44,11 +44,11 @@ public:
     }
 
     double TimeElapsed(
-        double initial_energy, double final_energy, double distance, double density) override
+        double initial_energy, double final_energy, double grammage, double local_density) override
     {
-        (void)distance;
+        (void)grammage;
         assert(initial_energy >= final_energy);
-        return time_integral.Calculate(initial_energy, final_energy) / density;
+        return time_integral.Calculate(initial_energy, final_energy) / local_density;
     }
 };
 
@@ -67,11 +67,10 @@ std::unique_ptr<Time> make_time(
 struct ApproximateTimeBuilder : public Time {
     ApproximateTimeBuilder() = default;
 
-    double TimeElapsed(double, double, double distance, double density) override
+    double TimeElapsed(double, double, double grammage, double local_density) override
     {
-        (void) density;
-        assert(distance >= 0);
-        return distance / SPEED;
+        assert(grammage >= 0);
+        return grammage / (local_density * SPEED);
     }
 };
 } // namespace PROPOSAL

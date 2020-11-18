@@ -257,12 +257,16 @@ PYBIND11_MODULE(proposal, m)
             });
 
     py::class_<Time, std::shared_ptr<Time>>(m, "Time")
-        .def("elapsed", &Time::TimeElapsed, py::arg("initial_energy"), py::arg("final_energy"), py::arg("distance"), py::arg("density"))
+        .def("elapsed", &Time::TimeElapsed, py::arg("initial_energy"), py::arg("final_energy"), py::arg("grammage"), py::arg("local_density"))
         .def_readwrite_static("interpol_def", &Time::interpol_def);
 
     m.def("make_time", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
             return shared_ptr<Time>(make_time(cross, particle, interpolate));
             });
+
+    m.def("make_time_approximate", [](){
+        return shared_ptr<Time>(PROPOSAL::make_unique<ApproximateTimeBuilder>());
+    });
 
     py::class_<PropagationUtility::Collection, std::shared_ptr<PropagationUtility::Collection>>(m, "PropagationUtilityCollection")
         .def(py::init<>())

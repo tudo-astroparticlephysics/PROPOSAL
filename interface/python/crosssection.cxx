@@ -159,7 +159,7 @@ void init_crosssection(py::module& m)
             )pbdoc")
         .def("calculate_dNdx", &CrossSectionContainer::CalculatedNdx,
                 py::arg("energy"),
-                py::arg("component"),
+                py::arg("component") = nullptr,
                 R"pbdoc(
 
         Calculates the total cross section
@@ -203,7 +203,8 @@ void init_crosssection(py::module& m)
         to determine the component of the current medium for which the
         stochatic energy loss is calculated.
 
-            )pbdoc");
+            )pbdoc")
+        .def("targets", &CrossSectionContainer::GetTargets);
 
     build_crosssection<crosssection::AnnihilationHeitler>(m_sub);
 
