@@ -73,6 +73,7 @@ public:
     bool compare(const Scattering&) const {return false;};
     void print(std::ostream&) const {};
 
+    // function will not be used
     RandomAngles CalculateRandomAngle(double, double, double,
         const std::array<double, 4>&){ return RandomAngles();};
 };
@@ -123,6 +124,6 @@ double ScatteringHighlandIntegral<T, Cross, Enable>::CalculateTheta0(
 }
 
 template <class T, class Cross, class Enable>
-Interpolant1DBuilder::Definition ScatteringHighlandIntegral<T, Cross, Enable>::interpol_def = {};
+Interpolant1DBuilder::Definition ScatteringHighlandIntegral<T, Cross, Enable>::interpol_def = {200};
 
 } // namespace PROPOSAL

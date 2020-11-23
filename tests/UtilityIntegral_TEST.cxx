@@ -22,7 +22,7 @@ TEST(Calculate, Integration){
     for(auto min : limits){
         for(auto max : limits){
             auto analytical = std::log(max) - std::log(min);
-            EXPECT_NEAR(integral.Calculate(min, max, 0.), analytical, std::abs(analytical * 1e-5));
+            EXPECT_NEAR(integral.Calculate(min, max), analytical, std::abs(analytical * 1e-5));
         }
     }
 }
@@ -40,7 +40,7 @@ TEST(GetUpperLimit, ForwardIntegration){
 }
 
 TEST(GetUpperLimit, ForwardIntegration_Outside_Range){
-    //Test GetUpperLimit when expected upper_limit is bigger than high parameter (expect high to be returned)
+    //Test GetUpperLimit when expected upper_limit is bigger than high parameter
     auto integrand1 = [](double x)->double { return 1/x;};
     double high = 1e14;
     auto integral1 = UtilityIntegral(integrand1, high);
@@ -48,7 +48,7 @@ TEST(GetUpperLimit, ForwardIntegration_Outside_Range){
     double lower_lim = 1e2;
     double xi = 40;
 
-    EXPECT_NEAR(integral1.GetUpperLimit(lower_lim, xi), high, high*1e-5);
+    ASSERT_DEATH(integral1.GetUpperLimit(lower_lim, xi), "");
 }
 
 TEST(GetUpperLimit, BackwardIntegration){
@@ -64,7 +64,7 @@ TEST(GetUpperLimit, BackwardIntegration){
 }
 
 TEST(GetUpperLimit, BackwardIntegration_Outside_Range){
-    //Test GetUpperLimit when expected lower_lim is smaller than low parameter (expect low to be returned)
+    //Test GetUpperLimit when expected lower_lim is smaller than low parameter
     auto integrand1 = [](double x)->double { return -1/x;};
     double low = 10;
     auto integral1 = UtilityIntegral(integrand1, low);
@@ -72,7 +72,7 @@ TEST(GetUpperLimit, BackwardIntegration_Outside_Range){
     double upper_lim = 1e5;
     double xi = 10;
 
-    EXPECT_NEAR(integral1.GetUpperLimit(upper_lim, xi), low, low*1e-5);
+    EXPECT_DEATH(integral1.GetUpperLimit(upper_lim, xi), "");
 }
 
 TEST(GetUpperLimit, ListForwardIntegration){
@@ -85,7 +85,7 @@ TEST(GetUpperLimit, ListForwardIntegration){
             if(lower_lim >= upper_lim){
                 continue;
             }
-            double xi = integral.Calculate(lower_lim,  upper_lim, 0.); //Calculate result
+            double xi = integral.Calculate(lower_lim, upper_lim); //Calculate result
             EXPECT_NEAR(integral.GetUpperLimit(lower_lim, xi), upper_lim, upper_lim * 1e-5);
         }
     }
@@ -101,7 +101,7 @@ TEST(GetUpperLimit, ListBackwardIntegration){
                 if(E_i <= E_f){
                     continue;
                 }
-                double xi = integral.Calculate(E_i,  E_f, 0.); //Calculate result
+                double xi = integral.Calculate(E_i, E_f); //Calculate result
                 EXPECT_NEAR(integral.GetUpperLimit(E_i, xi), E_f, E_f * 1e-5);
        }
     }

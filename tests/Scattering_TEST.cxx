@@ -9,17 +9,12 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/math/RandomGenerator.h"
 
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/ScatteringHighland.h"
 #include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
-
-#include "PROPOSAL/crosssection/factories/BremsstrahlungFactory.h"
-#include "PROPOSAL/crosssection/factories/IonizationFactory.h"
-#include "PROPOSAL/crosssection/factories/EpairProductionFactory.h"
-#include "PROPOSAL/crosssection/factories/PhotonuclearFactory.h"
+#include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
@@ -30,20 +25,26 @@ ParticleDef getParticleDef(const std::string& name)
 {
     if (name == "MuMinus")
     {
-        return MuMinusDef::Get();
+        return MuMinusDef();
     } else if (name == "TauMinus")
     {
-        return TauMinusDef::Get();
+        return TauMinusDef();
     } else
     {
-        return EMinusDef::Get();
+        return EMinusDef();
     }
+}
+
+auto GetCrossSections() {
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, false);
+    static auto cross = GetStdCrossSections(MuMinusDef(), StandardRock(), cuts, true);
+    return cross;
 }
 
 TEST(Comparison, Comparison_equal)
 {
-    ParticleDef mu = MuMinusDef::Get();
-    std::shared_ptr<const Medium> water(new Water(1.0));
+    ParticleDef mu = MuMinusDef();
+    auto water = Water();
 
     Scattering* moliere1 = new ScatteringMoliere(mu, water);
     ScatteringMoliere moliere2(mu, water);
@@ -60,11 +61,10 @@ TEST(Comparison, Comparison_equal)
 
 TEST(Comparison, Comparison_not_equal)
 {
-    ParticleDef mu  = MuMinusDef::Get();
-    ParticleDef tau = TauMinusDef::Get();
-    std::shared_ptr<const Medium> water(new Water(1.0));
-    std::shared_ptr<const Medium> ice(new Ice());
-
+    ParticleDef mu  = MuMinusDef();
+    ParticleDef tau = TauMinusDef();
+    auto water = Water();
+    auto ice = Ice();
 
     ScatteringMoliere moliere1(mu, water);
     ScatteringMoliere moliere2(tau, water);
@@ -85,8 +85,8 @@ TEST(Comparison, Comparison_not_equal)
 
 TEST(Assignment, Copyconstructor)
 {
-    ParticleDef mu = MuMinusDef::Get();
-    std::shared_ptr<const Medium> water(new Water(1.0));
+    ParticleDef mu = MuMinusDef();
+    auto water = Water();
 
     ScatteringMoliere moliere1(mu, water);
     ScatteringMoliere moliere2 = moliere1;
@@ -95,16 +95,13 @@ TEST(Assignment, Copyconstructor)
 
 TEST(Assignment, Copyconstructor2)
 {
-    ParticleDef mu = MuMinusDef::Get();
-    std::shared_ptr<const Medium> water(new Water(1.0));
+    ParticleDef mu = MuMinusDef();
+    auto water = Water();
 
     ScatteringHighland moliere1(mu, water);
     ScatteringHighland moliere2(moliere1);
     EXPECT_TRUE(moliere1 == moliere2);
 }
-
-
-
 
 
 // Tests for virtual Scattering class
@@ -118,10 +115,9 @@ public:
     void SetScatteringAngle(std::pair<double, double> scatter){theta_scatter_ = scatter.first; phi_scatter_ = scatter.second;}
 
 private:
-    RandomAngles CalculateRandomAngle(double dr,
+    RandomAngles CalculateRandomAngle(double grammage,
                                       double ei,
                                       double ef,
-                                      const Vector3D& pos,
                                       const std::array<double, 4>& rnd){
         Scattering::RandomAngles random_angles;
         //Set offset
@@ -145,8 +141,8 @@ private:
 };
 
 TEST(Scattering, Constructor){
-    ScatterDummy* dummy1 = new ScatterDummy(getParticleDef("MuMinus"));
-    ScatterDummy* dummy2 = new ScatterDummy(getParticleDef("TauMinus"));
+    ScatterDummy* dummy1 = new ScatterDummy(MuMinusDef());
+    ScatterDummy* dummy2 = new ScatterDummy(TauMinusDef());
 
     ASSERT_DOUBLE_EQ(dummy1->GetMass(), MMU);
     ASSERT_DOUBLE_EQ(dummy2->GetMass(), MTAU);
@@ -161,7 +157,7 @@ TEST(Scattering, Scatter){
     direction_list.emplace_back(0.,-1.,0.);
     direction_list.emplace_back(1./SQRT2,0.,-1/SQRT2);
 
-    ScatterDummy* dummy3 = new ScatterDummy(getParticleDef("MuMinus"));
+    ScatterDummy* dummy3 = new ScatterDummy(MuMinusDef());
     Vector3D position_init  = Vector3D(0, 0, 0);
 
     for(const std::pair<double, double> & offset: pairs) {
@@ -170,7 +166,7 @@ TEST(Scattering, Scatter){
                 direction_init.CalculateSphericalCoordinates();
                 dummy3->SetOffset(offset);
                 dummy3->SetScatteringAngle(scatter);
-                auto directions = dummy3->Scatter(1, 10., 1., position_init, direction_init, {0, 0, 0, 0,});
+                auto directions = dummy3->Scatter(1, 10., 1., direction_init, {0, 0, 0, 0});
                 // Expect directions to be normalized
                 ASSERT_DOUBLE_EQ(std::get<0>(directions).magnitude(), 1.);
                 ASSERT_DOUBLE_EQ(std::get<1>(directions).magnitude(), 1.);
@@ -186,25 +182,25 @@ TEST(Scattering, Scatter){
 }
 
 TEST(Scattering, BorderCases){
-    std::shared_ptr<const Medium> medium = CreateMedium("StandardRock");
+    auto medium = StandardRock();
     Vector3D position_init  = Vector3D(0, 0, 0);
     Vector3D direction_init = Vector3D(1, 0, 0);
     direction_init.CalculateSphericalCoordinates();
 
-    std::array<Scattering*, 2> scatter_list = {new ScatteringMoliere(getParticleDef("MuMinus"), medium),
-                                               new ScatteringHighland(getParticleDef("MuMinus"), medium)};
+    std::array<Scattering*, 2> scatter_list = {new ScatteringMoliere(MuMinusDef(), medium),
+                                               new ScatteringHighland(MuMinusDef(), medium)};
 
     for(Scattering* scatter : scatter_list) {
         // Expect no change of direction for displacement of almost zero
-        EXPECT_NEAR((std::get<0>(scatter->Scatter(1e-20, 1e4, 1e3, position_init, direction_init, {0.1, 0.2, 0.3, 0.4})) - direction_init).magnitude(),
+        EXPECT_NEAR((std::get<0>(scatter->Scatter(1e-20, 1e4, 1e3, direction_init, {0.1, 0.2, 0.3, 0.4})) - direction_init).magnitude(),
                     0, 1e-10);
-        EXPECT_NEAR((std::get<1>(scatter->Scatter(1e-20, 1e4, 1e3, position_init, direction_init, {0.1, 0.2, 0.3, 0.4})) - direction_init).magnitude(),
+        EXPECT_NEAR((std::get<1>(scatter->Scatter(1e-20, 1e4, 1e3, direction_init, {0.1, 0.2, 0.3, 0.4})) - direction_init).magnitude(),
                     0, 1e-10);
 
         // Expect change of direction
-        EXPECT_FALSE(std::get<0>(scatter->Scatter(1000, 1e4, 1e3, position_init, direction_init, {0.1, 0.2, 0.3, 0.4})) ==
+        EXPECT_FALSE(std::get<0>(scatter->Scatter(1000, 1e4, 1e3, direction_init, {0.1, 0.2, 0.3, 0.4})) ==
                 direction_init);
-        EXPECT_FALSE(std::get<1>(scatter->Scatter(1000, 1e4, 1e3, position_init, direction_init, {0.1, 0.2, 0.3, 0.4})) ==
+        EXPECT_FALSE(std::get<1>(scatter->Scatter(1000, 1e4, 1e3, direction_init, {0.1, 0.2, 0.3, 0.4})) ==
                 direction_init);
 
     }
@@ -212,30 +208,27 @@ TEST(Scattering, BorderCases){
 
 TEST(Scattering, FirstMomentum){
     RandomGenerator::Get().SetSeed(24601);
-    std::shared_ptr<const Medium> medium = CreateMedium("StandardRock");
+    auto medium = StandardRock();
     Vector3D position_init  = Vector3D(0, 0, 0);
     Vector3D direction_init = Vector3D(0, 0, 1);
     direction_init.CalculateSphericalCoordinates();
 
     int statistics = 1e7;
+    auto cross = GetCrossSections();
 
-    auto cross_dummy = std::make_shared<CrossSectionBuilder>("scattering_dummy", getParticleDef("MuMinus"));
-    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
-
-    std::array<Scattering*, 3> scatter_list = {new ScatteringMoliere(getParticleDef("MuMinus"), medium),
-                                               new ScatteringHighland(getParticleDef("MuMinus"), medium),
-                                               new ScatteringHighlandIntegral<UtilityIntegral>(getParticleDef("MuMinus"), medium, CrossSectionList{cross_dummy})
-    };
+    std::array<std::unique_ptr<Scattering>, 3> scatter_list = {make_scattering("moliere", MuMinusDef(), medium),
+                                                               make_scattering("highland", MuMinusDef(), medium),
+                                                               make_scattering("highland_integral", MuMinusDef(), medium, cross)};
     Vector3D scatter_sum;
     Vector3D offset_sum;
 
-    for(Scattering* scatter: scatter_list){
+    for(auto const& scatter: scatter_list){
         Vector3D scatter_sum = Vector3D(0., 0., 0.);
         Vector3D offset_sum = Vector3D(0., 0., 0.);
 
         for (int n=1; n<=statistics; ++n) {
             auto sampled_vectors = scatter->Scatter(
-                    1e3, 1e4, 1e3, position_init, direction_init,
+                    1e3, 1e4, 1e3, direction_init,
                     {RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble(),
                      RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble()}
             );
@@ -253,7 +246,7 @@ TEST(Scattering, FirstMomentum){
 
 TEST(Scattering, SecondMomentum){
     RandomGenerator::Get().SetSeed(24601);
-    std::shared_ptr<const Medium> medium = CreateMedium("StandardRock");
+    auto medium = StandardRock();
     Vector3D position_init  = Vector3D(0, 0, 0);
     Vector3D direction_init = Vector3D(0, 0, 1);
     direction_init.CalculateSphericalCoordinates();
@@ -262,32 +255,30 @@ TEST(Scattering, SecondMomentum){
 
     double E_i = 1e14;
     std::array<double, 10> final_energies = {1e13, 1e12, 1e11, 1e10, 1e9, 1e8, 1e7, 1e6, 1e5, 1e4};
-    auto cross_dummy = std::make_shared<CrossSectionBuilder>("scattering_dummy", getParticleDef("MuMinus"));
-    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
+    auto cross = GetCrossSections();
 
-    std::array<Scattering*, 3> scatter_list = {new ScatteringMoliere(getParticleDef("MuMinus"), medium),
-                                               new ScatteringHighland(getParticleDef("MuMinus"), medium),
-                                               new ScatteringHighlandIntegral<UtilityIntegral>(getParticleDef("MuMinus"), medium, CrossSectionList{cross_dummy})
-    };
+    std::array<std::unique_ptr<Scattering>, 3> scatter_list = {make_scattering("moliere", MuMinusDef(), medium),
+                                                               make_scattering("highland", MuMinusDef(), medium),
+                                                               make_scattering("highland_integral", MuMinusDef(), medium, cross)};
     double scatter_sum;
     double offset_sum;
     double displacement;
     double old_displacement;
-    auto displacement_calculator = DisplacementBuilder<UtilityIntegral>(CrossSectionList{cross_dummy});
+    auto displacement_calculator = DisplacementBuilder<UtilityIntegral>(cross);
     std::array<double, 2> variances = {0,0};
     std::array<double, 2> old_variances;
 
-    for(Scattering* scatter: scatter_list){
+    for(auto const& scatter: scatter_list){
         old_variances = {0, 0};
         old_displacement = 0;
         for(double E_f: final_energies) {
             scatter_sum = 0;
             offset_sum = 0;
-            displacement = displacement_calculator.SolveTrackIntegral(E_i, E_f, 0.5);
+            displacement = displacement_calculator.SolveTrackIntegral(E_i, E_f);
             ASSERT_TRUE(displacement > old_displacement);
             for (int n = 1; n <= statistics; ++n) {
                 auto sampled_vectors = scatter->Scatter(
-                        displacement, E_i, E_f, position_init, direction_init,
+                        displacement, E_i, E_f, direction_init,
                         {RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble(),
                          RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble()}
                 );
@@ -296,7 +287,7 @@ TEST(Scattering, SecondMomentum){
             }
 
             variances = {offset_sum, scatter_sum};
-            EXPECT_TRUE(variances > old_variances);
+            EXPECT_GT(variances, old_variances);
 
             old_displacement = displacement;
             old_variances = variances;
@@ -306,24 +297,23 @@ TEST(Scattering, SecondMomentum){
 
 TEST(Scattering, compare_integral_interpolant) {
     RandomGenerator::Get().SetSeed(24601);
-    std::shared_ptr<const Medium> medium = CreateMedium("StandardRock");
+    auto medium = StandardRock();
     Vector3D position_init  = Vector3D(0, 0, 0);
     Vector3D direction_init = Vector3D(0, 0, 1);
     direction_init.CalculateSphericalCoordinates();
 
-    auto cross_dummy = std::make_shared<CrossSectionBuilder>("scattering_dummy", getParticleDef("MuMinus"));
-    cross_dummy->SetdEdx_function([](double energy)->double {return 5 + 1e-5 * energy;});
+    auto cross = GetCrossSections();
 
-    auto scatter_integral = new ScatteringHighlandIntegral<UtilityIntegral>(getParticleDef("MuMinus"), medium, CrossSectionList{cross_dummy});
-    auto scatter_interpol = new ScatteringHighlandIntegral<UtilityInterpolant>(getParticleDef("MuMinus"), medium, CrossSectionList{cross_dummy});
+    auto scatter_integral = make_scattering("highland_integral", MuMinusDef(), medium, cross, false);
+    auto scatter_interpol = make_scattering("highland_integral", MuMinusDef(), medium, cross, true);
 
     auto energies = std::array<double, 5> {1e6, 1e7, 1e8, 1e9, 1e10};
 
     for(auto E_i : energies){
         auto rnd = std::array<double, 4>{RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble(),
                                          RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble()};
-        auto vec_integral = scatter_integral->Scatter(1e4, E_i, 1e5, position_init, direction_init, rnd);
-        auto vec_interpol = scatter_interpol->Scatter(1e4, E_i, 1e5, position_init, direction_init, rnd);
+        auto vec_integral = scatter_integral->Scatter(1e4, E_i, 1e5, direction_init, rnd);
+        auto vec_interpol = scatter_interpol->Scatter(1e4, E_i, 1e5, direction_init, rnd);
 
         EXPECT_NEAR(std::get<0>(vec_integral).GetX(), std::get<0>(vec_interpol).GetX(),std::abs(std::get<0>(vec_integral).GetX()*1e-5));
         EXPECT_NEAR(std::get<0>(vec_integral).GetY(), std::get<0>(vec_interpol).GetY(),std::abs(std::get<0>(vec_integral).GetY()*1e-5));
@@ -335,6 +325,8 @@ TEST(Scattering, compare_integral_interpolant) {
     }
 }
 
+//TODO: fix ParticleDef for GetStdCrossSection to enable reproducibility test
+/*
 TEST(Scattering, ScatterReproducibilityTest)
 {
     std::string filename = "bin/TestFiles/Scattering_scatter.txt";
@@ -362,21 +354,13 @@ TEST(Scattering, ScatterReproducibilityTest)
     double error    = 1e-3;
     bool first_line = true;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >> distance >> rnd1 >> rnd2 >> rnd3 >> rnd4 >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f)
     {
-        if (first_line)
-        {
-            in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >>
-                distance >> rnd1 >> rnd2 >> rnd3 >> rnd4 >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
-
-            first_line = false;
-        }
-
         energy_previous = -1;
 
         ParticleDef particle_def = getParticleDef(particleName);
 
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
+        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
 
         //reprouce old behaviour
         if(ecut==-1){
@@ -388,32 +372,24 @@ TEST(Scattering, ScatterReproducibilityTest)
 
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
 
-        Scattering* scattering = NULL;
-        if (parametrization == "HighlandIntegral")
+        std::unique_ptr<Scattering> scattering = NULL;
+        if (parametrization == "NoScattering")
         {
-            auto brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, medium, ecuts, BremsstrahlungFactory::Definition(), std::make_shared<InterpolationDef>());
-            auto ioniz = IonizationFactory::Get().CreateIonization(particle_def, medium, ecuts, IonizationFactory::Definition(), std::make_shared<InterpolationDef>());
-            auto epair = EpairProductionFactory::Get().CreateEpairProduction(particle_def, medium, ecuts, EpairProductionFactory::Definition(), std::make_shared<InterpolationDef>());
-            auto photo = PhotonuclearFactory::Get().CreatePhotonuclear(particle_def, medium, ecuts, PhotonuclearFactory::Definition(), std::make_shared<InterpolationDef>());
-            auto cross = new CrossSectionList{std::shared_ptr<CrossSection>(brems), std::shared_ptr<CrossSection>(ioniz), std::shared_ptr<CrossSection>(epair), std::shared_ptr<CrossSection>(photo)};
-            scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle_def, medium, std::make_shared<InterpolationDef>(), std::unique_ptr<CrossSectionList>(cross));
+            continue; // not implemented anymore
         }
-        else if(parametrization != "NoScattering")
-        {
-            scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle_def, medium);
 
-        }
+        auto cross = GetStdCrossSections(particle_def, medium, ecuts, true);
+        scattering = make_scattering(parametrization, particle_def, *medium, cross, true);
 
 
         while (energy_previous < energy_init)
         {
             energy_previous = energy_init;
-            if(parametrization!="NoScattering" && energy_final > particle_def.mass) {
+            if(energy_final > particle_def.mass) {
                 std::array<double, 4> rnd{rnd1, rnd2, rnd3, rnd4};
                 auto directions = scattering->Scatter(distance,
                                                       energy_init,
                                                       energy_final,
-                                                      position_init,
                                                       direction_init,
                                                       rnd);
                 position_out = position_init + distance * std::get<0>(directions);
@@ -439,11 +415,9 @@ TEST(Scattering, ScatterReproducibilityTest)
             }
 
         }
-
-        delete scattering;
     }
 }
-
+*/
 
 int main(int argc, char** argv)
 {

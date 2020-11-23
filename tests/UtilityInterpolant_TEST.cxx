@@ -15,8 +15,18 @@ TEST(IntegrationFromLowerLim, Calculate){
 
     auto integral = UtilityIntegral(integrand, lower_lim);
 
-    Interpolant1DBuilder::Definition interpol_def(
-            std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, lower_lim, 0), 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+    auto func = [&integral, lower_lim](double energy) {
+        return integral.Calculate(lower_lim, energy);
+    };
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d = func;
+    interpol_def.nodes = 200.;
+    interpol_def.xmin = 0.;
+    interpol_def.xmax = 1e14;
+    interpol_def.romberg = 5;
+
+    //Interpolant1DBuilder::Definition interpol_def(
+     //       func, 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
 
     auto interpolant = UtilityInterpolant(integrand, lower_lim);
     interpolant.BuildTables("unittest_interpolant", 4325465, interpol_def);
@@ -24,7 +34,7 @@ TEST(IntegrationFromLowerLim, Calculate){
     double E_i = 1e5;
     double E_f = 1e4;
     double analytical = std::log(E_i) - std::log(E_f);
-    EXPECT_NEAR(interpolant.Calculate(E_i, E_f, 0.), analytical, analytical*1e-5);
+    EXPECT_NEAR(interpolant.Calculate(E_i, E_f), analytical, analytical*1e-5);
 }
 
 TEST(IntegrationFromLowerLim, ApproximationCase){
@@ -33,8 +43,18 @@ TEST(IntegrationFromLowerLim, ApproximationCase){
 
     auto integral = UtilityIntegral(integrand, lower_lim);
 
-    Interpolant1DBuilder::Definition interpol_def(
-            std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, lower_lim, 0), 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+    auto func = [&integral, lower_lim](double energy) {
+        return integral.Calculate(lower_lim, energy);
+    };
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d = func;
+    interpol_def.nodes = 200.;
+    interpol_def.xmin = 0.;
+    interpol_def.xmax = 1e14;
+    interpol_def.romberg = 5;
+
+    //Interpolant1DBuilder::Definition interpol_def(
+    //        std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, lower_lim, 0), 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
 
     auto interpolant = UtilityInterpolant(integrand, lower_lim);
     interpolant.BuildTables("unittest_interpolant", 4325465, interpol_def);
@@ -43,7 +63,7 @@ TEST(IntegrationFromLowerLim, ApproximationCase){
     double E_f = 9999999;
     EXPECT_TRUE(E_i - E_f < E_i * IPREC); //This is the condition we want to check in this UnitTest
     double analytical = std::log(E_i) - std::log(E_f);
-    EXPECT_NEAR(interpolant.Calculate(E_i, E_f, 0.), analytical, analytical*1e-5);
+    EXPECT_NEAR(interpolant.Calculate(E_i, E_f), analytical, analytical*1e-5);
 }
 
 TEST(IntegrationFromLowerLim, GetUpperLimit){
@@ -52,8 +72,15 @@ TEST(IntegrationFromLowerLim, GetUpperLimit){
 
     auto integral = UtilityIntegral(integrand, lower_lim);
 
-    Interpolant1DBuilder::Definition interpol_def(
-            std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, lower_lim, 0), 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+    auto func = [&integral, lower_lim](double energy) {
+        return integral.Calculate(lower_lim, energy);
+    };
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d = func;
+    interpol_def.nodes = 200.;
+    interpol_def.xmin = 0.;
+    interpol_def.xmax = 1e14;
+    interpol_def.romberg = 5;
 
     auto interpolant = UtilityInterpolant(integrand, lower_lim);
     interpolant.BuildTables("unittest_interpolant", 4325465, interpol_def);
@@ -70,8 +97,15 @@ TEST(IntegrationFromLowerLim, PlausabilityChecks){
 
     auto integral = UtilityIntegral(integrand, lower_lim);
 
-    Interpolant1DBuilder::Definition interpol_def(
-            std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, lower_lim, 0), 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+    auto func = [&integral, lower_lim](double energy) {
+        return integral.Calculate(lower_lim, energy);
+    };
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d = func;
+    interpol_def.nodes = 200.;
+    interpol_def.xmin = 0.;
+    interpol_def.xmax = 1e14;
+    interpol_def.romberg = 5;
 
     auto interpolant = UtilityInterpolant(integrand, lower_lim);
     interpolant.BuildTables("unittest_interpolant", 4325465, interpol_def);
@@ -82,7 +116,7 @@ TEST(IntegrationFromLowerLim, PlausabilityChecks){
             if(E_i < E_f){
                 continue;
             }
-            double xi = interpolant.Calculate(E_i, E_f, 0.);
+            double xi = interpolant.Calculate(E_i, E_f);
             double upper = interpolant.GetUpperLimit(E_i, xi);
             EXPECT_NEAR(upper, E_f, E_f * 1e-5);
         }
@@ -96,8 +130,15 @@ TEST(IntegrationFromMax, Calculate){
     auto integral = UtilityIntegral(integrand, lower_lim);
     double xmax = 1e14;
 
-    Interpolant1DBuilder::Definition interpol_def(
-            std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, xmax, 0), 200, 0., xmax, 5, false, false, true, 5, false, false, false);
+    auto func = [&integral, lower_lim](double energy) {
+        return integral.Calculate(lower_lim, energy);
+    };
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d = func;
+    interpol_def.nodes = 200.;
+    interpol_def.xmin = 0.;
+    interpol_def.xmax = xmax;
+    interpol_def.romberg = 5;
 
     auto interpolant = UtilityInterpolant(integrand, lower_lim);
     interpolant.BuildTables("unittest_interpolant", 4325465, interpol_def);
@@ -105,7 +146,7 @@ TEST(IntegrationFromMax, Calculate){
     double E_i = 1e5;
     double E_f = 1e4;
     double analytical = std::log(E_i) - std::log(E_f);
-    EXPECT_NEAR(interpolant.Calculate(E_i, E_f, 0.), analytical, analytical*1e-5);
+    EXPECT_NEAR(interpolant.Calculate(E_i, E_f), analytical, analytical*1e-5);
 }
 
 TEST(IntegrationFromMax, ApproximationCase){
@@ -115,8 +156,15 @@ TEST(IntegrationFromMax, ApproximationCase){
     auto integral = UtilityIntegral(integrand, lower_lim);
     double xmax = 1e14;
 
-    Interpolant1DBuilder::Definition interpol_def(
-            std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, xmax, 0), 200, 0., xmax, 5, false, false, true, 5, false, false, false);
+    auto func = [&integral, lower_lim](double energy) {
+        return integral.Calculate(lower_lim, energy);
+    };
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d = func;
+    interpol_def.nodes = 200.;
+    interpol_def.xmin = 0.;
+    interpol_def.xmax = xmax;
+    interpol_def.romberg = 5;
 
     auto interpolant = UtilityInterpolant(integrand, lower_lim);
     interpolant.BuildTables("unittest_interpolant", 4325465, interpol_def);
@@ -125,7 +173,7 @@ TEST(IntegrationFromMax, ApproximationCase){
     double E_f = 9999999;
     EXPECT_TRUE(E_i - E_f < E_i * IPREC); //This is the condition we want to check in this UnitTest
     double analytical = std::log(E_i) - std::log(E_f);
-    EXPECT_NEAR(interpolant.Calculate(E_i, E_f, 0.), analytical, analytical*1e-5);
+    EXPECT_NEAR(interpolant.Calculate(E_i, E_f), analytical, analytical*1e-5);
 }
 
 TEST(IntegrationFromMax, GetUpperLimit){
@@ -135,8 +183,15 @@ TEST(IntegrationFromMax, GetUpperLimit){
     auto integral = UtilityIntegral(integrand, lower_lim);
     double xmax = 1e14;
 
-    Interpolant1DBuilder::Definition interpol_def(
-            std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, xmax, 0), 200, 0., xmax, 5, false, false, true, 5, false, false, false);
+    auto func = [&integral, lower_lim](double energy) {
+        return integral.Calculate(lower_lim, energy);
+    };
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d = func;
+    interpol_def.nodes = 200.;
+    interpol_def.xmin = 0.;
+    interpol_def.xmax = xmax;
+    interpol_def.romberg = 5;
 
     auto interpolant = UtilityInterpolant(integrand, lower_lim);
     interpolant.BuildTables("unittest_interpolant", 4325465, interpol_def);
@@ -154,8 +209,15 @@ TEST(IntegrationFromMax, PlausabilityChecks){
     auto integral = UtilityIntegral(integrand, lower_lim);
     double xmax = 1e14;
 
-    Interpolant1DBuilder::Definition interpol_def(
-            std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, xmax, 0), 200, 0., xmax, 5, false, false, true, 5, false, false, false);
+    auto func = [&integral, lower_lim](double energy) {
+        return integral.Calculate(lower_lim, energy);
+    };
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d = func;
+    interpol_def.nodes = 200.;
+    interpol_def.xmin = 0.;
+    interpol_def.xmax = xmax;
+    interpol_def.romberg = 5;
 
     auto interpolant = UtilityInterpolant(integrand, lower_lim);
     interpolant.BuildTables("unittest_interpolant", 4325465, interpol_def);
@@ -166,7 +228,7 @@ TEST(IntegrationFromMax, PlausabilityChecks){
             if(E_i < E_f){
                 continue;
             }
-            double xi = interpolant.Calculate(E_i, E_f, 0.);
+            double xi = interpolant.Calculate(E_i, E_f);
             double upper = interpolant.GetUpperLimit(E_i, xi);
             EXPECT_NEAR(upper, E_f, E_f * 1e-5);
         }
@@ -179,8 +241,15 @@ TEST(PositiveFunction, Calculate){
 
     auto integral = UtilityIntegral(integrand, lower_lim);
 
-    Interpolant1DBuilder::Definition interpol_def(
-            std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, lower_lim, 0), 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+    auto func = [&integral, lower_lim](double energy) {
+        return integral.Calculate(lower_lim, energy);
+    };
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d = func;
+    interpol_def.nodes = 200.;
+    interpol_def.xmin = 0.;
+    interpol_def.xmax = 1e14;
+    interpol_def.romberg = 5;
 
     auto interpolant = UtilityInterpolant(integrand, lower_lim);
     interpolant.BuildTables("unittest_interpolant", 4325465, interpol_def);
@@ -188,7 +257,7 @@ TEST(PositiveFunction, Calculate){
     double E_i = 1e5;
     double E_f = 1e4;
     double analytical = std::log(E_f) - std::log(E_i);
-    EXPECT_NEAR(interpolant.Calculate(E_i, E_f, 0.), analytical, std::abs(analytical*1e-5));
+    EXPECT_NEAR(interpolant.Calculate(E_i, E_f), analytical, std::abs(analytical*1e-5));
 }
 
 TEST(PositiveFunction, ApproximationCase){
@@ -197,8 +266,15 @@ TEST(PositiveFunction, ApproximationCase){
 
     auto integral = UtilityIntegral(integrand, lower_lim);
 
-    Interpolant1DBuilder::Definition interpol_def(
-            std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, lower_lim, 0), 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+    auto func = [&integral, lower_lim](double energy) {
+        return integral.Calculate(lower_lim, energy);
+    };
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d = func;
+    interpol_def.nodes = 200.;
+    interpol_def.xmin = 0.;
+    interpol_def.xmax = 1e14;
+    interpol_def.romberg = 5;
 
     auto interpolant = UtilityInterpolant(integrand, lower_lim);
     interpolant.BuildTables("unittest_interpolant", 4325465, interpol_def);
@@ -207,7 +283,7 @@ TEST(PositiveFunction, ApproximationCase){
     double E_f = 9999999;
     EXPECT_TRUE(E_i - E_f < E_i * IPREC); //This is the condition we want to check in this UnitTest
     double analytical = std::log(E_f) - std::log(E_i);
-    EXPECT_NEAR(interpolant.Calculate(E_i, E_f, 0.), analytical, std::abs(analytical*1e-5));
+    EXPECT_NEAR(interpolant.Calculate(E_i, E_f), analytical, std::abs(analytical*1e-5));
 }
 
 TEST(PositiveFunction, GetUpperLimit){
@@ -216,8 +292,15 @@ TEST(PositiveFunction, GetUpperLimit){
 
     auto integral = UtilityIntegral(integrand, lower_lim);
 
-    Interpolant1DBuilder::Definition interpol_def(
-            std::bind(&UtilityIntegral::Calculate, integral, std::placeholders::_1, lower_lim, 0), 200, 0., 1e14, 5, false, false, true, 5, false, false, false);
+    auto func = [&integral, lower_lim](double energy) {
+        return integral.Calculate(lower_lim, energy);
+    };
+    Interpolant1DBuilder::Definition interpol_def;
+    interpol_def.function1d = func;
+    interpol_def.nodes = 200.;
+    interpol_def.xmin = 0.;
+    interpol_def.xmax = 1e14;
+    interpol_def.romberg = 5;
 
     auto interpolant = UtilityInterpolant(integrand, lower_lim);
     interpolant.BuildTables("unittest_interpolant", 4325465, interpol_def);

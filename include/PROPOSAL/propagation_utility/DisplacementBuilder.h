@@ -33,9 +33,9 @@ public:
     {
     }
 
-    inline double SolveTrackIntegral(double upper_lim, double lower_lim) final
+    inline double SolveTrackIntegral(double lower_lim, double upper_lim) final
     {
-        return disp_integral.Calculate(upper_lim, lower_lim);
+        return disp_integral.Calculate(lower_lim, upper_lim);
     }
 
     inline double UpperLimitTrackIntegral(double lower_lim, double sum) final
