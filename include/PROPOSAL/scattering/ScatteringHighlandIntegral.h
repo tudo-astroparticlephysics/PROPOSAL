@@ -97,7 +97,7 @@ T ScatteringHighlandIntegral<T, Cross, Enable>::BuildHighlandIntegral(
     T decay_integral(higland_integral_func, CrossSectionVector::GetLowerLim(cross));
     if (typeid(T) == typeid(UtilityInterpolant)) {
         auto hash = CrossSectionVector::GetHash(cross);
-        decay_integral.BuildTables("highland", hash, interpol_def);
+        decay_integral.BuildTables("highland", hash, interpol_def, true);
     };
     return decay_integral;
 }

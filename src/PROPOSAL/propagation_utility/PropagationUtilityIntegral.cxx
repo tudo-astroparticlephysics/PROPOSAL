@@ -21,7 +21,7 @@ UtilityIntegral::UtilityIntegral(
 }
 
 void UtilityIntegral::BuildTables(const std::string , size_t ,
-    Interpolant1DBuilder::Definition )
+    Interpolant1DBuilder::Definition, bool)
 {
 }
 

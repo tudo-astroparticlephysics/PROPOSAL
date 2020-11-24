@@ -26,13 +26,20 @@ UtilityInterpolant::UtilityInterpolant(
 }
 
 void UtilityInterpolant::BuildTables(std::string name, size_t hash,
-    Interpolant1DBuilder::Definition interpol_def)
+    Interpolant1DBuilder::Definition interpol_def, bool reverse)
 {
+    interpol_def.xmin = lower_lim;
+    double reference_x;
+    if (reverse) {
+        reference_x = interpol_def.xmax;
+    } else {
+        reference_x = interpol_def.xmin;
+    }
     auto utility_func = [&](double energy) {
-        return UtilityIntegral::Calculate(energy, lower_lim);
+        return UtilityIntegral::Calculate(energy, reference_x);
     };
     interpol_def.function1d = utility_func;
-    interpol_def.xmin = lower_lim;
+    hash_combine(hash, reverse);
     interpolant_ = InitializeInterpolation(name, Interpolant1DBuilder(interpol_def), hash);
 }
 
@@ -59,10 +66,10 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
     auto integrated_to_upper = interpolant_->Interpolate(upper_limit);
     auto lower_limit = interpolant_->FindLimit(integrated_to_upper - rnd);
 
-    assert(integrated_to_upper > rnd); // searched Energy is below lower_lim
-                                       // return lower_lim as a lower limit
+    assert(integrated_to_upper > rnd or integrated_to_upper < 0); // searched Energy is below lower_lim
+                                                                  // or we use reverse interpolation
 
-    if (upper_limit - lower_limit > upper_limit * IPREC)
+    if (std::abs(upper_limit - lower_limit) > upper_limit * IPREC)
         return lower_limit;
 
     auto step = upper_limit + 0.5 * rnd / FunctionToIntegral(upper_limit);

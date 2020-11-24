@@ -53,7 +53,7 @@ class UtilityInterpolant : public UtilityIntegral {
 
 public:
     UtilityInterpolant(std::function<double(double)>, double);
-    void BuildTables(const std::string, size_t, Interpolant1DBuilder::Definition);
+    void BuildTables(const std::string, size_t, Interpolant1DBuilder::Definition, bool = false);
 
     double Calculate(double, double);
     double GetUpperLimit(double, double);
