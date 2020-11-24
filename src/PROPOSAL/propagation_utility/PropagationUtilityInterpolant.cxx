@@ -66,7 +66,7 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
     auto integrated_to_upper = interpolant_->Interpolate(upper_limit);
     auto lower_limit = interpolant_->FindLimit(integrated_to_upper - rnd);
 
-    assert(integrated_to_upper > rnd or integrated_to_upper < 0); // searched Energy is below lower_lim
+    assert(integrated_to_upper >= rnd or integrated_to_upper < 0); // searched Energy is below lower_lim
                                                                   // or we use reverse interpolation
 
     if (std::abs(upper_limit - lower_limit) > upper_limit * IPREC)
