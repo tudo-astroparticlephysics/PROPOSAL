@@ -42,7 +42,7 @@ template <typename T> void build_std_crosssection(py::module& m_sub)
 {
     m_sub.def("make_std_crosssection",
             [](T& p, Medium& m, shared_ptr<const EnergyCutSettings> c, bool i) {
-            return DefaultCrossSections<T>::template Get<std::false_type>(p, m, c, i);
+            return DefaultCrossSections<T>::Get(reinterpret_cast<ParticleDef const&>(p), m, c, i);
             },
             py::arg("particle_def"), py::arg("target"), py::arg("cuts"), py::arg("interpolate"));
 }

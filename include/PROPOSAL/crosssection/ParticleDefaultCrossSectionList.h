@@ -51,11 +51,11 @@ struct DefaultCrossSections{
         return cross;
     }
 
-    template <typename TypeCheck, typename... Args, typename = std::enable_if_t<std::is_same<TypeCheck, std::false_type>::value>>
-    static auto Get(ParticleType const& particle, Medium const& medium, Args... args)
+    template <typename M, typename... Args>
+    static auto Get(ParticleDef const& particle, M const& medium, Args... args)
     {
-        auto cross = crosssection_list_t<ParticleDef, Medium>();
-        DefaultCrossSections<ParticleType>::Append(cross, reinterpret_cast<ParticleDef const&>(particle), medium, args...);
+        auto cross = crosssection_list_t<ParticleDef, M>();
+        DefaultCrossSections<ParticleType>::Append(cross, particle, medium, args...);
         return cross;
     }
 };
@@ -64,6 +64,33 @@ template <typename P, typename M, typename... Args>
 auto GetStdCrossSections(P const& particle, M const& medium, Args... args)
 {
     return DefaultCrossSections<P>::Get(particle, medium, args...);
+}
+
+template <typename M, typename... Args>
+auto GetStdCrossSections(ParticleDef const& particle, M const& medium, Args... args)
+{
+    std::cout << "ParticleDef passed!" << std::endl;
+
+    switch (particle.particle_type) {
+        case 11:
+            return DefaultCrossSections<EMinusDef>::Get(particle, medium, args...);
+        case -11:
+            return DefaultCrossSections<EPlusDef>::Get(particle, medium, args...);
+        case 13:
+            return DefaultCrossSections<MuMinusDef>::Get(particle, medium, args...);
+        case -13:
+            return DefaultCrossSections<MuPlusDef>::Get(particle, medium, args...);
+        case 15:
+            return DefaultCrossSections<TauMinusDef>::Get(particle, medium, args...);
+        case -15:
+            return DefaultCrossSections<TauPlusDef>::Get(particle, medium, args...);
+        case 22:
+            return DefaultCrossSections<GammaDef>::Get(particle, medium, args...);
+        default:
+            throw std::invalid_argument("No StdCrossSection found for particle_type " + std::to_string(particle.particle_type));
+    }
+
+    //return DefaultCrossSections<P>::Get(particle, medium, args...);
 }
 
 template<>

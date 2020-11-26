@@ -97,7 +97,9 @@ double crosssection::Bremsstrahlung::DifferentialCrossSection(
 size_t crosssection::Bremsstrahlung::GetHash() const noexcept
 {
     size_t hash_digest = Parametrization::GetHash();
-    hash_combine(hash_digest, lpm_, lorenz_);
+    hash_combine(hash_digest, lorenz_);
+    if (lpm_ != nullptr)
+        hash_combine(hash_digest, lpm_->GetHash());
     return hash_digest;
 }
 
@@ -564,6 +566,12 @@ crosssection::BremsLPM::BremsLPM(const ParticleDef& p_def, const Medium& medium,
             eLpm_ = ALPHA * mass_;
             eLpm_ *= eLpm_ / (4. * PI * ME * RE * sum );
       }
+
+size_t crosssection::BremsLPM::GetHash() const noexcept {
+    size_t hash_digest = 0;
+    hash_combine(hash_digest, mass_, mol_density_, mass_density_, sum_charge_, density_correction_, eLpm_);
+    return hash_digest;
+}
 
 double crosssection::BremsLPM::suppression_factor(double energy, double v, const Component& comp) const {
     double G, fi, xi, ps, Gamma, s1;

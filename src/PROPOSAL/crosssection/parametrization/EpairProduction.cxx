@@ -69,7 +69,8 @@ std::tuple<double, double> crosssection::EpairProduction::GetKinematicLimits(
 size_t crosssection::EpairProduction::GetHash() const noexcept
 {
     size_t seed = Parametrization::GetHash();
-    hash_combine(seed, lpm_);
+    if (lpm_ != nullptr)
+        hash_combine(seed, lpm_->GetHash());
 
     return seed;
 }
@@ -561,6 +562,12 @@ crosssection::EpairLPM::EpairLPM(const ParticleDef& p_def, const Medium& medium,
         eLpm_ *= (eLpm_ * eLpm_) * ALPHA * mass_ /
                  (2 * PI * mol_density_ * density_correction *
                  charge_ * charge_ * sum);
+}
+
+size_t crosssection::EpairLPM::GetHash() const noexcept {
+    size_t hash_digest = 0;
+    hash_combine(hash_digest, mass_, std::abs(charge_), mol_density_, density_correction_);
+    return hash_digest;
 }
 
 // ------------------------------------------------------------------------- //

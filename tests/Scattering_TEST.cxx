@@ -35,9 +35,19 @@ ParticleDef getParticleDef(const std::string& name)
     }
 }
 
-auto GetCrossSections() {
-    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, false);
-    static auto cross = GetStdCrossSections(MuMinusDef(), StandardRock(), cuts, true);
+auto GetCrossSections(const ParticleDef& p_def, const Medium& med, std::shared_ptr<const EnergyCutSettings> cuts, bool interpolate) {
+    // old TestFiles were created using the old StandardCrossSections that are recreated here
+    crosssection_list_t<ParticleDef, Medium> cross;
+
+    auto brems = crosssection::BremsKelnerKokoulinPetrukhin{ true, p_def, med };
+    cross.push_back(make_crosssection(brems, p_def, med, cuts, interpolate));
+    auto epair = crosssection::EpairKelnerKokoulinPetrukhin{ true, p_def, med };
+    cross.push_back(make_crosssection(epair, p_def, med, cuts, interpolate));
+    auto ioniz = crosssection::IonizBetheBlochRossi{ EnergyCutSettings(*cuts)};
+    cross.push_back(make_crosssection(ioniz, p_def, med, cuts, interpolate));
+    auto photo = crosssection::PhotoAbramowiczLevinLevyMaor97 { make_unique<crosssection::ShadowButkevichMikheyev>() };
+    cross.push_back(make_crosssection(photo, p_def, med, cuts, interpolate));
+
     return cross;
 }
 
@@ -212,9 +222,10 @@ TEST(Scattering, FirstMomentum){
     Vector3D position_init  = Vector3D(0, 0, 0);
     Vector3D direction_init = Vector3D(0, 0, 1);
     direction_init.CalculateSphericalCoordinates();
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
 
     int statistics = 1e7;
-    auto cross = GetCrossSections();
+    auto cross = GetCrossSections(MuMinusDef(), medium, cuts, true);
 
     std::array<std::unique_ptr<Scattering>, 3> scatter_list = {make_scattering("moliere", MuMinusDef(), medium),
                                                                make_scattering("highland", MuMinusDef(), medium),
@@ -250,12 +261,13 @@ TEST(Scattering, SecondMomentum){
     Vector3D position_init  = Vector3D(0, 0, 0);
     Vector3D direction_init = Vector3D(0, 0, 1);
     direction_init.CalculateSphericalCoordinates();
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
 
     int statistics = 1e5;
 
     double E_i = 1e14;
     std::array<double, 10> final_energies = {1e13, 1e12, 1e11, 1e10, 1e9, 1e8, 1e7, 1e6, 1e5, 1e4};
-    auto cross = GetCrossSections();
+    auto cross = GetCrossSections(MuMinusDef(), medium, cuts, true);
 
     std::array<std::unique_ptr<Scattering>, 3> scatter_list = {make_scattering("moliere", MuMinusDef(), medium),
                                                                make_scattering("highland", MuMinusDef(), medium),
@@ -302,31 +314,47 @@ TEST(Scattering, compare_integral_interpolant) {
     Vector3D direction_init = Vector3D(0, 0, 1);
     direction_init.CalculateSphericalCoordinates();
 
-    auto cross = GetCrossSections();
+    std::vector<ParticleDef> particles = {EMinusDef(), MuMinusDef()};
+    auto cut1 = std::make_shared<EnergyCutSettings>(500, 0.05, false);
+    auto cut2 = std::make_shared<EnergyCutSettings>(INF, 1, false);
+    std::vector<std::shared_ptr<EnergyCutSettings>> cuts = {cut1, cut2};
 
-    auto scatter_integral = make_scattering("highland_integral", MuMinusDef(), medium, cross, false);
-    auto scatter_interpol = make_scattering("highland_integral", MuMinusDef(), medium, cross, true);
+    for (auto p : particles) {
+        for (auto cut : cuts) {
 
-    auto energies = std::array<double, 5> {1e6, 1e7, 1e8, 1e9, 1e10};
+            auto cross = GetCrossSections(p, Ice(), cut, true);
 
-    for(auto E_i : energies){
-        auto rnd = std::array<double, 4>{RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble(),
-                                         RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble()};
-        auto vec_integral = scatter_integral->Scatter(1e4, E_i, 1e5, direction_init, rnd);
-        auto vec_interpol = scatter_interpol->Scatter(1e4, E_i, 1e5, direction_init, rnd);
+            auto scatter_integral = make_scattering("highland_integral", p, medium, cross, false);
+            auto scatter_interpol = make_scattering("highland_integral", p, medium, cross, true);
 
-        EXPECT_NEAR(std::get<0>(vec_integral).GetX(), std::get<0>(vec_interpol).GetX(),std::abs(std::get<0>(vec_integral).GetX()*1e-5));
-        EXPECT_NEAR(std::get<0>(vec_integral).GetY(), std::get<0>(vec_interpol).GetY(),std::abs(std::get<0>(vec_integral).GetY()*1e-5));
-        EXPECT_NEAR(std::get<0>(vec_integral).GetZ(), std::get<0>(vec_interpol).GetZ(),std::abs(std::get<0>(vec_integral).GetZ()*1e-5));
+            auto energies = std::array<double, 5>{1e6, 1e7, 1e8, 1e9, 1e10};
 
-        EXPECT_NEAR(std::get<1>(vec_integral).GetX(), std::get<1>(vec_interpol).GetX(),std::abs(std::get<1>(vec_integral).GetX()*1e-5));
-        EXPECT_NEAR(std::get<1>(vec_integral).GetY(), std::get<1>(vec_interpol).GetY(),std::abs(std::get<1>(vec_integral).GetY()*1e-5));
-        EXPECT_NEAR(std::get<1>(vec_integral).GetZ(), std::get<1>(vec_interpol).GetZ(),std::abs(std::get<1>(vec_integral).GetZ()*1e-5));
+            for (auto E_i : energies) {
+                auto rnd = std::array<double, 4>{RandomGenerator::Get().RandomDouble(),
+                                                 RandomGenerator::Get().RandomDouble(),
+                                                 RandomGenerator::Get().RandomDouble(),
+                                                 RandomGenerator::Get().RandomDouble()};
+                auto vec_integral = scatter_integral->Scatter(1e4, E_i, 1e5, direction_init, rnd);
+                auto vec_interpol = scatter_interpol->Scatter(1e4, E_i, 1e5, direction_init, rnd);
+
+                EXPECT_NEAR(std::get<0>(vec_integral).GetX(), std::get<0>(vec_interpol).GetX(),
+                            std::abs(std::get<0>(vec_integral).GetX() * 1e-5));
+                EXPECT_NEAR(std::get<0>(vec_integral).GetY(), std::get<0>(vec_interpol).GetY(),
+                            std::abs(std::get<0>(vec_integral).GetY() * 1e-5));
+                EXPECT_NEAR(std::get<0>(vec_integral).GetZ(), std::get<0>(vec_interpol).GetZ(),
+                            std::abs(std::get<0>(vec_integral).GetZ() * 1e-5));
+
+                EXPECT_NEAR(std::get<1>(vec_integral).GetX(), std::get<1>(vec_interpol).GetX(),
+                            std::abs(std::get<1>(vec_integral).GetX() * 1e-5));
+                EXPECT_NEAR(std::get<1>(vec_integral).GetY(), std::get<1>(vec_interpol).GetY(),
+                            std::abs(std::get<1>(vec_integral).GetY() * 1e-5));
+                EXPECT_NEAR(std::get<1>(vec_integral).GetZ(), std::get<1>(vec_interpol).GetZ(),
+                            std::abs(std::get<1>(vec_integral).GetZ() * 1e-5));
+            }
+        }
     }
 }
 
-//TODO: fix ParticleDef for GetStdCrossSection to enable reproducibility test
-/*
 TEST(Scattering, ScatterReproducibilityTest)
 {
     std::string filename = "bin/TestFiles/Scattering_scatter.txt";
@@ -352,7 +380,6 @@ TEST(Scattering, ScatterReproducibilityTest)
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
     double error    = 1e-3;
-    bool first_line = true;
 
     while (in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >> distance >> rnd1 >> rnd2 >> rnd3 >> rnd4 >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f)
     {
@@ -372,14 +399,18 @@ TEST(Scattering, ScatterReproducibilityTest)
 
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
 
+        crosssection_list_t<ParticleDef, Medium> cross;
+
         std::unique_ptr<Scattering> scattering = NULL;
         if (parametrization == "NoScattering")
         {
             continue; // not implemented anymore
+        } else if (parametrization == "HighlandIntegral") {
+            parametrization = "highland_integral";
+            cross = GetCrossSections(particle_def, *medium, ecuts, false);
         }
 
-        auto cross = GetStdCrossSections(particle_def, medium, ecuts, true);
-        scattering = make_scattering(parametrization, particle_def, *medium, cross, true);
+        scattering = make_scattering(parametrization, particle_def, *medium, cross, false);
 
 
         while (energy_previous < energy_init)
@@ -387,14 +418,14 @@ TEST(Scattering, ScatterReproducibilityTest)
             energy_previous = energy_init;
             if(energy_final > particle_def.mass) {
                 std::array<double, 4> rnd{rnd1, rnd2, rnd3, rnd4};
-                auto directions = scattering->Scatter(distance,
+                auto directions = scattering->Scatter(distance * medium->GetMassDensity(),
                                                       energy_init,
                                                       energy_final,
                                                       direction_init,
                                                       rnd);
                 position_out = position_init + distance * std::get<0>(directions);
                 direction_out = std::get<1>(directions);
-                //std::cout << ecut << ", " << vcut << ", " << particleName << ", " << mediumName << "," << energy_init << ", " << energy_final << std::endl;
+
                 EXPECT_NEAR(position_out.GetX(), x_f, std::abs(error * x_f));
                 EXPECT_NEAR(position_out.GetY(), y_f, std::abs(error * y_f));
                 EXPECT_NEAR(position_out.GetZ(), z_f, std::abs(error * z_f));
@@ -417,7 +448,7 @@ TEST(Scattering, ScatterReproducibilityTest)
         }
     }
 }
-*/
+
 
 int main(int argc, char** argv)
 {

@@ -106,6 +106,7 @@ public:
     BremsLPM(const ParticleDef&, const Medium&, const Bremsstrahlung&,
              double density_correction = 1.0);
     double suppression_factor(double energy, double v, const Component&) const;
+    size_t GetHash() const noexcept;
 
 private:
     double mass_;

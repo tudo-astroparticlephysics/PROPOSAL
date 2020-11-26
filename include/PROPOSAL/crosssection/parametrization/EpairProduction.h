@@ -107,7 +107,7 @@ public:
     EpairLPM(const ParticleDef&, const Medium&, double density_correction=1.0);
     double suppression_factor(double E, double v, double r2, double beta,
                               double xi) const;
-
+    size_t GetHash() const noexcept;
 private:
     double mass_;
     double charge_;
