@@ -55,7 +55,7 @@ static const std::unordered_map<std::string, ScatteringType> ScatteringTable
     = { { "moliere", ScatteringType::Moliere },
           { "highland", ScatteringType::Highland },
           { "highland_integral", ScatteringType::HighlandIntegral },
-          { "NoScattering", ScatteringType::NoScattering }};
+          { "noscattering", ScatteringType::NoScattering }};
 
 template <typename Cross = std::nullptr_t>
 unique_ptr<Scattering> make_scattering(std::string const& name,

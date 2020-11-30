@@ -87,7 +87,7 @@ bool EnergyCutSettings::operator==(const EnergyCutSettings& cut) const noexcept
 size_t EnergyCutSettings::GetHash() const noexcept
 {
     size_t hash_digest = 0;
-    hash_combine(hash_digest, ecut_, vcut_, continuous_randomization_);
+    hash_combine(hash_digest, ecut_, vcut_);
     return hash_digest;
 }
 

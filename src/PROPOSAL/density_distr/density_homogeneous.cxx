@@ -20,6 +20,12 @@ Density_homogeneous::Density_homogeneous(const Density_homogeneous& dens_distr)
 
 Density_homogeneous::Density_homogeneous(const nlohmann::json& config) : Density_distr() {
     correction_factor_ = config.value("correction_factor", 1.);
+    if (config.contains("massDensity")) {
+        assert(config["massDensity"].is_number());
+        massDensity_ = config["massDensity"].get<double>();
+    } else {
+        throw std::invalid_argument("Density_distr: MassDensity must be defined in json");
+    }
 }
 
 

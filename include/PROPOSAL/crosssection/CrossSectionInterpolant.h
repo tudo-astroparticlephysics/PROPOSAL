@@ -90,8 +90,10 @@ public:
             // Only for a defined EnergyCut, dEdx and dE2dx return non-zero values
             dedx = build_dedx(reinterpret_cast<base_param_ref_t>(param), p_def,
                               medium, *cut, dEdx_def);
-            de2dx = build_de2dx(reinterpret_cast<base_param_ref_t>(param), p_def,
-                                medium, *cut, dE2dx_def);
+
+            if (cut->GetContRand())
+                de2dx = build_de2dx(reinterpret_cast<base_param_ref_t>(param),
+                                    p_def, medium, *cut, dE2dx_def);
         }
     }
     std::vector<std::shared_ptr<const Component>> GetTargets() const noexcept final
@@ -201,7 +203,8 @@ unique_ptr<Interpolant> build_dedx(Param&& param, const ParticleDef& p_def,
     def.rational = true;
     def.logSubst = true;
     auto hash = def.GetHash();
-    hash_combine(hash, param.GetHash(), cut.GetHash());
+    hash_combine(hash, param.GetHash(), p_def.GetHash(), medium.GetHash(),
+                 cut.GetHash());
     return Helper::InitializeInterpolation("dEdx", Interpolant1DBuilder(def), hash);
 }
 
@@ -217,7 +220,8 @@ unique_ptr<Interpolant> build_de2dx(Param&& param, const ParticleDef& p_def,
           };
     def.xmin = param.GetLowerEnergyLim(p_def);
     auto hash = def.GetHash();
-    hash_combine(hash, param.GetHash(), cut.GetHash());
+    hash_combine(hash, param.GetHash(), p_def.GetHash(), medium.GetHash(),
+                 cut.GetHash());
     return Helper::InitializeInterpolation("dE2dx", Interpolant1DBuilder(def), hash);
 }
 
