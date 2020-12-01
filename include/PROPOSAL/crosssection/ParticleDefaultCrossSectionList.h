@@ -69,8 +69,6 @@ auto GetStdCrossSections(P const& particle, M const& medium, Args... args)
 template <typename M, typename... Args>
 auto GetStdCrossSections(ParticleDef const& particle, M const& medium, Args... args)
 {
-    std::cout << "ParticleDef passed!" << std::endl;
-
     switch (particle.particle_type) {
         case 11:
             return DefaultCrossSections<EMinusDef>::Get(particle, medium, args...);

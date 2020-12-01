@@ -27,7 +27,7 @@ double crosssection::Ionization::GetLowerEnergyLim(const ParticleDef& p_def) con
 double crosssection::Ionization::FunctionToDE2dxIntegral(const ParticleDef& p_def,
     const Medium& medium, double energy, double v) const
 {
-    return v * FunctionToDEdxIntegral(p_def, medium, energy, v);
+    return v * v * DifferentialCrossSection(p_def, medium, energy, v);
 }
 
 double crosssection::Ionization::Delta(const Medium& medium, double beta, double gamma) const
@@ -115,7 +115,6 @@ double crosssection::IonizBetheBlochRossi::DifferentialCrossSection(const Partic
         / (2 * beta * energy * v * v);
 
     return result * (1 + InelCorrection(p_def, medium, energy, v));
-    ;
 }
 
 // ------------------------------------------------------------------------- //
