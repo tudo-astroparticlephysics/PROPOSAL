@@ -51,8 +51,10 @@ public:
         , cut(_cut)
     {
         hash_cross_section = 0;
-        hash_combine(hash_cross_section, _param.GetHash(), _particle.GetHash(),
-            _target.GetHash());
+        hash_combine(hash_cross_section, _param.GetHash(), _particle.mass,
+                     std::abs(_particle.charge), _target.GetHash());
+        if (_param.interaction_type == InteractionType::WeakInt)
+            hash_combine(hash_cross_section, _particle.charge);
         if (cut)
             hash_combine(hash_cross_section, cut->GetHash());
     }

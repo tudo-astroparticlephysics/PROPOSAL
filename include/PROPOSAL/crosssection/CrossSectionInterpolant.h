@@ -172,8 +172,13 @@ public:
     inline size_t GetHash() const noexcept override
     {
         auto hash_digest = size_t{ 0 };
-        hash_combine(hash_digest, param.GetHash(), p_def.GetHash(),
-            medium.GetHash());
+        hash_combine(hash_digest, param.GetHash(), p_def.mass,
+                     std::abs(p_def.charge), medium.GetHash());
+
+        // Only for WeakInteraction, the sign of the charge is important
+        if (param.interaction_type == InteractionType::WeakInt)
+            hash_combine(hash_digest, p_def.charge);
+
         if (cut != nullptr)
             hash_combine(hash_digest, cut->GetHash());
         return hash_digest;
@@ -203,8 +208,10 @@ unique_ptr<Interpolant> build_dedx(Param&& param, const ParticleDef& p_def,
     def.rational = true;
     def.logSubst = true;
     auto hash = def.GetHash();
-    hash_combine(hash, param.GetHash(), p_def.GetHash(), medium.GetHash(),
-                 cut.GetHash());
+    hash_combine(hash, param.GetHash(), p_def.mass, std::abs(p_def.charge),
+                 medium.GetHash(), cut.GetHash());
+    if (param.interaction_type == InteractionType::WeakInt)
+        hash_combine(hash, p_def.charge);
     return Helper::InitializeInterpolation("dEdx", Interpolant1DBuilder(def), hash);
 }
 
@@ -220,8 +227,10 @@ unique_ptr<Interpolant> build_de2dx(Param&& param, const ParticleDef& p_def,
           };
     def.xmin = param.GetLowerEnergyLim(p_def);
     auto hash = def.GetHash();
-    hash_combine(hash, param.GetHash(), p_def.GetHash(), medium.GetHash(),
-                 cut.GetHash());
+    hash_combine(hash, param.GetHash(), p_def.mass, std::abs(p_def.charge),
+                 medium.GetHash(), cut.GetHash());
+    if (param.interaction_type == InteractionType::WeakInt)
+        hash_combine(hash, p_def.charge);
     return Helper::InitializeInterpolation("dE2dx", Interpolant1DBuilder(def), hash);
 }
 

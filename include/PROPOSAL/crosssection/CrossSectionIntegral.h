@@ -123,9 +123,14 @@ public:
     inline size_t GetHash() const noexcept override
     {
         auto hash_digest = size_t{ 0 };
-        hash_combine(hash_digest, param.GetHash(), p_def.GetHash(),
-            medium.GetHash());
-        if(cut != nullptr)
+        hash_combine(hash_digest, param.GetHash(), p_def.mass,
+                     std::abs(p_def.charge), medium.GetHash());
+
+        // Only for WeakInteraction, the sign of the charge is important
+        if (param.interaction_type == InteractionType::WeakInt)
+            hash_combine(hash_digest, p_def.charge);
+
+        if (cut != nullptr)
             hash_combine(hash_digest, cut->GetHash());
         return hash_digest;
     }
