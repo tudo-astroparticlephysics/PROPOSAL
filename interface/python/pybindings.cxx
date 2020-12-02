@@ -10,7 +10,8 @@
 #include "PROPOSAL/propagation_utility/DecayBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/EnergyCutSettings.h"
-
+#include "PROPOSAL/Logging.h"
+#include <spdlog/spdlog.h>
 #include "pyBindings.h"
 
 namespace py = pybind11;
@@ -338,5 +339,18 @@ PYBIND11_MODULE(proposal, m)
     /*         py::arg("max_distance") = 1e20, py::arg("min_energy") = 1e20) */
     /*     .def("register_propagator", &PropagatorService::RegisterPropagator, */
     /*         py::arg("propagator")); */
+
+    py::module m_sub = m.def_submodule("logging");
+    m_sub.def("set_loglevel", &Logging::SetGlobalLoglevel, "Set logging level");
+
+    py::enum_<spdlog::level::level_enum>(m_sub, "loglevel")
+            .value("debug", spdlog::level::level_enum::debug)
+            .value("critical", spdlog::level::level_enum::critical)
+            .value("warn", spdlog::level::level_enum::warn)
+            .value("err", spdlog::level::level_enum::err)
+            .value("info", spdlog::level::level_enum::info)
+            .value("off", spdlog::level::level_enum::off)
+            .value("trace", spdlog::level::level_enum::trace);
+
 }
 

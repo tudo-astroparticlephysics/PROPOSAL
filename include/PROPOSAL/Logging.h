@@ -25,6 +25,7 @@
  *         "https://github.com/tudo-astroparticlephysics/PROPOSAL"            *
  *                                                                            *
  ******************************************************************************/
+#pragma once
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/sink.h>
@@ -47,11 +48,6 @@ struct Logging {
 
     Logging() = delete;
 
-    static unique_ptr<spdlog::logger> Create(std::string const& name)
-    {
-        return PROPOSAL::make_unique<spdlog::logger>(name, sink);
-    }
-
     static spdlog::logger* Get(std::string const& name)
     {
         auto it = Logging::logger.find(name);
@@ -59,5 +55,22 @@ struct Logging {
             Logging::logger[name] = Logging::Create(name);
         return Logging::logger[name].get();
     }
+
+    static void SetGlobalLoglevel(spdlog::level::level_enum loglevel)
+    {
+        for (auto& l : logger)
+            l.second->set_level(loglevel);
+        global_loglevel = loglevel;
+    }
+
+private:
+    static unique_ptr<spdlog::logger> Create(std::string const& name)
+    {
+        auto logger = PROPOSAL::make_unique<spdlog::logger>(name, sink);
+        logger->set_level(global_loglevel);
+        return logger;
+    }
+
+    static spdlog::level::level_enum global_loglevel;
 };
 } // namespace PROPOSAL
