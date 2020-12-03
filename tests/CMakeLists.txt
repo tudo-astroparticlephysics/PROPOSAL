@@ -39,6 +39,7 @@ EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/${TEST_FILES} -C $
 				OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # Unit Tests
+package_add_test(UnitTest_Decay Decay_TEST.cxx)
 package_add_test(UnitTest_DecayChannel DecayChannel_TEST.cxx)
 package_add_test(UnitTest_DecayTable DecayTable_TEST.cxx)
 package_add_test(UnitTest_Density Density_distribution_TEST.cxx)
