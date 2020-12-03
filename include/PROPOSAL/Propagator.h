@@ -119,8 +119,8 @@ private:
                                                 "homogeneous"},
                                         {"massDensity",
                                         medium->GetMassDensity()}};
-        if(json_sector.contains("density_dist"))
-            density_distr = json_sector["density_distr"];
+        if(json_sector.contains("density_distribution"))
+            density_distr = json_sector["density_distribution"];
 
         auto cross_config = json_sector.value("CrossSections", global.cross);
         PropagationUtility::Collection collection;

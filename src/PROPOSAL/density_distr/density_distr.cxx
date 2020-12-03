@@ -133,8 +133,8 @@ double CartesianAxis::GetEffectiveDistance(const Vector3D& xi,
 }
 
 std::shared_ptr<Density_distr> PROPOSAL::CreateDensityDistribution(const nlohmann::json& config) {
-    if (config.contains("density_distr_type")){
-        std::string density_distr_type = config["density_distr_type"];
+    if (config.contains("type")){
+        std::string density_distr_type = config["type"];
         if (density_distr_type == "exponential") {
             return std::make_shared<Density_exponential>(config);
         } else if (density_distr_type == "homogeneous") {
@@ -145,11 +145,11 @@ std::shared_ptr<Density_distr> PROPOSAL::CreateDensityDistribution(const nlohman
             return std::make_shared<Density_splines>(config);
         } else {
             throw std::invalid_argument("Density distribution config file must contain a paremeter called "
-                                        "'density_distr_type' with one of the keywords 'exponential', 'homogeneous',"
+                                        "'type' with one of the keywords 'exponential', 'homogeneous',"
                                         " 'polynomial' or 'spline'.");
         }
     }
     else{
-        throw std::invalid_argument("Density distribution config file must contain a paremeter called 'density_distr_type'.");
+        throw std::invalid_argument("Density distribution config file must contain a parameter called 'type'.");
     }
 }
