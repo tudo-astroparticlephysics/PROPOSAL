@@ -282,7 +282,8 @@ Propagator::GlobalSettings::GlobalSettings(const nlohmann::json& config_global)
 {
     if (config_global.contains("medium"))
         medium = CreateMedium(config_global["medium"].get<std::string>());
-    cross = config_global.value("CrossSections", "");
+    if (config_global.contains("CrossSections"))
+        cross = config_global["CrossSections"];
     if (config_global.contains("cuts"))
         cuts = make_shared<EnergyCutSettings>(config_global["cuts"]);
     do_exact_time = config_global.value("exact_time", true);
@@ -293,7 +294,7 @@ Propagator::GlobalSettings::GlobalSettings(const nlohmann::json& config_global)
 Propagator::GlobalSettings::GlobalSettings()
 {
     medium = nullptr;
-    cross = nullptr;
+    cross = {};
     do_exact_time = true;
     do_interpolation = true;
     scattering = "NoScattering";

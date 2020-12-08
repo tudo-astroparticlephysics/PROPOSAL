@@ -140,16 +140,6 @@ static std::map<std::string, ioniz_func_ptr<P, M>> ioniz_map = {
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
-    if (!config.contains("parametrization"))
-        throw std::logic_error("No parametrization passed for ionization");
-    std::string param_name = config["parametrization"];
-
-    return make_ionization(p_def, medium, cuts, interpol, param_name);
-}
-
-template<typename P, typename M>
-cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, const std::string& param_name){
     std::string name = param_name;
     std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
@@ -159,6 +149,17 @@ cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
 
     return it->second(p_def, medium, cuts, interpol);
 }
+
+template<typename P, typename M>
+cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
+        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
+    if (!config.contains("parametrization"))
+        throw std::logic_error("No parametrization passed for ionization");
+    std::string param_name = config["parametrization"];
+
+    return make_ionization(p_def, medium, cuts, interpol, param_name);
+}
+
 
 } // crosssection
 } // namespace PROPOSAL

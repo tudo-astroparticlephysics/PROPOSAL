@@ -224,23 +224,23 @@ This object has to contain the keyword `parametrization`, specifying the paramet
 #### Example
 
 ```json
-"CrossSections" : [
-	"brems" : {
-		"parametrization" : "KelnerKokoulinPetrukhin",
-		"lpm" : true
+"CrossSections" : {
+	"brems": {
+		"parametrization": "KelnerKokoulinPetrukhin",
+		"lpm": true
 	},
-	"epair" : {
-		"parametrization" : "KelnerKokoulinPetrukhin",
-		"lpm" : true
+	"epair": {
+		"parametrization": "KelnerKokoulinPetrukhin",
+		"lpm": true
 	},
-	"ioniz" : {
-		"parametrization" : "BetheBlochRossi"
+	"ioniz": {
+		"parametrization": "BetheBlochRossi"
+	},
+	"photo": {
+		"parametrization": "AbramowiczLevinLevyMaor97",
+		"shadow": "ButkevichMikheyev"
 	}
-	"photo" : {
-		"parametrization" : "AbramowiczLevinLevyMaor97",
-		"shadow" : "ButkevichMikheyev"
-	}
-],
+}
 ```
 
 *Note that all interaction types that are not listed in the `CrossSections` object will be disabled.*

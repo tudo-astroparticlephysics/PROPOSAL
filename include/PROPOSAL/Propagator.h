@@ -124,12 +124,12 @@ private:
 
         auto cross_config = json_sector.value("CrossSections", global.cross);
         PropagationUtility::Collection collection;
-        if(cross_config != "") {
+        if (!cross_config.empty()) {
             double density_correction = density_distr.value("mass_density", medium->GetMassDensity());
             density_correction /= medium->GetMassDensity();
             auto crosss = CreateCrossSectionList(p_def, *medium, cuts,
                                                  do_interpolation, density_correction,
-                                                 json_sector["CrossSections"]);
+                                                 cross_config);
             collection = CreateUtility(crosss, medium, cuts->GetContRand(),
                                        do_interpolation, do_exact_time, scattering);
         } else {
