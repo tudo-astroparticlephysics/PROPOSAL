@@ -184,13 +184,14 @@ Homogeneous density distribution with the density `mass_density`. No additional 
 
 Exponential density distribution along an axis of the form 
 
-> <img src="https://render.githubusercontent.com/render/math?math=\rho(x) = \rho_0 \cdot \exp{\left(\frac{d(x)}{\sigma}\right)}">
+> <img src="https://render.githubusercontent.com/render/math?math=\rho(x) = \rho_0 \cdot \exp{\left(\frac{d(x) - d_0}{\sigma}\right)}">
 
-with the scaling parameter `sigma`, the base `mass_density` <img src="https://render.githubusercontent.com/render/math?math=\rho_0"> and the depth d relative to the axis.
+with the scaling parameter `sigma`, the shifting parameter `d_0` in cm, the base `mass_density` <img src="https://render.githubusercontent.com/render/math?math=\rho_0"> and the depth d relative to the axis.
 
-| Keyword        |  Type  | Default | Description       |
-| -------------- | ------ | ------- | ----------------- |
-| `sigma`        | Number | `-`     | Scaling parameter |
+| Keyword |  Type  | Default | Description                |
+| ------- | ------ | ------- | -------------------------- |
+| `sigma` | Number | `1.0`   | Scaling parameter          |
+| `d0`    | Number | `0.0`   | Shifting parameter (in cm) |
 
 ### Polynomial
 

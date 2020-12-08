@@ -5,19 +5,20 @@
 #include "PROPOSAL/medium/Medium.h"
 using namespace PROPOSAL;
 
-Density_exponential::Density_exponential(const Axis& axis, double sigma, double massDensity)
-    : Density_distr(axis, massDensity), sigma_(sigma) {}
+Density_exponential::Density_exponential(const Axis& axis, double sigma, double d0, double massDensity)
+    : Density_distr(axis, massDensity), sigma_(sigma), d0_(d0) {}
 
-Density_exponential::Density_exponential(const Axis &axis, double sigma, const Medium &medium)
-    : Density_exponential(axis, sigma, medium.GetMassDensity()) {}
+Density_exponential::Density_exponential(const Axis &axis, double sigma, double d0, const Medium &medium)
+    : Density_exponential(axis, sigma, d0, medium.GetMassDensity()) {}
 
 Density_exponential::Density_exponential(const nlohmann::json& config) : Density_distr(config) {
     sigma_ = config.value("sigma", 1.);
+    d0_ = config.value("d0", 0.);
 }
 
 
 double Density_exponential::GetDepth(const Vector3D& xi) const {
-    return axis_->GetDepth(xi) / sigma_;
+    return (axis_->GetDepth(xi) - d0_) / sigma_;
 }
 
 bool Density_exponential::compare(const Density_distr& dens_distr) const {
@@ -25,6 +26,8 @@ bool Density_exponential::compare(const Density_distr& dens_distr) const {
     if(!dens_exp)
         return false;
     if(sigma_ != dens_exp->sigma_ )
+        return false;
+    if(d0_ != dens_exp->d0_ )
         return false;
     return true;
 }

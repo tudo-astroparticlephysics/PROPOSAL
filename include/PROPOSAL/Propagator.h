@@ -115,10 +115,8 @@ private:
             throw std::invalid_argument("Neither a specific Sector EnergyCut nor a "
                                         "global EnergyCut is defined.");
         }
-        nlohmann::json density_distr = {{"density_distr_type",
-                                                "homogeneous"},
-                                        {"mass_density",
-                                        medium->GetMassDensity()}};
+        nlohmann::json density_distr = {{"type", "homogeneous"},
+                                        {"mass_density", medium->GetMassDensity()}};
         if(json_sector.contains("density_distribution"))
             density_distr = json_sector["density_distribution"];
 

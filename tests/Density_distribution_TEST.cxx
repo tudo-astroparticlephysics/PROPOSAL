@@ -26,9 +26,10 @@ TEST(Comparison, Comparison_equal)
     EXPECT_TRUE(*A == *B);
 
     double sigma = 1.;
+    double d0 = 0.;
     double massDensity = 1.;
-    Density_distr* C = new Density_exponential(ax_D, sigma, massDensity);
-    Density_exponential D(ax_D, sigma, massDensity);
+    Density_distr* C = new Density_exponential(ax_D, sigma, d0, massDensity);
+    Density_exponential D(ax_D, sigma, d0, massDensity);
     EXPECT_TRUE(D == *C);
 
     delete A;
@@ -51,13 +52,12 @@ TEST(Comparison, Comparison_not_equal)
     EXPECT_TRUE(ax_A != ax_B);
     EXPECT_TRUE(ax_A != ax_C);
 
-    //Axis* ax_D = new CartesianAxis();
-    //Axis* ax_E = new RadialAxis();
-    //EXPECT_TRUE(*ax_D != *ax_E);
-
-    Density_distr* B = new Density_exponential(ax_A, 1, 1);
-    Density_distr* D = new Density_exponential(ax_A, 2, 1);
+    Density_distr* B = new Density_exponential(ax_A, 1, 0, 1);
+    Density_distr* C = new Density_exponential(ax_A, 1, 1, 1);
+    Density_distr* D = new Density_exponential(ax_A, 2, 0, 1);
     EXPECT_TRUE(*B != *D);
+    EXPECT_TRUE(*C != *D);
+    EXPECT_TRUE(*B != *C);
 
     std::vector<double> vecA = {1,2};
     std::vector<double> vecB = {2,3};
