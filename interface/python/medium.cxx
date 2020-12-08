@@ -208,7 +208,7 @@ void init_medium(py::module& m) {
     py::class_<Density_homogeneous, Density_distr,
                std::shared_ptr<Density_homogeneous>>(m_sub,
                                                      "density_homogeneous")
-        .def(py::init<double, double>(), py::arg("mass_density"), py::arg("correction_factor"));
+        .def(py::init<double>(), py::arg("mass_density"));
 
     py::class_<Density_exponential, Density_distr,
                std::shared_ptr<Density_exponential>>(m_sub,
@@ -227,8 +227,7 @@ void init_medium(py::module& m) {
              py::arg("splines"), py::arg("mass_density"));
 
     py::class_<Axis, std::shared_ptr<Axis>>(m_sub, "Density_axis")
-        .def_property_readonly("fAxis", &Axis::GetAxis)
-        .def_property_readonly("refernce_point", &Axis::GetFp0)
+        .def_property_readonly("reference_point", &Axis::GetFp0)
         .def("depth", &Axis::GetDepth, py::arg("position"),
              R"pbdoc(
                 Calculates in dependence of the particle position the depthcorrection.

@@ -5,35 +5,27 @@
 #include "PROPOSAL/medium/Medium.h"
 using namespace PROPOSAL;
 
-Density_homogeneous::Density_homogeneous()
-    : Density_distr(1.), correction_factor_(1.0) {}
-
-Density_homogeneous::Density_homogeneous(double massDensity, double correction_factor)
-    : Density_distr(massDensity), correction_factor_(correction_factor) {}
+Density_homogeneous::Density_homogeneous(double massDensity)
+    : Density_distr(massDensity) {}
 
 Density_homogeneous::Density_homogeneous(const Medium &medium, double correction_factor)
-    : Density_homogeneous(medium.GetMassDensity(), correction_factor) {}
+    : Density_homogeneous(medium.GetMassDensity() * correction_factor) {}
 
 Density_homogeneous::Density_homogeneous(const Density_homogeneous& dens_distr)
-    : Density_distr(dens_distr),
-      correction_factor_(dens_distr.correction_factor_) {}
+    : Density_distr(dens_distr) {}
 
 Density_homogeneous::Density_homogeneous(const nlohmann::json& config) : Density_distr() {
-    correction_factor_ = config.value("correction_factor", 1.);
-    if (config.contains("massDensity")) {
-        assert(config["massDensity"].is_number());
-        massDensity_ = config["massDensity"].get<double>();
+    if (config.contains("mass_density")) {
+        assert(config["mass_density"].is_number());
+        massDensity_ = config["mass_density"].get<double>();
     } else {
-        throw std::invalid_argument("Density_distr: MassDensity must be defined in json");
+        throw std::invalid_argument("Density_distr: mass_density must be defined in json");
     }
 }
-
 
 bool Density_homogeneous::compare(const Density_distr& dens_distr) const {
     const Density_homogeneous* dens_homogen = dynamic_cast<const Density_homogeneous*>(&dens_distr);
     if(!dens_homogen)
-        return false;
-    if(correction_factor_ != dens_homogen->correction_factor_ )
         return false;
     return true;
 }
@@ -46,7 +38,7 @@ double Density_homogeneous::Correct(const Vector3D& xi,
     (void)direction;
     (void)distance_to_border;
 
-    return res / (correction_factor_ * massDensity_);
+    return res / massDensity_;
 }
 
 double Density_homogeneous::Integrate(const Vector3D& xi,
@@ -55,7 +47,7 @@ double Density_homogeneous::Integrate(const Vector3D& xi,
     (void)xi;
     (void)direction;
 
-    return correction_factor_ * massDensity_ * l;
+    return massDensity_ * l;
 }
 
 double Density_homogeneous::Calculate(const Vector3D& xi,
@@ -67,5 +59,5 @@ double Density_homogeneous::Calculate(const Vector3D& xi,
 double Density_homogeneous::Evaluate(const Vector3D& xi) const {
     (void)xi;
 
-    return correction_factor_ * massDensity_;
+    return massDensity_;
 }

@@ -117,7 +117,7 @@ private:
         }
         nlohmann::json density_distr = {{"density_distr_type",
                                                 "homogeneous"},
-                                        {"massDensity",
+                                        {"mass_density",
                                         medium->GetMassDensity()}};
         if(json_sector.contains("density_distribution"))
             density_distr = json_sector["density_distribution"];
@@ -125,8 +125,11 @@ private:
         auto cross_config = json_sector.value("CrossSections", global.cross);
         PropagationUtility::Collection collection;
         if(cross_config != "") {
+            double density_correction = density_distr.value("mass_density", medium->GetMassDensity());
+            density_correction /= medium->GetMassDensity();
             auto crosss = CreateCrossSectionList(p_def, *medium, cuts,
-                                                 do_interpolation, json_sector["CrossSections"]);
+                                                 do_interpolation, density_correction,
+                                                 json_sector["CrossSections"]);
             collection = CreateUtility(crosss, medium, cuts->GetContRand(),
                                        do_interpolation, do_exact_time, scattering);
         } else {
@@ -175,7 +178,7 @@ private:
     template <typename P, typename M>
     crosssection_list_t<P, M> CreateCrossSectionList(
             P&& p_def, M&& medium, shared_ptr<const EnergyCutSettings> cuts,
-            bool interpolate, const nlohmann::json& config) {
+            bool interpolate, double density_correction, const nlohmann::json& config) {
         crosssection_list_t<P, M> cross;
 
         if (config.contains("annihilation"))
@@ -183,13 +186,15 @@ private:
                                                                interpolate, config["annihilation"]));
         if (config.contains("brems"))
             cross.emplace_back(crosssection::make_bremsstrahlung(p_def, medium,
-                                                                 cuts, interpolate, config["brems"]));
+                                                                 cuts, interpolate, config["brems"],
+                                                                 density_correction));
         if (config.contains("compton"))
             cross.emplace_back(crosssection::make_compton(p_def, medium,
                                                           cuts, interpolate, config["compton"]));
         if (config.contains("epair"))
             cross.emplace_back(crosssection::make_epairproduction(p_def, medium,
-                                                                  cuts, interpolate, config["epair"]));
+                                                                  cuts, interpolate, config["epair"],
+                                                                  density_correction));
         if (config.contains("ioniz"))
             cross.emplace_back(crosssection::make_ionization(p_def, medium,
                                                              cuts, interpolate, config["ioniz"]));

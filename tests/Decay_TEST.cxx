@@ -30,7 +30,6 @@ TEST(EnergyDecay, CompareIntegralInterpolant) {
 
     for (double logE_i = 3.; logE_i < 14; logE_i+=1) {
         double E_i = std::pow(10., logE_i);
-        std::cout << E_i << std::endl;
         for (double rnd = 0; rnd < 1; rnd+=1e-1) {
             double E_f_integral = decay_integral->EnergyDecay(E_i, rnd, Ice().GetMassDensity());
             double E_f_interpol = decay_interpol->EnergyDecay(E_i, rnd, Ice().GetMassDensity());

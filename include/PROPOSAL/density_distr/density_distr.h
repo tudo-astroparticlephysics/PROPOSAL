@@ -36,7 +36,7 @@ namespace PROPOSAL {
 class Axis {
    public:
     Axis();
-    Axis(const Vector3D& fp0, const Vector3D& fAxis);
+    Axis(const Vector3D& fp0);
     Axis(const nlohmann::json&);
     Axis(const Axis&);
 
@@ -51,11 +51,9 @@ class Axis {
     virtual double GetEffectiveDistance(const Vector3D& xi,
                                         const Vector3D& direction) const = 0;
 
-    Vector3D GetAxis() const { return fAxis_; };
     Vector3D GetFp0() const { return fp0_; };
 
    protected:
-    Vector3D fAxis_;
     Vector3D fp0_;
 };
 }  // namespace PROPOSAL
@@ -64,7 +62,7 @@ namespace PROPOSAL {
 class RadialAxis : public Axis {
    public:
     RadialAxis();
-    RadialAxis(const Vector3D& fAxis, const Vector3D& fp0);
+    RadialAxis(const Vector3D& fp0);
     RadialAxis(const nlohmann::json&);
 
     Axis* clone() const override { return new RadialAxis(*this); };
@@ -85,8 +83,16 @@ class CartesianAxis : public Axis {
 
     Axis* clone() const override { return new CartesianAxis(*this); };
 
+    bool operator==(const CartesianAxis& axis) const;
+    bool operator!=(const CartesianAxis& axis) const;
+
+    Vector3D GetAxis() const { return fAxis_; };
     double GetDepth(const Vector3D& xi) const override;
     double GetEffectiveDistance(const Vector3D& xi, const Vector3D& direction) const override;
+
+   private:
+    Vector3D fAxis_;
+
 };
 }  // namespace PROPOSAL
 

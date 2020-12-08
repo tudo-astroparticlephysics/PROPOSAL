@@ -26,11 +26,11 @@ Density_distr::Density_distr(const nlohmann::json& config) {
     } else {
         throw std::invalid_argument("Axis: Type of axis must be radial or cartesian");
     }
-    if (config.contains("massDensity")) {
-        assert(config["massDensity"].is_number());
-        massDensity_ = config["massDensity"].get<double>();
+    if (config.contains("mass_density")) {
+        assert(config["mass_density"].is_number());
+        massDensity_ = config["mass_density"].get<double>();
     } else {
-        throw std::invalid_argument("Density_distr: MassDensity must be defined in json");
+        throw std::invalid_argument("Density_distr: mass_density must be defined in json");
     }
 }
 
@@ -60,21 +60,17 @@ bool Density_distr::operator!=(const Density_distr& dens_distr) const {
 
 Axis::Axis() {}
 
-Axis::Axis(const Vector3D& fAxis, const Vector3D& fp0) : fAxis_(fAxis), fp0_(fp0) {}
+Axis::Axis(const Vector3D& fp0) : fp0_(fp0) {}
 
 Axis::Axis(const nlohmann::json& config) {
-    if(not config.contains("fAxis")) throw std::invalid_argument("Axis: No fAxis found.");
     if(not config.contains("fp0")) throw std::invalid_argument("Axis: No fp0 found.");
-    fAxis_ = Vector3D(config.at("origin"));
     fp0_ = Vector3D(config.at("fp0"));
 }
 
 
-Axis::Axis(const Axis& axis) : fAxis_(axis.fAxis_), fp0_(axis.fp0_) {}
+Axis::Axis(const Axis& axis) : fp0_(axis.fp0_) {}
 
 bool Axis::operator==(const Axis& axis) const {
-    if(fAxis_ != axis.fAxis_)
-        return false;
     if(fp0_ != axis.fp0_)
         return false;
     return true;
@@ -90,10 +86,9 @@ bool Axis::operator!=(const Axis& axis) const {
 
 RadialAxis::RadialAxis() : Axis() {
     fp0_.SetCartesianCoordinates(0, 0, 0);
-    fAxis_.SetSphericalCoordinates(1, 0, 0);
 }
 
-RadialAxis::RadialAxis(const Vector3D& fAxis, const Vector3D& fp0) : Axis(fAxis, fp0) {}
+RadialAxis::RadialAxis(const Vector3D& fp0) : Axis(fp0) {}
 
 RadialAxis::RadialAxis(const nlohmann::json& config) : Axis(config) {}
 
@@ -117,9 +112,22 @@ CartesianAxis::CartesianAxis() : Axis() {
     fp0_.SetCartesianCoordinates(0, 0, 0);
 }
 
-CartesianAxis::CartesianAxis(const Vector3D& fAxis, const Vector3D& fp0) : Axis(fAxis, fp0) {}
+CartesianAxis::CartesianAxis(const Vector3D& fAxis, const Vector3D& fp0) :  Axis(fp0) , fAxis_(fAxis) {}
 
-CartesianAxis::CartesianAxis(const nlohmann::json& config) : Axis(config) {}
+CartesianAxis::CartesianAxis(const nlohmann::json& config) : Axis(config) {
+    if(not config.contains("fAxis")) throw std::invalid_argument("Axis: No fAxis found.");
+    fAxis_ = Vector3D(config.at("fAxis"));
+}
+
+bool CartesianAxis::operator==(const CartesianAxis& axis) const {
+    if(fAxis_ != axis.fAxis_)
+        return false;
+    return Axis::operator==(axis);
+}
+
+bool CartesianAxis::operator!=(const CartesianAxis& axis) const {
+    return !(*this == axis);
+}
 
 double CartesianAxis::GetDepth(const Vector3D& xi) const {
     return fAxis_ * (xi - fp0_);

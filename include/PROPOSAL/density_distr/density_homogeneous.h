@@ -32,9 +32,8 @@ namespace PROPOSAL {
 class Medium;
 class Density_homogeneous : public Density_distr {
    public:
-    Density_homogeneous();
     Density_homogeneous(const Density_homogeneous&);
-    Density_homogeneous(double mass_density, double correction_factor = 1.);
+    Density_homogeneous(double mass_density);
     Density_homogeneous(const Medium& medium, double correction_factor = 1.);
     Density_homogeneous(const nlohmann::json&);
 
@@ -58,9 +57,5 @@ class Density_homogeneous : public Density_distr {
                      double distance) const override;
     double Evaluate(const Vector3D& xi) const override;
 
-    double GetCorrectionfactor() const { return correction_factor_; }
-
-   private:
-    double correction_factor_;
 };
 }  // namespace PROPOSAL
