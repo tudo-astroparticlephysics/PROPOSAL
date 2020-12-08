@@ -43,6 +43,7 @@ All keywords with `-` as a default option are mandatory and need to be defined e
 | `cuts`   | Object | `-`  | Energy cut settings to be used in this Sector. |
 | `geometries` | Array | `-` | List of geometry objects describing the geometry of the Sector. |
 | `do_interpolation` | Boolean | `true`  | Defines if interpolation tables should be used for propagation. Note that not using interpolation tables will increase the runtime by several orders of magnitude! |
+| `exact_time` | Boolean | `true`  | Defines if the elapsed time will be calculated exactly using the actual particle velocity or by using the approximation that all particles travel with the speed of light. |
 | `scattering` | String | `NoScattering`  | Multiple Scattering model to be used. |
 | `density_distribution`   | Object | Homogeneous density distribution | Distribution of the mass density of the Sector. |
 | `CrossSections` | Object | Standard cross sections | Cross sections that will be used in this Sector. |
