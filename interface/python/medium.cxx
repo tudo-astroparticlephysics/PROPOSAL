@@ -213,8 +213,8 @@ void init_medium(py::module& m) {
     py::class_<Density_exponential, Density_distr,
                std::shared_ptr<Density_exponential>>(m_sub,
                                                      "density_exponential")
-        .def(py::init<const Axis&, double, double>(), py::arg("density_axis"),
-             py::arg("sigma"), py::arg("mass_density"));
+        .def(py::init<const Axis&, double, double, double>(), py::arg("density_axis"),
+             py::arg("sigma"), py::arg("d0"), py::arg("mass_density"));
 
     py::class_<Density_polynomial, Density_distr,
                std::shared_ptr<Density_polynomial>>(m_sub, "density_polynomial")
