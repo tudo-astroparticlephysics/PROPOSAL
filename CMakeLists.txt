@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 3.8)
 
-project(PROPOSAL VERSION 6.1.2 LANGUAGES CXX)
+project(PROPOSAL VERSION 7.0.0 LANGUAGES CXX)
 
 IF(APPLE)
     # In newer version of cmake this will be the default

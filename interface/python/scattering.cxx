@@ -27,17 +27,4 @@ void init_scattering(py::module& m) {
                     ei(double): inital energy
                     ef(double): final energy
             )pbdoc");
-
-    py::class_<ScatteringMoliere, std::shared_ptr<ScatteringMoliere>,
-               Scattering>(m_sub, "Moliere")
-        .def(py::init<const ParticleDef&, Medium const&>());
-
-    /* py::class_<ScatteringHighlandIntegral, */
-    /*            std::shared_ptr<ScatteringHighlandIntegral>, Scattering>( */
-    /*     m_sub, "HighlandIntegral") */
-    /*     .def(py::init<const ParticleDef&, Utility&, InterpolationDef>()); */
-
-    py::class_<ScatteringHighland, std::shared_ptr<ScatteringHighland>,
-               Scattering>(m_sub, "Highland")
-        .def(py::init<const ParticleDef&, Medium const&>());
 }

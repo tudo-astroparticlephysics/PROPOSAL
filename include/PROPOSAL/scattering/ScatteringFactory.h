@@ -54,7 +54,7 @@ enum class ScatteringType : int { NoScattering, Moliere, Highland, HighlandInteg
 static const std::unordered_map<std::string, ScatteringType> ScatteringTable
     = { { "moliere", ScatteringType::Moliere },
           { "highland", ScatteringType::Highland },
-          { "highland_integral", ScatteringType::HighlandIntegral },
+          { "highlandintegral", ScatteringType::HighlandIntegral },
           { "noscattering", ScatteringType::NoScattering }};
 
 template <typename Cross = std::nullptr_t>
