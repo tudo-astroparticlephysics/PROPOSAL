@@ -1,9 +1,9 @@
 #pragma once
 
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/DefaultFactory.h"
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/secondaries/parametrization/Parametrization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/RegisteredInDefault.h"
+#include "PROPOSAL/scattering/stochastic_deflection/parametrization/Parametrization.h"
 
 #include <memory>
 #include <unordered_map>
@@ -16,31 +16,31 @@ namespace PROPOSAL {
 //! for different interactiontypes. Take into account that different particle
 //! make use of the same secondary calculator with different parameters.
 //!
-class SecondariesCalculator {
-    using param_ptr = std::unique_ptr<secondaries::Parametrization>;
+class StochasticDeflectionCalculator {
+    using param_ptr = unique_ptr<stochastic_deflection::Parametrization>;
 
     //!
     //! Storage of the associated secondary calculator to the corresponding
     //! interaction type.
     //!
-    std::unordered_map<InteractionType, param_ptr, InteractionType_hash> secondary_generator;
+    std::unordered_map<InteractionType, param_ptr, InteractionType_hash> m;
 
 public:
     //!
     //! Empty secondaries calculator. Parametrization has to be added by
     //! addInteraction.
     //!
-    SecondariesCalculator() = default;
+    StochasticDeflectionCalculator() = default;
 
     //!
     //! Initalize secondary calculator with a bunch of interaction types for a
     //! specific particle and medium.
     //!
     template <typename T>
-    SecondariesCalculator(T const& interaction_types, ParticleDef const& p, Medium const& m)
+    StochasticDeflectionCalculator(T const& interaction_types, ParticleDef const& p, Medium const& m)
     {
        for (auto& t : interaction_types)
-            addInteraction(DefaultFactory<secondaries::Parametrization>::Create(t, p, m));
+            addInteraction(DefaultFactory<stochastic_deflection::Parametrization>::Create(t, p, m));
     }
 
     //!
@@ -49,7 +49,7 @@ public:
     //!
     inline void addInteraction(param_ptr&& p)
     {
-        secondary_generator[p->GetInteractionType()] = std::move(p);
+        m[p->GetInteractionType()] = std::move(p);
     }
 
     //!
@@ -57,14 +57,14 @@ public:
     //!
     inline size_t RequiredRandomNumbers(InteractionType type) const noexcept
     {
-        return secondary_generator.find(type)->second->RequiredRandomNumbers();
+        return m.find(type)->second->RequiredRandomNumbers();
     }
 
     //!
     //! Calculates the secondary particle for a given loss. Initial particle is
     //! treated as a loss and returned as the first particle of the secondaries.
     //!
-    std::vector<ParticleState> CalculateSecondaries(StochasticLoss, Component const&,
+    std::array<double, 2> CalculateDeflection(StochasticLoss, Component const&,
                                                     std::vector<double>&);
 };
 
@@ -72,9 +72,9 @@ public:
 //! Produces a SecondariesCalculator.
 //!
 template <typename TypeList>
-std::unique_ptr<SecondariesCalculator> make_secondaries(TypeList&& list, ParticleDef const& p, Medium const& m)
+std::unique_ptr<StochasticDeflectionCalculator> make_stochastic_deflection(TypeList&& list, ParticleDef const& p, Medium const& m)
 {
-    return PROPOSAL::make_unique<SecondariesCalculator>(std::forward<TypeList>(list), p, m);
+    return PROPOSAL::make_unique<StochasticDeflectionCalculator>(std::forward<TypeList>(list), p, m);
 }
 
 } // namespace PROPOSAL

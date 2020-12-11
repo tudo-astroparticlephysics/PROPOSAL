@@ -26,59 +26,48 @@
  *                                                                            *
  ******************************************************************************/
 
+
 #pragma once
 
-#include <vector>
-
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/propagation_utility/ContRand.h"
-#include "PROPOSAL/propagation_utility/Decay.h"
-#include "PROPOSAL/propagation_utility/Displacement.h"
-#include "PROPOSAL/propagation_utility/Interaction.h"
-#include "PROPOSAL/propagation_utility/Time.h"
 #include "PROPOSAL/scattering/multiple_scattering/Scattering.h"
+#include <array>
+
+using std::array;
 
 namespace PROPOSAL {
 
-class PropagationUtility {
+class Medium;
+
+/**
+ * \brief This class provides the scattering routine provided by moliere.
+ *
+ * More precise scattering angles will be added soon.
+ */
+class ScatteringHighland : public Scattering
+{
 public:
-    struct Collection {
+    ScatteringHighland(const ParticleDef&, Medium const&);
+    ScatteringHighland(const ParticleDef&, const ScatteringHighland&);
+    ScatteringHighland(const ScatteringHighland&);
 
-        bool operator==(const Collection& lhs);
+    /* virtual Scattering* clone() const override { return new ScatteringHighland(*this); } */
+    /* virtual Scattering* clone(const ParticleDef& particle_def, const PropagationUtility& utility) const override */
+    /* { */
+    /*     (void)utility; */
+    /*     return new ScatteringHighland(particle_def, *this); */
+    /* } */
 
-        // obligatory pointers
-        std::shared_ptr<Interaction> interaction_calc;
-        std::shared_ptr<Displacement> displacement_calc;
-        std::shared_ptr<Time> time_calc;
+protected:
+    ScatteringHighland& operator=(const ScatteringHighland&); // Undefined & not allowed
 
-        // optional pointers
-        std::shared_ptr<Scattering> scattering;
-        std::shared_ptr<Decay> decay_calc;
-        std::shared_ptr<ContRand> cont_rand;
-    };
+    bool compare(const Scattering&) const override;
+    void print(std::ostream&) const override;
 
-    PropagationUtility(Collection const& collection);
+    RandomAngles CalculateRandomAngle(double grammage, double ei, double ef, const array<double, 4>& rnd) override;
+    virtual double CalculateTheta0(double grammage, double ei, double ef);
 
-    std::tuple<InteractionType, std::shared_ptr<const Component>, double> EnergyStochasticloss(double, double);
-    double EnergyDecay(double, std::function<double()>, double);
-    double EnergyInteraction(double, std::function<double()>);
-    double EnergyRandomize(double, double, std::function<double()>);
-    double EnergyDistance(double, double);
-    double LengthContinuous(double, double);
-    double TimeElapsed(double, double, double, double);
-
-    // TODO: return value doesn't tell what it include. Maybe it would be better
-    // to give a tuple of two directions back. One is the mean over the
-    // displacement and the other is the actual direction. With a get method
-    // there could be a possible access with the position of the object stored
-    // in an enum.
-
-    std::tuple<Vector3D, Vector3D> DirectionsScatter(
-        double, double, double, const Vector3D&, const std::array<double, 4>&);
-    Vector3D DirectionDeflect(StochasticLoss, std::shared_ptr<const Component>,
-            std::function<double()> rnd);
-
-    Collection collection;
+    Medium medium_;
+    double charge;
 };
+
 } // namespace PROPOSAL

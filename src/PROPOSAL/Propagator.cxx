@@ -18,7 +18,6 @@
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
 #include "PROPOSAL/propagation_utility/DecayBuilder.h"
 #include "PROPOSAL/propagation_utility/ContRandBuilder.h"
-#include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/density_distr/density_distr.h"
 #include <fstream>
 #include "PROPOSAL/Logging.h"
