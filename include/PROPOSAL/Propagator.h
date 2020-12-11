@@ -21,7 +21,7 @@
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 #include "PROPOSAL/medium/MediumFactory.h"
-#include "PROPOSAL/scattering/ScatteringFactory.h"
+#include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
 #include "PROPOSAL/Secondaries.h"
 
 using std::get;

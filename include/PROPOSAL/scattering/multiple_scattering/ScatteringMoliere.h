@@ -26,59 +26,67 @@
  *                                                                            *
  ******************************************************************************/
 
+
 #pragma once
 
 #include <vector>
+#include <array>
 
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/propagation_utility/ContRand.h"
-#include "PROPOSAL/propagation_utility/Decay.h"
-#include "PROPOSAL/propagation_utility/Displacement.h"
-#include "PROPOSAL/propagation_utility/Interaction.h"
-#include "PROPOSAL/propagation_utility/Time.h"
+
 #include "PROPOSAL/scattering/multiple_scattering/Scattering.h"
+#include "PROPOSAL/medium/Medium.h"
 
 namespace PROPOSAL {
 
-class PropagationUtility {
+
+class ScatteringMoliere : public Scattering
+{
 public:
-    struct Collection {
+    // constructor
+    ScatteringMoliere(const ParticleDef&, Medium const&);
+    ScatteringMoliere(const ParticleDef&, const ScatteringMoliere&);
+    ScatteringMoliere(const ScatteringMoliere&);
+    ~ScatteringMoliere();
 
-        bool operator==(const Collection& lhs);
 
-        // obligatory pointers
-        std::shared_ptr<Interaction> interaction_calc;
-        std::shared_ptr<Displacement> displacement_calc;
-        std::shared_ptr<Time> time_calc;
 
-        // optional pointers
-        std::shared_ptr<Scattering> scattering;
-        std::shared_ptr<Decay> decay_calc;
-        std::shared_ptr<ContRand> cont_rand;
-    };
+private:
+    ScatteringMoliere& operator=(const ScatteringMoliere&); // Undefined & not allowed
 
-    PropagationUtility(Collection const& collection);
-    // PropagationUtility(const PropagationUtility&);
+    bool compare(const Scattering&) const override;
+    void print(std::ostream&) const override;
 
-    std::tuple<InteractionType, std::shared_ptr<const Component>, double> EnergyStochasticloss(double, double);
-    double EnergyDecay(double, std::function<double()>, double);
-    double EnergyInteraction(double, std::function<double()>);
-    double EnergyRandomize(double, double, std::function<double()>);
-    double EnergyDistance(double, double);
-    double LengthContinuous(double, double);
-    double TimeElapsed(double, double, double, double);
+    RandomAngles CalculateRandomAngle(double grammage, double ei, double ef, const std::array<double, 4>& rnd) override;
 
-    // TODO: return value doesn't tell what it include. Maybe it would be better
-    // to give a tuple of two directions back. One is the mean over the
-    // displacement and the other is the actual direction. With a get method
-    // there could be a possible access with the position of the object stored
-    // in an enum.
+    Medium medium_;
 
-    std::tuple<Vector3D, Vector3D> DirectionsScatter(
-        double, double, double, const Vector3D&, const std::array<double, 4>&);
-    // std::pair<double, double> DirectionDeflect(CrossSection&, double, double);
+    int numComp_; // number of components in medium
+    double ZSq_A_average_;
+    std::vector<double> Zi_;        // nuclear charge of different components
+    std::vector<double> weight_ZZ_; // mass weights of different components time Z^2
+    double weight_ZZ_sum_;          // inverse of sum of mass weights of different components time Z^2
+    int max_weight_index_;          // index of the maximium of mass weights of different components
 
-    Collection collection;
+    // scattering parameters
+    double chiCSq_; // characteristic angle² in rad²
+    std::vector<double> B_;
+
+    //----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------//
+
+    double f1M(double x);
+    double f2M(double x);
+
+    double f(double theta);
+
+    double F1M(double x);
+    double F2M(double x);
+
+    double F(double theta);
+
+    //----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------//
+
+    double GetRandom(double pre_factor, double rnd);
 };
 } // namespace PROPOSAL

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "PROPOSAL/DefaultFactory.h"
-#include "PROPOSAL/secondaries/parametrization/Parametrization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/parametrization/Parametrization.h"
 
 namespace PROPOSAL {
-namespace secondaries {
+namespace stochastic_deflection {
 
     //!
     //! Storage class to register interaction dependent default secondaries
@@ -27,5 +27,5 @@ namespace secondaries {
     bool RegisteredInDefault<T>::s_registered
         = DefaultFactory<Parametrization>::Register<T>(T::type);
 
-} // namespace secondaries
+} // namespace crosssection
 } // namespace PROPOSAL

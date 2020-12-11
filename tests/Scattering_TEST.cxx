@@ -10,10 +10,10 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Vector3D.h"
 
-#include "PROPOSAL/scattering/ScatteringFactory.h"
-#include "PROPOSAL/scattering/ScatteringHighland.h"
-#include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
-#include "PROPOSAL/scattering/ScatteringMoliere.h"
+#include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
+#include "PROPOSAL/scattering/multiple_scattering/ScatteringHighland.h"
+#include "PROPOSAL/scattering/multiple_scattering/ScatteringHighlandIntegral.h"
+#include "PROPOSAL/scattering/multiple_scattering/ScatteringMoliere.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
