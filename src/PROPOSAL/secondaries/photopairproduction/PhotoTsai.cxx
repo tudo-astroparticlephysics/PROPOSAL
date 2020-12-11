@@ -145,8 +145,10 @@ tuple<Vector3D, Vector3D> secondaries::PhotoTsai::CalculateDirections(
         cosphi0 *= (-1);
     if (cosphi1 == -1.)
         cosphi1 *= (-1);
-    auto dir_0 = deflect(dir, cosphi0, theta0);
-    auto dir_1 = deflect(dir, cosphi1, theta1);
+    auto dir_0 = dir;
+    dir_0.deflect(cosphi0, theta0);
+    auto dir_1 = dir;
+    dir_1.deflect(cosphi1, theta1);
     return make_tuple(dir_0, dir_1);
 }
 

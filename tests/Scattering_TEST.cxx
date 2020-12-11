@@ -229,7 +229,7 @@ TEST(Scattering, FirstMomentum){
 
     std::array<std::unique_ptr<Scattering>, 3> scatter_list = {make_scattering("moliere", MuMinusDef(), medium),
                                                                make_scattering("highland", MuMinusDef(), medium),
-                                                               make_scattering("highland_integral", MuMinusDef(), medium, cross)};
+                                                               make_scattering("highlandintegral", MuMinusDef(), medium, cross)};
     Vector3D scatter_sum;
     Vector3D offset_sum;
 
@@ -271,7 +271,7 @@ TEST(Scattering, SecondMomentum){
 
     std::array<std::unique_ptr<Scattering>, 3> scatter_list = {make_scattering("moliere", MuMinusDef(), medium),
                                                                make_scattering("highland", MuMinusDef(), medium),
-                                                               make_scattering("highland_integral", MuMinusDef(), medium, cross)};
+                                                               make_scattering("highlandintegral", MuMinusDef(), medium, cross)};
     double scatter_sum;
     double offset_sum;
     double displacement;
@@ -324,8 +324,8 @@ TEST(Scattering, compare_integral_interpolant) {
 
             auto cross = GetCrossSections(p, Ice(), cut, true);
 
-            auto scatter_integral = make_scattering("highland_integral", p, medium, cross, false);
-            auto scatter_interpol = make_scattering("highland_integral", p, medium, cross, true);
+            auto scatter_integral = make_scattering("highlandintegral", p, medium, cross, false);
+            auto scatter_interpol = make_scattering("highlandintegral", p, medium, cross, true);
 
             auto energies = std::array<double, 5>{1e6, 1e7, 1e8, 1e9, 1e10};
 
@@ -406,7 +406,6 @@ TEST(Scattering, ScatterReproducibilityTest)
         {
             continue; // not implemented anymore
         } else if (parametrization == "HighlandIntegral") {
-            parametrization = "highland_integral";
             cross = GetCrossSections(particle_def, *medium, ecuts, false);
         }
 

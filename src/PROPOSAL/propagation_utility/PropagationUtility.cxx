@@ -83,12 +83,6 @@ PropagationUtility::PropagationUtility(PropagationUtility::Collection const& col
     }
 }
 
-/*
-PropagationUtility::PropagationUtility(const PropagationUtility& utility) :
-utility_def(utility.utility_def){
-}
-*/
-
 tuple<InteractionType, std::shared_ptr<const Component>, double> PropagationUtility::EnergyStochasticloss(
     double energy, double rnd)
 {
@@ -149,13 +143,21 @@ tuple<Vector3D, Vector3D> PropagationUtility::DirectionsScatter(
     return std::make_tuple(direction, direction); // no scattering
 }
 
-/* std::pair<double, double> DirectionDeflect( */
-/*     CrossSection& crosssection, double particle_energy, double loss_energy)
- */
-/* { */
-/*     return crosssection.StochasticDeflection(particle_energy, loss_energy);
- */
-/* } */
+Vector3D PropagationUtility::DirectionDeflect(StochasticLoss loss,
+            std::shared_ptr<const Component> comp, std::function<double()> rnd)
+{
+    /*
+    if (collection.scattering) {
+        std::vector<double> random_numbers = {};
+        auto required_rnd_numbers = collection.scattering->DeflectionCalculator->RequiredRandomNumbers(loss.type);
+        for (int i = 0; i < required_rnd_numbers; i++ )
+            random_numbers.push_back(rnd());
+        auto deflection_angles = collection.scattering->DeflectionCalculator->CalculateDeflection(loss, comp, random_numbers);
+        return deflect(loss.direction, get<0>(deflection_angles), get<1>(deflection_angles));
+    }
+    */
+    return loss.direction;
+}
 
 double PropagationUtility::LengthContinuous(
     double initial_energy, double final_energy)

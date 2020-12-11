@@ -107,10 +107,6 @@ public:
     double GetMomentum() const;
     ParticleDef GetParticleDef() const;
 
-    // Deflect the direction of a particle by cosphi_deflect with an azimuth of
-    // theta_deflect
-    void DeflectDirection(double cosphi_deflect, double theta_deflect);
-
 protected:
     virtual void print(std::ostream&) const {}
 

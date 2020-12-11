@@ -112,11 +112,13 @@ InteractionType Propagator::DoStochasticInteraction(ParticleState& p_cond,
     std::tie(loss_type, comp, loss_energy)
         = utility.EnergyStochasticloss(p_cond.energy, rnd());
 
-    /* auto deflection_angles = stochastic_cross->StochasticDeflection( */
-    /*     p_cond.GetEnergy(), loss_energy); // TODO: ugly */
-    /* p_cond.DeflectDirection( */
-    /*     get<0>(deflection_angles), get<1>(deflection_angles)); */
+    auto stochastic_loss = StochasticLoss((int)loss_type, loss_energy,
+                                          p_cond.position, p_cond.direction,
+                                          p_cond.time, p_cond.propagated_distance,
+                                          p_cond.energy);
+    auto dir_new = utility.DirectionDeflect(stochastic_loss, comp, rnd);
 
+    p_cond.direction = dir_new;
     p_cond.energy = p_cond.energy - loss_energy;
     return loss_type;
 }

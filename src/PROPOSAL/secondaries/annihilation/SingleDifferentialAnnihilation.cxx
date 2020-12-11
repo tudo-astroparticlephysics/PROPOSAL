@@ -37,8 +37,10 @@ secondaries::SingleDifferentialAnnihilation::CalculateDirections(
     auto cosphi1
         = (com_energy * rho - ME) / (rho * sqrt(com_energy * kin_energy));
     auto rnd_theta = rnd * 2. * PI;
-    auto dir_1 = deflect(primary_dir, cosphi0, rnd_theta);
-    auto dir_2 = deflect(primary_dir, cosphi1, fmod(rnd_theta + PI, 2. * PI));
+    auto dir_1 = primary_dir;
+    auto dir_2 = primary_dir;
+    dir_1.deflect(cosphi0, rnd_theta);
+    dir_2.deflect(cosphi1, fmod(rnd_theta + PI, 2. * PI));
     return make_tuple(dir_1, dir_2);
 }
 

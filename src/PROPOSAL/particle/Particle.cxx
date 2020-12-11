@@ -127,36 +127,6 @@ double ParticleState::GetMomentum() const
     return energy;
 }
 
-void ParticleState::DeflectDirection(double cosphi_deflect, double theta_deflect)
-{
-
-    auto old_direction = direction;
-
-    old_direction.CalculateSphericalCoordinates();
-    auto sinphi_deflect = std::sqrt(
-        std::max(0., (1. - cosphi_deflect) * (1. + cosphi_deflect)));
-    auto tx = sinphi_deflect * std::cos(theta_deflect);
-    auto ty = sinphi_deflect * std::sin(theta_deflect);
-    auto tz = std::sqrt(std::max(1. - tx * tx - ty * ty, 0.));
-    if (cosphi_deflect < 0.)
-        tz = -tz; // Backward deflection
-
-    auto sinth = std::sin(old_direction.GetTheta());
-    auto costh = std::cos(old_direction.GetTheta());
-    auto sinph = std::sin(old_direction.GetPhi());
-    auto cosph = std::cos(old_direction.GetPhi());
-
-    auto rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
-    auto rotate_vector_y = Vector3D(-sinph, cosph, 0.);
-
-    // Rotation towards all tree axes
-    auto new_direction = Vector3D(
-        tz * old_direction + tx * rotate_vector_x + ty * rotate_vector_y);
-    new_direction.CalculateSphericalCoordinates();
-
-    direction = new_direction;
-}
-
 StochasticLoss::StochasticLoss(int type, double loss_energy, Vector3D position,
                                Vector3D direction, double time,
                                double propagated_distance,

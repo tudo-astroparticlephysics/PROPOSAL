@@ -27,9 +27,10 @@ tuple<Vector3D, Vector3D> secondaries::NaivCompton::CalculateDirections(
     auto cosphi_electron
         = (com_energy * v - ME) / (v * sqrt(com_energy * kin_energy));
     auto rnd_theta = rnd * 2. * PI;
-    auto dir_gamma = deflect(primary_dir, cosphi_gamma, rnd_theta);
-    auto dir_electron
-        = deflect(primary_dir, cosphi_electron, fmod(rnd_theta + PI, 2. * PI));
+    auto dir_gamma = primary_dir;
+    dir_gamma.deflect(cosphi_gamma, rnd_theta);
+    auto dir_electron = primary_dir;
+    dir_electron.deflect(cosphi_electron, fmod(rnd_theta + PI, 2. * PI));
     return make_tuple(dir_gamma, dir_electron);
 }
 

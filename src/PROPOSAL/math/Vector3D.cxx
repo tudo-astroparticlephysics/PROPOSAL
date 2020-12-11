@@ -247,6 +247,32 @@ void Vector3D::normalise()
     spherical_.radius_ = 1;
 }
 
+void Vector3D::deflect(double cosphi_deflect, double theta_deflect) {
+    if (cosphi_deflect != 1 || theta_deflect != 0) {
+        CalculateSphericalCoordinates();
+        double sinphi_deflect = std::sqrt(
+                std::max(0., (1. - cosphi_deflect) * (1. + cosphi_deflect)));
+        double tx = sinphi_deflect * std::cos(theta_deflect);
+        double ty = sinphi_deflect * std::sin(theta_deflect);
+        double tz = std::sqrt(std::max(1. - tx * tx - ty * ty, 0.));
+        if (cosphi_deflect < 0.)
+            tz = -tz; // Backward deflection
+
+        auto spherical = GetSphericalCoordinates();
+        auto sinth = std::sin(spherical.zenith_);
+        auto costh = std::cos(spherical.zenith_);
+        auto sinph = std::sin(spherical.azimuth_);
+        auto cosph = std::cos(spherical.azimuth_);
+
+        // Rotation towards all tree axes
+        cartesian_.x_ = tz * cartesian_.x_ + tx * costh * cosph - ty * sinph;
+        cartesian_.y_ = tz * cartesian_.y_ + tx * costh * sinph + ty * cosph;
+        cartesian_.z_ = tz * cartesian_.z_ - tx * sinth;
+
+        CalculateSphericalCoordinates();
+    }
+}
+
 
 //----------------------------------------------------------------------//
 //---------------Spherical and cylindrical coordinates------------------//
@@ -321,34 +347,4 @@ Vector3D::SphericalCoordinates::SphericalCoordinates(
     , azimuth_(coordinates.azimuth_)
     , zenith_(coordinates.zenith_)
 {
-}
-
-namespace PROPOSAL{
-Vector3D deflect(Vector3D vec, double cosphi_deflect, double theta_deflect)
-{
-    if (cosphi_deflect != 1 || theta_deflect != 0) {
-        vec.CalculateSphericalCoordinates();
-
-        double sinphi_deflect = std::sqrt(
-            std::max(0., (1. - cosphi_deflect) * (1. + cosphi_deflect)));
-        double tx = sinphi_deflect * std::cos(theta_deflect);
-        double ty = sinphi_deflect * std::sin(theta_deflect);
-        double tz = std::sqrt(std::max(1. - tx * tx - ty * ty, 0.));
-        if (cosphi_deflect < 0.)
-            tz = -tz; // Backward deflection
-
-        auto spherical = vec.GetSphericalCoordinates();
-        auto sinth = std::sin(spherical.zenith_);
-        auto costh = std::cos(spherical.zenith_);
-        auto sinph = std::sin(spherical.azimuth_);
-        auto cosph = std::cos(spherical.azimuth_);
-
-        auto rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
-        auto rotate_vector_y = Vector3D(-sinph, cosph, 0.);
-
-        // Rotation towards all tree axes
-        return Vector3D(tz * vec + tx * rotate_vector_x + ty * rotate_vector_y);
-    }
-    return vec;
-}
 }

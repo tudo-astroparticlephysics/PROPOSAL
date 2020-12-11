@@ -66,6 +66,8 @@ public:
     double magnitude() const;
     void normalise();
 
+    void deflect(double, double);
+
     struct CartesianCoordinates {
         CartesianCoordinates(){};
         CartesianCoordinates(double, double, double);
@@ -136,7 +138,4 @@ private:
 
     // double cylindric_radius_, cylindric_azimuth_, cylindric_height_;
 };
-
-Vector3D deflect(Vector3D, double, double);
-
 } // namespace PROPOSAL
