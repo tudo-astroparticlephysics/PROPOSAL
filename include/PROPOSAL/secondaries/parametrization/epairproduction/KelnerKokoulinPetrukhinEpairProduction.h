@@ -4,7 +4,6 @@
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/secondaries/parametrization/epairproduction/EpairProduction.h"
-#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 
 using PROPOSAL::Components::Component;
 using std::array;
@@ -15,7 +14,7 @@ namespace PROPOSAL {
     namespace secondaries {
         class KelnerKokoulinPetrukhinEpairProduction
                 : public secondaries::EpairProduction,
-                  public RegisteredInDefault<KelnerKokoulinPetrukhinEpairProduction> {
+                  public DefaultSecondaries<KelnerKokoulinPetrukhinEpairProduction> {
 
             crosssection::EpairKelnerKokoulinPetrukhin param;
             Integral integral;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/DefaultFactory.h"
+#include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/secondaries/parametrization/Parametrization.h"
 
@@ -23,7 +23,8 @@ class SecondariesCalculator {
     //! Storage of the associated secondary calculator to the corresponding
     //! interaction type.
     //!
-    std::unordered_map<InteractionType, param_ptr, InteractionType_hash> secondary_generator;
+    std::unordered_map<InteractionType, param_ptr, InteractionType_hash>
+        secondary_generator;
 
 public:
     //!
@@ -37,10 +38,12 @@ public:
     //! specific particle and medium.
     //!
     template <typename T>
-    SecondariesCalculator(T const& interaction_types, ParticleDef const& p, Medium const& m)
+    SecondariesCalculator(
+        T const& interaction_types, ParticleDef const& p, Medium const& m)
     {
-       for (auto& t : interaction_types)
-            addInteraction(DefaultFactory<secondaries::Parametrization>::Create(t, p, m));
+        for (auto& t : interaction_types)
+            addInteraction(
+                DefaultFactory<secondaries::Parametrization>::Create(t, p, m));
     }
 
     //!
@@ -64,17 +67,19 @@ public:
     //! Calculates the secondary particle for a given loss. Initial particle is
     //! treated as a loss and returned as the first particle of the secondaries.
     //!
-    std::vector<ParticleState> CalculateSecondaries(StochasticLoss, Component const&,
-                                                    std::vector<double>&);
+    std::vector<ParticleState> CalculateSecondaries(
+        StochasticLoss, Component const&, std::vector<double>&);
 };
 
 //!
 //! Produces a SecondariesCalculator.
 //!
 template <typename TypeList>
-std::unique_ptr<SecondariesCalculator> make_secondaries(TypeList&& list, ParticleDef const& p, Medium const& m)
+std::unique_ptr<SecondariesCalculator> make_secondaries(
+    TypeList&& list, ParticleDef const& p, Medium const& m)
 {
-    return PROPOSAL::make_unique<SecondariesCalculator>(std::forward<TypeList>(list), p, m);
+    return PROPOSAL::make_unique<SecondariesCalculator>(
+        std::forward<TypeList>(list), p, m);
 }
 
 } // namespace PROPOSAL

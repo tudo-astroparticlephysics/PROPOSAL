@@ -130,6 +130,7 @@
 #include "PROPOSAL/scattering/stochastic_deflection/parametrization/Parametrization.h"
 #include "PROPOSAL/scattering/stochastic_deflection/parametrization/bremsstrahlung/Bremsstrahlung.h"
 #include "PROPOSAL/scattering/stochastic_deflection/parametrization/bremsstrahlung/NaivBremsstrahlung.h"
+
 #include "PROPOSAL/scattering/stochastic_deflection/StochasticDeflectionCalculator.h"
 
 #include "PROPOSAL/scattering/multiple_scattering/Coefficients.h"

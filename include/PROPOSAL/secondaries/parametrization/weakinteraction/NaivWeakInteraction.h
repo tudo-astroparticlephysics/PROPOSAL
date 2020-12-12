@@ -1,7 +1,6 @@
 #pragma once
 
 #include "PROPOSAL/secondaries/parametrization/weakinteraction/WeakInteraction.h"
-#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 
 using std::array;
 using std::vector;
@@ -10,7 +9,7 @@ namespace PROPOSAL {
 namespace secondaries {
     class NaivWeakInteraction
         : public secondaries::WeakInteraction,
-          public RegisteredInDefault<NaivWeakInteraction> {
+          public DefaultSecondaries<NaivWeakInteraction> {
         const int weak_partner_type;
 
     public:

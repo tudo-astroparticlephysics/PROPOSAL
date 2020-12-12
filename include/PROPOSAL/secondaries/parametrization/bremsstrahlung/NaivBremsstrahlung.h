@@ -1,12 +1,12 @@
 #pragma once
 
-#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 #include "PROPOSAL/secondaries/parametrization/bremsstrahlung/Bremsstrahlung.h"
 
 namespace PROPOSAL {
 namespace secondaries {
-    class NaivBremsstrahlung : public secondaries::Bremsstrahlung,
-                               public RegisteredInDefault<NaivBremsstrahlung> {
+    class NaivBremsstrahlung
+        : public secondaries::Bremsstrahlung,
+          public DefaultSecondaries<NaivBremsstrahlung> {
         static constexpr int n_rnd = 0;
         const int primary_lepton_type;
 

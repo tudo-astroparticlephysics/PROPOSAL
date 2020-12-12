@@ -1,12 +1,12 @@
 #pragma once
 
-#include "PROPOSAL/scattering/stochastic_deflection/RegisteredInDefault.h"
 #include "PROPOSAL/scattering/stochastic_deflection/parametrization/bremsstrahlung/Bremsstrahlung.h"
 
 namespace PROPOSAL {
 namespace stochastic_deflection {
-    class NaivBremsstrahlung : public stochastic_deflection::Bremsstrahlung,
-                               public RegisteredInDefault<NaivBremsstrahlung> {
+    class NaivBremsstrahlung
+        : public Bremsstrahlung,
+          public DefaultDeflection<NaivBremsstrahlung> {
 
         static constexpr int n_rnd = 0;
 

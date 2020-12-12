@@ -4,11 +4,8 @@
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/MupairProduction.h"
-#include "PROPOSAL/secondaries/RegisteredInDefault.h"
-/* #include <unordered_map> */
 
 using PROPOSAL::Components::Component;
-/* using std::unordered_map; */
 using std::array;
 using std::unique_ptr;
 
@@ -16,7 +13,7 @@ namespace PROPOSAL {
 namespace secondaries {
     class KelnerKokoulinPetrukhinMupairProduction
         : public secondaries::MupairProduction,
-          public RegisteredInDefault<KelnerKokoulinPetrukhinMupairProduction> {
+          public DefaultSecondaries<KelnerKokoulinPetrukhinMupairProduction> {
 
         crosssection::MupairKelnerKokoulinPetrukhin param;
         Integral integral;

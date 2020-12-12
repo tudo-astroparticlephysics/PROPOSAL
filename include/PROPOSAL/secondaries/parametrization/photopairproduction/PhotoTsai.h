@@ -3,7 +3,6 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotopairProduction.h"
 
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
@@ -14,7 +13,7 @@ using PROPOSAL::Components::Component;
 namespace PROPOSAL {
 namespace secondaries {
     class PhotoTsai : public PhotopairProduction,
-                      public RegisteredInDefault<PhotoTsai> {
+                      public DefaultSecondaries<PhotoTsai> {
         Integral integral;
         Medium medium;
         dndx_map_t dndx;

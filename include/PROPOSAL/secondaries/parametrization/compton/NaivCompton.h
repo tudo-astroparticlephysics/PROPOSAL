@@ -1,7 +1,6 @@
 #pragma once
 
 #include "PROPOSAL/secondaries/parametrization/compton/Compton.h"
-#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 
 #include <vector>
 
@@ -11,7 +10,7 @@ using std::vector;
 namespace PROPOSAL {
 namespace secondaries {
     struct NaivCompton : public Compton,
-                         public RegisteredInDefault<NaivCompton> {
+                         public DefaultSecondaries<NaivCompton> {
         NaivCompton() = default;
         NaivCompton(ParticleDef, Medium) {};
 

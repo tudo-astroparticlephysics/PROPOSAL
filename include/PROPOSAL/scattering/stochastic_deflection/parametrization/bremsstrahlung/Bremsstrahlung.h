@@ -1,15 +1,14 @@
 #pragma once
 
-#include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/secondaries/parametrization/Parametrization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/parametrization/Parametrization.h"
 
 namespace PROPOSAL {
 namespace stochastic_deflection {
-    struct Bremsstrahlung : public stochastic_deflection::Parametrization {
+    struct Bremsstrahlung : public Parametrization {
         Bremsstrahlung() = default;
         virtual ~Bremsstrahlung() = default;
 
-        static constexpr InteractionType type = PROPOSAL::InteractionType::Brems;
+        static constexpr InteractionType type = InteractionType::Brems;
 
         InteractionType GetInteractionType() const noexcept final { return type; };
     };

@@ -1,13 +1,14 @@
 #pragma once
 
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 #include <map>
 #include <memory>
 #include <vector>
+#include <iostream>
 
 namespace PROPOSAL {
 
@@ -15,15 +16,16 @@ template <typename T> class DefaultFactory {
 public:
     using TCreate = std::unique_ptr<T> (*)(ParticleDef const&, Medium const&);
     using m_t = std::map<InteractionType, TCreate>;
+
 private:
-    static std::unique_ptr<m_t> m ;
+    static std::unique_ptr<m_t> m;
 
 public:
     DefaultFactory() = delete;
 
-    template <typename T1>
-    static bool Register(InteractionType t)
+    template <typename T1> static bool Register(InteractionType t)
     {
+        std::cout << "Rrrrrrrrrrrrregister " << static_cast<int>(t) << std::endl;
         if (!m)
             m = std::make_unique<std::map<InteractionType, TCreate>>();
 
@@ -49,7 +51,7 @@ public:
     }
 };
 
-template<typename T>
+template <typename T>
 std::unique_ptr<typename DefaultFactory<T>::m_t> DefaultFactory<T>::m = nullptr;
 
 } // namespace PROPOSAL

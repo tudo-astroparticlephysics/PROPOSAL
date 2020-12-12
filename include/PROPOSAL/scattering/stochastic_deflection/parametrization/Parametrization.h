@@ -2,6 +2,8 @@
 
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/RegisteredInDefault.h"
+
 #include <array>
 #include <vector>
 
@@ -19,5 +21,9 @@ namespace stochastic_deflection {
             StochasticLoss const&, Component const&, std::vector<double> const&)
             = 0;
     };
+
+    template <typename T>
+    using DefaultDeflection
+        = RegisteredInDefault<stochastic_deflection::Parametrization, T>;
 } // namespace stochastic_deflection
 } // namespace PROPOSAL

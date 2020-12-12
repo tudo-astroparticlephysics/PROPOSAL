@@ -2,7 +2,6 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 #include "PROPOSAL/secondaries/parametrization/ionization/Ionization.h"
 
 
@@ -11,7 +10,7 @@ using PROPOSAL::Components::Component;
 namespace PROPOSAL {
 namespace secondaries {
     struct NaivIonization : public secondaries::Ionization,
-                            public RegisteredInDefault<NaivIonization> {
+                            public DefaultSecondaries<NaivIonization> {
         int primary_particle_type;
 
         static constexpr int n_rnd = 2;

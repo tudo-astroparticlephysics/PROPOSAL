@@ -2,12 +2,11 @@
 #include <stdexcept>
 
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/secondaries/RegisteredInDefault.h"
 
 namespace PROPOSAL {
 namespace secondaries {
     struct Photonuclear : public Parametrization,
-                          public RegisteredInDefault<Photonuclear> {
+                          public DefaultSecondaries<Photonuclear> {
         int primary_particle_type;
 
         Photonuclear(ParticleDef p, Medium)

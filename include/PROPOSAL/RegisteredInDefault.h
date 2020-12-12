@@ -1,11 +1,10 @@
 #pragma once
 
 #include "PROPOSAL/DefaultFactory.h"
-#include "PROPOSAL/scattering/stochastic_deflection/parametrization/Parametrization.h"
+
+#include <iostream>
 
 namespace PROPOSAL {
-namespace stochastic_deflection {
-
     //!
     //! Storage class to register interaction dependent default secondaries
     //! calculators. Storage is limited that only one secondary calculator type
@@ -13,19 +12,19 @@ namespace stochastic_deflection {
     //! different types of secondries calculator (not objects) for the same
     //! interaction type, the default register has to be modiefied.
     //!
-    template <typename T> class RegisteredInDefault {
+    template <typename T1, typename T2>
+    class RegisteredInDefault {
     protected:
         static bool s_registered;
-        RegisteredInDefault() { (void)s_registered; }
+        RegisteredInDefault() { std::cout << __PRETTY_FUNCTION__ << std::endl;(void)s_registered; }
     };
 
     //!
     //! Flag that a default secondary builder for these type of interaction is
     //! registered.
     //!
-    template <typename T>
-    bool RegisteredInDefault<T>::s_registered
-        = DefaultFactory<Parametrization>::Register<T>(T::type);
+    template <typename T1, typename T2>
+    bool RegisteredInDefault<T1, T2>::s_registered
+        = DefaultFactory<T1>::template Register<T2>(T2::type);
 
-} // namespace crosssection
 } // namespace PROPOSAL
