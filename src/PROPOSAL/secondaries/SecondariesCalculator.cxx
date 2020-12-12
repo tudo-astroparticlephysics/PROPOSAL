@@ -3,7 +3,7 @@
 using namespace PROPOSAL;
 
 std::vector<ParticleState> SecondariesCalculator::CalculateSecondaries(
-        StochasticLoss loss, const Component& comp, vector<double> &rnd)
+        StochasticLoss loss, const Component& comp, std::vector<double> &rnd)
 {
     auto type = static_cast<InteractionType>(loss.type);
     auto it = secondary_generator.find(type);

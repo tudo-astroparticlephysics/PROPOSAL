@@ -34,12 +34,12 @@ namespace secondaries {
 
         double CalculateRho(double, double, const Component&) override;
         tuple<Vector3D, Vector3D> CalculateDirections(Vector3D, double, double,
-            const Component&, vector<double>) override;
+            const Component&, std::vector<double>) override;
         tuple<double, double> CalculateEnergy(double, double, double) override;
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
-        vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
-                                                   vector<double>&) final;
+        std::vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
+                                                   std::vector<double>&) final;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

@@ -32,8 +32,8 @@ namespace PROPOSAL {
             //TODO: set lpm to true when possible
 
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
-            vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
-                                                       vector<double>&) final;
+            std::vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
+                                                       std::vector<double>&) final;
         };
     } // namespace secondaries
 } // namespace PROPOSAL

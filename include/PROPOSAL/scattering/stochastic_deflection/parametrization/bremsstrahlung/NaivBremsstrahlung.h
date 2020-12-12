@@ -12,12 +12,12 @@ namespace stochastic_deflection {
 
     public:
         NaivBremsstrahlung() = delete;
-        NaivBremsstrahlung(ParticleDef p, Medium);
+        NaivBremsstrahlung(ParticleDef p, Medium) {};
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 
-        std::array<double, 2> CalculateDeflection(
-            StochasticLoss, const Component&, std::vector<double>&);
+        std::array<double, 2> CalculateStochasticDeflection(
+            StochasticLoss const&, Component const&, std::vector<double> const&);
     };
 } // namespace stochastic_deflection
 } // namespace PROPOSAL

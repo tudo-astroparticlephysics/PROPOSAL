@@ -123,7 +123,7 @@ double secondaries::PhotoTsai::CalculateRho(
 
 tuple<Vector3D, Vector3D> secondaries::PhotoTsai::CalculateDirections(
     Vector3D dir, double energy, double rho, const Component& comp,
-    vector<double> rnd)
+    std::vector<double> rnd)
 {
     auto subst = std::max(1., std::log10(energy));
     auto integrand_substitution = [&, energy, rho, comp](double t) {
@@ -160,8 +160,8 @@ tuple<double, double> secondaries::PhotoTsai::CalculateEnergy(
     return make_tuple(energy * rho, energy * (1 - rho));
 }
 
-vector<ParticleState> secondaries::PhotoTsai::CalculateSecondaries(
-    StochasticLoss loss, const Component& comp, vector<double> &rnd)
+std::vector<ParticleState> secondaries::PhotoTsai::CalculateSecondaries(
+    StochasticLoss loss, const Component& comp, std::vector<double> &rnd)
 {
     auto rho = CalculateRho(loss.parent_particle_energy, rnd[0], comp);
     auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, rho,

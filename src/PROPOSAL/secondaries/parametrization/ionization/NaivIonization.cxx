@@ -24,8 +24,8 @@ tuple<double, double> secondaries::NaivIonization::CalculateEnergy(
     return make_tuple(energy * (1 - v), energy * v);
 }
 
-vector<ParticleState> secondaries::NaivIonization::CalculateSecondaries(
-    StochasticLoss loss, const Component&, vector<double> &rnd)
+std::vector<ParticleState> secondaries::NaivIonization::CalculateSecondaries(
+    StochasticLoss loss, const Component&, std::vector<double> &rnd)
 {
     auto v = loss.loss_energy / loss.parent_particle_energy;
     auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, v);

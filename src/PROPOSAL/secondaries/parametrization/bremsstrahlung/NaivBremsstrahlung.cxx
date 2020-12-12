@@ -7,8 +7,8 @@
 
 using namespace PROPOSAL;
 
-vector<ParticleState> secondaries::NaivBremsstrahlung::CalculateSecondaries(
-    StochasticLoss loss, const Component&, vector<double>&)
+std::vector<ParticleState> secondaries::NaivBremsstrahlung::CalculateSecondaries(
+    StochasticLoss loss, const Component&, std::vector<double>&)
 {
     auto primary_lepton = ParticleState();
     primary_lepton.energy = loss.parent_particle_energy - loss.loss_energy;
@@ -25,6 +25,6 @@ vector<ParticleState> secondaries::NaivBremsstrahlung::CalculateSecondaries(
     brems_photon.position = loss.position;
     brems_photon.direction = loss.direction;
 
-    auto sec = vector<ParticleState>{primary_lepton, brems_photon};
+    auto sec = std::vector<ParticleState>{primary_lepton, brems_photon};
     return sec;
 }

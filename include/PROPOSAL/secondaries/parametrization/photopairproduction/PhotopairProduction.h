@@ -23,7 +23,7 @@ namespace secondaries {
 
         virtual double CalculateRho(double, double, const Component&) = 0;
         virtual tuple<Vector3D, Vector3D> CalculateDirections(
-            Vector3D, double, double, const Component&, vector<double>)
+            Vector3D, double, double, const Component&, std::vector<double>)
             = 0;
         virtual tuple<double, double> CalculateEnergy(double, double, double)
             = 0;

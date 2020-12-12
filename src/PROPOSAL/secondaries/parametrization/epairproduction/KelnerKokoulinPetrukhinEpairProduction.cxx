@@ -57,9 +57,9 @@ secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateEnergy(
     return make_tuple(energy_1, energy_2);
 }
 
-vector<ParticleState>
+std::vector<ParticleState>
 secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateSecondaries(
-        StochasticLoss loss, const Component& comp, vector<double> &rnd)
+        StochasticLoss loss, const Component& comp, std::vector<double> &rnd)
 {
     auto v = loss.loss_energy / loss.parent_particle_energy;
     auto rho = CalculateRho(loss.parent_particle_energy, v, comp, rnd[0], rnd[1]);
