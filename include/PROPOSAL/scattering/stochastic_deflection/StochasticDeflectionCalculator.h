@@ -1,8 +1,6 @@
 #pragma once
 
 #include "PROPOSAL/DefaultFactory.h"
-#include "PROPOSAL/methods.h"
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/scattering/stochastic_deflection/parametrization/Parametrization.h"
 
 #include <memory>
@@ -66,8 +64,7 @@ public:
     //! Calculates the secondary particle for a given loss. Initial particle is
     //! treated as a loss and returned as the first particle of the secondaries.
     //!
-    std::array<double, 2> CalculateDeflection(
-        StochasticLoss, Component const&, std::vector<double>&);
+    std::array<double, 2> CalculateDeflection(StochasticLoss, Component const&, std::vector<double>&) const;
 };
 
 //!

@@ -25,7 +25,6 @@ public:
 
     template <typename T1> static bool Register(InteractionType t)
     {
-        std::cout << "Rrrrrrrrrrrrregister " << static_cast<int>(t) << std::endl;
         if (!m)
             m = std::make_unique<std::map<InteractionType, TCreate>>();
 

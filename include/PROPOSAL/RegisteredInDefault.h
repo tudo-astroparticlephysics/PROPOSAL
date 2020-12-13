@@ -16,7 +16,7 @@ namespace PROPOSAL {
     class RegisteredInDefault {
     protected:
         static bool s_registered;
-        RegisteredInDefault() { std::cout << __PRETTY_FUNCTION__ << std::endl;(void)s_registered; }
+        RegisteredInDefault() { (void)s_registered; }
     };
 
     //!

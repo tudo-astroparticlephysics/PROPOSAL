@@ -17,7 +17,7 @@ namespace stochastic_deflection {
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 
         std::array<double, 2> CalculateStochasticDeflection(
-            StochasticLoss const&, Component const&, std::vector<double> const&);
+            StochasticLoss const&, Component const&, std::vector<double> const&) const final;
     };
 } // namespace stochastic_deflection
 } // namespace PROPOSAL

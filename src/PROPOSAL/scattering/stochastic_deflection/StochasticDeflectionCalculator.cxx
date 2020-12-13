@@ -3,14 +3,10 @@
 using namespace PROPOSAL;
 
 std::array<double, 2> StochasticDeflectionCalculator::CalculateDeflection(
-        StochasticLoss loss, const Component& comp, std::vector<double> &rnd)
+        StochasticLoss loss, const Component& comp, std::vector<double> &rnd) const
 {
-    auto type = static_cast<InteractionType>(loss.type);
-    auto it = m.find(type);
+    auto it = m.find(static_cast<InteractionType>(loss.type));
     if (it != m.end())
         return it->second->CalculateStochasticDeflection(loss, comp, rnd);
-    std::ostringstream s;
-    s << "No stochastic deflection calculator for interaction type ("
-        << Type_Interaction_Name_Map.find(type)->second << ") available.";
-    throw std::logic_error(s.str());
+    return std::array<double, 2>{0., 0.};
 }

@@ -18,7 +18,7 @@ namespace stochastic_deflection {
         virtual size_t RequiredRandomNumbers() const noexcept = 0;
         virtual InteractionType GetInteractionType() const noexcept = 0;
         virtual std::array<double, 2> CalculateStochasticDeflection(
-            StochasticLoss const&, Component const&, std::vector<double> const&)
+            StochasticLoss const&, Component const&, std::vector<double> const&) const
             = 0;
     };
 
