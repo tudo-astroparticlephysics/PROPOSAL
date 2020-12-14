@@ -1,8 +1,6 @@
 #pragma once
 
 #include "PROPOSAL/DefaultFactory.h"
-#include "PROPOSAL/methods.h"
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/secondaries/parametrization/Parametrization.h"
 
 #include <memory>
