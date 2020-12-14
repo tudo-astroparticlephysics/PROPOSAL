@@ -114,9 +114,8 @@ InteractionType Propagator::DoStochasticInteraction(ParticleState& p_cond,
                                           p_cond.position, p_cond.direction,
                                           p_cond.time, p_cond.propagated_distance,
                                           p_cond.energy);
-    auto dir_new = utility.DirectionDeflect(stochastic_loss, comp, rnd);
+    p_cond.direction = utility.DirectionDeflect(loss_type, p_cond.energy, loss_energy, p_cond.direction, rnd);
 
-    p_cond.direction = dir_new;
     p_cond.energy = p_cond.energy - loss_energy;
     return loss_type;
 }
@@ -126,9 +125,6 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
 {
     assert(max_distance > 0);
     assert(E_f >= 0);
-
-    // TODO: For NoScattering, these random numbers are not used
-    auto rnd_scattering = std::array<double, 4>{ rnd(), rnd(), rnd(), rnd() };
 
     auto& utility = get<UTILITY>(current_sector);
     auto& density = get<DENSITY_DISTR>(current_sector);
@@ -141,7 +137,7 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
     Vector3D mean_direction, new_direction;
     std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
             grammage_next_interaction, state.energy, E_f, state.direction,
-        rnd_scattering);
+        rnd);
 
     double distance_next_interaction;
     try {
@@ -174,7 +170,7 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
 
             std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
                     advance_grammage, state.energy, E_f,
-                    state.direction, rnd_scattering);
+                    state.direction, rnd);
 
             try {
                 AdvanceDistance[ReachedInteraction] = density->Correct(

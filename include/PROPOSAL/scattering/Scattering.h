@@ -32,7 +32,7 @@ public:
         }
     }
 
-    inline size_t StochasticDeflectionRandomNumbers(
+    size_t StochasticDeflectionRandomNumbers(
         InteractionType type) const noexcept
     {
         auto it = stochastic_deflection.find(type);
@@ -41,7 +41,7 @@ public:
         return 0;
     }
 
-    inline size_t MultipleScatteringRandomNumbers() const noexcept { return 4; }
+    constexpr size_t MultipleScatteringRandomNumbers() noexcept { return 4; }
 
     template <typename... Args>
     auto CalculateStoachsticDeflection(InteractionType type, Args... args) const

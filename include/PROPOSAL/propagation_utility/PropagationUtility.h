@@ -60,7 +60,8 @@ public:
 
     PropagationUtility(Collection const& collection);
 
-    std::tuple<InteractionType, std::shared_ptr<const Component>, double> EnergyStochasticloss(double, double);
+    std::tuple<InteractionType, std::shared_ptr<const Component>, double>
+    EnergyStochasticloss(double, double);
     double EnergyDecay(double, std::function<double()>, double);
     double EnergyInteraction(double, std::function<double()>);
     double EnergyRandomize(double, double, std::function<double()>);
@@ -75,9 +76,9 @@ public:
     // in an enum.
 
     std::tuple<Vector3D, Vector3D> DirectionsScatter(
-        double, double, double, const Vector3D&, const std::array<double, 4>&);
-    Vector3D DirectionDeflect(StochasticLoss, std::shared_ptr<const Component>,
-            std::function<double()> rnd);
+        double, double, double, const Vector3D&, std::function<double()>);
+    Vector3D DirectionDeflect(
+        InteractionType, double, double, Vector3D, std::function<double()>);
 
     Collection collection;
 };

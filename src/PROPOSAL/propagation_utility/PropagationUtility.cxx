@@ -72,7 +72,8 @@ bool PropagationUtility::Collection::operator==(const Collection& lhs)
     return true;
 }
 
-PropagationUtility::PropagationUtility(PropagationUtility::Collection const& collect)
+PropagationUtility::PropagationUtility(
+    PropagationUtility::Collection const& collect)
     : collection(collect)
 {
     if (collect.interaction_calc == nullptr
@@ -83,8 +84,8 @@ PropagationUtility::PropagationUtility(PropagationUtility::Collection const& col
     }
 }
 
-tuple<InteractionType, std::shared_ptr<const Component>, double> PropagationUtility::EnergyStochasticloss(
-    double energy, double rnd)
+tuple<InteractionType, std::shared_ptr<const Component>, double>
+PropagationUtility::EnergyStochasticloss(double energy, double rnd)
 {
     auto rates = collection.interaction_calc->Rates(energy);
     auto loss = collection.interaction_calc->SampleLoss(energy, rates, rnd);
@@ -102,8 +103,8 @@ double PropagationUtility::EnergyDecay(
     return 0; // no decay, e.g. particle is stable
 }
 
-double PropagationUtility::EnergyInteraction(double energy,
-        std::function<double()> rnd)
+double PropagationUtility::EnergyInteraction(
+    double energy, std::function<double()> rnd)
 {
     return collection.interaction_calc->EnergyInteraction(energy, rnd());
 }
@@ -134,29 +135,32 @@ double PropagationUtility::TimeElapsed(
 
 tuple<Vector3D, Vector3D> PropagationUtility::DirectionsScatter(
     double displacement, double initial_energy, double final_energy,
-    const Vector3D& direction, const std::array<double, 4>& rnd)
+    const Vector3D& direction, std::function<double()> rnd)
 {
     if (collection.scattering) {
+        std::array<double, 4> random_numbers;
+        for (auto& r : random_numbers)
+            r = rnd();
         return collection.scattering->CalculateMultipleScattering(
-            displacement, initial_energy, final_energy, direction, rnd);
+            displacement, initial_energy, final_energy, direction, random_numbers);
     }
     return std::make_tuple(direction, direction); // no scattering
 }
 
-Vector3D PropagationUtility::DirectionDeflect(StochasticLoss loss,
-            std::shared_ptr<const Component> comp, std::function<double()> rnd)
+Vector3D PropagationUtility::DirectionDeflect(InteractionType type,
+    double initial_energy, double final_energy, Vector3D direction, std::function<double()> rnd)
 {
-    /*
     if (collection.scattering) {
-        std::vector<double> random_numbers = {};
-        auto required_rnd_numbers = collection.scattering->DeflectionCalculator->RequiredRandomNumbers(loss.type);
-        for (int i = 0; i < required_rnd_numbers; i++ )
-            random_numbers.push_back(rnd());
-        auto deflection_angles = collection.scattering->DeflectionCalculator->CalculateDeflection(loss, comp, random_numbers);
-        return deflect(loss.direction, get<0>(deflection_angles), get<1>(deflection_angles));
+        std::vector<double> random_numbers(
+            collection.scattering->StochasticDeflectionRandomNumbers(type));
+        for (auto& r : random_numbers)
+            r = rnd();
+        auto deflection_angles
+            = collection.scattering->CalculateStoachsticDeflection(
+                type, initial_energy, final_energy, random_numbers);
+        direction.deflect(deflection_angles[0], deflection_angles[1]);
     }
-    */
-    return loss.direction;
+    return direction;
 }
 
 double PropagationUtility::LengthContinuous(
