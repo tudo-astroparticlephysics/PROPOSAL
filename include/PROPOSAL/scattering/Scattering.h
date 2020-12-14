@@ -1,8 +1,8 @@
 #pragma once
 
 #include "PROPOSAL/DefaultFactory.h"
-#include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
 #include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
 
 #include <memory>
 #include <unordered_map>
@@ -46,7 +46,8 @@ public:
     template <typename... Args>
     auto CalculateStoachsticDeflection(InteractionType type, Args... args) const
     {
-        auto it = stochastic_deflection.find(static_cast<InteractionType>(type));
+        auto it
+            = stochastic_deflection.find(static_cast<InteractionType>(type));
         if (it != stochastic_deflection.end())
             return it->second->CalculateStochasticDeflection(args...);
         return std::array<double, 2> { 0., 0. };
@@ -60,15 +61,6 @@ public:
 };
 
 std::vector<std::unique_ptr<stochastic_deflection::Parametrization>>
-make_stochastic_deflection(
-    std::vector<InteractionType> types, ParticleDef const& p, Medium const& m)
-{
-    auto deflections = std::vector<
-        std::unique_ptr<stochastic_deflection::Parametrization>>();
-    for (auto t : types)
-        deflections.emplace_back(
-            DefaultFactory<stochastic_deflection::Parametrization>::Create(
-                t, p, m));
-    return deflections;
-}
+make_stochastic_deflection(std::vector<InteractionType> const& types,
+    ParticleDef const& p, Medium const& m);
 } // namespace PROPOSAL

@@ -41,6 +41,7 @@ namespace multiple_scattering {
         double mass;
 
     public:
+        Parametrization()=default;
         Parametrization(double mass);
         virtual ~Parametrization() = default;
 

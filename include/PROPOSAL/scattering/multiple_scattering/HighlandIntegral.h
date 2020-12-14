@@ -68,7 +68,7 @@ public:
                                     "to use scattering_highland.");
     };
 
-    bool compare(const Scattering&) const { return false; };
+    bool compare(const Parametrization&) const { return false; };
     void print(std::ostream&) const {};
 
     // function will not be used
@@ -93,7 +93,7 @@ T HighlandIntegral<T, Cross, Enable>::BuildHighlandIntegral(
 {
     auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
     auto higland_integral_func = [this, disp, &cross](double energy) {
-        return HighlandIntegral(*disp, cross, energy);
+        return Integral(*disp, cross, energy);
     };
     T decay_integral(
         higland_integral_func, CrossSectionVector::GetLowerLim(cross));

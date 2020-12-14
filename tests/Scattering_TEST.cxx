@@ -11,9 +11,9 @@
 #include "PROPOSAL/math/Vector3D.h"
 
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
-#include "PROPOSAL/scattering/multiple_scattering/ScatteringHighland.h"
-#include "PROPOSAL/scattering/multiple_scattering/ScatteringHighlandIntegral.h"
-#include "PROPOSAL/scattering/multiple_scattering/ScatteringMoliere.h"
+#include "PROPOSAL/scattering/multiple_scattering/Highland.h"
+#include "PROPOSAL/scattering/multiple_scattering/HighlandIntegral.h"
+#include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
@@ -56,39 +56,15 @@ TEST(Comparison, Comparison_equal)
     ParticleDef mu = MuMinusDef();
     auto water = Water();
 
-    Scattering* moliere1 = new ScatteringMoliere(mu, water);
-    ScatteringMoliere moliere2(mu, water);
+    multiple_scattering::Parametrization* moliere1 = new multiple_scattering::Moliere(mu, water);
+    multiple_scattering::Moliere moliere2(mu, water);
 
     EXPECT_TRUE(*moliere1 == moliere2);
 
-    Scattering* high1 = new ScatteringHighland(mu, water);
-    ScatteringHighland high2(mu, water);
+    multiple_scattering::Parametrization* high1 = new multiple_scattering::Highland(mu, water);
+    multiple_scattering::Highland high2(mu, water);
 
     EXPECT_TRUE(*high1 == high2);
-
-    // TODO: Add ScatteringHighlandIntegral as soon as it gets a compare operator
-}
-
-TEST(Comparison, Comparison_not_equal)
-{
-    ParticleDef mu  = MuMinusDef();
-    ParticleDef tau = TauMinusDef();
-    auto water = Water();
-    auto ice = Ice();
-
-    ScatteringMoliere moliere1(mu, water);
-    ScatteringMoliere moliere2(tau, water);
-    ScatteringMoliere moliere3(mu, ice);
-
-    EXPECT_TRUE(moliere1 != moliere2);
-    EXPECT_TRUE(moliere1 != moliere3);
-
-    ScatteringHighland high1(mu, water);
-    ScatteringHighland high2(tau, water);
-    ScatteringHighland high3(mu, ice);
-
-    EXPECT_TRUE(high1 != high2);
-    EXPECT_TRUE(high1 != high3);
 
     // TODO: Add ScatteringHighlandIntegral as soon as it gets a compare operator
 }
@@ -98,8 +74,9 @@ TEST(Assignment, Copyconstructor)
     ParticleDef mu = MuMinusDef();
     auto water = Water();
 
-    ScatteringMoliere moliere1(mu, water);
-    ScatteringMoliere moliere2 = moliere1;
+    multiple_scattering::Moliere moliere1(mu, water);
+    multiple_scattering::Moliere moliere2 = moliere1;
+
     EXPECT_TRUE(moliere1 == moliere2);
 }
 
@@ -108,17 +85,17 @@ TEST(Assignment, Copyconstructor2)
     ParticleDef mu = MuMinusDef();
     auto water = Water();
 
-    ScatteringHighland moliere1(mu, water);
-    ScatteringHighland moliere2(moliere1);
+    multiple_scattering::Highland moliere1(mu, water);
+    multiple_scattering::Highland moliere2(moliere1);
     EXPECT_TRUE(moliere1 == moliere2);
 }
 
 
 // Tests for virtual Scattering class
 
-class ScatterDummy : public Scattering{
+class ScatterDummy : public multiple_scattering::Parametrization {
 public:
-    ScatterDummy(const ParticleDef& p_def) : Scattering(p_def){}
+    ScatterDummy(const ParticleDef& p_def) : Parametrization(p_def.mass){}
     double GetMass(){return mass;}
 
     void SetOffset(std::pair<double, double> offset){theta_offset_ = offset.first; phi_offset_ = offset.second;}
@@ -129,7 +106,7 @@ private:
                                       double ei,
                                       double ef,
                                       const std::array<double, 4>& rnd){
-        Scattering::RandomAngles random_angles;
+        RandomAngles random_angles;
         //Set offset
         random_angles.sx = std::sin(theta_offset_) * std::cos(phi_offset_);
         random_angles.sy = std::sin(theta_offset_) * std::sin(phi_offset_);
@@ -140,7 +117,7 @@ private:
         return random_angles;
     };
 
-    bool compare(const Scattering&) const{return false;};
+    bool compare(const Parametrization&) const{return false;};
     void print(std::ostream&) const{};
 
     double theta_offset_; //polar angle for offset
@@ -197,10 +174,10 @@ TEST(Scattering, BorderCases){
     Vector3D direction_init = Vector3D(1, 0, 0);
     direction_init.CalculateSphericalCoordinates();
 
-    std::array<Scattering*, 2> scatter_list = {new ScatteringMoliere(MuMinusDef(), medium),
-                                               new ScatteringHighland(MuMinusDef(), medium)};
+    std::array<multiple_scattering::Parametrization*, 2> scatter_list = {new multiple_scattering::Moliere(MuMinusDef(), medium),
+                                               new multiple_scattering::Highland(MuMinusDef(), medium)};
 
-    for(Scattering* scatter : scatter_list) {
+    for(multiple_scattering::Parametrization* scatter : scatter_list) {
         // Expect no change of direction for displacement of almost zero
         EXPECT_NEAR((std::get<0>(scatter->Scatter(1e-20, 1e4, 1e3, direction_init, {0.1, 0.2, 0.3, 0.4})) - direction_init).magnitude(),
                     0, 1e-10);
@@ -227,9 +204,9 @@ TEST(Scattering, FirstMomentum){
     int statistics = 1e7;
     auto cross = GetCrossSections(MuMinusDef(), medium, cuts, true);
 
-    std::array<std::unique_ptr<Scattering>, 3> scatter_list = {make_scattering("moliere", MuMinusDef(), medium),
-                                                               make_scattering("highland", MuMinusDef(), medium),
-                                                               make_scattering("highlandintegral", MuMinusDef(), medium, cross)};
+    std::array<std::unique_ptr<multiple_scattering::Parametrization>, 3> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
+                                                               make_multiple_scattering("highland", MuMinusDef(), medium),
+                                                               make_multiple_scattering("highlandintegral", MuMinusDef(), medium, cross)};
     Vector3D scatter_sum;
     Vector3D offset_sum;
 
@@ -269,9 +246,9 @@ TEST(Scattering, SecondMomentum){
     std::array<double, 10> final_energies = {1e13, 1e12, 1e11, 1e10, 1e9, 1e8, 1e7, 1e6, 1e5, 1e4};
     auto cross = GetCrossSections(MuMinusDef(), medium, cuts, true);
 
-    std::array<std::unique_ptr<Scattering>, 3> scatter_list = {make_scattering("moliere", MuMinusDef(), medium),
-                                                               make_scattering("highland", MuMinusDef(), medium),
-                                                               make_scattering("highlandintegral", MuMinusDef(), medium, cross)};
+    std::array<std::unique_ptr<multiple_scattering::Parametrization>, 3> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
+                                                               make_multiple_scattering("highland", MuMinusDef(), medium),
+                                                               make_multiple_scattering("highlandintegral", MuMinusDef(), medium, cross)};
     double scatter_sum;
     double offset_sum;
     double displacement;
@@ -324,8 +301,8 @@ TEST(Scattering, compare_integral_interpolant) {
 
             auto cross = GetCrossSections(p, Ice(), cut, true);
 
-            auto scatter_integral = make_scattering("highlandintegral", p, medium, cross, false);
-            auto scatter_interpol = make_scattering("highlandintegral", p, medium, cross, true);
+            auto scatter_integral = make_multiple_scattering("highlandintegral", p, medium, cross, false);
+            auto scatter_interpol = make_multiple_scattering("highlandintegral", p, medium, cross, true);
 
             auto energies = std::array<double, 5>{1e6, 1e7, 1e8, 1e9, 1e10};
 
@@ -401,7 +378,7 @@ TEST(Scattering, ScatterReproducibilityTest)
 
         crosssection_list_t<ParticleDef, Medium> cross;
 
-        std::unique_ptr<Scattering> scattering = NULL;
+        std::unique_ptr<multiple_scattering::Parametrization> scattering = NULL;
         if (parametrization == "NoScattering")
         {
             continue; // not implemented anymore
@@ -409,7 +386,7 @@ TEST(Scattering, ScatterReproducibilityTest)
             cross = GetCrossSections(particle_def, *medium, ecuts, false);
         }
 
-        scattering = make_scattering(parametrization, particle_def, *medium, cross, false);
+        scattering = make_multiple_scattering(parametrization, particle_def, *medium, cross, false);
 
 
         while (energy_previous < energy_init)

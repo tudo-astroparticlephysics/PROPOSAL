@@ -43,6 +43,7 @@ namespace PROPOSAL {
 namespace multiple_scattering {
 class Highland : public Parametrization
 {
+    protected:
     double charge;
     double radiation_length;
 

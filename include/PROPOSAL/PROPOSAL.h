@@ -127,18 +127,19 @@
 #include "PROPOSAL/propagation_utility/Time.h"
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
 
-#include "PROPOSAL/scattering/stochastic_deflection/parametrization/Parametrization.h"
-#include "PROPOSAL/scattering/stochastic_deflection/parametrization/bremsstrahlung/Bremsstrahlung.h"
-#include "PROPOSAL/scattering/stochastic_deflection/parametrization/bremsstrahlung/NaivBremsstrahlung.h"
+#include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/Bremsstrahlung.h"
+#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
 
-#include "PROPOSAL/scattering/stochastic_deflection/StochasticDeflectionCalculator.h"
 
 #include "PROPOSAL/scattering/multiple_scattering/Coefficients.h"
-#include "PROPOSAL/scattering/multiple_scattering/Scattering.h"
+#include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
-#include "PROPOSAL/scattering/multiple_scattering/ScatteringHighland.h"
-#include "PROPOSAL/scattering/multiple_scattering/ScatteringHighlandIntegral.h"
-#include "PROPOSAL/scattering/multiple_scattering/ScatteringMoliere.h"
+#include "PROPOSAL/scattering/multiple_scattering/Highland.h"
+#include "PROPOSAL/scattering/multiple_scattering/HighlandIntegral.h"
+#include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
+
+#include "PROPOSAL/scattering/Scattering.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
