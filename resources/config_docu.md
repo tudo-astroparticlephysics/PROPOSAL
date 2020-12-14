@@ -311,7 +311,7 @@ Available `epair` parametrizations are:
 
 Available `ioniz` parametrizations are:
 
-* `BetheBlochRossi`: Ionization described by Bethe-Bloch formula with corrections for muons and taus by (B. B. Rossi. Prentice-Hall, Inc., Englewood Cliffs, NJ, 1954)
+* `BetheBlochRossi`: Ionization described by Bethe-Bloch formula with corrections for muons and taus by (B. B. Rossi. Prentice-Hall, Inc., Englewood Cliffs, NJ, 1952)
 * `BergerSeltzerBhabha`: Ionization for positrons based on Berger-Seltzer formula 
 * `BergerSeltzerMoller`: Ionization for electrons based on Berger-Seltzer forumla
 
