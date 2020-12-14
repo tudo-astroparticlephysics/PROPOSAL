@@ -1,30 +1,22 @@
 
 #include <cmath>
 
-#include "PROPOSAL/scattering/multiple_scattering/ScatteringMoliere.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/math/MathMethods.h"
+#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/scattering/multiple_scattering/Coefficients.h"
+#include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
 
-using namespace PROPOSAL;
+using namespace PROPOSAL::multiple_scattering;
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------public member functions----------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double grammage,
-                                                                 double ei,
-                                                                 double ef,
-                                                                 const std::array<double, 4>& rnd) {
+Moliere::RandomAngles Moliere::CalculateRandomAngle(
+    double grammage, double ei, double ef, const std::array<double, 4>& rnd)
+{
     (void)ef;
 
     double momentum_Sq = (ei - mass) * (ei + mass);
-    double beta_Sq = 1. / (1. + mass * mass / momentum_Sq);  // beta^2 = (v/c)^2
+    double beta_Sq = 1. / (1. + mass * mass / momentum_Sq); // beta^2 = (v/c)^2
 
     // beta^2 p^2 with beta^2 = (v/c)^2 = 1/(1+m^2/p^2)
     double beta_p_Sq = momentum_Sq / ei;
@@ -39,18 +31,17 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double grammage
         // Calculate Chi_0 * p
         chi_0 = ME * ALPHA * std::pow(Zi_[i] * 128. / (9. * PI * PI), 1. / 3.);
         // Calculate Chi_a^2
-        chi_A_Sq[i] = chi_0 * chi_0 / momentum_Sq *
-                      (1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq);
+        chi_A_Sq[i] = chi_0 * chi_0 / momentum_Sq
+            * (1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq);
     }
 
     // Calculate Chi_c^2
-    chiCSq_ =
-        ((4. * PI * NA * ALPHA * ALPHA * HBAR * HBAR * SPEED * SPEED) *
-         (grammage) / beta_p_Sq) *
-        ZSq_A_average_;
+    chiCSq_ = ((4. * PI * NA * ALPHA * ALPHA * HBAR * HBAR * SPEED * SPEED)
+                  * (grammage) / beta_p_Sq)
+        * ZSq_A_average_;
 
     // Calculate B
-    Scattering::RandomAngles random_angles;
+    RandomAngles random_angles;
 
     for (int i = 0; i < numComp_; i++) {
         // calculate B-ln(B) = ln(chi_c^2/chi_a^2)+1-2*EULER_MASCHERONI via
@@ -58,9 +49,10 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double grammage
         double xn = 15.;
 
         for (int n = 0; n < 6; n++) {
-            xn = xn * ((1. - std::log(xn) - std::log(chiCSq_ / chi_A_Sq[i]) -
-                        1. + 2. * EULER_MASCHERONI) /
-                       (1. - xn));
+            xn = xn
+                * ((1. - std::log(xn) - std::log(chiCSq_ / chi_A_Sq[i]) - 1.
+                       + 2. * EULER_MASCHERONI)
+                    / (1. - xn));
         }
 
         //  Check for inappropriate values of B. If B < 4.5 it is practical to
@@ -99,27 +91,27 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double grammage
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, Medium const& medium)
-    : Scattering(particle_def),
-      medium_(medium),
-      numComp_(medium_.GetNumComponents()),
-      ZSq_A_average_(0.0),
-      Zi_(numComp_),
-      weight_ZZ_(numComp_),
-      weight_ZZ_sum_(0.),
-      max_weight_index_(0),
-      chiCSq_(0.0),
-      B_(numComp_) {
+Moliere::Moliere(const ParticleDef& particle_def, Medium const& medium)
+    : Parametrization(particle_def.mass)
+    , numComp_(medium.GetNumComponents())
+    , ZSq_A_average_(0.0)
+    , Zi_(numComp_)
+    , weight_ZZ_(numComp_)
+    , weight_ZZ_sum_(0.)
+    , max_weight_index_(0)
+    , chiCSq_(0.0)
+    , B_(numComp_)
+{
     std::vector<double> Ai(numComp_,
-                           0);  // atomic number of different components
+        0); // atomic number of different components
     std::vector<double> ki(
-        numComp_, 0);  // number of atoms in molecule of different components
+        numComp_, 0); // number of atoms in molecule of different components
     std::vector<double> weight(
-        numComp_, 0);  // number of atoms in molecule of different components
+        numComp_, 0); // number of atoms in molecule of different components
     double A_sum = 0.;
 
     for (int i = 0; i < numComp_; i++) {
-        Components::Component component = medium_.GetComponents().at(i);
+        Components::Component component = medium.GetComponents().at(i);
         Zi_[i] = component.GetNucCharge();
         ki[i] = component.GetAtomInMolecule();
         Ai[i] = component.GetAtomicNum();
@@ -156,69 +148,36 @@ ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def, Medium con
     }
 }
 
-ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)
-    : Scattering(scattering),
-      medium_(scattering.medium_),
-      numComp_(scattering.numComp_),
-      ZSq_A_average_(scattering.ZSq_A_average_),
-      Zi_(scattering.Zi_),
-      weight_ZZ_(scattering.weight_ZZ_),
-      weight_ZZ_sum_(scattering.weight_ZZ_sum_),
-      max_weight_index_(scattering.max_weight_index_),
-      chiCSq_(scattering.chiCSq_),
-      B_(scattering.B_) {}
-
-ScatteringMoliere::ScatteringMoliere(const ParticleDef& particle_def,
-                                     const ScatteringMoliere& scattering)
-    : Scattering(particle_def),
-      medium_(scattering.medium_),
-      numComp_(scattering.numComp_),
-      ZSq_A_average_(scattering.ZSq_A_average_),
-      Zi_(scattering.Zi_),
-      weight_ZZ_(scattering.weight_ZZ_),
-      weight_ZZ_sum_(scattering.weight_ZZ_sum_),
-      max_weight_index_(scattering.max_weight_index_),
-      chiCSq_(scattering.chiCSq_),
-      B_(scattering.B_) {}
-
-ScatteringMoliere::~ScatteringMoliere() {
-}
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-bool ScatteringMoliere::compare(const Scattering& scattering) const {
-    const ScatteringMoliere* scatteringMoliere =
-        dynamic_cast<const ScatteringMoliere*>(&scattering);
+bool Moliere::compare(const Parametrization& scattering) const
+{
+    auto sc = dynamic_cast<const Moliere*>(&scattering);
 
-    if (!scatteringMoliere)
+    if (!sc)
         return false;
-    else if (!(medium_ == scatteringMoliere->medium_))
+    else if (numComp_ != sc->numComp_)
         return false;
-    else if (numComp_ != scatteringMoliere->numComp_)
+    else if (ZSq_A_average_ != sc->ZSq_A_average_)
         return false;
-    else if (ZSq_A_average_ != scatteringMoliere->ZSq_A_average_)
+    else if (Zi_ != sc->Zi_)
         return false;
-    else if (Zi_ != scatteringMoliere->Zi_)
+    else if (weight_ZZ_ != sc->weight_ZZ_)
         return false;
-    else if (weight_ZZ_ != scatteringMoliere->weight_ZZ_)
+    else if (weight_ZZ_sum_ != sc->weight_ZZ_sum_)
         return false;
-    else if (weight_ZZ_sum_ != scatteringMoliere->weight_ZZ_sum_)
+    else if (max_weight_index_ != sc->max_weight_index_)
         return false;
-    else if (max_weight_index_ != scatteringMoliere->max_weight_index_)
+    else if (chiCSq_ != sc->chiCSq_)
         return false;
-    else if (chiCSq_ != scatteringMoliere->chiCSq_)
-        return false;
-    else if (B_ != scatteringMoliere->B_)
+    else if (B_ != sc->B_)
         return false;
     else
         return true;
 }
 
-void ScatteringMoliere::print(std::ostream& os) const
-{
-    os << "Medium:\n" << medium_ << '\n';
-}
+void Moliere::print(std::ostream& os) const { os << "work in progress\n"; }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -230,11 +189,12 @@ void ScatteringMoliere::print(std::ostream& os) const
 //--------------------------calculate distribution----------------------------//
 //----------------------------------------------------------------------------//
 
-double ScatteringMoliere::f1M(double x) {
+double Moliere::f1M(double x)
+{
     // approximation for large numbers to avoid numerical errors
     if (x > 12.)
-        return 0.5 * std::sqrt(PI) /
-               (std::pow(x, 1.5) * std::pow(1. - 4.5 / x, 2. / 3.));
+        return 0.5 * std::sqrt(PI)
+            / (std::pow(x, 1.5) * std::pow(1. - 4.5 / x, 2. / 3.));
 
     double sum = c1[69];
 
@@ -247,7 +207,8 @@ double ScatteringMoliere::f1M(double x) {
 
 //----------------------------------------------------------------------------//
 
-double f2Mlarge(double x) {
+double f2Mlarge(double x)
+{
     double a = 0.00013567765224589459194769192063035;
     double b = -0.0022635502525409950842771866774683;
     double c = 0.0098037758070269476889935233998585;
@@ -260,14 +221,15 @@ double f2Mlarge(double x) {
     double sum = 0;
 
     for (int p = 2; p < 13; p++) {
-        sum += c2large[p] * (0.5 * std::log(x) + s2large[p]) *
-               std::pow(x, -(p + 0.5));
+        sum += PROPOSAL::c2large[p] * (0.5 * std::log(x) + PROPOSAL::s2large[p])
+            * std::pow(x, -(p + 0.5));
     }
 
     return sum;
 }
 
-double ScatteringMoliere::f2M(double x) {
+double Moliere::f2M(double x)
+{
     // approximation for larger x to avoid numerical errors
     if (x > 4.25 * 4.25)
         return f2Mlarge(x);
@@ -282,14 +244,15 @@ double ScatteringMoliere::f2M(double x) {
 
 //----------------------------------------------------------------------------//
 
-double ScatteringMoliere::f(double theta) {
+double Moliere::f(double theta)
+{
     double y1 = 0;
 
     for (int i = 0; i < numComp_; i++) {
         double x = theta * theta / (chiCSq_ * B_[i]);
 
-        y1 += weight_ZZ_[i] / std::sqrt(chiCSq_ * B_[i] * PI) *
-              (std::exp(-x) + f1M(x) / B_[i] + f2M(x) / (B_[i] * B_[i]));
+        y1 += weight_ZZ_[i] / std::sqrt(chiCSq_ * B_[i] * PI)
+            * (std::exp(-x) + f1M(x) / B_[i] + f2M(x) / (B_[i] * B_[i]));
     }
 
     return y1 * weight_ZZ_sum_;
@@ -299,17 +262,19 @@ double ScatteringMoliere::f(double theta) {
 //----------------------calculate indefinite integral-------------------------//
 //----------------------------------------------------------------------------//
 
-double F1Mlarge(double x) {
-    double sum = C1large[14];
+double F1Mlarge(double x)
+{
+    double sum = PROPOSAL::C1large[14];
 
     // Horner's method
     for (int p = 13; p >= 0; p--)
-        sum = C1large[p] + sum / x;
+        sum = PROPOSAL::C1large[p] + sum / x;
 
     return sum;
 }
 
-double ScatteringMoliere::F1M(double x) {
+double Moliere::F1M(double x)
+{
     if (x > 12.)
         return F1Mlarge(x);
 
@@ -324,7 +289,8 @@ double ScatteringMoliere::F1M(double x) {
 
 //----------------------------------------------------------------------------//
 
-double F2Mlarge(double x) {
+double F2Mlarge(double x)
+{
     double a = -0.00026360133958801203364619158975302;
     double b = 0.0039965027465457608410459577896745;
     double c = -0.016305842044996649714549974419242;
@@ -337,14 +303,15 @@ double F2Mlarge(double x) {
     double sum = 0;
 
     for (int p = 2; p < 13; p++) {
-        sum += -0.5 * c2large[p] / p *
-               (0.5 / p + 0.5 * std::log(x) + s2large[p]) * std::pow(x, -p);
+        sum += -0.5 * PROPOSAL::c2large[p] / p
+            * (0.5 / p + 0.5 * std::log(x) + PROPOSAL::s2large[p]) * std::pow(x, -p);
     }
 
     return sum;
 }
 
-double ScatteringMoliere::F2M(double x) {
+double Moliere::F2M(double x)
+{
     if (x > 4.25 * 4.25)
         return F2Mlarge(x);
 
@@ -358,15 +325,17 @@ double ScatteringMoliere::F2M(double x) {
 
 //----------------------------------------------------------------------------//
 
-double ScatteringMoliere::F(double theta) {
+double Moliere::F(double theta)
+{
     double y1 = 0;
 
     for (int i = 0; i < numComp_; i++) {
         double x = theta * theta / (chiCSq_ * B_[i]);
 
-        y1 += weight_ZZ_[i] * (0.5 * std::erf(std::sqrt(x)) +
-                               std::sqrt(1. / PI) *
-                                   (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
+        y1 += weight_ZZ_[i]
+            * (0.5 * std::erf(std::sqrt(x))
+                + std::sqrt(1. / PI)
+                    * (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
     }
 
     return (theta < 0.) ? (-1.) * y1 * weight_ZZ_sum_ : y1 * weight_ZZ_sum_;
@@ -376,7 +345,8 @@ double ScatteringMoliere::F(double theta) {
 //-------------------------generate random angle------------------------------//
 //----------------------------------------------------------------------------//
 
-double ScatteringMoliere::GetRandom(double pre_factor, double rnd) {
+double Moliere::GetRandom(double pre_factor, double rnd)
+{
     //  Generate random angles following Moliere's distribution by comparing a
     //  uniformly distributed random number with the integral of the
     //  distribution. Therefore, determine the angle where the integral is equal

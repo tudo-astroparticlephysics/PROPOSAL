@@ -29,45 +29,32 @@
 
 #pragma once
 
-#include "PROPOSAL/scattering/multiple_scattering/Scattering.h"
+#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"
 #include <array>
-
-using std::array;
-
-namespace PROPOSAL {
-
-class Medium;
 
 /**
  * \brief This class provides the scattering routine provided by moliere.
  *
  * More precise scattering angles will be added soon.
  */
-class ScatteringHighland : public Scattering
+namespace PROPOSAL {
+namespace multiple_scattering {
+class Highland : public Parametrization
 {
-public:
-    ScatteringHighland(const ParticleDef&, Medium const&);
-    ScatteringHighland(const ParticleDef&, const ScatteringHighland&);
-    ScatteringHighland(const ScatteringHighland&);
+    double charge;
+    double radiation_length;
 
-    /* virtual Scattering* clone() const override { return new ScatteringHighland(*this); } */
-    /* virtual Scattering* clone(const ParticleDef& particle_def, const PropagationUtility& utility) const override */
-    /* { */
-    /*     (void)utility; */
-    /*     return new ScatteringHighland(particle_def, *this); */
-    /* } */
-
-protected:
-    ScatteringHighland& operator=(const ScatteringHighland&); // Undefined & not allowed
-
-    bool compare(const Scattering&) const override;
+    bool compare(const Parametrization&) const override;
     void print(std::ostream&) const override;
 
-    RandomAngles CalculateRandomAngle(double grammage, double ei, double ef, const array<double, 4>& rnd) override;
+public:
+    Highland(const ParticleDef&, Medium const&);
+
+    RandomAngles CalculateRandomAngle(double grammage, double ei, double ef, const std::array<double, 4>& rnd) override;
     virtual double CalculateTheta0(double grammage, double ei, double ef);
 
-    Medium medium_;
-    double charge;
 };
-
+} // namespace multiple_scattering
 } // namespace PROPOSAL

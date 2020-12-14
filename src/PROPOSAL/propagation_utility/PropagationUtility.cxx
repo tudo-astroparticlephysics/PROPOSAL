@@ -137,7 +137,7 @@ tuple<Vector3D, Vector3D> PropagationUtility::DirectionsScatter(
     const Vector3D& direction, const std::array<double, 4>& rnd)
 {
     if (collection.scattering) {
-        return collection.scattering->Scatter(
+        return collection.scattering->CalculateMultipleScattering(
             displacement, initial_energy, final_energy, direction, rnd);
     }
     return std::make_tuple(direction, direction); // no scattering

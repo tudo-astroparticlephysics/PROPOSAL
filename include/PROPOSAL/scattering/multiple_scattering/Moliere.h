@@ -26,67 +26,54 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include <vector>
 #include <array>
+#include <vector>
 
-
-#include "PROPOSAL/scattering/multiple_scattering/Scattering.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"
 
 namespace PROPOSAL {
+class ParticleDef;
 
+namespace multiple_scattering {
 
-class ScatteringMoliere : public Scattering
-{
-public:
-    // constructor
-    ScatteringMoliere(const ParticleDef&, Medium const&);
-    ScatteringMoliere(const ParticleDef&, const ScatteringMoliere&);
-    ScatteringMoliere(const ScatteringMoliere&);
-    ~ScatteringMoliere();
+    class Moliere : public Parametrization {
+        bool compare(const Parametrization&) const override;
+        void print(std::ostream&) const override;
 
+        int numComp_; // number of components in medium
+        double ZSq_A_average_;
+        std::vector<double> Zi_; // nuclear charge of different components
+        std::vector<double>
+            weight_ZZ_;        // mass weights of different components time Z^2
+        double weight_ZZ_sum_; // inverse of sum of mass weights of different
+                               // components time Z^2
+        int max_weight_index_; // index of the maximium of mass weights of
+                               // different components
 
+        // scattering parameters
+        double chiCSq_; // characteristic angle² in rad²
+        std::vector<double> B_;
 
-private:
-    ScatteringMoliere& operator=(const ScatteringMoliere&); // Undefined & not allowed
+        double f1M(double x);
+        double f2M(double x);
 
-    bool compare(const Scattering&) const override;
-    void print(std::ostream&) const override;
+        double f(double theta);
 
-    RandomAngles CalculateRandomAngle(double grammage, double ei, double ef, const std::array<double, 4>& rnd) override;
+        double F1M(double x);
+        double F2M(double x);
 
-    Medium medium_;
+        double F(double theta);
 
-    int numComp_; // number of components in medium
-    double ZSq_A_average_;
-    std::vector<double> Zi_;        // nuclear charge of different components
-    std::vector<double> weight_ZZ_; // mass weights of different components time Z^2
-    double weight_ZZ_sum_;          // inverse of sum of mass weights of different components time Z^2
-    int max_weight_index_;          // index of the maximium of mass weights of different components
+        double GetRandom(double pre_factor, double rnd);
+    public:
+        // constructor
+        Moliere(const ParticleDef&, Medium const&);
 
-    // scattering parameters
-    double chiCSq_; // characteristic angle² in rad²
-    std::vector<double> B_;
-
-    //----------------------------------------------------------------------------//
-    //----------------------------------------------------------------------------//
-
-    double f1M(double x);
-    double f2M(double x);
-
-    double f(double theta);
-
-    double F1M(double x);
-    double F2M(double x);
-
-    double F(double theta);
-
-    //----------------------------------------------------------------------------//
-    //----------------------------------------------------------------------------//
-
-    double GetRandom(double pre_factor, double rnd);
-};
+        RandomAngles CalculateRandomAngle(double grammage, double ei, double ef,
+            const std::array<double, 4>& rnd) override;
+    };
+} // namespace multiple_scattering
 } // namespace PROPOSAL

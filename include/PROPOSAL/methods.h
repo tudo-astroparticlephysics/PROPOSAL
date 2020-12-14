@@ -92,7 +92,6 @@ struct InterpolationDef {
     InterpolationDef(const nlohmann::json&);
 };
 
-class Parametrization;
 class Interpolant;
 class InterpolantBuilder;
 
