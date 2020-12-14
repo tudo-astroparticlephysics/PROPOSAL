@@ -25,7 +25,6 @@
 #include <iomanip>
 
 using namespace PROPOSAL;
-using std::make_shared;
 using std::string;
 
 Propagator::Propagator(const ParticleDef& p_def, std::vector<Sector> sectors)
@@ -286,7 +285,7 @@ Propagator::GlobalSettings::GlobalSettings(const nlohmann::json& config_global)
     if (config_global.contains("CrossSections"))
         cross = config_global["CrossSections"];
     if (config_global.contains("cuts"))
-        cuts = make_shared<EnergyCutSettings>(config_global["cuts"]);
+        cuts = std::make_shared<EnergyCutSettings>(config_global["cuts"]);
     do_exact_time = config_global.value("exact_time", true);
     do_interpolation = config_global.value("do_interpolation", true);
     scattering = config_global.value("scattering", "NoScattering");

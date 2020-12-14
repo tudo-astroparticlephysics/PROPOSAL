@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PROPOSAL/scattering/stochastic_deflection/parametrization/Parametrization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
 
 namespace PROPOSAL {
 namespace stochastic_deflection {

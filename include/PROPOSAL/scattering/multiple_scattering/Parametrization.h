@@ -26,51 +26,41 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
-#include <utility>
-#include <memory>
 #include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/particle/Particle.h"
+#include <memory>
+#include <utility>
 
 namespace PROPOSAL {
+namespace multiple_scattering {
 
-struct ParticleDef;
-class PropagationUtility;
-
-class Scattering
-{
-public:
-    Scattering() = default;
-    Scattering(const ParticleDef&);
-    Scattering(const Scattering&);
-    virtual ~Scattering() = default;
-
-    bool operator==(const Scattering& scattering) const;
-    bool operator!=(const Scattering& scattering) const;
-    friend std::ostream& operator<<(std::ostream&, Scattering const&);
+    class Parametrization {
+    protected:
 
 
-    std::tuple<Vector3D, Vector3D> Scatter(double grammage, double ei, double ef, const Vector3D& old_direction, const std::array<double, 4>& rnd);
+        double mass;
 
-protected:
-    Scattering& operator=(const Scattering&); // Undefined & not allowed
+    public:
+        Parametrization(double mass);
+        virtual ~Parametrization() = default;
 
-    // Implemented in child classes to be able to use equality operator
-    virtual bool compare(const Scattering&) const = 0;
-    virtual void print(std::ostream&) const     = 0;
+        virtual bool compare(const Parametrization&) const = 0;
+        virtual void print(std::ostream&) const = 0;
 
-    struct RandomAngles
-    {
-        double sx, sy, tx, ty;
+        struct RandomAngles {
+            double sx, sy, tx, ty;
+        };
+
+        virtual RandomAngles CalculateRandomAngle(double grammage, double ei,
+            double ef, const std::array<double, 4>& rnd)
+            = 0;
+
+        virtual bool operator==(const Parametrization& scattering) const;
+        friend std::ostream& operator<<(std::ostream&, Parametrization const&);
+
+        std::tuple<Vector3D, Vector3D> Scatter(double grammage, double ei,
+            double ef, const Vector3D& old_direction,
+            const std::array<double, 4>& rnd);
     };
-
-    virtual RandomAngles CalculateRandomAngle(double grammage,
-                                              double ei,
-                                              double ef,
-                                              const std::array<double, 4>& rnd) = 0;
-
-    double mass;
-};
-
+} // namespace multiple_scattering
 } // namespace PROPOSAL

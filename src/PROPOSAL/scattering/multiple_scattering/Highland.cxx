@@ -14,69 +14,49 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/MathMethods.h"
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/scattering/multiple_scattering/ScatteringHighland.h"
+#include "PROPOSAL/scattering/multiple_scattering/Highland.h"
 
-using std::array;
-using namespace PROPOSAL;
+using namespace PROPOSAL::multiple_scattering;
 
 // ------------------------------------------------------------------------- //
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-ScatteringHighland::ScatteringHighland(
+Highland::Highland(
     const ParticleDef& particle_def, Medium const& medium)
-    : Scattering(particle_def)
-    , medium_(medium)
+    : Parametrization(particle_def.mass)
     , charge(particle_def.charge)
+    , radiation_length(medium.GetRadiationLength())
 {
 }
 
-ScatteringHighland::ScatteringHighland(const ScatteringHighland& scattering)
-    : Scattering(scattering)
-    , medium_(scattering.medium_)
-    , charge(scattering.charge)
+bool Highland::compare(const Parametrization& scattering) const
 {
-}
+    auto sc = dynamic_cast<const Highland*>(&scattering);
 
-ScatteringHighland::ScatteringHighland(
-    const ParticleDef& particle_def, const ScatteringHighland& scattering)
-    : Scattering(particle_def)
-    , medium_(scattering.medium_)
-    , charge(scattering.charge)
-{
-}
-
-bool ScatteringHighland::compare(const Scattering& scattering) const
-{
-    const ScatteringHighland* scatteringHighland
-        = dynamic_cast<const ScatteringHighland*>(&scattering);
-
-    if (!scatteringHighland)
+    if (radiation_length != sc->radiation_length)
         return false;
-    else if (medium_ == scatteringHighland->medium_)
-        return true;
-    else
+    else if(charge != sc->charge)
         return false;
+    return true;
 }
 
-void ScatteringHighland::print(std::ostream& os) const
+void Highland::print(std::ostream& os) const
 {
-    os << "Medium:\n" << medium_ << '\n';
+    os << "charge: " << charge << '\n' << "radiation_length: " << radiation_length << "\n";
 }
 
 // ------------------------------------------------------------------------- //
 // Private methods
 // ------------------------------------------------------------------------- //
 
-double ScatteringHighland::CalculateTheta0(double grammage, double ei, double ef)
+double Highland::CalculateTheta0(double grammage, double ei, double ef)
 {
     (void) ef;
 
     // eq 6 of Lynch, Dahl
     // Nuclear Instruments and Methods in Physics Research Section B 58 (1991)
-    double y = grammage / medium_.GetRadiationLength();
+    double y = grammage / radiation_length;
     double momentum_Sq = (ei - mass) * (ei + mass);
     double beta_p = momentum_Sq / ei; // beta * p = p^2/sqrt(p^2 + m^2)
     y = 13.6 * std::abs(charge) / (beta_p)*std::sqrt(y)
@@ -86,13 +66,12 @@ double ScatteringHighland::CalculateTheta0(double grammage, double ei, double ef
 
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringHighland::CalculateRandomAngle(double grammage,
-    double ei, double ef, const array<double, 4>& rnd)
+Highland::RandomAngles Highland::CalculateRandomAngle(double grammage,
+    double ei, double ef, const std::array<double, 4>& rnd)
 {
-    double Theta0;
-    Scattering::RandomAngles random_angles;
+    RandomAngles random_angles;
 
-    Theta0 = CalculateTheta0(grammage, ei, ef);
+    auto Theta0 = CalculateTheta0(grammage, ei, ef);
 
     auto rnd1 = Theta0 * normalppf(rnd[0]);
     auto rnd2 = Theta0 * normalppf(rnd[1]);

@@ -37,7 +37,7 @@
 #include "PROPOSAL/propagation_utility/Displacement.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
 #include "PROPOSAL/propagation_utility/Time.h"
-#include "PROPOSAL/scattering/multiple_scattering/Scattering.h"
+#include "PROPOSAL/scattering/Scattering.h"
 
 namespace PROPOSAL {
 
