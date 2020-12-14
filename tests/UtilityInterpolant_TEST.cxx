@@ -34,7 +34,9 @@ TEST(Calculate, Forward){
             double E_f = std::pow(10, logE_f);
             double analytical = std::log(E_i) - std::log(E_f);
             if (E_i < E_f) {
+                #ifndef NDEBUG
                 EXPECT_DEATH(interpolant.Calculate(E_i, E_f), "");
+                #endif
             } else {
                 EXPECT_NEAR(interpolant.Calculate(E_i, E_f), analytical, analytical*1e-5);
             }
@@ -67,7 +69,9 @@ TEST(Calculate, Reverse){
             double E_f = std::pow(10, logE_f);
             double analytical = std::log(E_i) - std::log(E_f);
             if (E_i < E_f) {
+                #ifndef NDEBUG
                 EXPECT_DEATH(interpolant.Calculate(E_i, E_f), "");
+                #endif
             } else {
                 EXPECT_NEAR(interpolant.Calculate(E_i, E_f), analytical, analytical*1e-5);
             }
@@ -152,7 +156,9 @@ TEST(GetUpperLimit, Forward){
             double xi = std::pow(10, logxi);
             double analytical_upper = lower * std::exp(-xi);
             if (analytical_upper < 100) {
+                #ifndef NDEBUG
                 EXPECT_DEATH(interpolant.GetUpperLimit(lower, xi), "");
+                #endif
             } else {
                 EXPECT_NEAR(interpolant.GetUpperLimit(lower, xi), analytical_upper, analytical_upper*1e-5);
             }

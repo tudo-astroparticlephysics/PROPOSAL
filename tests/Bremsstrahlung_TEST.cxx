@@ -299,7 +299,9 @@ TEST(Bremsstrahlung, Test_of_e)
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
+                    #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                    #endif
                 } else {
                     stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
                     EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
@@ -458,7 +460,9 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
+                    #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                    #endif
                 } else {
                     stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
                     EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);

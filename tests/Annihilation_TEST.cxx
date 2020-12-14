@@ -154,7 +154,9 @@ TEST(Annihilation, Test_of_dNdx) {
             parametrization);
 
         if (energy <= particle_def.mass) {
+            #ifndef NDEBUG
             EXPECT_DEATH(cross->CalculatedNdx(energy), "");
+            #endif
             continue;
         }
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
@@ -195,7 +197,9 @@ TEST(Annihilation, Test_Stochastic_Loss)
             parametrization);
 
         if (energy <= particle_def.mass) {
+            #ifndef NDEBUG
             EXPECT_DEATH(cross->CalculatedNdx(energy), "");
+            #endif
             continue;
         }
         auto dNdx_full = cross->CalculatedNdx(energy);

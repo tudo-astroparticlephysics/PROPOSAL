@@ -54,7 +54,9 @@ TEST(GetUpperLimit, ForwardIntegration){
             double xi = std::pow(10., logxi);
             double analytical_max = min * std::exp(xi);
             if (analytical_max > HIGH) {
+                #ifndef NDEBUG
                 EXPECT_DEATH(integral1.GetUpperLimit(min, xi), "");
+                #endif
             } else {
                 EXPECT_NEAR(integral1.GetUpperLimit(min, xi), analytical_max, analytical_max*1e-5);
             }
@@ -72,7 +74,9 @@ TEST(GetUpperLimit, ForwardIntegration_Outside_Range){
     double xi = 40;
 
     EXPECT_TRUE(lower_lim * std::exp(xi) > high);
+    #ifndef NDEBUG
     EXPECT_DEATH(integral1.GetUpperLimit(lower_lim, xi), "");
+    #endif
 }
 
 TEST(GetUpperLimit, BackwardIntegration){
@@ -87,7 +91,9 @@ TEST(GetUpperLimit, BackwardIntegration){
             double xi = std::pow(10, logxi);
             double analytical_upper = lower * std::exp(-xi);
             if (analytical_upper < LOW) {
+                #ifndef NDEBUG
                 EXPECT_DEATH(integral1.GetUpperLimit(lower, xi), "");
+                #endif
             } else {
                 EXPECT_NEAR(integral1.GetUpperLimit(lower, xi), analytical_upper, analytical_upper*1e-5);
             }
@@ -105,7 +111,9 @@ TEST(GetUpperLimit, BackwardIntegration_Outside_Range){
     double xi = 10;
 
     EXPECT_TRUE(LOW * std::exp(-xi) < LOW);
+    #ifndef NDEBUG
     EXPECT_DEATH(integral1.GetUpperLimit(lower, xi), "");
+    #endif
 }
 
 TEST(GetUpperLimit, ListForwardIntegration){
