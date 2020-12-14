@@ -60,7 +60,7 @@ public:
     }
 };
 
-std::vector<std::unique_ptr<stochastic_deflection::Parametrization>>
+std::unique_ptr<std::vector<std::unique_ptr<stochastic_deflection::Parametrization>>>
 make_stochastic_deflection(std::vector<InteractionType> const& types,
     ParticleDef const& p, Medium const& m);
 } // namespace PROPOSAL
