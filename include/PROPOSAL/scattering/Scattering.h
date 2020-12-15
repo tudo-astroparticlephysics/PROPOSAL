@@ -11,18 +11,18 @@
 namespace PROPOSAL {
 
 class Scattering {
-    using deflect_ptr = std::unique_ptr<stochastic_deflection::Parametrization>;
+    using deflect_ptr = std::shared_ptr<stochastic_deflection::Parametrization>;
 
     std::unordered_map<InteractionType, deflect_ptr, InteractionType_hash>
         stochastic_deflection;
-    std::unique_ptr<multiple_scattering::Parametrization> multiple_scatter;
+    std::shared_ptr<multiple_scattering::Parametrization> multiple_scatter;
 
 public:
     Scattering() = default;
 
     Scattering(
-        std::unique_ptr<multiple_scattering::Parametrization> _multiple_scatter,
-        std::unique_ptr<std::vector<deflect_ptr>> _stochastic_deflection)
+        std::shared_ptr<multiple_scattering::Parametrization> _multiple_scatter,
+        std::shared_ptr<std::vector<deflect_ptr>> _stochastic_deflection)
         : multiple_scatter(std::move(_multiple_scatter))
     {
         if (_stochastic_deflection) {
@@ -60,7 +60,7 @@ public:
     }
 };
 
-std::unique_ptr<std::vector<std::unique_ptr<stochastic_deflection::Parametrization>>>
+std::vector<std::shared_ptr<stochastic_deflection::Parametrization>>
 make_stochastic_deflection(std::vector<InteractionType> const& types,
     ParticleDef const& p, Medium const& m);
 } // namespace PROPOSAL

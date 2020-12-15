@@ -8,6 +8,8 @@
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
 #include "pyBindings.h"
 
+#include <pybind11/stl.h>
+
 namespace py = pybind11;
 using namespace PROPOSAL;
 
@@ -32,7 +34,8 @@ void init_scattering(py::module& m)
                     ef(double): final energy
             )pbdoc");
 
-    auto scattering_doc = R"pbdoc(Factory method for a MultipleScattering object.
+    auto scattering_doc
+        = R"pbdoc(Factory method for a MultipleScattering object.
 
                 Args:
                     name(string): name of the scattering method
@@ -58,7 +61,8 @@ void init_scattering(py::module& m)
             return std::shared_ptr<multiple_scattering::Parametrization>(
                 make_multiple_scattering(n, p, m));
         },
-        py::arg("name"), py::arg("particle"), py::arg("medium"), scattering_doc);
+        py::arg("name"), py::arg("particle"), py::arg("medium"),
+        scattering_doc);
 
     py::class_<stochastic_deflection::Parametrization,
         std::shared_ptr<stochastic_deflection::Parametrization>>(
@@ -77,4 +81,7 @@ void init_scattering(py::module& m)
             R"pbdoc(TODO: Doc is missing because it's not clear if second argument
             should be the lost energy or the final energy. Please contact the
             maintainers if required.)pbdoc");
+
+    m.def("make_stochastic_deflection", &make_stochastic_deflection,
+        py::arg("type"), py::arg("particle"), py::arg("medium"));
 }
