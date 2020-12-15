@@ -146,9 +146,9 @@ Each sector consists of at least one **geometry**. Three different geometry type
 PROPOSAL provides different multiple scattering models, which can be set with the `scattering` parameter, namely:
 
 * `NoScattering`: No multiple scattering effects.
+* `HighlandIntegral `: Gaussian approximation of Molière theory, derived by [Highland](https://doi.org/10.1016/0029-554X(75)90743-0) and corrected by [Lynch/Dahl](https://doi.org/10.1016/0168-583X(91)95671-Y). 
+* `Highland`: Same as `HighlandIntegral`, but with the approximation that the particle energy is constant during a propagation step. *This parametrization should only be used for small step sizes where this approximation is valid.*
 * `Moliere`: Scattering based on [Molière's theory](https://zfn.mpdl.mpg.de/data/Reihe_A/3/ZNA-1948-3a-0078.pdf). *Significantly slower compared to other scattering models.*
-* `Highland`: Gaussian approximation of Molière theory, derived by [Highland](https://doi.org/10.1016/0029-554X(75)90743-0) and corrected by [Lynch/Dahl](https://doi.org/10.1016/0168-583X(91)95671-Y).
-* `HighlandIntegral`: Same as `Highland`, but taking into account that the energy decreases during a propagation step.
 
 ## Density distribution
 
@@ -193,6 +193,23 @@ with the scaling parameter `sigma`, the shifting parameter `d_0` in cm, the base
 | `sigma` | Number | `1.0`   | Scaling parameter          |
 | `d0`    | Number | `0.0`   | Shifting parameter (in cm) |
 
+#### Example
+
+Model the earth's atmosphere by creating an exponential density distribution with an radial axis.
+Here, we assume that `[0, 0, 0]` is the position of the earth's core and that the earth is a perfect sphere with a radius of `6.3781e8` cm:
+ 
+```json5
+"density_distribution":
+{
+	"type": "exponential",
+	"mass_density" : 1.225e-3,
+	"axis_type" : "radial",
+	"fp0" : [0, 0, 0]
+	"sigma" : -10.4e5,
+	"d0" : 6.3781e8,
+}
+```
+
 ### Polynomial
 
 Density distribution described by a polynomial of the form 
@@ -217,13 +234,15 @@ Density distribution described by splines along an axis, using either `linear` o
 
 ## Cross sections
 
-PROPOSAL provides the option to consider additional interaction types as well as to use different physical parametrizations of interactions.
+PROPOSAL provides the option to consider additional interaction types as well as to use different physical parametrizations of interactions. If no `CrossSections` object is included in the json file, PROPOSAL chooses a set of interaction types and paremetrizations appropriate for the particle. 
 
-If no `CrossSections` object is included in the json file, PROPOSAL chooses a set of interaction types and paremetrizations appropriate for the particle. 
-To use different parametrizations or enable optional interaction types, the `CrossSections` object needs to contain one object with the appropriate name for each interaction type. 
-This object has to contain the keyword `parametrization`, specifying the parametrization that should be used, as well as additional, type-specific keywords.
+To use alternative parametrizations or to enable additional interaction types, the `CrossSections` object needs to contain one object with the appropriate name for each interaction type (e.g. `annihilation`, `brems`, etc.). If there is no object for an specific interaction type, this interaction type will be disabled.
+
+Each of the defined objects has to contain the keyword `parametrization`, specifying the parametrization that should be used, as well as additional, type-specific keywords.
 
 #### Example
+
+Example where the interactions bremsstrahlung, electron-positron pair producton, ionization and nuclear interactions are enabled. In contrast to the default parametrizations for muons and taus, the LPM effect for electron-positron pair production and bremsstrahlung will be enabled.
 
 ```json
 "CrossSections" : {
@@ -375,3 +394,70 @@ Creation of an electron-positron pair by an ingoing photon. Available `photopair
 Weak interaction of an ingoing charged lepton. Available `weak` parametrizations are:
 
 * `CooperSarkarMertsch`: ([arXiv:1106.3723](https://arxiv.org/abs/1106.3723v1))
+
+# Global settings
+
+Properties that should be set for all or more than one sector may be set in a `global` object at the top-level of the json configuration file.
+
+Objects or keywords that can be defined in this global object are:
+
+* `Medium`
+* `CrossSections`
+* `cuts`
+* `exact_time`
+* `do_interpolation`
+* `scattering`
+
+Note that these options can and will still be overwritten by options in the individual sector objects: PROPOSAL will first look if an object or keyword is defined the in sector object in the `sectors` list. Only if an option is undefined here, PROPOSAL uses the definition in the `global` setting sections.
+If an option is undefined here as well, PROPOSAL will either use an appropriate default value or throw an exception if the option is mandatory.
+
+#### Example
+
+In this example, be define a sector which describes an earth made out of ice as well as a sector with an air atmosphere which surrounds the earth.
+Since the EnergyCut settings `e_cut = 500`, `v_cut = 1`, `cont_rand = false` are defined for the air sector, these EnergyCuts will be used.
+Since there are no `cuts` defined in the ice sector, PROPOSAL looks at the `global` section, where the EnergyCut settings `e_cut = inf`, `v_cut = 0.05`, `cont_rand = true` are defined and will therefore be used:
+
+```json5
+{
+	"global":
+	{
+		"cuts":
+		{
+			"e_cut": "inf",
+			"v_cut": 0.05,
+			"cont_rand": true
+		}
+	},
+	"sectors": [
+		{
+			"medium": "ice",
+			"geometries": [
+				{
+					"hierarchy": 0,
+					"shape": "sphere",
+					"origin": [0, 0, 0],
+					"outer_radius": 6.3781e8
+				}
+			]
+		},
+		{
+			"medium": "air",
+			"geometries": [
+				{
+					"hierarchy": 0,
+					"shape": "sphere",
+					"origin": [0, 0, 0],
+					"inner_radius": 6.3781e8,
+					"inner_radius": 1e20,
+				}
+			],
+			"cuts":
+			{
+				"e_cut": "500",
+				"v_cut": 1,
+				"cont_rand": false
+			}
+		}
+	]
+}
+```
