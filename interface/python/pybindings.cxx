@@ -137,18 +137,6 @@ PYBIND11_MODULE(proposal, m)
             return shared_ptr<Displacement>(make_displacement(cross, interpolate));
             });
 
-    m.def("make_scattering", [](std::string const& name,
-            ParticleDef const& particle, Medium const& medium,
-            crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
-        return shared_ptr<Scattering>(make_scattering(name, particle, medium,
-                                                      cross, interpolate));
-    }, py::arg("name"), py::arg("particle"), py::arg("medium"),
-          py::arg("cross"), py::arg("interpolate"));
-
-    m.def("make_scattering", [](std::string const& name,
-            ParticleDef const& particle, Medium const& medium){
-        return shared_ptr<Scattering>(make_scattering(name, particle, medium));
-        }, py::arg("name"), py::arg("particle"), py::arg("medium"));
 
     py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m,
             "InterpolationDef",
@@ -366,4 +354,3 @@ PYBIND11_MODULE(proposal, m)
             .value("trace", spdlog::level::level_enum::trace);
 
 }
-

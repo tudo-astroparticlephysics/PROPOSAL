@@ -4,7 +4,6 @@
 #include "PROPOSAL/math/MathMethods.h"
 
 using namespace PROPOSAL;
-using std::tuple;
 
 /*
 PropagationUtility::Definition::Definition(CrossSectionList cross,
@@ -84,7 +83,7 @@ PropagationUtility::PropagationUtility(
     }
 }
 
-tuple<InteractionType, std::shared_ptr<const Component>, double>
+std::tuple<InteractionType, std::shared_ptr<const Component>, double>
 PropagationUtility::EnergyStochasticloss(double energy, double rnd)
 {
     auto rates = collection.interaction_calc->Rates(energy);
@@ -133,7 +132,7 @@ double PropagationUtility::TimeElapsed(
         initial_energy, final_energy, distance, density);
 }
 
-tuple<Vector3D, Vector3D> PropagationUtility::DirectionsScatter(
+std::tuple<Vector3D, Vector3D> PropagationUtility::DirectionsScatter(
     double displacement, double initial_energy, double final_energy,
     const Vector3D& direction, std::function<double()> rnd)
 {
@@ -141,14 +140,15 @@ tuple<Vector3D, Vector3D> PropagationUtility::DirectionsScatter(
         std::array<double, 4> random_numbers;
         for (auto& r : random_numbers)
             r = rnd();
-        return collection.scattering->CalculateMultipleScattering(
-            displacement, initial_energy, final_energy, direction, random_numbers);
+        return collection.scattering->CalculateMultipleScattering(displacement,
+            initial_energy, final_energy, direction, random_numbers);
     }
     return std::make_tuple(direction, direction); // no scattering
 }
 
 Vector3D PropagationUtility::DirectionDeflect(InteractionType type,
-    double initial_energy, double final_energy, Vector3D direction, std::function<double()> rnd)
+    double initial_energy, double final_energy, Vector3D direction,
+    std::function<double()> rnd) const
 {
     if (collection.scattering) {
         std::vector<double> random_numbers(
