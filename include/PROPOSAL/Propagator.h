@@ -159,8 +159,7 @@ private:
         PropagationUtility::Collection def;
         def.interaction_calc = make_interaction(crosss, do_interpol);
         def.displacement_calc = make_displacement(crosss, do_interpol);
-        def.scattering = make_scattering(scatter, p_def, *medium, crosss,
-                                         do_interpol);
+        def.scattering = std::make_shared<Scattering>(make_multiple_scattering(scatter, p_def, *medium, crosss, do_interpol), nullptr);
         if (std::isfinite(p_def.lifetime))
             def.decay_calc = make_decay(crosss, p_def, do_interpol);
         if (do_cont_rand)

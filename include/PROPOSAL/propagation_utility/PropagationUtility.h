@@ -77,8 +77,8 @@ public:
 
     std::tuple<Vector3D, Vector3D> DirectionsScatter(
         double, double, double, const Vector3D&, std::function<double()>);
-    Vector3D DirectionDeflect(
-        InteractionType, double, double, Vector3D, std::function<double()>);
+    Vector3D DirectionDeflect(InteractionType, double, double, Vector3D,
+        std::function<double()>) const;
 
     Collection collection;
 };

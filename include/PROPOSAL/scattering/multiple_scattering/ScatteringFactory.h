@@ -56,7 +56,7 @@ static const std::unordered_map<std::string, ScatteringType> MultipleScatteringT
           { "noscattering", ScatteringType::NoScattering }};
 
 template <typename Cross = std::nullptr_t>
-unique_ptr<multiple_scattering::Parametrization> make_multiple_scattering(std::string const& name,
+std::unique_ptr<multiple_scattering::Parametrization> make_multiple_scattering(std::string const& name,
     ParticleDef const& p_def, Medium const& medium,
     Cross&& cross = nullptr, bool interpolate = true)
 {

@@ -1,14 +1,13 @@
-#include "PROPOSAL/secondaries/Parametrization.h"
-
-#include "PROPOSAL/secondaries/annihilation/HeitlerAnnihilation.h"
-#include "PROPOSAL/secondaries/bremsstrahlung/NaivBremsstrahlung.h"
-#include "PROPOSAL/secondaries/compton/NaivCompton.h"
-#include "PROPOSAL/secondaries/epairproduction/KelnerKokoulinPetrukhinEpairProduction.h"
-#include "PROPOSAL/secondaries/ionization/NaivIonization.h"
-#include "PROPOSAL/secondaries/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
-#include "PROPOSAL/secondaries/photonuclear/Photonuclear.h"
-#include "PROPOSAL/secondaries/photopairproduction/PhotoTsai.h"
-#include "PROPOSAL/secondaries/weakinteraction/NaivWeakInteraction.h"
+#include "PROPOSAL/secondaries/parametrization/Parametrization.h"
+#include "PROPOSAL/secondaries/parametrization/annihilation/HeitlerAnnihilation.h"
+#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/NaivBremsstrahlung.h"
+#include "PROPOSAL/secondaries/parametrization/compton/NaivCompton.h"
+#include "PROPOSAL/secondaries/parametrization/epairproduction/KelnerKokoulinPetrukhinEpairProduction.h"
+#include "PROPOSAL/secondaries/parametrization/ionization/NaivIonization.h"
+#include "PROPOSAL/secondaries/parametrization/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
+#include "PROPOSAL/secondaries/parametrization/photonuclear/Photonuclear.h"
+#include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsai.h"
+#include "PROPOSAL/secondaries/parametrization/weakinteraction/NaivWeakInteraction.h"
 
 #include "PROPOSAL/secondaries/SecondariesCalculator.h"
 
@@ -61,6 +60,6 @@ void init_secondaries(py::module& m)
 
     m_sub.def("make_secondary",
             [](InteractionType type, ParticleDef const& p, Medium const& m) {
-                return std::shared_ptr<secondaries::Parametrization>(secondaries::DefaultFactory::Create(type, p, m));
+                return std::shared_ptr<secondaries::Parametrization>(DefaultFactory<secondaries::Parametrization>::Create(type, p, m));
             });
 }
