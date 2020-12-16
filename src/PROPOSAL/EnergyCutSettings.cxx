@@ -7,9 +7,6 @@
 #include <stdexcept>
 
 using namespace PROPOSAL;
-using std::max;
-using std::min;
-using std::get;
 
 //----------------------------------------------------------------------------//
 //-------------------------public member functions----------------------------//
