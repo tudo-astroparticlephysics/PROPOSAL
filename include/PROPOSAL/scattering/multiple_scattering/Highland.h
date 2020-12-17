@@ -26,11 +26,10 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"
 #include <array>
 
@@ -41,21 +40,26 @@
  */
 namespace PROPOSAL {
 namespace multiple_scattering {
-class Highland : public Parametrization
-{
+    class Highland : public Parametrization {
     protected:
-    double charge;
-    double radiation_length;
+        double charge;
+        double radiation_length;
 
-    bool compare(const Parametrization&) const override;
-    void print(std::ostream&) const override;
+        bool compare(const Parametrization&) const override;
+        void print(std::ostream&) const override;
 
-public:
-    Highland(const ParticleDef&, Medium const&);
+    public:
+        Highland(const ParticleDef&, Medium const&);
 
-    RandomAngles CalculateRandomAngle(double grammage, double ei, double ef, const std::array<double, 4>& rnd) override;
-    virtual double CalculateTheta0(double grammage, double ei, double ef);
+        std::unique_ptr<Parametrization> clone() const
+        {
+            return std::unique_ptr<Parametrization>(
+                std::make_unique<Highland>(*this));
+        }
 
-};
+        RandomAngles CalculateRandomAngle(double grammage, double ei, double ef,
+            const std::array<double, 4>& rnd) override;
+        virtual double CalculateTheta0(double grammage, double ei, double ef);
+    };
 } // namespace multiple_scattering
 } // namespace PROPOSAL

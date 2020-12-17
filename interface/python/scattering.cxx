@@ -82,6 +82,14 @@ void init_scattering(py::module& m)
             should be the lost energy or the final energy. Please contact the
             maintainers if required.)pbdoc");
 
-    m.def("make_stochastic_deflection", &make_stochastic_deflection,
+    m.def(
+        "make_stochastic_deflection",
+        [](std::vector<InteractionType> const& t, ParticleDef const& p, Medium const& m) {
+            auto v = make_stochastic_deflection(t, p, m);
+            auto v_shared = std::vector<std::shared_ptr<stochastic_deflection::Parametrization>>();
+            for (auto& v_i : v)
+                v_shared.emplace_back(v_i->clone());
+            return v_shared;
+        },
         py::arg("type"), py::arg("particle"), py::arg("medium"));
 }

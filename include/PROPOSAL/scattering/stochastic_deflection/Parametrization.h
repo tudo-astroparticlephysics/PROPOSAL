@@ -5,6 +5,7 @@
 #include "PROPOSAL/particle/Particle.h"
 
 #include <array>
+#include <memory>
 #include <vector>
 
 using PROPOSAL::Components::Component;
@@ -14,6 +15,8 @@ namespace stochastic_deflection {
     struct Parametrization {
         Parametrization() = default;
         virtual ~Parametrization() = default;
+
+        virtual std::unique_ptr<Parametrization> clone() const = 0;
 
         virtual size_t RequiredRandomNumbers() const noexcept = 0;
         virtual InteractionType GetInteractionType() const noexcept = 0;

@@ -36,14 +36,14 @@ namespace multiple_scattering {
 
     class Parametrization {
     protected:
-
-
         double mass;
 
     public:
         Parametrization()=default;
         Parametrization(double mass);
         virtual ~Parametrization() = default;
+
+        virtual std::unique_ptr<Parametrization> clone() const = 0;
 
         virtual bool compare(const Parametrization&) const = 0;
         virtual void print(std::ostream&) const = 0;

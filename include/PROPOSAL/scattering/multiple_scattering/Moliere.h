@@ -43,6 +43,12 @@ namespace multiple_scattering {
         bool compare(const Parametrization&) const override;
         void print(std::ostream&) const override;
 
+        std::unique_ptr<Parametrization> clone() const final
+        {
+            return std::unique_ptr<Parametrization>(
+                std::make_unique<Moliere>(*this));
+        }
+
         int numComp_; // number of components in medium
         double ZSq_A_average_;
         std::vector<double> Zi_; // nuclear charge of different components

@@ -9,33 +9,42 @@
 #include <vector>
 
 namespace PROPOSAL {
-
 class Scattering {
-    using deflect_ptr = std::shared_ptr<stochastic_deflection::Parametrization>;
 
-    std::unordered_map<InteractionType, deflect_ptr, InteractionType_hash>
-        stochastic_deflection;
-    std::shared_ptr<multiple_scattering::Parametrization> multiple_scatter;
+    using deflect_ptr = std::unique_ptr<stochastic_deflection::Parametrization>;
+    using deflect_map_t = std::unordered_map<InteractionType, deflect_ptr,
+        InteractionType_hash>;
+    using scatter_ptr = std::unique_ptr<multiple_scattering::Parametrization>;
+
+    scatter_ptr multiple_scatter;
+    deflect_map_t stochastic_deflection;
+
+    template <typename T> inline deflect_map_t init_deflection(T obj)
+    {
+        auto m = deflect_map_t();
+        for (auto& d : *obj)
+            m[d->GetInteractionType()] = d->clone();
+        return m;
+    }
+
+    template <typename T> inline scatter_ptr init_multiple_scatter(T obj)
+    {
+        return obj->clone();
+    }
 
 public:
     Scattering() = default;
 
-    Scattering(
-        std::shared_ptr<multiple_scattering::Parametrization> _multiple_scatter,
-        std::shared_ptr<std::vector<deflect_ptr>> _stochastic_deflection)
-        : multiple_scatter(std::move(_multiple_scatter))
+    template <typename T1, typename T2>
+    Scattering(T1 _multiple_scatter, T2 _stochastic_deflection)
+        : multiple_scatter(init_multiple_scatter(std::move(_multiple_scatter)))
+        , stochastic_deflection(init_deflection(std::move(_stochastic_deflection)))
     {
-        if (_stochastic_deflection) {
-            for (auto& d : *_stochastic_deflection) {
-                stochastic_deflection[d->GetInteractionType()] = std::move(d);
-            }
-        }
     }
 
-    size_t StochasticDeflectionRandomNumbers(
-        InteractionType type) const noexcept
+    size_t StochasticDeflectionRandomNumbers(InteractionType t) const noexcept
     {
-        auto it = stochastic_deflection.find(type);
+        auto it = stochastic_deflection.find(t);
         if (it != stochastic_deflection.end())
             return it->second->RequiredRandomNumbers();
         return 0;
@@ -60,7 +69,33 @@ public:
     }
 };
 
-std::vector<std::shared_ptr<stochastic_deflection::Parametrization>>
-make_stochastic_deflection(std::vector<InteractionType> const& types,
-    ParticleDef const& p, Medium const& m);
+template <>
+inline Scattering::deflect_map_t Scattering::init_deflection(std::nullptr_t)
+{
+    return Scattering::deflect_map_t();
+}
+
+template <>
+inline Scattering::scatter_ptr Scattering::init_multiple_scatter(std::nullptr_t)
+{
+    return nullptr;
+}
+
+inline auto make_stochastic_deflection(
+    InteractionType t, ParticleDef const& p, Medium const& m)
+{
+    return DefaultFactory<stochastic_deflection::Parametrization>::Create(
+        t, p, m);
+}
+
+template <typename T>
+inline auto make_stochastic_deflection(
+    T types_container, ParticleDef const& p, Medium const& m)
+{
+    auto v = std::vector<
+        std::unique_ptr<stochastic_deflection::Parametrization>>();
+    for (auto t : types_container)
+        v.emplace_back(make_stochastic_deflection(t, p, m));
+    return v;
+}
 } // namespace PROPOSAL

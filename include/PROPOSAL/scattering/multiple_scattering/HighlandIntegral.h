@@ -36,7 +36,7 @@
 namespace PROPOSAL {
     namespace multiple_scattering {
 
-template <class T, class Cross, class Enable = void>
+template <class T, class Cross>
 class HighlandIntegral : public Highland {
     T highland_integral;
 
@@ -46,49 +46,74 @@ class HighlandIntegral : public Highland {
 public:
     HighlandIntegral(const ParticleDef&, Medium const&, Cross&&);
 
+    std::unique_ptr<Parametrization> clone() const
+    {
+        return std::unique_ptr<Parametrization>(
+            std::make_unique<HighlandIntegral<T, Cross>>(*this));
+    }
+
     static Interpolant1DBuilder::Definition interpol_def;
 
     double Integral(Displacement&, Cross, double);
 };
 
-template <class T>
-struct is_null_pointer
-    : std::is_same<std::nullptr_t, typename std::remove_cv<T>::type> {
-};
+/* template <class T> */
+/* struct is_null_pointer */
+/*     : std::is_same<std::nullptr_t, typename std::remove_cv<T>::type> { */
+/* }; */
+
+/* template <class T, class Cross> */
+/* class HighlandIntegral<T, Cross, */
+/*     typename std::enable_if< */
+/*         is_null_pointer<typename std::decay<Cross>::type>::value>::type> */
+/*     : public Parametrization { */
+/* public: */
+/*     HighlandIntegral(const ParticleDef&, Medium const&, Cross&&) */
+/*     { */
+/*         throw std::invalid_argument("CrossSectionVector needs to be passed " */
+/*                                     "to use scattering_highland."); */
+/*     }; */
+
+/*     bool compare(const Parametrization&) const { return false; }; */
+/*     void print(std::ostream&) const {}; */
+
+/*     std::unique_ptr<Parametrization> clone() const */
+/*     { */
+/*         return std::unique_ptr<Parametrization>( */
+/*             std::make_unique<HighlandIntegral<T, Cross>>(*this)); */
+/*     } */
+
+/*     // function will not be used */
+/*     RandomAngles CalculateRandomAngle( */
+/*         double, double, double, const std::array<double, 4>&) */
+/*     { */
+/*         return RandomAngles(); */
+/*     }; */
+/* }; */
 
 template <class T, class Cross>
-class HighlandIntegral<T, Cross,
-    typename std::enable_if<
-        is_null_pointer<typename std::decay<Cross>::type>::value>::type>
-    : public Parametrization {
-public:
-    HighlandIntegral(const ParticleDef&, Medium const&, Cross&&)
-    {
-        throw std::invalid_argument("CrossSectionVector needs to be passed "
-                                    "to use scattering_highland.");
-    };
-
-    bool compare(const Parametrization&) const { return false; };
-    void print(std::ostream&) const {};
-
-    // function will not be used
-    RandomAngles CalculateRandomAngle(
-        double, double, double, const std::array<double, 4>&)
-    {
-        return RandomAngles();
-    };
-};
-
-template <class T, class Cross, class Enable>
-HighlandIntegral<T, Cross, Enable>::HighlandIntegral(
+HighlandIntegral<T, Cross>::HighlandIntegral(
     const ParticleDef& p_def, Medium const& medium, Cross&& cross)
     : Highland(p_def, medium)
     , highland_integral(BuildHighlandIntegral(cross))
 {
 }
 
-template <class T, class Cross, class Enable>
-T HighlandIntegral<T, Cross, Enable>::BuildHighlandIntegral(
+template <class T>
+struct HighlandIntegral<T, std::nullptr_t>{
+    HighlandIntegral( const ParticleDef& , Medium const& , std::nullptr_t )
+{
+        throw std::invalid_argument("CrossSectionVector needs to be passed "
+                                    "to use scattering_highland.");
+}
+    std::unique_ptr<Parametrization> clone() const
+    {
+        return nullptr;
+    }
+};
+
+template <class T, class Cross>
+T HighlandIntegral<T, Cross>::BuildHighlandIntegral(
     Cross&& cross)
 {
     auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
@@ -104,8 +129,8 @@ T HighlandIntegral<T, Cross, Enable>::BuildHighlandIntegral(
     return decay_integral;
 }
 
-template <class T, class Cross, class Enable>
-double HighlandIntegral<T, Cross, Enable>::Integral(
+template <class T, class Cross>
+double HighlandIntegral<T, Cross>::Integral(
     Displacement& disp, Cross, double energy)
 {
     auto square_momentum = (energy - mass) * (energy + mass);
@@ -113,8 +138,8 @@ double HighlandIntegral<T, Cross, Enable>::Integral(
     return disp.FunctionToIntegral(energy) * aux * aux;
 }
 
-template <class T, class Cross, class Enable>
-double HighlandIntegral<T, Cross, Enable>::CalculateTheta0(
+template <class T, class Cross>
+double HighlandIntegral<T, Cross>::CalculateTheta0(
     double grammage, double ei, double ef)
 {
     auto aux = 13.6
@@ -124,9 +149,9 @@ double HighlandIntegral<T, Cross, Enable>::CalculateTheta0(
     return std::min(aux, 1.0);
 }
 
-template <class T, class Cross, class Enable>
+template <class T, class Cross>
 Interpolant1DBuilder::Definition
-    HighlandIntegral<T, Cross, Enable>::interpol_def
+    HighlandIntegral<T, Cross>::interpol_def
     = { 200 };
 } // namespace multiple_scattering
 } // namespace PROPOSAL

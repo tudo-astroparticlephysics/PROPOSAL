@@ -43,7 +43,7 @@ class Interpolant;
 struct InterpolationDef;
 
 class UtilityInterpolant : public UtilityIntegral {
-    std::unique_ptr<Interpolant> interpolant_;
+    std::shared_ptr<Interpolant> interpolant_;
     std::pair<double, double> upper_limit;
 
     // maybe interpolate function to integral will give a performance boost.
