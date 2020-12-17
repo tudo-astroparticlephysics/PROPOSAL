@@ -7,9 +7,6 @@
 #include <stdexcept>
 
 using namespace PROPOSAL;
-using std::max;
-using std::min;
-using std::get;
 
 //----------------------------------------------------------------------------//
 //-------------------------public member functions----------------------------//
@@ -21,7 +18,7 @@ EnergyCutSettings::EnergyCutSettings(
     , vcut_(vcut)
     , continuous_randomization_(continuous_randomization)
 {
-    if (ecut_ < 0)
+    if (ecut_ <= 0)
         throw std::invalid_argument(
             "Absolut EnergyCut (ecut) must be larger > 0! \nINFO: If a ecut = "
             "std::numeric_limits<double>::infinity() is set the particle will "
@@ -29,7 +26,7 @@ EnergyCutSettings::EnergyCutSettings(
 
     if (vcut_ <= 0 || vcut_ > 1)
         throw std::invalid_argument(
-            "Relative EnergyCut (vcut) must be between [0, 1]. \nINF0: If a vc"
+            "Relative EnergyCut (vcut) must be between (0, 1]. \nINF0: If a vc"
             "ut = 1 is set, the particle is only propagate continous.");
 
     Logging::Get("proposal.cut")->debug(
@@ -40,9 +37,9 @@ EnergyCutSettings::EnergyCutSettings(
 EnergyCutSettings::EnergyCutSettings(const nlohmann::json& config)
 {
     if (!config.contains("e_cut"))
-        throw std::invalid_argument("A e_cut must be defined. e_cut = [0-inf]");
+        throw std::invalid_argument("A e_cut must be defined. e_cut = (0-inf)");
     if (!config.contains("v_cut"))
-        throw std::invalid_argument("A v_cut must be defined. v_cut = [0-1]");
+        throw std::invalid_argument("A v_cut must be defined. v_cut = (0-1]");
     if (!config.contains("cont_rand"))
         throw std::invalid_argument(
             "cont_rand must be activated/deactivated. cont_rand = true/false");
