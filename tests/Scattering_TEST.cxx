@@ -51,6 +51,40 @@ auto GetCrossSections(const ParticleDef& p_def, const Medium& med, std::shared_p
     return cross;
 }
 
+// Borrow this function from PropagationUtility
+std::tuple<Vector3D, Vector3D> DirectionsScatter(const Vector3D& direction,
+                                                 std::array<double, 4>& coords)
+{
+    auto& sx = coords[multiple_scattering::Parametrization::SX];
+    auto& sy = coords[multiple_scattering::Parametrization::SY];
+    auto& tx = coords[multiple_scattering::Parametrization::TX];
+    auto& ty = coords[multiple_scattering::Parametrization::TY];
+    auto sz = std::sqrt(std::max(1. - (sx * sx + sy * sy), 0.));
+    auto tz = std::sqrt(std::max(1. - (tx * tx + ty * ty), 0.));
+
+    auto sinth = std::sin(direction.GetTheta());
+    auto costh = std::cos(direction.GetTheta());
+    auto sinph = std::sin(direction.GetPhi());
+    auto cosph = std::cos(direction.GetPhi());
+
+    auto rotate_vector_x = PROPOSAL::Vector3D(costh * cosph, costh * sinph, -sinth);
+    auto rotate_vector_y = PROPOSAL::Vector3D(-sinph, cosph, 0.);
+
+    // Rotation towards all tree axes
+    auto mean_direction = sz * direction;
+    mean_direction += sx * rotate_vector_x;
+    mean_direction += sy * rotate_vector_y;
+    mean_direction.CalculateSphericalCoordinates();
+
+    // Rotation towards all tree axes
+    auto final_direction = tz * direction;
+    final_direction += tx * rotate_vector_x;
+    final_direction += ty * rotate_vector_y;
+    final_direction.CalculateSphericalCoordinates();
+
+    return std::make_tuple(mean_direction, final_direction);
+}
+
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef mu = MuMinusDef();
@@ -101,18 +135,23 @@ public:
     void SetOffset(std::pair<double, double> offset){theta_offset_ = offset.first; phi_offset_ = offset.second;}
     void SetScatteringAngle(std::pair<double, double> scatter){theta_scatter_ = scatter.first; phi_scatter_ = scatter.second;}
 
-private:
-    RandomAngles CalculateRandomAngle(double grammage,
+    std::unique_ptr<Parametrization> clone() const final
+    {
+        return std::unique_ptr<Parametrization>(
+                std::make_unique<ScatterDummy>(*this));
+    }
+
+    std::array<double, 4> CalculateRandomAngle(double grammage,
                                       double ei,
                                       double ef,
                                       const std::array<double, 4>& rnd){
-        RandomAngles random_angles;
+        std::array<double, 4> random_angles{};
         //Set offset
-        random_angles.sx = std::sin(theta_offset_) * std::cos(phi_offset_);
-        random_angles.sy = std::sin(theta_offset_) * std::sin(phi_offset_);
+        random_angles.at(multiple_scattering::Parametrization::SX) = std::sin(theta_offset_) * std::cos(phi_offset_);
+        random_angles.at(multiple_scattering::Parametrization::SY) = std::sin(theta_offset_) * std::sin(phi_offset_);
         //Set Scattering
-        random_angles.tx = std::sin(theta_scatter_) * std::cos(phi_scatter_);
-        random_angles.ty = std::sin(theta_scatter_) * std::sin(phi_scatter_);
+        random_angles.at(multiple_scattering::Parametrization::TX) = std::sin(theta_scatter_) * std::cos(phi_scatter_);
+        random_angles.at(multiple_scattering::Parametrization::TY) = std::sin(theta_scatter_) * std::sin(phi_scatter_);
 
         return random_angles;
     };
@@ -153,7 +192,9 @@ TEST(Scattering, Scatter){
                 direction_init.CalculateSphericalCoordinates();
                 dummy3->SetOffset(offset);
                 dummy3->SetScatteringAngle(scatter);
-                auto directions = dummy3->Scatter(1, 10., 1., direction_init, {0, 0, 0, 0});
+
+                auto coords = dummy3->CalculateRandomAngle(1, 10., 1., {0, 0, 0, 0});
+                auto directions = DirectionsScatter(direction_init, coords);
                 // Expect directions to be normalized
                 ASSERT_DOUBLE_EQ(std::get<0>(directions).magnitude(), 1.);
                 ASSERT_DOUBLE_EQ(std::get<1>(directions).magnitude(), 1.);
@@ -179,17 +220,18 @@ TEST(Scattering, BorderCases){
 
     for(multiple_scattering::Parametrization* scatter : scatter_list) {
         // Expect no change of direction for displacement of almost zero
-        EXPECT_NEAR((std::get<0>(scatter->Scatter(1e-20, 1e4, 1e3, direction_init, {0.1, 0.2, 0.3, 0.4})) - direction_init).magnitude(),
-                    0, 1e-10);
-        EXPECT_NEAR((std::get<1>(scatter->Scatter(1e-20, 1e4, 1e3, direction_init, {0.1, 0.2, 0.3, 0.4})) - direction_init).magnitude(),
-                    0, 1e-10);
+        auto coords = scatter->CalculateRandomAngle(1e-20, 1e4, 1e3, {0.1, 0.2, 0.3, 0.4});
+        auto directions = DirectionsScatter(direction_init, coords);
+
+        EXPECT_NEAR((std::get<0>(directions) - direction_init).magnitude(), 0, 1e-10);
+        EXPECT_NEAR((std::get<1>(directions) - direction_init).magnitude(), 0, 1e-10);
 
         // Expect change of direction
-        EXPECT_FALSE(std::get<0>(scatter->Scatter(1000, 1e4, 1e3, direction_init, {0.1, 0.2, 0.3, 0.4})) ==
-                direction_init);
-        EXPECT_FALSE(std::get<1>(scatter->Scatter(1000, 1e4, 1e3, direction_init, {0.1, 0.2, 0.3, 0.4})) ==
-                direction_init);
+        coords = scatter->CalculateRandomAngle(1000, 1e4, 1e3, {0.1, 0.2, 0.3, 0.4});
+        directions = DirectionsScatter(direction_init, coords);
 
+        EXPECT_FALSE(std::get<0>(directions) == direction_init);
+        EXPECT_FALSE(std::get<1>(directions) == direction_init);
     }
 }
 
@@ -215,11 +257,14 @@ TEST(Scattering, FirstMomentum){
         Vector3D offset_sum = Vector3D(0., 0., 0.);
 
         for (int n=1; n<=statistics; ++n) {
-            auto sampled_vectors = scatter->Scatter(
-                    1e3, 1e4, 1e3, direction_init,
+            auto coords = scatter->CalculateRandomAngle(
+                    1e3, 1e4, 1e3,
                     {RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble(),
                      RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble()}
             );
+
+            auto sampled_vectors = DirectionsScatter(direction_init, coords);
+
             offset_sum = offset_sum + ( std::get<0>(sampled_vectors) - offset_sum) * (1./n);
             scatter_sum = scatter_sum + ( std::get<1>(sampled_vectors) - scatter_sum)* (1./n);
         }
@@ -266,11 +311,12 @@ TEST(Scattering, SecondMomentum){
             displacement = displacement_calculator.SolveTrackIntegral(E_i, E_f);
             ASSERT_TRUE(displacement > old_displacement);
             for (int n = 1; n <= statistics; ++n) {
-                auto sampled_vectors = scatter->Scatter(
-                        displacement, E_i, E_f, direction_init,
+                auto coords = scatter->CalculateRandomAngle(
+                        displacement, E_i, E_f,
                         {RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble(),
                          RandomGenerator::Get().RandomDouble(), RandomGenerator::Get().RandomDouble()}
                 );
+                auto sampled_vectors = DirectionsScatter(direction_init, coords);
                 offset_sum = offset_sum + ((std::get<0>(sampled_vectors) - direction_init).magnitude() - offset_sum) * (1. / n);
                 scatter_sum = scatter_sum + ((std::get<1>(sampled_vectors) - direction_init).magnitude() - scatter_sum) * (1. / n);
             }
@@ -311,8 +357,11 @@ TEST(Scattering, compare_integral_interpolant) {
                                                  RandomGenerator::Get().RandomDouble(),
                                                  RandomGenerator::Get().RandomDouble(),
                                                  RandomGenerator::Get().RandomDouble()};
-                auto vec_integral = scatter_integral->Scatter(1e4, E_i, 1e5, direction_init, rnd);
-                auto vec_interpol = scatter_interpol->Scatter(1e4, E_i, 1e5, direction_init, rnd);
+                auto coords_integral = scatter_integral->CalculateRandomAngle(1e4, E_i, 1e5, rnd);
+                auto coords_interpol = scatter_interpol->CalculateRandomAngle(1e4, E_i, 1e5, rnd);
+
+                auto vec_integral = DirectionsScatter(direction_init, coords_integral);
+                auto vec_interpol = DirectionsScatter(direction_init, coords_interpol);
 
                 EXPECT_NEAR(std::get<0>(vec_integral).GetX(), std::get<0>(vec_interpol).GetX(),
                             std::abs(std::get<0>(vec_integral).GetX() * 1e-5));
@@ -394,11 +443,11 @@ TEST(Scattering, ScatterReproducibilityTest)
             energy_previous = energy_init;
             if(energy_final > particle_def.mass) {
                 std::array<double, 4> rnd{rnd1, rnd2, rnd3, rnd4};
-                auto directions = scattering->Scatter(distance * medium->GetMassDensity(),
+                auto coords = scattering->CalculateRandomAngle(distance * medium->GetMassDensity(),
                                                       energy_init,
                                                       energy_final,
-                                                      direction_init,
                                                       rnd);
+                auto directions = DirectionsScatter(direction_init, coords);
                 position_out = position_init + distance * std::get<0>(directions);
                 direction_out = std::get<1>(directions);
 
