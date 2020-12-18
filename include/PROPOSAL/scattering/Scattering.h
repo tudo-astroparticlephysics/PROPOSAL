@@ -48,6 +48,17 @@ class Scattering {
 public:
     Scattering() = default;
 
+    /**
+     * @brief Storage class of objects related to particle deflection. There are
+     * diffentiated between stochastic deflection and multiple scattering
+     *
+     * @tparam T1 multiple_scattering::Parametrization or nullptr_t
+     * @tparam T2 container of stochastic_deflection::Parametrization or nullptr_t
+     * @param _m Multiple scattering calculator to take deflections caused by
+     * continuous losses into account
+     * @param _s list of deflection calculator to take stochastic deflections
+     * intor account
+     */
     template <typename T1, typename T2>
     Scattering(T1&& _m, T2&& _s)
         : multiple_scatter(init_multiple_scatter(std::forward<T1>(_m)))
@@ -55,6 +66,9 @@ public:
     {
     }
 
+    /**
+     * @brief random numbers required for a deflection of a specific type.
+     */
     size_t StochasticDeflectionRandomNumbers(InteractionType t) const noexcept
     {
         auto it = stochastic_deflection.find(t);
@@ -63,18 +77,31 @@ public:
         return 0;
     }
 
+    /**
+     * @brief random numbers required for multiple scattering.
+     */
     constexpr size_t MultipleScatteringRandomNumbers() noexcept { return 4; }
 
+    /**
+     * @brief Calculates deflection angles for specific interaction type. Take a
+     * deeper look into stochastic_deflection::Parametrization for a better
+     * understanding.
+     */
     template <typename... Args>
     std::array<double, 2> CalculateStochasticDeflection(
         InteractionType t, Args... args) const
     {
-        auto it = stochastic_deflection.find(static_cast<InteractionType>(t));
+        auto it = stochastic_deflection.find(t);
         if (it != stochastic_deflection.end())
             return it->second->CalculateStochasticDeflection(args...);
         return std::array<double, 2> { 0., 0. };
     }
 
+    /**
+     * @brief Calculate scattering angles in cartesian coordinates. Take a
+     * deeper look into multiple_scattering::Parametrization for a better
+     * understanding.
+     */
     template <typename... Args>
     std::array<double, 4> CalculateMultipleScattering(Args... args) const
     {
@@ -94,21 +121,35 @@ template <> inline auto Scattering::init_multiple_scatter(std::nullptr_t&&)
     return nullptr;
 }
 
-inline auto make_stochastic_deflection(
-    InteractionType t, ParticleDef const& p, Medium const& m)
+/**
+ * @brief Creates a default deflection of specific type.
+ *
+ * @tparam Args InteractionType and stochastic_deflection::Parametrization
+ * cstr. arguments
+ * @param args interaction type and the arguments of the corresponding cstr.
+ */
+template <typename... Args> inline auto make_stochastic_deflection(Args... args)
 {
     return DefaultFactory<stochastic_deflection::Parametrization>::Create(
-        t, p, m);
+        args...);
 }
 
+/**
+ * @brief Creates a vector of default deflection for a vector of types.
+ *
+ * @tparam Args std::vector<InteractionType> and
+ * stochastic_deflection::Parametrization cstr. arguments
+ * @param types list of interaction types
+ * @param args the corresponding cstr. argmuents
+ */
+template <typename... Args>
 inline auto make_stochastic_deflection(
-    std::vector<InteractionType> const& types, ParticleDef const& p,
-    Medium const& m)
+    std::vector<InteractionType> const& types, Args... args)
 {
     using param_ptr = std::unique_ptr<stochastic_deflection::Parametrization>;
     auto v = std::vector<param_ptr>();
     for (auto t : types)
-        v.emplace_back(make_stochastic_deflection(t, p, m));
+        v.emplace_back(make_stochastic_deflection(t, args...));
     return v;
 }
 } // namespace PROPOSAL
