@@ -7,7 +7,7 @@ namespace stochastic_deflection {
     class NaivBremsstrahlung : public Bremsstrahlung,
                                public DefaultDeflection<NaivBremsstrahlung> {
 
-        static constexpr int n_rnd = 2;
+        static constexpr int n_rnd = 1;
 
         std::unique_ptr<Parametrization> clone() const final
         {
