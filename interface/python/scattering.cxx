@@ -1,11 +1,13 @@
 
-/* #include "PROPOSAL/medium/Medium.h" */
-/* #include "PROPOSAL/particle/Particle.h" */
+#include "PROPOSAL/scattering/Scattering.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/scattering/multiple_scattering/Highland.h"
 #include "PROPOSAL/scattering/multiple_scattering/HighlandIntegral.h"
 #include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
+
+#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
+
 #include "pyBindings.h"
 
 #include <pybind11/stl.h>
@@ -82,14 +84,34 @@ void init_scattering(py::module& m)
             should be the lost energy or the final energy. Please contact the
             maintainers if required.)pbdoc");
 
+    using deflect_ptr = std::shared_ptr<stochastic_deflection::Parametrization>;
+    using deflect_list_t = std::vector<deflect_ptr>;
+
     m.def(
         "make_stochastic_deflection",
-        [](std::vector<InteractionType> const& t, ParticleDef const& p, Medium const& m) {
-            auto v = make_stochastic_deflection(t, p, m);
-            auto v_shared = std::vector<std::shared_ptr<stochastic_deflection::Parametrization>>();
-            for (auto& v_i : v)
+        [](std::vector<InteractionType> t, ParticleDef const& p,
+            Medium const& m) {
+            auto v_shared = deflect_list_t();
+            for (auto& v_i : make_stochastic_deflection(t, p, m))
                 v_shared.emplace_back(v_i->clone());
             return v_shared;
         },
         py::arg("type"), py::arg("particle"), py::arg("medium"));
+
+    using multiple_scattering_t = multiple_scattering::Parametrization;
+
+    py::class_<Scattering, std::shared_ptr<Scattering>>(m_sub, "Scattering")
+        .def(
+            py::init([](multiple_scattering_t const& s,
+                         deflect_list_t const& d) { return Scattering(s, d); }))
+        .def("n_rnd_mulitple_scatter",
+            &Scattering::MultipleScatteringRandomNumbers)
+        .def("n_rnd_stochastic_deflect",
+            &Scattering::StochasticDeflectionRandomNumbers)
+        .def("stochastic_deflection",
+            &Scattering::CalculateStochasticDeflection<double, double,
+                std::vector<double> const&>)
+        .def("multiple_scattering",
+            &Scattering::CalculateMultipleScattering<double, double, double,
+                const Vector3D&, const std::array<double, 4>&>);
 }

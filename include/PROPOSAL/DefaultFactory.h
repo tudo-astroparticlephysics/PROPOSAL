@@ -40,6 +40,9 @@ public:
     template <typename... Args>
     static std::unique_ptr<T> Create(InteractionType t, Args... args)
     {
+        if(!m)
+            throw std::logic_error("No default registered at all.");
+
         auto it = m->find(t);
         if (it != m->end())
             return it->second(args...);

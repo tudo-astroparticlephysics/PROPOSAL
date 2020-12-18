@@ -19,26 +19,39 @@ class Scattering {
     scatter_ptr multiple_scatter;
     deflect_map_t stochastic_deflection;
 
-    template <typename T> inline deflect_map_t init_deflection(T obj)
+    template <typename T> inline auto init_deflection(T&& obj)
     {
         auto m = deflect_map_t();
-        for (auto& d : *obj)
-            m[d->GetInteractionType()] = d->clone();
+        for (auto&& d : obj)
+            m[d->GetInteractionType()] = std::move(d);
         return m;
     }
 
-    template <typename T> inline scatter_ptr init_multiple_scatter(T obj)
+    template <typename T> inline auto init_deflection(T const& ref)
     {
-        return obj->clone();
+        auto _copy = std::vector<deflect_ptr>();
+        for (auto& _d : ref)
+            _copy.emplace_back(_d->clone());
+        return init_deflection(std::move(_copy));
+    }
+
+    template <typename T> inline auto init_multiple_scatter(T&& obj)
+    {
+        return std::move(obj);
+    }
+
+    template <typename T> inline auto init_multiple_scatter(T const& ref)
+    {
+        return init_multiple_scatter(ref.clone());
     }
 
 public:
     Scattering() = default;
 
     template <typename T1, typename T2>
-    Scattering(T1 _multiple_scatter, T2 _stochastic_deflection)
-        : multiple_scatter(init_multiple_scatter(std::move(_multiple_scatter)))
-        , stochastic_deflection(init_deflection(std::move(_stochastic_deflection)))
+    Scattering(T1&& _m, T2&& _s)
+        : multiple_scatter(init_multiple_scatter(std::forward<T1>(_m)))
+        , stochastic_deflection(init_deflection(std::forward<T2>(_s)))
     {
     }
 
@@ -53,7 +66,7 @@ public:
     constexpr size_t MultipleScatteringRandomNumbers() noexcept { return 4; }
 
     template <typename... Args>
-    auto CalculateStoachsticDeflection(InteractionType type, Args... args) const
+    std::array<double, 2> CalculateStochasticDeflection(InteractionType type, Args... args) const
     {
         auto it
             = stochastic_deflection.find(static_cast<InteractionType>(type));
@@ -63,20 +76,20 @@ public:
     }
 
     template <typename... Args>
-    auto CalculateMultipleScattering(Args... args) const
+    std::tuple<Vector3D, Vector3D> CalculateMultipleScattering(Args... args) const
     {
         return multiple_scatter->Scatter(args...);
     }
 };
 
 template <>
-inline Scattering::deflect_map_t Scattering::init_deflection(std::nullptr_t)
+inline auto Scattering::init_deflection(std::nullptr_t&&)
 {
     return Scattering::deflect_map_t();
 }
 
 template <>
-inline Scattering::scatter_ptr Scattering::init_multiple_scatter(std::nullptr_t)
+inline auto Scattering::init_multiple_scatter(std::nullptr_t&&)
 {
     return nullptr;
 }
@@ -88,13 +101,13 @@ inline auto make_stochastic_deflection(
         t, p, m);
 }
 
-template <typename T>
 inline auto make_stochastic_deflection(
-    T types_container, ParticleDef const& p, Medium const& m)
+    std::vector<InteractionType> const& types, ParticleDef const& p,
+    Medium const& m)
 {
-    auto v = std::vector<
-        std::unique_ptr<stochastic_deflection::Parametrization>>();
-    for (auto t : types_container)
+    using param_ptr = std::unique_ptr<stochastic_deflection::Parametrization>;
+    auto v = std::vector<param_ptr>();
+    for (auto t : types)
         v.emplace_back(make_stochastic_deflection(t, p, m));
     return v;
 }

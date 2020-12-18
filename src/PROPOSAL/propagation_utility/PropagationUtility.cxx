@@ -156,7 +156,7 @@ Vector3D PropagationUtility::DirectionDeflect(InteractionType type,
         for (auto& r : random_numbers)
             r = rnd();
         auto deflection_angles
-            = collection.scattering->CalculateStoachsticDeflection(
+            = collection.scattering->CalculateStochasticDeflection(
                 type, initial_energy, final_energy, random_numbers);
         direction.deflect(deflection_angles[0], deflection_angles[1]);
     }
@@ -164,7 +164,7 @@ Vector3D PropagationUtility::DirectionDeflect(InteractionType type,
 }
 
 double PropagationUtility::LengthContinuous(
-    double initial_energy, double final_energy)
+    double initial_energy, double& final_energy)
 {
     return collection.displacement_calc->SolveTrackIntegral(
         initial_energy, final_energy);

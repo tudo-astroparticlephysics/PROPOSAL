@@ -33,13 +33,12 @@
 
 namespace PROPOSAL {
 namespace multiple_scattering {
-
     class Parametrization {
     protected:
         double mass;
 
     public:
-        Parametrization()=default;
+        Parametrization() = default;
         Parametrization(double mass);
         virtual ~Parametrization() = default;
 
