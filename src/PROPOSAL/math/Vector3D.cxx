@@ -248,7 +248,7 @@ void Vector3D::normalise()
 }
 
 void Vector3D::deflect(double cosphi_deflect, double theta_deflect) {
-    if (cosphi_deflect != 1 || theta_deflect != 0) {
+    if (cosphi_deflect != 1. || theta_deflect != 0.) {
         CalculateSphericalCoordinates();
         double sinphi_deflect = std::sqrt(
                 std::max(0., (1. - cosphi_deflect) * (1. + cosphi_deflect)));

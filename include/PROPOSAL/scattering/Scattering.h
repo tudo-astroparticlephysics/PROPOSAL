@@ -66,30 +66,30 @@ public:
     constexpr size_t MultipleScatteringRandomNumbers() noexcept { return 4; }
 
     template <typename... Args>
-    std::array<double, 2> CalculateStochasticDeflection(InteractionType type, Args... args) const
+    std::array<double, 2> CalculateStochasticDeflection(
+        InteractionType t, Args... args) const
     {
-        auto it
-            = stochastic_deflection.find(static_cast<InteractionType>(type));
+        auto it = stochastic_deflection.find(static_cast<InteractionType>(t));
         if (it != stochastic_deflection.end())
             return it->second->CalculateStochasticDeflection(args...);
         return std::array<double, 2> { 0., 0. };
     }
 
     template <typename... Args>
-    std::tuple<Vector3D, Vector3D> CalculateMultipleScattering(Args... args) const
+    std::array<double, 4> CalculateMultipleScattering(Args... args) const
     {
-        return multiple_scatter->Scatter(args...);
+        if (multiple_scatter)
+            return multiple_scatter->CalculateRandomAngle(args...);
+        return std::array<double, 4> { 0, 0, 0, 0 };
     }
 };
 
-template <>
-inline auto Scattering::init_deflection(std::nullptr_t&&)
+template <> inline auto Scattering::init_deflection(std::nullptr_t&&)
 {
     return Scattering::deflect_map_t();
 }
 
-template <>
-inline auto Scattering::init_multiple_scatter(std::nullptr_t&&)
+template <> inline auto Scattering::init_multiple_scatter(std::nullptr_t&&)
 {
     return nullptr;
 }

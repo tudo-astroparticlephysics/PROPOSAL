@@ -74,12 +74,13 @@ namespace multiple_scattering {
         double F(double theta);
 
         double GetRandom(double pre_factor, double rnd);
+
     public:
         // constructor
         Moliere(const ParticleDef&, Medium const&);
 
-        RandomAngles CalculateRandomAngle(double grammage, double ei, double ef,
-            const std::array<double, 4>& rnd) override;
+        std::array<double, 4> CalculateRandomAngle(double grammage, double ei,
+            double ef, const std::array<double, 4>& rnd) override;
     };
 } // namespace multiple_scattering
 } // namespace PROPOSAL

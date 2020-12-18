@@ -57,8 +57,8 @@ namespace multiple_scattering {
                 std::make_unique<Highland>(*this));
         }
 
-        RandomAngles CalculateRandomAngle(double grammage, double ei, double ef,
-            const std::array<double, 4>& rnd) override;
+        std::array<double, 4> CalculateRandomAngle(double grammage, double ei,
+            double ef, const std::array<double, 4>& rnd) override;
         virtual double CalculateTheta0(double grammage, double ei, double ef);
     };
 } // namespace multiple_scattering

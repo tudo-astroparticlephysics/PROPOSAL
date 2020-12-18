@@ -140,8 +140,38 @@ std::tuple<Vector3D, Vector3D> PropagationUtility::DirectionsScatter(
         std::array<double, 4> random_numbers;
         for (auto& r : random_numbers)
             r = rnd();
-        return collection.scattering->CalculateMultipleScattering(displacement,
-            initial_energy, final_energy, direction, random_numbers);
+        auto random_angles = collection.scattering->CalculateMultipleScattering(
+            displacement, initial_energy, final_energy, random_numbers);
+
+        auto& sx = random_angles[multiple_scattering::Parametrization::SX];
+        auto& sy = random_angles[multiple_scattering::Parametrization::SY];
+        auto& tx = random_angles[multiple_scattering::Parametrization::TX];
+        auto& ty = random_angles[multiple_scattering::Parametrization::TY];
+        auto sz = std::sqrt(std::max(1. - (sx * sx + sy * sy), 0.));
+        auto tz = std::sqrt(std::max(1. - (tx * tx + ty * ty), 0.));
+
+        auto sinth = std::sin(direction.GetTheta());
+        auto costh = std::cos(direction.GetTheta());
+        auto sinph = std::sin(direction.GetPhi());
+        auto cosph = std::cos(direction.GetPhi());
+
+        auto rotate_vector_x
+            = PROPOSAL::Vector3D(costh * cosph, costh * sinph, -sinth);
+        auto rotate_vector_y = PROPOSAL::Vector3D(-sinph, cosph, 0.);
+
+        // Rotation towards all tree axes
+        auto mean_direction = sz * direction;
+        mean_direction += sx * rotate_vector_x;
+        mean_direction += sy * rotate_vector_y;
+        mean_direction.CalculateSphericalCoordinates();
+
+        // Rotation towards all tree axes
+        auto final_direction = tz * direction;
+        final_direction += tx * rotate_vector_x;
+        final_direction += ty * rotate_vector_y;
+        final_direction.CalculateSphericalCoordinates();
+
+        return std::make_tuple(mean_direction, final_direction);
     }
     return std::make_tuple(direction, direction); // no scattering
 }
@@ -151,20 +181,19 @@ Vector3D PropagationUtility::DirectionDeflect(InteractionType type,
     std::function<double()> rnd) const
 {
     if (collection.scattering) {
-        std::vector<double> random_numbers(
+        auto v_rnd = std::vector<double>(
             collection.scattering->StochasticDeflectionRandomNumbers(type));
-        for (auto& r : random_numbers)
+        for (auto& r : v_rnd)
             r = rnd();
-        auto deflection_angles
-            = collection.scattering->CalculateStochasticDeflection(
-                type, initial_energy, final_energy, random_numbers);
-        direction.deflect(deflection_angles[0], deflection_angles[1]);
+        auto angles = collection.scattering->CalculateStochasticDeflection(
+            type, initial_energy, final_energy, v_rnd);
+        direction.deflect(std::cos(angles[0]), angles[1]);
     }
     return direction;
 }
 
 double PropagationUtility::LengthContinuous(
-    double initial_energy, double& final_energy)
+    double initial_energy, double final_energy)
 {
     return collection.displacement_calc->SolveTrackIntegral(
         initial_energy, final_energy);

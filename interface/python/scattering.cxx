@@ -22,13 +22,10 @@ void init_scattering(py::module& m)
     py::class_<multiple_scattering::Parametrization,
         std::shared_ptr<multiple_scattering::Parametrization>>(
         m_sub, "MultipleScattering")
-        .def("scatter", &multiple_scattering::Parametrization::Scatter,
-            py::arg("grammage"), py::arg("e_i"), py::arg("e_f"),
-            py::arg("position"), py::arg("random_numbers"),
+        .def("scatter", &multiple_scattering::Parametrization::CalculateRandomAngle,
+            py::arg("grammage"), py::arg("e_i"), py::arg("e_f"), py::arg("random_numbers"),
             R"pbdoc(
-                Calculate a random averaged scatterangle `u` alonge the given
-                displacement`dr` and the particle directions after distance
-                `n_i`.
+                Calculate a random averaged scatterangle `u` in cartesian coordinates.
 
                 Args:
                     dr(double): displacement of particle
@@ -41,8 +38,8 @@ void init_scattering(py::module& m)
 
                 Args:
                     name(string): name of the scattering method
-                    particle(ParticleDef): particle related constants
-                    medium(Medium): medium related constants
+                    particle_def(ParticleDef): particle related constants
+                    target(Medium): medium related constants
 
                 Returns: MultipleScattering
     )pbdoc";
@@ -54,7 +51,7 @@ void init_scattering(py::module& m)
             return std::shared_ptr<multiple_scattering::Parametrization>(
                 make_multiple_scattering(n, p, m, c, i));
         },
-        py::arg("name"), py::arg("particle"), py::arg("medium"),
+        py::arg("name"), py::arg("particle_def"), py::arg("target"),
         py::arg("cross"), py::arg("interpolate"), scattering_doc);
 
     m.def(
@@ -63,7 +60,7 @@ void init_scattering(py::module& m)
             return std::shared_ptr<multiple_scattering::Parametrization>(
                 make_multiple_scattering(n, p, m));
         },
-        py::arg("name"), py::arg("particle"), py::arg("medium"),
+        py::arg("name"), py::arg("particle_def"), py::arg("target"),
         scattering_doc);
 
     py::class_<stochastic_deflection::Parametrization,
@@ -96,14 +93,18 @@ void init_scattering(py::module& m)
                 v_shared.emplace_back(v_i->clone());
             return v_shared;
         },
-        py::arg("type"), py::arg("particle"), py::arg("medium"));
+        py::arg("type"), py::arg("particle_def"), py::arg("target"));
 
-    using multiple_scattering_t = multiple_scattering::Parametrization;
+    using multiple_scatter_t = multiple_scattering::Parametrization;
 
     py::class_<Scattering, std::shared_ptr<Scattering>>(m_sub, "Scattering")
-        .def(
-            py::init([](multiple_scattering_t const& s,
-                         deflect_list_t const& d) { return Scattering(s, d); }))
+        .def(py::init([](multiple_scatter_t const& s, deflect_list_t const& d) {
+            return Scattering(s, d);
+        }))
+        .def(py::init(
+            [](multiple_scatter_t const& s) { return Scattering(s, nullptr); }))
+        .def(py::init(
+            [](deflect_list_t const& d) { return Scattering(nullptr, d); }))
         .def("n_rnd_mulitple_scatter",
             &Scattering::MultipleScatteringRandomNumbers)
         .def("n_rnd_stochastic_deflect",
@@ -113,5 +114,5 @@ void init_scattering(py::module& m)
                 std::vector<double> const&>)
         .def("multiple_scattering",
             &Scattering::CalculateMultipleScattering<double, double, double,
-                const Vector3D&, const std::array<double, 4>&>);
+                const std::array<double, 4>&>);
 }

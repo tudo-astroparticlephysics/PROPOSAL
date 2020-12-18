@@ -10,7 +10,7 @@
 
 using namespace PROPOSAL::multiple_scattering;
 
-Moliere::RandomAngles Moliere::CalculateRandomAngle(
+std::array<double, 4> Moliere::CalculateRandomAngle(
     double grammage, double ei, double ef, const std::array<double, 4>& rnd)
 {
     (void)ef;
@@ -41,7 +41,6 @@ Moliere::RandomAngles Moliere::CalculateRandomAngle(
         * ZSq_A_average_;
 
     // Calculate B
-    RandomAngles random_angles;
 
     for (int i = 0; i < numComp_; i++) {
         // calculate B-ln(B) = ln(chi_c^2/chi_a^2)+1-2*EULER_MASCHERONI via
@@ -58,11 +57,7 @@ Moliere::RandomAngles Moliere::CalculateRandomAngle(
         //  Check for inappropriate values of B. If B < 4.5 it is practical to
         //  assume no deviation.
         if ((xn < 4.5) || xn != xn) {
-            random_angles.sx = 0;
-            random_angles.sy = 0;
-            random_angles.tx = 0;
-            random_angles.ty = 0;
-            return random_angles;
+            return std::array<double, 4>{0,0,0,0};
         }
 
         B_[i] = xn;
@@ -73,16 +68,16 @@ Moliere::RandomAngles Moliere::CalculateRandomAngle(
     auto rnd1 = GetRandom(pre_factor, rnd[0]);
     auto rnd2 = GetRandom(pre_factor, rnd[1]);
 
-    random_angles.sx = 0.5 * (rnd1 / SQRT3 + rnd2);
-    random_angles.tx = rnd2;
+    auto sx = 0.5 * (rnd1 / SQRT3 + rnd2);
+    auto tx = rnd2;
 
     rnd1 = GetRandom(pre_factor, rnd[2]);
     rnd2 = GetRandom(pre_factor, rnd[3]);
 
-    random_angles.sy = 0.5 * (rnd1 / SQRT3 + rnd2);
-    random_angles.ty = rnd2;
+    auto sy = 0.5 * (rnd1 / SQRT3 + rnd2);
+    auto ty = rnd2;
 
-    return random_angles;
+    return std::array<double, 4>{sx, sy, tx, ty};
 }
 
 //----------------------------------------------------------------------------//

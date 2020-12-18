@@ -7,7 +7,7 @@ namespace stochastic_deflection {
     class NaivBremsstrahlung : public Bremsstrahlung,
                                public DefaultDeflection<NaivBremsstrahlung> {
 
-        static constexpr int n_rnd = 0;
+        static constexpr int n_rnd = 2;
 
         std::unique_ptr<Parametrization> clone() const final
         {
@@ -21,8 +21,7 @@ namespace stochastic_deflection {
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 
         std::array<double, 2> CalculateStochasticDeflection(
-            double initial_energy, double final_energy,
-            std::vector<double> const&) const final;
+            double e_i, double e_f, std::vector<double> const& rnd) const final;
     };
 } // namespace stochastic_deflection
 } // namespace PROPOSAL

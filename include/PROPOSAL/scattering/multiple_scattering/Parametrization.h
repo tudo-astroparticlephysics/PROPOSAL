@@ -47,20 +47,14 @@ namespace multiple_scattering {
         virtual bool compare(const Parametrization&) const = 0;
         virtual void print(std::ostream&) const = 0;
 
-        struct RandomAngles {
-            double sx, sy, tx, ty;
-        };
+        enum { SX, SY, TX, TY };
 
-        virtual RandomAngles CalculateRandomAngle(double grammage, double ei,
-            double ef, const std::array<double, 4>& rnd)
+        virtual std::array<double, 4> CalculateRandomAngle(double grammage,
+            double ei, double ef, const std::array<double, 4>& rnd)
             = 0;
 
         virtual bool operator==(const Parametrization& scattering) const;
         friend std::ostream& operator<<(std::ostream&, Parametrization const&);
-
-        std::tuple<Vector3D, Vector3D> Scatter(double grammage, double ei,
-            double ef, const Vector3D& old_direction,
-            const std::array<double, 4>& rnd);
     };
 } // namespace multiple_scattering
 } // namespace PROPOSAL
