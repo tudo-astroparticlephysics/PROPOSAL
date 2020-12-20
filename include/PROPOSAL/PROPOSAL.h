@@ -140,6 +140,7 @@
 #include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
 
 #include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/scattering/ScatteringMultiplier.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"

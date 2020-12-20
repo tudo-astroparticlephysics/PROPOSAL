@@ -5,6 +5,7 @@
 #include "PROPOSAL/scattering/multiple_scattering/HighlandIntegral.h"
 #include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
+#include "PROPOSAL/scattering/ScatteringMultiplier.h"
 
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
 
@@ -115,4 +116,16 @@ void init_scattering(py::module& m)
         .def("multiple_scattering",
             &Scattering::CalculateMultipleScattering<double, double, double,
                 const std::array<double, 4>&>);
+
+        py::class_<ScatteringMultiplier, Scattering, std::shared_ptr<ScatteringMultiplier>>(m_sub, "ScatteringMultiplier")
+        .def(py::init([](multiple_scatter_t const& s, deflect_list_t const& d, double mm, std::vector<std::pair<InteractionType, double>> dm) {
+            return ScatteringMultiplier(s, d, mm, dm);
+        }))
+        .def(py::init(
+            [](multiple_scatter_t const& s, double mm) {
+            auto dm =std::vector<std::pair<InteractionType, double>>();
+            return ScatteringMultiplier(s, nullptr, mm, dm); }))
+        .def(py::init(
+            [](deflect_list_t const& d, std::vector<std::pair<InteractionType, double>> dm) { return ScatteringMultiplier(nullptr, d, 1., dm); }));
+
 }

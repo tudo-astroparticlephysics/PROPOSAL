@@ -16,7 +16,7 @@ class Scattering {
         InteractionType_hash>;
     using scatter_ptr = std::unique_ptr<multiple_scattering::Parametrization>;
 
-    scatter_ptr multiple_scatter;
+    scatter_ptr m_scatter_ptr;
     deflect_map_t stochastic_deflection;
 
     template <typename T> inline auto init_deflection(T&& obj)
@@ -45,6 +45,34 @@ class Scattering {
         return init_multiple_scatter(ref.clone());
     }
 
+protected:
+    virtual std::array<double, 2> _scale_deflect(
+        std::array<double, 2>& a, InteractionType)
+    {
+        return a;
+    }
+
+    template <typename... Args>
+    auto _stochastic_deflect(
+        stochastic_deflection::Parametrization const& p, Args... args)
+    {
+        auto angles = p.CalculateStochasticDeflection(args...);
+        return _scale_deflect(angles, p.GetInteractionType());
+    }
+
+    virtual std::array<double, 4> _scale_scatter(std::array<double, 4>& a)
+    {
+        return a;
+    }
+
+    template <typename... Args>
+    auto _multiple_scatter(
+        multiple_scattering::Parametrization& p, Args... args)
+    {
+        auto angles = p.CalculateRandomAngle(args...);
+        return _scale_scatter(angles);
+    }
+
 public:
     Scattering() = default;
 
@@ -53,7 +81,8 @@ public:
      * diffentiated between stochastic deflection and multiple scattering
      *
      * @tparam T1 multiple_scattering::Parametrization or nullptr_t
-     * @tparam T2 container of stochastic_deflection::Parametrization or nullptr_t
+     * @tparam T2 container of stochastic_deflection::Parametrization or
+     * nullptr_t
      * @param _m Multiple scattering calculator to take deflections caused by
      * continuous losses into account
      * @param _s list of deflection calculator to take stochastic deflections
@@ -61,7 +90,7 @@ public:
      */
     template <typename T1, typename T2>
     Scattering(T1&& _m, T2&& _s)
-        : multiple_scatter(init_multiple_scatter(std::forward<T1>(_m)))
+        : m_scatter_ptr(init_multiple_scatter(std::forward<T1>(_m)))
         , stochastic_deflection(init_deflection(std::forward<T2>(_s)))
     {
     }
@@ -89,11 +118,11 @@ public:
      */
     template <typename... Args>
     std::array<double, 2> CalculateStochasticDeflection(
-        InteractionType t, Args... args) const
+        InteractionType t, Args... args)
     {
         auto it = stochastic_deflection.find(t);
         if (it != stochastic_deflection.end())
-            return it->second->CalculateStochasticDeflection(args...);
+            return _stochastic_deflect(*it->second, args...);
         return std::array<double, 2> { 0., 0. };
     }
 
@@ -103,10 +132,10 @@ public:
      * understanding.
      */
     template <typename... Args>
-    std::array<double, 4> CalculateMultipleScattering(Args... args) const
+    std::array<double, 4> CalculateMultipleScattering(Args... args)
     {
-        if (multiple_scatter)
-            return multiple_scatter->CalculateRandomAngle(args...);
+        if (m_scatter_ptr)
+            return _multiple_scatter(*m_scatter_ptr, args...);
         return std::array<double, 4> { 0, 0, 0, 0 };
     }
 };
