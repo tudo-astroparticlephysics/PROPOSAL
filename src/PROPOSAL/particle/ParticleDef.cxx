@@ -511,11 +511,6 @@ PARTICLE_IMP(K0, MKAON, -1.0, 0.0, static_cast<int>(ParticleType::K0))
 PARTICLE_IMP(KMinus, MKAON, LKAON, -1.0, static_cast<int>(ParticleType::KMinus))
 PARTICLE_IMP(KPlus, MKAON, LKAON, 1.0, static_cast<int>(ParticleType::KPlus))
 
-PARTICLE_IMP(
-    PMinus, MP, STABLE_PARTICLE, -1.0, static_cast<int>(ParticleType::PMinus))
-PARTICLE_IMP(
-    PPlus, MP, STABLE_PARTICLE, 1.0, static_cast<int>(ParticleType::PPlus))
-
 PARTICLE_IMP(Monopole, MMON, STABLE_PARTICLE, CMON,
     static_cast<int>(ParticleType::Monopole))
 

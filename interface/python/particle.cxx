@@ -23,13 +23,11 @@ void init_particle(py::module& m) {
         +----------+----------+----------+----------+----------+----------+
         |MuMinus   |MuPlus    |EMinus    |EPlus     |TauMinus  |TauPlus   |
         +----------+----------+----------+----------+----------+----------+
+        |NuTau     |NuTauBar  |NuE       |NuEBar    |NuMu      |NuMuBar   |
+        +----------+----------+----------+----------+----------+----------+
         |StauMinus |StauPlus  |Pi0       |PiMinus   |PiPlus    |K0        |
         +----------+----------+----------+----------+----------+----------+
-        |KMinus    |KPlus     |PMinus    |PPlus     |NuE       |NuEBar    |
-        +----------+----------+----------+----------+----------+----------+
-        |NuMu      |NuMuBar   |NuTau     |NuTauBar  |Monopole  |Gamma     |
-        +----------+----------+----------+----------+----------+----------+
-        |SMPMinus  |SMPPlus   |          |          |          |          |
+        |KMinus    |KPlus     |Monopole  |Gamma     |SMPMinus  |SMPPlus   |
         +----------+----------+----------+----------+----------+----------+
 
         Particle are static objects, so that the properties can not be
@@ -39,7 +37,7 @@ void init_particle(py::module& m) {
 
         A predefined particle can be initialize for example with
 
-        >>> muon = proposal.particle.MuMinusDef.get()
+        >>> muon = proposal.particle.MuMinusDef()
 
         The :meth:`Particle` class is a container for partilce related data.
         There can be for example initial energy set and losses read out.
@@ -193,8 +191,6 @@ void init_particle(py::module& m) {
     PARTICLE_DEF(m_sub, K0)
     PARTICLE_DEF(m_sub, KMinus)
     PARTICLE_DEF(m_sub, KPlus)
-    PARTICLE_DEF(m_sub, PMinus)
-    PARTICLE_DEF(m_sub, PPlus)
     PARTICLE_DEF(m_sub, NuE)
     PARTICLE_DEF(m_sub, NuEBar)
     PARTICLE_DEF(m_sub, NuMu)
@@ -348,8 +344,6 @@ void init_particle(py::module& m) {
         .value("KMinus", ParticleType::KMinus)
         .value("STauMinus", ParticleType::STauMinus)
         .value("STauPlus", ParticleType::STauPlus)
-        .value("PPlus", ParticleType::PPlus)
-        .value("PMinus", ParticleType::PMinus)
         .value("Monopole", ParticleType::Monopole);
 }
 
