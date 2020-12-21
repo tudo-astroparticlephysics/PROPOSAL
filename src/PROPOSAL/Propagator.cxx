@@ -282,9 +282,10 @@ Propagator::GlobalSettings::GlobalSettings(const nlohmann::json& config_global)
         cross = config_global["CrossSections"];
     if (config_global.contains("cuts"))
         cuts = std::make_shared<EnergyCutSettings>(config_global["cuts"]);
+    if (config_global.contains("scattering"))
+        scattering = config_global["scattering"];
     do_exact_time = config_global.value("exact_time", true);
     do_interpolation = config_global.value("do_interpolation", true);
-    scattering = config_global.value("scattering", "NoScattering");
 }
 
 Propagator::GlobalSettings::GlobalSettings()
@@ -293,5 +294,5 @@ Propagator::GlobalSettings::GlobalSettings()
     cross = {};
     do_exact_time = true;
     do_interpolation = true;
-    scattering = "NoScattering";
+    scattering = {};
 }

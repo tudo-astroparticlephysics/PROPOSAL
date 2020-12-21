@@ -128,6 +128,7 @@
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
 
 #include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/ScatteringFactory.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/Bremsstrahlung.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
 
@@ -141,6 +142,7 @@
 
 #include "PROPOSAL/scattering/Scattering.h"
 #include "PROPOSAL/scattering/ScatteringMultiplier.h"
+#include "PROPOSAL/scattering/ScatteringFactory.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
