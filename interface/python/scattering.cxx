@@ -1,11 +1,11 @@
 
 #include "PROPOSAL/scattering/Scattering.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/scattering/ScatteringMultiplier.h"
 #include "PROPOSAL/scattering/multiple_scattering/Highland.h"
 #include "PROPOSAL/scattering/multiple_scattering/HighlandIntegral.h"
 #include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
-#include "PROPOSAL/scattering/ScatteringMultiplier.h"
 
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
 
@@ -23,8 +23,10 @@ void init_scattering(py::module& m)
     py::class_<multiple_scattering::Parametrization,
         std::shared_ptr<multiple_scattering::Parametrization>>(
         m_sub, "MultipleScattering")
-        .def("scatter", &multiple_scattering::Parametrization::CalculateRandomAngle,
-            py::arg("grammage"), py::arg("e_i"), py::arg("e_f"), py::arg("random_numbers"),
+        .def("scatter",
+            &multiple_scattering::Parametrization::CalculateRandomAngle,
+            py::arg("grammage"), py::arg("e_i"), py::arg("e_f"),
+            py::arg("random_numbers"),
             R"pbdoc(
                 Calculate a random averaged scatterangle `u` in cartesian coordinates.
 
@@ -101,31 +103,79 @@ void init_scattering(py::module& m)
     py::class_<Scattering, std::shared_ptr<Scattering>>(m_sub, "Scattering")
         .def(py::init([](multiple_scatter_t const& s, deflect_list_t const& d) {
             return Scattering(s, d);
-        }))
-        .def(py::init(
-            [](multiple_scatter_t const& s) { return Scattering(s, nullptr); }))
-        .def(py::init(
-            [](deflect_list_t const& d) { return Scattering(nullptr, d); }))
+        }),
+            py::arg("multiple_scatter"), py::arg("stochastic_deflection"))
+        .def(py::init([](multiple_scatter_t const& s) {
+            return Scattering(s, nullptr);
+        }),
+            py::arg("multiple_scatter"))
+        .def(py::init([](deflect_list_t const& d) {
+            return Scattering(nullptr, d);
+        }),
+            py::arg("stochastic_deflection"))
         .def("n_rnd_mulitple_scatter",
-            &Scattering::MultipleScatteringRandomNumbers)
+            &Scattering::MultipleScatteringRandomNumbers,
+            R"pbdoc(Required number of random numbers to sample multiple scattering.
+            Returns:
+                int: required rnd numbers)pbdoc")
         .def("n_rnd_stochastic_deflect",
-            &Scattering::StochasticDeflectionRandomNumbers)
+            &Scattering::StochasticDeflectionRandomNumbers,
+            R"pbdoc(Required number of random numbers to sample a stochastic interaction for given type.
+            Args:
+                type (Interaction_Type): type of interaction
+            Returns:
+                int: required rnd numbers)pbdoc")
         .def("stochastic_deflection",
             &Scattering::CalculateStochasticDeflection<double, double,
-                std::vector<double> const&>)
+                std::vector<double> const&>,
+            py::arg("type"), py::arg("inital_energy"), py::arg("final_energy"),
+            py::arg("rnd"),
+            R"pbdoc(Sample stochastic defleciton angles in radians.
+            Args:
+                type (Interaction_Type): type of stochastic loss
+                initial_energy (double): energy before continuous loss
+                final_energy (double): energy after continuous loss
+                rnd (list(double)): container of random numbers
+            Returns:
+                list(double): deflection angles)pbdoc")
         .def("multiple_scattering",
             &Scattering::CalculateMultipleScattering<double, double, double,
-                const std::array<double, 4>&>);
+                const std::array<double, 4>&>,
+            py::arg("grammage"), py::arg("inital_energy"),
+            py::arg("final_energy"), py::arg("rnd"),
+            R"pbdoc(Sample multiple scattering angles in cartesian coordinates.
+            Args:
+                initial_energy (double): energy before continuous loss
+                final_energy (double): energy after continuous loss
+                rnd (list(double)): container of random numbers
+            Returns:
+                list(double): averaged deflection over continuous loss and final direction)pbdoc");
 
-        py::class_<ScatteringMultiplier, Scattering, std::shared_ptr<ScatteringMultiplier>>(m_sub, "ScatteringMultiplier")
-        .def(py::init([](multiple_scatter_t const& s, deflect_list_t const& d, double mm, std::vector<std::pair<InteractionType, double>> dm) {
+    py::class_<ScatteringMultiplier, Scattering,
+        std::shared_ptr<ScatteringMultiplier>>(m_sub, "ScatteringMultiplier")
+        .def(py::init([](multiple_scatter_t const& s, deflect_list_t const& d,
+                          double mm,
+                          std::vector<std::pair<InteractionType, double>> dm) {
             return ScatteringMultiplier(s, d, mm, dm);
-        }))
-        .def(py::init(
-            [](multiple_scatter_t const& s, double mm) {
-            auto dm =std::vector<std::pair<InteractionType, double>>();
-            return ScatteringMultiplier(s, nullptr, mm, dm); }))
-        .def(py::init(
-            [](deflect_list_t const& d, std::vector<std::pair<InteractionType, double>> dm) { return ScatteringMultiplier(nullptr, d, 1., dm); }));
-
+        }),
+            py::arg("multiple_scatter"), py::arg("stochastic_deflection"),
+            py::arg("multiple_scatter_multiplier"),
+            py::arg("stochastic_deflection_multiplier"),
+            R"pbdoc(Sample multiple scattering angles in cartesian coordinates.
+            Args:
+                multiple_scatter (MultipleScattering): multiple scattering calculator
+                stochastic_deflection (StochasticDeflection): stochastic deflection calculator
+                multiple_scatter_multiplier (double): multiple scatter factor
+                stochastic_deflection_multiplier ([tuple(Interaction_Type, double)]): interaction types with corresponding multiplier )pbdoc")
+        .def(py::init([](multiple_scatter_t const& s, double mm) {
+            auto dm = std::vector<std::pair<InteractionType, double>>();
+            return ScatteringMultiplier(s, nullptr, mm, dm);
+        }),
+            py::arg("multiple_scatter"), py::arg("multiple_scatter_multiplier"))
+        .def(py::init([](deflect_list_t const& d,
+                          std::vector<std::pair<InteractionType, double>> dm) {
+            return ScatteringMultiplier(nullptr, d, 1., dm);
+        }),
+            py::arg("stochastic_deflection"),
+            py::arg("stochastic_deflection_multiplier"));
 }

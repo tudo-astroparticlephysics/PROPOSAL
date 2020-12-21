@@ -27,6 +27,18 @@ class ScatteringMultiplier : public Scattering {
     }
 
 public:
+    /**
+     * @brief A wrapper class for handling with scattering multiplier.
+     * Multiplier are linear factors for scattering angles.
+     *
+     * @tparam T1 multiple_scattering::Parametrization or nullptr_t
+     * @tparam T2 container of stochastic_deflection::Parametrization or
+     * @param _m Multiple scattering calculator to take deflections caused by
+     * continuous losses into account
+     * @param _s list of deflection calculator to take stochastic deflections
+     * @param _mm multiple scattering factor
+     * @param _sm interaction type dependent stochastic deflection factor
+     */
     template <typename T1, typename T2>
     ScatteringMultiplier(T1&& _m, T2&& _s, double _mm,
         std::vector<std::pair<InteractionType, double>> _sm)
