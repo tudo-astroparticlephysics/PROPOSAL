@@ -11,8 +11,8 @@ class ScatteringMultiplier : public Scattering {
     {
         for (auto m : stochastic_deflect) {
             if (m.first == t) {
-                for (auto& a : angles)
-                    a *= m.second;
+                get<0>(angles) *= m.second;
+                assert(get<0>(angles) < PI);
                 return angles;
             }
         }
