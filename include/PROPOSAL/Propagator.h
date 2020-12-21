@@ -21,7 +21,7 @@
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 #include "PROPOSAL/medium/MediumFactory.h"
-#include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
+#include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/Secondaries.h"
 
 using std::get;
@@ -83,7 +83,7 @@ private:
         GlobalSettings();
         GlobalSettings(const nlohmann::json& config_global);
         nlohmann::json cross;
-        std::string scattering;
+        nlohmann::json scattering;
         std::shared_ptr<EnergyCutSettings> cuts = nullptr;
         std::shared_ptr<Medium> medium = nullptr;
         bool do_exact_time;
@@ -99,7 +99,7 @@ private:
         bool do_interpolation
                 = json_sector.value("do_interpolation", global.do_interpolation);
         bool do_exact_time = json_sector.value("exact_time", global.do_exact_time);
-        std::string scattering = json_sector.value("scattering", global.scattering);
+        auto scattering_config = json_sector.value("scattering", global.scattering);
         std::shared_ptr<Medium> medium = global.medium;
         if (json_sector.contains("medium")) {
             medium = CreateMedium(json_sector["medium"].get<std::string>());
@@ -129,12 +129,14 @@ private:
                                                  do_interpolation, density_correction,
                                                  cross_config);
             collection = CreateUtility(crosss, medium, cuts->GetContRand(),
-                                       do_interpolation, do_exact_time, scattering);
+                                       do_interpolation, do_exact_time,
+                                       scattering_config);
         } else {
             auto std_crosss = GetStdCrossSections(p_def, *medium, cuts,
                                                   do_interpolation);
             collection = CreateUtility(std_crosss, medium, cuts->GetContRand(),
-                                       do_interpolation, do_exact_time, scattering);
+                                       do_interpolation, do_exact_time,
+                                       scattering_config);
         }
         auto utility = PropagationUtility(collection);
 
@@ -154,12 +156,13 @@ private:
     template<typename CrossVec>
     PropagationUtility::Collection CreateUtility(
             CrossVec&& crosss, std::shared_ptr<Medium> medium, bool do_cont_rand,
-            bool do_interpol, bool do_exact_time, std::string scatter)
+            bool do_interpol, bool do_exact_time, nlohmann::json scatter)
     {
         PropagationUtility::Collection def;
         def.interaction_calc = make_interaction(crosss, do_interpol);
         def.displacement_calc = make_displacement(crosss, do_interpol);
-        /* def.scattering = std::make_shared<Scattering>(make_multiple_scattering(scatter, p_def, *medium, crosss, do_interpol), nullptr); */
+        if (!scatter.empty())
+            def.scattering = make_scattering(scatter, p_def, *medium, crosss, do_interpol);
         if (std::isfinite(p_def.lifetime))
             def.decay_calc = make_decay(crosss, p_def, do_interpol);
         if (do_cont_rand)

@@ -1,7 +1,9 @@
 {
 	"global":
 	{
-		"scattering": "NoScattering",
+		"scattering": {
+			"multiple_scattering": "HighlandIntegral"
+		},
 		"cuts":
 		{
 			"e_cut": 500,

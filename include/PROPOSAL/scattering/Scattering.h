@@ -2,6 +2,7 @@
 
 #include "PROPOSAL/DefaultFactory.h"
 #include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/ScatteringFactory.h"
 #include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
 
 #include <memory>
@@ -157,7 +158,7 @@ template <> inline auto Scattering::init_multiple_scatter(std::nullptr_t&&)
  * cstr. arguments
  * @param args interaction type and the arguments of the corresponding cstr.
  */
-template <typename... Args> inline auto make_stochastic_deflection(Args... args)
+template <typename... Args> inline auto make_default_stochastic_deflection(Args... args)
 {
     return DefaultFactory<stochastic_deflection::Parametrization>::Create(
         args...);
@@ -172,13 +173,13 @@ template <typename... Args> inline auto make_stochastic_deflection(Args... args)
  * @param args the corresponding cstr. argmuents
  */
 template <typename... Args>
-inline auto make_stochastic_deflection(
+inline auto make_default_stochastic_deflection(
     std::vector<InteractionType> const& types, Args... args)
 {
     using param_ptr = std::unique_ptr<stochastic_deflection::Parametrization>;
     auto v = std::vector<param_ptr>();
     for (auto t : types)
-        v.emplace_back(make_stochastic_deflection(t, args...));
+        v.emplace_back(make_default_stochastic_deflection(t, args...));
     return v;
 }
 } // namespace PROPOSAL

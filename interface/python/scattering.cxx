@@ -88,11 +88,11 @@ void init_scattering(py::module& m)
     using deflect_list_t = std::vector<deflect_ptr>;
 
     m.def(
-        "make_stochastic_deflection",
+        "make_default_stochastic_deflection",
         [](std::vector<InteractionType> t, ParticleDef const& p,
             Medium const& m) {
             auto v_shared = deflect_list_t();
-            for (auto& v_i : make_stochastic_deflection(t, p, m))
+            for (auto& v_i : make_default_stochastic_deflection(t, p, m))
                 v_shared.emplace_back(v_i->clone());
             return v_shared;
         },
