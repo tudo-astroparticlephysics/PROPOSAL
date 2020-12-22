@@ -63,7 +63,8 @@ public:
     Propagator(ParticleDef const&, std::vector<Sector> sectors);
 
     Secondaries Propagate(const ParticleState& initial_particle,
-            double max_distance = 1e20, double min_energy = 0.);
+            double max_distance = 1e20, double min_energy = 0.,
+            unsigned int hierarchy_condition = 0);
     enum {GEOMETRY, UTILITY, DENSITY_DISTR};
 
 private:

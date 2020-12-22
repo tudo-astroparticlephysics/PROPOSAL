@@ -34,7 +34,8 @@ Propagator::Propagator(const ParticleDef& p_def, std::vector<Sector> sectors)
 }
 
 Secondaries Propagator::Propagate(
-        const ParticleState& initial_particle, double max_distance, double min_energy)
+        const ParticleState& initial_particle, double max_distance,
+        double min_energy, unsigned int hierarchy_condition)
 {
     Secondaries track(std::make_shared<ParticleDef>(p_def), sector_list);
 
@@ -90,9 +91,14 @@ Secondaries Propagator::Propagate(
                     }
                 }
                 break;
-            case ReachedBorder :
+            case ReachedBorder: {
+                auto hierarchy_i = get<GEOMETRY>(current_sector)->GetHierarchy();
                 current_sector = GetCurrentSector(state.position, state.direction);
+                auto hierarchy_f = get<GEOMETRY>(current_sector)->GetHierarchy();
+                if (hierarchy_i > hierarchy_condition and hierarchy_f < hierarchy_condition)
+                    continue_propagation = false;
                 break;
+            }
             case ReachedMaxDistance :
                 continue_propagation = false;
                 break;
@@ -246,8 +252,8 @@ Sector Propagator::GetCurrentSector(
     }
 
     if (potential_sec.empty())
-        throw std::logic_error(
-            "Propagator: No sector defined at current particle position.");
+        Logging::Get("proposal.propagator")->critical("No sector defined at particle position {}, {}, {}.",
+                                                      position.GetY(), position.GetY(), position.GetZ());
 
     auto highest_sector_iter = std::max_element(
         potential_sec.begin(), potential_sec.end(), [](Sector* a, Sector* b) {

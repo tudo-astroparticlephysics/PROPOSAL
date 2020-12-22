@@ -122,17 +122,17 @@ void init_geometry(py::module& m) {
     py::class_<Box, std::shared_ptr<Box>, Geometry>(m_sub, "Box")
         .def(py::init<Vector3D, double, double, double>())
         .def(py::init<const Box&>())
-        .def_property("width", &Box::GetX, &Box::SetX,
+        .def_property("length", &Box::GetX, &Box::SetX,
                       R"pbdoc(
-                width of the box (x-axis)
+                length of the box (x-axis)
             )pbdoc")
-        .def_property("height", &Box::GetY, &Box::SetY,
+        .def_property("width", &Box::GetY, &Box::SetY,
                       R"pbdoc(
-                height of the box (y-axis)
+                width of the box (y-axis)
             )pbdoc")
-        .def_property("depth", &Box::GetZ, &Box::SetZ,
+        .def_property("height", &Box::GetZ, &Box::SetZ,
                       R"pbdoc(
-                depth of the box (z-axis)
+                height of the box (z-axis)
             )pbdoc");
 
     py::class_<Cylinder, std::shared_ptr<Cylinder>, Geometry>(m_sub, "Cylinder",

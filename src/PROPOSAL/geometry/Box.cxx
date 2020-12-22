@@ -240,6 +240,11 @@ std::pair<double, double> Box::DistanceToBorder(const Vector3D& position, const 
                                  // of the particle trajectory ( two
                                  // intersections).
     {
+        if (dist.at(0) == dist.at(1)) {
+            // Both distances are equal, this means he have hit an edge of the box
+            distance.first = dist.at(0);
+            distance.second = -1;
+        }
         distance.first  = dist.at(0);
         distance.second = dist.at(1);
         if (distance.second < distance.first)
@@ -247,9 +252,15 @@ std::pair<double, double> Box::DistanceToBorder(const Vector3D& position, const 
             std::swap(distance.first, distance.second);
         }
 
+    } else if (dist.size() == 3 && dist.at(0) == dist.at(1) && dist.at(1) == dist.at(2))
+    {
+        // We have three intersections, all of them are equal, this means we
+        // hit an corner of the box
+        distance.first = dist.at(0);
+        distance.second = -1;
     } else
     {
-        Logging::Get("proposal.geometry")->error("This point should nerver be reached... (-1/-1) is returned");
+        Logging::Get("proposal.geometry")->error("This point should never be reached... (-1/-1) is returned");
 
         distance.first  = -1;
         distance.second = -1;

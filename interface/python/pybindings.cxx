@@ -331,7 +331,7 @@ PYBIND11_MODULE(proposal, m)
         .def(py::init<MuPlusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
         .def(py::init<TauMinusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
         .def(py::init<TauPlusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def("propagate", &Propagator::Propagate, py::arg("initial_particle"), py::arg("max_distance") = 1.e20, py::arg("min_energy") = 0.);
+        .def("propagate", &Propagator::Propagate, py::arg("initial_particle"), py::arg("max_distance") = 1.e20, py::arg("min_energy") = 0., py::arg("hierarchy_condition") = 0);
 
 
     /* py::class_<PropagatorService, std::shared_ptr<PropagatorService>>( */
