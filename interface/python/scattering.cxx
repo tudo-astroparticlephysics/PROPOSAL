@@ -87,6 +87,14 @@ void init_scattering(py::module& m)
     using deflect_ptr = std::shared_ptr<stochastic_deflection::Parametrization>;
     using deflect_list_t = std::vector<deflect_ptr>;
 
+    m.def("make_stochastic_deflection",
+            [](std::string const& n, ParticleDef const& p, Medium const& m) {
+                return std::shared_ptr<stochastic_deflection::Parametrization>(
+                        make_stochastic_deflection(n, p, m));
+            },
+            py::arg("name"), py::arg("particle_def"), py::arg("target"),
+            scattering_doc);
+
     m.def(
         "make_default_stochastic_deflection",
         [](std::vector<InteractionType> t, ParticleDef const& p,

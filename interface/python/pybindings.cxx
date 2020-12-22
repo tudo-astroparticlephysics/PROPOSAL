@@ -20,6 +20,7 @@ using namespace PROPOSAL;
 
 void init_components(py::module& m);
 void init_medium(py::module& m);
+void init_density_distribution(py::module& m);
 void init_particle(py::module& m);
 void init_decay(py::module& m);
 void init_geometry(py::module& m);
@@ -37,6 +38,7 @@ PYBIND11_MODULE(proposal, m)
 
     init_components(m);
     init_medium(m);
+    init_density_distribution(m);
     init_particle(m);
     init_decay(m);
     init_geometry(m);
