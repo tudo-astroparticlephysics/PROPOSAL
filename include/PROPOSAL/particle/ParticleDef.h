@@ -99,8 +99,6 @@ enum class ParticleType : int {
     KMinus = -321,
     STauMinus = 1000015,
     STauPlus = -1000015,
-    PPlus = 2212,
-    PMinus = -2212,
     Monopole = 41,
     SMPPlus = 9500,
     SMPMinus = -9500,
@@ -298,9 +296,6 @@ PARTICLE_DEF(K0)
 PARTICLE_DEF(KMinus)
 PARTICLE_DEF(KPlus)
 
-PARTICLE_DEF(PMinus)
-PARTICLE_DEF(PPlus)
-
 PARTICLE_DEF(NuE)
 PARTICLE_DEF(NuEBar)
 
@@ -344,8 +339,6 @@ static const std::unordered_map<ParticleType, const ParticleDef, ParticleType_ha
         { ParticleType::K0, K0Def() },
         { ParticleType::KPlus, KPlusDef() },
         { ParticleType::KMinus, KMinusDef() },
-        { ParticleType::PPlus, PPlusDef() },
-        { ParticleType::PMinus, PMinusDef() },
         { ParticleType::Monopole, MonopoleDef() },
         { ParticleType::SMPPlus, SMPPlusDef() },
         { ParticleType::SMPMinus, SMPMinusDef() },
