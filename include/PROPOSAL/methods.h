@@ -93,7 +93,7 @@ struct InterpolationDef {
 };
 
 class Interpolant;
-class InterpolantBuilder;
+struct InterpolantBuilder;
 
 namespace Helper {
 

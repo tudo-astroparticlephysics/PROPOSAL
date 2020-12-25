@@ -35,7 +35,7 @@
 #include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"
 
 namespace PROPOSAL {
-class ParticleDef;
+struct ParticleDef;
 
 namespace multiple_scattering {
 

@@ -45,7 +45,7 @@ namespace multiple_scattering {
     public:
         HighlandIntegral(const ParticleDef&, Medium const&, Cross&&);
 
-        std::unique_ptr<Parametrization> clone() const
+        std::unique_ptr<Parametrization> clone() const override
         {
             return std::unique_ptr<Parametrization>(
                 std::make_unique<HighlandIntegral<T, Cross>>(*this));

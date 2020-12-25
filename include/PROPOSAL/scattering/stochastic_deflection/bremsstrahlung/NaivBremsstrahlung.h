@@ -16,7 +16,7 @@ namespace stochastic_deflection {
         }
 
     public:
-        NaivBremsstrahlung(ParticleDef p, Medium) {};
+        NaivBremsstrahlung(ParticleDef, Medium) {};
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 

@@ -267,7 +267,7 @@ double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
 
 template <typename Param, typename P, typename M>
 double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
-    std::shared_ptr<const Component> const&, double energy, double, bool, std::true_type)
+    std::shared_ptr<const Component> const&, double, double, bool, std::true_type)
 {
     return 1;
 }
