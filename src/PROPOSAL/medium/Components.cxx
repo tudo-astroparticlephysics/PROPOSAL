@@ -249,11 +249,14 @@ void Component::SetBPrime()
 double Component::WoodSaxonPotential(double r0)
 {
     // This is the analytical intergral to
-    // $\int_{r_0}^{\infty} \frac{r^2}{1+\exp((r-r_0)/a)}dr \quad \text{with }
-    // a=0.54$ which can be written to $ar_0^2 \int_0^{\infty} \frac{dx}{1+e^x}
-    // \\$ $ + 2a^2r_0 \int_0^{\infty} \frac{x dx}{1+e^x} \\$ $ + a^3
-    // \int_0^{\infty} \frac{x^2 dx}{1+e^x}$ and results in $ar_0^2\log(2) +
-    // 2a^2r_0\pi^2/12 + 3/2a^3\zeta(3)$
+    // $\int_{r_0}^{\infty} \frac{r^2}{1+\exp((r-r_0)/a)}dr$
+    // with $a=0.54$ 
+    // which can be written to
+    // $ar_0^2 \int_0^{\infty} \frac{dx}{1+e^x}$
+    // $ + 2a^2r_0 \int_0^{\infty} \frac{x dx}{1+e^x}$
+    // $ + a^3 \int_0^{\infty} \frac{x^2 dx}{1+e^x}$
+    // and results in 
+    // $ar_0^2\log(2) + 2a^2r_0\pi^2/12 + 3/2a^3\zeta(3)$
     const double a = 0.54;
     return a
         * (r0 * r0 * std::log(2) + a * r0 * PI * PI / 6 + a * a * 1.5 * ZETA3);
