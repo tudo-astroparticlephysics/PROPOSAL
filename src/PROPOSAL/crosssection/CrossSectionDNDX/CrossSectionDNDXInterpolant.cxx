@@ -1,6 +1,7 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
 #include <cmath>
 
+using std::get;
 using namespace PROPOSAL;
 
 namespace PROPOSAL {
@@ -24,7 +25,7 @@ double retransform_relativ_loss(double v_cut, double v_max, double v)
 }
 
 
-unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx(crosssection::Parametrization const& param, ParticleDef const& p_def)
+std::unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx(crosssection::Parametrization const& param, ParticleDef const& p_def)
 {
     dNdx_def.xmin = param.GetLowerEnergyLim(p_def);
     dNdx_def.isLog = true;
@@ -43,7 +44,7 @@ unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx(crosssection::Pa
     return Helper::InitializeInterpolation("dNdx", Interpolant2DBuilder(dNdx_def), hash_digest);
 }
 
-unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx1d(crosssection::Parametrization const& param, ParticleDef const& p_def)
+std::unique_ptr<Interpolant> CrossSectionDNDXInterpolant::build_dndx1d(crosssection::Parametrization const& param, ParticleDef const& p_def)
 {
     dNdx_def.xmin = param.GetLowerEnergyLim(p_def);
     dNdx_def.isLog = true;

@@ -7,18 +7,19 @@
 using std::fmod;
 using std::make_tuple;
 using std::sqrt;
+using std::get;
 
 using namespace PROPOSAL;
 
 
 
-tuple<Vector3D, Vector3D> secondaries::NaivIonization::CalculateDirections(
+std::tuple<Vector3D, Vector3D> secondaries::NaivIonization::CalculateDirections(
     Vector3D dir, double, double, double)
 {
     return make_tuple(dir, dir);
 }
 
-tuple<double, double> secondaries::NaivIonization::CalculateEnergy(
+std::tuple<double, double> secondaries::NaivIonization::CalculateEnergy(
     double energy, double v)
 {
     return make_tuple(energy * (1 - v), energy * v);

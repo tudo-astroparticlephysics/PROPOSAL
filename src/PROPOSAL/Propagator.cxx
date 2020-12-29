@@ -26,6 +26,7 @@
 
 using namespace PROPOSAL;
 using std::string;
+using std::get;
 
 Propagator::Propagator(const ParticleDef& p_def, std::vector<Sector> sectors)
     : p_def(p_def)

@@ -1,15 +1,10 @@
 #pragma once
 
 #include "PROPOSAL/medium/Components.h"
-/* #include "PROPOSAL/particle/Particle.h" */
+#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/secondaries/parametrization/Parametrization.h"
 
-#include <array>
-#include <vector>
-
 using PROPOSAL::Components::Component;
-using std::array;
-using std::tuple;
 
 namespace PROPOSAL {
 namespace secondaries {
@@ -22,10 +17,10 @@ namespace secondaries {
         InteractionType GetInteractionType() const noexcept { return type; };
 
         virtual double CalculateRho(double, double, const Component&) = 0;
-        virtual tuple<Vector3D, Vector3D> CalculateDirections(
+        virtual std::tuple<Vector3D, Vector3D> CalculateDirections(
             Vector3D, double, double, const Component&, std::vector<double>)
             = 0;
-        virtual tuple<double, double> CalculateEnergy(double, double, double)
+        virtual std::tuple<double, double> CalculateEnergy(double, double, double)
             = 0;
     };
 } // namespace secondaries

@@ -35,8 +35,6 @@
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
-using std::shared_ptr;
-
 namespace PROPOSAL {
 
 class ManyBodyPhaseSpace : public DecayChannel
@@ -63,7 +61,7 @@ public:
     typedef std::function<void(PhaseSpaceParameters&, const ParticleDef&)> EstimateFunction;
 
 public:
-    ManyBodyPhaseSpace(std::vector<shared_ptr<const ParticleDef>> daughters, MatrixElementFunction ME = nullptr);
+    ManyBodyPhaseSpace(std::vector<std::shared_ptr<const ParticleDef>> daughters, MatrixElementFunction ME = nullptr);
     ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode);
     virtual ~ManyBodyPhaseSpace() = default;
 
@@ -190,7 +188,7 @@ private:
     bool compare(const DecayChannel&) const;
     void print(std::ostream&) const;
 
-    std::vector<shared_ptr<const ParticleDef>> daughters_;
+    std::vector<std::shared_ptr<const ParticleDef>> daughters_;
     std::vector<double> daughter_masses_;
 
     int number_of_daughters_;
@@ -222,7 +220,7 @@ public:
     ManyBodyPhaseSpace build();
 
 private:
-    std::vector<shared_ptr<const ParticleDef>> daughters_;
+    std::vector<std::shared_ptr<const ParticleDef>> daughters_;
     MatrixElementFunction matrix_element_;
 };
 

@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 
 #include <fstream>
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/math/RandomGenerator.h"

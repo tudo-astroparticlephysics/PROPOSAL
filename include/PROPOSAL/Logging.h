@@ -35,16 +35,10 @@
 #include <memory>
 #include <string>
 
-using std::unordered_map;
-using std::unique_ptr;
-using std::shared_ptr;
-using std::string;
-using std::make_shared;
-
 namespace PROPOSAL {
 struct Logging {
-    static unordered_map<std::string, unique_ptr<spdlog::logger>> logger;
-    static shared_ptr<spdlog::sinks::sink> sink;
+    static std::unordered_map<std::string, std::unique_ptr<spdlog::logger>> logger;
+    static std::shared_ptr<spdlog::sinks::sink> sink;
 
     Logging() = delete;
 
@@ -64,7 +58,7 @@ struct Logging {
     }
 
 private:
-    static unique_ptr<spdlog::logger> Create(std::string const& name)
+    static std::unique_ptr<spdlog::logger> Create(std::string const& name)
     {
         auto logger = PROPOSAL::make_unique<spdlog::logger>(name, sink);
         logger->set_level(global_loglevel);

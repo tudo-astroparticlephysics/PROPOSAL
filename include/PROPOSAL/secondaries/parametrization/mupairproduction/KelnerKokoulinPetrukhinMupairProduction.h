@@ -6,8 +6,6 @@
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/MupairProduction.h"
 
 using PROPOSAL::Components::Component;
-using std::array;
-using std::unique_ptr;
 
 namespace PROPOSAL {
 namespace secondaries {
@@ -29,13 +27,13 @@ namespace secondaries {
         }
 
         double CalculateRho(double, double, const Component&, double, double) final;
-        tuple<Vector3D, Vector3D> CalculateDirections(
+        std::tuple<Vector3D, Vector3D> CalculateDirections(
             Vector3D, double, double, double) final;
-        tuple<double, double> CalculateEnergy(double, double) final;
+        std::tuple<double, double> CalculateEnergy(double, double) final;
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
-        vector<ParticleState> CalculateSecondaries(
-                StochasticLoss, const Component&, vector<double>&) final;
+        std::vector<ParticleState> CalculateSecondaries(
+                StochasticLoss, const Component&, std::vector<double>&) final;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

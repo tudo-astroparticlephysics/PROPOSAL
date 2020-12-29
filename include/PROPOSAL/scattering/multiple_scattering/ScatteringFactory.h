@@ -69,20 +69,20 @@ namespace detail {
         switch (type) {
         case ScatteringType::HighlandIntegral:
             if (interpolate) {
-                return unique_ptr<multiple_scattering::Parametrization>(
+                return std::unique_ptr<multiple_scattering::Parametrization>(
                     new multiple_scattering::HighlandIntegral<
                         UtilityInterpolant, Cross>(
                         p_def, medium, std::forward<Cross>(cross)));
             } else {
-                return unique_ptr<multiple_scattering::Parametrization>(
+                return std::unique_ptr<multiple_scattering::Parametrization>(
                     new multiple_scattering::HighlandIntegral<UtilityIntegral,
                         Cross>(p_def, medium, std::forward<Cross>(cross)));
             }
         case ScatteringType::Highland:
-            return unique_ptr<multiple_scattering::Parametrization>(
+            return std::unique_ptr<multiple_scattering::Parametrization>(
                     new multiple_scattering::Highland(p_def, medium));
         case ScatteringType::Moliere:
-            return unique_ptr<multiple_scattering::Parametrization>(
+            return std::unique_ptr<multiple_scattering::Parametrization>(
                     new multiple_scattering::Moliere(p_def, medium));
         case ScatteringType::NoScattering:
             return nullptr;

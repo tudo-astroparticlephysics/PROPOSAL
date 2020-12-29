@@ -33,10 +33,6 @@
 #include <memory>
 #include <tuple>
 
-using std::get;
-using std::max;
-using std::min;
-
 namespace PROPOSAL {
 
 /**
@@ -68,7 +64,7 @@ public:
     }
     inline double GetCut(const std::tuple<double, double>& lim, double energy) const
     {
-        return std::min(std::max(get<0>(lim), GetCut(energy)), get<1>(lim));
+        return std::min(std::max(std::get<0>(lim), GetCut(energy)), std::get<1>(lim));
     }
     size_t GetHash() const noexcept;
     double GetEcut() const noexcept { return ecut_; }

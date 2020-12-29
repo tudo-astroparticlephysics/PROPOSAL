@@ -1,6 +1,5 @@
 #pragma once
 
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotopairProduction.h"
@@ -33,9 +32,9 @@ namespace secondaries {
         }
 
         double CalculateRho(double, double, const Component&) override;
-        tuple<Vector3D, Vector3D> CalculateDirections(Vector3D, double, double,
+        std::tuple<Vector3D, Vector3D> CalculateDirections(Vector3D, double, double,
             const Component&, std::vector<double>) override;
-        tuple<double, double> CalculateEnergy(double, double, double) override;
+        std::tuple<double, double> CalculateEnergy(double, double, double) override;
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
         std::vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,

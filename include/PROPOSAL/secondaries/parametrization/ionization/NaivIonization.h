@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/secondaries/parametrization/ionization/Ionization.h"
 
 

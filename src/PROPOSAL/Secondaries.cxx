@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 
+using std::get;
 using namespace PROPOSAL;
 
 Secondaries::Secondaries(std::shared_ptr<ParticleDef> p_def,

@@ -2,9 +2,6 @@
 
 #include "PROPOSAL/secondaries/parametrization/weakinteraction/WeakInteraction.h"
 
-using std::array;
-using std::vector;
-
 namespace PROPOSAL {
 namespace secondaries {
     class NaivWeakInteraction
@@ -19,8 +16,8 @@ namespace secondaries {
             : weak_partner_type(p.weak_partner) {}
 
         size_t RequiredRandomNumbers() const noexcept override { return n_rnd; }
-        vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
-                                                   vector<double>&) override;
+        std::vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
+                                                   std::vector<double>&) override;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

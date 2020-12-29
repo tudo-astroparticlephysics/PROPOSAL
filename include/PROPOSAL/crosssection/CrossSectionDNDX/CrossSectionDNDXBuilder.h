@@ -5,11 +5,11 @@
 
 namespace PROPOSAL {
 
-using dndx_map_t = unordered_map<std::shared_ptr<const Component>, unique_ptr<CrossSectionDNDX>>;
+using dndx_map_t = std::unordered_map<std::shared_ptr<const Component>, std::unique_ptr<CrossSectionDNDX>>;
 
 template <typename Param>
 dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
-    const Medium& medium, shared_ptr<const EnergyCutSettings> cut, bool interpol,
+    const Medium& medium, std::shared_ptr<const EnergyCutSettings> cut, bool interpol,
     std::true_type)
 {
     auto m = dndx_map_t();
@@ -30,7 +30,7 @@ dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
 
 template <typename Param>
 dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
-    const Medium& medium, shared_ptr<const EnergyCutSettings> cut,  bool interpol,
+    const Medium& medium, std::shared_ptr<const EnergyCutSettings> cut,  bool interpol,
     std::false_type)
 {
     auto m = dndx_map_t();
@@ -43,7 +43,7 @@ dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
 
 template <typename Param>
 dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
-    const Medium& medium, shared_ptr<const EnergyCutSettings> cut, bool interpol)
+    const Medium& medium, std::shared_ptr<const EnergyCutSettings> cut, bool interpol)
 {
     return build_cross_section_dndx(param, p_def, medium, cut, interpol,
         typename Param::base_param_t::component_wise{});

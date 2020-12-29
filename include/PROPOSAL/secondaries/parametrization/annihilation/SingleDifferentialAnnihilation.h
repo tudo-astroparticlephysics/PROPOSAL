@@ -8,8 +8,6 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
 
 using PROPOSAL::Components::Component;
-using std::array;
-using std::vector;
 
 namespace PROPOSAL {
 namespace secondaries {
@@ -30,13 +28,13 @@ namespace secondaries {
         }
 
         double CalculateRho(double, double, const Component&) final;
-        tuple<Vector3D, Vector3D> CalculateDirections(
+        std::tuple<Vector3D, Vector3D> CalculateDirections(
             Vector3D, double, double, double) final;
-        tuple<double, double> CalculateEnergy(double, double) final;
+        std::tuple<double, double> CalculateEnergy(double, double) final;
 
         size_t RequiredRandomNumbers() const noexcept { return n_rnd; }
-        vector<ParticleState> CalculateSecondaries(StochasticLoss,
-                                                   const Component&, vector<double>&);
+        std::vector<ParticleState> CalculateSecondaries(StochasticLoss,
+                                                   const Component&, std::vector<double>&);
     };
 } // namespace secondaries
 } // namespace PROPOSAL

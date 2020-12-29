@@ -8,6 +8,7 @@
 using std::fmod;
 using std::make_tuple;
 using std::sqrt;
+using std::get;
 
 using namespace PROPOSAL;
 
@@ -26,7 +27,7 @@ double secondaries::SingleDifferentialAnnihilation::CalculateRho(
     throw std::out_of_range(s.str());
 }
 
-tuple<Vector3D, Vector3D>
+std::tuple<Vector3D, Vector3D>
 secondaries::SingleDifferentialAnnihilation::CalculateDirections(
     Vector3D primary_dir, double energy, double rho, double rnd)
 {
@@ -44,7 +45,7 @@ secondaries::SingleDifferentialAnnihilation::CalculateDirections(
     return make_tuple(dir_1, dir_2);
 }
 
-tuple<double, double>
+std::tuple<double, double>
 secondaries::SingleDifferentialAnnihilation::CalculateEnergy(
     double energy, double rho)
 {
@@ -55,9 +56,9 @@ secondaries::SingleDifferentialAnnihilation::CalculateEnergy(
     return make_tuple(energy_1, energy_2);
 }
 
-vector<ParticleState>
+std::vector<ParticleState>
 secondaries::SingleDifferentialAnnihilation::CalculateSecondaries(
-        StochasticLoss loss, const Component& comp, vector<double> &rnd)
+        StochasticLoss loss, const Component& comp, std::vector<double> &rnd)
 {
     auto rho = CalculateRho(loss.parent_particle_energy, rnd[0], comp);
     auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, rho);

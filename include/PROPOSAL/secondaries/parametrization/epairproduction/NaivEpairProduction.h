@@ -1,15 +1,12 @@
 
 #pragma once
 
-#include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/secondaries/parametrization/epairproduction/EpairProduction.h"
 
-/* #include <unordered_map> */
-
 using PROPOSAL::Components::Component;
-/* using std::unordered_map; */
+
 namespace PROPOSAL {
 namespace secondaries {
     struct NaivEpairProduction

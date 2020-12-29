@@ -16,6 +16,7 @@
 
 namespace py = pybind11;
 using namespace PROPOSAL;
+using std::shared_ptr;
 
 
 void init_components(py::module& m);

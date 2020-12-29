@@ -6,9 +6,6 @@
 #include "PROPOSAL/secondaries/parametrization/epairproduction/EpairProduction.h"
 
 using PROPOSAL::Components::Component;
-using std::array;
-using std::unique_ptr;
-using std::tuple;
 
 namespace PROPOSAL {
     namespace secondaries {
@@ -22,9 +19,9 @@ namespace PROPOSAL {
             static constexpr int n_rnd = 3;
 
             double CalculateRho(double, double, const Component&, double, double);
-            tuple<Vector3D, Vector3D> CalculateDirections(
+            std::tuple<Vector3D, Vector3D> CalculateDirections(
                     Vector3D, double, double, double);
-            tuple<double, double> CalculateEnergy(double, double);
+            std::tuple<double, double> CalculateEnergy(double, double);
 
         public:
             KelnerKokoulinPetrukhinEpairProduction(

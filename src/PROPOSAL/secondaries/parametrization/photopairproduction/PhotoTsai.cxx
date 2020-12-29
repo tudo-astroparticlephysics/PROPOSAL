@@ -1,3 +1,5 @@
+
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsai.h"
 
 #include <cmath>
@@ -121,7 +123,7 @@ double secondaries::PhotoTsai::CalculateRho(
     throw std::out_of_range(s.str());
 }
 
-tuple<Vector3D, Vector3D> secondaries::PhotoTsai::CalculateDirections(
+std::tuple<Vector3D, Vector3D> secondaries::PhotoTsai::CalculateDirections(
     Vector3D dir, double energy, double rho, const Component& comp,
     std::vector<double> rnd)
 {
@@ -152,7 +154,7 @@ tuple<Vector3D, Vector3D> secondaries::PhotoTsai::CalculateDirections(
     return make_tuple(dir_0, dir_1);
 }
 
-tuple<double, double> secondaries::PhotoTsai::CalculateEnergy(
+std::tuple<double, double> secondaries::PhotoTsai::CalculateEnergy(
     double energy, double rho, double rnd)
 {
     if (rnd > 0.5)

@@ -15,7 +15,7 @@ using namespace PROPOSAL;
 const std::string ManyBodyPhaseSpace::name_ = "ManyBodyPhaseSpace";
 
 // ------------------------------------------------------------------------- //
-ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<shared_ptr<const ParticleDef>> daughters, MatrixElementFunction me)
+ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<std::shared_ptr<const ParticleDef>> daughters, MatrixElementFunction me)
     : DecayChannel()
     , daughters_(daughters)
     , daughter_masses_()

@@ -7,10 +7,10 @@
 
 using namespace PROPOSAL;
 
-vector<ParticleState>
+std::vector<ParticleState>
 secondaries::NaivWeakInteraction::CalculateSecondaries(StochasticLoss loss,
                                                        const Component&,
-                                                       vector<double>&)
+                                                       std::vector<double>&)
 {
     // TODO: Treatment of hadronic parts of interaction
     auto sec = std::vector<ParticleState>();

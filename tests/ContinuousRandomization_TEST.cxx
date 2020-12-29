@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 
 #include <fstream>
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"

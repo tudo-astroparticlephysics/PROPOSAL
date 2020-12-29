@@ -47,8 +47,6 @@
     };                                                                         \
     }
 
-using std::unique_ptr;
-
 namespace PROPOSAL {
 
 template<typename T, typename... Args>
@@ -150,7 +148,7 @@ namespace Helper {
     std::string Centered(int width, const std::string& str, char fill = '=');
 
     using InterpolantBuilderContainer
-        = std::vector<unique_ptr<InterpolantBuilder>>;
+        = std::vector<std::unique_ptr<InterpolantBuilder>>;
 
     // ----------------------------------------------------------------------------
     /// @brief Helper for interpolation initialization

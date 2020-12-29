@@ -37,7 +37,7 @@
 
 #define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                     \
     struct Photo##param : public PhotoQ2Integral {                             \
-        Photo##param(shared_ptr<ShadowEffect>);                                \
+        Photo##param(std::shared_ptr<ShadowEffect>);                                \
         using base_param_t = Photonuclear;                                     \
         double FunctionToQ2Integral(const ParticleDef&, const Component&,      \
             double energy, double v, double Q2) const;                         \
@@ -91,7 +91,7 @@ private:
 
 class PhotoQ2Integral : public Photonuclear {
 public:
-    PhotoQ2Integral(shared_ptr<ShadowEffect>);
+    PhotoQ2Integral(std::shared_ptr<ShadowEffect>);
     virtual ~PhotoQ2Integral() = default;
 
     virtual double DifferentialCrossSection(
@@ -111,11 +111,11 @@ Q2_PHOTO_PARAM_INTEGRAL_DEC(RenoSarcevicSu)
 
 template <typename P, typename M>
 using photoQ2_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
-        EnergyCutSettings>, shared_ptr<ShadowEffect>, bool);
+        EnergyCutSettings>, std::shared_ptr<ShadowEffect>, bool);
 
 template <typename Param, typename P, typename M>
 cross_t_ptr<P, M> create_photoQ2(P p_def, M medium,std::shared_ptr<const
-        EnergyCutSettings> cuts, shared_ptr<ShadowEffect> shadow, bool interpol) {
+        EnergyCutSettings> cuts, std::shared_ptr<ShadowEffect> shadow, bool interpol) {
     auto param = Param(shadow);
     return make_crosssection(param, p_def, medium, cuts, interpol);
 }

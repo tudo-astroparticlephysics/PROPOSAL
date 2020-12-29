@@ -89,7 +89,7 @@ PropagationUtility::EnergyStochasticloss(double energy, double rnd)
     auto rates = collection.interaction_calc->Rates(energy);
     auto loss = collection.interaction_calc->SampleLoss(energy, rates, rnd);
 
-    get<Interaction::FRACTIONAL_LOSS>(loss) *= energy;
+    std::get<Interaction::FRACTIONAL_LOSS>(loss) *= energy;
     return loss;
 }
 

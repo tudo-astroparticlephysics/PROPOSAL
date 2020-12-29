@@ -19,8 +19,8 @@ namespace secondaries {
             = PROPOSAL::InteractionType::Photonuclear;
         InteractionType GetInteractionType() const noexcept { return type; }
 
-        vector<ParticleState> CalculateSecondaries(StochasticLoss loss, const Component&,
-                                                   vector<double>&)
+        std::vector<ParticleState> CalculateSecondaries(StochasticLoss loss, const Component&,
+                                                   std::vector<double>&)
         {
             std::cout << "a hadronic interaction modell must be called."
                       << std::endl;

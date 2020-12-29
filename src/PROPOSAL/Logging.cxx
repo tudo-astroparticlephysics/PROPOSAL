@@ -3,9 +3,9 @@
 
 using namespace PROPOSAL;
 
-unordered_map<string, unique_ptr<spdlog::logger>> Logging::logger = {};
+std::unordered_map<std::string, std::unique_ptr<spdlog::logger>> Logging::logger = {};
 
-shared_ptr<spdlog::sinks::sink> Logging::sink
-    = make_shared<spdlog::sinks::stdout_color_sink_mt>();
+std::shared_ptr<spdlog::sinks::sink> Logging::sink
+    = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
 spdlog::level::level_enum Logging::global_loglevel = spdlog::level::level_enum::warn;

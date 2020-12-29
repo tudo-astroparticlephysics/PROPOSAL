@@ -59,7 +59,7 @@ namespace PROPOSAL {
         };
 
     template <typename Cross = std::nullptr_t>
-    unique_ptr<stochastic_deflection::Parametrization> make_stochastic_deflection(
+    std::unique_ptr<stochastic_deflection::Parametrization> make_stochastic_deflection(
             std::string const& name, ParticleDef const& p_def, Medium const& medium)
     {
         std::string name_lower = name;

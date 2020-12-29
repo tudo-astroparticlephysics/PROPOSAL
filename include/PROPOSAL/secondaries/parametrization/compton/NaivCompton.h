@@ -4,9 +4,6 @@
 
 #include <vector>
 
-using std::array;
-using std::vector;
-
 namespace PROPOSAL {
 namespace secondaries {
     struct NaivCompton : public Compton,
@@ -23,8 +20,8 @@ namespace secondaries {
         std::tuple<double, double> CalculateEnergy(double, double) final;
 
         size_t RequiredRandomNumbers() const noexcept { return n_rnd; }
-        vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
-                                                   vector<double>&);
+        std::vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
+                                                   std::vector<double>&);
     };
 } // namespace secondaries
 } // namespace PROPOSAL

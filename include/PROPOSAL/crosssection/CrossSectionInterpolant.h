@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "PROPOSAL/Constants.h"
+// #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/CrossSectionInterpolantBase.h"
@@ -55,7 +55,7 @@ class CrossSectionInterpolant : public crosssection_t<P, M>, public CrossSection
     param_t param;
     particle_t p_def;
     medium_t medium;
-    shared_ptr<const EnergyCutSettings> cut;
+    std::shared_ptr<const EnergyCutSettings> cut;
 
 
     dndx_map_t dndx_map;
@@ -67,13 +67,13 @@ class CrossSectionInterpolant : public crosssection_t<P, M>, public CrossSection
     double CalculateStochasticLoss_impl(
             std::shared_ptr<const Component> const&, double, double, bool, std::true_type);
 protected:
-    unique_ptr<Interpolant> dedx;
-    unique_ptr<Interpolant> de2dx;
+    std::unique_ptr<Interpolant> dedx;
+    std::unique_ptr<Interpolant> de2dx;
     /* unordered_map<const Component*, unique_ptr<Interpolant>> dndx; */
 
 public:
     CrossSectionInterpolant(Param&& _param, P&& _p_def, M&& _medium,
-        shared_ptr<const EnergyCutSettings> _cut)
+        std::shared_ptr<const EnergyCutSettings> _cut)
         : CrossSection<typename std::decay<P>::type, typename std::decay<M>::type>()
         , param(std::forward<Param>(_param)) // only for back transformation
         , p_def(std::forward<P>(_p_def))     // needed TODO: Maximilian Sackel
@@ -195,7 +195,7 @@ public:
 
 
 template <typename Param>
-unique_ptr<Interpolant> build_dedx(Param&& param, const ParticleDef& p_def,
+std::unique_ptr<Interpolant> build_dedx(Param&& param, const ParticleDef& p_def,
     const Medium& medium, const EnergyCutSettings& cut, Interpolant1DBuilder::Definition& def)
 {
     Integral integral;
@@ -216,7 +216,7 @@ unique_ptr<Interpolant> build_dedx(Param&& param, const ParticleDef& p_def,
 }
 
 template <typename Param>
-unique_ptr<Interpolant> build_de2dx(Param&& param, const ParticleDef& p_def,
+std::unique_ptr<Interpolant> build_de2dx(Param&& param, const ParticleDef& p_def,
     const Medium& medium, const EnergyCutSettings& cut, Interpolant1DBuilder::Definition& def)
 {
     Integral integral;

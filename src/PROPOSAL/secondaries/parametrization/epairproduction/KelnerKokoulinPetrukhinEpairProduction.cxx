@@ -41,14 +41,14 @@ double secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateRho(
     }
 }
 
-tuple<Vector3D, Vector3D>
+std::tuple<Vector3D, Vector3D>
 secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateDirections(
         Vector3D primary_dir, double, double, double)
 {
     return make_tuple(primary_dir, primary_dir);
 }
 
-tuple<double, double>
+std::tuple<double, double>
 secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateEnergy(
         double energy, double rho)
 {

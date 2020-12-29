@@ -10,6 +10,8 @@
 using std::fmod;
 using std::get;
 using std::make_tuple;
+using std::tuple;
+using std::vector;
 using std::sqrt;
 
 using namespace PROPOSAL;

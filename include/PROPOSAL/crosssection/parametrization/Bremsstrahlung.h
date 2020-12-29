@@ -43,8 +43,6 @@
             double energy, double v) const override;                           \
     };
 
-using std::unique_ptr;
-
 namespace PROPOSAL {
 class Interpolant;
 } // namespace PROPOSAL

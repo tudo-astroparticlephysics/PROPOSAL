@@ -24,8 +24,6 @@
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/Secondaries.h"
 
-using std::get;
-using std::make_shared;
 namespace PROPOSAL {
 
 using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
@@ -171,14 +169,14 @@ private:
         if(do_exact_time) {
             def.time_calc = make_time(crosss, p_def, do_interpol);
         } else {
-            def.time_calc = make_shared<ApproximateTimeBuilder>();
+            def.time_calc = std::make_shared<ApproximateTimeBuilder>();
         }
         return def;
     }
 
     template <typename P, typename M>
     crosssection_list_t<P, M> CreateCrossSectionList(
-            P&& p_def, M&& medium, shared_ptr<const EnergyCutSettings> cuts,
+            P&& p_def, M&& medium, std::shared_ptr<const EnergyCutSettings> cuts,
             bool interpolate, double density_correction, const nlohmann::json& config) {
         crosssection_list_t<P, M> cross;
 
