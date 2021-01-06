@@ -16,8 +16,11 @@ protected:
     std::function<std::tuple<double, double>(double)> kinematic_limits;
     std::shared_ptr<const EnergyCutSettings> cut;
     size_t hash_cross_section;
+    double lower_energy_lim;
 
 public:
+    CrossSectionDNDX() = default;
+
     template <typename Param, typename Particle, typename Target>
     CrossSectionDNDX(Param _param, Particle _particle, Target _target,
         std::shared_ptr<const EnergyCutSettings> _cut)
@@ -45,6 +48,7 @@ public:
             return _param.GetKinematicLimits(_particle, _target, energy);
         })
         , cut(_cut)
+        , lower_energy_lim(_param.GetLowerEnergyLim(_particle))
     {
         hash_cross_section = 0;
         hash_combine(hash_cross_section, _param.GetHash(), _particle.mass,
@@ -74,5 +78,7 @@ public:
         }
 
     }
+
+    auto GetLowerEnergyLim() { return lower_energy_lim;}
 };
 } // namespace PROPOSAL

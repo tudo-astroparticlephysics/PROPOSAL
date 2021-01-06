@@ -36,11 +36,19 @@ OPTION(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 OPTION(ADD_PYTHON "Choose to compile the python wrapper library" ON)
 
 #################################################################
+#################           spdlog        #######################
+#################################################################
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+add_subdirectory("vendor/spdlog")
+
+#################################################################
 ####################       PROPOSAL      ########################
 #################################################################
 file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/src/PROPOSAL/*)
-add_library(PROPOSAL SHARED ${SRC_FILES})
+add_library(PROPOSAL ${SRC_FILES})
 add_library(PROPOSAL::PROPOSAL ALIAS PROPOSAL)
+target_link_libraries(PROPOSAL PUBLIC spdlog)
 target_compile_features(PROPOSAL PUBLIC cxx_std_14)
 set_target_properties(PROPOSAL PROPERTIES CXX_EXTENSIONS OFF)
 target_include_directories(
@@ -50,7 +58,7 @@ target_include_directories(
 )
 target_compile_options(PROPOSAL PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-format-security)
 install(
-    TARGETS PROPOSAL
+    TARGETS PROPOSAL spdlog
     EXPORT PROPOSALTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
@@ -86,14 +94,9 @@ if(NOT IS_SYMLINK ${CMAKE_BINARY_DIR}/resources)
 endif()
 
 
-#################################################################
-#################           spdlog        #######################
-#################################################################
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-add_subdirectory("vendor/spdlog")
-target_link_libraries(PROPOSAL PRIVATE spdlog)
-
+find_package(CubicInterpolation)
+target_link_libraries(PROPOSAL PUBLIC CubicInterpolation::CubicInterpolation)
 
 #################################################################
 #################           Tests        ########################
@@ -123,7 +126,7 @@ IF(ADD_PYTHON)
     add_subdirectory("vendor/pybind11")
     file(GLOB_RECURSE PYTHON_SRC_FILES ${PROJECT_SOURCE_DIR}/interface/python/*)
 
-    pybind11_add_module(pyproposal SHARED ${PYTHON_SRC_FILES})
+    pybind11_add_module(pyproposal ${PYTHON_SRC_FILES})
     set_target_properties(pyproposal PROPERTIES OUTPUT_NAME proposal)
     target_include_directories(pyproposal PRIVATE ${PYTHON_INCLUDE_DIRS})
     target_include_directories(pyproposal PRIVATE ${PROJECT_SOURCE_DIR}/interface/python)
@@ -140,20 +143,41 @@ ENDIF(ADD_PYTHON)
 #################################################################
 #################         INSTALLATION        ###################
 #################################################################
-install(
-    EXPORT PROPOSALTargets
-    FILE PROPOSALConfig.cmake
+install(EXPORT PROPOSALTargets
+    FILE PROPOSALTargets.cmake
     NAMESPACE PROPOSAL::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/PROPOSAL
-)
+    DESTINATION lib/cmake/PROPOSAL
+    )
 
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    "PROPOSALConfigVersion.cmake"
-    VERSION ${PACKAGE_VERSION}
-    COMPATIBILITY SameMajorVersion
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/PROPOSALConfig.cmake
+    INSTALL_DESTINATION lib/cmake
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO
+    )
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/PROPOSALConfig.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/PROPOSAL
+    )
+
+export(EXPORT PROPOSALTargets
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/PROPOSALTargets.cmake"
 )
-install(
-    FILES "${CMAKE_CURRENT_BINARY_DIR}/PROPOSALConfigVersion.cmake"
-    DESTINATION lib/cmake/PROPOSAL
-)
+
+# install(
+#     EXPORT PROPOSALTargets
+#     FILE PROPOSALConfig.cmake
+#     NAMESPACE PROPOSAL::
+#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/PROPOSAL
+# )
+
+# include(CMakePackageConfigHelpers)
+# write_basic_package_version_file(
+#     "PROPOSALConfigVersion.cmake"
+#     VERSION ${PACKAGE_VERSION}
+#     COMPATIBILITY SameMajorVersion
+# )
+# install(
+#     FILES "${CMAKE_CURRENT_BINARY_DIR}/PROPOSALConfigVersion.cmake"
+#     DESTINATION lib/cmake/PROPOSAL
+# )
