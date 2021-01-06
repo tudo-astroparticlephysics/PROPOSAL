@@ -12,7 +12,7 @@ class ScatteringMultiplier : public Scattering {
         for (auto m : stochastic_deflect) {
             if (m.first == t) {
                 std::get<0>(angles) *= m.second;
-                assert(std::get<0>(angles) < PI);
+                assert(std::get<0>(angles) <= PI);
                 return angles;
             }
         }

@@ -131,7 +131,8 @@
 #include "PROPOSAL/scattering/stochastic_deflection/ScatteringFactory.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/Bremsstrahlung.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
-
+#include "PROPOSAL/scattering/stochastic_deflection/ionization/Ionization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/ionization/NaivIonization.h"
 
 #include "PROPOSAL/scattering/multiple_scattering/Coefficients.h"
 #include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"

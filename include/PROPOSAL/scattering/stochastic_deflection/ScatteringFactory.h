@@ -42,6 +42,7 @@
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
+#include "PROPOSAL/scattering/stochastic_deflection/ionization/NaivIonization.h"
 
 
 namespace PROPOSAL {
@@ -55,8 +56,10 @@ namespace PROPOSAL {
     }
 
     static const std::map<std::string, func_ptr> DeflectionTable = {
-                {"naivbremsstrahlung", create_deflection<stochastic_deflection::NaivBremsstrahlung>}
-        };
+                {"naivbremsstrahlung", create_deflection<stochastic_deflection::NaivBremsstrahlung>},
+                {"naivionization", create_deflection<stochastic_deflection::NaivIonization>}
+
+    };
 
     template <typename Cross = std::nullptr_t>
     std::unique_ptr<stochastic_deflection::Parametrization> make_stochastic_deflection(
