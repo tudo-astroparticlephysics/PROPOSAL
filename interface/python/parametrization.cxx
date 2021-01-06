@@ -609,10 +609,13 @@ void init_parametrization(py::module& m)
                 >>> param = proposal.parametrization.ionization.BetheBlochRossi(mu, medium, cuts, multiplier)
                 )pbdoc")
             .def("differential_crosssection",
-                    /* py::overload_cast<ParticleDef const&, Medium const&, double, double>(&crosssection::Ionization::DifferentialCrossSection), */
                     py::overload_cast<ParticleDef const&, Medium const&, double, double>(&crosssection::Ionization::DifferentialCrossSection, py::const_ ),
-                    py::arg("particle_def"), py::arg("component"), py::arg("energy"),
+                    py::arg("particle_def"), py::arg("medium"), py::arg("energy"),
                     py::arg("v")
+                )
+            .def("kinematic_limits",
+                 py::overload_cast<ParticleDef const&, Medium const&, double>(&crosssection::Ionization::GetKinematicLimits, py::const_ ),
+                 py::arg("particle_def"), py::arg("medium"), py::arg("energy")
                 );
 
     py::class_<crosssection::IonizBetheBlochRossi,

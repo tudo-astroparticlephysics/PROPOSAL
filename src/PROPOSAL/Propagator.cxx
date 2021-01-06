@@ -121,7 +121,9 @@ InteractionType Propagator::DoStochasticInteraction(ParticleState& p_cond,
                                           p_cond.position, p_cond.direction,
                                           p_cond.time, p_cond.propagated_distance,
                                           p_cond.energy);
-    p_cond.direction = utility.DirectionDeflect(loss_type, p_cond.energy, loss_energy, p_cond.direction, rnd);
+    p_cond.direction = utility.DirectionDeflect(loss_type, p_cond.energy,
+                                                p_cond.energy - loss_energy,
+                                                p_cond.direction, rnd);
 
     p_cond.energy = p_cond.energy - loss_energy;
     return loss_type;
