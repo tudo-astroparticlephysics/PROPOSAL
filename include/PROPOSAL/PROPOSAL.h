@@ -79,6 +79,7 @@
 #include "PROPOSAL/secondaries/SecondariesCalculator.h"
 
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionIntegral.h"
 #include "PROPOSAL/crosssection/CrossSectionInterpolant.h"

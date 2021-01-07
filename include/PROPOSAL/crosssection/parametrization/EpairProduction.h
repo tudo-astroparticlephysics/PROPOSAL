@@ -35,6 +35,7 @@
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 
 using PROPOSAL::Components::Component;
 
@@ -120,14 +121,18 @@ private:
 
 template <typename P, typename M>
 using epair_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
-        EnergyCutSettings>, bool, bool, double);
+        EnergyCutSettings>, bool, bool, double, double);
 
 template <typename Param, typename P, typename M>
 cross_t_ptr<P, M> create_epair(P p_def, M medium,std::shared_ptr<const
         EnergyCutSettings> cuts, bool lpm, bool interpol,
-        double density_correction = 1.0) {
+        double density_correction = 1.0, double multiplier = 1.0) {
     auto param = Param(lpm, p_def, medium, density_correction);
-    return make_crosssection(param, p_def, medium, cuts, interpol);
+    auto cross = make_crosssection(param, p_def, medium, cuts, interpol);
+    if (multiplier == 1.0)
+        return cross;
+    return make_crosssection_multiplier(std::shared_ptr<crosssection_t<P, M>>(
+            std::move(cross)), multiplier);
 }
 
 template<typename P, typename M>
@@ -140,14 +145,16 @@ static std::map<std::string, epair_func_ptr<P, M>> epair_map = {
 template<typename P, typename M>
 cross_t_ptr<P, M> make_epairproduction(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, bool lpm,
-        const std::string& param_name, double density_correction = 1.0){
+        const std::string& param_name, double density_correction = 1.0,
+        double multiplier = 1.0){
     std::string name = param_name;
     std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
     auto it = epair_map<P, M>.find(name);
     if (it == epair_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for epairproduction");
 
-    return it->second(p_def, medium, cuts, lpm, interpol, density_correction);
+    return it->second(p_def, medium, cuts, lpm, interpol, density_correction,
+                      multiplier);
 }
 
 template<typename P, typename M>
@@ -159,9 +166,9 @@ cross_t_ptr<P, M> make_epairproduction(P p_def, M medium, std::shared_ptr<const
 
     std::string param_name = config["parametrization"];
     bool lpm = config.value("lpm", true);
-
+    double multiplier = config.value("multiplier", 1.0);
     return make_epairproduction(p_def, medium, cuts, interpol, lpm, param_name,
-                                density_correction);
+                                density_correction, multiplier);
 }
 
 } // namespace crosssection

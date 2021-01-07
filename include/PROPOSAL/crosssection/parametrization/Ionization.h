@@ -33,6 +33,7 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -122,13 +123,17 @@ namespace crosssection {
 
 template <typename P, typename M>
 using ioniz_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
-        EnergyCutSettings>, bool);
+        EnergyCutSettings>, bool, double);
 
 template <typename Param, typename P, typename M>
 cross_t_ptr<P, M> create_ioniz(P p_def, M medium,std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol) {
+        EnergyCutSettings> cuts, bool interpol, double multiplier) {
     auto param = Param(*cuts);
-    return make_crosssection(param, p_def, medium, cuts, interpol);
+    auto cross = make_crosssection(param, p_def, medium, cuts, interpol);
+    if (multiplier == 1.0)
+        return cross;
+    return make_crosssection_multiplier(std::shared_ptr<crosssection_t<P, M>>(
+            std::move(cross)), multiplier);
 }
 
 template<typename P, typename M>
@@ -140,14 +145,15 @@ static std::map<std::string, ioniz_func_ptr<P, M>> ioniz_map = {
 
 template<typename P, typename M>
 cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol, const std::string& param_name){
+        EnergyCutSettings> cuts, bool interpol, const std::string& param_name,
+        double multiplier = 1.0){
     std::string name = param_name;
     std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
     auto it = ioniz_map<P, M>.find(name);
     if (it == ioniz_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for ionization");
 
-    return it->second(p_def, medium, cuts, interpol);
+    return it->second(p_def, medium, cuts, interpol, multiplier);
 }
 
 template<typename P, typename M>
@@ -156,8 +162,9 @@ cross_t_ptr<P, M> make_ionization(P p_def, M medium, std::shared_ptr<const
     if (!config.contains("parametrization"))
         throw std::logic_error("No parametrization passed for ionization");
     std::string param_name = config["parametrization"];
-
-    return make_ionization(p_def, medium, cuts, interpol, param_name);
+    double multiplier = config.value("multiplier", 1.0);
+    return make_ionization(p_def, medium, cuts, interpol, param_name,
+                           multiplier);
 }
 
 

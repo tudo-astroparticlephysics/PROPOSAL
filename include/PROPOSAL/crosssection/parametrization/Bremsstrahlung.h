@@ -31,6 +31,7 @@
 #include <memory>
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 
 #define BREMSSTRAHLUNG_DEF(param)                                              \
     struct Brems##param : public Bremsstrahlung {                              \
@@ -119,15 +120,20 @@ private:
 
 template <typename P, typename M>
 using brems_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
-        EnergyCutSettings>, bool, bool, double);
+        EnergyCutSettings>, bool, bool, double, double);
 
 template <typename Param, typename P, typename M>
 cross_t_ptr<P, M> create_brems(P p_def, M medium,
                                std::shared_ptr<const EnergyCutSettings> cuts,
                                bool lpm, bool interpol,
-                               double density_correction = 1.0) {
+                               double density_correction = 1.0,
+                               double multiplier = 1.0) {
         auto param = Param(lpm, p_def, medium, density_correction);
-        return make_crosssection(param, p_def, medium, cuts, interpol);
+        auto cross = make_crosssection(param, p_def, medium, cuts, interpol);
+        if (multiplier == 1.0)
+            return cross;
+        return make_crosssection_multiplier(std::shared_ptr<crosssection_t<P, M>>(
+                std::move(cross)), multiplier);
 }
 
 template<typename P, typename M>
@@ -143,14 +149,15 @@ static std::map<std::string, brems_func_ptr<P, M>> brems_map = {
 template<typename P, typename M>
 cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, bool lpm, std::string param_name,
-        double density_correction = 1.0){
+        double density_correction = 1.0, double multiplier = 1.0){
     std::string name = param_name;
     std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
     auto it = brems_map<P, M>.find(name);
     if (it == brems_map<P, M>.end())
         throw std::logic_error("Unknown parametrization for bremsstrahlung");
 
-    return it->second(p_def, medium, cuts, lpm, interpol, density_correction);
+    return it->second(p_def, medium, cuts, lpm, interpol, density_correction,
+                      multiplier);
 }
 
 template<typename P, typename M>
@@ -162,9 +169,9 @@ cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium, std::shared_ptr<const
 
     std::string param_name = config["parametrization"];
     bool lpm = config.value("lpm", true);
-
+    double multiplier = config.value("multiplier", 1.0);
     return make_bremsstrahlung(p_def, medium, cuts, interpol, lpm, param_name,
-                               density_correction);
+                               density_correction, multiplier);
 }
 
 } // namespace crosssection

@@ -34,10 +34,11 @@
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 
 #define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                     \
     struct Photo##param : public PhotoQ2Integral {                             \
-        Photo##param(std::shared_ptr<ShadowEffect>);                                \
+        Photo##param(std::shared_ptr<ShadowEffect>);                           \
         using base_param_t = Photonuclear;                                     \
         double FunctionToQ2Integral(const ParticleDef&, const Component&,      \
             double energy, double v, double Q2) const;                         \
@@ -111,13 +112,19 @@ Q2_PHOTO_PARAM_INTEGRAL_DEC(RenoSarcevicSu)
 
 template <typename P, typename M>
 using photoQ2_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
-        EnergyCutSettings>, std::shared_ptr<ShadowEffect>, bool);
+        EnergyCutSettings>, std::shared_ptr<ShadowEffect>, bool, double);
 
 template <typename Param, typename P, typename M>
-cross_t_ptr<P, M> create_photoQ2(P p_def, M medium,std::shared_ptr<const
-        EnergyCutSettings> cuts, std::shared_ptr<ShadowEffect> shadow, bool interpol) {
+cross_t_ptr<P, M> create_photoQ2(P p_def, M medium,
+                                 std::shared_ptr<const EnergyCutSettings> cuts,
+                                 std::shared_ptr<ShadowEffect> shadow,
+                                 bool interpol, double multiplier = 1.0) {
     auto param = Param(shadow);
-    return make_crosssection(param, p_def, medium, cuts, interpol);
+    auto cross = make_crosssection(param, p_def, medium, cuts, interpol);
+    if (multiplier == 1.0)
+        return cross;
+    return make_crosssection_multiplier(std::shared_ptr<crosssection_t<P, M>>(
+            std::move(cross)), multiplier);
 }
 
 template<typename P, typename M>
@@ -143,7 +150,7 @@ static std::map<std::string, shadow_func_ptr> shadow_map = {
 template<typename P, typename M>
 cross_t_ptr<P, M> make_photonuclearQ2(P p_def, M medium, std::shared_ptr<const
         EnergyCutSettings> cuts, bool interpol, const std::string& param_name,
-        const std::string& shadow_name){
+        const std::string& shadow_name, double multiplier = 1.0){
     std::string name = param_name;
     std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
     auto it = photoQ2_map<P, M>.find(name);
@@ -155,7 +162,8 @@ cross_t_ptr<P, M> make_photonuclearQ2(P p_def, M medium, std::shared_ptr<const
     auto it_shadow = shadow_map.find(name2);
     if(it_shadow == shadow_map.end())
         throw std::logic_error("Shadow effect name unknown");
-    return it->second(p_def, medium, cuts, it_shadow->second(), interpol);
+    return it->second(p_def, medium, cuts, it_shadow->second(), interpol,
+                      multiplier);
 }
 
 template<typename P, typename M>
@@ -166,8 +174,9 @@ cross_t_ptr<P, M> make_photonuclearQ2(P p_def, M medium, std::shared_ptr<const
 
     std::string param_name = config["parametrization"];
     std::string shadow_name = config.value("shadow", "ButkevichMikheyev");
-
-    return make_photonuclearQ2(p_def, medium, cuts, interpol, param_name, shadow_name);
+    double multiplier = config.value("multiplier", 1.0);
+    return make_photonuclearQ2(p_def, medium, cuts, interpol, param_name,
+                               shadow_name, multiplier);
 }
 
 } // namespace crosssection
