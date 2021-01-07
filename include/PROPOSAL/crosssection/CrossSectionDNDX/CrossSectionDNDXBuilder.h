@@ -17,12 +17,12 @@ dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
         if (interpol)
             m.emplace(
                     std::make_shared<const Components::Component>(target),
-                    PROPOSAL::make_unique<CrossSectionDNDXInterpolant>(param, p_def, target, cut)
+                    std::make_unique<CrossSectionDNDXInterpolant>(param, p_def, target, cut)
             );
         else
             m.emplace(
                     std::make_shared<const Components::Component>(target),
-                    PROPOSAL::make_unique<CrossSectionDNDXIntegral>(param, p_def, target, cut)
+                    std::make_unique<CrossSectionDNDXIntegral>(param, p_def, target, cut)
             );
     }
     return m;
@@ -35,9 +35,9 @@ dndx_map_t build_cross_section_dndx(Param param, const ParticleDef& p_def,
 {
     auto m = dndx_map_t();
     if (interpol)
-        m.emplace(nullptr, PROPOSAL::make_unique<CrossSectionDNDXInterpolant>(param, p_def, medium, cut));
+        m.emplace(nullptr, std::make_unique<CrossSectionDNDXInterpolant>(param, p_def, medium, cut));
     else
-        m.emplace(nullptr, PROPOSAL::make_unique<CrossSectionDNDXIntegral>(param, p_def, medium, cut));
+        m.emplace(nullptr, std::make_unique<CrossSectionDNDXIntegral>(param, p_def, medium, cut));
     return m;
 }
 
