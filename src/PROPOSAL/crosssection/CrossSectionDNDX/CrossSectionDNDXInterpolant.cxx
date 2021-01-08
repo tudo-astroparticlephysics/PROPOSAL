@@ -29,7 +29,7 @@ double retransform_relativ_loss(double v_cut, double v_max, double v)
 
 double CrossSectionDNDXInterpolant::Calculate(double energy)
 {
-    return interpolant.evaluate(std::array<float, 2> { energy, 1.0 });
+    return Calculate( energy, 1.0 );
 }
 
 double CrossSectionDNDXInterpolant::Calculate(double energy, double v)

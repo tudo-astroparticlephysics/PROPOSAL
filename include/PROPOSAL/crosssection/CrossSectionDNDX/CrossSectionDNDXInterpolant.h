@@ -24,10 +24,12 @@ auto build_dndx_def(T const& param, Args... args)
     auto def = cubic_splines::BicubicSplines::Definition();
     def.axis[0] = std::make_unique<cubic_splines::ExpAxis>(
         dndx->GetLowerEnergyLim(), 1e14, (size_t)100);
+    std::cout << dndx->GetLowerEnergyLim() << std::endl;
     def.axis[1] = std::make_unique<cubic_splines::LinAxis>(0, 1, (size_t)100);
     def.f = [dndx](double energy, double v) {
         auto lim = dndx->GetIntegrationLimits(energy);
-        v = transform_relativ_loss(lim[CrossSectionDNDX::MIN], lim[CrossSectionDNDX::MAX], v);
+        v = transform_relativ_loss(
+            lim[CrossSectionDNDX::MIN], lim[CrossSectionDNDX::MAX], v);
         return dndx->Calculate(energy, v);
     };
     return def;
@@ -41,7 +43,10 @@ public:
     template <typename... Args>
     CrossSectionDNDXInterpolant(Args... args)
         : CrossSectionDNDX(args...)
-        , interpolant(build_dndx_def(args...), "/tmp", "interpolant.txt")
+        , interpolant(build_dndx_def(args...), "/tmp",
+              std::string("dndx_")
+                  + std::to_string(crosssection_hasher((size_t)0, args...))
+                  + std::string(".txt"))
     {
     }
 
