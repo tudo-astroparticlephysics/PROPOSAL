@@ -7,8 +7,6 @@
 #include <memory>
 
 namespace PROPOSAL {
-/* using v_trafo_t = std::function<double(double, double, double)>; */
-
 class CrossSectionDNDX {
     template <typename T1, typename T2, typename T3>
     inline auto define_kinematic_limits(T1 param, T2 particle, T3 target)
@@ -24,10 +22,17 @@ class CrossSectionDNDX {
 
 public:
     template <typename T1, typename T2, typename T3>
-    CrossSectionDNDX(T1 _param, T2 _particle, T3 _target,
-        std::shared_ptr<const EnergyCutSettings> _cut)
+    CrossSectionDNDX(
+        T1 _param, T2 _particle, T3 _target, EnergyCutSettings const& _cut)
         : kinematic_limits(define_kinematic_limits(_param, _particle, _target))
-        , cut(_cut)
+        , cut(std::make_shared<const EnergyCutSettings>(_cut))
+        , lower_energy_lim(_param.GetLowerEnergyLim(_particle))
+    {
+    }
+
+    template <typename T1, typename T2, typename T3>
+    CrossSectionDNDX(T1 _param, T2 _particle, T3 _target)
+        : kinematic_limits(define_kinematic_limits(_param, _particle, _target))
         , lower_energy_lim(_param.GetLowerEnergyLim(_particle))
     {
     }

@@ -9,10 +9,6 @@
 #include "CubicInterpolation/Interpolant.h"
 
 namespace PROPOSAL {
-namespace crosssection {
-    struct Parametrization;
-}
-struct ParticleDef;
 
 double transform_relativ_loss(double v_cut, double v_max, double v);
 double retransform_relativ_loss(double v_cut, double v_max, double v);
@@ -39,14 +35,18 @@ class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
 
     cubic_splines::Interpolant<cubic_splines::BicubicSplines> interpolant;
 
+    template <typename... Args> static std::string gen_name(Args... args)
+    {
+        return std::string("dndx_")
+            + std::to_string(crosssection_hasher((size_t)0, args...))
+            + std::string(".txt");
+    }
+
 public:
     template <typename... Args>
     CrossSectionDNDXInterpolant(Args... args)
         : CrossSectionDNDX(args...)
-        , interpolant(build_dndx_def(args...), "/tmp",
-              std::string("dndx_")
-                  + std::to_string(crosssection_hasher((size_t)0, args...))
-                  + std::string(".txt"))
+        , interpolant(build_dndx_def(args...), "/tmp", gen_name(args...))
     {
     }
 

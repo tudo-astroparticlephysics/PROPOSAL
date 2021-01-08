@@ -8,8 +8,6 @@
 #include <memory>
 #include <unordered_map>
 
-using PROPOSAL::Components::Component;
-
 namespace PROPOSAL {
 class CrossSectionDNDXIntegral : public CrossSectionDNDX {
     Integral integral;
@@ -35,10 +33,9 @@ class CrossSectionDNDXIntegral : public CrossSectionDNDX {
     }
 
 public:
-    template <typename T1, typename T2, typename T3>
-    CrossSectionDNDXIntegral(T1 _param, T2 _particle, T3 _target,
-        std::shared_ptr<const EnergyCutSettings> _cut)
-        : CrossSectionDNDX(_param, _particle, _target, _cut)
+    template <typename T1, typename T2, typename T3, typename... Args>
+    CrossSectionDNDXIntegral(T1 _param, T2 _particle, T3 _target, Args... args)
+        : CrossSectionDNDX(_param, _particle, _target, args...)
         , dndx_integral(define_integral(_param, _particle, _target))
         , dndx_upper_limit(define_upper_lim(_param, _particle, _target))
     {

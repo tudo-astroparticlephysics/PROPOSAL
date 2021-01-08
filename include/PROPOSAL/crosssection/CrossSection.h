@@ -99,8 +99,8 @@ size_t crosssection_hasher(size_t hash_diggest, T const& obj, Args... args)
     return crosssection_hasher(hash_diggest, args...);
 }
 
-template<>
-size_t crosssection_hasher(size_t hash_diggest, std::shared_ptr<const EnergyCutSettings> const& ptr);
+/* template<> */
+/* size_t crosssection_hasher(size_t hash_diggest, std::shared_ptr<const EnergyCutSettings> const& ptr); */
 
 
 } // namespace PROPOSAL
