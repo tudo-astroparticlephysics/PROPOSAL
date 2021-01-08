@@ -272,7 +272,7 @@ Example where the interactions bremsstrahlung, electron-positron pair producton,
 | Keyword           |  Type  | Default | Description                |
 | ----------------- | ------ | ------- | -------------------------- |
 | `parametrization` | String | `-`     | Parametrization to be used |
-| `multiplier`      | Double | `1.0`   | Multiplier to scale the cross section with a coefficient |
+| `multiplier`      | Number | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Annihilation of an ingoing positron with an atomic electron. Available `annihilation` parametrizations are:
 
@@ -283,7 +283,7 @@ Annihilation of an ingoing positron with an atomic electron. Available `annihila
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
-| `multiplier`      | Double | `1.0`   | Multiplier to scale the cross section with a coefficient |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 | `lpm`             | Boolean | `true`  | Enabling or disabling the reduction of the cross section at high energies by the Landau-Pomeranchuk-Migdal effect.  |
 
 Note that the LPM correction currently only supports the correct description of homogeneous media.
@@ -303,7 +303,7 @@ Available `brems` parametrizations are:
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
-| `multiplier`      | Double | `1.0`   | Multiplier to scale the cross section with a coefficient |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Compton scattering of photons on free electrons. Available `compton` parametrizations are:
 
@@ -314,7 +314,7 @@ Compton scattering of photons on free electrons. Available `compton` parametriza
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
-| `multiplier`      | Double | `1.0`   | Multiplier to scale the cross section with a coefficient |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 | `lpm`             | Boolean | `true`  | Enabling or disabling the reduction of the cross section at high energies by the Landau-Pomeranchuk-Migdal effect.  |
 
 Creation of electron-positron pairs by ingoing leptons.
@@ -332,7 +332,7 @@ Available `epair` parametrizations are:
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
-| `multiplier`      | Double | `1.0`   | Multiplier to scale the cross section with a coefficient |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Available `ioniz` parametrizations are:
 
@@ -345,7 +345,7 @@ Available `ioniz` parametrizations are:
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
-| `multiplier`      | Double | `1.0`   | Multiplier to scale the cross section with a coefficient |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Creation of muon-antimuon pairs by ingoing leptons. Available `mupair` parametrizations:
 
@@ -356,7 +356,7 @@ Creation of muon-antimuon pairs by ingoing leptons. Available `mupair` parametri
 | Keyword           |  Type   | Default              | Description                |
 | ----------------- | ------- | -------------------- | -------------------------- |
 | `parametrization` | String  | `-`                  | Parametrization to be used |
-| `multiplier`      | Double | `1.0`   | Multiplier to scale the cross section with a coefficient |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 | `hard_component`  | Boolean | `true`               | Enabling or disabling the hard component for parametrizations using the real photon approximation |
 | `shadow`          | String  | `ButkevichMikheyev`  | Parametrization of the shadowing effect, relevant for parametrizations using the momentum integration approach |
 
@@ -388,7 +388,7 @@ For there parametrizations, the parametrization of the shadowing effect can be c
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
-| `multiplier`      | Double | `1.0`   | Multiplier to scale the cross section with a coefficient |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Creation of an electron-positron pair by an ingoing photon. Available `photopair` parametrizations are:
 
@@ -399,7 +399,7 @@ Creation of an electron-positron pair by an ingoing photon. Available `photopair
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
-| `multiplier`      | Double | `1.0`   | Multiplier to scale the cross section with a coefficient |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Weak interaction of an ingoing charged lepton. Available `weak` parametrizations are:
 
