@@ -278,7 +278,7 @@ nlohmann::json Propagator::ParseConfig(const string& config_file)
         std::ifstream infilestream(expanded_config_file_path);
         infilestream >> json_config;
     } catch (const nlohmann::json::parse_error& e) {
-        Logging::Get("proposal.propagator")->critical("Unable parse \"%s\" as json file", config_file.c_str());
+        Logging::Get("proposal.propagator")->critical("Unable parse {} as json file", config_file.c_str());
     }
     return json_config;
 }
