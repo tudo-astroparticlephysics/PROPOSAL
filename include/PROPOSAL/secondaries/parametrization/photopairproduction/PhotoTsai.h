@@ -4,6 +4,7 @@
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotopairProduction.h"
 
+#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 
@@ -25,20 +26,21 @@ namespace secondaries {
 
         PhotoTsai() = default;
         PhotoTsai(ParticleDef p, Medium m)
-            : medium(m),
-              dndx(build_cross_section_dndx(crosssection::PhotoPairTsai(), p, medium,
-                  std::make_shared<EnergyCutSettings>(0.f, 1.f, false), false))
+            : medium(m)
+            , dndx(detail::build_dndx(std::true_type {}, false, medium,
+                  crosssection::PhotoPairTsai(), p, nullptr))
         {
         }
 
         double CalculateRho(double, double, const Component&) override;
-        std::tuple<Vector3D, Vector3D> CalculateDirections(Vector3D, double, double,
-            const Component&, std::vector<double>) override;
-        std::tuple<double, double> CalculateEnergy(double, double, double) override;
+        std::tuple<Vector3D, Vector3D> CalculateDirections(Vector3D, double,
+            double, const Component&, std::vector<double>) override;
+        std::tuple<double, double> CalculateEnergy(
+            double, double, double) override;
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
-        std::vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
-                                                   std::vector<double>&) final;
+        std::vector<ParticleState> CalculateSecondaries(
+            StochasticLoss, const Component&, std::vector<double>&) final;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

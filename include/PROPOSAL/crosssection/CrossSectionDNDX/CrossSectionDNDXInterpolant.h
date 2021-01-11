@@ -37,8 +37,9 @@ class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
 
     template <typename... Args> static std::string gen_name(Args... args)
     {
+        auto hash = 0u;
         return std::string("dndx_")
-            + std::to_string(crosssection_hasher((size_t)0, args...))
+            + std::to_string(crosssection_hasher(hash, args...))
             + std::string(".txt");
     }
 
@@ -50,8 +51,10 @@ public:
     {
     }
 
-    double Calculate(double) final;
-    double Calculate(double, double) final;
+    double Calculate(double E) final;
+
+    double Calculate(double E, double v) final;
+
     double GetUpperLimit(double, double) final;
 };
 } // namespace PROPOSAL

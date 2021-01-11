@@ -28,10 +28,11 @@
 
 #pragma once
 
+#include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDX.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/EnergyCutSettings.h"
 #include <memory>
 #include <type_traits>
 #include <unordered_map>
@@ -44,6 +45,7 @@ using Components::Component;
 using rates_t = std::unordered_map<std::shared_ptr<const Component>, double>;
 
 struct CrossSectionBase {
+
     virtual ~CrossSectionBase() = default;
     virtual double CalculatedEdx(double) = 0;
     virtual double CalculatedE2dx(double) = 0;
@@ -60,7 +62,31 @@ struct CrossSectionBase {
     GetTargets() const noexcept = 0;
 };
 
+namespace detail {
+    template <typename T, typename... Args>
+    inline auto build_dndx(
+        std::false_type, bool interpol, T target, Args&&... args)
+    {
+        return std::unordered_map<std::shared_ptr<const Component>,
+            std::unique_ptr<CrossSectionDNDX>> { { nullptr },
+            { make_dndx(interpol, target, std::forward<Args>(args)...) } };
+    }
+
+    template <typename T, typename... Args>
+    inline auto build_dndx(
+        std::true_type, bool interpol, T target, Args&&... args)
+    {
+        auto dndx = std::unordered_map<std::shared_ptr<const Component>,
+            std::unique_ptr<CrossSectionDNDX>> {};
+        for (auto& c : target.GetComponents())
+            dndx.emplace(std::make_shared<const Components::Component>(c),
+                make_dndx(interpol, c, std::forward<Args>(args)...));
+        return dndx;
+    }
+}
+
 template <class P, class M> struct CrossSection : public CrossSectionBase {
+
     CrossSection() = default;
     virtual ~CrossSection() = default;
 
@@ -100,7 +126,7 @@ size_t crosssection_hasher(size_t hash_diggest, T const& obj, Args... args)
 }
 
 /* template<> */
-/* size_t crosssection_hasher(size_t hash_diggest, std::shared_ptr<const EnergyCutSettings> const& ptr); */
-
+/* size_t crosssection_hasher(size_t hash_diggest, std::shared_ptr<const
+ * EnergyCutSettings> const& ptr); */
 
 } // namespace PROPOSAL

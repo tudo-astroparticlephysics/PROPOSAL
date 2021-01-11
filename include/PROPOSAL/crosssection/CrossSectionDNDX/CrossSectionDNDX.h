@@ -2,12 +2,15 @@
 
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-#include "PROPOSAL/math/Integral.h"
 
 #include <memory>
 
 namespace PROPOSAL {
 class CrossSectionDNDX {
+    std::function<std::tuple<double, double>(double)> kinematic_limits;
+    std::shared_ptr<const EnergyCutSettings> cut;
+    double lower_energy_lim;
+
     template <typename T1, typename T2, typename T3>
     inline auto define_kinematic_limits(T1 param, T2 particle, T3 target)
     {
@@ -15,10 +18,6 @@ class CrossSectionDNDX {
             return param.GetKinematicLimits(particle, target, E);
         };
     }
-
-    std::function<std::tuple<double, double>(double)> kinematic_limits;
-    std::shared_ptr<const EnergyCutSettings> cut;
-    double lower_energy_lim;
 
 public:
     template <typename T1, typename T2, typename T3>
@@ -44,18 +43,8 @@ public:
     virtual double GetUpperLimit(double energy, double rate) = 0;
 
     enum { MIN, MAX };
-    inline std::array<double, 2> GetIntegrationLimits(double energy)
-    {
-        auto kin_lim = kinematic_limits(energy);
-        if (cut)
-            return std::array<double, 2> { cut->GetCut(kin_lim, energy),
-                std::get<crosssection::Parametrization::V_MAX>(kin_lim) };
-        return std::array<double, 2> {
-            std::get<crosssection::Parametrization::V_MIN>(kin_lim),
-            std::get<crosssection::Parametrization::V_MAX>(kin_lim)
-        };
-    }
+    std::array<double, 2> GetIntegrationLimits(double energy) const;
 
-    auto GetLowerEnergyLim() { return lower_energy_lim; }
+    double GetLowerEnergyLim() const;
 };
 } // namespace PROPOSAL

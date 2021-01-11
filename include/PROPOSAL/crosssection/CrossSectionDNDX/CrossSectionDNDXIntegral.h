@@ -2,11 +2,6 @@
 
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDX.h"
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/ParticleDef.h"
-
-#include <memory>
-#include <unordered_map>
 
 namespace PROPOSAL {
 class CrossSectionDNDXIntegral : public CrossSectionDNDX {
@@ -41,26 +36,10 @@ public:
     {
     }
 
-    double Calculate(double energy) override
-    {
-        return Calculate(energy, std::get<MAX>(GetIntegrationLimits(energy)));
-    }
+    double Calculate(double energy) override;
 
-    double Calculate(double energy, double v) override
-    {
-        auto integral_lim = GetIntegrationLimits(energy);
-        if (std::get<MIN>(integral_lim) < v)
-            return dndx_integral(
-                integral, energy, std::get<MIN>(integral_lim), v, 0);
-        return 0;
-    }
+    double Calculate(double energy, double v) override;
 
-    double GetUpperLimit(double energy, double rate) override
-    {
-        auto integral_lim = GetIntegrationLimits(energy);
-        auto v = dndx_upper_limit(integral, energy, std::get<MIN>(integral_lim),
-            std::get<MAX>(integral_lim), -rate);
-        return v;
-    }
+    double GetUpperLimit(double energy, double rate) override;
 };
 } // namespace PROPOSAL
