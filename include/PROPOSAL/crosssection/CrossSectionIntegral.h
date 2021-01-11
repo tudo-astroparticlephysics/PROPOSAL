@@ -28,12 +28,11 @@
 
 #pragma once
 
-#include "PROPOSAL/EnergyCutSettings.h"
+/* #include "PROPOSAL/EnergyCutSettings.h" */
 #include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/ParticleDef.h"
+/* #include "PROPOSAL/medium/Medium.h" */
+/* #include "PROPOSAL/particle/ParticleDef.h" */
 
 namespace PROPOSAL {
 template <typename Param, typename P, typename M>
@@ -47,36 +46,17 @@ class CrossSectionIntegral : public crosssection_t<P, M> {
 
     Integral integral;
     param_t param;
-    particle_t p_def;
-    medium_t medium;
     std::shared_ptr<const EnergyCutSettings> cut;
 
-    dndx_map_t dndx_map;
-
-    double CalculatedNdx_impl(
-        double energy, std::true_type, std::shared_ptr<const Component>);
-    double CalculatedNdx_impl(
-        double energy, std::false_type, std::shared_ptr<const Component>);
-
-    double CalculateStochasticLoss_impl(std::shared_ptr<const Component> const&,
-        double, double, std::true_type, std::false_type);
-    double CalculateStochasticLoss_impl(std::shared_ptr<const Component> const&,
-        double, double, std::false_type, std::false_type);
-    double CalculateStochasticLoss_impl(std::shared_ptr<const Component> const&,
-        double, double, bool, std::true_type);
-
 public:
-    CrossSectionIntegral(Param&& _param, P&& _p_def, M&& _medium,
+    CrossSectionIntegral(Param _param, P _p_def, M _medium,
         std::shared_ptr<const EnergyCutSettings> _cut)
-        : CrossSection<typename std::decay<P>::type,
-            typename std::decay<M>::type>()
-        , param(std::forward<Param>(_param))
-        , p_def(std::forward<P>(_p_def))
-        , medium(std::forward<M>(_medium))
+        : crosssection_t<P, M>(_p_def, _medium,
+            detail::build_dndx(
+                typename param_t::base_param_t::component_wise {}, false,
+                _medium, _param, _p_def, _cut))
+        , param(_param)
         , cut(_cut)
-        , dndx_map(detail::build_dndx(
-              typename Param::base_param_t::component_wise {}, false, param,
-              p_def, medium, cut))
     {
         if (typename param_t::only_stochastic {} == true and cut != nullptr) {
             throw std::invalid_argument(
@@ -85,13 +65,55 @@ public:
                 "EnergyCuts. Pass a nullptr as an EnergyCut instead.");
         }
     }
-    inline std::vector<std::shared_ptr<const Component>>
+
+    /* template <typename T> */
+    /* auto CalculatedNdx_impl(double energy, std::true_type, T comp_ptr) */
+    /* { */
+    /*     if (comp_ptr) */
+    /*         return dndx[comp_ptr]->Calculate(energy) */
+    /*             / detail::reweight_dndx(medium, *comp_ptr); */
+    /*     return CalculatedNdx_impl(energy, std::true_type {}, nullptr); */
+    /* } */
+    /* auto CalculatedNdx_impl(double energy, std::true_type tt, std::nullptr_t)
+     */
+    /* { */
+    /*     auto dNdx_all = 0.; */
+    /*     for (auto& it : dndx) */
+    /*         dNdx_all += CalculatedNdx_impl(energy, tt, *it.first); */
+    /*     return dNdx_all; */
+    /* } */
+    /* template <typename T> */
+    /* auto CalculatedNdx_impl(double energy, std::false_type, T) */
+    /* { */
+    /*     return dndx[nullptr]->Calculate(energy); */
+    /* } */
+
+    /* auto CalculateStochasticLoss_impl( */
+    /*     std::shared_ptr<const Component> const& comp, double energy, */
+    /*     double rate, std::true_type, std::false_type) */
+    /* { */
+    /*     return dndx[comp]->GetUpperLimit( */
+    /*         energy, rate * detail::reweight_dndx(medium, *comp)); */
+    /* } */
+    /* auto CalculateStochasticLoss_impl( */
+    /*     std::shared_ptr<const Component> const& comp, double energy, */
+    /*     double rate, std::false_type, std::false_type) */
+    /* { */
+    /*     return dndx[comp]->GetUpperLimit(energy, rate); */
+    /* } */
+    /* auto CalculateStochasticLoss_impl(std::shared_ptr<const Component>
+     * const&, */
+    /*     double, double, bool, std::true_type) */
+    /* { */
+    /*     return 1; */
+    /* } */
+
+    std::vector<std::shared_ptr<const Component>>
     GetTargets() const noexcept final
     {
         std::vector<std::shared_ptr<const Component>> targets;
-        for (auto& dndx : dndx_map) {
-            targets.emplace_back(dndx.first);
-        }
+        for (auto& it : this->dndx)
+            targets.emplace_back(it.first);
         return targets;
     }
     inline double CalculatedEdx(double energy) override
@@ -99,7 +121,7 @@ public:
         if (cut == nullptr)
             return 0;
         auto aux = calculate_dedx(reinterpret_cast<base_param_ref_t>(param),
-            integral, p_def, medium, *cut, energy,
+            integral, this->p_def, this->medium, *cut, energy,
             typename param_t::component_wise {});
         return aux;
     }
@@ -108,45 +130,41 @@ public:
         if (cut == nullptr)
             return 0;
         return calculate_de2dx(reinterpret_cast<base_param_ref_t>(param),
-            integral, p_def, medium, *cut, energy,
+            integral, this->p_def, this->medium, *cut, energy,
             typename param_t::component_wise {});
     }
-    // inline rates_t CalculatedNdx(double energy) override
-    // {
-    //     return CalculatedNdx_impl(
-    //         energy, typename param_t::base_param_t::component_wise{});
-    // }
     inline double CalculatedNdx(double energy,
         std::shared_ptr<const Component> comp_ptr = nullptr) override
     {
-        return CalculatedNdx_impl(energy,
+        return this->CalculatedNdx_impl(energy,
             typename param_t::base_param_t::component_wise {}, comp_ptr);
     }
     inline double CalculateStochasticLoss(
         std::shared_ptr<const Component> const& comp, double energy,
         double rate) override
     {
-        return CalculateStochasticLoss_impl(comp, energy, rate,
+        assert(rate > 0);
+        return this->CalculateStochasticLoss_impl(comp, energy, rate,
             typename param_t::base_param_t::component_wise {},
             typename param_t::base_param_t::only_stochastic {});
     }
     inline size_t GetHash() const noexcept override
     {
         auto hash_digest = size_t { 0 };
-        hash_combine(hash_digest, param.GetHash(), p_def.mass,
-            std::abs(p_def.charge), medium.GetHash());
+        hash_combine(hash_digest, param.GetHash(), this->p_def.mass,
+            std::abs(this->p_def.charge), this->medium.GetHash());
 
         // Only for WeakInteraction, the sign of the charge is important
         if (param.interaction_type == InteractionType::WeakInt)
-            hash_combine(hash_digest, p_def.charge);
+            hash_combine(hash_digest, this->p_def.charge);
 
-        if (cut != nullptr)
+        if (cut)
             hash_combine(hash_digest, cut->GetHash());
         return hash_digest;
     }
     inline double GetLowerEnergyLim() const override
     {
-        return param.GetLowerEnergyLim(p_def);
+        return param.GetLowerEnergyLim(this->p_def);
     }
     inline InteractionType GetInteractionType() const noexcept override
     {
@@ -170,7 +188,7 @@ double calculate_dedx(Param&& param, Integral& integral,
         auto weight_for_loss_in_medium = medium.GetSumNucleons()
             / (c.GetAtomInMolecule() * c.GetAtomicNum());
 
-        sum += loss / weight_for_loss_in_medium;
+        sum += loss / detail::reweight_dndx(medium, c);
     }
     return energy * sum;
 }
@@ -226,61 +244,4 @@ double calculate_de2dx(Param&& param, Integral& integral,
         * energy * energy;
 }
 
-template <typename Param, typename P, typename M>
-double CrossSectionIntegral<Param, P, M>::CalculatedNdx_impl(
-    double energy, std::true_type, std::shared_ptr<const Component> comp_ptr)
-{
-    if (comp_ptr == nullptr) {
-        auto dNdx_all = 0.;
-        for (auto& dndx : dndx_map) {
-            auto weight_for_rate_in_medium = medium.GetSumNucleons()
-                / (dndx.first->GetAtomInMolecule()
-                    * dndx.first->GetAtomicNum());
-            dNdx_all
-                += dndx.second->Calculate(energy) / weight_for_rate_in_medium;
-        }
-        return dNdx_all;
-    } else {
-        auto weight_for_rate_in_medium = medium.GetSumNucleons()
-            / (comp_ptr->GetAtomInMolecule() * comp_ptr->GetAtomicNum());
-        return dndx_map[comp_ptr]->Calculate(energy)
-            / weight_for_rate_in_medium;
-    }
-}
-
-template <typename Param, typename P, typename M>
-double CrossSectionIntegral<Param, P, M>::CalculatedNdx_impl(
-    double energy, std::false_type, std::shared_ptr<const Component>)
-{
-    return dndx_map[nullptr]->Calculate(energy);
-}
-
-template <typename Param, typename P, typename M>
-double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
-    std::shared_ptr<const Component> const& comp, double energy, double rate,
-    std::true_type, std::false_type)
-{
-    assert(rate > 0);
-    auto weight_for_rate_in_medium = medium.GetSumNucleons()
-        / (comp->GetAtomInMolecule() * comp->GetAtomicNum());
-    return dndx_map[comp]->GetUpperLimit(
-        energy, rate * weight_for_rate_in_medium);
-}
-
-template <typename Param, typename P, typename M>
-double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
-    std::shared_ptr<const Component> const& comp, double energy, double rate,
-    std::false_type, std::false_type)
-{
-    assert(rate > 0);
-    return dndx_map[comp]->GetUpperLimit(energy, rate);
-}
-
-template <typename Param, typename P, typename M>
-double CrossSectionIntegral<Param, P, M>::CalculateStochasticLoss_impl(
-    std::shared_ptr<const Component> const&, double, double, bool,
-    std::true_type)
-{
-    return 1;
-}
 } // namepace PROPOSAL

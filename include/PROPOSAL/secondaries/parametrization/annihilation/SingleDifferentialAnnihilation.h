@@ -5,7 +5,7 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/secondaries/parametrization/annihilation/Annihilation.h"
-#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 using PROPOSAL::Components::Component;
 
@@ -22,8 +22,7 @@ namespace secondaries {
         SingleDifferentialAnnihilation(
             Param&& param, const ParticleDef& p, const Medium& medium, bool interpol)
             : m(medium),
-              dndx(build_cross_section_dndx(std::forward<Param>(param), p, m,
-                      std::make_shared<EnergyCutSettings>(0.f, 1.f, false), interpol))
+              dndx(detail::build_dndx(std::true_type {}, interpol, medium, std::forward<Param>(param), p, nullptr))
         {
         }
 

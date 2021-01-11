@@ -29,9 +29,10 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDX.h"
+#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/Particle.h"
 #include <memory>
 #include <type_traits>
@@ -78,18 +79,75 @@ namespace detail {
     {
         auto dndx = std::unordered_map<std::shared_ptr<const Component>,
             std::unique_ptr<CrossSectionDNDX>> {};
-        for (auto& c : target.GetComponents())
+        for (auto& c : target.GetComponents()) {
             dndx.emplace(std::make_shared<const Components::Component>(c),
                 make_dndx(interpol, c, std::forward<Args>(args)...));
+        }
         return dndx;
+    }
+
+    inline auto reweight_dndx(Medium const& m, Component const& c)
+    {
+        return m.GetSumNucleons() / (c.GetAtomInMolecule() * c.GetAtomicNum());
     }
 }
 
-template <class P, class M> struct CrossSection : public CrossSectionBase {
+template <class P, class M> class CrossSection : public CrossSectionBase {
+public:
+    P p_def;
+    M medium;
+    dndx_map_t dndx;
 
-    CrossSection() = default;
+    template <typename T>
+    CrossSection(P _p_def, M _medium, T&& _dndx)
+        : p_def(_p_def)
+        , medium(_medium)
+        , dndx(std::forward<T>(_dndx))
+    {
+    }
+
     virtual ~CrossSection() = default;
 
+    template <typename T>
+    auto CalculatedNdx_impl(double energy, std::true_type, T comp_ptr)
+    {
+        if (comp_ptr)
+            return dndx[comp_ptr]->Calculate(energy)
+                / detail::reweight_dndx(medium, *comp_ptr);
+        return CalculatedNdx_impl(energy, std::true_type {}, nullptr);
+    }
+    auto CalculatedNdx_impl(double energy, std::true_type tt, std::nullptr_t)
+    {
+        auto dNdx_all = 0.;
+        for (auto& it : dndx)
+            dNdx_all += CalculatedNdx_impl(energy, tt, it.first);
+        return dNdx_all;
+    }
+    template <typename T>
+    auto CalculatedNdx_impl(double energy, std::false_type, T)
+    {
+        return dndx[nullptr]->Calculate(energy);
+    }
+
+    auto CalculateStochasticLoss_impl(
+        std::shared_ptr<const Component> const& comp, double energy,
+        double rate, std::true_type, std::false_type)
+    {
+        return dndx[comp]->GetUpperLimit(
+            energy, rate * detail::reweight_dndx(medium, *comp));
+    }
+    auto CalculateStochasticLoss_impl(
+        std::shared_ptr<const Component> const& comp, double energy,
+        double rate, std::false_type, std::false_type)
+    {
+        return dndx[comp]->GetUpperLimit(energy, rate);
+    }
+    auto CalculateStochasticLoss_impl(std::shared_ptr<const Component> const&,
+        double, double, bool, std::true_type)
+    {
+        return 1;
+    }
+    /* public: */
     /* virtual double CalculatedEdx(double) = 0; */
     /* virtual double CalculatedE2dx(double) = 0; */
     /* virtual rates_t CalculatedNdx(double) = 0; */
