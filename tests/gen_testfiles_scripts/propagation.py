@@ -14,7 +14,7 @@ def create_table(dir_name):
         "resources/config_ice.json"
     )
 
-    mu = pp.particle.DynamicData(pp.particle.Particle_Id.MuMinus)
+    mu = pp.particle.DynamicData(pp.particle.Particle_Type.MuMinus)
 
     mu.energy = 1e8
     mu.propagated_distance = 0
@@ -26,7 +26,7 @@ def create_table(dir_name):
 
         buf = [""]
         buf.append("name")
-        buf.append("lenght")
+        buf.append("length")
         buf.append("energy")
         buf.append("x")
         buf.append("y")

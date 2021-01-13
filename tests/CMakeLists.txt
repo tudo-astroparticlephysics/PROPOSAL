@@ -1,5 +1,5 @@
 SET(RESOURCE_URL https://proposal.app.tu-dortmund.de/resources)
-SET(TEST_FILES TestFiles_2020-10-21.tar.gz)
+SET(TEST_FILES TestFiles-2021-01-13.tar.gz)
 add_subdirectory("${PROJECT_SOURCE_DIR}/vendor/google/googletest" "extern/googletest" EXCLUDE_FROM_ALL)
 mark_as_advanced(
 	BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
