@@ -65,13 +65,20 @@ struct CrossSectionBase {
 };
 
 namespace detail {
+    inline auto weight_component(Medium const& m, Component const& c)
+    {
+        return m.GetSumNucleons() / (c.GetAtomInMolecule() * c.GetAtomicNum());
+    }
+
     template <typename T, typename... Args>
     inline auto build_dndx(
         std::false_type, bool interpol, T target, Args&&... args)
     {
-        return std::unordered_map<std::shared_ptr<const Component>,
-            std::unique_ptr<CrossSectionDNDX>> { { nullptr },
-            { make_dndx(interpol, target, std::forward<Args>(args)...) } };
+        auto dndx = std::unordered_map<std::shared_ptr<const Component>,
+            std::unique_ptr<CrossSectionDNDX>> {};
+        dndx.emplace(std::shared_ptr<const Component>(nullptr),
+            make_dndx(interpol, target, std::forward<Args>(args)...));
+        return dndx;
     }
 
     template <typename T, typename... Args>
@@ -91,11 +98,12 @@ namespace detail {
     inline auto build_dedx(std::true_type, bool interpol, T1&& param,
         T2&& p_def, T3 const& target, Args&&... args)
     {
-        auto dedx = std::vector<std::unique_ptr<CrossSectionDEDX>> {};
+        using dedx_ptr = std::unique_ptr<CrossSectionDEDX>;
+        auto dedx = std::vector<std::tuple<double, dedx_ptr>> {};
         for (auto& c : target.GetComponents()) {
             auto calc = make_dedx(interpol, std::forward<T1>(param),
                 std::forward<T2>(p_def), c, args...);
-            dedx.push_back(std::move(calc));
+            dedx.emplace_back(weight_component(target, c), std::move(calc));
         }
         return dedx;
     }
@@ -104,23 +112,24 @@ namespace detail {
     inline auto build_dedx(std::false_type, bool interpol, T1&& param,
         T2&& p_def, T3 const& target, Args&&... args)
     {
-        return std::vector<std::unique_ptr<CrossSectionDEDX>> { make_dedx(
-            interpol, std::forward<T1>(param), std::forward<T2>(p_def), target,
-            args...) };
+        using dedx_ptr = std::unique_ptr<CrossSectionDEDX>;
+        auto calc = make_dedx(interpol, std::forward<T1>(param),
+            std::forward<T2>(p_def), target, args...);
+
+        auto dedx = std::vector<std::tuple<double, dedx_ptr>> {};
+        dedx.emplace_back(1., std::move(calc));
+        return dedx;
     }
 
-    inline auto reweight_dndx(Medium const& m, Component const& c)
-    {
-        return m.GetSumNucleons() / (c.GetAtomInMolecule() * c.GetAtomicNum());
-    }
 }
 
 template <class P, class M> class CrossSection : public CrossSectionBase {
 public:
     P p_def;
     M medium;
+
     dndx_map_t dndx;
-    std::vector<std::unique_ptr<CrossSectionDEDX>> dedx;
+    std::vector<std::tuple<double, std::unique_ptr<CrossSectionDEDX>>> dedx;
 
     template <typename T1, typename T2>
     CrossSection(P _p_def, M _medium, T1&& _dndx, T2&& _dedx)
@@ -138,7 +147,7 @@ public:
     {
         if (comp_ptr)
             return dndx[comp_ptr]->Calculate(energy)
-                / detail::reweight_dndx(medium, *comp_ptr);
+                / detail::weight_component(medium, *comp_ptr);
         return CalculatedNdx_impl(energy, std::true_type {}, nullptr);
     }
     auto CalculatedNdx_impl(double energy, std::true_type tt, std::nullptr_t)
@@ -159,7 +168,7 @@ public:
         double rate, std::true_type, std::false_type)
     {
         return dndx[comp]->GetUpperLimit(
-            energy, rate * detail::reweight_dndx(medium, *comp));
+            energy, rate * detail::weight_component(medium, *comp));
     }
     auto CalculateStochasticLoss_impl(
         std::shared_ptr<const Component> const& comp, double energy,
@@ -172,16 +181,14 @@ public:
     {
         return 1;
     }
-    /* public: */
-    /* virtual double CalculatedEdx(double) = 0; */
-    /* virtual double CalculatedE2dx(double) = 0; */
-    /* virtual rates_t CalculatedNdx(double) = 0; */
-    /* virtual double CalculateStochasticLoss(std::shared_ptr<const Component>
-     * const&, double, double) = 0; */
-    /* virtual double GetLowerEnergyLim() const = 0; */
 
-    /* virtual size_t GetHash() const noexcept = 0; */
-    /* virtual InteractionType GetInteractionType() const noexcept = 0; */
+    inline double CalculatedEdx(double energy) override
+    {
+        auto loss = 0.;
+        for (auto& [weight, dedx] : this->dedx)
+            loss += dedx->Calculate(energy) / weight;
+        return loss;
+    }
 };
 
 template <typename P, typename M>

@@ -39,8 +39,6 @@ class CrossSectionInterpolant : public crosssection_t<P, M>,
                                 public CrossSectionInterpolantBase {
 
     using param_t = typename std::decay<Param>::type;
-    using particle_t = typename std::decay<P>::type;
-    using medium_t = typename std::decay<M>::type;
     using base_param_ref_t = typename std::add_lvalue_reference<
         typename param_t::base_param_t>::type;
 
@@ -48,7 +46,6 @@ class CrossSectionInterpolant : public crosssection_t<P, M>,
     std::shared_ptr<const EnergyCutSettings> cut;
 
 protected:
-    /* std::unique_ptr<Interpolant> dedx; */
     std::unique_ptr<Interpolant> de2dx;
 
 public:
@@ -73,11 +70,6 @@ public:
         }
 
         if (cut != nullptr) {
-            // Only for a defined EnergyCut, dEdx and dE2dx return non-zero
-            // values
-            /* dedx = build_dedx(reinterpret_cast<base_param_ref_t>(param), */
-            /*     this->p_def, this->medium, *cut, dEdx_def); */
-
             if (cut->GetContRand())
                 de2dx = build_de2dx(reinterpret_cast<base_param_ref_t>(param),
                     this->p_def, this->medium, *cut, dE2dx_def);
@@ -92,12 +84,11 @@ public:
         }
         return targets;
     }
-    inline double CalculatedEdx(double energy) override
+    inline double CalculatedNdx(double energy,
+        std::shared_ptr<const Component> comp_ptr = nullptr) override
     {
-        auto loss = 0.;
-        for (auto& it : this->dedx)
-            loss += it->Calculate(energy);
-        return loss;
+        return this->CalculatedNdx_impl(energy,
+            typename param_t::base_param_t::component_wise {}, comp_ptr);
     }
 
     inline double CalculatedE2dx(double energy) override
@@ -105,50 +96,6 @@ public:
         if (de2dx == nullptr)
             return 0;
         return de2dx->Interpolate(energy);
-    }
-    // inline rates_t CalculatedNdx(double energy) override
-    // {
-    //     auto rates = rates_t();
-    //     for (auto& dndx : dndx_map) {
-    //         //TODO: dNdx interpolant results for individual components
-    //         can become negative for small energies
-    //         // Instead of clipping these values to zero, the interpolant
-    //         should be revised (jm) rates[dndx.first] =
-    //         std::max(dndx.second->Calculate(energy), 0.); if (dndx.first)
-    //             rates[dndx.first] /= medium.GetSumNucleons()
-    //                 / (dndx.first->GetAtomInMolecule()
-    //                       * dndx.first->GetAtomicNum());
-    //     }
-    //     return rates;
-    // }
-    inline double CalculatedNdx(
-        double energy, std::shared_ptr<const Component> comp_ptr) override
-    {
-        // TODO: dNdx interpolant results for individual components can
-        // become negative for small energies Instead of clipping these
-        // values to zero, the interpolant should be revised (jm)
-        if (comp_ptr == nullptr) {
-            double dndx_all = 0.;
-            double tmp;
-            for (auto& it : this->dndx) {
-                tmp = std::max(it.second->Calculate(energy), 0.);
-                if (it.first)
-                    tmp /= this->medium.GetSumNucleons()
-                        / (it.first->GetAtomInMolecule()
-                            * it.first->GetAtomicNum());
-
-                dndx_all += tmp;
-            }
-
-            return dndx_all;
-        } else {
-            double val = std::max(this->dndx[comp_ptr]->Calculate(energy), 0.);
-            if (comp_ptr)
-                val /= this->medium.GetSumNucleons()
-                    / (comp_ptr->GetAtomInMolecule()
-                        * comp_ptr->GetAtomicNum());
-            return val;
-        }
     }
     inline double CalculateStochasticLoss(
         std::shared_ptr<const Component> const& comp, double energy,
@@ -183,28 +130,6 @@ public:
 };
 
 template <typename Param>
-std::unique_ptr<Interpolant> build_dedx(Param&& param, const ParticleDef& p_def,
-    const Medium& medium, const EnergyCutSettings& cut,
-    Interpolant1DBuilder::Definition& def)
-{
-    Integral integral;
-    def.function1d = [&integral, &param, &p_def, &medium, &cut](double energy) {
-        return calculate_dedx(param, integral, p_def, medium, cut, energy,
-            typename std::decay<Param>::type::component_wise {});
-    };
-    def.xmin = param.GetLowerEnergyLim(p_def);
-    def.rational = true;
-    def.logSubst = true;
-    auto hash = def.GetHash();
-    hash_combine(hash, param.GetHash(), p_def.mass, std::abs(p_def.charge),
-        medium.GetHash(), cut.GetHash());
-    if (param.interaction_type == InteractionType::WeakInt)
-        hash_combine(hash, p_def.charge);
-    return Helper::InitializeInterpolation(
-        "dEdx", Interpolant1DBuilder(def), hash);
-}
-
-template <typename Param>
 std::unique_ptr<Interpolant> build_de2dx(Param&& param,
     const ParticleDef& p_def, const Medium& medium,
     const EnergyCutSettings& cut, Interpolant1DBuilder::Definition& def)
@@ -223,37 +148,5 @@ std::unique_ptr<Interpolant> build_de2dx(Param&& param,
     return Helper::InitializeInterpolation(
         "dE2dx", Interpolant1DBuilder(def), hash);
 }
-
-/* template <typename Param, typename P, typename M> */
-/* double CrossSectionInterpolant<Param, P,
- * M>::CalculateStochasticLoss_impl( */
-/*     std::shared_ptr<const Component> const& comp, double energy, double
- * rate, */
-/*     std::true_type, std::false_type) */
-/* { */
-/*     auto weight_for_rate_in_medium = medium.GetSumNucleons() */
-/*         / (comp->GetAtomInMolecule() * comp->GetAtomicNum()); */
-/*     return dndx[comp]->GetUpperLimit(energy, rate *
- * weight_for_rate_in_medium); */
-/* } */
-
-/* template <typename Param, typename P, typename M> */
-/* double CrossSectionInterpolant<Param, P,
- * M>::CalculateStochasticLoss_impl( */
-/*     std::shared_ptr<const Component> const&, double energy, double rate,
- */
-/*     std::false_type, std::false_type) */
-/* { */
-/*     return dndx[nullptr]->GetUpperLimit(energy, rate); */
-/* } */
-
-/* template <typename Param, typename P, typename M> */
-/* double CrossSectionInterpolant<Param, P,
- * M>::CalculateStochasticLoss_impl( */
-/*     std::shared_ptr<const Component> const&, double, double, bool, */
-/*     std::true_type) */
-/* { */
-/*     return 1; */
-/* } */
 
 } // namespace PROPOSAL

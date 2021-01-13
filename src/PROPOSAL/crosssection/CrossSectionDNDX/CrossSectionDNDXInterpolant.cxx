@@ -4,7 +4,6 @@
 
 #include "CubicInterpolation/Axis.h"
 
-using std::get;
 using namespace PROPOSAL;
 
 namespace PROPOSAL {

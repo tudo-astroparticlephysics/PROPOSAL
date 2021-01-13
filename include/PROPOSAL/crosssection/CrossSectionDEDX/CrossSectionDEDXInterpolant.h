@@ -44,6 +44,6 @@ public:
     {
     }
 
-    double Calculate(double E) final { return E; }
+    double Calculate(double E) final;
 };
 } // namespace PROPOSAL
