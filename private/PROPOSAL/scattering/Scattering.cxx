@@ -92,6 +92,7 @@ Directions Scattering::Scatter(double dr,
     // u averaged continous propagation direction
     // n_i direction after continous propagation
     directions_.n_i_ = Vector3D(old_direction);
+    directions_.n_i_.CalculateSphericalCoordinates();
 
     if(dr<=0)
     {
@@ -106,10 +107,10 @@ Directions Scattering::Scatter(double dr,
     tz = std::sqrt(std::max(1. - (random_angles.tx * random_angles.tx + random_angles.ty * random_angles.ty), 0.));
 
     double sinth, costh, sinph, cosph;
-    sinth = std::sin(old_direction.GetTheta());
-    costh = std::cos(old_direction.GetTheta());
-    sinph = std::sin(old_direction.GetPhi());
-    cosph = std::cos(old_direction.GetPhi());
+    sinth = std::sin(directions_.n_i_.GetTheta());
+    costh = std::cos(directions_.n_i_.GetTheta());
+    sinph = std::sin(directions_.n_i_.GetPhi());
+    cosph = std::cos(directions_.n_i_.GetPhi());
 
     const Vector3D rotate_vector_x = Vector3D(costh * cosph, costh * sinph, -sinth);
     const Vector3D rotate_vector_y = Vector3D(-sinph, cosph, 0.);
