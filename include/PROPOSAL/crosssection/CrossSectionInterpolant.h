@@ -35,9 +35,8 @@
 namespace PROPOSAL {
 
 template <typename Param, typename P, typename M>
-class CrossSectionInterpolant : public crosssection_t<P, M>
-                                , public CrossSectionInterpolantBase
-    {
+class CrossSectionInterpolant : public crosssection_t<P, M>,
+                                public CrossSectionInterpolantBase {
 
     using param_t = typename std::decay<Param>::type;
     using particle_t = typename std::decay<P>::type;
@@ -49,7 +48,7 @@ class CrossSectionInterpolant : public crosssection_t<P, M>
     std::shared_ptr<const EnergyCutSettings> cut;
 
 protected:
-    std::unique_ptr<Interpolant> dedx;
+    /* std::unique_ptr<Interpolant> dedx; */
     std::unique_ptr<Interpolant> de2dx;
 
 public:
@@ -57,8 +56,11 @@ public:
         std::shared_ptr<const EnergyCutSettings> _cut)
         : crosssection_t<P, M>(_p_def, _medium,
             detail::build_dndx(
+                typename param_t::base_param_t::component_wise {}, true, _medium,
+                _param, _p_def, _cut),
+            detail::build_dedx(
                 typename param_t::base_param_t::component_wise {}, true,
-                _medium, _param, _p_def, _cut))
+                _param, _p_def,_medium, *_cut))
         , param(_param) // only for back transformation
         , cut(_cut)
     {
@@ -73,8 +75,8 @@ public:
         if (cut != nullptr) {
             // Only for a defined EnergyCut, dEdx and dE2dx return non-zero
             // values
-            dedx = build_dedx(reinterpret_cast<base_param_ref_t>(param),
-                this->p_def, this->medium, *cut, dEdx_def);
+            /* dedx = build_dedx(reinterpret_cast<base_param_ref_t>(param), */
+            /*     this->p_def, this->medium, *cut, dEdx_def); */
 
             if (cut->GetContRand())
                 de2dx = build_de2dx(reinterpret_cast<base_param_ref_t>(param),
@@ -92,9 +94,10 @@ public:
     }
     inline double CalculatedEdx(double energy) override
     {
-        if (dedx == nullptr)
-            return 0;
-        return dedx->Interpolate(energy);
+        auto loss = 0.;
+        for (auto& it : this->dedx)
+            loss += it->Calculate(energy);
+        return loss;
     }
 
     inline double CalculatedE2dx(double energy) override

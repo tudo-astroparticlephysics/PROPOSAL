@@ -29,6 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDXBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Components.h"
@@ -86,6 +87,28 @@ namespace detail {
         return dndx;
     }
 
+    template <typename T1, typename T2, typename T3, typename... Args>
+    inline auto build_dedx(std::true_type, bool interpol, T1&& param,
+        T2&& p_def, T3 const& target, Args&&... args)
+    {
+        auto dedx = std::vector<std::unique_ptr<CrossSectionDEDX>> {};
+        for (auto& c : target.GetComponents()) {
+            auto calc = make_dedx(interpol, std::forward<T1>(param),
+                std::forward<T2>(p_def), c, args...);
+            dedx.push_back(std::move(calc));
+        }
+        return dedx;
+    }
+
+    template <typename T1, typename T2, typename T3, typename... Args>
+    inline auto build_dedx(std::false_type, bool interpol, T1&& param,
+        T2&& p_def, T3 const& target, Args&&... args)
+    {
+        return std::vector<std::unique_ptr<CrossSectionDEDX>> { make_dedx(
+            interpol, std::forward<T1>(param), std::forward<T2>(p_def), target,
+            args...) };
+    }
+
     inline auto reweight_dndx(Medium const& m, Component const& c)
     {
         return m.GetSumNucleons() / (c.GetAtomInMolecule() * c.GetAtomicNum());
@@ -97,12 +120,14 @@ public:
     P p_def;
     M medium;
     dndx_map_t dndx;
+    std::vector<std::unique_ptr<CrossSectionDEDX>> dedx;
 
-    template <typename T>
-    CrossSection(P _p_def, M _medium, T&& _dndx)
+    template <typename T1, typename T2>
+    CrossSection(P _p_def, M _medium, T1&& _dndx, T2&& _dedx)
         : p_def(_p_def)
         , medium(_medium)
-        , dndx(std::forward<T>(_dndx))
+        , dndx(std::forward<T1>(_dndx))
+        , dedx(std::forward<T2>(_dedx))
     {
     }
 

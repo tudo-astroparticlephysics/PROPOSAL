@@ -54,7 +54,10 @@ public:
         : crosssection_t<P, M>(_p_def, _medium,
             detail::build_dndx(
                 typename param_t::base_param_t::component_wise {}, false,
-                _medium, _param, _p_def, _cut))
+                _medium, _param, _p_def, _cut),
+            detail::build_dedx(
+                typename param_t::base_param_t::component_wise {}, false,
+                _param, _p_def, _medium, *_cut))
         , param(_param)
         , cut(_cut)
     {
@@ -118,12 +121,10 @@ public:
     }
     inline double CalculatedEdx(double energy) override
     {
-        if (cut == nullptr)
-            return 0;
-        auto aux = calculate_dedx(reinterpret_cast<base_param_ref_t>(param),
-            integral, this->p_def, this->medium, *cut, energy,
-            typename param_t::component_wise {});
-        return aux;
+        auto loss = 0.;
+        for (auto& it : this->dedx)
+            loss += it->Calculate(energy);
+        return loss;
     }
     inline double CalculatedE2dx(double energy) override
     {
