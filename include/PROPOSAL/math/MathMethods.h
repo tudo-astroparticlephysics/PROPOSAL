@@ -174,4 +174,10 @@ double SampleFromGaussian(double mean, double sigma, double rnd,
                           double min = -std::numeric_limits<double>::infinity(),
                           double max = std::numeric_limits<double>::infinity());
 
+
+/// @brief          Sample a value from exponential distribution with a given lambda 
+/// @param p        Random number between 0 and 1 for sampling 
+/// @param lambda   Rate parameter, lambda = 1 / beta
+double SampleFromExponential(double p, double lambda);                          
+
 } // namespace PROPOSAL

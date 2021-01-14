@@ -425,4 +425,9 @@ double SampleFromGaussian(double mean, double sigma, double rnd, double min, dou
     return sigma * normalppf(rndtmp)  + mean;
 }
 
+double SampleFromExponential(double p, double lambda) {
+    auto inverse_cdf_exp = - log(1.0 - p) / lambda;
+    return inverse_cdf_exp;
+}
+
 }  // namespace PROPOSAL

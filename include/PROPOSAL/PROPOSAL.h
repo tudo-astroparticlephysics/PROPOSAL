@@ -132,6 +132,10 @@
 #include "PROPOSAL/scattering/stochastic_deflection/ScatteringFactory.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/Bremsstrahlung.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
+#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/NuclearInteraction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/NaivNuclearInteraction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/pairProd/PairProduction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/pairProd/NaivPairProduction.h"
 #include "PROPOSAL/scattering/stochastic_deflection/ionization/Ionization.h"
 #include "PROPOSAL/scattering/stochastic_deflection/ionization/NaivIonization.h"
 
