@@ -29,6 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/crosssection/CrossSectionDE2DX/CrossSectionDE2DXBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDXBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
@@ -94,54 +95,127 @@ namespace detail {
         return dndx;
     }
 
-    template <typename T1, typename T2, typename T3, typename... Args>
-    inline auto build_dedx(std::true_type, bool interpol, T1&& param,
-        T2&& p_def, T3 const& target, Args&&... args)
+    template <typename Cont, typename T1, typename T2, typename T3,
+        typename... Args>
+    inline auto _build_dedx(Cont container, std::true_type, bool interpol,
+        T1&& param, T2&& p_def, T3 const& target, Args&&... args)
+    {
+        for (auto& c : target.GetComponents())
+            container->emplace_back(weight_component(target, c),
+                make_dedx(interpol, std::forward<T1>(param),
+                    std::forward<T2>(p_def), c, args...));
+    }
+
+    template <typename Cont, typename T1, typename T2, typename T3,
+        typename... Args>
+    inline auto _build_dedx(Cont container, std::false_type, bool interpol,
+        T1&& param, T2&& p_def, T3 const& target, Args&&... args)
+    {
+        container->emplace_back(1.,
+            make_dedx(interpol, std::forward<T1>(param),
+                std::forward<T2>(p_def), target, args...));
+    }
+
+    template <typename Type, typename T1, typename T2, typename T3, typename T4,
+        typename... Args>
+    inline auto build_dedx(Type comp_wise, bool interpol, T1&& param,
+        T2&& p_def, T3&& target, T4 cut_ptr, Args&&... args)
     {
         using dedx_ptr = std::unique_ptr<CrossSectionDEDX>;
-        auto dedx = std::vector<std::tuple<double, dedx_ptr>> {};
-        for (auto& c : target.GetComponents()) {
-            auto calc = make_dedx(interpol, std::forward<T1>(param),
-                std::forward<T2>(p_def), c, args...);
-            dedx.emplace_back(weight_component(target, c), std::move(calc));
+        auto dedx = std::unique_ptr<std::vector<std::tuple<double, dedx_ptr>>>(
+            nullptr);
+        if (cut_ptr) {
+            dedx
+                = std::make_unique<std::vector<std::tuple<double, dedx_ptr>>>();
+            _build_dedx(dedx.get(), comp_wise, interpol,
+                std::forward<T1>(param), std::forward<T2>(p_def),
+                std::forward<T3>(target), *cut_ptr,
+                std::forward<Args>(args)...);
         }
         return dedx;
     }
 
-    template <typename T1, typename T2, typename T3, typename... Args>
-    inline auto build_dedx(std::false_type, bool interpol, T1&& param,
-        T2&& p_def, T3 const& target, Args&&... args)
+    template <typename Cont, typename T1, typename T2, typename T3,
+        typename... Args>
+    inline auto _build_de2dx(Cont container, std::true_type, bool interpol,
+        T1&& param, T2&& p_def, T3 const& target, Args&&... args)
     {
-        using dedx_ptr = std::unique_ptr<CrossSectionDEDX>;
-        auto calc = make_dedx(interpol, std::forward<T1>(param),
-            std::forward<T2>(p_def), target, args...);
+        for (auto& c : target.GetComponents())
+            container->emplace_back(weight_component(target, c),
+                make_de2dx(interpol, std::forward<T1>(param),
+                    std::forward<T2>(p_def), c, args...));
+    }
 
-        auto dedx = std::vector<std::tuple<double, dedx_ptr>> {};
-        dedx.emplace_back(1., std::move(calc));
-        return dedx;
+    template <typename Cont, typename T1, typename T2, typename T3,
+        typename... Args>
+    inline auto _build_de2dx(Cont container, std::false_type, bool interpol,
+        T1&& param, T2&& p_def, T3 const& target, Args&&... args)
+    {
+        container->emplace_back(1.,
+            make_de2dx(interpol, std::forward<T1>(param),
+                std::forward<T2>(p_def), target, args...));
+    }
+
+    template <typename Type, typename T1, typename T2, typename T3, typename T4,
+        typename... Args>
+    inline auto build_de2dx(Type comp_wise, bool interpol, T1&& param,
+        T2&& p_def, T3&& target, T4 cut_ptr, Args&&... args)
+    {
+        using de2dx_ptr = std::unique_ptr<CrossSectionDE2DX>;
+        using de2dx_container = std::vector<std::tuple<double, de2dx_ptr>>;
+        auto de2dx = std::unique_ptr<de2dx_container>(nullptr);
+        if (!cut_ptr)
+            return de2dx;
+        if (cut_ptr->GetContRand()) {
+            de2dx = std::make_unique<de2dx_container>();
+            _build_de2dx(de2dx.get(), comp_wise, interpol,
+                std::forward<T1>(param), std::forward<T2>(p_def),
+                std::forward<T3>(target), *cut_ptr,
+                std::forward<Args>(args)...);
+        }
+        return de2dx;
     }
 
 }
 
 template <class P, class M> class CrossSection : public CrossSectionBase {
+    using dedx_ptr = std::unique_ptr<CrossSectionDEDX>;
+    using de2dx_ptr = std::unique_ptr<CrossSectionDE2DX>;
+
 public:
     P p_def;
     M medium;
 
-    dndx_map_t dndx;
-    std::vector<std::tuple<double, std::unique_ptr<CrossSectionDEDX>>> dedx;
+    size_t hash;
 
-    template <typename T1, typename T2>
-    CrossSection(P _p_def, M _medium, T1&& _dndx, T2&& _dedx)
+    dndx_map_t dndx;
+    std::unique_ptr<std::vector<std::tuple<double, dedx_ptr>>> dedx;
+    std::unique_ptr<std::vector<std::tuple<double, de2dx_ptr>>> de2dx;
+
+    template <typename T1, typename T2, typename T3>
+    CrossSection(P _p_def, M _medium, T1&& _dndx, T2&& _dedx, T3&& _de2dx)
         : p_def(_p_def)
         , medium(_medium)
+        , hash(0)
         , dndx(std::forward<T1>(_dndx))
         , dedx(std::forward<T2>(_dedx))
+        , de2dx(std::forward<T3>(_de2dx))
     {
+        for (auto const& i : dndx)
+            hash_combine(hash, i.second->GetHash());
+        if (dedx) {
+            for (auto const& i : *dedx)
+                hash_combine(hash, std::get<1>(i)->GetHash());
+        }
+        if (de2dx) {
+            for (auto const& i : *de2dx)
+                hash_combine(hash, std::get<1>(i)->GetHash());
+        }
     }
 
     virtual ~CrossSection() = default;
 
+protected:
     template <typename T>
     auto CalculatedNdx_impl(double energy, std::true_type, T comp_ptr)
     {
@@ -182,13 +256,36 @@ public:
         return 1;
     }
 
+public:
     inline double CalculatedEdx(double energy) override
     {
         auto loss = 0.;
-        for (auto& [weight, dedx] : this->dedx)
-            loss += dedx->Calculate(energy) / weight;
+        if (not dedx)
+            return loss;
+        for (auto& [weight, calc] : *dedx)
+            loss += calc->Calculate(energy) / weight;
         return loss;
     }
+
+    inline double CalculatedE2dx(double energy) override
+    {
+        auto loss = 0.;
+        if (not de2dx)
+            return loss;
+        for (auto& [weight, calc] : *de2dx)
+            loss += calc->Calculate(energy) / weight;
+        return loss;
+    }
+
+    std::vector<std::shared_ptr<const Component>>
+    GetTargets() const noexcept final
+    {
+        std::vector<std::shared_ptr<const Component>> targets;
+        for (auto& it : this->dndx)
+            targets.emplace_back(it.first);
+        return targets;
+    }
+    size_t GetHash() const noexcept final { return hash; }
 };
 
 template <typename P, typename M>
@@ -214,9 +311,5 @@ size_t crosssection_hasher(size_t hash_diggest, T const& obj, Args... args)
     hash_combine(hash_diggest, obj.GetHash());
     return crosssection_hasher(hash_diggest, args...);
 }
-
-/* template<> */
-/* size_t crosssection_hasher(size_t hash_diggest, std::shared_ptr<const
- * EnergyCutSettings> const& ptr); */
 
 } // namespace PROPOSAL

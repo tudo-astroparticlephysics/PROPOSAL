@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDXIntegral.h"
+#include "PROPOSAL/crosssection/CrossSectionDE2DX/CrossSectionDE2DXIntegral.h"
 
 #include <type_traits>
 
@@ -14,35 +14,34 @@ double transform_relativ_loss(double v_cut, double v_max, double v);
 double retransform_relativ_loss(double v_cut, double v_max, double v);
 
 template <typename T1, typename T2, typename... Args>
-auto build_dedx_def(T1 const& param, T2 const& p_def, Args... args)
+auto build_de2dx_def(T1 const& param, T2 const& p_def, Args... args)
 {
-    auto dedx
-        = std::make_shared<CrossSectionDEDXIntegral>(param, p_def, args...);
+    auto de2dx
+        = std::make_shared<CrossSectionDE2DXIntegral>(param, p_def, args...);
     auto def = cubic_splines::CubicSplines::Definition();
     def.axis = std::make_unique<cubic_splines::ExpAxis>(
         param.GetLowerEnergyLim(p_def), 1e14, (size_t)100);
-    def.f = [dedx](double E) { return dedx->Calculate(E); };
+    def.f = [de2dx](double E) { return de2dx->Calculate(E); };
     return def;
 }
 
-class CrossSectionDEDXInterpolant : public CrossSectionDEDX {
+class CrossSectionDE2DXInterpolant : public CrossSectionDE2DX {
 
     cubic_splines::Interpolant<cubic_splines::CubicSplines> interpolant;
 
     std::string gen_name()
     {
-        return std::string("dedx_") + std::to_string(GetHash()) + std::string(".txt");
+        return std::string("de2dx_") + std::to_string(GetHash())
+            + std::string(".txt");
     }
 
 public:
     template <typename T1, typename T2>
-    CrossSectionDEDXInterpolant(T1 param, ParticleDef const& p_def,
+    CrossSectionDE2DXInterpolant(T1 param, ParticleDef const& p_def,
         T2 const& target, EnergyCutSettings const& cut)
         : interpolant(
-            build_dedx_def(param, p_def, target, cut), "/tmp", gen_name())
+            build_de2dx_def(param, p_def, target, cut), "/tmp", gen_name())
     {
-        hash_combine(hash, param.GetHash(), p_def.GetHash(), target.GetHash(),
-            cut.GetHash());
     }
 
     double Calculate(double E) final;

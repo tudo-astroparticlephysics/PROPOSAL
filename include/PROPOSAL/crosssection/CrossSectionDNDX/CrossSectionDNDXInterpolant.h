@@ -33,19 +33,16 @@ class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
 
     cubic_splines::Interpolant<cubic_splines::BicubicSplines> interpolant;
 
-    template <typename... Args> static std::string gen_name(Args... args)
+    std::string gen_name()
     {
-        auto hash = 0u;
-        return std::string("dndx_")
-            + std::to_string(crosssection_hasher(hash, args...))
-            + std::string(".txt");
+        return std::string("dndx_") + std::to_string(GetHash()) + std::string(".txt");
     }
 
 public:
     template <typename... Args>
     CrossSectionDNDXInterpolant(Args... args)
         : CrossSectionDNDX(args...)
-        , interpolant(build_dndx_def(args...), "/tmp", gen_name(args...))
+        , interpolant(build_dndx_def(args...), "/tmp", gen_name())
     {
     }
 

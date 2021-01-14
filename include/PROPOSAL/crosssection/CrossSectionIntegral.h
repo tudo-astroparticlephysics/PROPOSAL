@@ -55,7 +55,10 @@ public:
                 _medium, _param, _p_def, _cut),
             detail::build_dedx(
                 typename param_t::base_param_t::component_wise {}, false,
-                _param, _p_def, _medium, *_cut))
+                _param, _p_def, _medium, _cut),
+            detail::build_de2dx(
+                typename param_t::base_param_t::component_wise {}, false,
+                _param, _p_def, _medium, _cut))
         , param(_param)
         , cut(_cut)
     {
@@ -67,22 +70,6 @@ public:
         }
     }
 
-    std::vector<std::shared_ptr<const Component>>
-    GetTargets() const noexcept final
-    {
-        std::vector<std::shared_ptr<const Component>> targets;
-        for (auto& it : this->dndx)
-            targets.emplace_back(it.first);
-        return targets;
-    }
-    inline double CalculatedE2dx(double energy) override
-    {
-        if (cut == nullptr)
-            return 0;
-        return calculate_de2dx(reinterpret_cast<base_param_ref_t>(param),
-            integral, this->p_def, this->medium, *cut, energy,
-            typename param_t::component_wise {});
-    }
     inline double CalculatedNdx(double energy,
         std::shared_ptr<const Component> comp_ptr = nullptr) override
     {
@@ -98,20 +85,6 @@ public:
             typename param_t::base_param_t::component_wise {},
             typename param_t::base_param_t::only_stochastic {});
     }
-    inline size_t GetHash() const noexcept override
-    {
-        auto hash_digest = size_t { 0 };
-        hash_combine(hash_digest, param.GetHash(), this->p_def.mass,
-            std::abs(this->p_def.charge), this->medium.GetHash());
-
-        // Only for WeakInteraction, the sign of the charge is important
-        if (param.interaction_type == InteractionType::WeakInt)
-            hash_combine(hash_digest, this->p_def.charge);
-
-        if (cut)
-            hash_combine(hash_digest, cut->GetHash());
-        return hash_digest;
-    }
     inline double GetLowerEnergyLim() const override
     {
         return param.GetLowerEnergyLim(this->p_def);
@@ -122,38 +95,3 @@ public:
     }
 };
 } // namespace PROPOSAL
-
-namespace PROPOSAL {
-
-template <typename Param>
-double calculate_de2dx(Param&& param, Integral& integral,
-    const ParticleDef& p_def, const Medium& medium,
-    const EnergyCutSettings& cut, double energy, std::true_type)
-{
-    double sum = 0.;
-    for (const auto& c : medium.GetComponents()) {
-        auto lim = param.GetKinematicLimits(p_def, c, energy);
-        auto v_cut = cut.GetCut(lim, energy);
-        auto loss2 = integrate_de2dx(integral, param, p_def, c, energy,
-            std::get<crosssection::Parametrization::V_MIN>(lim), v_cut);
-        auto weight_for_loss_in_medium = medium.GetSumNucleons()
-            / (c.GetAtomInMolecule() * c.GetAtomicNum());
-
-        sum += loss2 / weight_for_loss_in_medium;
-    }
-    return energy * energy * sum;
-}
-
-template <typename Param>
-double calculate_de2dx(Param&& param, Integral& integral,
-    const ParticleDef& p_def, const Medium& medium,
-    const EnergyCutSettings& cut, double energy, std::false_type)
-{
-    auto lim = param.GetKinematicLimits(p_def, medium, energy);
-    auto v_cut = cut.GetCut(lim, energy);
-    return integrate_de2dx(integral, param, p_def, medium, energy,
-               std::get<crosssection::Parametrization::V_MIN>(lim), v_cut)
-        * energy * energy;
-}
-
-} // namepace PROPOSAL

@@ -10,6 +10,7 @@ class CrossSectionDNDX {
     std::function<std::tuple<double, double>(double)> kinematic_limits;
     std::shared_ptr<const EnergyCutSettings> cut;
     double lower_energy_lim;
+    size_t hash;
 
     template <typename T1, typename T2, typename T3>
     inline auto define_kinematic_limits(T1 param, T2 particle, T3 target)
@@ -21,19 +22,23 @@ class CrossSectionDNDX {
 
 public:
     template <typename T1, typename T2, typename T3>
-    CrossSectionDNDX(
-        T1 _param, T2 _particle, T3 _target, EnergyCutSettings const& _cut)
-        : kinematic_limits(define_kinematic_limits(_param, _particle, _target))
-        , cut(std::make_shared<const EnergyCutSettings>(_cut))
-        , lower_energy_lim(_param.GetLowerEnergyLim(_particle))
-    {
-    }
-
-    template <typename T1, typename T2, typename T3>
     CrossSectionDNDX(T1 _param, T2 _particle, T3 _target)
         : kinematic_limits(define_kinematic_limits(_param, _particle, _target))
         , lower_energy_lim(_param.GetLowerEnergyLim(_particle))
+        , hash(0)
     {
+        hash_combine(
+            hash, _param.GetHash(), _particle.GetHash(), _target.GetHash());
+    }
+
+    template <typename T1, typename T2, typename T3>
+    CrossSectionDNDX(T1&& _param, T2&& _particle, T3&& _target,
+        EnergyCutSettings const& _cut)
+    {
+        *this = CrossSectionDNDX(std::forward<T1>(_param),
+            std::forward<T2>(_particle), std::forward<T3>(_target));
+        this->cut = std::make_shared<const EnergyCutSettings>(cut);
+        hash_combine(this->hash, _cut.GetHash());
     }
 
     virtual ~CrossSectionDNDX() = default;
@@ -46,5 +51,7 @@ public:
     std::array<double, 2> GetIntegrationLimits(double energy) const;
 
     double GetLowerEnergyLim() const;
+
+    size_t GetHash() const noexcept { return hash; }
 };
 } // namespace PROPOSAL

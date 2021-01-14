@@ -50,10 +50,13 @@ class CrossSectionDEDXIntegral : public CrossSectionDEDX {
     }
 
 public:
-    template <typename... Args>
-    CrossSectionDEDXIntegral(Args... args)
-        : dedx_integral(define_integral(std::forward<Args>(args)...))
+    template <typename T1, typename T2>
+    CrossSectionDEDXIntegral(T1 param, ParticleDef const& p_def,
+        T2 const& target, EnergyCutSettings const& cut)
+        : dedx_integral(define_integral(param, p_def, target, cut))
     {
+        hash_combine(hash, param.GetHash(), p_def.GetHash(), target.GetHash(),
+            cut.GetHash());
     }
 
     double Calculate(double E) override { return dedx_integral(integral, E); }
