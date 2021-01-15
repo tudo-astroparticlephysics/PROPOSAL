@@ -13,10 +13,11 @@
 
 #define EPAIR_PARAM_INTEGRAL_IMPL(param)                                       \
     crosssection::Epair##param::Epair##param(bool lpm)                         \
-        : EpairProductionRhoIntegral(lpm) {}                                   \
+        : EpairProductionRhoIntegral(lpm)                                      \
+    {                                                                          \
+    }                                                                          \
     crosssection::Epair##param::Epair##param(bool lpm, const ParticleDef& p,   \
-                                             const Medium& medium,             \
-                                             double density_distribution)      \
+        const Medium& medium, double density_distribution)                     \
         : EpairProductionRhoIntegral(lpm, p, medium, density_distribution)     \
     {                                                                          \
     }
@@ -35,9 +36,8 @@ crosssection::EpairProduction::EpairProduction(bool lpm)
 }
 
 crosssection::EpairProduction::EpairProduction(bool lpm, const ParticleDef& p,
-                                               const Medium& medium,
-                                               double density_correction)
-        : Parametrization(InteractionType::Epair, "Epair")
+    const Medium& medium, double density_correction)
+    : Parametrization(InteractionType::Epair, "Epair")
 {
     if (lpm) {
         lpm_ = std::make_shared<EpairLPM>(p, medium, density_correction);
@@ -46,14 +46,14 @@ crosssection::EpairProduction::EpairProduction(bool lpm, const ParticleDef& p,
     }
 }
 
-double crosssection::EpairProduction::GetLowerEnergyLim(const ParticleDef& p_def) const
-    noexcept
+double crosssection::EpairProduction::GetLowerEnergyLim(
+    const ParticleDef& p_def) const noexcept
 {
     return p_def.mass + 2.f * ME;
 }
 std::tuple<double, double> crosssection::EpairProduction::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy) const
-    noexcept
+    const ParticleDef& p_def, const Component& comp,
+    double energy) const noexcept
 {
     auto aux = p_def.mass / energy;
     auto v_min = 4 * ME / energy;
@@ -76,44 +76,46 @@ size_t crosssection::EpairProduction::GetHash() const noexcept
 }
 
 namespace PROPOSAL {
-template <>
-double integrate_dedx(Integral& integral, crosssection::EpairProduction& param,
-    const ParticleDef& p_def, const Component& comp, double energy,
-    double v_min, double v_max)
-{
-    double r1 = 0.8;
-    double rUp = v_max * (1 - HALF_PRECISION);
-    bool rflag = false;
-    if (r1 < rUp) {
-        if (2 * param.FunctionToDEdxIntegral(p_def, comp, energy, r1)
-            < param.FunctionToDEdxIntegral(p_def, comp, energy, rUp)) {
-            rflag = true;
+namespace detail {
+    double integrate_dedx_epair(Integral& integral,
+        crosssection::EpairProduction const& param, const ParticleDef& p_def,
+        const Component& comp, double energy, double v_min, double v_max)
+    {
+        double r1 = 0.8;
+        double rUp = v_max * (1 - HALF_PRECISION);
+        bool rflag = false;
+        if (r1 < rUp) {
+            if (2 * param.FunctionToDEdxIntegral(p_def, comp, energy, r1)
+                < param.FunctionToDEdxIntegral(p_def, comp, energy, rUp)) {
+                rflag = true;
+            }
         }
-    }
-    auto func = [&param, &p_def, &comp, energy](double v) {
-        return param.FunctionToDEdxIntegral(p_def, comp, energy, v);
-    };
-    if (rflag) {
-        if (r1 > v_max) {
-            r1 = v_max;
-        }
-        if (r1 < v_min) {
-            r1 = v_min;
-        }
-        auto sum = integral.Integrate(v_min, r1, func, 4);
-        double r2 = std::max(1 - v_max, COMPUTER_PRECISION);
-        if (r2 > 1 - r1) {
-            r2 = 1 - r1;
-        }
-        auto func_reverse = [&, energy](double v) {
-            return (1 - v)
-                * param.DifferentialCrossSection(p_def, comp, energy, 1 - v);
+        auto func = [&param, &p_def, &comp, energy](double v) {
+            return param.FunctionToDEdxIntegral(p_def, comp, energy, v);
         };
-        sum += integral.Integrate(1 - v_max, r2, func_reverse, 2)
-            + integral.Integrate(r2, 1 - r1, func_reverse, 4);
-        return sum;
+        if (rflag) {
+            if (r1 > v_max) {
+                r1 = v_max;
+            }
+            if (r1 < v_min) {
+                r1 = v_min;
+            }
+            auto sum = integral.Integrate(v_min, r1, func, 4);
+            double r2 = std::max(1 - v_max, COMPUTER_PRECISION);
+            if (r2 > 1 - r1) {
+                r2 = 1 - r1;
+            }
+            auto func_reverse = [&, energy](double v) {
+                return (1 - v)
+                    * param.DifferentialCrossSection(
+                        p_def, comp, energy, 1 - v);
+            };
+            sum += integral.Integrate(1 - v_max, r2, func_reverse, 2)
+                + integral.Integrate(r2, 1 - r1, func_reverse, 4);
+            return sum;
+        }
+        return integral.Integrate(v_min, v_max, func, 4);
     }
-    return integral.Integrate(v_min, v_max, func, 4);
 }
 } // namespace PROPOSAL
 
@@ -126,10 +128,9 @@ crosssection::EpairProductionRhoIntegral::EpairProductionRhoIntegral(bool lpm)
 {
 }
 
-crosssection::EpairProductionRhoIntegral::EpairProductionRhoIntegral(
-        bool lpm, const ParticleDef& p_def, const Medium& medium,
-        double density_correction )
-        : crosssection::EpairProduction(lpm, p_def, medium, density_correction)
+crosssection::EpairProductionRhoIntegral::EpairProductionRhoIntegral(bool lpm,
+    const ParticleDef& p_def, const Medium& medium, double density_correction)
+    : crosssection::EpairProduction(lpm, p_def, medium, density_correction)
 {
 }
 
@@ -158,7 +159,7 @@ double crosssection::EpairProductionRhoIntegral::DifferentialCrossSection(
 
     return NA / comp.GetAtomicNum() * p_def.charge * p_def.charge
         * (integral.Integrate(1 - rMax, aux, func, 2)
-              + integral.Integrate(aux, 1, func, 4));
+            + integral.Integrate(aux, 1, func, 4));
 }
 
 /******************************************************************************
@@ -206,7 +207,7 @@ double crosssection::EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
     // these are the Y_e and Y_mu expressions in the original paper
     diagram_e = (5 - r2 + 4 * beta * (1 + r2))
         / (2 * (1 + 3 * beta) * std::log(3 + 1 / xi) - r2
-              - 2 * beta * (2 - r2));
+            - 2 * beta * (2 - r2));
     diagram_mu = (4 + r2 + 3 * beta * (1 + r2))
         / ((1 + r2) * (1.5 + 2 * beta) * std::log(3 + xi) + 1 - 1.5 * r2);
 
@@ -322,7 +323,7 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
     double zeta, zeta1, zeta2;
     zeta1 = (0.073
             * std::log(energy / m_in
-                  / (1.0 + g1 * std::pow(nucl_Z, 2.0 / 3.0) * energy / m_in))
+                / (1.0 + g1 * std::pow(nucl_Z, 2.0 / 3.0) * energy / m_in))
         - 0.26);
     zeta2 = (0.058 * std::log(energy / m_in / (1 + g2 / Z13 * energy / m_in))
         - 0.14);
@@ -360,40 +361,40 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
         double Xe = std::exp(-De / Be);
         Le1 = std::log(rad_log * Z13 * std::sqrt(1.0 + xi)
                   / (Xe
-                        + 2.0 * ME * std::exp(0.5) * rad_log * Z13 * (1.0 + xi)
-                            / (energy * v * (1.0 - rho2))))
+                      + 2.0 * ME * std::exp(0.5) * rad_log * Z13 * (1.0 + xi)
+                          / (energy * v * (1.0 - rho2))))
             - De / Be
             - 0.5 * std::log(Xe + std::pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
 
         Le2 = std::log(rad_log * Z13 * std::exp(-1.0 / 6.0) * std::sqrt(1 + xi)
                   / (Xe
-                        + 2.0 * ME * std::exp(1.0 / 3.0) * rad_log * Z13
-                            * (1.0 + xi) / (energy * v * (1.0 - rho2))))
+                      + 2.0 * ME * std::exp(1.0 / 3.0) * rad_log * Z13
+                          * (1.0 + xi) / (energy * v * (1.0 - rho2))))
             - De / Be
             - 0.5
                 * std::log(Xe
-                      + pow(ME / m_in * d_n, 2.0) * std::exp(-1.0 / 3.0)
-                          * (1.0 + xi));
+                    + pow(ME / m_in * d_n, 2.0) * std::exp(-1.0 / 3.0)
+                        * (1.0 + xi));
     } else {
         double Xe_inv = std::exp(De / Be);
         Le1 = std::log(rad_log * Z13 * std::sqrt(1.0 + xi)
                   / (1.
-                        + Xe_inv * 2.0 * ME * std::exp(0.5) * rad_log * Z13
-                            * (1.0 + xi) / (energy * v * (1.0 - rho2))))
+                      + Xe_inv * 2.0 * ME * std::exp(0.5) * rad_log * Z13
+                          * (1.0 + xi) / (energy * v * (1.0 - rho2))))
             - 0.5 * De / Be
             - 0.5
-                * std::log(1.
-                      + Xe_inv * std::pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
+                * std::log(
+                    1. + Xe_inv * std::pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
 
         Le2 = std::log(rad_log * Z13 * std::exp(-1.0 / 6.0) * std::sqrt(1 + xi)
                   / (1.
-                        + Xe_inv * 2.0 * ME * std::exp(1.0 / 3.0) * rad_log
-                            * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2))))
+                      + Xe_inv * 2.0 * ME * std::exp(1.0 / 3.0) * rad_log * Z13
+                          * (1.0 + xi) / (energy * v * (1.0 - rho2))))
             - 0.5 * De / Be
             - 0.5
                 * std::log(1.
-                      + Xe_inv * std::pow(ME / m_in * d_n, 2.0)
-                          * std::exp(-1.0 / 3.0) * (1.0 + xi));
+                    + Xe_inv * std::pow(ME / m_in * d_n, 2.0)
+                        * std::exp(-1.0 / 3.0) * (1.0 + xi));
     }
 
     double diagram_e = std::max(0.0,
@@ -430,22 +431,22 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
         double Xm = std::exp(-Dm / Bm);
         Lm1 = std::log(Xm * m_in / ME * rad_log * Z13 / d_n
             / (Xm
-                  + 2.0 * ME * std::exp(0.5) * rad_log * Z13 * (1.0 + xi)
-                      / (energy * v * (1.0 - rho2))));
+                + 2.0 * ME * std::exp(0.5) * rad_log * Z13 * (1.0 + xi)
+                    / (energy * v * (1.0 - rho2))));
         Lm2 = std::log(Xm * m_in / ME * rad_log * Z13 / d_n
             / (Xm
-                  + 2.0 * ME * std::exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi)
-                      / (energy * v * (1.0 - rho2))));
+                + 2.0 * ME * std::exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi)
+                    / (energy * v * (1.0 - rho2))));
     } else {
         double Xm_inv = std::exp(Dm / Bm);
         Lm1 = std::log(m_in / ME * rad_log * Z13 / d_n
             / (1.0
-                  + 2.0 * ME * std::exp(0.5) * rad_log * Z13 * (1.0 + xi)
-                      / (energy * v * (1.0 - rho2)) * Xm_inv));
+                + 2.0 * ME * std::exp(0.5) * rad_log * Z13 * (1.0 + xi)
+                    / (energy * v * (1.0 - rho2)) * Xm_inv));
         Lm2 = std::log(m_in / ME * rad_log * Z13 / d_n
             / (1.0
-                  + 2.0 * ME * std::exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi)
-                      / (energy * v * (1.0 - rho2)) * Xm_inv));
+                + 2.0 * ME * std::exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi)
+                    / (energy * v * (1.0 - rho2)) * Xm_inv));
     }
 
     double diagram_mu = std::max(0.0,
@@ -467,70 +468,70 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
 
 // ------------------------------------------------------------------------- //
 double crosssection::EpairForElectronPositron::FunctionToIntegral(
-        const ParticleDef& p_def, const Component& comp, double energy, double v,
-        double rho) const
+    const ParticleDef& p_def, const Component& comp, double energy, double v,
+    double rho) const
 {
     // Adaptation of the direct muon pair production cross section of muons.
-    // Nuclear formfactor effects have been removed as they are negligible for electrons.
-    // Based on the parametrization of Kelner/Kokoulin/Petrukhin
-    // Physics of Atomic Nuclei, Vol. 63, No. 9, 2000, pp. 1603-1611. Translated from Yadernaya Fizika, Vol. 63, 2000, pp. 1690-1698
-    // Original Russian Text Copyright 2000 by Kel'ner, Kokoulin, Petukhin
-    // DOI: 10.1134/1.1312894
-
+    // Nuclear formfactor effects have been removed as they are negligible for
+    // electrons. Based on the parametrization of Kelner/Kokoulin/Petrukhin
+    // Physics of Atomic Nuclei, Vol. 63, No. 9, 2000, pp. 1603-1611. Translated
+    // from Yadernaya Fizika, Vol. 63, 2000, pp. 1690-1698 Original Russian Text
+    // Copyright 2000 by Kel'ner, Kokoulin, Petukhin DOI: 10.1134/1.1312894
 
     double aux, aux1, aux2, r2, rMax, Z3, xi, beta;
     double phi, U, U_max, X, Y;
     auto medium_charge = comp.GetNucCharge();
     auto medium_log_constant = comp.GetLogConstant();
-    //double medium_log_constant = 183; // According to the paper, B is set to 183
+    // double medium_log_constant = 183; // According to the paper, B is set to
+    // 183
 
-    r2          = rho * rho;
-    rMax        = 1 - 2 * ME / (v * energy);
-    Z3          = std::pow(medium_charge, -1. / 3);
-    aux         = v / 2;
-    xi          = aux * aux * (1 - r2) / (1 - v);
-    beta        = (v * v) / (2 * (1 - v));
+    r2 = rho * rho;
+    rMax = 1 - 2 * ME / (v * energy);
+    Z3 = std::pow(medium_charge, -1. / 3);
+    aux = v / 2;
+    xi = aux * aux * (1 - r2) / (1 - v);
+    beta = (v * v) / (2 * (1 - v));
 
-    //Phi Calculation (18)
-    aux     = (2 + r2) * (1 + beta) + xi * (3 + r2);
-    aux     *= std::log(1 + 1. / xi);
+    // Phi Calculation (18)
+    aux = (2 + r2) * (1 + beta) + xi * (3 + r2);
+    aux *= std::log(1 + 1. / xi);
 
-    aux1    = (1 + r2) * (1 + 1.5 * beta) - 1. / xi * (1 + 2 * beta) * (1 - r2);
-    aux1    *= std::log(1 + xi);
-    aux2    = -1 - 3 * r2 + beta * (1 - 2 * r2);
+    aux1 = (1 + r2) * (1 + 1.5 * beta) - 1. / xi * (1 + 2 * beta) * (1 - r2);
+    aux1 *= std::log(1 + xi);
+    aux2 = -1 - 3 * r2 + beta * (1 - 2 * r2);
 
-    phi     = aux + aux1 + aux2;
+    phi = aux + aux1 + aux2;
 
-    //X Calculation (22)
-    Y       = 12 * std::sqrt(ME / energy); //(21)
-    aux     = medium_log_constant * Z3;
-    aux1    = 2 * SQRTE * std::pow(ME, 2) * medium_log_constant * Z3 * (1 + xi) * (1 + Y);
-    aux2    = ME * energy * v * (1 - r2);
+    // X Calculation (22)
+    Y = 12 * std::sqrt(ME / energy); //(21)
+    aux = medium_log_constant * Z3;
+    aux1 = 2 * SQRTE * std::pow(ME, 2) * medium_log_constant * Z3 * (1 + xi)
+        * (1 + Y);
+    aux2 = ME * energy * v * (1 - r2);
 
-    U       = aux / (1 + aux1 / aux2);
+    U = aux / (1 + aux1 / aux2);
 
-    xi      = v * v * (1 - rMax * rMax)/(4 * (1 - v));
-    aux1    = 2 * SQRTE * std::pow(ME, 2) * medium_log_constant * Z3 * (1 + xi) * (1 + Y);
-    aux2    = ME * energy * v * (1 - rMax * rMax);
-    U_max   = aux / (1 + aux1 / aux2);
+    xi = v * v * (1 - rMax * rMax) / (4 * (1 - v));
+    aux1 = 2 * SQRTE * std::pow(ME, 2) * medium_log_constant * Z3 * (1 + xi)
+        * (1 + Y);
+    aux2 = ME * energy * v * (1 - rMax * rMax);
+    U_max = aux / (1 + aux1 / aux2);
 
-    X       = 1 + U - U_max;
+    X = 1 + U - U_max;
 
-    //Combine results
-    aux     = ALPHA * RE * p_def.charge * medium_charge;
-    aux     *= 2 * aux * phi * (1 - v) / (1.5 * PI * v); //Factor 2: Similar to factor 2 from EPairProduction, probably from symmetry in Rho
+    // Combine results
+    aux = ALPHA * RE * p_def.charge * medium_charge;
+    aux *= 2 * aux * phi * (1 - v)
+        / (1.5 * PI * v); // Factor 2: Similar to factor 2 from EPairProduction,
+                          // probably from symmetry in Rho
 
-    if (X > 0)
-    {
+    if (X > 0) {
         aux *= std::log(X);
-    }
-    else
-    {
+    } else {
         aux = 0;
     }
 
-    if (aux < 0)
-    {
+    if (aux < 0) {
         aux = 0;
     }
 
@@ -543,30 +544,32 @@ double crosssection::EpairForElectronPositron::FunctionToIntegral(
 
 #undef EPAIR_PARAM_INTEGRAL_IMPL
 
-crosssection::EpairLPM::EpairLPM(const ParticleDef& p_def, const Medium& medium,
-                                 double density_correction)
-    : mass_(p_def.mass),
-      charge_(p_def.charge),
-      mol_density_(medium.GetMolDensity()),
-      density_correction_(density_correction)
-    {
-        double sum = 0.;
-        auto components = medium.GetComponents();
+crosssection::EpairLPM::EpairLPM(
+    const ParticleDef& p_def, const Medium& medium, double density_correction)
+    : mass_(p_def.mass)
+    , charge_(p_def.charge)
+    , mol_density_(medium.GetMolDensity())
+    , density_correction_(density_correction)
+{
+    double sum = 0.;
+    auto components = medium.GetComponents();
 
-        for (auto comp : components) {
-            sum += comp.GetNucCharge() * comp.GetNucCharge() * std::log(
-                    3.25 * comp.GetLogConstant() * std::pow(
-                            comp.GetNucCharge(), -1. / 3));
-        }
-        eLpm_ = mass_ / (ME * RE);
-        eLpm_ *= (eLpm_ * eLpm_) * ALPHA * mass_ /
-                 (2 * PI * mol_density_ * density_correction *
-                 charge_ * charge_ * sum);
+    for (auto comp : components) {
+        sum += comp.GetNucCharge() * comp.GetNucCharge()
+            * std::log(3.25 * comp.GetLogConstant()
+                * std::pow(comp.GetNucCharge(), -1. / 3));
+    }
+    eLpm_ = mass_ / (ME * RE);
+    eLpm_ *= (eLpm_ * eLpm_) * ALPHA * mass_
+        / (2 * PI * mol_density_ * density_correction * charge_ * charge_
+            * sum);
 }
 
-size_t crosssection::EpairLPM::GetHash() const noexcept {
+size_t crosssection::EpairLPM::GetHash() const noexcept
+{
     size_t hash_digest = 0;
-    hash_combine(hash_digest, mass_, std::abs(charge_), mol_density_, density_correction_);
+    hash_combine(hash_digest, mass_, std::abs(charge_), mol_density_,
+        density_correction_);
     return hash_digest;
 }
 
@@ -575,35 +578,36 @@ size_t crosssection::EpairLPM::GetHash() const noexcept {
 // J. Phys. G: Nucl Part. Phys. 28 (2002) 427
 // ------------------------------------------------------------------------- //
 
-double crosssection::EpairLPM::suppression_factor(double energy, double v,
-                                                  double r2, double b,
-                                                  double x) const {
+double crosssection::EpairLPM::suppression_factor(
+    double energy, double v, double r2, double b, double x) const
+{
     // Ternovskii functions calculated in appendix (eq. A.2)
     double A, B, C, D, E, s;
     double s36, s6, d1, d2, atan_, log1, log2;
 
-    s     = 0.25 * std::sqrt(eLpm_ / (energy * v * (1 - r2))); // eq. 29
-    s6    = 6 * s;
+    s = 0.25 * std::sqrt(eLpm_ / (energy * v * (1 - r2))); // eq. 29
+    s6 = 6 * s;
     atan_ = s6 * (x + 1);
 
-    if (atan_ > 1 / COMPUTER_PRECISION)
-    {
+    if (atan_ > 1 / COMPUTER_PRECISION) {
         return 1;
     }
 
-    s36   = 36 * s * s;
-    d1    = s6 / (s6 + 1);
-    d2    = s36 / (s36 + 1);
+    s36 = 36 * s * s;
+    d1 = s6 / (s6 + 1);
+    d2 = s36 / (s36 + 1);
     atan_ = std::atan(atan_) - PI / 2;
-    log1  = std::log((s36 * (1 + x) * (1 + x) + 1) / (s36 * x * x));
-    log2  = std::log((s6 * (1 + x) + 1) / (s6 * x));
-    A     = 0.5 * d2 * (1 + 2 * d2 * x) * log1 - d2 + 6 * d2 * s * (1 + ((s36 - 1) / (s36 + 1)) * x) * atan_;
-    B     = d1 * (1 + d1 * x) * log2 - d1;
-    C     = -d2 * d2 * x * log1 + d2 - (d2 * d2 * (s36 - 1) / (6 * s)) * x * atan_;
-    D     = d1 - d1 * d1 * x * log2;
-    E     = -s6 * atan_;
+    log1 = std::log((s36 * (1 + x) * (1 + x) + 1) / (s36 * x * x));
+    log2 = std::log((s6 * (1 + x) + 1) / (s6 * x));
+    A = 0.5 * d2 * (1 + 2 * d2 * x) * log1 - d2
+        + 6 * d2 * s * (1 + ((s36 - 1) / (s36 + 1)) * x) * atan_;
+    B = d1 * (1 + d1 * x) * log2 - d1;
+    C = -d2 * d2 * x * log1 + d2 - (d2 * d2 * (s36 - 1) / (6 * s)) * x * atan_;
+    D = d1 - d1 * d1 * x * log2;
+    E = -s6 * atan_;
 
-    return ((1 + b) * (A + (1 + r2) * B) + b * (C + (1 + r2) * D) + (1 - r2) * E) /
-           (((2 + r2) * (1 + b) + x * (3 + r2)) * std::log(1 + 1 / x) + (1 - r2 - b) / (1 + x) - (3 + r2));
-
+    return ((1 + b) * (A + (1 + r2) * B) + b * (C + (1 + r2) * D)
+               + (1 - r2) * E)
+        / (((2 + r2) * (1 + b) + x * (3 + r2)) * std::log(1 + 1 / x)
+            + (1 - r2 - b) / (1 + x) - (3 + r2));
 }

@@ -74,38 +74,6 @@ namespace crosssection {
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-template <typename P, typename M>
-double integrate_dndx(Integral& integral, P&& param, const ParticleDef& p_def,
-    const M& medium, double energy, double v_min, double v_max, double rnd = 0)
-{
-    auto dNdx = [&param, &p_def, &medium, energy](double v) {
-        return param.DifferentialCrossSection(p_def, medium, energy, v);
-    };
-    return integral.IntegrateWithRandomRatio(v_min, v_max, dNdx, 4, rnd);
-}
-
-template <typename P, typename M>
-double calculate_upper_lim_dndx(Integral& integral, P&& param,
-    const ParticleDef& p_def, const M& medium, double energy, double v_min,
-    double v_max, double rnd)
-{
-    auto dNdx = [&param, &p_def, &medium, energy](double v) {
-        return param.DifferentialCrossSection(p_def, medium, energy, v);
-    };
-    integral.IntegrateWithRandomRatio(v_min, v_max, dNdx, 4, rnd);
-    return integral.GetUpperLimit();
-}
-
-template <typename Param, typename M>
-double integrate_dedx(Integral& integral, Param&& param,
-    const ParticleDef& p_def, M& medium, double energy, double v_min,
-    double v_max)
-{
-    auto dEdx = [&param, &p_def, &medium, energy](double v) {
-        return param.FunctionToDEdxIntegral(p_def, medium, energy, v);
-    };
-    return integral.Integrate(v_min, v_max, dEdx, 2);
-}
 
 template <typename Param, typename M>
 double integrate_de2dx(Integral& integral, Param&& param,

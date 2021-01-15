@@ -42,16 +42,13 @@ class CrossSectionInterpolant : public crosssection_t<P, M>,
     using base_param_ref_t = typename std::add_lvalue_reference<
         typename param_t::base_param_t>::type;
 
-    param_t param;
-    std::shared_ptr<const EnergyCutSettings> cut;
-
 protected:
     std::unique_ptr<Interpolant> de2dx;
 
 public:
     CrossSectionInterpolant(Param _param, P _p_def, M _medium,
         std::shared_ptr<const EnergyCutSettings> _cut)
-        : crosssection_t<P, M>(_p_def, _medium,
+        : crosssection_t<P, M>(_param, _p_def, _medium,
             detail::build_dndx(
                 typename param_t::base_param_t::component_wise {}, true,
                 _medium, _param, _p_def, _cut),
@@ -60,25 +57,15 @@ public:
                 _p_def, _medium, _cut),
             detail::build_de2dx(
                 typename param_t::base_param_t::component_wise {}, true, _param,
-                _p_def, _medium, _cut)
-            )
-        , param(_param) // only for back transformation
-        , cut(_cut)
+                _p_def, _medium, _cut))
     {
-        if (typename param_t::only_stochastic {} == true and cut != nullptr) {
+        if (typename param_t::only_stochastic {} == true and _cut != nullptr) {
             throw std::invalid_argument(
                 "CrossSections of parametrizations that are only "
                 "stochastic do "
                 "not use"
                 "EnergyCuts. Pass a nullptr as an EnergyCut instead.");
         }
-
-        /* if (cut != nullptr) { */
-        /*     if (cut->GetContRand()) */
-        /*         de2dx =
-         * build_de2dx(reinterpret_cast<base_param_ref_t>(param), */
-        /*             this->p_def, this->medium, *cut, dE2dx_def); */
-        /* } */
     }
     inline double CalculatedNdx(double energy,
         std::shared_ptr<const Component> comp_ptr = nullptr) override
@@ -94,14 +81,6 @@ public:
         return this->CalculateStochasticLoss_impl(comp, energy, rate,
             typename param_t::base_param_t::component_wise {},
             typename param_t::base_param_t::only_stochastic {});
-    }
-    inline double GetLowerEnergyLim() const override
-    {
-        return param.GetLowerEnergyLim(this->p_def);
-    }
-    inline InteractionType GetInteractionType() const noexcept override
-    {
-        return param.interaction_type;
     }
 };
 

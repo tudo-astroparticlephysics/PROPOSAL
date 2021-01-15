@@ -17,8 +17,8 @@ double secondaries::SingleDifferentialAnnihilation::CalculateRho(
 {
     for (auto& it : dndx) {
         if (comp.GetName() == it.first->GetName()) {
-            auto rate = it.second->Calculate(energy);
-            return it.second->GetUpperLimit(energy, rnd * rate);
+            auto rate = std::get<1>(it.second)->Calculate(energy);
+            return std::get<1>(it.second)->GetUpperLimit(energy, rnd * rate);
         }
     }
     std::ostringstream s;

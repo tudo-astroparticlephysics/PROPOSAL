@@ -1,8 +1,9 @@
 
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsai.h"
+#include "PROPOSAL/Constants.h"
 
 #include <cmath>
+#include <tuple>
 
 using std::make_tuple;
 
@@ -92,10 +93,10 @@ double secondaries::PhotoTsai::FunctionToIntegral(
     // (3.5) with erratum
     aux = G2
         * (2. * x * (1. - x) / std::pow(1. + l, 2.)
-              - 12. * l * x * (1. - x) / std::pow(1. + l, 4.));
+            - 12. * l * x * (1. - x) / std::pow(1. + l, 4.));
     aux += (X - 2. * Z * Z * f)
         * ((2. * x * x - 2. * x + 1.) / std::pow(1. + l, 2.)
-              + (4. * l * x * (1. - x)) / std::pow(1. + l, 4));
+            + (4. * l * x * (1. - x)) / std::pow(1. + l, 4));
 
     // aux *= 2. * std::pow(ALPHA, 3.) / (PI * energy) * (E * E /
     // std::pow(ME, 4.)); only overall factor relevant
@@ -110,16 +111,20 @@ double secondaries::PhotoTsai::CalculateRho(
     double energy, double rnd, const Component& comp)
 {
     for (auto& it : dndx) {
-        if (comp.GetName() == it.first->GetName())
-        {
-            auto rate = rnd * it.second->Calculate(energy, get<CrossSectionDNDX::MAX>(it.second->GetIntegrationLimits(energy)));
-            auto rho = it.second->GetUpperLimit(energy, rate);
+        if (comp.GetName() == it.first->GetName()) {
+            auto& calc = *std::get<1>(it.second);
+            auto rate = rnd
+                * calc.Calculate(energy,
+                    get<CrossSectionDNDX::MAX>(
+                        calc.GetIntegrationLimits(energy)));
+            auto rho = calc.GetUpperLimit(energy, rate);
             return rho;
         }
     }
     std::ostringstream s;
     s << "Component (" << comp.GetName()
-      << ") can not be found in the precalculated tsai photopairproduction tables.";
+      << ") can not be found in the precalculated tsai photopairproduction "
+         "tables.";
     throw std::out_of_range(s.str());
 }
 
@@ -163,18 +168,18 @@ std::tuple<double, double> secondaries::PhotoTsai::CalculateEnergy(
 }
 
 std::vector<ParticleState> secondaries::PhotoTsai::CalculateSecondaries(
-    StochasticLoss loss, const Component& comp, std::vector<double> &rnd)
+    StochasticLoss loss, const Component& comp, std::vector<double>& rnd)
 {
     auto rho = CalculateRho(loss.parent_particle_energy, rnd[0], comp);
-    auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, rho,
-                                            rnd[1]);
+    auto secondary_energies
+        = CalculateEnergy(loss.parent_particle_energy, rho, rnd[1]);
     auto secondary_dir = CalculateDirections(
         loss.direction, loss.parent_particle_energy, rho, comp, rnd);
 
     auto sec = std::vector<ParticleState>();
     sec.emplace_back(ParticleType::EMinus, loss.position, get<0>(secondary_dir),
-                     get<0>(secondary_energies), loss.time, 0.);
+        get<0>(secondary_energies), loss.time, 0.);
     sec.emplace_back(ParticleType::EPlus, loss.position, get<1>(secondary_dir),
-                     get<1>(secondary_energies), loss.time, 0.);
+        get<1>(secondary_energies), loss.time, 0.);
     return sec;
 }

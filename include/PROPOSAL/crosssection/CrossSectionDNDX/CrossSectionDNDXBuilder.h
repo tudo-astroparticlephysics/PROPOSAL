@@ -9,7 +9,7 @@ using dndx_map_t = std::unordered_map<std::shared_ptr<const Component>,
 
 namespace detail {
     template <typename T, typename P1, typename P2, typename P3>
-    auto dndx_builder_cut(P1 target, P2 param, P3 p_def, std::nullptr_t)
+    auto dndx_builder_cut(P1 target, P2 param, P3 p_def)
     {
         return std::unique_ptr<CrossSectionDNDX>(
             std::make_unique<T>(param, p_def, target));

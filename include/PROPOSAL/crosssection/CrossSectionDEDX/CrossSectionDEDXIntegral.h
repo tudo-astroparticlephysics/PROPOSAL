@@ -6,12 +6,10 @@
 #include "PROPOSAL/medium/Medium.h"
 
 namespace PROPOSAL {
-class CrossSectionDEDXIntegral : public CrossSectionDEDX {
-    Integral integral;
-    std::function<double(Integral&, double)> dedx_integral;
 
+namespace detail {
     template <typename T1>
-    auto define_integral(T1 param, ParticleDef const& p_def,
+    auto define_dedx_integral(T1 param, ParticleDef const& p_def,
         Component const& comp, EnergyCutSettings const& cut)
     {
         return [param, p_def, comp, cut](Integral& i, double E) {
@@ -28,7 +26,7 @@ class CrossSectionDEDXIntegral : public CrossSectionDEDX {
     }
 
     template <typename T1>
-    auto define_integral(T1 param, ParticleDef const& p_def,
+    auto define_dedx_integral(T1 param, ParticleDef const& p_def,
         Medium const& medium, EnergyCutSettings const& cut)
     {
         return [param, p_def, medium, cut](Integral& i, double E) {
@@ -43,41 +41,41 @@ class CrossSectionDEDXIntegral : public CrossSectionDEDX {
         };
     }
 
-    /* template <typename T1, typename T2> */
-    /* inline auto define_integral(T1, ParticleDef const&, T2, std::nullptr_t) */
-    /* { */
-    /*     return [](Integral&, double) { return 0.; }; */
-    /* } */
+    template <>
+    inline auto define_dedx_integral(
+        crosssection::IonizBergerSeltzerBhabha param, ParticleDef const& p_def,
+        Medium const& medium, EnergyCutSettings const& cut)
+
+    {
+        return [param, p_def, medium](Integral&, double E) {
+            return param.FunctionToDEdxIntegral(p_def, medium, E, 0.);
+        };
+    }
+
+    template <>
+    inline auto define_dedx_integral(
+        crosssection::IonizBergerSeltzerMoller param, ParticleDef const& p_def,
+        Medium const& medium, EnergyCutSettings const& cut)
+    {
+        return [param, p_def, medium](Integral&, double E) {
+            return param.FunctionToDEdxIntegral(p_def, medium, E, 0.);
+        };
+    }
+}
+
+class CrossSectionDEDXIntegral : public CrossSectionDEDX {
+    Integral integral;
+    std::function<double(Integral&, double)> dedx_integral;
 
 public:
     template <typename... Args>
     CrossSectionDEDXIntegral(Args... args)
         : CrossSectionDEDX(args...)
-        , dedx_integral(define_integral(args...))
+        , dedx_integral(detail::define_dedx_integral(args...))
     {
     }
 
-    double Calculate(double E) override { return dedx_integral(integral, E); }
+    double Calculate(double E) final { return dedx_integral(integral, E); }
 };
 
-template <>
-inline auto CrossSectionDEDXIntegral::define_integral(
-    crosssection::IonizBergerSeltzerBhabha param, ParticleDef const& p_def,
-    Medium const& medium, EnergyCutSettings const& cut)
-
-{
-    return [param, p_def, medium](Integral&, double E) {
-        return param.FunctionToDEdxIntegral(p_def, medium, E, 0.);
-    };
-}
-
-template <>
-inline auto CrossSectionDEDXIntegral::define_integral(
-    crosssection::IonizBergerSeltzerMoller param, ParticleDef const& p_def,
-    Medium const& medium, EnergyCutSettings const& cut)
-{
-    return [param, p_def, medium](Integral&, double E) {
-        return param.FunctionToDEdxIntegral(p_def, medium, E, 0.);
-    };
-}
 } // namespace PROPOSAL

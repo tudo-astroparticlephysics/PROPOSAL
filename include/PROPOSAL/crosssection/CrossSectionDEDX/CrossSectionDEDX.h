@@ -24,6 +24,6 @@ public:
 
     virtual double Calculate(double energy) = 0;
 
-    size_t GetHash() { return hash; }
+    size_t GetHash() const noexcept { return hash; }
 };
 } // namespace PROPOSAL

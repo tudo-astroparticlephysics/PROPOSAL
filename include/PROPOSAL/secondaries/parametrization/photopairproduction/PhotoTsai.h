@@ -14,9 +14,13 @@ namespace PROPOSAL {
 namespace secondaries {
     class PhotoTsai : public PhotopairProduction,
                       public DefaultSecondaries<PhotoTsai> {
+
+        using comp_ptr = std::shared_ptr<const Component>;
+        using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
+        std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>> dndx;
+
         Integral integral;
         Medium medium;
-        dndx_map_t dndx;
 
         double FunctionToIntegral(
             double energy, double x, double theta, const Component&);
@@ -28,7 +32,7 @@ namespace secondaries {
         PhotoTsai(ParticleDef p, Medium m)
             : medium(m)
             , dndx(detail::build_dndx(std::true_type {}, false, medium,
-                  crosssection::PhotoPairTsai(), p, nullptr))
+                  crosssection::PhotoPairTsai(), p))
         {
         }
 

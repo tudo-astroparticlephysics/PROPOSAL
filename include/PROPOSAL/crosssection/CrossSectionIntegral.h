@@ -39,14 +39,10 @@ template <typename Param, typename P, typename M>
 class CrossSectionIntegral : public crosssection_t<P, M> {
     using param_t = typename std::decay<Param>::type;
 
-    /* param_t param; */
-    double lower_energy_lim;
-    InteractionType interaction_type;
-
 public:
     CrossSectionIntegral(Param _param, P _p_def, M _medium,
         std::shared_ptr<const EnergyCutSettings> _cut)
-        : crosssection_t<P, M>(_p_def, _medium,
+        : crosssection_t<P, M>(_param, _p_def, _medium,
             detail::build_dndx(
                 typename param_t::base_param_t::component_wise {}, false,
                 _medium, _param, _p_def, _cut),
@@ -56,9 +52,6 @@ public:
             detail::build_de2dx(
                 typename param_t::base_param_t::component_wise {}, false,
                 _param, _p_def, _medium, _cut))
-        /* , param(_param) */
-        , lower_energy_lim(_param.GetLowerEnergyLim(_p_def))
-        , interaction_type(_param.interaction_type)
     {
         if (typename param_t::only_stochastic {} == true and _cut != nullptr) {
             throw std::invalid_argument(
@@ -82,14 +75,6 @@ public:
         return this->CalculateStochasticLoss_impl(comp, energy, rate,
             typename param_t::base_param_t::component_wise {},
             typename param_t::base_param_t::only_stochastic {});
-    }
-    inline double GetLowerEnergyLim() const override
-    {
-        return lower_energy_lim;
-    }
-    inline InteractionType GetInteractionType() const noexcept override
-    {
-        return interaction_type;
     }
 };
 } // namespace PROPOSAL

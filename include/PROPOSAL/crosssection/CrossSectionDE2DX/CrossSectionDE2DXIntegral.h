@@ -7,12 +7,10 @@
 #include "PROPOSAL/medium/Medium.h"
 
 namespace PROPOSAL {
-class CrossSectionDE2DXIntegral : public CrossSectionDE2DX {
-    Integral integral;
-    std::function<double(Integral&, double)> de2dx_integral;
 
+namespace detail {
     template <typename T1>
-    auto define_integral(T1 param, ParticleDef const& p_def,
+    auto define_de2dx_integral(T1 param, ParticleDef const& p_def,
         Component const& comp, EnergyCutSettings const& cut)
     {
         return [param, p_def, comp, cut](Integral& i, double E) {
@@ -26,6 +24,11 @@ class CrossSectionDE2DXIntegral : public CrossSectionDE2DX {
                 dE2dx, 2);
         };
     }
+}
+
+class CrossSectionDE2DXIntegral : public CrossSectionDE2DX {
+    Integral integral;
+    std::function<double(Integral&, double)> de2dx_integral;
 
     template <typename T1>
     auto define_integral(T1 param, ParticleDef const& p_def,
@@ -47,7 +50,7 @@ public:
     template <typename... Args>
     CrossSectionDE2DXIntegral(Args... args)
         : CrossSectionDE2DX(args...)
-        , de2dx_integral(define_integral(args...))
+        , de2dx_integral(detail::define_de2dx_integral(args...))
     {
     }
 

@@ -75,24 +75,28 @@ namespace detail {
     inline auto build_dndx(
         std::false_type, bool interpol, T target, Args&&... args)
     {
-        auto dndx = std::unordered_map<std::shared_ptr<const Component>,
-            std::unique_ptr<CrossSectionDNDX>> {};
-        dndx.emplace(std::shared_ptr<const Component>(nullptr),
-            make_dndx(interpol, target, std::forward<Args>(args)...));
-        return dndx;
+        using comp_ptr = std::shared_ptr<const Component>;
+        using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
+        auto m = std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>>();
+        auto calc = make_dndx(interpol, target, std::forward<Args>(args)...);
+        m.emplace(comp_ptr(nullptr), std::make_tuple(1., std::move(calc)));
+        return m;
     }
 
     template <typename T, typename... Args>
     inline auto build_dndx(
         std::true_type, bool interpol, T target, Args&&... args)
     {
-        auto dndx = std::unordered_map<std::shared_ptr<const Component>,
-            std::unique_ptr<CrossSectionDNDX>> {};
+        using comp_ptr = std::shared_ptr<const Component>;
+        using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
+        auto m = std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>>();
         for (auto& c : target.GetComponents()) {
-            dndx.emplace(std::make_shared<const Components::Component>(c),
-                make_dndx(interpol, c, std::forward<Args>(args)...));
+            auto comp = std::make_shared<const Components::Component>(c);
+            auto weight = weight_component(target, c);
+            auto calc = make_dndx(interpol, c, std::forward<Args>(args)...);
+            m.emplace(comp, std::make_tuple(weight, std::move(calc)));
         }
-        return dndx;
+        return m;
     }
 
     template <typename Cont, typename T1, typename T2, typename T3,
@@ -179,30 +183,36 @@ namespace detail {
 }
 
 template <class P, class M> class CrossSection : public CrossSectionBase {
+    using comp_ptr = std::shared_ptr<const Component>;
+    using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
     using dedx_ptr = std::unique_ptr<CrossSectionDEDX>;
     using de2dx_ptr = std::unique_ptr<CrossSectionDE2DX>;
 
 public:
-    P p_def;
-    M medium;
+    /* P p_def; */
+    /* M medium; */
 
     size_t hash;
 
-    dndx_map_t dndx;
+    std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>> dndx;
     std::unique_ptr<std::vector<std::tuple<double, dedx_ptr>>> dedx;
     std::unique_ptr<std::vector<std::tuple<double, de2dx_ptr>>> de2dx;
 
-    template <typename T1, typename T2, typename T3>
-    CrossSection(P _p_def, M _medium, T1&& _dndx, T2&& _dedx, T3&& _de2dx)
-        : p_def(_p_def)
-        , medium(_medium)
-        , hash(0)
+    double lower_energy_lim;
+    InteractionType interaction_type;
+
+    template <typename Param, typename T1, typename T2, typename T3>
+    CrossSection(
+        Param _param, P _p_def, M _medium, T1&& _dndx, T2&& _dedx, T3&& _de2dx)
+        : hash(0)
         , dndx(std::forward<T1>(_dndx))
         , dedx(std::forward<T2>(_dedx))
         , de2dx(std::forward<T3>(_de2dx))
+        , lower_energy_lim(_param.GetLowerEnergyLim(_p_def))
+        , interaction_type(_param.interaction_type)
     {
         for (auto const& i : dndx)
-            hash_combine(hash, i.second->GetHash());
+            hash_combine(hash, std::get<1>(i.second)->GetHash());
         if (dedx) {
             for (auto const& i : *dedx)
                 hash_combine(hash, std::get<1>(i)->GetHash());
@@ -219,9 +229,10 @@ protected:
     template <typename T>
     auto CalculatedNdx_impl(double energy, std::true_type, T comp_ptr)
     {
-        if (comp_ptr)
-            return dndx[comp_ptr]->Calculate(energy)
-                / detail::weight_component(medium, *comp_ptr);
+        if (comp_ptr) {
+            return std::get<1>(dndx[comp_ptr])->Calculate(energy)
+                / std::get<0>(dndx[comp_ptr]);
+        }
         return CalculatedNdx_impl(energy, std::true_type {}, nullptr);
     }
     auto CalculatedNdx_impl(double energy, std::true_type tt, std::nullptr_t)
@@ -234,26 +245,26 @@ protected:
     template <typename T>
     auto CalculatedNdx_impl(double energy, std::false_type, T)
     {
-        return dndx[nullptr]->Calculate(energy);
+        return std::get<1>(dndx[nullptr])->Calculate(energy);
     }
 
     auto CalculateStochasticLoss_impl(
         std::shared_ptr<const Component> const& comp, double energy,
         double rate, std::true_type, std::false_type)
     {
-        return dndx[comp]->GetUpperLimit(
-            energy, rate * detail::weight_component(medium, *comp));
+        return std::get<1>(dndx[comp])
+            ->GetUpperLimit(energy, rate * std::get<0>(dndx[comp]));
     }
     auto CalculateStochasticLoss_impl(
         std::shared_ptr<const Component> const& comp, double energy,
         double rate, std::false_type, std::false_type)
     {
-        return dndx[comp]->GetUpperLimit(energy, rate);
+        return std::get<1>(dndx[comp])->GetUpperLimit(energy, rate);
     }
     auto CalculateStochasticLoss_impl(std::shared_ptr<const Component> const&,
         double, double, bool, std::true_type)
     {
-        return 1;
+        return 1.;
     }
 
 public:
@@ -285,7 +296,18 @@ public:
             targets.emplace_back(it.first);
         return targets;
     }
+
     size_t GetHash() const noexcept final { return hash; }
+
+    inline double GetLowerEnergyLim() const override
+    {
+        return lower_energy_lim;
+    }
+
+    inline InteractionType GetInteractionType() const noexcept override
+    {
+        return interaction_type;
+    }
 };
 
 template <typename P, typename M>

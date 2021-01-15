@@ -11,8 +11,6 @@ std::array<double, 2> CrossSectionDNDX::GetIntegrationLimits(
         std::get<crosssection::Parametrization::V_MAX>(kin_lim)
     };
     if (cut)
-        lim[0] = cut->GetCut(kin_lim, energy);
+        lim[0] = std::max(cut->GetCut(kin_lim, energy), lim[0]);
     return lim;
 }
-
-double CrossSectionDNDX::GetLowerEnergyLim() const { return lower_energy_lim; }
