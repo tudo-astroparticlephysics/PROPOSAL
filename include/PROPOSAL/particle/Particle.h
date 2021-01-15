@@ -90,7 +90,7 @@ public:
                   const double&, const double&);
     ParticleState(const ParticleType&, const Vector3D&, const Vector3D&, const double&,
                   const double&, const double&);
-    virtual ~ParticleState() = default;
+    ~ParticleState() = default;
     bool operator==(const ParticleState&) const;
     bool operator!=(const ParticleState&) const;
     friend std::ostream& operator<<(std::ostream&, ParticleState const&);
@@ -107,8 +107,8 @@ public:
     double GetMomentum() const;
     ParticleDef GetParticleDef() const;
 
-protected:
-    virtual void print(std::ostream&) const {}
+private:
+    void print(std::ostream&) const {}
 
 };
 

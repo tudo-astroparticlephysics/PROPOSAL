@@ -61,9 +61,10 @@ public:
 
     // Track functions
     double GetELost(const Geometry&) const;
-    std::unique_ptr<ParticleState> GetEntryPoint(const Geometry&) const;
-    std::unique_ptr<ParticleState> GetExitPoint(const Geometry&) const;
-    std::unique_ptr<ParticleState> GetClosestApproachPoint(const Geometry&) const;
+    //TODO: These methods should return unique_ptr instead of shared_ptr, but pybind11 seems to have problems with them
+    std::shared_ptr<ParticleState> GetEntryPoint(const Geometry&) const;
+    std::shared_ptr<ParticleState> GetExitPoint(const Geometry&) const;
+    std::shared_ptr<ParticleState> GetClosestApproachPoint(const Geometry&) const;
 
     std::vector<ParticleState> GetTrack() const { return track_; };
     std::vector<ParticleState> GetTrack(const Geometry&) const;
