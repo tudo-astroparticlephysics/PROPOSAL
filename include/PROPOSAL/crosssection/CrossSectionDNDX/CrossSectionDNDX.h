@@ -34,10 +34,10 @@ public:
     template <typename T1, typename T2, typename T3>
     CrossSectionDNDX(T1&& _param, T2&& _particle, T3&& _target,
         EnergyCutSettings const& _cut)
+        : CrossSectionDNDX(std::forward<T1>(_param),
+            std::forward<T2>(_particle), std::forward<T3>(_target))
     {
-        *this = CrossSectionDNDX(std::forward<T1>(_param),
-            std::forward<T2>(_particle), std::forward<T3>(_target));
-        this->cut = std::make_shared<const EnergyCutSettings>(cut);
+        cut = std::make_shared<const EnergyCutSettings>(_cut);
         hash_combine(this->hash, _cut.GetHash());
     }
 

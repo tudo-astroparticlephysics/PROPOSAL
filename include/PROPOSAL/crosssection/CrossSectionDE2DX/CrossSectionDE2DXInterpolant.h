@@ -36,11 +36,10 @@ class CrossSectionDE2DXInterpolant : public CrossSectionDE2DX {
     }
 
 public:
-    template <typename T1, typename T2>
-    CrossSectionDE2DXInterpolant(T1 param, ParticleDef const& p_def,
-        T2 const& target, EnergyCutSettings const& cut)
-        : interpolant(
-            build_de2dx_def(param, p_def, target, cut), "/tmp", gen_name())
+    template <typename... Args>
+    CrossSectionDE2DXInterpolant(Args... args)
+        : CrossSectionDE2DX(args...)
+        , interpolant(build_de2dx_def(args...), "/tmp", gen_name())
     {
     }
 

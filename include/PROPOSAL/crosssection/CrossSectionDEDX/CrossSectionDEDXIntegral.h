@@ -43,29 +43,22 @@ class CrossSectionDEDXIntegral : public CrossSectionDEDX {
         };
     }
 
-    template <typename T1, typename T2>
-    inline auto define_integral(T1, ParticleDef const&, T2, std::nullptr_t)
-    {
-        return [](Integral&, double) { return 0.; };
-    }
+    /* template <typename T1, typename T2> */
+    /* inline auto define_integral(T1, ParticleDef const&, T2, std::nullptr_t) */
+    /* { */
+    /*     return [](Integral&, double) { return 0.; }; */
+    /* } */
 
 public:
-    template <typename T1, typename T2>
-    CrossSectionDEDXIntegral(T1 param, ParticleDef const& p_def,
-        T2 const& target, EnergyCutSettings const& cut)
-        : dedx_integral(define_integral(param, p_def, target, cut))
+    template <typename... Args>
+    CrossSectionDEDXIntegral(Args... args)
+        : CrossSectionDEDX(args...)
+        , dedx_integral(define_integral(args...))
     {
-        hash_combine(hash, param.GetHash(), p_def.GetHash(), target.GetHash(),
-            cut.GetHash());
     }
 
     double Calculate(double E) override { return dedx_integral(integral, E); }
 };
-
-/* namespace crosssection { */
-/*  class IonizBergerSeltzerMoller; */
-/*  class IonizBergerSeltzerBhabha; */
-/* } */
 
 template <>
 inline auto CrossSectionDEDXIntegral::define_integral(
@@ -87,5 +80,4 @@ inline auto CrossSectionDEDXIntegral::define_integral(
         return param.FunctionToDEdxIntegral(p_def, medium, E, 0.);
     };
 }
-
 } // namespace PROPOSAL

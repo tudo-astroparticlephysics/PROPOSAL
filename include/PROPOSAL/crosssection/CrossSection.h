@@ -297,19 +297,4 @@ using cross_t_ptr = std::unique_ptr<crosssection_t<P, M>>;
 
 template <typename P, typename M>
 using crosssection_list_t = std::vector<std::shared_ptr<crosssection_t<P, M>>>;
-
-template <typename T>
-size_t crosssection_hasher(size_t hash_diggest, T const& obj)
-{
-    hash_combine(hash_diggest, obj.GetHash());
-    return hash_diggest;
-}
-
-template <typename T, typename... Args>
-size_t crosssection_hasher(size_t hash_diggest, T const& obj, Args... args)
-{
-    hash_combine(hash_diggest, obj.GetHash());
-    return crosssection_hasher(hash_diggest, args...);
-}
-
 } // namespace PROPOSAL

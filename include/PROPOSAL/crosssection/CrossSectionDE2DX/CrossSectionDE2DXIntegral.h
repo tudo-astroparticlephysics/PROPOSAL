@@ -44,16 +44,13 @@ class CrossSectionDE2DXIntegral : public CrossSectionDE2DX {
     }
 
 public:
-    template <typename T1, typename T2>
-    CrossSectionDE2DXIntegral(T1 param, ParticleDef const& p_def,
-        T2 const& target, EnergyCutSettings const& cut)
-        : de2dx_integral(define_integral(param, p_def, target, cut))
+    template <typename... Args>
+    CrossSectionDE2DXIntegral(Args... args)
+        : CrossSectionDE2DX(args...)
+        , de2dx_integral(define_integral(args...))
     {
-        hash_combine(hash, param.GetHash(), p_def.GetHash(), target.GetHash(),
-            cut.GetHash());
     }
 
-    double Calculate(double E) override {
-        return de2dx_integral(integral, E); }
+    double Calculate(double E) override { return de2dx_integral(integral, E); }
 };
 } // namespace PROPOSAL

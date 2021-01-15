@@ -31,18 +31,16 @@ class CrossSectionDEDXInterpolant : public CrossSectionDEDX {
 
     std::string gen_name()
     {
-        return std::string("dedx_") + std::to_string(GetHash()) + std::string(".txt");
+        return std::string("dedx_") + std::to_string(GetHash())
+            + std::string(".txt");
     }
 
 public:
-    template <typename T1, typename T2>
-    CrossSectionDEDXInterpolant(T1 param, ParticleDef const& p_def,
-        T2 const& target, EnergyCutSettings const& cut)
-        : interpolant(
-            build_dedx_def(param, p_def, target, cut), "/tmp", gen_name())
+    template <typename... Args>
+    CrossSectionDEDXInterpolant(Args... args)
+        : CrossSectionDEDX(args...)
+        , interpolant(build_dedx_def(args...), "/tmp", gen_name())
     {
-        hash_combine(hash, param.GetHash(), p_def.GetHash(), target.GetHash(),
-            cut.GetHash());
     }
 
     double Calculate(double E) final;
