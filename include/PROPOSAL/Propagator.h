@@ -194,9 +194,9 @@ private:
             cross.emplace_back(crosssection::make_epairproduction(p_def, medium,
                                                                   cuts, interpolate, config["epair"],
                                                                   density_correction));
-        /* if (config.contains("ioniz")) */
-        /*     cross.emplace_back(crosssection::make_ionization(p_def, medium, */
-        /*                                                      cuts, interpolate, config["ioniz"])); */
+        if (config.contains("ioniz"))
+            cross.emplace_back(crosssection::make_ionization(p_def, medium,
+                                                             cuts, interpolate, config["ioniz"]));
         if (config.contains("mupair"))
             cross.emplace_back(crosssection::make_mupairproduction(p_def, medium,
                                                                    cuts, interpolate, config["mupair"]));

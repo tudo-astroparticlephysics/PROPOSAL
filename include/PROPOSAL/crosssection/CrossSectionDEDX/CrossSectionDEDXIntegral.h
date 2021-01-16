@@ -1,7 +1,6 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDX.h"
-#include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
 
@@ -41,26 +40,7 @@ namespace detail {
         };
     }
 
-    template <>
-    inline auto define_dedx_integral(
-        crosssection::IonizBergerSeltzerBhabha param, ParticleDef const& p_def,
-        Medium const& medium, EnergyCutSettings const& cut)
 
-    {
-        return [param, p_def, medium](Integral&, double E) {
-            return param.FunctionToDEdxIntegral(p_def, medium, E, 0.);
-        };
-    }
-
-    template <>
-    inline auto define_dedx_integral(
-        crosssection::IonizBergerSeltzerMoller param, ParticleDef const& p_def,
-        Medium const& medium, EnergyCutSettings const& cut)
-    {
-        return [param, p_def, medium](Integral&, double E) {
-            return param.FunctionToDEdxIntegral(p_def, medium, E, 0.);
-        };
-    }
 }
 
 class CrossSectionDEDXIntegral : public CrossSectionDEDX {

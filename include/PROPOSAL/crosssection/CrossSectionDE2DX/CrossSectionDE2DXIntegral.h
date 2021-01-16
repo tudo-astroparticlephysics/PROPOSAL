@@ -9,15 +9,15 @@
 namespace PROPOSAL {
 
 namespace detail {
-    template <typename T1>
+    template <typename T1, typename T2>
     auto define_de2dx_integral(T1 param, ParticleDef const& p_def,
-        Component const& comp, EnergyCutSettings const& cut)
+        T2 const& target, EnergyCutSettings const& cut)
     {
-        return [param, p_def, comp, cut](Integral& i, double E) {
-            auto lim = param.GetKinematicLimits(p_def, comp, E);
+        return [param, p_def, target, cut](Integral& i, double E) {
+            auto lim = param.GetKinematicLimits(p_def, target, E);
             auto v_cut = cut.GetCut(lim, E);
-            auto dE2dx = [&param, &p_def, &comp, E](double v) {
-                return param.FunctionToDE2dxIntegral(p_def, comp, E, v);
+            auto dE2dx = [&param, &p_def, &target, E](double v) {
+                return param.FunctionToDE2dxIntegral(p_def, target, E, v);
             };
             return i.Integrate(
                 std::get<crosssection::Parametrization::V_MIN>(lim), v_cut,

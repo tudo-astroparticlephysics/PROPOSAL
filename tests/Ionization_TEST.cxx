@@ -168,7 +168,7 @@ TEST(Ionization, Test_of_dEdx)
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
+        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-6 * dEdx_stored);
 
     }
 }
@@ -211,7 +211,7 @@ TEST(Ionization, Test_of_dNdx)
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
         if (parametrization != "BetheBlochRossi")
             dNdx_new *= ME / particle_def.mass; // For muons and taus, a kinematic variable has been wrongly defined in the old version of PROPOSAL
-        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-6 * dNdx_stored);
     }
 }
 
@@ -315,7 +315,7 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
+        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-6 * dEdx_stored);
 
     }
 }
@@ -358,7 +358,7 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
         if (parametrization != "BetheBlochRossi")
             dNdx_new *= ME / particle_def.mass; // For muons and taus, a kinematic variable has been wrongly defined in the old version of PROPOSAL
-        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-6 * dNdx_stored);
     }
 }
 

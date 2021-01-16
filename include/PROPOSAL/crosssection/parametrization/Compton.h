@@ -110,7 +110,7 @@ namespace detail {
             };
             return i.Integrate(t_min, t_max, dEdx, 2);
         };
-    };
+    }
 
     inline auto define_de2dx_integral(crosssection::ComptonKleinNishina param,
         ParticleDef const& p_def, Component const& comp,
