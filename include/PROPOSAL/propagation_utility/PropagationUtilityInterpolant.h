@@ -33,6 +33,10 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+
+#include "CubicInterpolation/CubicSplines.h"
+#include "CubicInterpolation/Interpolant.h"
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -43,8 +47,12 @@ class Interpolant;
 struct InterpolationDef;
 
 class UtilityInterpolant : public UtilityIntegral {
-    std::shared_ptr<Interpolant> interpolant_;
-    std::pair<double, double> upper_limit;
+    using interpolant_t
+        = cubic_splines::Interpolant<cubic_splines::CubicSplines>;
+    using interpolant_ptr = std::shared_ptr<interpolant_t>;
+
+    double lower_lim;
+    interpolant_ptr interpolant_;
 
     // maybe interpolate function to integral will give a performance boost.
     // in general this function should be underfrequently called
@@ -52,8 +60,29 @@ class UtilityInterpolant : public UtilityIntegral {
     // std::unique_ptr<Interpolant> interpolant_diff_;
 
 public:
-    UtilityInterpolant(std::function<double(double)>, double);
-    void BuildTables(const std::string, size_t, Interpolant1DBuilder::Definition, bool = false);
+    UtilityInterpolant(std::function<double(double)>, double, size_t);
+
+    template <typename T>
+    void BuildTables(const std::string name, T&& def, bool reverse = false)
+    {
+        auto reference_x = lower_lim;
+        if (reverse)
+            reference_x = 1.e14;
+
+        hash_combine(this->hash, reverse);
+
+        def.f = [&](double energy) {
+            return UtilityIntegral::Calculate(energy, reference_x);
+        };
+
+        def.axis = std::make_unique<cubic_splines::ExpAxis>(
+            lower_lim, 1e14, (size_t)100);
+
+        auto filename = std::string("disp") + std::to_string(this->hash)
+            + std::string(".txt");
+
+        interpolant_ = std::make_shared<interpolant_t>(std::move(def), "tmp", filename);
+    }
 
     double Calculate(double, double);
     double GetUpperLimit(double, double);

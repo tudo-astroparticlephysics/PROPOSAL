@@ -33,17 +33,17 @@
 
 namespace PROPOSAL {
 class UtilityIntegral {
-protected:
     Integral integral;
+
+protected:
     double lower_lim;
+    std::function<double(double)> FunctionToIntegral;
+    size_t hash;
 
 public:
-    UtilityIntegral(std::function<double(double)>, double);
-    void BuildTables(const std::string, size_t, Interpolant1DBuilder::Definition, bool = false);
+    UtilityIntegral(std::function<double(double)>, double, size_t);
 
     virtual double Calculate(double, double);
     virtual double GetUpperLimit(double, double);
-
-    std::function<double(double)> FunctionToIntegral;
 };
 } // namespace PROPOSAL

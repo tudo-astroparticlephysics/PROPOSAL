@@ -1,26 +1,30 @@
 #pragma once
 
-#include "PROPOSAL/propagation_utility/Displacement.h"
+#include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include <tuple>
 
 namespace PROPOSAL {
 class Interaction {
+    size_t hash;
+
 protected:
-    using rate_t = std::tuple<std::shared_ptr<CrossSectionBase>, std::shared_ptr<const Component>, double>;
-    using loss_t = std::tuple<InteractionType, std::shared_ptr<const Component>, double>;
-    using crossbase_list_t = std::vector<std::shared_ptr<CrossSectionBase>>;
+    using comp_ptr = std::shared_ptr<const Component>;
+    using cross_ptr = std::shared_ptr<CrossSectionBase>;
+    using rate_t = std::tuple<cross_ptr, comp_ptr, double>;
+    using loss_t = std::tuple<InteractionType, comp_ptr, double>;
 
-    crossbase_list_t cross_list;
-    double lower_lim;
+    std::shared_ptr<Displacement> disp;
+    std::vector<cross_ptr> cross_list;
 
-    double FunctionToIntegral(Displacement&, double);
+    double FunctionToIntegral(double);
 
 public:
     template <typename Cross>
-    Interaction(Cross const& cross)
-        : cross_list(std::begin(cross), std::end(cross))
-        , lower_lim(CrossSectionVector::GetLowerLim(cross))
-    {}
+    Interaction(std::shared_ptr<Displacement> _disp, Cross const& _cross)
+        : disp(_disp)
+        , cross_list(std::begin(_cross), std::end(_cross))
+    {
+    }
     virtual ~Interaction() = default;
 
     static Interpolant1DBuilder::Definition interpol_def;
@@ -31,8 +35,10 @@ public:
     std::vector<rate_t> Rates(double energy);
 
     enum { CROSS, COMP, RATE };
-    loss_t SampleLoss(double energy, std::vector<rate_t> const& rates, double rnd);
+    loss_t SampleLoss(
+        double energy, std::vector<rate_t> const& rates, double rnd);
 
     double MeanFreePath(double energy);
+    auto GetHash() const noexcept { return hash; }
 };
 } // namespace PROPOSAL

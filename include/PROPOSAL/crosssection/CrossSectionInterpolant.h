@@ -42,9 +42,6 @@ class CrossSectionInterpolant : public crosssection_t<P, M>,
     using base_param_ref_t = typename std::add_lvalue_reference<
         typename param_t::base_param_t>::type;
 
-protected:
-    std::unique_ptr<Interpolant> de2dx;
-
 public:
     CrossSectionInterpolant(Param _param, P _p_def, M _medium,
         std::shared_ptr<const EnergyCutSettings> _cut)

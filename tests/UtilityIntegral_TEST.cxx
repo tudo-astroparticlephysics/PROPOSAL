@@ -9,14 +9,15 @@ int main(int argc, char** argv) {
     return RUN_ALL_TESTS();
 }
 
+constexpr static size_t hash = 42;
 TEST(Constructor, Constructor){
     auto integrand = [](double x)->double {return 1/x;};
-    auto integral = UtilityIntegral(integrand, 0);
+    auto integral = UtilityIntegral(integrand, 0, hash);
 }
 
 TEST(Calculate, Integration){
     auto integrand = [](double x)->double {return 1/x;};
-    auto integral = UtilityIntegral(integrand, 0);
+    auto integral = UtilityIntegral(integrand, 0, hash);
 
     for(double logmin = -7; logmin <= 7; logmin+=1e-1){
         for(double logmax = -7; logmax <= 7; logmax+=1e-1){
@@ -30,7 +31,7 @@ TEST(Calculate, Integration){
 
 TEST(Calculate, BackwardIntegration){
     auto integrand = [](double x)->double {return -1/x;};
-    auto integral = UtilityIntegral(integrand, 0);
+    auto integral = UtilityIntegral(integrand, 0, hash);
 
     for(double logmin = -7; logmin <= 7; logmin+=1e-1){
         for(double logmax = -7; logmax <= 7; logmax+=1e-1){
@@ -46,7 +47,7 @@ TEST(GetUpperLimit, ForwardIntegration){
     //Test forward integration with positive integrand
     auto integrand1 = [](double x)->double { return 1/x;};
     double HIGH = 1.e14;
-    auto integral1 = UtilityIntegral(integrand1, HIGH);
+    auto integral1 = UtilityIntegral(integrand1, HIGH, hash);
 
     for (double logmin = -7; logmin < 7; logmin+=1e-1) {
         for (double logxi = -3; logxi < 3; logxi+=1e-1) {
@@ -68,7 +69,7 @@ TEST(GetUpperLimit, ForwardIntegration_Outside_Range){
     //Test GetUpperLimit when expected upper_limit is bigger than high parameter
     auto integrand1 = [](double x)->double { return 1/x;};
     double high = 1e14;
-    auto integral1 = UtilityIntegral(integrand1, high);
+    auto integral1 = UtilityIntegral(integrand1, high, hash);
 
     double lower_lim = 1e2;
     double xi = 40;
@@ -83,7 +84,7 @@ TEST(GetUpperLimit, BackwardIntegration){
     //Test backward integration with negative integrand
     auto integrand1 = [](double x)->double { return -1/x;};
     double LOW = 1;
-    auto integral1 = UtilityIntegral(integrand1, LOW);
+    auto integral1 = UtilityIntegral(integrand1, LOW, hash);
 
     for (double loglower = 1; loglower < 7; loglower+=1e-1) {
         for (double logxi = -3; logxi < 3; logxi+=1e-1) {
@@ -105,7 +106,7 @@ TEST(GetUpperLimit, BackwardIntegration_Outside_Range){
     //Test GetUpperLimit when expected lower_lim is smaller than low parameter
     auto integrand1 = [](double x)->double { return -1/x;};
     double LOW = 10;
-    auto integral1 = UtilityIntegral(integrand1, LOW);
+    auto integral1 = UtilityIntegral(integrand1, LOW, hash);
 
     double lower = 1e5;
     double xi = 10;
@@ -118,7 +119,7 @@ TEST(GetUpperLimit, BackwardIntegration_Outside_Range){
 
 TEST(GetUpperLimit, ListForwardIntegration){
     auto integrand1 = [](double x)->double { return 1/x;};
-    auto integral = UtilityIntegral(integrand1, 1e14);
+    auto integral = UtilityIntegral(integrand1, 1e14, hash);
     auto limits = std::array<double, 6>{1e3, 1e5, 1e7, 1e9, 1e11, 1e13};
 
     for(double loglower = 1.; loglower < 13.; loglower+=1e-1){
@@ -136,7 +137,7 @@ TEST(GetUpperLimit, ListForwardIntegration){
 
 TEST(GetUpperLimit, ListBackwardIntegration){
     auto integrand1 = [](double x)->double { return -1/x;};
-    auto integral = UtilityIntegral(integrand1, 1);
+    auto integral = UtilityIntegral(integrand1, 1, hash);
     auto limits = std::array<double, 4>{1e3, 1e4, 1e5, 1e6};
 
     for(double loglower = 1.; loglower < 13; loglower+=1e-1){

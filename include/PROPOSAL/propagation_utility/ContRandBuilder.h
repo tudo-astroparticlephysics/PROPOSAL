@@ -1,32 +1,19 @@
-#include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
-#include "PROPOSAL/propagation_utility/ContRand.h"
 #include "PROPOSAL/math/MathMethods.h"
+#include "PROPOSAL/propagation_utility/ContRand.h"
+#include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 
 namespace PROPOSAL {
 template <class T> class ContRandBuilder : public ContRand {
     T cont_rand_integral;
 
-    T BuildContRandIntegral(crossbase_list_t const& cross)
-    {
-        auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
-        auto cont_rand_func = [this, disp](double energy) mutable {
-            return FunctionToIntegral(*disp, energy);
-        };
-        T cont_rand_integral(cont_rand_func, lower_lim);
-        if (typeid(T) == typeid(UtilityInterpolant)) {
-            auto hash_digest = (size_t)0;
-            hash_combine(hash_digest, CrossSectionVector::GetHash(cross), interpol_def.GetHash());
+    void build_tables() {};
 
-            cont_rand_integral.BuildTables("contrand", hash_digest, interpol_def);
-        };
-        return cont_rand_integral;
-    }
-
-    public:
+public:
     template <typename Cross>
-    ContRandBuilder(Cross&& cross)
-        : ContRand(std::forward<Cross>(cross))
-        , cont_rand_integral(BuildContRandIntegral(cross_list))
+    ContRandBuilder(std::shared_ptr<Displacement> disp, Cross&& cross)
+        : ContRand(disp, std::forward<Cross>(cross))
+        , cont_rand_integral([this](double E) { return FunctionToIntegral(E); },
+              disp->GetLowerLim(), this->GetHash())
     {
     }
 
@@ -37,20 +24,31 @@ template <class T> class ContRandBuilder : public ContRand {
     }
 
     inline double EnergyRandomize(
-            double initial_energy, double final_energy, double rnd) final
+        double initial_energy, double final_energy, double rnd) final
     {
         auto std = std::sqrt(Variance(initial_energy, final_energy));
-        return SampleFromGaussian(final_energy, std, rnd, lower_lim, initial_energy);
+        return SampleFromGaussian(
+            final_energy, std, rnd, disp->GetLowerLim(), initial_energy);
     }
 };
 
 template <typename T>
-std::unique_ptr<ContRand> make_contrand(T&& cross, bool interpolate = true)
+auto make_contrand(
+    std::shared_ptr<Displacement> disp, T&& cross, bool interpolate = true)
 {
+    auto cont_rand = std::unique_ptr<ContRand>();
     if (interpolate)
-        return PROPOSAL::make_unique<ContRandBuilder<UtilityInterpolant>>(
-                std::forward<T>(cross));
-    return PROPOSAL::make_unique<ContRandBuilder<UtilityIntegral>>(
-            std::forward<T>(cross));
+        cont_rand = std::make_unique<ContRandBuilder<UtilityInterpolant>>(
+            disp, std::forward<T>(cross));
+    else
+        cont_rand = std::make_unique<ContRandBuilder<UtilityIntegral>>(
+            disp, std::forward<T>(cross));
+    return cont_rand;
+}
+
+template <typename T> auto make_contrand(T&& cross, bool interpolate = true)
+{
+    auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
+    return make_contrand(disp, cross, interpolate);
 }
 } // namespace PROPOSAL

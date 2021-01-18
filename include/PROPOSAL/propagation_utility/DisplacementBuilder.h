@@ -2,35 +2,20 @@
 #include "PROPOSAL/propagation_utility/Displacement.h"
 
 namespace PROPOSAL {
-template <typename T>
-class DisplacementBuilder : public Displacement {
+template <typename T> class DisplacementBuilder : public Displacement {
     T disp_integral;
 
-    T BuildTrackIntegral(crossbase_list_t const& cross)
-    {
-        if (cross.size() < 1)
-            throw std::invalid_argument(
-                "at least one crosssection is required.");
-        auto disp_func = [this](double energy) {
-            return FunctionToIntegral(energy);
-        };
-        auto low_lim = CrossSectionVector::GetLowerLim(cross);
-        T integral(disp_func, low_lim);
-        if (typeid(T) == typeid(UtilityInterpolant)) {
-            auto hash_digest = (size_t)0;
-            hash_combine(hash_digest, CrossSectionVector::GetHash(cross), interpol_def.GetHash());
-
-            integral.BuildTables("displacement", hash_digest, interpol_def);
-        };
-        return integral;
-    }
+    void build_tables();
 
 public:
     template <typename Cross>
     DisplacementBuilder(Cross&& cross)
         : Displacement(std::forward<Cross>(cross))
-        , disp_integral(BuildTrackIntegral(cross_list))
+        , disp_integral(
+              [this](double energy) { return FunctionToIntegral(energy); },
+              this->lower_lim, this->hash)
     {
+        build_tables();
     }
 
     inline double SolveTrackIntegral(double lower_lim, double upper_lim) final
@@ -44,12 +29,15 @@ public:
     }
 };
 
+template <> void DisplacementBuilder<UtilityIntegral>::build_tables();
+template <> void DisplacementBuilder<UtilityInterpolant>::build_tables();
+
 template <typename T>
 std::unique_ptr<Displacement> make_displacement(T&& cross, bool interpolate)
 {
     if (interpolate)
-        return PROPOSAL::make_unique<
-            DisplacementBuilder<UtilityInterpolant>>(std::forward<T>(cross));
+        return PROPOSAL::make_unique<DisplacementBuilder<UtilityInterpolant>>(
+            std::forward<T>(cross));
     return PROPOSAL::make_unique<DisplacementBuilder<UtilityIntegral>>(
         std::forward<T>(cross));
 }

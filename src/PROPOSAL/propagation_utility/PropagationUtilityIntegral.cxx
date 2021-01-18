@@ -13,15 +13,11 @@
 using namespace PROPOSAL;
 
 UtilityIntegral::UtilityIntegral(
-    std::function<double(double)> func, double lower_lim)
+    std::function<double(double)> _func, double _lower_lim, size_t _hash)
     : integral(IROMB, IMAXS, IPREC2)
-    , lower_lim(lower_lim)
-    , FunctionToIntegral(func)
-{
-}
-
-void UtilityIntegral::BuildTables(const std::string , size_t ,
-    Interpolant1DBuilder::Definition, bool)
+    , lower_lim(_lower_lim)
+    , FunctionToIntegral(_func)
+    , hash(_hash)
 {
 }
 
