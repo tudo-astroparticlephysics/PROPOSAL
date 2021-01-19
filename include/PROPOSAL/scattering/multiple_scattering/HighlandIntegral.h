@@ -31,87 +31,70 @@
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include "PROPOSAL/scattering/multiple_scattering/Highland.h"
 
 namespace PROPOSAL {
 namespace multiple_scattering {
-
-    template <class T, class Cross> class HighlandIntegral : public Highland {
+    template <class T> class HighlandIntegral : public Highland {
         T highland_integral;
 
-        T BuildHighlandIntegral(Cross&&);
-        double CalculateTheta0(double, double, double) override;
+        inline double CalculateTheta0(
+            double grammage, double ei, double ef) final
+        {
+            auto aux = 13.6
+                * std::sqrt(
+                    highland_integral.Calculate(ei, ef) / radiation_length)
+                * std::abs(charge);
+            aux *= std::max(
+                1. + 0.038 * std::log(grammage / radiation_length), 0.0);
+            return std::min(aux, 1.0);
+        }
 
-    public:
-        HighlandIntegral(const ParticleDef&, Medium const&, Cross&&);
+        inline double Integral(Displacement& disp, double energy)
+        {
+            auto square_momentum = (energy - mass) * (energy + mass);
+            auto aux = energy / square_momentum;
+            return disp.FunctionToIntegral(energy) * aux * aux;
+        }
 
-        std::unique_ptr<Parametrization> clone() const override
+        inline std::unique_ptr<Parametrization> clone() const override
         {
             return std::unique_ptr<Parametrization>(
-                std::make_unique<HighlandIntegral<T, Cross>>(*this));
+                std::make_unique<HighlandIntegral<T>>(*this));
         }
 
-        static Interpolant1DBuilder::Definition interpol_def;
-
-        double Integral(Displacement&, Cross, double);
+    public:
+        HighlandIntegral(const ParticleDef& p, Medium const& m,
+            std::shared_ptr<Displacement> disp)
+            : Highland(p, m)
+            , highland_integral(
+                  [this, disp](double E) { return Integral(*disp, E); },
+                  disp->GetLowerLim(), disp->GetHash()) {};
     };
-
-    template <class T, class Cross>
-    HighlandIntegral<T, Cross>::HighlandIntegral(
-        const ParticleDef& p_def, Medium const& medium, Cross&& cross)
-        : Highland(p_def, medium)
-        , highland_integral(BuildHighlandIntegral(cross))
-    {
-    }
-
-    template <class T> struct HighlandIntegral<T, std::nullptr_t> {
-        HighlandIntegral(const ParticleDef&, Medium const&, std::nullptr_t)
-        {
-            throw std::invalid_argument("CrossSectionVector needs to be passed "
-                                        "to use scattering_highland.");
-        }
-        std::unique_ptr<Parametrization> clone() const { return nullptr; }
-    };
-
-    template <class T, class Cross>
-    T HighlandIntegral<T, Cross>::BuildHighlandIntegral(Cross&& cross)
-    {
-        auto disp
-            = std::shared_ptr<Displacement>(make_displacement(cross, false));
-        auto higland_integral_func = [this, disp, &cross](double energy) {
-            return Integral(*disp, cross, energy);
-        };
-        T decay_integral(
-            higland_integral_func, CrossSectionVector::GetLowerLim(cross));
-        if (typeid(T) == typeid(UtilityInterpolant)) {
-            auto hash = CrossSectionVector::GetHash(cross);
-            decay_integral.BuildTables("highland", hash, interpol_def, true);
-        };
-        return decay_integral;
-    }
-
-    template <class T, class Cross>
-    double HighlandIntegral<T, Cross>::Integral(
-        Displacement& disp, Cross, double energy)
-    {
-        auto square_momentum = (energy - mass) * (energy + mass);
-        auto aux = energy / square_momentum;
-        return disp.FunctionToIntegral(energy) * aux * aux;
-    }
-
-    template <class T, class Cross>
-    double HighlandIntegral<T, Cross>::CalculateTheta0(
-        double grammage, double ei, double ef)
-    {
-        auto aux = 13.6
-            * std::sqrt(highland_integral.Calculate(ei, ef) / radiation_length)
-            * std::abs(charge);
-        aux *= std::max(1 + 0.038 * std::log(grammage / radiation_length), 0.0);
-        return std::min(aux, 1.0);
-    }
-
-    template <class T, class Cross>
-    Interpolant1DBuilder::Definition HighlandIntegral<T, Cross>::interpol_def
-        = { 200 };
 } // namespace multiple_scattering
+
+inline auto make_highland_integral(ParticleDef const& p, Medium const& m,
+    std::shared_ptr<Displacement> disp, bool interpol = false)
+{
+    auto scatter = std::unique_ptr<multiple_scattering::Parametrization>();
+    if (interpol)
+        scatter.reset(
+            new multiple_scattering::HighlandIntegral<UtilityInterpolant>(
+                p, m, disp));
+    else
+        scatter.reset(
+            new multiple_scattering::HighlandIntegral<UtilityIntegral>(
+                p, m, disp));
+    return scatter;
+}
+
+template <typename Cross>
+inline auto make_highland_integral(
+    ParticleDef const& p, Medium const& m, Cross&& c, bool interpol = false)
+{
+    auto disp = std::shared_ptr<Displacement>(make_displacement(c, false));
+    return make_highland_integral(p, m, disp, interpol);
+}
 } // namespace PROPOSAL

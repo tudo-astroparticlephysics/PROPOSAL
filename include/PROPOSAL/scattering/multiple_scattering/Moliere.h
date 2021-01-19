@@ -83,4 +83,11 @@ namespace multiple_scattering {
             double ef, const std::array<double, 4>& rnd) override;
     };
 } // namespace multiple_scattering
+
+template <typename... Args> inline auto make_moliere(Args... args)
+{
+    return std::unique_ptr<multiple_scattering::Parametrization>(
+        new multiple_scattering::Moliere(std::forward<Args>(args)...));
+}
+
 } // namespace PROPOSAL

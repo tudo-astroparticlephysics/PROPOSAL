@@ -62,4 +62,10 @@ namespace multiple_scattering {
         virtual double CalculateTheta0(double grammage, double ei, double ef);
     };
 } // namespace multiple_scattering
+
+template <typename... Args> inline auto make_highland(Args... args)
+{
+    return std::unique_ptr<multiple_scattering::Parametrization>(
+        new multiple_scattering::Highland(std::forward<Args>(args)...));
+}
 } // namespace PROPOSAL

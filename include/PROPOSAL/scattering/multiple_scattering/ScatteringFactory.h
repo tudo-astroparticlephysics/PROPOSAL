@@ -61,51 +61,56 @@ static const std::unordered_map<std::string, ScatteringType>
         { "noscattering", ScatteringType::NoScattering } };
 
 namespace detail {
-    template <typename Cross>
-    std::unique_ptr<multiple_scattering::Parametrization>
-    make_multiple_scattering(ScatteringType type, ParticleDef const& p_def,
-        Medium const& medium, Cross&& cross, bool interpolate = true)
+
+    constexpr static char multiple_scattering_msg[]
+        = "This constructor is not provided.";
+
+    template <typename... Args>
+    inline auto make_multiple_scattering(
+        ScatteringType t, ParticleDef const& p, Medium const& m, Args&&... args)
     {
-        switch (type) {
+        switch (t) {
         case ScatteringType::HighlandIntegral:
-            if (interpolate) {
-                return std::unique_ptr<multiple_scattering::Parametrization>(
-                    new multiple_scattering::HighlandIntegral<
-                        UtilityInterpolant, Cross>(
-                        p_def, medium, std::forward<Cross>(cross)));
-            } else {
-                return std::unique_ptr<multiple_scattering::Parametrization>(
-                    new multiple_scattering::HighlandIntegral<UtilityIntegral,
-                        Cross>(p_def, medium, std::forward<Cross>(cross)));
-            }
-        case ScatteringType::Highland:
-            return std::unique_ptr<multiple_scattering::Parametrization>(
-                    new multiple_scattering::Highland(p_def, medium));
-        case ScatteringType::Moliere:
-            return std::unique_ptr<multiple_scattering::Parametrization>(
-                    new multiple_scattering::Moliere(p_def, medium));
-        case ScatteringType::NoScattering:
-            return nullptr;
+            return make_highland_integral(p, m, std::forward<Args>(args)...);
         default:
-            throw std::out_of_range("This constructor is not provided.");
+            throw std::out_of_range(multiple_scattering_msg);
         }
     }
 
-    std::unique_ptr<multiple_scattering::Parametrization>
-    make_multiple_scattering(ScatteringType, ParticleDef const&, Medium const&);
+    inline auto make_multiple_scattering(
+        ScatteringType t, ParticleDef const& p, Medium const& m)
+    {
+        switch (t) {
+        case ScatteringType::Highland:
+            return make_highland(p, m);
+        case ScatteringType::Moliere:
+            return make_moliere(p, m);
+        default:
+            throw std::out_of_range(multiple_scattering_msg);
+        }
+    }
 
+    inline auto make_multiple_scattering(ScatteringType t)
+    {
+        switch (t) {
+        case ScatteringType::NoScattering:
+            return std::unique_ptr<multiple_scattering::Parametrization>(
+                nullptr);
+        default:
+            throw std::out_of_range(multiple_scattering_msg);
+        }
+    }
 }
 
 template <typename... Args>
-std::unique_ptr<multiple_scattering::Parametrization> make_multiple_scattering(
-    std::string const& name, Args... args)
+auto make_multiple_scattering(std::string const& name, Args... args)
 {
     std::string name_lower = name;
     std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
 
     auto it = MultipleScatteringTable.find(name_lower);
     if (it != MultipleScatteringTable.end()) {
-       return detail::make_multiple_scattering(it->second, args...);
+        return detail::make_multiple_scattering(it->second, args...);
     }
     throw std::out_of_range("This scattering model is not provided.");
 }
