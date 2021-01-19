@@ -187,7 +187,7 @@ Vector3D PropagationUtility::DirectionDeflect(InteractionType type,
             r = rnd();
         auto angles = collection.scattering->CalculateStochasticDeflection(
             type, initial_energy, final_energy, v_rnd);
-        direction.deflect(std::cos(angles[0]), angles[1]);
+        direction.deflect(std::cos(angles.zenith), angles.azimuth);
     }
     return direction;
 }

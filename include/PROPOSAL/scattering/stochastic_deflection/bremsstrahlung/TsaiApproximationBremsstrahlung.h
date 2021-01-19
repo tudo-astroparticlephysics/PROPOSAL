@@ -20,7 +20,7 @@ namespace stochastic_deflection {
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 
-        std::array<double, 2> CalculateStochasticDeflection(
+        DirectionChangeAngular CalculateStochasticDeflection(
             double e_i, double e_f, std::vector<double> const& rnd) const final;
     };
 } // namespace stochastic_deflection

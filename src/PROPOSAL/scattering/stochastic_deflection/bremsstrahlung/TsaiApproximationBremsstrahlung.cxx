@@ -3,7 +3,7 @@
 
 using namespace PROPOSAL;
 
-std::array<double, 2>
+DirectionChangeAngular 
 stochastic_deflection::TsaiApproximationBremsstrahlung::CalculateStochasticDeflection(
     double e_i, double e_f, std::vector<double> const& rnd) const
 {
@@ -15,5 +15,5 @@ stochastic_deflection::TsaiApproximationBremsstrahlung::CalculateStochasticDefle
     auto theta_photon = MMU / e_i * r;
     auto theta_muon = epsilon / e_f * theta_photon;
 
-    return std::array<double, 2> { theta_muon, 2 * PI * rnd[1]};
+    return  DirectionChangeAngular {theta_muon, 2 * PI * rnd[1]};
 }

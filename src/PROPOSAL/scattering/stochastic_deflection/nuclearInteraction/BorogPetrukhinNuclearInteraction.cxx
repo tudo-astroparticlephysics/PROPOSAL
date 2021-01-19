@@ -4,7 +4,7 @@
 
 using namespace PROPOSAL;
 
-std::array<double, 2>
+DirectionChangeAngular
 stochastic_deflection::BorogPetrukhinNuclearInteraction::CalculateStochasticDeflection(
         double e_i, double e_f, std::vector<double> const& rnd) const
 {
@@ -26,5 +26,5 @@ stochastic_deflection::BorogPetrukhinNuclearInteraction::CalculateStochasticDefl
 
 
     //TODO: PropagationUtility will call cos() on the first return value
-    return std::array<double, 2> { theta_muon, 2 * PI * rnd[1] };
+    return DirectionChangeAngular { theta_muon, 2 * PI * rnd[1] };
 }
