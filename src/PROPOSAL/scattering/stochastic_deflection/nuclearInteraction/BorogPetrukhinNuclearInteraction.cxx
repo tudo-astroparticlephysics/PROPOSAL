@@ -1,21 +1,18 @@
-#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/NaivNuclearInteraction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BorogPetrukhinNuclearInteraction.h"
 #include "PROPOSAL/Constants.h"
 #include "math.h"
 
 using namespace PROPOSAL;
 
 std::array<double, 2>
-stochastic_deflection::NaivNuclearInteraction::CalculateStochasticDeflection(
+stochastic_deflection::BorogPetrukhinNuclearInteraction::CalculateStochasticDeflection(
         double e_i, double e_f, std::vector<double> const& rnd) const
 {
-    // ------- NuclInt 
-    auto proton_mass = 938.272; // Proton mass in MeV
-    auto muon_mass = 105.558;
     // All energies should be in units of GeV
     e_i = e_i / 1000.0;
     e_f = e_f / 1000.0;
-    proton_mass = proton_mass / 1000.0;
-    muon_mass = muon_mass / 1000.0;
+    auto proton_mass = MP / 1000.0;
+    auto muon_mass = MMU / 1000.0;
 
     auto m_0 = std::sqrt(0.4);
     auto epsilon = e_i - e_f; 

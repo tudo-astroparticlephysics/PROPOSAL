@@ -26,3 +26,5 @@ namespace PROPOSAL {
         };
     } // namespace stochastic_deflection
 } // namespace PROPOSAL
+
+// Use 4 momentum conservation with assumption: E_{e,i} = m_e

@@ -4,20 +4,19 @@
 
 namespace PROPOSAL {
     namespace stochastic_deflection {
-        class NaivPairProduction : public PairProduction,
-                               public DefaultDeflection<NaivPairProduction> {
+        class KelnerPairProduction : public PairProduction,
+                               public DefaultDeflection<KelnerPairProduction> {
 
             static constexpr int n_rnd = 2;
-            double mass;
 
             std::unique_ptr<Parametrization> clone() const final
             {
                 return std::unique_ptr<Parametrization>(
-                        std::make_unique<NaivPairProduction>(*this));
+                        std::make_unique<KelnerPairProduction>(*this));
             }
 
         public:
-            NaivPairProduction(ParticleDef p_def, Medium) : mass(p_def.mass) {};
+            KelnerPairProduction(ParticleDef, Medium) {};
 
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 
@@ -26,3 +25,5 @@ namespace PROPOSAL {
         };
     } // namespace stochastic_deflection
 } // namespace PROPOSAL
+
+// S.R. Kel'ner, Sov. J. Nucl. Phys.5 (1967)778.

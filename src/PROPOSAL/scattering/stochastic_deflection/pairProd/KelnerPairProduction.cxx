@@ -1,4 +1,4 @@
-#include "PROPOSAL/scattering/stochastic_deflection/pairProd/NaivPairProduction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/pairProd/KelnerPairProduction.h"
 #include "PROPOSAL/Constants.h"
 #include "math.h"
 #include "random"
@@ -7,17 +7,14 @@
 using namespace PROPOSAL;
 
 std::array<double, 2>
-stochastic_deflection::NaivPairProduction::CalculateStochasticDeflection(
+stochastic_deflection::KelnerPairProduction::CalculateStochasticDeflection(
         double e_i, double e_f, std::vector<double> const& rnd) const
 {
-    // ------ PairProd -----------
-    auto electron_mass = 0.511; // Proton mass in MeV
-    auto muon_mass = 105.558;
     // All energies should be in units of GeV
     e_i = e_i / 1000.0;
     e_f = e_f / 1000.0;
-    electron_mass = electron_mass / 1000.0;
-    muon_mass = muon_mass / 1000.0;
+    auto electron_mass = ME / 1000.0;
+    auto muon_mass = MMU / 1000.0;
 
     // Muon values
     auto n = -1.0;
