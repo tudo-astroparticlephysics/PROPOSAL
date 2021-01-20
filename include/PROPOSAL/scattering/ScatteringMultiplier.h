@@ -1,6 +1,8 @@
 #pragma once
 
 #include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/Constants.h"
+
 
 namespace PROPOSAL {
 class ScatteringMultiplier : public Scattering {
@@ -12,7 +14,9 @@ class ScatteringMultiplier : public Scattering {
         for (auto m : stochastic_deflect) {
             if (m.first == t) {
                 angles.zenith *= m.second;
-                assert(angles.zenith <= PI);
+                if (angles.zenith >= PI) {
+                    angles.zenith = 2 * PI - angles.zenith;
+                };
                 return angles;
             }
         }
