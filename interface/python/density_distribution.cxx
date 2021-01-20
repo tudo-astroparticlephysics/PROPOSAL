@@ -140,9 +140,9 @@ void init_density_distribution(py::module& m) {
             )pbdoc");
 
     py::class_<CartesianAxis, Axis, std::shared_ptr<CartesianAxis>>(m_sub, "cartesian_axis")
-        .def(py::init<Vector3D, Vector3D>(), py::arg("axis"),
+        .def(py::init<const Vector3D&, const Vector3D&>(), py::arg("axis"),
              py::arg("reference_point"));
 
     py::class_<RadialAxis, Axis, std::shared_ptr<RadialAxis>>(m_sub, "radial_axis")
-            .def(py::init<Vector3D>(), py::arg("reference_point"));
+            .def(py::init<const Vector3D&>(), py::arg("reference_point"));
 }

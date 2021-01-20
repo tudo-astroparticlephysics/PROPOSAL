@@ -12,6 +12,7 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include <cmath>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 using namespace PROPOSAL;
@@ -43,8 +44,8 @@ std::ostream& operator<<(std::ostream& os, ParticleState const& data)
 
 ParticleState::ParticleState()
     : type(0)
-    , position(Vector3D())
-    , direction(Vector3D())
+    , position(Cartesian3D())
+    , direction(Cartesian3D())
     , energy(0)
     , time(0)
     , propagated_distance(0)
@@ -127,8 +128,8 @@ double ParticleState::GetMomentum() const
     return energy;
 }
 
-StochasticLoss::StochasticLoss(int type, double loss_energy, Vector3D position,
-                               Vector3D direction, double time,
+StochasticLoss::StochasticLoss(int type, double loss_energy, const Vector3D& position,
+                               const Vector3D& direction, double time,
                                double propagated_distance,
                                double parent_particle_energy) : Loss(type, loss_energy),
                                position(position), direction(direction), time(time),
@@ -136,8 +137,8 @@ StochasticLoss::StochasticLoss(int type, double loss_energy, Vector3D position,
                                parent_particle_energy(parent_particle_energy) {}
 
 ContinuousLoss::ContinuousLoss(std::pair<double, double> energies,
-                               std::pair<Vector3D, Vector3D> positions,
-                               std::pair<Vector3D, Vector3D> directions,
+                               std::pair<const Vector3D&, const Vector3D&> positions,
+                               std::pair<const Vector3D&, const Vector3D&> directions,
                                std::pair<double, double> times)
                                : Loss((int)InteractionType::ContinuousEnergyLoss,
                                       std::abs(energies.second - energies.first)),

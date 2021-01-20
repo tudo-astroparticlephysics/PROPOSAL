@@ -35,6 +35,7 @@
 namespace PROPOSAL {
 
 class Vector3D;
+class Cartesian3D;
 struct ParticleState;
 class Particle;
 struct ParticleDef;
@@ -118,7 +119,7 @@ public:
     ///
     /// @return
     // ----------------------------------------------------------------------------
-    static Vector3D GenerateRandomDirection();
+    static Cartesian3D GenerateRandomDirection();
 
     // ----------------------------------------------------------------------------
     /// @brief Sets the uniform flag in the ManyBodyPhaseSpace channels

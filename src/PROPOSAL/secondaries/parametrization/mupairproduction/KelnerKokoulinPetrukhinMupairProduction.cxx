@@ -36,11 +36,11 @@ double secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateRho(
     }
 }
 
-tuple<Vector3D, Vector3D>
+tuple<Cartesian3D, Cartesian3D>
 secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateDirections(
-    Vector3D primary_dir, double, double, double)
+    const Vector3D& primary_dir, double, double, double)
 {
-    return make_tuple(primary_dir, primary_dir);
+    return make_tuple(Cartesian3D(primary_dir), Cartesian3D(primary_dir));
 }
 
 tuple<double, double>

@@ -41,11 +41,11 @@ double secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateRho(
     }
 }
 
-std::tuple<Vector3D, Vector3D>
+std::tuple<Cartesian3D, Cartesian3D>
 secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateDirections(
-        Vector3D primary_dir, double, double, double)
+        const Vector3D& primary_dir, double, double, double)
 {
-    return make_tuple(primary_dir, primary_dir);
+    return make_tuple(Cartesian3D(primary_dir), Cartesian3D(primary_dir));
 }
 
 std::tuple<double, double>

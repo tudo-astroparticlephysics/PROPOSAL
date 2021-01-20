@@ -15,8 +15,8 @@ namespace secondaries {
         InteractionType GetInteractionType() const noexcept { return type; };
 
         virtual double CalculateRho(double, double) = 0;
-        virtual std::tuple<Vector3D, Vector3D> CalculateDirections(
-            Vector3D, double, double, double)
+        virtual std::tuple<Cartesian3D, Cartesian3D> CalculateDirections(
+            const Vector3D&, double, double, double)
             = 0;
         virtual std::tuple<double, double> CalculateEnergy(double, double) = 0;
     };

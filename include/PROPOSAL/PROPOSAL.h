@@ -108,6 +108,8 @@
 #include "PROPOSAL/math/Spline.h"
 #include "PROPOSAL/math/TableWriter.h"
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/math/Cartesian3D.h"
+#include "PROPOSAL/math/Spherical3D.h"
 
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"

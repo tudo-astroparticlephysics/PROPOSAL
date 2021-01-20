@@ -36,7 +36,7 @@ namespace PROPOSAL {
 class Cylinder : public Geometry
 {
 public:
-    Cylinder(const Vector3D position, double z, double radius, double inner_radius = 0.);
+    Cylinder(const Vector3D& position, double z, double radius, double inner_radius = 0.);
     Cylinder(const nlohmann::json& config);
 
 

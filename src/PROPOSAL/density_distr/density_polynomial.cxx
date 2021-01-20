@@ -1,11 +1,9 @@
 
-#include <algorithm>
-#include <cmath>
 #include <functional>
-#include <iostream>
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/density_distr/density_polynomial.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/math/Cartesian3D.h"
 using namespace PROPOSAL;
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%% Polynomial-Density %%%%%%%%%%%%%%%%%%%%
@@ -58,8 +56,8 @@ double Density_polynomial::helper_function(const Vector3D& xi,
                                            double res,
                                            double l) const {
     (void)res;
-
-    return Evaluate(xi) - Evaluate(xi + l * direction);
+    Cartesian3D dir_cartesian(direction);
+    return Evaluate(xi) - Evaluate(xi + l * dir_cartesian);
 }
 
 double Density_polynomial::Correct(const Vector3D& xi,
@@ -67,12 +65,12 @@ double Density_polynomial::Correct(const Vector3D& xi,
                                    double res,
                                    double distance_to_border) const {
     std::function<double(double)> F =
-        std::bind(&Density_polynomial::Helper_function, this, xi, direction,
-                  res, std::placeholders::_1);
+        std::bind(&Density_polynomial::Helper_function, this, std::ref(xi),
+                  std::ref(direction), res, std::placeholders::_1);
 
     std::function<double(double)> dF =
-        std::bind(&Density_polynomial::helper_function, this, xi, direction,
-                  res, std::placeholders::_1);
+        std::bind(&Density_polynomial::helper_function, this, std::ref(xi),
+                  std::ref(direction), res, std::placeholders::_1);
 
     // check if direction * axis larger or less than zero
     // direction * fAxis_

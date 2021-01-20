@@ -5,6 +5,7 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/math/Cartesian3D.h"
 
 #include <memory>
 #include <vector>
@@ -109,17 +110,17 @@ ParticleState Secondaries::GetStateForDistance(double propagated_distance) const
     return track_.back();
 }
 
-std::vector<Vector3D> Secondaries::GetTrackPositions() const
+std::vector<Cartesian3D> Secondaries::GetTrackPositions() const
 {
-    std::vector<Vector3D> vec;
+    std::vector<Cartesian3D> vec;
     for (auto i : track_)
         vec.emplace_back(i.position);
     return vec;
 }
 
-std::vector<Vector3D> Secondaries::GetTrackDirections() const
+std::vector<Cartesian3D> Secondaries::GetTrackDirections() const
 {
-    std::vector<Vector3D> vec;
+    std::vector<Cartesian3D> vec;
     for (auto i : track_)
         vec.emplace_back(i.direction);
     return vec;

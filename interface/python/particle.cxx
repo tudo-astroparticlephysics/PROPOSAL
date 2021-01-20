@@ -3,6 +3,7 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/Secondaries.h"
+#include "PROPOSAL/geometry/Geometry.h"
 #include "pyBindings.h"
 
 #define PARTICLE_DEF(module, cls)                                                    \
@@ -275,7 +276,7 @@ void init_particle(py::module& m) {
             .def_readwrite("parent_particle_energy", &StochasticLoss::parent_particle_energy);
 
     py::class_<ContinuousLoss, Loss, std::shared_ptr<ContinuousLoss>>(m_sub, "ContinuousLoss")
-            .def(py::init<const std::pair<double, double>&, const std::pair<Vector3D, Vector3D>&, const std::pair<Vector3D, Vector3D>&, const std::pair<double, double>&>(),
+            .def(py::init<const std::pair<double, double>&, const std::pair<const Vector3D&, const Vector3D&>&, const std::pair<const Vector3D&, const Vector3D&>&, const std::pair<double, double>&>(),
                     py::arg("energies"), py::arg("positions"), py::arg("directions"), py::arg("times"))
             .def_readwrite("energies", &ContinuousLoss::energies)
             .def_readwrite("positions", &ContinuousLoss::positions)

@@ -117,10 +117,10 @@ InteractionType Propagator::DoStochasticInteraction(ParticleState& p_cond,
     std::tie(loss_type, comp, loss_energy)
         = utility.EnergyStochasticloss(p_cond.energy, rnd());
 
-    auto stochastic_loss = StochasticLoss((int)loss_type, loss_energy,
+    /*auto stochastic_loss = StochasticLoss((int)loss_type, loss_energy,
                                           p_cond.position, p_cond.direction,
                                           p_cond.time, p_cond.propagated_distance,
-                                          p_cond.energy);
+                                          p_cond.energy);*/
     p_cond.direction = utility.DirectionDeflect(loss_type, p_cond.energy,
                                                 p_cond.energy - loss_energy,
                                                 p_cond.direction, rnd);
@@ -143,7 +143,7 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
     auto max_distance_left = max_distance - state.propagated_distance;
     assert(max_distance_left > 0);
 
-    Vector3D mean_direction, new_direction;
+    Cartesian3D mean_direction, new_direction;
     std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
             grammage_next_interaction, state.energy, E_f, state.direction,
         rnd);
@@ -256,7 +256,9 @@ Sector Propagator::GetCurrentSector(
 
     if (potential_sec.empty())
         Logging::Get("proposal.propagator")->critical("No sector defined at particle position {}, {}, {}.",
-                                                      position.GetY(), position.GetY(), position.GetZ());
+                                                      position.GetSphericalCoordinates().at(0),
+                                                      position.GetSphericalCoordinates().at(1),
+                                                      position.GetSphericalCoordinates().at(2));
 
     auto highest_sector_iter = std::max_element(
         potential_sec.begin(), potential_sec.end(), [](Sector* a, Sector* b) {

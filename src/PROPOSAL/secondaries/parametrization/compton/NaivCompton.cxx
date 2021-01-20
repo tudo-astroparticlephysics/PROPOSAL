@@ -12,8 +12,8 @@ double secondaries::NaivCompton::CalculateRho(
     return loss_energy / primary_energy;
 }
 
-std::tuple<Vector3D, Vector3D> secondaries::NaivCompton::CalculateDirections(
-    Vector3D primary_dir, double energy, double v, double rnd)
+std::tuple<Cartesian3D, Cartesian3D> secondaries::NaivCompton::CalculateDirections(
+    const Vector3D& primary_dir, double energy, double v, double rnd)
 {
     auto com_energy = energy + ME; // center of mass energy
     auto kin_energy = energy;      // kinetic energy
@@ -22,9 +22,9 @@ std::tuple<Vector3D, Vector3D> secondaries::NaivCompton::CalculateDirections(
     auto cosphi_electron
         = (com_energy * v - ME) / (v * std::sqrt(com_energy * kin_energy));
     auto rnd_theta = rnd * 2. * PI;
-    auto dir_gamma = primary_dir;
+    auto dir_gamma = Cartesian3D(primary_dir);
     dir_gamma.deflect(cosphi_gamma, rnd_theta);
-    auto dir_electron = primary_dir;
+    auto dir_electron = Cartesian3D(primary_dir);
     dir_electron.deflect(cosphi_electron, std::fmod(rnd_theta + PI, 2. * PI));
     return std::make_tuple(dir_gamma, dir_electron);
 }

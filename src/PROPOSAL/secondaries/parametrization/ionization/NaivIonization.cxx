@@ -13,10 +13,10 @@ using namespace PROPOSAL;
 
 
 
-std::tuple<Vector3D, Vector3D> secondaries::NaivIonization::CalculateDirections(
-    Vector3D dir, double, double, double)
+std::tuple<Cartesian3D, Cartesian3D> secondaries::NaivIonization::CalculateDirections(
+    const Vector3D& dir, double, double, double)
 {
-    return make_tuple(dir, dir);
+    return make_tuple(Cartesian3D(dir), Cartesian3D(dir));
 }
 
 std::tuple<double, double> secondaries::NaivIonization::CalculateEnergy(
