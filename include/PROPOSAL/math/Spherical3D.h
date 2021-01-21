@@ -13,9 +13,9 @@ namespace PROPOSAL  {
         Spherical3D(const nlohmann::json&);
 
 
-        double GetRadius() const {return coordinates[Radius];}
-        double GetAzimuth() const {return coordinates[Azimuth];}
-        double GetZenith() const {return coordinates[Zenith];}
+        auto GetRadius() const {return coordinates[Radius];}
+        auto GetAzimuth() const {return coordinates[Azimuth];}
+        auto GetZenith() const {return coordinates[Zenith];}
         void SetRadius(double radius) {coordinates[Radius] = radius;}
         void SetAzimuth(double azimuth) {coordinates[Azimuth] = azimuth;}
         void SetZenith(double zenith) {coordinates[Zenith] = zenith;}

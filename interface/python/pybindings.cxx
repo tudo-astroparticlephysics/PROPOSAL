@@ -1,5 +1,4 @@
 
-#include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/math/Spherical3D.h"
 #include "PROPOSAL/version.h"
 #include "PROPOSAL/crosssection/CrossSection.h"

@@ -127,7 +127,7 @@ std::vector<ParticleState> LeptonicDecayChannelApprox::Decay(const ParticleDef& 
     double momentum_neutrinos = 0.5 * virtual_mass;
 
 
-    Cartesian3D direction = GenerateRandomDirection();
+    auto direction = GenerateRandomDirection();
 
     ParticleState neutrino((ParticleType)neutrino_.particle_type,
                            p_condition.position,

@@ -6,15 +6,15 @@ namespace PROPOSAL{
     class Spherical3D;
     class Cartesian3D : public Vector3D {
     public:
-        Cartesian3D() : Vector3D() {};
+        Cartesian3D() = default;
         Cartesian3D(std::array<double, 3> val) : Vector3D(val) {};
         Cartesian3D(double x, double y, double z) : Vector3D({x, y, z}) {};
         Cartesian3D(const Vector3D& vec) : Cartesian3D(vec.GetCartesianCoordinates()) {};
         Cartesian3D(const nlohmann::json&);
 
-        double GetX() const {return coordinates[0];}
-        double GetY() const {return coordinates[1];}
-        double GetZ() const {return coordinates[2];}
+        auto GetX() const {return coordinates[0];}
+        auto GetY() const {return coordinates[1];}
+        auto GetZ() const {return coordinates[2];}
         void SetX(double x) {coordinates[0] = x;}
         void SetY(double y) {coordinates[1] = y;}
         void SetZ(double z) {coordinates[2] = z;}

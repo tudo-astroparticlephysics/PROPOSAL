@@ -17,17 +17,17 @@ Spherical3D::Spherical3D(const nlohmann::json& config) {
 }
 
 void Spherical3D::print(std::ostream& os) const {
-    os << "radius: " << coordinates[SphericalCoordinate::Radius] << "\t";
-    os << "azimuth: " << coordinates[SphericalCoordinate::Azimuth] << "\t";
-    os << "zenith: " << coordinates[SphericalCoordinate::Zenith] << "\n";
+    os << "radius: " << GetRadius() << "\t";
+    os << "azimuth: " << GetAzimuth() << "\t";
+    os << "zenith: " << GetZenith() << "\n";
 }
 
 double Spherical3D::magnitude() const {
-    return coordinates[SphericalCoordinate::Radius];
+    return GetRadius();
 }
 
 void Spherical3D::normalize() {
-    coordinates[SphericalCoordinate::Radius] = 1.;
+    SetRadius(1.);
 }
 
 std::array<double, 3> Spherical3D::GetSphericalCoordinates() const {
@@ -35,11 +35,11 @@ std::array<double, 3> Spherical3D::GetSphericalCoordinates() const {
 }
 
 std::array<double, 3> Spherical3D::GetCartesianCoordinates() const {
-    auto cos_a = cos(coordinates[SphericalCoordinate::Azimuth]);
-    auto sin_a = sin(coordinates[SphericalCoordinate::Azimuth]);
-    auto cos_z = cos(coordinates[SphericalCoordinate::Zenith]);
-    auto sin_z = sin(coordinates[SphericalCoordinate::Zenith]);
-    auto r = coordinates[SphericalCoordinate::Radius];
+    auto cos_a = cos(GetAzimuth());
+    auto sin_a = sin(GetAzimuth());
+    auto cos_z = cos(GetZenith());
+    auto sin_z = sin(GetZenith());
+    auto r = GetRadius();
 
     auto x = r * cos_a * sin_z;
     auto y = r * sin_a * sin_z;

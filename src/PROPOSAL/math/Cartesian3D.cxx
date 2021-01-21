@@ -18,13 +18,13 @@ Cartesian3D::Cartesian3D(const nlohmann::json& config) {
 }
 
 void Cartesian3D::print(std::ostream& os) const {
-    os << "x: " << coordinates[0] << "\t";
-    os << "y: " << coordinates[1] << "\t";
-    os << "z: " << coordinates[2] << "\n";
+    os << "x: " << GetX() << "\t";
+    os << "y: " << GetY() << "\t";
+    os << "z: " << GetZ() << "\n";
 }
 
 double Cartesian3D::magnitude() const {
-    double sum = 0;
+    auto sum = 0.;
     for (auto& c : coordinates) {
         sum += c * c;
     }
@@ -32,7 +32,7 @@ double Cartesian3D::magnitude() const {
 }
 
 void Cartesian3D::normalize() {
-    double length = magnitude();
+    auto length = magnitude();
     for (size_t i = 0; i<3; i++) {
         coordinates[i] /= length;
     }
@@ -57,7 +57,7 @@ namespace PROPOSAL {
     }
 
     double operator*(const Cartesian3D &lhs, const Cartesian3D &rhs) {
-        double sum = 0.;
+        auto sum = 0.;
         for (size_t i = 0; i < 3; i++) {
             sum += lhs[i] * rhs[i];
         }
@@ -97,9 +97,9 @@ namespace PROPOSAL {
 
     Cartesian3D vector_product(const Cartesian3D& lhs, const Cartesian3D& rhs) {
         Cartesian3D product;
-        product[0] = lhs[1] * rhs[2] - lhs[2] * rhs[1];
-        product[1] = lhs[2] * rhs[0] - lhs[0] * rhs[2];
-        product[2] = lhs[0] * rhs[1] - lhs[1] * rhs[0];
+        product.SetX(lhs.GetY() * rhs.GetZ() - lhs.GetZ() * rhs.GetY());
+        product.SetY(lhs.GetZ() * rhs.GetX() - lhs.GetX() * rhs.GetZ());
+        product.SetZ(lhs.GetX() * rhs.GetY() - lhs.GetY() * rhs.GetX());
         return product;
     }
 }
@@ -107,21 +107,20 @@ namespace PROPOSAL {
 void Cartesian3D::deflect(double cosphi_deflect, double theta_deflect) {
     if(cosphi_deflect != 1 || theta_deflect != 0)
     {
-        double sinphi_deflect = std::sqrt( std::max(0., (1. - cosphi_deflect) * (1. + cosphi_deflect) ));
-        double tx = sinphi_deflect * std::cos(theta_deflect);
-        double ty = sinphi_deflect * std::sin(theta_deflect);
-        double tz = std::sqrt(std::max(1. - tx * tx - ty * ty, 0.));
+        auto sinphi_deflect = std::sqrt( std::max(0., (1. - cosphi_deflect) * (1. + cosphi_deflect) ));
+        auto tx = sinphi_deflect * std::cos(theta_deflect);
+        auto ty = sinphi_deflect * std::sin(theta_deflect);
+        auto tz = std::sqrt(std::max(1. - tx * tx - ty * ty, 0.));
         if(cosphi_deflect < 0. ){
             // Backward deflection
             tz = -tz;
         }
 
-        double sinth, costh, sinph, cosph;
-        auto spherical = this->GetSphericalCoordinates();
-        sinth = std::sin(spherical[Spherical3D::SphericalCoordinate::Zenith]);
-        costh = std::cos(spherical[Spherical3D::SphericalCoordinate::Zenith]);
-        sinph = std::sin(spherical[Spherical3D::SphericalCoordinate::Azimuth]);
-        cosph = std::cos(spherical[Spherical3D::SphericalCoordinate::Azimuth]);
+        auto spherical = Spherical3D(*this);
+        auto sinth = std::sin(spherical.GetZenith());
+        auto costh = std::cos(spherical.GetZenith());
+        auto sinph = std::sin(spherical.GetAzimuth());
+        auto cosph = std::cos(spherical.GetAzimuth());
 
         auto rotate_vector_x = Cartesian3D(costh * cosph, costh * sinph, -sinth);
         auto rotate_vector_y = Cartesian3D(-sinph, cosph, 0.);
@@ -143,8 +142,8 @@ std::array<double, 3> Cartesian3D::GetSphericalCoordinates() const {
     if (r == 0)
         return {0., 0., 0.};
 
-    auto azimuth = std::atan2(coordinates[1], coordinates[0]);
-    auto zenith = std::acos(coordinates[2] / r);
+    auto azimuth = std::atan2(GetY(), GetX());
+    auto zenith = std::acos(GetZ() / r);
 
     return {r, azimuth, zenith};
 }

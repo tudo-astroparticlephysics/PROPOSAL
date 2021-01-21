@@ -151,17 +151,17 @@ std::tuple<Cartesian3D, Cartesian3D> PropagationUtility::DirectionsScatter(
         auto sz = std::sqrt(std::max(1. - (sx * sx + sy * sy), 0.));
         auto tz = std::sqrt(std::max(1. - (tx * tx + ty * ty), 0.));
 
-        auto direction_spherical = direction.GetSphericalCoordinates();
-        auto sinth = std::sin(direction_spherical[Spherical3D::SphericalCoordinate::Zenith]);
-        auto costh = std::cos(direction_spherical[Spherical3D::SphericalCoordinate::Zenith]);
-        auto sinph = std::sin(direction_spherical[Spherical3D::SphericalCoordinate::Azimuth]);
-        auto cosph = std::cos(direction_spherical[Spherical3D::SphericalCoordinate::Azimuth]);
+        auto direction_spherical = Spherical3D(direction);
+        auto sinth = std::sin(direction_spherical.GetZenith());
+        auto costh = std::cos(direction_spherical.GetZenith());
+        auto sinph = std::sin(direction_spherical.GetAzimuth());
+        auto cosph = std::cos(direction_spherical.GetAzimuth());
 
         auto rotate_vector_x = Cartesian3D(costh * cosph, costh * sinph, -sinth);
         auto rotate_vector_y = Cartesian3D(-sinph, cosph, 0.);
 
         // Rotation towards all tree axes
-        auto direction_cartesian = Cartesian3D(direction.GetCartesianCoordinates());
+        auto direction_cartesian = Cartesian3D(direction);
         auto mean_direction = sz * direction_cartesian;
         mean_direction += sx * rotate_vector_x;
         mean_direction += sy * rotate_vector_y;

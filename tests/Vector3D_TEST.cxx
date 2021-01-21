@@ -269,9 +269,9 @@ TEST(CalculateCartesianFromSpherical, Conversion)
     Cartesian3D C(B);
     double epsilon = std::numeric_limits<double>::epsilon();
     double error_factor = 2.;
-    bool test_x = std::abs(A[0] - C[0]) < std::abs(std::min(A[0], C[0])) * epsilon * error_factor;
-    bool test_y = std::abs(A[1] - C[1]) < std::abs(std::min(A[1], C[1])) * epsilon * error_factor;
-    bool test_z = std::abs(A[2] - C[2]) < std::abs(std::min(A[2], C[2])) * epsilon * error_factor;
+    bool test_x = std::abs(A.GetX() - C.GetX()) < std::abs(std::min(A.GetX(), C.GetX())) * epsilon * error_factor;
+    bool test_y = std::abs(A.GetY() - C.GetY()) < std::abs(std::min(A.GetY(), C.GetY())) * epsilon * error_factor;
+    bool test_z = std::abs(A.GetZ() - C.GetZ()) < std::abs(std::min(A.GetZ(), C.GetZ())) * epsilon * error_factor;
     EXPECT_TRUE(A == C || test_x && test_y && test_z);
 }
 

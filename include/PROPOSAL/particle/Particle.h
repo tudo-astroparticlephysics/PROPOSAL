@@ -32,7 +32,6 @@
 #include <memory>
 #include <string>
 
-#include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/math/Cartesian3D.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 

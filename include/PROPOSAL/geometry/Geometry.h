@@ -98,7 +98,7 @@ public:
 
     ParticleLocation::Enum GetLocation(const Vector3D& position, const Vector3D& direction) const;
 
-    Cartesian3D GetPosition() const { return position_; }
+    auto GetPosition() const { return position_; }
 
     std::string GetName() const { return name_; }
 

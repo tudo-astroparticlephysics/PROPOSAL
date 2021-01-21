@@ -45,7 +45,7 @@ std::vector<ParticleState> TwoBodyPhaseSpace::Decay(const ParticleDef& p_def, co
     products.emplace_back((ParticleType)second_daughter_.particle_type, p_condition.position, p_condition.direction, p_condition.energy, p_condition.time, 0);
 
     double momentum    = Momentum(p_def.mass, first_daughter_.mass, second_daughter_.mass);
-    Cartesian3D direction = GenerateRandomDirection();
+    auto direction = GenerateRandomDirection();
 
     products[0].direction = direction;
     products[0].SetMomentum(momentum);

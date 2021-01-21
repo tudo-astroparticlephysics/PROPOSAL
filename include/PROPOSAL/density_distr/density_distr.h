@@ -51,7 +51,7 @@ class Axis {
     virtual double GetEffectiveDistance(const Vector3D& xi,
                                         const Vector3D& direction) const = 0;
 
-    Cartesian3D GetFp0() const { return fp0_; };
+    auto GetFp0() const { return fp0_; };
 
    protected:
     Cartesian3D fp0_;
@@ -86,7 +86,7 @@ class CartesianAxis : public Axis {
     bool operator==(const CartesianAxis& axis) const;
     bool operator!=(const CartesianAxis& axis) const;
 
-    Cartesian3D GetAxis() const { return fAxis_; };
+    auto GetAxis() const { return fAxis_; };
     double GetDepth(const Vector3D& xi) const override;
     double GetEffectiveDistance(const Vector3D& xi, const Vector3D& direction) const override;
 

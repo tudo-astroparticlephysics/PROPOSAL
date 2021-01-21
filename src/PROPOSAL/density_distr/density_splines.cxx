@@ -68,13 +68,8 @@ double Density_splines::Correct(const Vector3D& xi,
                                 const Vector3D& direction,
                                 double res,
                                 double distance_to_border) const {
-    std::function<double(double)> F =
-        std::bind(&Density_splines::Helper_function, this, std::ref(xi),
-                  std::ref(direction), res, std::placeholders::_1);
-
-    std::function<double(double)> dF =
-        std::bind(&Density_splines::helper_function, this, std::ref(xi),
-                  std::ref(direction), res, std::placeholders::_1);
+    auto F = [&](double l) {return Helper_function(xi, direction, res, l);};
+    auto dF = [&](double l) {return helper_function(xi, direction, res, l);};
 
     try {
         res =

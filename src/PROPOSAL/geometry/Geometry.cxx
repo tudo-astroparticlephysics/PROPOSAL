@@ -5,7 +5,6 @@
  *      Author: koehne
  */
 
-#include <string>
 #include <sstream>
 #include "PROPOSAL/geometry/Geometry.h"
 
