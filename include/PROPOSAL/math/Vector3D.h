@@ -28,7 +28,7 @@
 
 #pragma once
 #include <array>
-
+#include <ostream>
 namespace PROPOSAL {
 class Cartesian3D;
 class Spherical3D;
