@@ -113,9 +113,11 @@ private:
 };
 
 struct Loss {
-    Loss(int type, double loss_energy) : type(type), loss_energy(loss_energy){};
+    Loss(int type, double energy, double parent_particle_energy)
+        : type(type), energy(energy), parent_particle_energy(parent_particle_energy) {};
     int type;
-    double loss_energy;
+    double energy;
+    double parent_particle_energy;
 };
 
 struct StochasticLoss : public Loss {
@@ -124,15 +126,16 @@ struct StochasticLoss : public Loss {
     Cartesian3D direction;
     double time;
     double propagated_distance;
-    double parent_particle_energy;
 };
 
 struct ContinuousLoss : public Loss {
-    ContinuousLoss(std::pair<double, double>, std::pair<const Vector3D&, const Vector3D&>,
-            std::pair<const Vector3D&, const Vector3D&>, std::pair<double, double>);
-    std::pair<double, double> energies;
-    std::pair<Cartesian3D, Cartesian3D> positions;
-    std::pair<Cartesian3D, Cartesian3D> directions;
-    std::pair<double, double> times;
+    ContinuousLoss(double, double, const Vector3D&, double, const Vector3D&,
+            const Vector3D&, double, double);
+    Cartesian3D start_position;
+    double length;
+    Cartesian3D direction_initial;
+    Cartesian3D direction_final;
+    double time_initial;
+    double time_final;
 };
 } // namespace PROPOSAL

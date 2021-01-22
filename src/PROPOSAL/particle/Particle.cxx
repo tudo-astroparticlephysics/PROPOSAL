@@ -131,18 +131,21 @@ double ParticleState::GetMomentum() const
 StochasticLoss::StochasticLoss(int type, double loss_energy, const Vector3D& position,
                                const Vector3D& direction, double time,
                                double propagated_distance,
-                               double parent_particle_energy) : Loss(type, loss_energy),
+                               double parent_particle_energy)
+                               : Loss(type, loss_energy, parent_particle_energy),
                                position(position), direction(direction), time(time),
-                               propagated_distance(propagated_distance),
-                               parent_particle_energy(parent_particle_energy) {}
+                               propagated_distance(propagated_distance) {}
 
-ContinuousLoss::ContinuousLoss(std::pair<double, double> energies,
-                               std::pair<const Vector3D&, const Vector3D&> positions,
-                               std::pair<const Vector3D&, const Vector3D&> directions,
-                               std::pair<double, double> times)
+ContinuousLoss::ContinuousLoss(double energy, double parent_particle_energy,
+                               const Vector3D& start_position, double length,
+                               const Vector3D& direction_initial,
+                               const Vector3D& direction_final,
+                               double time_initial, double time_final)
                                : Loss((int)InteractionType::ContinuousEnergyLoss,
-                                      std::abs(energies.second - energies.first)),
-                                      energies(energies),
-                                      positions(positions),
-                                      directions(directions),
-                                      times(times) {}
+                                      energy, parent_particle_energy),
+                                      start_position(start_position),
+                                      length(length),
+                                      direction_initial(direction_initial),
+                                      direction_final(direction_final),
+                                      time_initial(time_initial),
+                                      time_final(time_final) {}

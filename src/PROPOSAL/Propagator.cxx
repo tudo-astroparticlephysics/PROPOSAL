@@ -250,11 +250,14 @@ Sector Propagator::GetCurrentSector(
             potential_sec.push_back(&sector);
     }
 
-    if (potential_sec.empty())
+    if (potential_sec.empty()) {
+        auto spherical_position = Cartesian3D(position);
         Logging::Get("proposal.propagator")->critical("No sector defined at particle position {}, {}, {}.",
-                                                      position.GetSphericalCoordinates().at(0),
-                                                      position.GetSphericalCoordinates().at(1),
-                                                      position.GetSphericalCoordinates().at(2));
+                                                      spherical_position.GetX(),
+                                                      spherical_position.GetY(),
+                                                      spherical_position.GetZ());
+    }
+
 
     auto highest_sector_iter = std::max_element(
         potential_sec.begin(), potential_sec.end(), [](Sector* a, Sector* b) {

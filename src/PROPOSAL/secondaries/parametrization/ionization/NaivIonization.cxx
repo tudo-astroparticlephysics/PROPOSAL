@@ -28,9 +28,9 @@ std::tuple<double, double> secondaries::NaivIonization::CalculateEnergy(
 std::vector<ParticleState> secondaries::NaivIonization::CalculateSecondaries(
     StochasticLoss loss, const Component&, std::vector<double> &rnd)
 {
-    auto v = loss.loss_energy / loss.parent_particle_energy;
+    auto v = loss.energy / loss.parent_particle_energy;
     auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, v);
-    auto secondary_dir = CalculateDirections( loss.direction, loss.loss_energy,
+    auto secondary_dir = CalculateDirections( loss.direction, loss.energy,
                                               v, rnd[1]);
 
     auto sec = std::vector<ParticleState>();

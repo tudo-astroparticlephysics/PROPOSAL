@@ -38,10 +38,10 @@ std::tuple<double, double> secondaries::NaivCompton::CalculateEnergy(
 std::vector<ParticleState> secondaries::NaivCompton::CalculateSecondaries(
         StochasticLoss loss, const Component&, std::vector<double> &rnd)
 {
-    auto v = loss.loss_energy /  loss.parent_particle_energy;
+    auto v = loss.energy /  loss.parent_particle_energy;
     auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, v);
-    auto secondary_dir = CalculateDirections(loss.direction, loss.loss_energy,
-                                             v, rnd[1]);
+    auto secondary_dir = CalculateDirections(loss.direction, loss.energy, v,
+                                             rnd[1]);
 
     auto sec = std::vector<ParticleState>();
     sec.emplace_back(ParticleType::Gamma, loss.position,
