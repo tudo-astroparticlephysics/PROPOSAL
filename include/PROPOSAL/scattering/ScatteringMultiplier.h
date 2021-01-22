@@ -14,9 +14,7 @@ class ScatteringMultiplier : public Scattering {
         for (auto m : stochastic_deflect) {
             if (m.first == t) {
                 angles.zenith *= m.second;
-                if (angles.zenith >= PI) {
-                    angles.zenith = 2 * PI - angles.zenith;
-                };
+                assert(angles.zenith <= PI);
                 return angles;
             }
         }
