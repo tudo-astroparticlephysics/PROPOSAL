@@ -18,9 +18,8 @@ namespace detail {
                 return param.FunctionToDEdxIntegral(p_def, comp, E, v);
             };
             return i.Integrate(
-                       std::get<crosssection::Parametrization::V_MIN>(lim),
-                       v_cut, dEdx, 2)
-                * E;
+                std::get<crosssection::Parametrization::V_MIN>(lim), v_cut,
+                dEdx, 2);
         };
     }
 
@@ -32,14 +31,13 @@ namespace detail {
             auto physical_lim = param.GetKinematicLimits(p_def, medium, E);
             auto v_cut = cut.GetCut(physical_lim, E);
             auto dEdx = [&param, &p_def, &medium, E](double v) {
-                return E * param.FunctionToDEdxIntegral(p_def, medium, E, v);
+                return param.FunctionToDEdxIntegral(p_def, medium, E, v);
             };
             return i.Integrate(
                 std::get<crosssection::Parametrization::V_MIN>(physical_lim),
                 v_cut, dEdx, 4);
         };
     }
-
 
 }
 
@@ -55,7 +53,7 @@ public:
     {
     }
 
-    double Calculate(double E) final { return dedx_integral(integral, E); }
+    double Calculate(double E) final { return dedx_integral(integral, E) * E; }
 };
 
 } // namespace PROPOSAL

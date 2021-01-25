@@ -17,6 +17,7 @@ crosssection::Ionization::Ionization(const EnergyCutSettings& cuts)
     : Parametrization(InteractionType::Ioniz, "ionization")
     , cuts_(cuts)
 {
+    hash_combine(hash, cuts_.GetHash());
 }
 
 double crosssection::Ionization::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept
@@ -78,6 +79,7 @@ tuple<double, double> crosssection::IonizBetheBlochRossi::GetKinematicLimits(
 crosssection::IonizBetheBlochRossi::IonizBetheBlochRossi(const EnergyCutSettings& cuts)
     : crosssection::Ionization(cuts)
 {
+    hash_combine(hash, std::string("bethe_bloch_rossi"));
 }
 
 // ------------------------------------------------------------------------- //
@@ -243,6 +245,7 @@ crosssection::IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(
     const EnergyCutSettings& cuts)
     : crosssection::Ionization(cuts)
 {
+    hash_combine(hash, std::string("berger_seltzer_bhabha"));
 }
 
 tuple<double, double> crosssection::IonizBergerSeltzerBhabha::GetKinematicLimits(
@@ -364,6 +367,7 @@ crosssection::IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(
     const EnergyCutSettings& cuts)
     : crosssection::Ionization(cuts)
 {
+    hash_combine(hash, std::string("berger_seltzer_moller"));
 }
 
 tuple<double, double> crosssection::IonizBergerSeltzerMoller::GetKinematicLimits(

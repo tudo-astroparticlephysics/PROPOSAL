@@ -17,22 +17,25 @@ auto build_dndx_def(T1 const& param, T2 const& p_def, Args... args)
 {
     auto dndx
         = std::make_shared<CrossSectionDNDXIntegral>(param, p_def, args...);
-    auto def = cubic_splines::BicubicSplines::Definition();
-    def.axis[0] = std::make_unique<cubic_splines::ExpAxis>(
-        param.GetLowerEnergyLim(p_def), 1e14, (size_t)100);
-    def.axis[1] = std::make_unique<cubic_splines::LinAxis>(0, 1, (size_t)100);
+    auto def = cubic_splines::BicubicSplines<double>::Definition();
+    def.axis[0] = std::make_unique<cubic_splines::ExpAxis<double>>(
+        param.GetLowerEnergyLim(p_def), 1.e14, (size_t)100);
+    def.axis[1]
+        = std::make_unique<cubic_splines::LinAxis<double>>(0., 1., (size_t)100);
     def.f = [dndx](double energy, double v) {
         auto lim = dndx->GetIntegrationLimits(energy);
         v = transform_relativ_loss(
             lim[CrossSectionDNDX::MIN], lim[CrossSectionDNDX::MAX], v);
         return dndx->Calculate(energy, v);
     };
+    def.approx_derivates = true;
     return def;
 }
 
 class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
 
-    cubic_splines::Interpolant<cubic_splines::BicubicSplines> interpolant;
+    cubic_splines::Interpolant<cubic_splines::BicubicSplines<double>>
+        interpolant;
 
     std::string gen_name()
     {

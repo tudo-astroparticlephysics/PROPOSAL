@@ -22,6 +22,7 @@ const std::string crosssection::SoftComponent::name_ = "SoftComponent";
 crosssection::HardComponent::HardComponent(const ParticleDef& particle_def)
     : interpolant_()
 {
+    hash_combine(hash, std::string("hard_component"));
     const auto& y = particle_def.hard_component_table;
 
     if (!y.empty()) {
@@ -65,4 +66,3 @@ double crosssection::SoftComponent::CalculateHardComponent(double energy, double
 
     return 0;
 }
-

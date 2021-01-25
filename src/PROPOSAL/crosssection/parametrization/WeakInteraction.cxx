@@ -35,8 +35,8 @@ std::tuple<double, double> crosssection::WeakInteraction::GetKinematicLimits(
 }
 
 crosssection::WeakCooperSarkarMertsch::WeakCooperSarkarMertsch()
-    : crosssection::WeakInteraction()
 {
+    hash_combine(hash, std::string("cooper_sarkar_mertsch"));
     auto interpolant_particle_p = std::make_shared<Interpolant>(
             energies, y_nubar_p, sigma_nubar_p, IROMB, false, false, IROMB, false, false);
     auto interpolant_particle_n = std::make_shared<Interpolant>(

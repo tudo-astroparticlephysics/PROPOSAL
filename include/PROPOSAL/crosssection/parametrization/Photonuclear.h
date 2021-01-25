@@ -37,20 +37,23 @@ namespace PROPOSAL {
 class Interpolant;
 namespace crosssection {
 class RealPhoton {
+protected:
+    size_t hash;
 public:
-    RealPhoton() = default;
+    RealPhoton() : hash(0) { hash_combine(hash, std::string("real_photon"));}
     virtual ~RealPhoton() {}
 
     virtual double CalculateHardComponent(double energy, double v) = 0;
 
     virtual const std::string& GetName() const = 0;
+    auto GetHash() const noexcept {return hash;}
 };
 
 class SoftComponent : public RealPhoton {
     static const std::string name_;
 
 public:
-    SoftComponent() = default;
+    SoftComponent() { hash_combine(hash, name_);}
     virtual ~SoftComponent() = default;
 
     virtual double CalculateHardComponent(double energy, double v);

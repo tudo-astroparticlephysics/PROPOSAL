@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDXIntegral.h"
 
 #include <type_traits>
@@ -13,21 +14,70 @@ namespace PROPOSAL {
 double transform_relativ_loss(double v_cut, double v_max, double v);
 double retransform_relativ_loss(double v_cut, double v_max, double v);
 
-template <typename T1, typename T2, typename... Args>
-auto build_dedx_def(T1 const& param, T2 const& p_def, Args... args)
+class AxisBuilder_dEdx {
+    using axis_t = cubic_splines::ExpAxis<double>;
+    double low, up;
+    size_t n;
+
+public:
+    template <typename... Args>
+    AxisBuilder_dEdx(crosssection::Parametrization const& _param,
+        ParticleDef const& _p, Args...)
+        : low(_param.GetLowerEnergyLim(_p))
+        , up(UPPER_ENERGY_LIM_DEFAULT)
+        , n(NODES_DEDX_DEFAULT)
+    {
+        if (UPPER_ENERGY_LIM)
+            up = *UPPER_ENERGY_LIM;
+        if (NODES_DEDX)
+            n = *NODES_DEDX;
+    }
+
+    template <typename T1> auto refine_definition_range(T1 func)
+    {
+        auto i = 0u;
+        auto ax = axis_t(low, up, n);
+        while (not(func(ax.back_transform(i)) > 0))
+            ++i;
+        low = ax.back_transform(i);
+    }
+
+    auto Create() const { return std::make_unique<axis_t>(low, up, n); }
+};
+
+/* template <typename T1, typename T2, typename... Args> */
+/* auto build_dedx_def(T1 const& param, T2 const& p_def, Args... args) */
+/* { */
+/*     auto dedx */
+/*         = std::make_shared<CrossSectionDEDXIntegral>(param, p_def, args...);
+ */
+/*     auto def = cubic_splines::CubicSplines<double>::Definition(); */
+/*     def.f_trafo = std::make_unique<cubic_splines::ExpAxis<double>>(1., 0.);
+ */
+/*     def.f = [dedx](double E) { return dedx->Calculate(E); }; */
+/*     auto axis_builder = AxisBuilder_dEdx(param, p_def); */
+/*     axis_builder.refine_definition_range(def.f); */
+/*     def.axis = axis_builder.Get(); */
+/*     return def; */
+/* } */
+
+template <typename T1, typename... Args>
+auto build_dedx_def(T1 const& param, Args... args)
 {
-    auto dedx
-        = std::make_shared<CrossSectionDEDXIntegral>(param, p_def, args...);
-    auto def = cubic_splines::CubicSplines::Definition();
-    def.axis = std::make_unique<cubic_splines::ExpAxis>(
-        param.GetLowerEnergyLim(p_def), 1e14, (size_t)100);
+    auto dedx = std::make_shared<CrossSectionDEDXIntegral>(param, args...);
+    auto ax = AxisBuilder_dEdx(param, args...);
+    ax.refine_definition_range([dedx](double E) { return dedx->Calculate(E); });
+
+    auto def = cubic_splines::CubicSplines<double>::Definition();
+    def.f_trafo = std::make_unique<cubic_splines::ExpAxis<double>>(1., 0.);
     def.f = [dedx](double E) { return dedx->Calculate(E); };
+    def.axis = ax.Create();
     return def;
 }
 
 class CrossSectionDEDXInterpolant : public CrossSectionDEDX {
 
-    cubic_splines::Interpolant<cubic_splines::CubicSplines> interpolant;
+    cubic_splines::Interpolant<cubic_splines::CubicSplines<double>> interpolant;
 
     std::string gen_name()
     {
@@ -43,6 +93,6 @@ public:
     {
     }
 
-    double Calculate(double E) final;
+    double Calculate(double E) final { return interpolant.evaluate(E); }
 };
 } // namespace PROPOSAL

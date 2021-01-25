@@ -6,6 +6,6 @@ template <> void DisplacementBuilder<UtilityIntegral>::build_tables() { }
 
 template <> void DisplacementBuilder<UtilityInterpolant>::build_tables()
 {
-    auto def = cubic_splines::CubicSplines::Definition();
+    auto def = cubic_splines::CubicSplines<double>::Definition();
     disp_integral.BuildTables("disp", std::move(def), false);
 }

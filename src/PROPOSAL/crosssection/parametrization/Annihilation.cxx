@@ -12,11 +12,6 @@
 using std::make_tuple;
 using namespace PROPOSAL;
 
-crosssection::Annihilation::Annihilation()
-    : Parametrization(InteractionType::Annihilation, "annihililation")
-{
-}
-
 double crosssection::Annihilation::GetLowerEnergyLim(
     const ParticleDef& p_def) const noexcept
 {

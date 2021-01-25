@@ -13,6 +13,8 @@
 
 using namespace PROPOSAL;
 
+constexpr static double interpolation_precision = 1.e-3;
+
 ParticleDef getParticleDef(const std::string& name)
 {
     if (name == "MuMinus")
@@ -196,7 +198,7 @@ TEST(Bremsstrahlung, Test_of_dEdx)
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+        ASSERT_NEAR(dEdx_new, dEdx_stored, interpolation_precision * dEdx_stored);
     }
 }
 
@@ -242,7 +244,7 @@ TEST(Bremsstrahlung, Test_of_dNdx)
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+        ASSERT_NEAR(dNdx_new, dNdx_stored, interpolation_precision * dNdx_stored);
     }
 }
 
@@ -305,7 +307,7 @@ TEST(Bremsstrahlung, Test_of_e)
                     #endif
                 } else {
                     stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, interpolation_precision * stochastic_loss_stored);
                     break;
                 }
             }
@@ -315,7 +317,7 @@ TEST(Bremsstrahlung, Test_of_e)
 
 TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Brems_dEdx_interpol.txt";
+    std::string filename = testfile_dir + "Brems_dEdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -355,13 +357,13 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+        ASSERT_NEAR(dEdx_new, dEdx_stored, interpolation_precision * dEdx_stored);
     }
 }
 
 TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Brems_dNdx_interpol.txt";
+    std::string filename = testfile_dir + "Brems_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -402,13 +404,13 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+        ASSERT_NEAR(dNdx_new, dNdx_stored, interpolation_precision * dNdx_stored);
     }
 }
 
 TEST(Bremsstrahlung, Test_of_e_Interpolant)
 {
-    std::string filename = testfile_dir + "Brems_e_interpol.txt";
+    std::string filename = testfile_dir + "Brems_e.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -466,7 +468,7 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
                     #endif
                 } else {
                     stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, interpolation_precision * stochastic_loss_stored);
                     break;
                 }
             }

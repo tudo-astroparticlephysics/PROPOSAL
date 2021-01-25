@@ -28,13 +28,10 @@
 
 #pragma once
 
-#include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include <iostream>
+
 #include <tuple>
-#include <type_traits>
 
 using PROPOSAL::Components::Component;
 
@@ -42,10 +39,10 @@ namespace PROPOSAL {
 class Medium;
 enum class InteractionType;
 namespace crosssection {
-
     struct Parametrization {
         const InteractionType interaction_type;
         const std::string name;
+        size_t hash;
 
         Parametrization(InteractionType, const std::string&);
         virtual ~Parametrization() = default;
@@ -57,33 +54,21 @@ namespace crosssection {
         virtual std::tuple<double, double> GetKinematicLimits(
             const ParticleDef&, const Component&, double) const = 0;
 
-        inline double FunctionToDEdxIntegral(const ParticleDef& p_def,
+        inline double FunctionToDEdxIntegral(ParticleDef const& p_def,
             const Component& comp, double energy, double v) const
         {
             return v * DifferentialCrossSection(p_def, comp, energy, v);
         }
-        inline double FunctionToDE2dxIntegral(const ParticleDef& p_def,
+
+        inline double FunctionToDE2dxIntegral(ParticleDef const& p_def,
             const Component& comp, double energy, double v) const
         {
             return v * v * DifferentialCrossSection(p_def, comp, energy, v);
         }
-        virtual double GetLowerEnergyLim(const ParticleDef&) const noexcept = 0;
-        virtual size_t GetHash() const noexcept;
+
+        virtual double GetLowerEnergyLim(ParticleDef const&) const noexcept = 0;
+
+        inline size_t GetHash() const noexcept { return hash; };
     };
 } // namespace crosssection
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
-
-template <typename Param, typename M>
-double integrate_de2dx(Integral& integral, Param&& param,
-    const ParticleDef& p_def, M& medium, double energy, double v_min,
-    double v_max)
-{
-    auto dE2dx = [&param, &p_def, &medium, energy](double v) {
-        return param.FunctionToDE2dxIntegral(p_def, medium, energy, v);
-    };
-    return integral.Integrate(v_min, v_max, dE2dx, 2);
-}
-
 } // namespace PROPOSAL

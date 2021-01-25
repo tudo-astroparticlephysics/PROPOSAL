@@ -18,8 +18,8 @@ auto build_de2dx_def(T1 const& param, T2 const& p_def, Args... args)
 {
     auto de2dx
         = std::make_shared<CrossSectionDE2DXIntegral>(param, p_def, args...);
-    auto def = cubic_splines::CubicSplines::Definition();
-    def.axis = std::make_unique<cubic_splines::ExpAxis>(
+    auto def = cubic_splines::CubicSplines<double>::Definition();
+    def.axis = std::make_unique<cubic_splines::ExpAxis<double>>(
         param.GetLowerEnergyLim(p_def), 1e14, (size_t)100);
     def.f = [de2dx](double E) { return de2dx->Calculate(E); };
     return def;
@@ -27,7 +27,7 @@ auto build_de2dx_def(T1 const& param, T2 const& p_def, Args... args)
 
 class CrossSectionDE2DXInterpolant : public CrossSectionDE2DX {
 
-    cubic_splines::Interpolant<cubic_splines::CubicSplines> interpolant;
+    cubic_splines::Interpolant<cubic_splines::CubicSplines<double>> interpolant;
 
     std::string gen_name()
     {

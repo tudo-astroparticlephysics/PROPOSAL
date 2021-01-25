@@ -69,7 +69,6 @@ namespace crosssection {
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
         std::tuple<double, double> GetKinematicLimits(const ParticleDef&,
             const Component&, double energy) const noexcept override;
-        size_t GetHash() const noexcept override;
     };
 
     class EpairProductionRhoIntegral : public EpairProduction {
@@ -101,19 +100,19 @@ namespace crosssection {
 #undef EPAIR_PARAM_INTEGRAL_DEC
 
     class EpairLPM {
-    public:
-        EpairLPM(
-            const ParticleDef&, const Medium&, double density_correction = 1.0);
-        double suppression_factor(
-            double E, double v, double r2, double beta, double xi) const;
-        size_t GetHash() const noexcept;
-
-    private:
         double mass_;
         double charge_;
         double mol_density_;
         double density_correction_;
         double eLpm_;
+        size_t hash;
+    public:
+        EpairLPM(
+            const ParticleDef&, const Medium&, double density_correction = 1.0);
+        double suppression_factor(
+            double E, double v, double r2, double beta, double xi) const;
+        size_t GetHash() const noexcept { return hash;}
+
     };
 
     // Factory pattern functions

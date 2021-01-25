@@ -1,24 +1,24 @@
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/CrossSectionInterpolantBase.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 
-#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/crosssection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crosssection/parametrization/Compton.h"
 #include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
-#include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
+#include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 #include "pyBindings.h"
 #include <type_traits>
@@ -28,23 +28,28 @@ using namespace PROPOSAL;
 
 template <typename T> void build_crosssection(py::module& m_sub)
 {
-    m_sub.def("make_crosssection",
-            [](T& param, ParticleDef& p, Medium& m,
-                std::shared_ptr<const EnergyCutSettings> c, bool i) {
+    m_sub.def(
+        "make_crosssection",
+        [](T& param, ParticleDef& p, Medium& m,
+            std::shared_ptr<const EnergyCutSettings> c, bool i) {
             return std::shared_ptr<CrossSection<ParticleDef, Medium>>(
-                    make_crosssection(param, p, m, c, i));
-            },
-            py::arg("parametrization"), py::arg("particle_def"), py::arg("target"),
-            py::arg("cuts"), py::arg("interpolate"));
+                make_crosssection(param, p, m, c, i));
+        },
+        py::arg("parametrization"), py::arg("particle_def"), py::arg("target"),
+        py::arg("cuts"), py::arg("interpolate"));
 }
 
 template <typename T> void build_std_crosssection(py::module& m_sub)
 {
-    m_sub.def("make_std_crosssection",
-            [](T& p, Medium& m, std::shared_ptr<const EnergyCutSettings> c, bool i) {
-            return DefaultCrossSections<T>::Get(reinterpret_cast<ParticleDef const&>(p), m, c, i);
-            },
-            py::arg("particle_def"), py::arg("target"), py::arg("cuts"), py::arg("interpolate"));
+    m_sub.def(
+        "make_std_crosssection",
+        [](T& p, Medium& m, std::shared_ptr<const EnergyCutSettings> c,
+            bool i) {
+            return DefaultCrossSections<T>::Get(
+                reinterpret_cast<ParticleDef const&>(p), m, c, i);
+        },
+        py::arg("particle_def"), py::arg("target"), py::arg("cuts"),
+        py::arg("interpolate"));
 }
 
 void init_crosssection(py::module& m)
@@ -53,19 +58,102 @@ void init_crosssection(py::module& m)
     py::module m_sub = m.def_submodule("crosssection");
 
     py::class_<CrossSectionBase, std::shared_ptr<CrossSectionBase>>(
-            m_sub, "CrossSectionBase")
-        .def_property_readonly("lower_energy_lim", &CrossSectionContainer::GetLowerEnergyLim)
-        .def_property_readonly("type", &CrossSectionContainer::GetInteractionType);
-
-    py::class_<CrossSectionInterpolantBase, std::shared_ptr<CrossSectionInterpolantBase>>(
-            m_sub, "CrossSectionInterpolantBase")
-        .def_readwrite_static("dNdx_def", &CrossSectionInterpolantBase::dNdx_def)
-        .def_readwrite_static("dEdx_def", &CrossSectionInterpolantBase::dEdx_def)
-        .def_readwrite_static("dE2dx_def", &CrossSectionInterpolantBase::dE2dx_def);
-
-    py::class_<CrossSectionContainer, CrossSectionBase, std::shared_ptr<CrossSectionContainer>>(
-            m_sub, "CrossSection",
+        m_sub, "CrossSectionBase")
+        .def_property_readonly(
+            "lower_energy_limit", &CrossSectionBase::GetLowerEnergyLim)
+        .def_property_readonly("type", &CrossSectionBase::GetInteractionType)
+        .def_property_readonly("hash", &CrossSectionBase::GetHash)
+        .def_property_readonly("targets", &CrossSectionBase::GetTargets)
+        .def("calculate_dEdx",
+            py::vectorize(&CrossSectionContainer::CalculatedEdx),
+            py::arg("energy"),
             R"pbdoc(
+
+            Calculates the continous energy loss :math:`\langle \frac{dE}{dx} \rangle`,
+            which equals to
+
+                .. math:: \frac{N_A}{A} \cdot E \cdot \int_{v_{min}}^{v_{cut}} v \cdot \frac{d\sigma}{dv} dv
+
+            with the particle energy E, the relative energy loss v and the
+            crosssection :math:`\sigma`. The value :math:`v_{cut}` is the
+            energy cut to differentiate between continous and stochastic losses
+            in PROPOSAL, see :meth:`~proposal.EnergyCutSettings` for more
+            information on the energy cuts.
+
+            Args:
+                energy (float): energy in MeV
+
+                )pbdoc")
+        .def("calculate_dE2dx",
+            py::vectorize(&CrossSectionContainer::CalculatedE2dx),
+            py::arg("energy"),
+            R"pbdoc(
+
+        Calculates the value
+
+            .. math:: \frac{N_A}{A} \cdot E^2 \cdot \int_{v_{min}}^{v_{cut}} v^2 \cdot \frac{d\sigma}{dv} dv
+
+        with the particle energy E, the relative energy loss v and the
+        crosssection :math:`\sigma`. The value :math:`v_{cut}` is the
+        energy cut to differentiate between continous and stochastic losses
+        in PROPOSAL, see :meth:`~proposal.EnergyCutSettings` for more
+        information on the energy cuts.
+
+        The value is important for the calculation of the
+        ContinuousRandomization (see :meth:`~proposal.ContinuousRandomizer`)
+
+        Args:
+            energy (float): energy in MeV
+
+            )pbdoc")
+        .def("calculate_dNdx", py::vectorize(&CrossSectionContainer::CalculatedNdx),
+            py::arg("energy"), py::arg("component") = nullptr,
+            R"pbdoc(
+
+        Calculates the total cross section
+
+            .. math:: \frac{N_A}{A} \cdot \int_{v_{cut}}^{v_{max}} \frac{d\sigma}{dv} dv
+
+        with the particle energy E, the relative energy loss v and the
+        crosssection :math:`\sigma`. The value v_{cut} is the energy cut to
+        differentiate between continous and stochastic losses in PROPOSAL,
+        see :meth:`~proposal.EnergyCutSettings` for more information on the
+        energy cuts.
+
+        Note that this integral only includes the v values about our cut,
+        therefore this values represents only the total crosssection for the
+        stochastic energy losses.
+
+        Args:
+            energy (float): energy in MeV
+
+            )pbdoc")
+        .def("calculate_stochastic_loss",
+            &CrossSectionContainer::CalculateStochasticLoss,
+            py::arg("component"), py::arg("energy"), py::arg("rate"),
+            R"pbdoc(
+
+        Samples a stochastic energy loss for a particle of the energy E.
+
+        Args:
+            energy (float): energy in MeV
+            rnd1 (float): random number between 0 and 1, samples the energy
+                loss fraction
+            rnd2 (float): random number between 0 and 1, sampled the
+                component where the energy loss in occuring
+
+        Returns:
+            sampled energy loss for the current particle in MeV
+
+        With inverse transform sampling, using rnd1, the fraction of the
+        energy loss v is determined from the differential crosssection.  By
+        comparing the total cross sections for every medium, rnd2 is used
+        to determine the component of the current medium for which the
+        stochatic energy loss is calculated.)pbdoc");
+
+    py::class_<CrossSectionContainer, CrossSectionBase,
+        std::shared_ptr<CrossSectionContainer>>(m_sub, "CrossSection",
+        R"pbdoc(
 
             Virtual class for crosssections. The crosssection class provides
             all mathematical methods to process the theoretical, differential
@@ -115,96 +203,8 @@ void init_crosssection(py::module& m)
                 >>> param = proposal.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
                 >>> cross = proposal.crosssection.BremsInterpolant(param, interpol)
                 >>> cross.calculate_dEdx(1e6) # exmaple usage of the created crosssection class...
-                )pbdoc")
-        /* .def("__str__", &py_print<CrossSectionContainer>) */
-        .def("calculate_dEdx", py::vectorize(&CrossSectionContainer::CalculatedEdx),
-                py::arg("energy"),
-                R"pbdoc(
-
-            Calculates the continous energy loss :math:`\langle \frac{dE}{dx} \rangle`,
-            which equals to
-
-                .. math:: \frac{N_A}{A} \cdot E \cdot \int_{v_{min}}^{v_{cut}} v \cdot \frac{d\sigma}{dv} dv
-
-            with the particle energy E, the relative energy loss v and the
-            crosssection :math:`\sigma`. The value :math:`v_{cut}` is the
-            energy cut to differentiate between continous and stochastic losses
-            in PROPOSAL, see :meth:`~proposal.EnergyCutSettings` for more
-            information on the energy cuts.
-
-            Args:
-                energy (float): energy in MeV
-
-                )pbdoc")
-        .def("calculate_dE2dx", py::vectorize(&CrossSectionContainer::CalculatedE2dx),
-                py::arg("energy"),
-                R"pbdoc(
-
-        Calculates the value
-
-            .. math:: \frac{N_A}{A} \cdot E^2 \cdot \int_{v_{min}}^{v_{cut}} v^2 \cdot \frac{d\sigma}{dv} dv
-
-        with the particle energy E, the relative energy loss v and the
-        crosssection :math:`\sigma`. The value :math:`v_{cut}` is the
-        energy cut to differentiate between continous and stochastic losses
-        in PROPOSAL, see :meth:`~proposal.EnergyCutSettings` for more
-        information on the energy cuts.
-
-        The value is important for the calculation of the
-        ContinuousRandomization (see :meth:`~proposal.ContinuousRandomizer`)
-
-        Args:
-            energy (float): energy in MeV
-
-            )pbdoc")
-        .def("calculate_dNdx", &CrossSectionContainer::CalculatedNdx,
-                py::arg("energy"),
-                py::arg("component") = nullptr,
-                R"pbdoc(
-
-        Calculates the total cross section
-
-            .. math:: \frac{N_A}{A} \cdot \int_{v_{cut}}^{v_{max}} \frac{d\sigma}{dv} dv
-
-        with the particle energy E, the relative energy loss v and the
-        crosssection :math:`\sigma`. The value v_{cut} is the energy cut to
-        differentiate between continous and stochastic losses in PROPOSAL,
-        see :meth:`~proposal.EnergyCutSettings` for more information on the
-        energy cuts.
-
-        Note that this integral only includes the v values about our cut,
-        therefore this values represents only the total crosssection for the
-        stochastic energy losses.
-
-        Args:
-            energy (float): energy in MeV
-
-            )pbdoc")
-        .def("calculate_stochastic_loss",
-                &CrossSectionContainer::CalculateStochasticLoss,
-                py::arg("component"), py::arg("energy"), py::arg("rate"),
-                R"pbdoc(
-
-        Samples a stochastic energy loss for a particle of the energy E.
-
-        Args:
-            energy (float): energy in MeV
-            rnd1 (float): random number between 0 and 1, samples the energy
-                loss fraction
-            rnd2 (float): random number between 0 and 1, sampled the
-                component where the energy loss in occuring
-
-        Returns:
-            sampled energy loss for the current particle in MeV
-
-        With inverse transform sampling, using rnd1, the fraction of the
-        energy loss v is determined from the differential crosssection.  By
-        comparing the total cross sections for every medium, rnd2 is used
-        to determine the component of the current medium for which the
-        stochatic energy loss is calculated.
-
-            )pbdoc")
-        .def("targets", &CrossSectionContainer::GetTargets);
+                )pbdoc");
+    /* .def("__str__", &py_print<CrossSectionContainer>) */
 
     build_crosssection<crosssection::AnnihilationHeitler>(m_sub);
 
@@ -247,5 +247,4 @@ void init_crosssection(py::module& m)
     build_std_crosssection<MuPlusDef>(m_sub);
     build_std_crosssection<TauMinusDef>(m_sub);
     build_std_crosssection<TauPlusDef>(m_sub);
-
 }

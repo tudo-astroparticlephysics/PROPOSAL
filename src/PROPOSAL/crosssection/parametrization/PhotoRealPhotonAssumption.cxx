@@ -10,9 +10,10 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 
 #define PHOTO_PARAM_REAL_IMPL(param, parent)                                   \
-    crosssection::Photo##param::Photo##param(bool hard_component)                            \
-        : crosssection::Photo##parent(hard_component)                                        \
+    crosssection::Photo##param::Photo##param(bool hard_component)              \
+        : crosssection::Photo##parent(hard_component)                          \
     {                                                                          \
+        hash_combine(hash, std::string(#param));                                         \
     }
 
 using namespace PROPOSAL;

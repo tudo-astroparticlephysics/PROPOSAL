@@ -40,7 +40,7 @@
         using base_param_t = Bremsstrahlung;                                   \
                                                                                \
         double CalculateParametrization(const ParticleDef&, const Component&,  \
-            double energy, double v) const override;                           \
+            double energy, double v) const final;                           \
     };
 
 namespace PROPOSAL {
@@ -58,7 +58,14 @@ protected:
     std::shared_ptr<BremsLPM> lpm_;
 
 public:
-    Bremsstrahlung();
+    Bremsstrahlung()
+        : Parametrization(InteractionType::Brems, "Brems")
+        , lorenz_(false) // TODO(mario): make it use to enable Mon 2017/09/04
+        , lorenz_cut_(1e6)
+    {
+        hash_combine(hash, lorenz_, lorenz_cut_);
+    }
+
     virtual ~Bremsstrahlung() = default;
 
     using only_stochastic = std::false_type;
@@ -74,7 +81,6 @@ public:
     double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
     std::tuple<double, double> GetKinematicLimits(
         const ParticleDef&, const Component&, double) const noexcept override;
-    size_t GetHash() const noexcept override;
 };
 
 BREMSSTRAHLUNG_DEF(PetrukhinShestakov)
@@ -100,19 +106,18 @@ public:
 
 // LPM effect object
 class BremsLPM {
-public:
-    BremsLPM(const ParticleDef&, const Medium&, const Bremsstrahlung&,
-             double density_correction = 1.0);
-    double suppression_factor(double energy, double v, const Component&) const;
-    size_t GetHash() const noexcept;
-
-private:
+    size_t hash;
     double mass_;
     double mol_density_;
     double mass_density_;
     double sum_charge_;
     double density_correction_;
     double eLpm_;
+public:
+    BremsLPM(const ParticleDef&, const Medium&, const Bremsstrahlung&,
+             double density_correction = 1.0);
+    double suppression_factor(double energy, double v, const Component&) const;
+    size_t GetHash() const noexcept {return hash;}
 };
 
 // Factory pattern functions

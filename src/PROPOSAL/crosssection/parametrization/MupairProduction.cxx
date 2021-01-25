@@ -9,9 +9,10 @@
 #include "PROPOSAL/Constants.h"
 
 #define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                      \
-    crosssection::Mupair##param::Mupair##param()                                             \
-        : crosssection::MupairProductionRhoIntegral()                                        \
+    crosssection::Mupair##param::Mupair##param()                               \
+        : crosssection::MupairProductionRhoIntegral()                          \
     {                                                                          \
+        hash_combine(hash, std::string(#param));                                         \
     }
 
 using namespace PROPOSAL;

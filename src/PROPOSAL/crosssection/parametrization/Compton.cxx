@@ -9,11 +9,6 @@
 
 using namespace PROPOSAL;
 
-crosssection::Compton::Compton()
-    : Parametrization(InteractionType::Compton, "compton")
-{
-}
-
 double crosssection::Compton::GetLowerEnergyLim(
     const ParticleDef&) const noexcept
 {

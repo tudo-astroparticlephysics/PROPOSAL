@@ -55,28 +55,30 @@ target_include_directories(
     PROPOSAL PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
-)
-target_compile_options(PROPOSAL PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-format-security -ftemplate-backtrace-limit=0)
+    )
+target_compile_options(PROPOSAL PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic
+    -fdiagnostics-show-option -Wno-format-security -ftemplate-backtrace-limit=0
+    )
 install(
     TARGETS PROPOSAL spdlog
     EXPORT PROPOSALTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
+    )
 
 # input version from the project call, so the library knows its own version
 configure_file(
     "${PROJECT_SOURCE_DIR}/include/PROPOSAL/version.h.in"
     "${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h"
-)
+    )
 install(
     FILES ${PROJECT_BINARY_DIR}/include/PROPOSAL/version.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/PROPOSAL
-)
+    )
 target_include_directories(
     PROPOSAL PUBLIC
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>
-)
+    )
 
 # install header files
 file(GLOB_RECURSE INC_FILES ${PROJECT_SOURCE_DIR}/include/*)
@@ -132,6 +134,7 @@ IF(ADD_PYTHON)
     target_include_directories(pyproposal PRIVATE ${PROJECT_SOURCE_DIR}/interface/python)
     target_link_libraries(pyproposal PRIVATE PROPOSAL)
     target_link_libraries(pyproposal PRIVATE spdlog)
+    target_link_libraries(PROPOSAL PRIVATE CubicInterpolation::CubicInterpolation)
     target_compile_options(pyproposal PRIVATE -fvisibility=hidden)
     install(TARGETS pyproposal EXPORT PROPOSALTargets DESTINATION ${CMAKE_INSTALL_LIBDIR})
 ELSE(ADD_PYTHON)
@@ -162,7 +165,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/PROPOSALConfig.cmake
 
 export(EXPORT PROPOSALTargets
     FILE "${CMAKE_CURRENT_BINARY_DIR}/PROPOSALTargets.cmake"
-)
+    )
 
 # install(
 #     EXPORT PROPOSALTargets

@@ -7,12 +7,10 @@
 
 namespace PROPOSAL {
 template <typename Param, typename P, typename M>
-std::unique_ptr<crosssection_t<P, M>> make_crosssection(Param&& param,
-    P&& p_def, M&& medium, std::shared_ptr<const EnergyCutSettings> cuts,
-    bool interpolate)
+auto make_crosssection(Param&& param, P&& p_def, M&& medium,
+    std::shared_ptr<const EnergyCutSettings> cuts, bool interpolate)
 {
     auto cross = std::unique_ptr<crosssection_t<P, M>>();
-
     if (interpolate)
         cross = std::make_unique<CrossSectionInterpolant<Param, P, M>>(
             std::forward<Param>(param), std::forward<P>(p_def),

@@ -188,10 +188,7 @@ template <class P, class M> class CrossSection : public CrossSectionBase {
     using dedx_ptr = std::unique_ptr<CrossSectionDEDX>;
     using de2dx_ptr = std::unique_ptr<CrossSectionDE2DX>;
 
-public:
-    /* P p_def; */
-    /* M medium; */
-
+protected:
     size_t hash;
 
     std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>> dndx;
@@ -201,6 +198,7 @@ public:
     double lower_energy_lim;
     InteractionType interaction_type;
 
+public:
     template <typename Param, typename T1, typename T2, typename T3>
     CrossSection(
         Param _param, P _p_def, M _medium, T1&& _dndx, T2&& _dedx, T3&& _de2dx)

@@ -26,8 +26,9 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
+
+#include <memory>
 
 namespace PROPOSAL {
 // numbers
@@ -46,11 +47,20 @@ extern const int IMAXS;     // max number of int. steps
 extern const double IPREC;  // integration precision
 extern const double IPREC2; // integration precision
 
+// interpolation parameters
+static constexpr double UPPER_ENERGY_LIM_DEFAULT = 1.e14;
+static constexpr unsigned int NODES_DEDX_DEFAULT = 100;
+static std::unique_ptr<double> UPPER_ENERGY_LIM;
+static std::unique_ptr<unsigned int> NODES_DEDX;
+static std::unique_ptr<unsigned int> NODES_DE2DX;
+static std::unique_ptr<unsigned int> NODES_DNDX;
+
 // precision parameters
 extern const double COMPUTER_PRECISION;
 extern const double HALF_PRECISION; // std::sqrt(computerPrecision);
 extern const double GEOMETRY_PRECISION;
-extern const double PARTICLE_POSITION_RESOLUTION; // resolution of particle position (cm)
+extern const double
+    PARTICLE_POSITION_RESOLUTION; // resolution of particle position (cm)
 
 // physical constants
 extern const double ALPHA; // fine structure constant

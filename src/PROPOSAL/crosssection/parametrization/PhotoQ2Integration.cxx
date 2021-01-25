@@ -11,10 +11,11 @@ using namespace PROPOSAL;
 using std::get;
 using std::make_tuple;
 
-#define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                    \
-    crosssection::Photo##param::Photo##param(std::shared_ptr<ShadowEffect> shadow_effect)         \
+#define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                                  \
+    crosssection::Photo##param::Photo##param(std::shared_ptr<ShadowEffect> shadow_effect)    \
         : crosssection::PhotoQ2Integral(shadow_effect)                                       \
-    {                                                                          \
+    {                                                                                        \
+        hash_combine(hash, std::string(#param));                                                       \
     }
 
 crosssection::PhotoQ2Integral::PhotoQ2Integral(std::shared_ptr<ShadowEffect> shadow_effect)

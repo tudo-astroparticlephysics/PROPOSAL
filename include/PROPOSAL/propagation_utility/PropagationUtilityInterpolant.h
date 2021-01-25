@@ -48,7 +48,7 @@ struct InterpolationDef;
 
 class UtilityInterpolant : public UtilityIntegral {
     using interpolant_t
-        = cubic_splines::Interpolant<cubic_splines::CubicSplines>;
+        = cubic_splines::Interpolant<cubic_splines::CubicSplines<double>>;
     using interpolant_ptr = std::shared_ptr<interpolant_t>;
 
     double lower_lim;
@@ -75,13 +75,14 @@ public:
             return UtilityIntegral::Calculate(energy, reference_x);
         };
 
-        def.axis = std::make_unique<cubic_splines::ExpAxis>(
+        def.axis = std::make_unique<cubic_splines::ExpAxis<double>>(
             lower_lim, 1e14, (size_t)100);
 
         auto filename = std::string("disp") + std::to_string(this->hash)
             + std::string(".txt");
 
-        interpolant_ = std::make_shared<interpolant_t>(std::move(def), "tmp", filename);
+        interpolant_
+            = std::make_shared<interpolant_t>(std::move(def), "tmp", filename);
     }
 
     double Calculate(double, double);

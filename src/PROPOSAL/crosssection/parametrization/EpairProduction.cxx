@@ -15,11 +15,13 @@
     crosssection::Epair##param::Epair##param(bool lpm)                         \
         : EpairProductionRhoIntegral(lpm)                                      \
     {                                                                          \
+        hash_combine(hash, std::string(#param));                                         \
     }                                                                          \
     crosssection::Epair##param::Epair##param(bool lpm, const ParticleDef& p,   \
         const Medium& medium, double density_distribution)                     \
         : EpairProductionRhoIntegral(lpm, p, medium, density_distribution)     \
     {                                                                          \
+        hash_combine(hash, std::string(#param));                                         \
     }
 
 using namespace PROPOSAL;
@@ -32,7 +34,6 @@ crosssection::EpairProduction::EpairProduction(bool lpm)
     if (lpm)
         throw std::invalid_argument("Missing particle_def and medium for Epair "
                                     "constructor with lpm=true");
-    lpm_ = nullptr;
 }
 
 crosssection::EpairProduction::EpairProduction(bool lpm, const ParticleDef& p,
@@ -41,9 +42,9 @@ crosssection::EpairProduction::EpairProduction(bool lpm, const ParticleDef& p,
 {
     if (lpm) {
         lpm_ = std::make_shared<EpairLPM>(p, medium, density_correction);
-    } else {
-        lpm_ = nullptr;
+        hash_combine(hash, lpm_->GetHash());
     }
+    hash_combine(hash, p.GetHash(), medium.GetHash(), density_correction);
 }
 
 double crosssection::EpairProduction::GetLowerEnergyLim(
@@ -66,14 +67,6 @@ std::tuple<double, double> crosssection::EpairProduction::GetKinematicLimits(
     return make_tuple(v_min, v_max);
 }
 
-size_t crosssection::EpairProduction::GetHash() const noexcept
-{
-    size_t seed = Parametrization::GetHash();
-    if (lpm_ != nullptr)
-        hash_combine(seed, lpm_->GetHash());
-
-    return seed;
-}
 
 namespace PROPOSAL {
 namespace detail {
@@ -563,14 +556,7 @@ crosssection::EpairLPM::EpairLPM(
     eLpm_ *= (eLpm_ * eLpm_) * ALPHA * mass_
         / (2 * PI * mol_density_ * density_correction * charge_ * charge_
             * sum);
-}
-
-size_t crosssection::EpairLPM::GetHash() const noexcept
-{
-    size_t hash_digest = 0;
-    hash_combine(hash_digest, mass_, std::abs(charge_), mol_density_,
-        density_correction_);
-    return hash_digest;
+    hash_combine(hash, mass_, charge_, mol_density_, density_correction_);
 }
 
 // ------------------------------------------------------------------------- //

@@ -49,25 +49,25 @@ public:
     }
 };
 
-auto make_decay(std::shared_ptr<Displacement> disp, const ParticleDef& p_def,
+inline auto make_decay(std::shared_ptr<Displacement> disp, const ParticleDef& p,
     bool interpolate = true)
 {
     auto decay = std::unique_ptr<Decay>();
     if (interpolate)
-        decay.reset(new DecayBuilder<UtilityInterpolant>(
-            disp, p_def.lifetime, p_def.mass));
+        decay.reset(
+            new DecayBuilder<UtilityInterpolant>(disp, p.lifetime, p.mass));
     else
-        decay.reset(new DecayBuilder<UtilityIntegral>(
-            disp, p_def.lifetime, p_def.mass));
+        decay.reset(
+            new DecayBuilder<UtilityIntegral>(disp, p.lifetime, p.mass));
     return decay;
 }
 
 template <typename Cross>
-auto make_decay(
-    Cross&& cross, const ParticleDef& p_def, bool interpolate = true)
+inline auto make_decay(
+    Cross&& cross, const ParticleDef& p, bool interpolate = true)
 {
     auto disp = std::shared_ptr<Displacement>(
         make_displacement(std::forward<Cross>(cross), false));
-    return make_decay(disp, p_def, interpolate);
+    return make_decay(disp, p, interpolate);
 }
 } // namespace PROPOSAL

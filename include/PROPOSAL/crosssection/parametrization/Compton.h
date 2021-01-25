@@ -38,7 +38,11 @@ namespace PROPOSAL {
 namespace crosssection {
     class Compton : public Parametrization {
     public:
-        Compton();
+        Compton()
+            : Parametrization(InteractionType::Compton, "compton")
+        {
+        }
+
         virtual ~Compton() = default;
 
         using only_stochastic = std::false_type;
@@ -50,7 +54,7 @@ namespace crosssection {
     };
 
     struct ComptonKleinNishina : public Compton {
-        ComptonKleinNishina() = default;
+        ComptonKleinNishina() { hash_combine(hash, std::string("klein_nishina")); };
         using base_param_t = Compton;
 
         double DifferentialCrossSection(const ParticleDef&, const Component&,

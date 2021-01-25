@@ -8,40 +8,33 @@
 #include "PROPOSAL/crosssection/parametrization/ParamTables.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/medium/Medium.h"
 
 #define BREMSSTRAHLUNG_IMPL(param)                                             \
     crosssection::Brems##param::Brems##param(bool lpm)                         \
-        : crosssection::Bremsstrahlung() {                                     \
-            if (lpm)                                                           \
-                throw std::invalid_argument("Missing particle_def and medium " \
-                       "for Bremsstrahlung constructor with lpm=true");        \
-            lpm_ = nullptr;                                                    \
-        }                                                                      \
+    {                                                                          \
+        if (lpm)                                                               \
+            throw std::invalid_argument(                                       \
+                "Missing particle_def and medium "                             \
+                "for Bremsstrahlung constructor with lpm=true");               \
+        lpm_ = nullptr;                                                        \
+        hash_combine(hash, std::string(#param));                               \
+    }                                                                          \
     crosssection::Brems##param::Brems##param(bool lpm, const ParticleDef& p,   \
-                                             const Medium& medium,             \
-                                             double density_correction)        \
-        : crosssection::Bremsstrahlung() {                                     \
-            if (lpm) {                                                         \
-                lpm_ = std::make_shared<BremsLPM>(p, medium, *this,            \
-                                                  density_correction);         \
-            } else {                                                           \
-                lpm_ = nullptr;                                                \
-            }                                                                  \
-        }
+        const Medium& medium, double density_correction)                       \
+    {                                                                          \
+        lpm_ = nullptr;                                                        \
+        if (lpm) {                                                             \
+            lpm_ = std::make_shared<BremsLPM>(                                 \
+                p, medium, *this, density_correction);                         \
+            hash_combine(hash, lpm_->GetHash());                               \
+        }                                                                      \
+        hash_combine(hash, std::string(#param));                               \
+    }
 
-using std::logic_error;
-using std::make_tuple;
 using namespace PROPOSAL;
-
-crosssection::Bremsstrahlung::Bremsstrahlung()
-    : Parametrization(InteractionType::Brems, "Brems")
-    , lorenz_(false) // TODO(mario): make it use to enable Mon 2017/09/04
-    , lorenz_cut_(1e6)
-{
-}
 
 double crosssection::Bremsstrahlung::GetLowerEnergyLim(
     const ParticleDef& p_def) const noexcept
@@ -50,8 +43,8 @@ double crosssection::Bremsstrahlung::GetLowerEnergyLim(
 }
 
 std::tuple<double, double> crosssection::Bremsstrahlung::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy) const
-    noexcept
+    const ParticleDef& p_def, const Component& comp,
+    double energy) const noexcept
 {
     // The limit is taken from the Petrukhin/Shestakov Parametrization
     auto v_min = 0.;
@@ -70,7 +63,7 @@ std::tuple<double, double> crosssection::Bremsstrahlung::GetKinematicLimits(
     // so the next line will never be called, or?
     // limits.vMax = std::min(limits.vMax, 1 - p_def.mass / energy);
 
-    return make_tuple(v_min, v_max);
+    return std::make_tuple(v_min, v_max);
 }
 
 double crosssection::Bremsstrahlung::DifferentialCrossSection(
@@ -92,15 +85,6 @@ double crosssection::Bremsstrahlung::DifferentialCrossSection(
     }
 
     return NA / comp.GetAtomicNum() * aux;
-}
-
-size_t crosssection::Bremsstrahlung::GetHash() const noexcept
-{
-    size_t hash_digest = Parametrization::GetHash();
-    hash_combine(hash_digest, lorenz_);
-    if (lpm_ != nullptr)
-        hash_combine(hash_digest, lpm_->GetHash());
-    return hash_digest;
 }
 
 BREMSSTRAHLUNG_IMPL(PetrukhinShestakov)
@@ -191,9 +175,9 @@ double crosssection::BremsKelnerKokoulinPetrukhin::CalculateParametrization(
     // eq. 2
     result = ((4. / 3) * (1 - v) + v * v)
         * (std::log(p_def.mass / delta) - 0.5 // eq.3
-              - formfactor_atomic_elastic - formfactor_nuclear_elastic
-              + (formfactor_nuclear_inelastic + formfactor_atomic_inelastic)
-                  / comp.GetNucCharge());
+            - formfactor_atomic_elastic - formfactor_nuclear_elastic
+            + (formfactor_nuclear_inelastic + formfactor_atomic_inelastic)
+                / comp.GetNucCharge());
 
     return result;
 }
@@ -221,7 +205,7 @@ double crosssection::BremsCompleteScreening::CalculateParametrization(
     aux *= aux;
     fZ = aux
         * (1 / (1 + aux) + 0.20206
-              + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
+            + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
 
     // check rounding
     switch ((int)(comp.GetNucCharge() + 0.5)) {
@@ -417,28 +401,29 @@ double crosssection::BremsSandrockSoedingreksoRhode::CalculateParametrization(
 // ------------------------------------------------------------------------- //
 
 crosssection::BremsElectronScreening::BremsElectronScreening(bool lpm)
-    : Bremsstrahlung()
-    , interpolant_(new Interpolant(
-          A_logZ, A_energies, A_correction, 2, false, false, 2, false, false))
+    : interpolant_(new Interpolant(
+        A_logZ, A_energies, A_correction, 2, false, false, 2, false, false))
 {
     if (lpm)
         throw std::invalid_argument("Missing particle_def and medium for "
                                     "Bremsstrahlung constructor with lpm=true");
     lpm_ = nullptr;
+    hash_combine(hash, std::string("electron_screening"));
 }
 
-crosssection::BremsElectronScreening::BremsElectronScreening(
-        bool lpm, const ParticleDef& p_def, const Medium& medium,
-        double density_correction)
-        : Bremsstrahlung()
-        , interpolant_(new Interpolant(
-              A_logZ, A_energies, A_correction, 2, false, false, 2, false, false))
+crosssection::BremsElectronScreening::BremsElectronScreening(bool lpm,
+    const ParticleDef& p_def, const Medium& medium, double density_correction)
+    : interpolant_(new Interpolant(
+        A_logZ, A_energies, A_correction, 2, false, false, 2, false, false))
 {
     if (lpm) {
-        lpm_ = std::make_shared<BremsLPM>(p_def, medium, *this, density_correction);
+        lpm_ = std::make_shared<BremsLPM>(
+            p_def, medium, *this, density_correction);
+        hash_combine(hash, lpm_->GetHash());
     } else {
         lpm_ = nullptr;
     }
+    hash_combine(hash, std::string("electron_screening"));
 }
 
 double crosssection::BremsElectronScreening::DifferentialCrossSection(
@@ -488,7 +473,7 @@ double crosssection::BremsElectronScreening::CalculateParametrization(
     aux *= aux;
     auto f_c = aux
         * (1 / (1 + aux) + 0.20206
-              + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
+            + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
 
     // bremsstrahlung contribution with atomic electrons as target particles
     double Lr, Lp, xi;
@@ -542,38 +527,43 @@ double crosssection::BremsElectronScreening::CalculateParametrization(
 #undef BREMSSTRAHLUNG_IMPL
 
 crosssection::BremsLPM::BremsLPM(const ParticleDef& p_def, const Medium& medium,
-                                 const Bremsstrahlung& param, double density_correction)
-    : mass_(p_def.mass),
-      mol_density_(medium.GetMolDensity()),
-      mass_density_(medium.GetMassDensity()),
-      sum_charge_(medium.GetSumCharge()),
-      density_correction_(density_correction)
-      {
-            double upper_energy = 1e14;
-            Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
-            auto components = medium.GetComponents();
+    const Bremsstrahlung& param, double density_correction)
+    : hash(0)
+    , mass_(p_def.mass)
+    , mol_density_(medium.GetMolDensity())
+    , mass_density_(medium.GetMassDensity())
+    , sum_charge_(medium.GetSumCharge())
+    , density_correction_(density_correction)
+{
+    hash_combine(hash, mass_, mol_density_, mass_density_, sum_charge_,
+        density_correction_, eLpm_);
+    double upper_energy = 1e14;
+    Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
+    auto components = medium.GetComponents();
 
-            double sum = 0.;
-            for (auto comp : components) {
-                auto limits = param.GetKinematicLimits(p_def, comp, upper_energy);
-                double contribution = 0;
-                contribution += integral_temp.Integrate(std::get<0>(limits), std::get<1>(limits), [&param, &p_def, &comp, &upper_energy](double v) {return param.FunctionToDEdxIntegral(p_def, comp, upper_energy, v);}, 2.);
-                double weight_for_loss_in_medium = medium.GetSumNucleons()
-                                                 / (comp.GetAtomInMolecule() * comp.GetAtomicNum());
-                sum += contribution / weight_for_loss_in_medium;
-            }
-            sum = sum * (mass_density_ * density_correction_);
-            eLpm_ = ALPHA * mass_;
-            eLpm_ *= eLpm_ / (4. * PI * ME * RE * sum );
-      }
-
-size_t crosssection::BremsLPM::GetHash() const noexcept {
-    size_t hash_digest = 0;
-    hash_combine(hash_digest, mass_, mol_density_, mass_density_, sum_charge_, density_correction_, eLpm_);
-    return hash_digest;
+    double sum = 0.;
+    for (auto comp : components) {
+        auto limits = param.GetKinematicLimits(p_def, comp, upper_energy);
+        double contribution = 0;
+        contribution += integral_temp.Integrate(
+            std::get<0>(limits), std::get<1>(limits),
+            [&param, &p_def, &comp, &upper_energy](double v) {
+                return param.FunctionToDEdxIntegral(
+                    p_def, comp, upper_energy, v);
+            },
+            2.);
+        double weight_for_loss_in_medium = medium.GetSumNucleons()
+            / (comp.GetAtomInMolecule() * comp.GetAtomicNum());
+        sum += contribution / weight_for_loss_in_medium;
+    }
+    sum = sum * (mass_density_ * density_correction_);
+    eLpm_ = ALPHA * mass_;
+    eLpm_ *= eLpm_ / (4. * PI * ME * RE * sum);
 }
 
-double crosssection::BremsLPM::suppression_factor(double energy, double v, const Component& comp) const {
+double crosssection::BremsLPM::suppression_factor(
+    double energy, double v, const Component& comp) const
+{
     double G, fi, xi, ps, Gamma, s1;
 
     const double fi1 = 1.54954;
@@ -600,28 +590,28 @@ double crosssection::BremsLPM::suppression_factor(double energy, double v, const
 
     Gamma = RE * ME / (ALPHA * mass_ * v);
     Gamma = 1
-            + 4 * PI * sum_charge_ * RE
-              * Gamma * Gamma * mol_density_ * density_correction_;
+        + 4 * PI * sum_charge_ * RE * Gamma * Gamma * mol_density_
+            * density_correction_;
     double s = sp / std::sqrt(xi) * Gamma;
     double s2 = s * s;
 
     if (s < fi1) {
         // Stanev et al.,  Phys. Rev. D 25 (1982), 1291 (eq. 14d)
         fi = 1
-             - std::exp(-6 * s * (1 + (3 - PI) * s)
-                        + s2 * s / (0.623 + 0.796 * s + 0.658 * s2));
+            - std::exp(-6 * s * (1 + (3 - PI) * s)
+                + s2 * s / (0.623 + 0.796 * s + 0.658 * s2));
     } else {
         fi = 1
-             - 0.012 / (s2 * s2); // Migdal, Phys. Rev. 103 (1956), 1811 (eq. 48)
+            - 0.012 / (s2 * s2); // Migdal, Phys. Rev. 103 (1956), 1811 (eq. 48)
     }
 
     if (s < G1) {
         //  Stanev et al.,  Phys. Rev. D 25 (1982), 1291 (eq. 15d)
         ps = 1
-             - std::exp(-4 * s
-                        - 8 * s2
-                          / (1 + 3.936 * s + 4.97 * s2 - 0.05 * s2 * s
-                             + 7.50 * s2 * s2));
+            - std::exp(-4 * s
+                - 8 * s2
+                    / (1 + 3.936 * s + 4.97 * s2 - 0.05 * s2 * s
+                        + 7.50 * s2 * s2));
         // Klein, Rev. Mod. Phys. 71 (1999), 1501 (eq. 77)
         G = 3 * ps - 2 * fi;
     } else if (s < G2) {
@@ -632,7 +622,7 @@ double crosssection::BremsLPM::suppression_factor(double energy, double v, const
     }
 
     return ((xi / 3)
-            * ((v * v) * G / (Gamma * Gamma)
-               + 2 * (1 + (1 - v) * (1 - v)) * fi / Gamma))
-           / ((4. / 3) * (1 - v) + v * v);
+               * ((v * v) * G / (Gamma * Gamma)
+                   + 2 * (1 + (1 - v) * (1 - v)) * fi / Gamma))
+        / ((4. / 3) * (1 - v) + v * v);
 }
