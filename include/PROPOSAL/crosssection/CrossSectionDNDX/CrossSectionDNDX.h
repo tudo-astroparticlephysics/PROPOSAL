@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
 #include <memory>
@@ -25,6 +26,8 @@ public:
         : kinematic_limits(define_kinematic_limits(_param, _particle, _target))
         , hash(0)
     {
+        auto logger = Logging::Get("PROPOSAL.CrossSection.dNdx");
+        logger->info("Building {} dNdx.", _param.name);
         hash_combine(
             hash, _param.GetHash(), _particle.GetHash(), _target.GetHash());
     }
@@ -47,7 +50,6 @@ public:
 
     enum { MIN, MAX };
     std::array<double, 2> GetIntegrationLimits(double energy) const;
-
 
     size_t GetHash() const noexcept { return hash; }
 };

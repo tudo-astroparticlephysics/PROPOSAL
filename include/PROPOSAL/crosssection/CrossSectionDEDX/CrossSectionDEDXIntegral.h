@@ -6,9 +6,16 @@
 
 namespace PROPOSAL {
 
+namespace crosssection {
+    class IonizBergerSeltzerBhabha;
+    class IonizBergerSeltzerMoller;
+}
+
 namespace detail {
+    using dedx_integral_t = std::function<double(Integral&, double)>;
+
     template <typename T1>
-    auto define_dedx_integral(T1 param, ParticleDef const& p_def,
+    dedx_integral_t define_dedx_integral(T1 param, ParticleDef const& p_def,
         Component const& comp, EnergyCutSettings const& cut)
     {
         return [param, p_def, comp, cut](Integral& i, double E) {
@@ -24,7 +31,7 @@ namespace detail {
     }
 
     template <typename T1>
-    auto define_dedx_integral(T1 param, ParticleDef const& p_def,
+    dedx_integral_t define_dedx_integral(T1 param, ParticleDef const& p_def,
         Medium const& medium, EnergyCutSettings const& cut)
     {
         return [param, p_def, medium, cut](Integral& i, double E) {
@@ -38,6 +45,16 @@ namespace detail {
                 v_cut, dEdx, 4);
         };
     }
+
+    template <>
+    dedx_integral_t define_dedx_integral(
+        crosssection::IonizBergerSeltzerBhabha param, ParticleDef const& p_def,
+        Medium const& medium, EnergyCutSettings const&);
+
+    template <>
+    dedx_integral_t define_dedx_integral(
+        crosssection::IonizBergerSeltzerMoller param, ParticleDef const& p_def,
+        Medium const& medium, EnergyCutSettings const&);
 
 }
 

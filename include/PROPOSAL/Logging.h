@@ -27,27 +27,29 @@
  ******************************************************************************/
 #pragma once
 
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/sink.h>
 #include <PROPOSAL/methods.h>
+#include <spdlog/sinks/sink.h>
+#include <spdlog/spdlog.h>
 
-#include <unordered_map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace PROPOSAL {
+
+using logger_ptr = std::shared_ptr<spdlog::logger>;
 struct Logging {
-    static std::unordered_map<std::string, std::unique_ptr<spdlog::logger>> logger;
+    static std::unordered_map<std::string, logger_ptr> logger;
     static std::shared_ptr<spdlog::sinks::sink> sink;
 
     Logging() = delete;
 
-    static spdlog::logger* Get(std::string const& name)
+    static logger_ptr Get(std::string const& name)
     {
         auto it = Logging::logger.find(name);
         if (it == logger.end())
             Logging::logger[name] = Logging::Create(name);
-        return Logging::logger[name].get();
+        return Logging::logger[name];
     }
 
     static void SetGlobalLoglevel(spdlog::level::level_enum loglevel)
@@ -58,9 +60,9 @@ struct Logging {
     }
 
 private:
-    static std::unique_ptr<spdlog::logger> Create(std::string const& name)
+    static logger_ptr Create(std::string const& name)
     {
-        auto logger = PROPOSAL::make_unique<spdlog::logger>(name, sink);
+        auto logger = std::make_shared<spdlog::logger>(name, sink);
         logger->set_level(global_loglevel);
         return logger;
     }

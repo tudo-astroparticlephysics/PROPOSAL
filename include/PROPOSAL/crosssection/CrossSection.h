@@ -29,6 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/crosssection/CrossSectionDE2DX/CrossSectionDE2DXBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDXBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
@@ -209,6 +210,8 @@ public:
         , lower_energy_lim(_param.GetLowerEnergyLim(_p_def))
         , interaction_type(_param.interaction_type)
     {
+        auto logger = Logging::Get("PROPOSAL.CrossSection");
+        logger->info("Building {} crosssection.", _param.name);
         for (auto const& i : dndx)
             hash_combine(hash, std::get<1>(i.second)->GetHash());
         if (dedx) {

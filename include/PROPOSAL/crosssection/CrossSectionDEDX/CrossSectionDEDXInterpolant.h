@@ -45,22 +45,6 @@ public:
     auto Create() const { return std::make_unique<axis_t>(low, up, n); }
 };
 
-/* template <typename T1, typename T2, typename... Args> */
-/* auto build_dedx_def(T1 const& param, T2 const& p_def, Args... args) */
-/* { */
-/*     auto dedx */
-/*         = std::make_shared<CrossSectionDEDXIntegral>(param, p_def, args...);
- */
-/*     auto def = cubic_splines::CubicSplines<double>::Definition(); */
-/*     def.f_trafo = std::make_unique<cubic_splines::ExpAxis<double>>(1., 0.);
- */
-/*     def.f = [dedx](double E) { return dedx->Calculate(E); }; */
-/*     auto axis_builder = AxisBuilder_dEdx(param, p_def); */
-/*     axis_builder.refine_definition_range(def.f); */
-/*     def.axis = axis_builder.Get(); */
-/*     return def; */
-/* } */
-
 template <typename T1, typename... Args>
 auto build_dedx_def(T1 const& param, Args... args)
 {
@@ -76,7 +60,6 @@ auto build_dedx_def(T1 const& param, Args... args)
 }
 
 class CrossSectionDEDXInterpolant : public CrossSectionDEDX {
-
     cubic_splines::Interpolant<cubic_splines::CubicSplines<double>> interpolant;
 
     std::string gen_name()
@@ -91,6 +74,7 @@ public:
         : CrossSectionDEDX(args...)
         , interpolant(build_dedx_def(args...), "/tmp", gen_name())
     {
+        logger->debug("Interpolationtables successfully build.");
     }
 
     double Calculate(double E) final { return interpolant.evaluate(E); }

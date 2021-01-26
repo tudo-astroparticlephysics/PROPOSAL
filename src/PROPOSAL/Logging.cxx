@@ -3,7 +3,7 @@
 
 using namespace PROPOSAL;
 
-std::unordered_map<std::string, std::unique_ptr<spdlog::logger>> Logging::logger = {};
+std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> Logging::logger = {};
 
 std::shared_ptr<spdlog::sinks::sink> Logging::sink
     = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();

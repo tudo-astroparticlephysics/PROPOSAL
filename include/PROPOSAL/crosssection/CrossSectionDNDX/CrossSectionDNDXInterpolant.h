@@ -49,6 +49,8 @@ public:
         : CrossSectionDNDX(args...)
         , interpolant(build_dndx_def(args...), "/tmp", gen_name())
     {
+        auto logger = Logging::Get("PROPOSAL.CrossSectionDEDX");
+        logger->debug("Interpolationtables successfully build.");
     }
 
     double Calculate(double E) final;

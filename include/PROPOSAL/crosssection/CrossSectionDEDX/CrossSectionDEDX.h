@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
 #include <memory>
@@ -9,15 +10,20 @@ namespace PROPOSAL {
 class CrossSectionDEDX {
 protected:
     size_t hash;
+    logger_ptr logger;
 
 public:
     template <typename T1, typename T2>
-    CrossSectionDEDX(T1 const& param, ParticleDef const& p_def,
-        T2 const& target, EnergyCutSettings const& cut)
+    CrossSectionDEDX(T1 const& _param, ParticleDef const& _p, T2 const& _target,
+        EnergyCutSettings const& _cut)
         : hash(0)
+        , logger(Logging::Get("PROPOSAL.CrossSectionDEDX"))
     {
-        hash_combine(hash, param.GetHash(), p_def.GetHash(), target.GetHash(),
-            cut.GetHash());
+        logger->info("Building {} {} dEdx for target {}.", _p.name, _param.name,
+            _target.GetName());
+
+        hash_combine(hash, _param.GetHash(), _p.GetHash(), _target.GetHash(),
+            _cut.GetHash());
     }
 
     virtual ~CrossSectionDEDX() = default;

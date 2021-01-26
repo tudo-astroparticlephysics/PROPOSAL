@@ -29,10 +29,10 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
+#include "PROPOSAL/medium/Medium.h"
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -103,19 +103,6 @@ namespace crosssection {
         bool dEdx_integration() const final { return false; };
     };
 
-    namespace detail {
-        inline auto define_dedx_integral(
-            crosssection::IonizBergerSeltzerBhabha param,
-            ParticleDef const& p_def, Medium const& medium,
-            EnergyCutSettings const&)
-
-        {
-            return [param, p_def, medium](Integral&, double E) {
-                return param.FunctionToDEdxIntegral(p_def, medium, E, 0.);
-            };
-        }
-    }
-
     struct IonizBergerSeltzerMoller : public Ionization {
         IonizBergerSeltzerMoller(const EnergyCutSettings&);
         using base_param_t = Ionization;
@@ -129,18 +116,6 @@ namespace crosssection {
 
         bool dEdx_integration() const final { return false; };
     };
-
-    namespace detail {
-        inline auto define_dedx_integral(
-            crosssection::IonizBergerSeltzerMoller param,
-            ParticleDef const& p_def, Medium const& medium,
-            EnergyCutSettings const&)
-        {
-            return [param, p_def, medium](Integral&, double E) {
-                return param.FunctionToDEdxIntegral(p_def, medium, E, 0.);
-            };
-        }
-    }
 
     // Factory pattern functions
 
