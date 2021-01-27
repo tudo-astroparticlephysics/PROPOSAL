@@ -1,3 +1,4 @@
+#pragma once
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/propagation_utility/ContRand.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
