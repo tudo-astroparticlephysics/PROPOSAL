@@ -8,18 +8,18 @@
 
 using namespace PROPOSAL;
 
-double crosssection::Compton::GetLowerEnergyLim(const ParticleDef&) const
+double crosssection::Compton::GetLowerEnergyLim(const ParticleDef&) const noexcept
 {
     return ME;
 }
 
-KinematicLimits crosssection::Compton::GetKinematicLimits(
+crosssection::KinematicLimits crosssection::Compton::GetKinematicLimits(
     ParticleDef const&, Component const&, double energy) const
 {
     assert(energy > 0);
     auto kin_lim = KinematicLimits();
-    auto kin_lim.v_max = 0;
-    auto kin_lim.v_max = 1. - 1. / (1. + 2. * energy / ME);
+    kin_lim.v_min = 0;
+    kin_lim.v_max = 1. - 1. / (1. + 2. * energy / ME);
     return kin_lim;
 }
 

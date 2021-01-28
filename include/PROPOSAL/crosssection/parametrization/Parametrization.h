@@ -33,9 +33,13 @@
 namespace PROPOSAL {
 struct ParticleDef;
 class Medium;
-class Component;
+    namespace Components {
+        class Component;
+    }
 enum class InteractionType;
 } // namespace PROPOSAL
+
+using PROPOSAL::Components::Component;
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -69,7 +73,7 @@ namespace crosssection {
             ParticleDef const&, Target const&, double, double) const = 0;
 
         virtual KinematicLimits GetKinematicLimits(
-            ParticleDef const&, Component const&, double) const = 0;
+            ParticleDef const&, Target const&, double) const = 0;
 
         virtual double FunctionToDEdxIntegral(
             ParticleDef const& p, const Target& t, double E, double v) const

@@ -29,7 +29,6 @@ using std::logic_error;
 using std::make_tuple;
 
 crosssection::EpairProduction::EpairProduction(bool lpm)
-    : Parametrization(InteractionType::Epair, "Epair")
 {
     if (lpm)
         throw std::invalid_argument("Missing particle_def and medium for Epair "
@@ -38,7 +37,6 @@ crosssection::EpairProduction::EpairProduction(bool lpm)
 
 crosssection::EpairProduction::EpairProduction(bool lpm, const ParticleDef& p,
     const Medium& medium, double density_correction)
-    : Parametrization(InteractionType::Epair, "Epair")
 {
     if (lpm) {
         lpm_ = std::make_shared<EpairLPM>(p, medium, density_correction);
@@ -52,19 +50,20 @@ double crosssection::EpairProduction::GetLowerEnergyLim(
 {
     return p_def.mass + 2.f * ME;
 }
-std::tuple<double, double> crosssection::EpairProduction::GetKinematicLimits(
+crosssection::KinematicLimits crosssection::EpairProduction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp,
     double energy) const noexcept
 {
+    auto lim = KinematicLimits();
     auto aux = p_def.mass / energy;
-    auto v_min = 4 * ME / energy;
-    auto v_max = 1 - 0.75 * SQRTE * aux * std::pow(comp.GetNucCharge(), 1. / 3);
+    lim.v_min = 4 * ME / energy;
+    lim.v_max = 1 - 0.75 * SQRTE * aux * std::pow(comp.GetNucCharge(), 1. / 3);
     aux = 1 - 6 * aux * aux;
-    v_max = std::min(v_max, aux);
+    lim.v_max = std::min(lim.v_max, aux);
     // limits.vMax = std::min(limits.vMax, 1 - p_def.mass / particle_energy);
-    if (v_max < v_min)
-        v_max = v_min;
-    return make_tuple(v_min, v_max);
+    if (lim.v_max < lim.v_min)
+        lim.v_max = lim.v_min;
+    return lim;
 }
 
 

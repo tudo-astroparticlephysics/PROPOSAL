@@ -6,6 +6,7 @@
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/medium/Medium.h"
 
 using std::get;
 using std::logic_error;
@@ -40,13 +41,8 @@ double crosssection::Ionization::Delta(
     }
 }
 
-double crosssection::Ionization::DifferentialCrossSection(
-    const ParticleDef&, const Component&, double, double) const
-{
-    throw std::logic_error("Not implemented, Ionization requires medium.");
-}
 
-KinematicLimits crosssection::IonizBetheBlochRossi::GetKinematicLimits(
+crosssection::KinematicLimits crosssection::IonizBetheBlochRossi::GetKinematicLimits(
     const ParticleDef& p_def, const Medium& medium, double energy) const
 {
     auto mass_ration = ME / p_def.mass;
@@ -99,9 +95,7 @@ double crosssection::IonizBetheBlochRossi::DifferentialCrossSection(
     spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
     auto result = 1
         - beta
-            * (v
-                / get<Parametrization::V_MAX>(
-                    GetKinematicLimits(p_def, medium, energy)))
+            * (v / GetKinematicLimits(p_def, medium, energy).v_max)
         + spin_1_2_contribution;
     result *= IONK * p_def.charge * p_def.charge
         * calculate_proton_massnumber_fraction(medium.GetComponents())
@@ -177,10 +171,7 @@ double crosssection::IonizBetheBlochRossi::InelCorrection(
 {
     double gamma = energy / p_def.mass;
     auto a = std::log(1 + 2 * v * energy / ME);
-    auto b = std::log((1
-                          - v
-                              / get<Parametrization::V_MAX>(
-                                  GetKinematicLimits(p_def, medium, energy)))
+    auto b = std::log((1 - v / GetKinematicLimits(p_def, medium, energy).v_max)
         / (1 - v));
     auto c = std::log((2 * gamma * (1 - v) * ME) / (p_def.mass * v));
     auto result = a * (2 * b + c) - b * b;
@@ -238,7 +229,7 @@ crosssection::IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(
     hash_combine(hash, std::string("berger_seltzer_bhabha"));
 }
 
-KinematicLimits crosssection::IonizBergerSeltzerBhabha::GetKinematicLimits(
+crosssection::KinematicLimits crosssection::IonizBergerSeltzerBhabha::GetKinematicLimits(
     const ParticleDef& p_def, const Medium&, double energy) const
 {
     auto kin_lim = KinematicLimits();
@@ -359,7 +350,7 @@ crosssection::IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(
     hash_combine(hash, std::string("berger_seltzer_moller"));
 }
 
-KinematicLimits crosssection::IonizBergerSeltzerMoller::GetKinematicLimits(
+crosssection::KinematicLimits crosssection::IonizBergerSeltzerMoller::GetKinematicLimits(
     const ParticleDef& p_def, const Medium&, double energy) const
 {
     auto kin_lim = KinematicLimits();

@@ -31,18 +31,13 @@
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
 namespace PROPOSAL {
-class Component;
-class ParticleDef;
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
 namespace crosssection {
     class Annihilation : public Parametrization<Component> {
     public:
         Annihilation() = default;
-        virtual ~Annihilation() = default;
+        ~Annihilation() override = default;
 
-        double GetLowerEnergyLim(ParticleDef const&) const final;
+        double GetLowerEnergyLim(ParticleDef const&) const noexcept final;
 
         KinematicLimits GetKinematicLimits(
             ParticleDef const&, Component const&, double) const final;
@@ -53,7 +48,7 @@ namespace crosssection {
     };
 
     struct AnnihilationHeitler : public Annihilation {
-        AnnihilationHeitler();
+        AnnihilationHeitler() = default;
 
         double DifferentialCrossSection(
             const ParticleDef&, const Component&, double, double) const final;

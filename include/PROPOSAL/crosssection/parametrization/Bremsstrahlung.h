@@ -41,9 +41,6 @@
     };
 
 namespace PROPOSAL {
-class ParticleDef;
-class Medium;
-class Component;
 class Interpolant;
 } // namespace PROPOSAL
 
@@ -68,7 +65,7 @@ namespace crosssection {
         virtual double CalculateParametrization(
             const ParticleDef&, const Component&, double, double) const = 0;
 
-        double GetLowerEnergyLim(const ParticleDef&) const final;
+        double GetLowerEnergyLim(const ParticleDef&) const noexcept final;
         KinematicLimits GetKinematicLimits(
             const ParticleDef&, const Component&, double) const final;
     };

@@ -31,12 +31,10 @@
 #include <cmath>
 #include <functional>
 
-#include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/EnergyCutSettings.h"
 
-using PROPOSAL::Components::Component;
 
 #define EPAIR_PARAM_INTEGRAL_DEC(param)                                        \
     struct Epair##param : public EpairProductionRhoIntegral {                  \
@@ -52,7 +50,7 @@ using PROPOSAL::Components::Component;
 namespace PROPOSAL {
 namespace crosssection {
     class EpairLPM;
-    class EpairProduction : public Parametrization {
+    class EpairProduction : public Parametrization<Component> {
 
     protected:
         std::shared_ptr<EpairLPM> lpm_;
@@ -67,7 +65,7 @@ namespace crosssection {
         using component_wise = std::true_type;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-        std::tuple<double, double> GetKinematicLimits(const ParticleDef&,
+        KinematicLimits GetKinematicLimits(const ParticleDef&,
             const Component&, double energy) const noexcept override;
     };
 
@@ -117,6 +115,7 @@ namespace crosssection {
 
     // Factory pattern functions
 
+    /*
     template <typename P, typename M>
     using epair_func_ptr = cross_t_ptr<P, M> (*)(
         P, M, std::shared_ptr<const EnergyCutSettings>, bool, bool, double);
@@ -171,6 +170,7 @@ namespace crosssection {
         return make_epairproduction(
             p_def, medium, cuts, interpol, lpm, param_name, density_correction);
     }
+    */
 
 } // namespace crosssection
 
@@ -183,11 +183,11 @@ namespace detail {
     auto define_epair_dedx_integral(T1 param, ParticleDef const& p_def,
         Component const& comp, EnergyCutSettings const& cut)
     {
-        return [param, p_def, comp, cut](Integral& i, double E) {
+        return [param, &p_def, &comp, &cut](Integral& i, double E) {
             auto lim = param.GetKinematicLimits(p_def, comp, E);
             auto v_cut = cut.GetCut(lim, E);
             return integrate_dedx_epair(i, param, p_def, comp, E,
-                std::get<crosssection::Parametrization::V_MIN>(lim), v_cut);
+                lim.v_min, v_cut);
         };
     }
 

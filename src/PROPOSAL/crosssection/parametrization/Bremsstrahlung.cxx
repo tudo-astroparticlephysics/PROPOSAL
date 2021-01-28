@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/crosssection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crosssection/parametrization/ParamTables.h"
 #include "PROPOSAL/math/Integral.h"
@@ -37,12 +38,12 @@
 using namespace PROPOSAL;
 
 double crosssection::Bremsstrahlung::GetLowerEnergyLim(
-    const ParticleDef& p_def) const
+    const ParticleDef& p_def) const noexcept
 {
     return p_def.mass;
 }
 
-KinematicLimits crosssection::Bremsstrahlung::GetKinematicLimits(
+crosssection::KinematicLimits crosssection::Bremsstrahlung::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy) const
 {
     // The limit is taken from the Petrukhin/Shestakov Parametrization
@@ -546,7 +547,7 @@ crosssection::BremsLPM::BremsLPM(const ParticleDef& p_def, const Medium& medium,
         auto limits = param.GetKinematicLimits(p_def, comp, upper_energy);
         double contribution = 0;
         contribution += integral_temp.Integrate(
-            std::get<0>(limits), std::get<1>(limits),
+            limits.v_min, limits.v_max,
             [&param, &p_def, &comp, &upper_energy](double v) {
                 return param.FunctionToDEdxIntegral(
                     p_def, comp, upper_energy, v);

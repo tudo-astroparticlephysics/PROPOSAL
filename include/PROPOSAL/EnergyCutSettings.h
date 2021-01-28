@@ -35,6 +35,12 @@
 
 namespace PROPOSAL {
 
+namespace crosssection {
+    struct KinematicLimits {
+        double v_min;
+        double v_max;
+    };
+}
 /**
  * \brief Class containing the energy cut such as ecut and vcut.
  *
@@ -62,9 +68,9 @@ public:
         assert(energy > 0);
         return std::min(ecut_ / energy, vcut_);
     }
-    inline double GetCut(const std::tuple<double, double>& lim, double energy) const
+    inline double GetCut(const crosssection::KinematicLimits& lim, double energy) const
     {
-        return std::min(std::max(std::get<0>(lim), GetCut(energy)), std::get<1>(lim));
+        return std::min(std::max(lim.v_min, GetCut(energy)), lim.v_max);
     }
     size_t GetHash() const noexcept;
     double GetEcut() const noexcept { return ecut_; }

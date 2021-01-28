@@ -29,10 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-
-namespace PROPOSAL {
-class EnergyCutSettings;
-} // namespace PROPOSAL
+#include "PROPOSAL/EnergyCutSettings.h"
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -49,15 +46,12 @@ namespace crosssection {
 
     public:
         Ionization(const EnergyCutSettings&);
+        double GetLowerEnergyLim(const ParticleDef&) const noexcept final;
         virtual ~Ionization() = default;
     };
 
     template <> struct ParametrizationName<Ionization> {
         static constexpr char value[36] = "ionization";
-    };
-
-    template <typename T> struct IonizationDEdxIntegration {
-        constexpr static bool value = false;
     };
 
     class IonizBetheBlochRossi : public Ionization {
@@ -112,7 +106,7 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<IonizBergerSeltzerMoller> {
-        static constexpr char value[36] = "ionization_berger_seltzer_molle";
+        static constexpr char value[36] = "ionization_berger_seltzer_moller";
     };
 
     /* // Factory pattern functions */

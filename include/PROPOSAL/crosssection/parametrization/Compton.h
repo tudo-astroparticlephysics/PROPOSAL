@@ -31,17 +31,13 @@
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
 namespace PROPOSAL {
-class Component;
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
 namespace crosssection {
     class Compton : public Parametrization<Component> {
     public:
         Compton() = default;
         virtual ~Compton() = default;
 
-        double GetLowerEnergyLim(ParticleDef const&) const final;
+        double GetLowerEnergyLim(ParticleDef const&) const noexcept final;
         KinematicLimits GetKinematicLimits(
             ParticleDef const&, Component const&, double) const final;
     };

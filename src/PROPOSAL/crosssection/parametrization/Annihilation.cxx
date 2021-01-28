@@ -4,28 +4,26 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
-#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/Particle.h"
 
 using std::make_tuple;
 using namespace PROPOSAL;
 
 double crosssection::Annihilation::GetLowerEnergyLim(
-    ParticleDef const& p_def) const
+    ParticleDef const& p_def) const noexcept
 {
     return p_def.mass * 2.f;
 }
 
-KinematicLimits crosssection::Annihilation::GetKinematicLimits(
+crosssection::KinematicLimits crosssection::Annihilation::GetKinematicLimits(
     ParticleDef const& p_def, Component const&, double energy) const
 {
     // Limits according to simple 2->2 body interactions
     assert(energy >= p_def.mass);
     auto gamma = energy / p_def.mass;
     auto aux = std::sqrt((gamma - 1.) / (gamma + 1.));
-    auto kin_lim = KineamticLimits();
+    auto kin_lim = crosssection::KinematicLimits();
     kin_lim.v_min = 0.5 * (1. - aux);
     kin_lim.v_max = 0.5 * (1. + aux);
     return kin_lim;

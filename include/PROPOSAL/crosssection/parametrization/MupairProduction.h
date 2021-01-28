@@ -32,8 +32,6 @@
 #include <functional>
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-#include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/math/Integral.h"
 
 #define MUPAIR_PARAM_INTEGRAL_DEC(param)                                       \
@@ -48,7 +46,7 @@
 namespace PROPOSAL {
 namespace crosssection {
 
-    class MupairProduction : public Parametrization {
+    class MupairProduction : public Parametrization<Component> {
 
     protected:
         Integral drho_integral_;
@@ -63,7 +61,7 @@ namespace crosssection {
             double energy, double v, double r) const = 0;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-        std::tuple<double, double> GetKinematicLimits(const ParticleDef&,
+        KinematicLimits GetKinematicLimits(const ParticleDef&,
             const Component&, double) const noexcept override;
     };
 
@@ -79,7 +77,7 @@ namespace crosssection {
 
     MUPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
 // Factory pattern functions
-
+/*
 template <typename P, typename M>
 using mupair_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
         EnergyCutSettings>, bool);
@@ -117,6 +115,7 @@ cross_t_ptr<P, M> make_mupairproduction(P p_def, M medium, std::shared_ptr<const
 
     return make_mupairproduction(p_def, medium, cuts, interpol, param_name);
 }
+*/
 
 } // namespace crosssection
 } // namespace PROPOSAL
