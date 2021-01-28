@@ -1,3 +1,4 @@
+#pragma once
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
@@ -62,7 +63,7 @@ auto make_interaction(
     return inter;
 }
 
-template <typename T> auto make_interaction(T const& cross, bool interpolate)
+template <typename T> auto make_interaction(T&& cross, bool interpolate)
 {
     auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
     return make_interaction(disp, cross, interpolate);

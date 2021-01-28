@@ -4,6 +4,7 @@
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/Logging.h"
 
 #include <memory>

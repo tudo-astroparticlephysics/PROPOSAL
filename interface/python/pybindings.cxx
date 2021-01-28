@@ -4,6 +4,7 @@
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
 #include "PROPOSAL/propagation_utility/ContRandBuilder.h"
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
@@ -324,14 +325,8 @@ PYBIND11_MODULE(proposal, m)
     /*         "get", &RandomGenerator::Get, py::return_value_policy::reference); */
 
     py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
-        .def(py::init<ParticleDef const&, std::vector<Sector>>())
-        .def(py::init<GammaDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<EMinusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<EPlusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<MuMinusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<MuPlusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<TauMinusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def(py::init<TauPlusDef, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def(py::init<const ParticleDef&, std::vector<Sector>>())
+        .def(py::init<const ParticleDef&, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
         .def("propagate", &Propagator::Propagate, py::arg("initial_particle"), py::arg("max_distance") = 1.e20, py::arg("min_energy") = 0., py::arg("hierarchy_condition") = 0);
 
 

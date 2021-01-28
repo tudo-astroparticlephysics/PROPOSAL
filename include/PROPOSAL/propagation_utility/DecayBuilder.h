@@ -1,4 +1,4 @@
-
+#pragma once
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/propagation_utility/Decay.h"
 #include <math.h>
