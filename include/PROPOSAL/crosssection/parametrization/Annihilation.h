@@ -28,92 +28,84 @@
 
 #pragma once
 
-#include <cmath>
-#include <fstream>
-#include <functional>
-
-#include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-#include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/particle/Particle.h"
+
+namespace PROPOSAL {
+class Component;
+class ParticleDef;
+} // namespace PROPOSAL
 
 namespace PROPOSAL {
 namespace crosssection {
-    class Annihilation : public Parametrization {
+    class Annihilation : public Parametrization<Component> {
     public:
-        Annihilation()
-            : Parametrization(InteractionType::Annihilation, "annihililation")
-        {
-        }
-
+        Annihilation() = default;
         virtual ~Annihilation() = default;
 
-        using component_wise = std::true_type;
-        using only_stochastic = std::true_type;
+        double GetLowerEnergyLim(ParticleDef const&) const final;
 
-        double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
+        KinematicLimits GetKinematicLimits(
+            ParticleDef const&, Component const&, double) const final;
+    };
 
-        std::tuple<double, double> GetKinematicLimits(const ParticleDef&,
-            const Component&, double) const noexcept override;
+    template <> struct ParametrizationName<Annihilation> {
+        static constexpr char value[36] = "annihilation";
     };
 
     struct AnnihilationHeitler : public Annihilation {
-        AnnihilationHeitler()
-            : Annihilation()
-        {
-            hash_combine(hash, std::string("heitler"));
-        };
-
-        using base_param_t = Annihilation;
+        AnnihilationHeitler();
 
         double DifferentialCrossSection(
             const ParticleDef&, const Component&, double, double) const final;
     };
 
-    // Factory pattern functions
-
-    template <typename P, typename M>
-    using annih_func_ptr = cross_t_ptr<P, M> (*)(P, M, bool);
-
-    template <typename Param, typename P, typename M>
-    cross_t_ptr<P, M> create_annihi(P p_def, M medium, bool interpol)
-    {
-        auto param = Param();
-        return make_crosssection(param, p_def, medium, nullptr, interpol);
-    }
-
-    template <typename P, typename M>
-    static std::map<std::string, annih_func_ptr<P, M>> annih_map = {
-        { "annihilationheitler", create_annihi<AnnihilationHeitler, P, M> }
+    template <> struct ParametrizationName<AnnihilationHeitler> {
+        static constexpr char value[36] = "annihilation_heitler";
     };
 
-    template <typename P, typename M>
-    cross_t_ptr<P, M> make_annihilation(
-        P p_def, M medium, bool interpol, const std::string& param_name)
-    {
+    /* // Factory pattern functions */
 
-        std::string name = param_name;
-        std::transform(
-            param_name.begin(), param_name.end(), name.begin(), ::tolower);
-        auto it = annih_map<P, M>.find(name);
-        if (it == annih_map<P, M>.end())
-            throw std::logic_error("Unknown parametrization for annihilation");
+    /* template <typename P, typename M> */
+    /* using annih_func_ptr = cross_t_ptr<P, M> (*)(P, M, bool); */
 
-        return it->second(p_def, medium, interpol);
-    }
+    /* template <typename Param, typename P, typename M> */
+    /* cross_t_ptr<P, M> create_annihi(P p_def, M medium, bool interpol) */
+    /* { */
+    /*     auto param = Param(); */
+    /*     return make_crosssection(param, p_def, medium, nullptr, interpol); */
+    /* } */
 
-    template <typename P, typename M>
-    cross_t_ptr<P, M> make_annihilation(
-        P p_def, M medium, bool interpol, const nlohmann::json& config)
-    {
-        if (!config.contains("parametrization"))
-            throw std::logic_error(
-                "No parametrization passed for annihilation");
-        std::string param_name = config["parametrization"];
+    /* template <typename P, typename M> */
+    /* static std::map<std::string, annih_func_ptr<P, M>> annih_map = { */
+    /*     { "annihilationheitler", create_annihi<AnnihilationHeitler, P, M> } */
+    /* }; */
 
-        return make_annihilation(p_def, medium, interpol, param_name);
-    }
+    /* template <typename P, typename M> */
+    /* cross_t_ptr<P, M> make_annihilation( */
+    /*     P p_def, M medium, bool interpol, const std::string& param_name) */
+    /* { */
+
+    /*     std::string name = param_name; */
+    /*     std::transform( */
+    /*         param_name.begin(), param_name.end(), name.begin(), ::tolower); */
+    /*     auto it = annih_map<P, M>.find(name); */
+    /*     if (it == annih_map<P, M>.end()) */
+    /*         throw std::logic_error("Unknown parametrization for annihilation"); */
+
+    /*     return it->second(p_def, medium, interpol); */
+    /* } */
+
+    /* template <typename P, typename M> */
+    /* cross_t_ptr<P, M> make_annihilation( */
+    /*     P p_def, M medium, bool interpol, const nlohmann::json& config) */
+    /* { */
+    /*     if (!config.contains("parametrization")) */
+    /*         throw std::logic_error( */
+    /*             "No parametrization passed for annihilation"); */
+    /*     std::string param_name = config["parametrization"]; */
+
+    /*     return make_annihilation(p_def, medium, interpol, param_name); */
+    /* } */
 
 } // namespace crosssection
 } // namespace PROPOSAL
