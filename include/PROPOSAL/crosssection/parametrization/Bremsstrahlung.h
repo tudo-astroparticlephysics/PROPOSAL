@@ -29,148 +29,157 @@
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include <memory>
-#include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 
 #define BREMSSTRAHLUNG_DEF(param)                                              \
     struct Brems##param : public Bremsstrahlung {                              \
         Brems##param(bool lpm = false);                                        \
         Brems##param(bool lpm, const ParticleDef&, const Medium&,              \
-                     double density_correction = 1.0);                         \
-        using base_param_t = Bremsstrahlung;                                   \
+            double density_correction = 1.0);                                  \
                                                                                \
         double CalculateParametrization(const ParticleDef&, const Component&,  \
-            double energy, double v) const final;                           \
+            double energy, double v) const final;                              \
     };
 
 namespace PROPOSAL {
+class ParticleDef;
+class Medium;
+class Component;
 class Interpolant;
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
 namespace crosssection {
-class BremsLPM;
-class Bremsstrahlung : public Parametrization {
+    class BremsLPM;
 
-protected:
-    bool lorenz_;       // enable lorenz cut
-    double lorenz_cut_; // in [MeV]
-    std::shared_ptr<BremsLPM> lpm_;
+    class Bremsstrahlung : public Parametrization<Component> {
 
-public:
-    Bremsstrahlung()
-        : Parametrization(InteractionType::Brems, "Brems")
-        , lorenz_(false) // TODO(mario): make it use to enable Mon 2017/09/04
-        , lorenz_cut_(1e6)
-    {
-        hash_combine(hash, lorenz_, lorenz_cut_);
-    }
+    protected:
+        bool lorenz_;       // enable lorenz cut
+        double lorenz_cut_; // in [MeV]
+        std::shared_ptr<BremsLPM> lpm_;
 
-    virtual ~Bremsstrahlung() = default;
+    public:
+        Bremsstrahlung() = default;
 
-    using only_stochastic = std::false_type;
-    using component_wise = std::true_type;
-    using base_param_t = Bremsstrahlung;
+        virtual ~Bremsstrahlung() = default;
 
-    double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double, double) const override;
-    virtual double CalculateParametrization(
-        const ParticleDef&, const Component&, double, double) const
-        = 0;
+        double DifferentialCrossSection(const ParticleDef&, const Component&,
+            double, double) const override;
+        virtual double CalculateParametrization(
+            const ParticleDef&, const Component&, double, double) const = 0;
 
-    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-    std::tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double) const noexcept override;
-};
+        double GetLowerEnergyLim(const ParticleDef&) const final;
+        KinematicLimits GetKinematicLimits(
+            const ParticleDef&, const Component&, double) const final;
+    };
 
-BREMSSTRAHLUNG_DEF(PetrukhinShestakov)
-BREMSSTRAHLUNG_DEF(KelnerKokoulinPetrukhin)
-BREMSSTRAHLUNG_DEF(CompleteScreening)
-BREMSSTRAHLUNG_DEF(AndreevBezrukovBugaev)
-BREMSSTRAHLUNG_DEF(SandrockSoedingreksoRhode)
+    BREMSSTRAHLUNG_DEF(PetrukhinShestakov)
+    BREMSSTRAHLUNG_DEF(KelnerKokoulinPetrukhin)
+    BREMSSTRAHLUNG_DEF(CompleteScreening)
+    BREMSSTRAHLUNG_DEF(AndreevBezrukovBugaev)
+    BREMSSTRAHLUNG_DEF(SandrockSoedingreksoRhode)
 
-class BremsElectronScreening : public Bremsstrahlung {
-    std::shared_ptr<Interpolant> interpolant_;
+    class BremsElectronScreening : public Bremsstrahlung {
+        std::shared_ptr<Interpolant> interpolant_;
 
-public:
-    BremsElectronScreening(bool lpm = false);
-    BremsElectronScreening(bool lpm, const ParticleDef&, const Medium&,
-                           double density_correction = 1.0);
-    using base_param_t = Bremsstrahlung;
+    public:
+        BremsElectronScreening(bool lpm = false);
+        BremsElectronScreening(bool lpm, const ParticleDef&, const Medium&,
+            double density_correction = 1.0);
 
-    double CalculateParametrization(
-        const ParticleDef&, const Component&, double energy, double v) const override;
-    double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double energy, double v) const override;
-};
+        double CalculateParametrization(const ParticleDef&, const Component&,
+            double energy, double v) const final;
+        double DifferentialCrossSection(const ParticleDef&, const Component&,
+            double energy, double v) const final;
+    };
 
-// LPM effect object
-class BremsLPM {
-    size_t hash;
-    double mass_;
-    double mol_density_;
-    double mass_density_;
-    double sum_charge_;
-    double density_correction_;
-    double eLpm_;
-public:
-    BremsLPM(const ParticleDef&, const Medium&, const Bremsstrahlung&,
-             double density_correction = 1.0);
-    double suppression_factor(double energy, double v, const Component&) const;
-    size_t GetHash() const noexcept {return hash;}
-};
+    // LPM effect object
+    class BremsLPM {
+        size_t hash;
+        double mass_;
+        double mol_density_;
+        double mass_density_;
+        double sum_charge_;
+        double density_correction_;
+        double eLpm_;
 
-// Factory pattern functions
+    public:
+        BremsLPM(const ParticleDef&, const Medium&, const Bremsstrahlung&,
+            double density_correction = 1.0);
+        double suppression_factor(
+            double energy, double v, const Component&) const;
+        size_t GetHash() const noexcept { return hash; }
+    };
 
-template <typename P, typename M>
-using brems_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
-        EnergyCutSettings>, bool, bool, double);
+    /* // Factory pattern functions */
 
-template <typename Param, typename P, typename M>
-cross_t_ptr<P, M> create_brems(P p_def, M medium,
-                               std::shared_ptr<const EnergyCutSettings> cuts,
-                               bool lpm, bool interpol,
-                               double density_correction = 1.0) {
-        auto param = Param(lpm, p_def, medium, density_correction);
-        return make_crosssection(param, p_def, medium, cuts, interpol);
-}
+    /* template <typename P, typename M> */
+    /* using brems_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
+     */
+    /*         EnergyCutSettings>, bool, bool, double); */
 
-template<typename P, typename M>
-static std::map<std::string, brems_func_ptr<P, M>> brems_map = {
-        {"kelnerkokoulinpetrukhin", create_brems<BremsKelnerKokoulinPetrukhin, P, M>},
-        {"petrukhinshestakov", create_brems<BremsPetrukhinShestakov, P, M>},
-        {"completescreening", create_brems<BremsCompleteScreening, P, M>},
-        {"andreevbezrukovbugaev", create_brems<BremsAndreevBezrukovBugaev, P, M>},
-        {"sandrocksoedingreksorhode", create_brems<BremsSandrockSoedingreksoRhode, P, M>},
-        {"electronscreening", create_brems<BremsElectronScreening, P, M>}
-};
+    /* template <typename Param, typename P, typename M> */
+    /* cross_t_ptr<P, M> create_brems(P p_def, M medium, */
+    /*                                std::shared_ptr<const EnergyCutSettings>
+     * cuts, */
+    /*                                bool lpm, bool interpol, */
+    /*                                double density_correction = 1.0) { */
+    /*         auto param = Param(lpm, p_def, medium, density_correction); */
+    /*         return make_crosssection(param, p_def, medium, cuts, interpol);
+     */
+    /* } */
 
-template<typename P, typename M>
-cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium, std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol, bool lpm, std::string param_name,
-        double density_correction = 1.0){
-    std::string name = param_name;
-    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
-    auto it = brems_map<P, M>.find(name);
-    if (it == brems_map<P, M>.end())
-        throw std::logic_error("Unknown parametrization for bremsstrahlung");
+    /* template<typename P, typename M> */
+    /* static std::map<std::string, brems_func_ptr<P, M>> brems_map = { */
+    /*         {"kelnerkokoulinpetrukhin",
+     * create_brems<BremsKelnerKokoulinPetrukhin, P, M>}, */
+    /*         {"petrukhinshestakov", create_brems<BremsPetrukhinShestakov, P,
+     * M>}, */
+    /*         {"completescreening", create_brems<BremsCompleteScreening, P,
+     * M>}, */
+    /*         {"andreevbezrukovbugaev",
+     * create_brems<BremsAndreevBezrukovBugaev, P, M>}, */
+    /*         {"sandrocksoedingreksorhode",
+     * create_brems<BremsSandrockSoedingreksoRhode, P, M>}, */
+    /*         {"electronscreening", create_brems<BremsElectronScreening, P, M>}
+     */
+    /* }; */
 
-    return it->second(p_def, medium, cuts, lpm, interpol, density_correction);
-}
+    /* template<typename P, typename M> */
+    /* cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium,
+     * std::shared_ptr<const */
+    /*         EnergyCutSettings> cuts, bool interpol, bool lpm, std::string
+     * param_name, */
+    /*         double density_correction = 1.0){ */
+    /*     std::string name = param_name; */
+    /*     std::transform(param_name.begin(), param_name.end(), name.begin(),
+     * ::tolower); */
+    /*     auto it = brems_map<P, M>.find(name); */
+    /*     if (it == brems_map<P, M>.end()) */
+    /*         throw std::logic_error("Unknown parametrization for
+     * bremsstrahlung"); */
 
-template<typename P, typename M>
-cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium, std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config,
-        double density_correction = 1.0){
-    if (!config.contains("parametrization"))
-        throw std::logic_error("No parametrization passed for bremsstrahlung");
+    /*     return it->second(p_def, medium, cuts, lpm, interpol,
+     * density_correction); */
+    /* } */
 
-    std::string param_name = config["parametrization"];
-    bool lpm = config.value("lpm", true);
+    /* template<typename P, typename M> */
+    /* cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium,
+     * std::shared_ptr<const */
+    /*         EnergyCutSettings> cuts, bool interpol, const nlohmann::json&
+     * config, */
+    /*         double density_correction = 1.0){ */
+    /*     if (!config.contains("parametrization")) */
+    /*         throw std::logic_error("No parametrization passed for
+     * bremsstrahlung"); */
 
-    return make_bremsstrahlung(p_def, medium, cuts, interpol, lpm, param_name,
-                               density_correction);
-}
+    /*     std::string param_name = config["parametrization"]; */
+    /*     bool lpm = config.value("lpm", true); */
+
+    /*     return make_bremsstrahlung(p_def, medium, cuts, interpol, lpm,
+     * param_name, */
+    /*                                density_correction); */
+    /* } */
 
 } // namespace crosssection
 } // namespace PROPOSAL

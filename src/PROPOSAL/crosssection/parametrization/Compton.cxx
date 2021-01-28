@@ -1,6 +1,5 @@
 
 #include <cmath>
-#include <functional>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/parametrization/Compton.h"
@@ -9,18 +8,19 @@
 
 using namespace PROPOSAL;
 
-double crosssection::Compton::GetLowerEnergyLim(
-    const ParticleDef&) const noexcept
+double crosssection::Compton::GetLowerEnergyLim(const ParticleDef&) const
 {
     return ME;
 }
 
-std::tuple<double, double> crosssection::Compton::GetKinematicLimits(
-    const ParticleDef&, const Component&, double energy) const noexcept
+KinematicLimits crosssection::Compton::GetKinematicLimits(
+    ParticleDef const&, Component const&, double energy) const
 {
     assert(energy > 0);
-    auto vmax = 1. - 1. / (1. + 2. * energy / ME);
-    return std::make_tuple(0., vmax);
+    auto kin_lim = KinematicLimits();
+    auto kin_lim.v_max = 0;
+    auto kin_lim.v_max = 1. - 1. / (1. + 2. * energy / ME);
+    return kin_lim;
 }
 
 double crosssection::ComptonKleinNishina::DifferentialCrossSection(

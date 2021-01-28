@@ -31,7 +31,7 @@
 #include <cstddef>
 
 namespace PROPOSAL {
-class ParticleDef;
+struct ParticleDef;
 class Medium;
 class Component;
 enum class InteractionType;

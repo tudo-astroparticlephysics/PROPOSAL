@@ -13,25 +13,26 @@ using std::make_tuple;
 using namespace PROPOSAL;
 
 double crosssection::Annihilation::GetLowerEnergyLim(
-    const ParticleDef& p_def) const noexcept
+    ParticleDef const& p_def) const
 {
     return p_def.mass * 2.f;
 }
 
-std::tuple<double, double> crosssection::Annihilation::GetKinematicLimits(
-    const ParticleDef& p_def, const Component&, double energy) const noexcept
+KinematicLimits crosssection::Annihilation::GetKinematicLimits(
+    ParticleDef const& p_def, Component const&, double energy) const
 {
     // Limits according to simple 2->2 body interactions
     assert(energy >= p_def.mass);
     auto gamma = energy / p_def.mass;
     auto aux = std::sqrt((gamma - 1.) / (gamma + 1.));
-    auto vmin = 0.5 * (1. - aux);
-    auto vmax = 0.5 * (1. + aux);
-    return make_tuple(vmin, vmax);
+    auto kin_lim = KineamticLimits();
+    kin_lim.v_min = 0.5 * (1. - aux);
+    kin_lim.v_max = 0.5 * (1. + aux);
+    return kin_lim;
 }
 
 double crosssection::AnnihilationHeitler::DifferentialCrossSection(
-    const ParticleDef& p_def, const Component& comp, double energy,
+    ParticleDef const& p_def, Component const& comp, double energy,
     double v) const
 {
     // W. Heitler. The Quantum Theory of Radiation, Clarendon Press, Oxford

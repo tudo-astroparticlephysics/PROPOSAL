@@ -37,25 +37,25 @@
 using namespace PROPOSAL;
 
 double crosssection::Bremsstrahlung::GetLowerEnergyLim(
-    const ParticleDef& p_def) const noexcept
+    const ParticleDef& p_def) const
 {
     return p_def.mass;
 }
 
-std::tuple<double, double> crosssection::Bremsstrahlung::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp,
-    double energy) const noexcept
+KinematicLimits crosssection::Bremsstrahlung::GetKinematicLimits(
+    const ParticleDef& p_def, const Component& comp, double energy) const
 {
     // The limit is taken from the Petrukhin/Shestakov Parametrization
-    auto v_min = 0.;
-    auto v_max = 1
+    auto kin_lim = KinematicLimits();
+    kin_lim.v_min = 0.;
+    kin_lim.v_max = 1
         - 0.75 * SQRTE * (p_def.mass / energy)
             * std::pow(comp.GetNucCharge(), 1. / 3);
 
-    if (v_max < 0) {
-        v_max = 0;
+    if (kin_lim.v_max < 0) {
+        kin_lim.v_max = 0;
     } else if (lorenz_) {
-        v_max = std::min(v_max, lorenz_cut_ / energy);
+        kin_lim.v_max = std::min(kin_lim.v_max, lorenz_cut_ / energy);
     }
 
     // TODO: 1 - a*x is always smaller than 1 - x if a > 1
@@ -63,7 +63,7 @@ std::tuple<double, double> crosssection::Bremsstrahlung::GetKinematicLimits(
     // so the next line will never be called, or?
     // limits.vMax = std::min(limits.vMax, 1 - p_def.mass / energy);
 
-    return std::make_tuple(v_min, v_max);
+    return kin_lim;
 }
 
 double crosssection::Bremsstrahlung::DifferentialCrossSection(

@@ -56,7 +56,6 @@ namespace crosssection {
         static constexpr char value[36] = "ionization";
     };
 
-
     template <typename T> struct IonizationDEdxIntegration {
         constexpr static bool value = false;
     };
