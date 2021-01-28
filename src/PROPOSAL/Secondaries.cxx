@@ -6,6 +6,7 @@
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/Constants.h"
 
 #include <memory>
 #include <vector>

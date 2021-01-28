@@ -1,5 +1,6 @@
 #pragma once
 #include "PROPOSAL/propagation_utility/Displacement.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
 namespace PROPOSAL {
 template <typename T> class DisplacementBuilder : public Displacement {

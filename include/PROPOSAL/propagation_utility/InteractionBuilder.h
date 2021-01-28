@@ -1,8 +1,6 @@
 #pragma once
-#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
-#include <type_traits>
 
 namespace PROPOSAL {
 template <class I> class InteractionBuilder : public Interaction {
@@ -11,22 +9,6 @@ template <class I> class InteractionBuilder : public Interaction {
     void build_tables() {};
 
 public:
-    /* I BuildInteractionIntegral() */
-    /* { */
-    /*     auto disp = std::shared_ptr<Displacement>( */
-    /*         make_displacement(cross_list, false)); */
-    /*     auto interaction_func = [this, disp](double energy) { */
-    /*         return FunctionToIntegral(*disp, energy); */
-    /*     }; */
-    /*     I integral(interaction_func, lower_lim); */
-    /*     if (typeid(I) == typeid(UtilityInterpolant)) { */
-    /*         auto hash_digest = (size_t)0; */
-    /* hash_combine(hash_digest, CrossSectionVector::GetHash(cross_list), */
-    /*             interpol_def.GetHash()); */
-    /* integral.BuildTables("interaction", hash_digest, interpol_def); */
-    /* }; */
-    /* return integral; */
-    /* } */
 
     template <typename Cross>
     InteractionBuilder(std::shared_ptr<Displacement> _disp, Cross&& _cross)

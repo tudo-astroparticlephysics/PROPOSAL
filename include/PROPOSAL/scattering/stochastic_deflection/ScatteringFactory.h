@@ -37,7 +37,6 @@
 #include <utility>
 #include <vector>
 
-#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"

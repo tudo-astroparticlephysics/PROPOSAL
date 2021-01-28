@@ -5,12 +5,28 @@
 #include "PROPOSAL/Secondaries.h"
 
 namespace PROPOSAL {
-class ParticleDef;
-class Geometry;
+    class ParticleDef;
 
-using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
-    std::shared_ptr<const Density_distr>>;
+    class Geometry;
 
+    using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
+            std::shared_ptr<const Density_distr>>;
+
+    template<class P, class M>
+    class CrossSection;
+
+    template<typename P, typename M>
+    using crosssection_t
+    = CrossSection<typename std::decay<P>::type, typename std::decay<M>::type>;
+
+    template<typename P, typename M>
+    using cross_t_ptr = std::unique_ptr<crosssection_t<P, M>>;
+
+    template<typename P, typename M>
+    using crosssection_list_t = std::vector<std::shared_ptr<crosssection_t<P, M>>>;
+}
+
+namespace PROPOSAL {
 class Propagator
 {
 public:

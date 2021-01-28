@@ -1,9 +1,12 @@
 #pragma once
 
-#include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/CrossSectionVector.h"
+#include <vector>
 #include "PROPOSAL/math/InterpolantBuilder.h"
-#include "PROPOSAL/propagation_utility/Displacement.h"
+
+namespace PROPOSAL {
+    class Displacement;
+    class CrossSectionBase;
+}
 
 namespace PROPOSAL {
 
@@ -21,7 +24,7 @@ struct ContRand {
         , hash(0)
         , cross_list(std::begin(cross), std::end(cross))
     {
-        hash_combine(hash, _disp->GetHash());
+        CalculateHash();
     }
 
     virtual ~ContRand() = default;
@@ -34,6 +37,9 @@ struct ContRand {
     virtual double EnergyRandomize(double, double, double) = 0;
 
     auto GetHash() const noexcept { return hash; }
+
+private:
+    void CalculateHash() noexcept;
 };
 
 } // namespace PROPOSAL

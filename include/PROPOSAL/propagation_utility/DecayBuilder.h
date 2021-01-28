@@ -1,7 +1,7 @@
 #pragma once
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/propagation_utility/Decay.h"
-#include <math.h>
+#include <cmath>
 
 namespace PROPOSAL {
 template <class T> class DecayBuilder : public Decay {
@@ -9,25 +9,6 @@ template <class T> class DecayBuilder : public Decay {
 
     void build_tables() {};
 
-    /* T BuildDecayIntegral(Cross&& cross) */
-    /* { */
-    /*     auto disp = std::shared_ptr<Displacement>(make_displacement(cross,
-     * false)); */
-    /*     auto decay_func = [this, cross, disp](double energy) mutable { */
-    /*         return FunctionToIntegral(cross, *disp, energy); */
-    /*     }; */
-    /*     T decay_integral(decay_func, CrossSectionVector::GetLowerLim(cross));
-     */
-    /*     if (typeid(T) == typeid(UtilityInterpolant)) { */
-    /*         auto hash_digest = (size_t)0; */
-    /*         hash_combine(hash_digest, CrossSectionVector::GetHash(cross),
-     * interpol_def.GetHash()); */
-
-    /*         decay_integral.BuildTables("decay", hash_digest, interpol_def);
-     */
-    /*     }; */
-    /*     return decay_integral; */
-    /* } */
 
 public:
     DecayBuilder(

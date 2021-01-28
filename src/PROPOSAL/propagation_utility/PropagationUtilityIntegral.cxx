@@ -1,14 +1,6 @@
 
-#include <cmath>
-#include <functional>
-
-#include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 

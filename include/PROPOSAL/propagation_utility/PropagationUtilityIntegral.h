@@ -29,7 +29,6 @@
 #pragma once
 
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
 
 namespace PROPOSAL {
 class UtilityIntegral {

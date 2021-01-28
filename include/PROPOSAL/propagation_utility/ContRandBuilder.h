@@ -2,7 +2,7 @@
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/propagation_utility/ContRand.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
-
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 namespace PROPOSAL {
 template <class T> class ContRandBuilder : public ContRand {
     T cont_rand_integral;

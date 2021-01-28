@@ -3,18 +3,9 @@
 #include <cmath>
 #include <functional>
 
-#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Logging.h"
-#include "PROPOSAL/methods.h"
-
-#include "PROPOSAL/crosssection/CrossSection.h"
-
 #include "CubicInterpolation/Interpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
-#include "PROPOSAL/math/MathMethods.h"
 
 using namespace PROPOSAL;
 using Helper::InitializeInterpolation;

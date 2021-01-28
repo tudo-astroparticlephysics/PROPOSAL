@@ -28,12 +28,8 @@
 
 #pragma once
 
-#include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
-#include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-
+#include "PROPOSAL/methods.h"
 #include "CubicInterpolation/CubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
 

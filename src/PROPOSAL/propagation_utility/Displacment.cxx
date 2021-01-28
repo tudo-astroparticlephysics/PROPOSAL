@@ -1,4 +1,5 @@
 #include "PROPOSAL/propagation_utility/Displacement.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 using namespace PROPOSAL;
 

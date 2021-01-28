@@ -1,11 +1,12 @@
 #pragma once
 
-#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/CrossSectionVector.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-#include <utility>
 #include <vector>
+
+namespace PROPOSAL {
+    class CrossSectionBase;
+}
 
 namespace PROPOSAL {
 

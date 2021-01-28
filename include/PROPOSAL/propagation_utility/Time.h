@@ -1,8 +1,10 @@
 #pragma once
 
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
-#include "PROPOSAL/propagation_utility/Displacement.h"
+
+namespace PROPOSAL {
+    class Displacement;
+}
 
 namespace PROPOSAL {
 class Time {
@@ -15,13 +17,8 @@ protected:
 public:
     Time() = default;
 
-    Time(std::shared_ptr<Displacement> _disp, double _mass)
-        : disp(_disp)
-        , mass(_mass)
-        , hash(0)
-    {
-        hash_combine(hash, mass);
-    }
+    Time(std::shared_ptr<Displacement> _disp, double _mass);
+
     virtual ~Time() = default;
 
     static Interpolant1DBuilder::Definition interpol_def;
