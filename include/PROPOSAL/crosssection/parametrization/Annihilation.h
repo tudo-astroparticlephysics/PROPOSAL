@@ -55,7 +55,7 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<AnnihilationHeitler> {
-        static constexpr char value[36] = "annihilation_heitler";
+        static constexpr char value[36] = "annihilationheitler";
     };
 
     /* // Factory pattern functions */

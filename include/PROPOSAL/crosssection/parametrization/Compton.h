@@ -42,12 +42,21 @@ namespace crosssection {
             ParticleDef const&, Component const&, double) const final;
     };
 
+    template <> struct ParametrizationName<Compton> {
+        static constexpr char value[36] = "compton";
+    };
+
     struct ComptonKleinNishina : public Compton {
         ComptonKleinNishina() = default;
 
         double DifferentialCrossSection(const ParticleDef&, const Component&,
             double energy, double v) const final;
     };
+
+    template <> struct ParametrizationName<ComptonKleinNishina> {
+        static constexpr char value[36] = "comptonkleinnishina";
+    };
+
 } // namespace crosssection
 
 /* namespace detail { */

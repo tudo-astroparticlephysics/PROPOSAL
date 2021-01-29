@@ -41,6 +41,10 @@
                                                                                \
         double FunctionToIntegral(const ParticleDef&, const Component&,        \
             double energy, double v, double r) const;                          \
+    };                                                                         \
+                                                                               \
+    template <> struct ParametrizationName<Mupair##param> {                    \
+        static constexpr char value[36] = "mupair"#param;                      \
     };
 
 namespace PROPOSAL {
@@ -54,8 +58,8 @@ namespace crosssection {
     public:
         MupairProduction();
         virtual ~MupairProduction() = default;
-        using only_stochastic = std::false_type;
-        using component_wise = std::true_type;
+        //using only_stochastic = std::false_type;
+        //using component_wise = std::true_type;
 
         virtual double FunctionToIntegral(const ParticleDef&, const Component&,
             double energy, double v, double r) const = 0;
@@ -63,6 +67,10 @@ namespace crosssection {
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
         KinematicLimits GetKinematicLimits(const ParticleDef&,
             const Component&, double) const noexcept override;
+    };
+
+    template <> struct ParametrizationName<MupairProduction> {
+        static constexpr char value[36] = "mupairproduction";
     };
 
     class MupairProductionRhoIntegral : public MupairProduction {
