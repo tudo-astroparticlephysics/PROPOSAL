@@ -30,6 +30,7 @@
 
 /* #include "PROPOSAL/EnergyCutSettings.h" */
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
 /* #include "PROPOSAL/medium/Medium.h" */
 /* #include "PROPOSAL/particle/ParticleDef.h" */
@@ -37,21 +38,19 @@
 namespace PROPOSAL {
 template <typename Param, typename P, typename M>
 class CrossSectionIntegral : public crosssection_t<P, M> {
-    using param_t = typename std::decay<Param>::type;
+
+    using comp_wise = crosssection::is_component_wise<Param>;
 
 public:
     CrossSectionIntegral(Param _param, P _p_def, M _medium,
         std::shared_ptr<const EnergyCutSettings> _cut)
         : crosssection_t<P, M>(_param, _p_def, _medium,
-            detail::build_dndx(
-                typename param_t::base_param_t::component_wise {}, false,
+            detail::build_dndx(crosssection::is_component_wise<Param> {}, false,
                 _medium, _param, _p_def, _cut),
-            detail::build_dedx(
-                typename param_t::base_param_t::component_wise {}, false,
+            detail::build_dedx(crosssection::is_component_wise<Param> {}, false,
                 _param, _p_def, _medium, _cut),
-            detail::build_de2dx(
-                typename param_t::base_param_t::component_wise {}, false,
-                _param, _p_def, _medium, _cut))
+            detail::build_de2dx(crosssection::is_component_wise<Param> {},
+                false, _param, _p_def, _medium, _cut))
     {
         if (typename param_t::only_stochastic {} == true and _cut != nullptr) {
             throw std::invalid_argument(

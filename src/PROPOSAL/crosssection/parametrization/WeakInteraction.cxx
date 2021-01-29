@@ -13,7 +13,7 @@
 using namespace PROPOSAL;
 
 double crosssection::WeakInteraction::GetLowerEnergyLim(
-    const ParticleDef& p_def) const
+    const ParticleDef& p_def) const noexcept
 {
     return p_def.mass;
 }

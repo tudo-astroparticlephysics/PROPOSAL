@@ -35,17 +35,18 @@
 
 namespace PROPOSAL {
 class Interpolant;
+class Component;
 } // namespace PROPOSAL;
 
 namespace PROPOSAL {
 namespace crosssection {
 
-    class WeakInteraction : public Parametrization {
+    class WeakInteraction : public Parametrization<Component> {
     public:
         WeakInteraction() = default;
         virtual ~WeakInteraction() = default;
 
-        double GetLowerEnergyLim(ParticleDef const&) const final;
+        double GetLowerEnergyLim(ParticleDef const&) const noexcept final;
         KinematicLimits GetKinematicLimits(
             ParticleDef const&, Component const&, double) const final;
     };

@@ -394,40 +394,40 @@ crosssection_list_t<ParticleDef, Medium> Propagator::CreateCrossSectionList(
         bool interpolate, double density_correction, const nlohmann::json& config) {
     crosssection_list_t<ParticleDef, Medium> cross;
 
-    if (config.contains("annihilation"))
-        cross.emplace_back(crosssection::make_annihilation(p_def, medium,
-                                                           interpolate, config["annihilation"]));
-    if (config.contains("brems"))
-        cross.emplace_back(crosssection::make_bremsstrahlung(p_def, medium,
-                                                             cuts, interpolate, config["brems"],
-                                                             density_correction));
-    if (config.contains("compton"))
-        cross.emplace_back(crosssection::make_compton(p_def, medium,
-                                                      cuts, interpolate, config["compton"]));
-    if (config.contains("epair"))
-        cross.emplace_back(crosssection::make_epairproduction(p_def, medium,
-                                                              cuts, interpolate, config["epair"],
-                                                              density_correction));
-    if (config.contains("ioniz"))
-        cross.emplace_back(crosssection::make_ionization(p_def, medium,
-                                                         cuts, interpolate, config["ioniz"]));
-    if (config.contains("mupair"))
-        cross.emplace_back(crosssection::make_mupairproduction(p_def, medium,
-                                                               cuts, interpolate, config["mupair"]));
-    if (config.contains("photo")) {
-        try { cross.emplace_back(crosssection::make_photonuclearreal(p_def, medium,
-                                                                     cuts, interpolate, config["photo"]));
-        } catch (std::invalid_argument &e) {
-            cross.emplace_back(crosssection::make_photonuclearQ2(p_def, medium,
-                                                                 cuts, interpolate, config["photo"]));
-        }
-    }
-    if (config.contains("photopair"))
-        cross.emplace_back(crosssection::make_photopairproduction(p_def, medium,
-                                                                  interpolate, config["photopair"]));
-    if(config.contains("weak"))
-        cross.emplace_back(crosssection::make_weakinteraction(p_def, medium,
-                                                              interpolate, config["weak"]));
+/*     if (config.contains("annihilation")) */
+/*         cross.emplace_back(crosssection::make_annihilation(p_def, medium, */
+/*                                                            interpolate, config["annihilation"])); */
+/*     if (config.contains("brems")) */
+/*         cross.emplace_back(crosssection::make_bremsstrahlung(p_def, medium, */
+/*                                                              cuts, interpolate, config["brems"], */
+/*                                                              density_correction)); */
+/*     if (config.contains("compton")) */
+/*         cross.emplace_back(crosssection::make_compton(p_def, medium, */
+/*                                                       cuts, interpolate, config["compton"])); */
+/*     if (config.contains("epair")) */
+/*         cross.emplace_back(crosssection::make_epairproduction(p_def, medium, */
+/*                                                               cuts, interpolate, config["epair"], */
+/*                                                               density_correction)); */
+/*     if (config.contains("ioniz")) */
+/*         cross.emplace_back(crosssection::make_ionization(p_def, medium, */
+/*                                                          cuts, interpolate, config["ioniz"])); */
+/*     if (config.contains("mupair")) */
+/*         cross.emplace_back(crosssection::make_mupairproduction(p_def, medium, */
+/*                                                                cuts, interpolate, config["mupair"])); */
+/*     if (config.contains("photo")) { */
+/*         try { cross.emplace_back(crosssection::make_photonuclearreal(p_def, medium, */
+/*                                                                      cuts, interpolate, config["photo"])); */
+/*         } catch (std::invalid_argument &e) { */
+/*             cross.emplace_back(crosssection::make_photonuclearQ2(p_def, medium, */
+/*                                                                  cuts, interpolate, config["photo"])); */
+/*         } */
+/*     } */
+/*     if (config.contains("photopair")) */
+/*         cross.emplace_back(crosssection::make_photopairproduction(p_def, medium, */
+/*                                                                   interpolate, config["photopair"])); */
+/*     if(config.contains("weak")) */
+/*         cross.emplace_back(crosssection::make_weakinteraction(p_def, medium, */
+/*                                                               interpolate, config["weak"])); */
 
     return cross;
 }

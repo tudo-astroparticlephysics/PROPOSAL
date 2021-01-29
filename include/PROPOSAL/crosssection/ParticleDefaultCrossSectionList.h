@@ -8,6 +8,7 @@
 #include "PROPOSAL/crosssection/CrossSectionIntegral.h"
 #include "PROPOSAL/crosssection/CrossSectionInterpolant.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/crosssection/parametrization/Bremsstrahlung.h"

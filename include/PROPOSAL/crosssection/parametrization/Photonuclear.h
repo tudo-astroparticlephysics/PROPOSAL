@@ -74,6 +74,11 @@ namespace crosssection {
     public:
         Photonuclear();
         virtual ~Photonuclear() = default;
+
+        KinematicLimits GetKinematicLimits(
+            const ParticleDef&, const Component&, double) const final;
+
+        double GetLowerEnergyLim(ParticleDef const&) const noexcept final;
     };
 
 } // namespace crosssection

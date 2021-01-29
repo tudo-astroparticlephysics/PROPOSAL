@@ -39,24 +39,19 @@ class CrossSectionInterpolant : public crosssection_t<P, M>,
                                 public CrossSectionInterpolantBase {
 
     using param_t = typename std::decay<Param>::type;
-    using base_param_ref_t = typename std::add_lvalue_reference<
-        typename param_t::base_param_t>::type;
 
 public:
     CrossSectionInterpolant(Param _param, P _p_def, M _medium,
         std::shared_ptr<const EnergyCutSettings> _cut)
         : crosssection_t<P, M>(_param, _p_def, _medium,
-            detail::build_dndx(
-                typename param_t::base_param_t::component_wise {}, true,
+            detail::build_dndx(crosssection::is_component_wise<Param> {}, true,
                 _medium, _param, _p_def, _cut),
-            detail::build_dedx(
-                typename param_t::base_param_t::component_wise {}, true, _param,
-                _p_def, _medium, _cut),
-            detail::build_de2dx(
-                typename param_t::base_param_t::component_wise {}, true, _param,
-                _p_def, _medium, _cut))
+            detail::build_dedx(crosssection::is_component_wise<Param> {}, true,
+                _param, _p_def, _medium, _cut),
+            detail::build_de2dx(crosssection::is_component_wise<Param> {}, true,
+                _param, _p_def, _medium, _cut))
     {
-        if (typename param_t::only_stochastic {} == true and _cut != nullptr) {
+        if (crosssection::is_only_stochastic<Param> {} == true and _cut != nullptr) {
             throw std::invalid_argument(
                 "CrossSections of parametrizations that are only "
                 "stochastic do "

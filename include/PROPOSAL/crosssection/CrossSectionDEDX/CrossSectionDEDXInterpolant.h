@@ -21,9 +21,8 @@ class AxisBuilder_dEdx {
     size_t n;
 
 public:
-    template <typename... Args>
-    AxisBuilder_dEdx(crosssection::Parametrization const& _param,
-        ParticleDef const& _p, Args...)
+    template <typename Param, typename... Args>
+    AxisBuilder_dEdx(Param const& _param, ParticleDef const& _p, Args...)
         : low(_param.GetLowerEnergyLim(_p))
         , up(UPPER_ENERGY_LIM_DEFAULT)
         , n(NODES_DEDX_DEFAULT)

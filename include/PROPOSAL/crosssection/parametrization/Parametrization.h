@@ -29,6 +29,7 @@
 #pragma once
 
 #include <cstddef>
+#include <type_traits>
 
 namespace PROPOSAL {
 struct ParticleDef;
@@ -54,7 +55,14 @@ namespace crosssection {
         static constexpr size_t value = 0;
     };
 
-    template <typename Target> class Parametrization {
+    template <typename T> struct is_component_wise : std::true_type {
+    };
+
+    template <typename T> struct is_only_stochastic : std::false_type {
+    };
+
+    template <typename Target>
+    class Parametrization {
     protected:
         size_t hash;
 

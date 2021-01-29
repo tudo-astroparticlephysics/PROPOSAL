@@ -138,7 +138,7 @@ namespace crosssection {
 /*             return i.Integrate(t_min, t_max, dEdx, 2); */
 /*         }; */
 /*     } */
-}
+/* } */
 
 // Factory pattern functions
 
