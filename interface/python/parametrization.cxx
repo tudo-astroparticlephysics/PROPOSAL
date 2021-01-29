@@ -276,7 +276,9 @@ void init_parametrization(py::module& m)
         crosssection::EpairProduction>(
                 m_sub_epair, "EpairProductionRhoIntegral")
             .def("function_to_integral",
-                    &crosssection::EpairProductionRhoIntegral::FunctionToIntegral);
+                    &crosssection::EpairProductionRhoIntegral::FunctionToIntegral,
+                    py::arg("particle_def"), py::arg("component"), py::arg("energy"),
+                    py::arg("v"), py::arg("rho"));
 
         EPAIR_DEF(m_sub_epair, KelnerKokoulinPetrukhin)
         EPAIR_DEF(m_sub_epair, SandrockSoedingreksoRhode)
@@ -369,7 +371,9 @@ void init_parametrization(py::module& m)
         crosssection::MupairProduction>(
                 m_sub_mupair, "MupairProductionRhoIntegral")
             .def("function_to_integral",
-                    &crosssection::MupairProductionRhoIntegral::FunctionToIntegral);
+                    &crosssection::MupairProductionRhoIntegral::FunctionToIntegral,
+                    py::arg("particle_def"), py::arg("component"), py::arg("energy"),
+                    py::arg("v"), py::arg("rho"));
 
     MUPAIR_DEF(m_sub_mupair, KelnerKokoulinPetrukhin)
 
