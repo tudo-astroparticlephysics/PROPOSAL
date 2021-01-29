@@ -5,51 +5,47 @@
 
 #include "PROPOSAL/crosssection/parametrization/ParamTables.h"
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
-#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
-using std::make_tuple;
 
-crosssection::WeakInteraction::WeakInteraction()
-    : crosssection::Parametrization(InteractionType::WeakInt, "weak_interaction")
-{
-}
-
-double crosssection::WeakInteraction::GetLowerEnergyLim(const ParticleDef& p_def) const
-    noexcept
+double crosssection::WeakInteraction::GetLowerEnergyLim(
+    const ParticleDef& p_def) const
 {
     return p_def.mass;
 }
-std::tuple<double, double> crosssection::WeakInteraction::GetKinematicLimits(
-    const ParticleDef&, const Component&, double energy) const
-    noexcept
+
+KinematicLimits crosssection::WeakInteraction::GetKinematicLimits(
+    ParticleDef const&, Component const&, double energy) const
 {
     double aux = (MP + MN) / 2; // for isoscalar targets
     aux = 2 * energy * aux + pow(aux, 2);
-    auto v_min = 1e6 / (aux); // q^2_min = 1e6 MeV for experimental reasons
-    auto v_max = 1.f;
-    return make_tuple(v_min, v_max);
+    auto kin_lim = KinematicLimits();
+    kin_lim.v_min = 1e6 / (aux); // q^2_min = 1e6 MeV for experimental reasons
+    kin_lim.v_max = 1.f;
+    return kin_lim;
 }
 
 crosssection::WeakCooperSarkarMertsch::WeakCooperSarkarMertsch()
 {
     hash_combine(hash, std::string("cooper_sarkar_mertsch"));
-    auto interpolant_particle_p = std::make_shared<Interpolant>(
-            energies, y_nubar_p, sigma_nubar_p, IROMB, false, false, IROMB, false, false);
-    auto interpolant_particle_n = std::make_shared<Interpolant>(
-            energies, y_nubar_n, sigma_nubar_n, IROMB, false, false, IROMB, false, false);
-    interpolants_particle = std::make_pair(interpolant_particle_p, interpolant_particle_n);
+    auto interpolant_particle_p = std::make_shared<Interpolant>(energies,
+        y_nubar_p, sigma_nubar_p, IROMB, false, false, IROMB, false, false);
+    auto interpolant_particle_n = std::make_shared<Interpolant>(energies,
+        y_nubar_n, sigma_nubar_n, IROMB, false, false, IROMB, false, false);
+    interpolants_particle
+        = std::make_pair(interpolant_particle_p, interpolant_particle_n);
 
     auto interpolant_antiparticle_p = std::make_shared<Interpolant>(
-            energies, y_nu_p, sigma_nu_p, IROMB, false, false, IROMB, false, false);
+        energies, y_nu_p, sigma_nu_p, IROMB, false, false, IROMB, false, false);
     auto interpolant_antiparticle_n = std::make_shared<Interpolant>(
-            energies, y_nu_n, sigma_nu_n, IROMB, false, false, IROMB, false, false);
-    interpolants_antiparticle = std::make_pair(interpolant_antiparticle_p, interpolant_antiparticle_n);
+        energies, y_nu_n, sigma_nu_n, IROMB, false, false, IROMB, false, false);
+    interpolants_antiparticle = std::make_pair(
+        interpolant_antiparticle_p, interpolant_antiparticle_n);
 }
-
 
 double crosssection::WeakCooperSarkarMertsch::DifferentialCrossSection(
     const ParticleDef& p_def, const Component& comp, double energy,
@@ -62,19 +58,19 @@ double crosssection::WeakCooperSarkarMertsch::DifferentialCrossSection(
     double proton_contr = nuclear_charge;
     double neutron_contr = (nuclear_number - nuclear_charge);
     if (p_def.charge < 0.) {
-        proton_contr *= interpolants_particle.first->InterpolateArray(
-                log10_energy, v);
-        neutron_contr *= interpolants_particle.second->InterpolateArray(
-                log10_energy, v);
+        proton_contr
+            *= interpolants_particle.first->InterpolateArray(log10_energy, v);
+        neutron_contr
+            *= interpolants_particle.second->InterpolateArray(log10_energy, v);
     } else {
         proton_contr *= interpolants_antiparticle.first->InterpolateArray(
-                log10_energy, v);
+            log10_energy, v);
         neutron_contr *= interpolants_antiparticle.second->InterpolateArray(
-                log10_energy, v);
+            log10_energy, v);
     }
 
     auto mean_contr = (proton_contr + neutron_contr) / nuclear_number;
-    //assert(mean_contr > 0);
+    // assert(mean_contr > 0);
 
     // factor 1e-36: conversion from pb to cm^2
     return NA / comp.GetAtomicNum() * 1e-36 * std::max(mean_contr, 0.);

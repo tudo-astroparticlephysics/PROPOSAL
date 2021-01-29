@@ -19,9 +19,7 @@ namespace detail {
             auto dE2dx = [&param, &p_def, &target, E](double v) {
                 return param.FunctionToDE2dxIntegral(p_def, target, E, v);
             };
-            return i.Integrate(
-                std::get<crosssection::Parametrization::V_MIN>(lim), v_cut,
-                dE2dx, 2);
+            return i.Integrate(lim.v_min, v_cut, dE2dx, 2);
         };
     }
 }
@@ -40,9 +38,7 @@ class CrossSectionDE2DXIntegral : public CrossSectionDE2DX {
             auto dE2dx = [&param, &p_def, &medium, E](double v) {
                 return param.FunctionToDE2dxIntegral(p_def, medium, E, v);
             };
-            return i.Integrate(
-                std::get<crosssection::Parametrization::V_MIN>(lim), v_cut,
-                dE2dx, 2);
+            return i.Integrate(lim.v_min, v_cut, dE2dx, 2);
         };
     }
 

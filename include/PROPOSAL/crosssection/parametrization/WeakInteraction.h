@@ -29,83 +29,95 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-#include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
-#include "PROPOSAL/math/Interpolant.h"
 
 #include <memory>
-#include <unordered_map>
-#include <vector>
+#include <utility>
 
 namespace PROPOSAL {
 class Interpolant;
+} // namespace PROPOSAL;
 
+namespace PROPOSAL {
 namespace crosssection {
+
     class WeakInteraction : public Parametrization {
     public:
-        WeakInteraction();
-        ~WeakInteraction() = default;
+        WeakInteraction() = default;
+        virtual ~WeakInteraction() = default;
 
-        using only_stochastic = std::true_type;
-        using component_wise = std::true_type;
+        double GetLowerEnergyLim(ParticleDef const&) const final;
+        KinematicLimits GetKinematicLimits(
+            ParticleDef const&, Component const&, double) const final;
+    };
 
-        double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-        std::tuple<double, double> GetKinematicLimits(const ParticleDef&,
-            const Component&, double) const noexcept override;
+    template <> struct ParametrizationName<WeakInteraction> {
+        static constexpr char value[36] = "weak_interaction";
+    };
+
+    template <> struct ParametrizationId<WeakInteraction> {
+        static constexpr size_t value = 1000000009;
     };
 
     class WeakCooperSarkarMertsch : public WeakInteraction {
-        std::pair<std::shared_ptr<Interpolant>,
-                std::shared_ptr<Interpolant>> interpolants_particle;
-        std::pair<std::shared_ptr<Interpolant>,
-                std::shared_ptr<Interpolant>> interpolants_antiparticle;
+        using Interpolant_t = std::shared_ptr<Interpolant>;
+        std::pair<Interpolant_t, Interpolant_t> interpolants_particle;
+        std::pair<Interpolant_t, Interpolant_t> interpolants_antiparticle;
 
     public:
         WeakCooperSarkarMertsch();
 
-        using base_param_t = WeakInteraction;
-
-        double DifferentialCrossSection(const ParticleDef&, const Component&,
-            double, double) const override;
+        double DifferentialCrossSection(
+            ParticleDef const&, Component const&, double, double) const final;
     };
 
-// Factory pattern functions
-
-template <typename P, typename M>
-using weak_func_ptr = cross_t_ptr<P, M>(*)(P, M, bool);
-
-template <typename Param, typename P, typename M>
-cross_t_ptr<P, M> create_weak(P p_def, M medium, bool interpol) {
-    auto param = Param();
-    return make_crosssection(param, p_def, medium, nullptr, interpol);
-}
-
-template<typename P, typename M>
-static std::map<std::string, weak_func_ptr<P, M>> weak_map = {
-        {"coopersarkarmertsch", create_weak<WeakCooperSarkarMertsch, P, M>}
-};
-
-template<typename P, typename M>
-cross_t_ptr<P, M> make_weakinteraction(P p_def, M medium, bool interpol,
-                                    const std::string& param_name){
-    std::string name = param_name;
-    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
-    auto it = weak_map<P, M>.find(name);
-    if (it == weak_map<P, M>.end())
-        throw std::logic_error("Unknown parametrization for weak interaction");
-
-    return it->second(p_def, medium, interpol);
-}
-
-template<typename P, typename M>
-cross_t_ptr<P, M> make_weakinteraction(P p_def, M medium, bool interpol,
-                                    const nlohmann::json& config){
-    if (!config.contains("parametrization"))
-        throw std::logic_error("No parametrization passed for weak interaction");
-    std::string param_name = config["parametrization"];
-
-    return make_weakinteraction(p_def, medium, interpol, param_name);
-}
-
+    template <> struct ParametrizationName<WeakCooperSarkarMertsch> {
+        static constexpr char value[36] = "weak_cooper_sarkar_mertsch";
+    };
 } // namespace crosssection
 } // namespace PROPOSAL
+
+/* // Factory pattern functions */
+
+/* template <typename P, typename M> */
+/* using weak_func_ptr = cross_t_ptr<P, M> (*)(P, M, bool); */
+
+/* template <typename Param, typename P, typename M> */
+/* cross_t_ptr<P, M> create_weak(P p_def, M medium, bool interpol) */
+/* { */
+/*     auto param = Param(); */
+/*     return make_crosssection(param, p_def, medium, nullptr, interpol); */
+/* } */
+
+/* template <typename P, typename M> */
+/* static std::map<std::string, weak_func_ptr<P, M>> weak_map = { */
+/*     { "coopersarkarmertsch", create_weak<WeakCooperSarkarMertsch, P, M> }
+ */
+/* }; */
+
+/* template <typename P, typename M> */
+/* cross_t_ptr<P, M> make_weakinteraction( */
+/*     P p_def, M medium, bool interpol, const std::string& param_name) */
+/* { */
+/*     std::string name = param_name; */
+/*     std::transform( */
+/*         param_name.begin(), param_name.end(), name.begin(), ::tolower);
+ */
+/*     auto it = weak_map<P, M>.find(name); */
+/*     if (it == weak_map<P, M>.end()) */
+/*         throw std::logic_error( */
+/*             "Unknown parametrization for weak interaction"); */
+
+/*     return it->second(p_def, medium, interpol); */
+/* } */
+
+/* template <typename P, typename M> */
+/* cross_t_ptr<P, M> make_weakinteraction( */
+/*     P p_def, M medium, bool interpol, const nlohmann::json& config) */
+/* { */
+/*     if (!config.contains("parametrization")) */
+/*         throw std::logic_error( */
+/*             "No parametrization passed for weak interaction"); */
+/*     std::string param_name = config["parametrization"]; */
+
+/*     return make_weakinteraction(p_def, medium, interpol, param_name); */
+/* } */

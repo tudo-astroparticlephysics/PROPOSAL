@@ -29,7 +29,6 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
-#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include <memory>
 #include <unordered_map>
 
@@ -45,83 +44,95 @@
 
 namespace PROPOSAL {
 namespace crosssection {
-class PhotoRealPhotonAssumption : public Photonuclear {
-protected:
-    bool hard_component_;
-    std::unordered_map<size_t, std::shared_ptr<RealPhoton>> hard_component_map;
+    class PhotoRealPhotonAssumption : public Photonuclear {
+        using realphoton_ptr = std::shared_ptr<RealPhoton>;
 
-public:
-    PhotoRealPhotonAssumption(bool hard_component);
-    virtual ~PhotoRealPhotonAssumption() = default;
+    protected:
+        bool hard_component_;
+        std::unordered_map<size_t, realphoton_ptr> hard_component_map;
 
-    virtual double DifferentialCrossSection(
-        const ParticleDef&, const Component&, double energy, double v) const;
-    virtual double CalculateParametrization(
-        const Component&, double nu) const = 0;
-    double NucleusCrossSectionCaldwell(double nu) const;
-};
+    public:
+        PhotoRealPhotonAssumption(bool hard_component);
+        virtual ~PhotoRealPhotonAssumption() = default;
 
-PHOTO_PARAM_REAL_DEC(Zeus, RealPhotonAssumption)
-PHOTO_PARAM_REAL_DEC(BezrukovBugaev, RealPhotonAssumption)
-PHOTO_PARAM_REAL_DEC(Kokoulin, BezrukovBugaev)
+        virtual double DifferentialCrossSection(const ParticleDef&,
+            const Component&, double energy, double v) const;
+        virtual double CalculateParametrization(
+            const Component&, double nu) const = 0;
+        double NucleusCrossSectionCaldwell(double nu) const;
+    };
 
-class PhotoRhode : public PhotoRealPhotonAssumption {
-    std::shared_ptr<Interpolant> interpolant_;
+    PHOTO_PARAM_REAL_DEC(Zeus, RealPhotonAssumption)
+    PHOTO_PARAM_REAL_DEC(BezrukovBugaev, RealPhotonAssumption)
+    PHOTO_PARAM_REAL_DEC(Kokoulin, BezrukovBugaev)
 
-    double MeasuredSgN(double e) const;
+    class PhotoRhode : public PhotoRealPhotonAssumption {
+        Interpolant interpolant_;
 
-public:
-    PhotoRhode(bool hard_component);
-    using base_param_t = Photonuclear;
-    double CalculateParametrization(const Component&, double nu) const override;
-};
+        double MeasuredSgN(double e) const;
+
+    public:
+        PhotoRhode(bool hard_component);
+        using base_param_t = Photonuclear;
+        double CalculateParametrization(
+            const Component&, double nu) const override;
+    };
+
+} // namespace crosssection
+} // namespace PROPOSAL
 
 #undef PHOTO_PARAM_REAL_DEC
 
 // Factory pattern functions
 
-template <typename P, typename M>
-using photoreal_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
-        EnergyCutSettings>, bool, bool);
+/* template <typename P, typename M> */
+/* using photoreal_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
+ */
+/*         EnergyCutSettings>, bool, bool); */
 
-template <typename Param, typename P, typename M>
-cross_t_ptr<P, M> create_photoreal(P p_def, M medium,std::shared_ptr<const
-        EnergyCutSettings> cuts, bool hard_component, bool interpol) {
-    auto param = Param(hard_component);
-    return make_crosssection(param, p_def, medium, cuts, interpol);
-}
+/* template <typename Param, typename P, typename M> */
+/* cross_t_ptr<P, M> create_photoreal(P p_def, M medium,std::shared_ptr<const */
+/*         EnergyCutSettings> cuts, bool hard_component, bool interpol) { */
+/*     auto param = Param(hard_component); */
+/*     return make_crosssection(param, p_def, medium, cuts, interpol); */
+/* } */
 
-template<typename P, typename M>
-static std::map<std::string, photoreal_func_ptr<P, M>> photoreal_map = {
-        {"zeus", create_photoreal<PhotoZeus, P, M>},
-        {"bezrukovbugaev", create_photoreal<PhotoBezrukovBugaev, P, M>},
-        {"kokoulin", create_photoreal<PhotoKokoulin, P, M>},
-        {"rhode", create_photoreal<PhotoRhode, P, M>},
-};
+/* template<typename P, typename M> */
+/* static std::map<std::string, photoreal_func_ptr<P, M>> photoreal_map = { */
+/*         {"zeus", create_photoreal<PhotoZeus, P, M>}, */
+/*         {"bezrukovbugaev", create_photoreal<PhotoBezrukovBugaev, P, M>}, */
+/*         {"kokoulin", create_photoreal<PhotoKokoulin, P, M>}, */
+/*         {"rhode", create_photoreal<PhotoRhode, P, M>}, */
+/* }; */
 
-template<typename P, typename M>
-cross_t_ptr<P, M> make_photonuclearreal(P p_def, M medium, std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol, const std::string& param_name,
-        bool hard_component){
-    std::string name = param_name;
-    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
-    auto it = photoreal_map<P, M>.find(name);
-    if (it == photoreal_map<P, M>.end())
-        throw std::invalid_argument("Unknown parametrization for photonuclear");
+/* template<typename P, typename M> */
+/* cross_t_ptr<P, M> make_photonuclearreal(P p_def, M medium,
+ * std::shared_ptr<const */
+/*         EnergyCutSettings> cuts, bool interpol, const std::string&
+ * param_name, */
+/*         bool hard_component){ */
+/*     std::string name = param_name; */
+/*     std::transform(param_name.begin(), param_name.end(), name.begin(),
+ * ::tolower); */
+/*     auto it = photoreal_map<P, M>.find(name); */
+/*     if (it == photoreal_map<P, M>.end()) */
+/*         throw std::invalid_argument("Unknown parametrization for
+ * photonuclear"); */
 
-    return it->second(p_def, medium, cuts, hard_component, interpol);
-}
+/*     return it->second(p_def, medium, cuts, hard_component, interpol); */
+/* } */
 
-template<typename P, typename M>
-cross_t_ptr<P, M> make_photonuclearreal(P p_def, M medium, std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
-    if (!config.contains("parametrization"))
-        throw std::logic_error("No parametrization passed for photonuclear");
-    std::string param_name = config["parametrization"];
-    bool hard_component = config.value("hard_component", true);
+/* template<typename P, typename M> */
+/* cross_t_ptr<P, M> make_photonuclearreal(P p_def, M medium,
+ * std::shared_ptr<const */
+/*         EnergyCutSettings> cuts, bool interpol, const nlohmann::json&
+ * config){ */
+/*     if (!config.contains("parametrization")) */
+/*         throw std::logic_error("No parametrization passed for photonuclear");
+ */
+/*     std::string param_name = config["parametrization"]; */
+/*     bool hard_component = config.value("hard_component", true); */
 
-    return make_photonuclearreal(p_def, medium, cuts, interpol, param_name, hard_component);
-}
-
-} // namespace crosssection
-} // namespace PROPOSAL
+/*     return make_photonuclearreal(p_def, medium, cuts, interpol, param_name,
+ * hard_component); */
+/* } */

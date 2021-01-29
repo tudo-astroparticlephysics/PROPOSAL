@@ -13,12 +13,13 @@
     crosssection::Photo##param::Photo##param(bool hard_component)              \
         : crosssection::Photo##parent(hard_component)                          \
     {                                                                          \
-        hash_combine(hash, std::string(#param));                                         \
+        hash_combine(hash, std::string(#param));                               \
     }
 
 using namespace PROPOSAL;
 
-crosssection::PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(bool hard_component)
+crosssection::PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(
+    bool hard_component)
     : crosssection::Photonuclear()
     , hard_component_(hard_component)
 {
@@ -65,7 +66,7 @@ double crosssection::PhotoRealPhotonAssumption::DifferentialCrossSection(
     aux = 2 * aum / t;
     aux = G
             * ((kappa + 4 * aum / m1) * std::log(1 + m1 / t)
-                  - (kappa * m1) / (m1 + t) - aux)
+                - (kappa * m1) / (m1 + t) - aux)
         + ((kappa + 2 * aum / m2) * std::log(1 + m2 / t) - aux)
         + aux * (G * (m1 - 4 * t) / (m1 + t) + (m2 / t) * std::log(1 + t / m2));
 
@@ -89,7 +90,8 @@ double crosssection::PhotoRealPhotonAssumption::DifferentialCrossSection(
 // Phys. Rev Let. 42 (1979), 553
 // Table 1
 // ------------------------------------------------------------------------- //
-double crosssection::PhotoRealPhotonAssumption::NucleusCrossSectionCaldwell(double nu) const
+double crosssection::PhotoRealPhotonAssumption::NucleusCrossSectionCaldwell(
+    double nu) const
 {
     return 49.2 + 11.1 * std::log(nu) + 151.8 / std::sqrt(nu);
 }
@@ -101,7 +103,8 @@ PHOTO_PARAM_REAL_IMPL(Zeus, RealPhotonAssumption)
 // Eur. Phys. J. C 7 (1999), 609
 // eq. 6
 // ------------------------------------------------------------------------- //
-double crosssection::PhotoZeus::CalculateParametrization(const Component& comp, double nu) const
+double crosssection::PhotoZeus::CalculateParametrization(
+    const Component& comp, double nu) const
 {
     double aux;
 
@@ -132,7 +135,8 @@ double crosssection::PhotoBezrukovBugaev::CalculateParametrization(
 PHOTO_PARAM_REAL_IMPL(Kokoulin, BezrukovBugaev)
 
 // ------------------------------------------------------------------------- //
-double crosssection::PhotoKokoulin::CalculateParametrization(const Component& comp, double nu) const
+double crosssection::PhotoKokoulin::CalculateParametrization(
+    const Component& comp, double nu) const
 {
     if (nu <= 200.) {
         if (nu <= 17.) {
@@ -166,15 +170,16 @@ crosssection::PhotoRhode::PhotoRhode(bool hard_component)
         248.921, 262.631, 277.006, 292.046, 307.751, 324.121, 341.157, 358.857,
         377.222, 396.253, 415.948, 436.309, 457.334, 479.025 };
 
-    interpolant_.reset(new Interpolant(x, y, 4, false, false));
+    interpolant_ = Interpolant(x, y, 4, false, false);
 }
 
 double crosssection::PhotoRhode::MeasuredSgN(double e) const
 {
-    return interpolant_->InterpolateArray(e);
+    return interpolant_.InterpolateArray(e);
 }
 
-double crosssection::PhotoRhode::CalculateParametrization(const Component&, double nu) const
+double crosssection::PhotoRhode::CalculateParametrization(
+    const Component&, double nu) const
 {
     if (nu <= 200.) {
         return MeasuredSgN(nu);

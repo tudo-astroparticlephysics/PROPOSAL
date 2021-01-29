@@ -3,6 +3,7 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDXIntegral.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
 #include <type_traits>
 

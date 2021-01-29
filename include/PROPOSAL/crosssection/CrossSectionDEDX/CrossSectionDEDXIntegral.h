@@ -24,9 +24,7 @@ namespace detail {
             auto dEdx = [&param, &p_def, &comp, E](double v) {
                 return param.FunctionToDEdxIntegral(p_def, comp, E, v);
             };
-            return i.Integrate(
-                std::get<crosssection::Parametrization::V_MIN>(lim), v_cut,
-                dEdx, 2);
+            return i.Integrate(lim.v_min, v_cut, dEdx, 2);
         };
     }
 
@@ -35,14 +33,12 @@ namespace detail {
         Medium const& medium, EnergyCutSettings const& cut)
     {
         return [param, p_def, medium, cut](Integral& i, double E) {
-            auto physical_lim = param.GetKinematicLimits(p_def, medium, E);
-            auto v_cut = cut.GetCut(physical_lim, E);
+            auto lim = param.GetKinematicLimits(p_def, medium, E);
+            auto v_cut = cut.GetCut(lim, E);
             auto dEdx = [&param, &p_def, &medium, E](double v) {
                 return param.FunctionToDEdxIntegral(p_def, medium, E, v);
             };
-            return i.Integrate(
-                std::get<crosssection::Parametrization::V_MIN>(physical_lim),
-                v_cut, dEdx, 4);
+            return i.Integrate(lim.v_min, v_cut, dEdx, 4);
         };
     }
 
@@ -55,7 +51,6 @@ namespace detail {
     dedx_integral_t define_dedx_integral(
         crosssection::IonizBergerSeltzerMoller param, ParticleDef const& p_def,
         Medium const& medium, EnergyCutSettings const&);
-
 }
 
 class CrossSectionDEDXIntegral : public CrossSectionDEDX {

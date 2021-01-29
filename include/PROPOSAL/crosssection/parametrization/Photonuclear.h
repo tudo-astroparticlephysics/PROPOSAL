@@ -28,67 +28,53 @@
 
 #pragma once
 
-#include <cmath>
-#include <memory>
-#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
+
+#include <vector>
 
 namespace PROPOSAL {
 class Interpolant;
+class Component;
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
 namespace crosssection {
-class RealPhoton {
-protected:
-    size_t hash;
-public:
-    RealPhoton() : hash(0) { hash_combine(hash, std::string("real_photon"));}
-    virtual ~RealPhoton() {}
+    class RealPhoton {
+    protected:
+        size_t hash;
 
-    virtual double CalculateHardComponent(double energy, double v) = 0;
+    public:
+        RealPhoton() = default;
+        virtual ~RealPhoton() { }
 
-    virtual const std::string& GetName() const = 0;
-    auto GetHash() const noexcept {return hash;}
-};
+        virtual double CalculateHardComponent(double energy, double v) = 0;
 
-class SoftComponent : public RealPhoton {
-    static const std::string name_;
+        auto GetHash() const noexcept { return hash; }
+    };
 
-public:
-    SoftComponent() { hash_combine(hash, name_);}
-    virtual ~SoftComponent() = default;
+    class SoftComponent : public RealPhoton {
+    public:
+        SoftComponent() = default;
 
-    virtual double CalculateHardComponent(double energy, double v);
+        virtual double CalculateHardComponent(double energy, double v);
+    };
 
-    virtual const std::string& GetName() const { return name_; }
-};
+    class HardComponent : public RealPhoton {
+        static std::vector<double> x;
+        std::vector<Interpolant> interpolant_;
 
-class HardComponent : public RealPhoton {
-    static std::vector<double> x;
-    std::vector<std::shared_ptr<Interpolant>> interpolant_;
+    public:
+        HardComponent(const ParticleDef&);
+        virtual ~HardComponent() = default;
 
-    static const std::string name_;
+        double CalculateHardComponent(double energy, double v);
+    };
 
-public:
-    HardComponent(const ParticleDef&);
-    virtual ~HardComponent() = default;
-
-    double CalculateHardComponent(double energy, double v);
-
-    virtual const std::string& GetName() const { return name_; }
-};
-
-
-class Photonuclear : public Parametrization {
-public:
-    Photonuclear();
-    virtual ~Photonuclear() = default;
-
-    using only_stochastic = std::false_type;
-    using component_wise = std::true_type;
-
-    double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-    std::tuple<double, double> GetKinematicLimits(
-        const ParticleDef&, const Component&, double) const noexcept override;
-};
+    class Photonuclear : public Parametrization<Component> {
+    public:
+        Photonuclear();
+        virtual ~Photonuclear() = default;
+    };
 
 } // namespace crosssection
 } // namespace PROPOSAL

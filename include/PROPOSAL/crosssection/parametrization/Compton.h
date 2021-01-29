@@ -49,6 +49,7 @@ namespace crosssection {
             double energy, double v) const final;
     };
 } // namespace crosssection
+} // namespace PROPOSAL
 
 /* namespace detail { */
 /*     template <typename T1, typename T2> */
@@ -128,7 +129,6 @@ namespace crosssection {
 /*             return i.Integrate(t_min, t_max, dEdx, 2); */
 /*         }; */
 /*     } */
-
 }
 
 // Factory pattern functions
@@ -180,4 +180,3 @@ namespace crosssection {
 /*         return make_compton(p_def, medium, cuts, interpol, param_name); */
 /*     } */
 /* } // namespace crosssection */
-} // namespace PROPOSAL

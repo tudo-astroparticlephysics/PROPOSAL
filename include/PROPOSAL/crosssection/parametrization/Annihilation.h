@@ -72,7 +72,8 @@ namespace crosssection {
 
     /* template <typename P, typename M> */
     /* static std::map<std::string, annih_func_ptr<P, M>> annih_map = { */
-    /*     { "annihilationheitler", create_annihi<AnnihilationHeitler, P, M> } */
+    /*     { "annihilationheitler", create_annihi<AnnihilationHeitler, P, M> }
+     */
     /* }; */
 
     /* template <typename P, typename M> */
@@ -82,10 +83,12 @@ namespace crosssection {
 
     /*     std::string name = param_name; */
     /*     std::transform( */
-    /*         param_name.begin(), param_name.end(), name.begin(), ::tolower); */
+    /*         param_name.begin(), param_name.end(), name.begin(), ::tolower);
+     */
     /*     auto it = annih_map<P, M>.find(name); */
     /*     if (it == annih_map<P, M>.end()) */
-    /*         throw std::logic_error("Unknown parametrization for annihilation"); */
+    /*         throw std::logic_error("Unknown parametrization for
+     * annihilation"); */
 
     /*     return it->second(p_def, medium, interpol); */
     /* } */

@@ -11,21 +11,23 @@ using namespace PROPOSAL;
 using std::get;
 using std::make_tuple;
 
-#define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                                  \
-    crosssection::Photo##param::Photo##param(std::shared_ptr<ShadowEffect> shadow_effect)    \
-        : crosssection::PhotoQ2Integral(shadow_effect)                                       \
-    {                                                                                        \
-        hash_combine(hash, std::string(#param));                                                       \
+#define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                    \
+    crosssection::Photo##param::Photo##param(                                  \
+        std::shared_ptr<ShadowEffect> shadow_effect)                           \
+        : crosssection::PhotoQ2Integral(shadow_effect)                         \
+    {                                                                          \
     }
 
-crosssection::PhotoQ2Integral::PhotoQ2Integral(std::shared_ptr<ShadowEffect> shadow_effect)
+crosssection::PhotoQ2Integral::PhotoQ2Integral(
+    std::shared_ptr<ShadowEffect> shadow_effect)
     : crosssection::Photonuclear()
     , shadow_effect_(shadow_effect)
 {
 }
 
-double crosssection::PhotoQ2Integral::DifferentialCrossSection(const ParticleDef& p_def,
-    const Component& comp, double energy, double v) const
+double crosssection::PhotoQ2Integral::DifferentialCrossSection(
+    const ParticleDef& p_def, const Component& comp, double energy,
+    double v) const
 {
     auto limits = GetKinematicLimits(p_def, comp, energy);
 
@@ -39,8 +41,7 @@ double crosssection::PhotoQ2Integral::DifferentialCrossSection(const ParticleDef
         q2_min -= (aux * aux) / (2 * (1 - v));
     }
 
-    q2_max = 2 * comp.GetAverageNucleonWeight() * energy
-        * (v - get<Parametrization::V_MIN>(limits));
+    q2_max = 2 * comp.GetAverageNucleonWeight() * energy * (v - limits.v_min);
 
     //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and
     //  Mikheyev
@@ -49,8 +50,8 @@ double crosssection::PhotoQ2Integral::DifferentialCrossSection(const ParticleDef
 
     Integral integral;
     aux = integral.Integrate(q2_min, q2_max,
-        std::bind(&crosssection::PhotoQ2Integral::FunctionToQ2Integral, this, p_def, comp,
-            energy, v, std::placeholders::_1),
+        std::bind(&crosssection::PhotoQ2Integral::FunctionToQ2Integral, this,
+            p_def, comp, energy, v, std::placeholders::_1),
         4);
 
     aux *= NA / comp.GetAtomicNum() * p_def.charge * p_def.charge;
@@ -185,8 +186,8 @@ double crosssection::PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(
     double structure_function_nucleus = structure_function_proton
         * shadow_effect_->CalculateShadowEffect(comp, bjorken_x, v * energy)
         * (comp.GetNucCharge()
-              + (comp.GetAtomicNum() - comp.GetNucCharge())
-                  * relation_proton_neutron);
+            + (comp.GetAtomicNum() - comp.GetNucCharge())
+                * relation_proton_neutron);
 
     // differential cross section from Dutta et al.
     // Phys. Rev. D 63 (2001), 094020
@@ -200,11 +201,11 @@ double crosssection::PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v
         * (1 - v - mass_nucleus * bjorken_x * v / (2 * energy)
-              + (1 - 2 * p_def.mass * p_def.mass / Q2) * v * v
-                  * (1
-                        + 4 * mass_nucleus * mass_nucleus * bjorken_x
-                            * bjorken_x / Q2)
-                  / (2 * (1 + R)));
+            + (1 - 2 * p_def.mass * p_def.mass / Q2) * v * v
+                * (1
+                    + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x
+                        / Q2)
+                / (2 * (1 + R)));
 
     return result;
 }
@@ -331,8 +332,8 @@ double crosssection::PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
     double structure_function_nucleus = structure_function_proton
         * shadow_effect_->CalculateShadowEffect(comp, bjorken_x, v * energy)
         * (comp.GetNucCharge()
-              + (comp.GetAtomicNum() - comp.GetNucCharge())
-                  * relation_proton_neutron);
+            + (comp.GetAtomicNum() - comp.GetNucCharge())
+                * relation_proton_neutron);
 
     // differential cross section from Dutta et al.
     // Phys. Rev. D 63 (2001), 094020
@@ -346,11 +347,11 @@ double crosssection::PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v
         * (1 - v - mass_nucleus * bjorken_x * v / (2 * energy)
-              + (1 - 2 * p_def.mass * p_def.mass / Q2) * v * v
-                  * (1
-                        + 4 * mass_nucleus * mass_nucleus * bjorken_x
-                            * bjorken_x / Q2)
-                  / (2 * (1 + R)));
+            + (1 - 2 * p_def.mass * p_def.mass / Q2) * v * v
+                * (1
+                    + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x
+                        / Q2)
+                / (2 * (1 + R)));
 
     return result;
 }
@@ -359,8 +360,9 @@ double crosssection::PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(
 // Butkevich Mikheyev Parametrization
 // JETP 95 (2002), 11
 // ------------------------------------------------------------------------- //
-double crosssection::PhotoButkevichMikheyev::FunctionToQ2Integral(const ParticleDef& p_def,
-    const Component& comp, double energy, double v, double Q2) const
+double crosssection::PhotoButkevichMikheyev::FunctionToQ2Integral(
+    const ParticleDef& p_def, const Component& comp, double energy, double v,
+    double Q2) const
 {
 
     double mass_nucleus = comp.GetAverageNucleonWeight();
@@ -429,8 +431,8 @@ double crosssection::PhotoButkevichMikheyev::FunctionToQ2Integral(const Particle
     double structure_function_nucleus
         = shadow_effect_->CalculateShadowEffect(comp, bjorken_x, v * energy)
         * (comp.GetNucCharge() * structure_function_proton
-              + (comp.GetAtomicNum() - comp.GetNucCharge())
-                  * structure_function_neutron);
+            + (comp.GetAtomicNum() - comp.GetNucCharge())
+                * structure_function_neutron);
 
     // differential cross section from Dutta et al.
     // Phys. Rev. D 63 (2001), 094020
@@ -444,11 +446,11 @@ double crosssection::PhotoButkevichMikheyev::FunctionToQ2Integral(const Particle
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v
         * (1 - v - mass_nucleus * bjorken_x * v / (2 * energy)
-              + (1 - 2 * p_def.mass * p_def.mass / Q2) * v * v
-                  * (1
-                        + 4 * mass_nucleus * mass_nucleus * bjorken_x
-                            * bjorken_x / Q2)
-                  / (2 * (1 + R)));
+            + (1 - 2 * p_def.mass * p_def.mass / Q2) * v * v
+                * (1
+                    + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x
+                        / Q2)
+                / (2 * (1 + R)));
 
     return result;
 }
@@ -459,8 +461,9 @@ double crosssection::PhotoButkevichMikheyev::FunctionToQ2Integral(const Particle
 // this parametrization was calculated for sTaus with spin 0
 // the other parametrizations are for charged leptons with spin 1/2
 // ------------------------------------------------------------------------- //
-double crosssection::PhotoRenoSarcevicSu::FunctionToQ2Integral(const ParticleDef& p_def,
-    const Component& comp, double energy, double v, double Q2) const
+double crosssection::PhotoRenoSarcevicSu::FunctionToQ2Integral(
+    const ParticleDef& p_def, const Component& comp, double energy, double v,
+    double Q2) const
 {
 
     double mass_nucleus = comp.GetAverageNucleonWeight();
@@ -576,8 +579,8 @@ double crosssection::PhotoRenoSarcevicSu::FunctionToQ2Integral(const ParticleDef
     double structure_function_nucleus = structure_function_proton
         * shadow_effect_->CalculateShadowEffect(comp, bjorken_x, v * energy)
         * (comp.GetNucCharge()
-              + (comp.GetAtomicNum() - comp.GetNucCharge())
-                  * relation_proton_neutron);
+            + (comp.GetAtomicNum() - comp.GetNucCharge())
+                * relation_proton_neutron);
 
     // --------------------------------------------------------------------- //
     // this is the only part, that differs from ALLM parametrization
@@ -592,11 +595,11 @@ double crosssection::PhotoRenoSarcevicSu::FunctionToQ2Integral(const ParticleDef
     double result = ME * RE / Q2;
     result *= result * 4 * PI * structure_function_nucleus / v
         * (1 - v + 0.25 * v * v
-              - (1 + 4 * p_def.mass * p_def.mass / Q2) * 0.25 * v * v
-                  * (1
-                        + 4 * mass_nucleus * mass_nucleus * bjorken_x
-                            * bjorken_x / Q2)
-                  / (1 + R));
+            - (1 + 4 * p_def.mass * p_def.mass / Q2) * 0.25 * v * v
+                * (1
+                    + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x
+                        / Q2)
+                / (1 + R));
 
     return result;
 }
@@ -604,7 +607,8 @@ double crosssection::PhotoRenoSarcevicSu::FunctionToQ2Integral(const ParticleDef
 
 const std::string crosssection::ShadowDuttaRenoSarcevicSeckel::name_
     = "ShadowDuttaRenoSarcevicSeckel";
-const std::string crosssection::ShadowButkevichMikheyev::name_ = "ShadowButkevichMikheyev";
+const std::string crosssection::ShadowButkevichMikheyev::name_
+    = "ShadowButkevichMikheyev";
 
 // ------------------------------------------------------------------------- //
 // Dutta, Reno, Sarcevic, Seckel
@@ -659,7 +663,7 @@ double crosssection::ShadowButkevichMikheyev::CalculateShadowEffect(
         // eq. 48
         double Aosc = (1 - la * x)
             * (au - ac
-                  - MPI / comp.GetAverageNucleonWeight() * (au * au - ac * ac));
+                - MPI / comp.GetAverageNucleonWeight() * (au * au - ac * ac));
         // eq. 44
         G = 1 - Mb * comp.GetWoodSaxon() * Aosc;
     } else {
@@ -703,30 +707,34 @@ size_t crosssection::ShadowButkevichMikheyev::GetHash() const
 }
 
 crosssection::Photonuclear::Photonuclear()
-    : crosssection::Parametrization(InteractionType::Photonuclear, "photonuclear")
+    : crosssection::Parametrization(
+        InteractionType::Photonuclear, "photonuclear")
 {
 }
 
-double crosssection::Photonuclear::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept {
+double crosssection::Photonuclear::GetLowerEnergyLim(
+    const ParticleDef& p_def) const noexcept
+{
     return p_def.mass;
 }
 
-std::tuple<double, double> crosssection::Photonuclear::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy) const noexcept
+KinematicLimits crosssection::Photonuclear::GetKinematicLimits(
+    const ParticleDef& p_def, const Component& comp, double energy) const
 {
-    auto v_min
+    auto kin_lim = KinematicLimits();
+    kin_lim.v_min
         = (MPI + MPI * MPI / (2 * comp.GetAverageNucleonWeight())) / energy;
-    auto v_max = 1.f;
+    kin_lim.v_max = 1.f;
     if (p_def.mass < MPI) {
         auto aux = p_def.mass / comp.GetAverageNucleonWeight();
-        v_max
+        kin_lim.v_max
             -= comp.GetAverageNucleonWeight() * (1 + aux * aux) / (2 * energy);
     }
     // vMax calculated above is always smaller than 1-m/E
     // in comparison, the following inequality arise
     // (M-m)^2 >= 0
     // limits.vMax = std::min(limits.vMax, 1 - p_def.mass/energy);
-    if (v_max < v_min)
-        return make_tuple(v_min, v_min);
-    return make_tuple(v_min, v_max);
+    if (kin_lim.v_max < kin_lim.v_min)
+        kin_lim.v_max = kin_lim.v_min;
+    return kin_lim;
 }

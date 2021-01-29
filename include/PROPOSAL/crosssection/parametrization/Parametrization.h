@@ -33,9 +33,9 @@
 namespace PROPOSAL {
 struct ParticleDef;
 class Medium;
-    namespace Components {
-        class Component;
-    }
+namespace Components {
+    class Component;
+}
 enum class InteractionType;
 } // namespace PROPOSAL
 
@@ -44,10 +44,7 @@ using PROPOSAL::Components::Component;
 namespace PROPOSAL {
 namespace crosssection {
 
-    struct KinematicLimits {
-        double v_min;
-        double v_max;
-    };
+    struct KinematicLimits;
 
     template <typename T> struct ParametrizationName {
         static constexpr char value[36] = "";
