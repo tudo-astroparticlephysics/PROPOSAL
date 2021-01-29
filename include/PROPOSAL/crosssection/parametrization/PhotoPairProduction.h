@@ -28,24 +28,26 @@
 
 #pragma once
 
-#include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-#include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/methods.h"
 
 namespace PROPOSAL {
 namespace crosssection {
-    class PhotoPairProduction : public Parametrization {
+    class PhotoPairProduction : public Parametrization<Component> {
     public:
-        PhotoPairProduction();
+        PhotoPairProduction() = default;
         virtual ~PhotoPairProduction() = default;
 
-        using only_stochastic = std::true_type;
-        using component_wise = std::true_type;
+        //using only_stochastic = std::true_type;
+        //using component_wise = std::true_type;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-        std::tuple<double, double> GetKinematicLimits(const ParticleDef&,
+        KinematicLimits GetKinematicLimits(const ParticleDef&,
             const Component&, double) const noexcept override;
+    };
+
+    template <> struct ParametrizationName<PhotoPairProduction> {
+        static constexpr char value[36] = "photopairproduction";
     };
 
     struct PhotoPairTsai : public PhotoPairProduction {
@@ -54,6 +56,10 @@ namespace crosssection {
 
         virtual double DifferentialCrossSection(
             const ParticleDef&, const Component&, double, double) const;
+    };
+
+    template <> struct ParametrizationName<PhotoPairTsai> {
+        static constexpr char value[36] = "photopairtsai";
     };
 
     /* class PhotoAngleDistribution { */
@@ -99,7 +105,7 @@ namespace crosssection {
     /* }; */
 
     // Factory pattern functions
-
+    /*
     template <typename P, typename M>
     using photopair_func_ptr = cross_t_ptr<P, M> (*)(P, M, bool);
 
@@ -140,6 +146,7 @@ namespace crosssection {
 
         return make_photopairproduction(p_def, medium, interpol, param_name);
     }
+    */
 
 } // namespace crosssection
 } // namespace PROPOSAL

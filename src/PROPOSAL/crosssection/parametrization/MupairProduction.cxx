@@ -3,7 +3,7 @@
 
 #include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-
+#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/Constants.h"
@@ -12,7 +12,7 @@
     crosssection::Mupair##param::Mupair##param()                               \
         : crosssection::MupairProductionRhoIntegral()                          \
     {                                                                          \
-        hash_combine(hash, std::string(#param));                                         \
+        hash_combine(hash, std::string(#param));                                \
     }
 
 using namespace PROPOSAL;
@@ -20,7 +20,7 @@ using crosssection::MupairProduction;
 using std::make_tuple;
 
 crosssection::MupairProduction::MupairProduction()
-    : Parametrization(InteractionType::MuPair, "mupair")
+    : Parametrization()
     , drho_integral_(IROMB, IMAXS, IPREC)
 {
 }
@@ -31,17 +31,18 @@ double crosssection::MupairProduction::GetLowerEnergyLim(const ParticleDef& p_de
     return p_def.mass + 2.f * MMU;
 }
 
-std::tuple<double, double> crosssection::MupairProduction::GetKinematicLimits(
+crosssection::KinematicLimits crosssection::MupairProduction::GetKinematicLimits(
     const ParticleDef& p_def, const Component& , double energy) const
     noexcept
 {
-    auto vmin = 2 * MMU / energy;
-    auto vmax = 1 - p_def.mass / energy;
+    KinematicLimits lim;
+    lim.v_min = 2 * MMU / energy;
+    lim.v_max = 1 - p_def.mass / energy;
 
-    if (vmax < vmin)
-        return make_tuple(vmin, vmin);
+    if (lim.v_max < lim.v_min)
+        lim.v_max = lim.v_min;
 
-    return make_tuple(vmin, vmax);
+    return lim;
 }
 
 crosssection::MupairProductionRhoIntegral::MupairProductionRhoIntegral()

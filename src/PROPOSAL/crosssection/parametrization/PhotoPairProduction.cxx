@@ -12,26 +12,25 @@
 using namespace PROPOSAL;
 using std::make_tuple;
 
-crosssection::PhotoPairProduction::PhotoPairProduction()
-    : Parametrization(InteractionType::Photopair, "photopairproduction")
-{
-}
-
 double crosssection::PhotoPairProduction::GetLowerEnergyLim(const ParticleDef&) const noexcept
 {
     return 2 * ME;
 }
 
-std::tuple<double, double> crosssection::PhotoPairProduction::GetKinematicLimits(
+crosssection::KinematicLimits crosssection::PhotoPairProduction::GetKinematicLimits(
     const ParticleDef&, const Component&, double energy) const
     noexcept
 {
     // x is the integration variable here
-    if (energy <= 2. * ME)
-        return make_tuple(0.5, 0.5);
-    auto vmin = ME / energy;
-    auto vmax = 1. - ME / energy;
-    return make_tuple(vmin, vmax);
+    KinematicLimits lim;
+    if (energy <= 2. * ME) {
+        lim.v_min = 0.5;
+        lim.v_max = 0.5;
+    } else {
+        lim.v_min = ME / energy;
+        lim.v_max = 1. - ME / energy;
+    }
+    return lim;
 }
 
 double crosssection::PhotoPairTsai::DifferentialCrossSection(

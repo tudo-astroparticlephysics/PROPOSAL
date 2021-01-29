@@ -38,6 +38,10 @@
                                                                                \
         double CalculateParametrization(const ParticleDef&, const Component&,  \
             double energy, double v) const final;                              \
+    };                                                                         \
+                                                                               \
+    template <> struct ParametrizationName<Brems##param> {                     \
+        static constexpr char value[36] = "brems"#param;                       \
     };
 
 namespace PROPOSAL {
@@ -70,6 +74,10 @@ namespace crosssection {
             const ParticleDef&, const Component&, double) const final;
     };
 
+    template <> struct ParametrizationName<Bremsstrahlung> {
+        static constexpr char value[36] = "bremsstrahlung";
+    };
+
     BREMSSTRAHLUNG_DEF(PetrukhinShestakov)
     BREMSSTRAHLUNG_DEF(KelnerKokoulinPetrukhin)
     BREMSSTRAHLUNG_DEF(CompleteScreening)
@@ -88,6 +96,10 @@ namespace crosssection {
             double energy, double v) const final;
         double DifferentialCrossSection(const ParticleDef&, const Component&,
             double energy, double v) const final;
+    };
+
+    template <> struct ParametrizationName<BremsElectronScreening> {
+        static constexpr char value[36] = "bremselectronscreening";
     };
 
     // LPM effect object

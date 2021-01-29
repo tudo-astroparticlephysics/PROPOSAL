@@ -45,6 +45,10 @@
                                                                                \
         double FunctionToIntegral(const ParticleDef&, const Component&,        \
             double energy, double v, double r) const;                          \
+    };                                                                         \
+                                                                               \
+    template <> struct ParametrizationName<Epair##param> {                     \
+        static constexpr char value[36] = "epair"#param;                       \
     };
 
 namespace PROPOSAL {
@@ -61,12 +65,16 @@ namespace crosssection {
             double density_correction = 1.0);
         virtual ~EpairProduction() = default;
 
-        using only_stochastic = std::false_type;
-        using component_wise = std::true_type;
+        //using only_stochastic = std::false_type;
+        //using component_wise = std::true_type;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
         KinematicLimits GetKinematicLimits(const ParticleDef&,
             const Component&, double energy) const noexcept override;
+    };
+
+    template <> struct ParametrizationName<EpairProduction> {
+        static constexpr char value[36] = "epairproduction";
     };
 
     class EpairProductionRhoIntegral : public EpairProduction {

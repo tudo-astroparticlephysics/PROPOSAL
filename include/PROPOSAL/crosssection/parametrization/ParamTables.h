@@ -28,7 +28,6 @@
 
 
 #pragma once
-#include <string>
 #include <vector>
 namespace PROPOSAL {
 
