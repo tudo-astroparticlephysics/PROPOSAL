@@ -38,7 +38,7 @@ namespace PROPOSAL {
 class Box : public Geometry
 {
 public:
-    Box(const Vector3D position, double x, double y, double z);
+    Box(const Vector3D& position, double x, double y, double z);
     Box(const nlohmann::json& config);
 
 

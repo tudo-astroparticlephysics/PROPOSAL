@@ -42,10 +42,10 @@ TEST(Comparison, Comparison_equal)
 
 TEST(Comparison, Comparison_not_equal)
 {
-    Vector3D faxis_default(1,0,0);
-    Vector3D faxis_new(0,1,0);
-    Vector3D fp0_default(0,0,0);
-    Vector3D fp0_new(1,1,1);
+    Cartesian3D faxis_default(1,0,0);
+    Cartesian3D faxis_new(0,1,0);
+    Cartesian3D fp0_default(0,0,0);
+    Cartesian3D fp0_new(1,1,1);
     CartesianAxis ax_A;
     CartesianAxis ax_B(faxis_default, fp0_new);
     CartesianAxis ax_C(faxis_new, fp0_default);

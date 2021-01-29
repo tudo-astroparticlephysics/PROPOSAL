@@ -5,7 +5,7 @@
 #include "PROPOSAL/geometry/Sphere.h"
 using namespace PROPOSAL;
 
-Sphere::Sphere(const Vector3D position, double radius, double inner_radius)
+Sphere::Sphere(const Vector3D& position, double radius, double inner_radius)
     : Geometry("Sphere", position)
     , radius_(radius)
     , inner_radius_(inner_radius)
@@ -79,7 +79,7 @@ std::pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, con
     difference_length_squared = std::pow((position - position_).magnitude(), 2);
     A                         = difference_length_squared - radius_ * radius_;
 
-    B = scalar_product(position - position_, direction);
+    B = (position - position_) * direction;
 
     determinant = B * B - A;
 

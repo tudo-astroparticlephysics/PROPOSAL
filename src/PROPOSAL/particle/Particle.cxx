@@ -12,6 +12,7 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include <cmath>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 using namespace PROPOSAL;
@@ -43,8 +44,8 @@ std::ostream& operator<<(std::ostream& os, ParticleState const& data)
 
 ParticleState::ParticleState()
     : type(0)
-    , position(Vector3D())
-    , direction(Vector3D())
+    , position(Cartesian3D())
+    , direction(Cartesian3D())
     , energy(0)
     , time(0)
     , propagated_distance(0)
@@ -127,21 +128,24 @@ double ParticleState::GetMomentum() const
     return energy;
 }
 
-StochasticLoss::StochasticLoss(int type, double loss_energy, Vector3D position,
-                               Vector3D direction, double time,
+StochasticLoss::StochasticLoss(int type, double loss_energy, const Vector3D& position,
+                               const Vector3D& direction, double time,
                                double propagated_distance,
-                               double parent_particle_energy) : Loss(type, loss_energy),
+                               double parent_particle_energy)
+                               : Loss(type, loss_energy, parent_particle_energy),
                                position(position), direction(direction), time(time),
-                               propagated_distance(propagated_distance),
-                               parent_particle_energy(parent_particle_energy) {}
+                               propagated_distance(propagated_distance) {}
 
-ContinuousLoss::ContinuousLoss(std::pair<double, double> energies,
-                               std::pair<Vector3D, Vector3D> positions,
-                               std::pair<Vector3D, Vector3D> directions,
-                               std::pair<double, double> times)
+ContinuousLoss::ContinuousLoss(double energy, double parent_particle_energy,
+                               const Vector3D& start_position, double length,
+                               const Vector3D& direction_initial,
+                               const Vector3D& direction_final,
+                               double time_initial, double time_final)
                                : Loss((int)InteractionType::ContinuousEnergyLoss,
-                                      std::abs(energies.second - energies.first)),
-                                      energies(energies),
-                                      positions(positions),
-                                      directions(directions),
-                                      times(times) {}
+                                      energy, parent_particle_energy),
+                                      start_position(start_position),
+                                      length(length),
+                                      direction_initial(direction_initial),
+                                      direction_final(direction_final),
+                                      time_initial(time_initial),
+                                      time_final(time_final) {}

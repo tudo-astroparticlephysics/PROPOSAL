@@ -5,6 +5,7 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/math/Cartesian3D.h"
 
 #include <memory>
 #include <vector>
@@ -109,17 +110,17 @@ ParticleState Secondaries::GetStateForDistance(double propagated_distance) const
     return track_.back();
 }
 
-std::vector<Vector3D> Secondaries::GetTrackPositions() const
+std::vector<Cartesian3D> Secondaries::GetTrackPositions() const
 {
-    std::vector<Vector3D> vec;
+    std::vector<Cartesian3D> vec;
     for (auto i : track_)
         vec.emplace_back(i.position);
     return vec;
 }
 
-std::vector<Vector3D> Secondaries::GetTrackDirections() const
+std::vector<Cartesian3D> Secondaries::GetTrackDirections() const
 {
-    std::vector<Vector3D> vec;
+    std::vector<Cartesian3D> vec;
     for (auto i : track_)
         vec.emplace_back(i.direction);
     return vec;
@@ -394,12 +395,11 @@ std::vector<ContinuousLoss> Secondaries::GetContinuousLosses() const
     std::vector<ContinuousLoss> losses;
     for (unsigned int i=1; i<track_.size(); i++) {
         if (types_[i] == InteractionType::ContinuousEnergyLoss) {
-            losses.emplace_back(
-                    std::make_pair(track_[i-1].energy, track_[i].energy),
-                    std::make_pair(track_[i-1].position, track_[i].position),
-                    std::make_pair(track_[i-1].direction, track_[i].direction),
-                    std::make_pair(track_[i-1].time, track_[i].time)
-                    );
+            losses.emplace_back( track_[i].energy - track_[i-1].energy,
+                                 track_[i-1].energy, track_[i-1].position,
+                                 (track_[i].position - track_[i-1].position).magnitude(),
+                                 track_[i-1].direction, track_[i].direction,
+                                 track_[i-1].time, track_[i].time);
         }
     }
     return losses;
@@ -416,11 +416,11 @@ std::vector<ContinuousLoss> Secondaries::GetContinuousLosses(const Geometry& geo
         if (geometry.IsInside(track_[i].position, track_[i].direction)) {
             if (types_[i] == InteractionType::ContinuousEnergyLoss) {
                 losses.emplace_back(
-                        std::make_pair(track_[i-1].energy, track_[i].energy),
-                        std::make_pair(track_[i-1].position, track_[i].position),
-                        std::make_pair(track_[i-1].direction, track_[i].direction),
-                        std::make_pair(track_[i-1].time, track_[i].time)
-                        );
+                        track_[i].energy - track_[i-1].energy,
+                        track_[i-1].energy, track_[i-1].position,
+                        (track_[i].position - track_[i-1].position).magnitude(),
+                        track_[i-1].direction, track_[i].direction,
+                        track_[i-1].time, track_[i].time);
             }
         }
     }

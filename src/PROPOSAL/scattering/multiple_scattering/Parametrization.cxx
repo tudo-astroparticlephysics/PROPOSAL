@@ -9,6 +9,10 @@
 
 #include <cmath>
 #include <tuple>
+#include <string>
+#include <sstream>
+#include <iostream>
+
 
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"

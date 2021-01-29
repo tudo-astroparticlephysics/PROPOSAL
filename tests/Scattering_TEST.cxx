@@ -9,6 +9,7 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/math/Spherical3D.h"
 
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/multiple_scattering/Highland.h"
@@ -52,7 +53,7 @@ auto GetCrossSections(const ParticleDef& p_def, const Medium& med, std::shared_p
 }
 
 // Borrow this function from PropagationUtility
-std::tuple<Vector3D, Vector3D> DirectionsScatter(const Vector3D& direction,
+std::tuple<Cartesian3D, Cartesian3D> DirectionsScatter(const Vector3D& direction,
                                                  std::array<double, 4>& coords)
 {
     auto& sx = coords[multiple_scattering::Parametrization::SX];
@@ -62,25 +63,25 @@ std::tuple<Vector3D, Vector3D> DirectionsScatter(const Vector3D& direction,
     auto sz = std::sqrt(std::max(1. - (sx * sx + sy * sy), 0.));
     auto tz = std::sqrt(std::max(1. - (tx * tx + ty * ty), 0.));
 
-    auto sinth = std::sin(direction.GetTheta());
-    auto costh = std::cos(direction.GetTheta());
-    auto sinph = std::sin(direction.GetPhi());
-    auto cosph = std::cos(direction.GetPhi());
+    auto direction_spherical = Spherical3D(direction);
+    auto sinth = std::sin(direction_spherical.GetZenith());
+    auto costh = std::cos(direction_spherical.GetZenith());
+    auto sinph = std::sin(direction_spherical.GetAzimuth());
+    auto cosph = std::cos(direction_spherical.GetAzimuth());
 
-    auto rotate_vector_x = PROPOSAL::Vector3D(costh * cosph, costh * sinph, -sinth);
-    auto rotate_vector_y = PROPOSAL::Vector3D(-sinph, cosph, 0.);
+    auto rotate_vector_x = Cartesian3D(costh * cosph, costh * sinph, -sinth);
+    auto rotate_vector_y = Cartesian3D(-sinph, cosph, 0.);
 
+    auto direction_cartesian = Cartesian3D(direction);
     // Rotation towards all tree axes
-    auto mean_direction = sz * direction;
+    auto mean_direction = sz * direction_cartesian;
     mean_direction += sx * rotate_vector_x;
     mean_direction += sy * rotate_vector_y;
-    mean_direction.CalculateSphericalCoordinates();
 
     // Rotation towards all tree axes
-    auto final_direction = tz * direction;
+    auto final_direction = tz * direction_cartesian;
     final_direction += tx * rotate_vector_x;
     final_direction += ty * rotate_vector_y;
-    final_direction.CalculateSphericalCoordinates();
 
     return std::make_tuple(mean_direction, final_direction);
 }
@@ -178,18 +179,17 @@ TEST(Scattering, Scatter){
     std::array<std::pair<double, double>, 5> pairs{{{0,0}, {PI/4, PI/4},
                                                     {PI/2, PI/2.}, {PI/4, -PI/2.}}} ;
 
-    std::vector<Vector3D> direction_list;
+    std::vector<Cartesian3D> direction_list;
     direction_list.emplace_back(1.,0.,0.);
     direction_list.emplace_back(0.,-1.,0.);
     direction_list.emplace_back(1./SQRT2,0.,-1/SQRT2);
 
     ScatterDummy* dummy3 = new ScatterDummy(MuMinusDef());
-    Vector3D position_init  = Vector3D(0, 0, 0);
+    auto position_init = Cartesian3D(0, 0, 0);
 
     for(const std::pair<double, double> & offset: pairs) {
         for (const std::pair<double, double> &scatter: pairs) {
-            for(Vector3D &direction_init: direction_list) {
-                direction_init.CalculateSphericalCoordinates();
+            for(auto direction_init: direction_list) {
                 dummy3->SetOffset(offset);
                 dummy3->SetScatteringAngle(scatter);
 
@@ -199,9 +199,9 @@ TEST(Scattering, Scatter){
                 ASSERT_DOUBLE_EQ(std::get<0>(directions).magnitude(), 1.);
                 ASSERT_DOUBLE_EQ(std::get<1>(directions).magnitude(), 1.);
                 // Expect input polar angles to be equal to angles between input direction and output directions
-                ASSERT_NEAR(std::acos(std::min(scalar_product(direction_init, std::get<0>(directions)), 1.)), offset.first,
+                ASSERT_NEAR(std::acos(std::min((direction_init * std::get<0>(directions)), 1.)), offset.first,
                             offset.first * 1e-10);
-                ASSERT_NEAR(std::acos(std::min(scalar_product(direction_init, std::get<1>(directions)), 1.)), scatter.first,
+                ASSERT_NEAR(std::acos(std::min((direction_init * std::get<1>(directions)), 1.)), scatter.first,
                             scatter.first * 1e-10);
             }
         }
@@ -211,9 +211,8 @@ TEST(Scattering, Scatter){
 
 TEST(Scattering, BorderCases){
     auto medium = StandardRock();
-    Vector3D position_init  = Vector3D(0, 0, 0);
-    Vector3D direction_init = Vector3D(1, 0, 0);
-    direction_init.CalculateSphericalCoordinates();
+    auto position_init  = Cartesian3D(0, 0, 0);
+    auto direction_init = Cartesian3D(1, 0, 0);
 
     std::array<multiple_scattering::Parametrization*, 2> scatter_list = {new multiple_scattering::Moliere(MuMinusDef(), medium),
                                                new multiple_scattering::Highland(MuMinusDef(), medium)};
@@ -238,9 +237,8 @@ TEST(Scattering, BorderCases){
 TEST(Scattering, FirstMomentum){
     RandomGenerator::Get().SetSeed(24601);
     auto medium = StandardRock();
-    Vector3D position_init  = Vector3D(0, 0, 0);
-    Vector3D direction_init = Vector3D(0, 0, 1);
-    direction_init.CalculateSphericalCoordinates();
+    auto position_init  = Cartesian3D(0, 0, 0);
+    auto direction_init = Cartesian3D(0, 0, 1);
     auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
 
     int statistics = 1e7;
@@ -249,12 +247,12 @@ TEST(Scattering, FirstMomentum){
     std::array<std::unique_ptr<multiple_scattering::Parametrization>, 3> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
                                                                make_multiple_scattering("highland", MuMinusDef(), medium),
                                                                make_multiple_scattering("highlandintegral", MuMinusDef(), medium, cross)};
-    Vector3D scatter_sum;
-    Vector3D offset_sum;
+    Cartesian3D scatter_sum;
+    Cartesian3D offset_sum;
 
     for(auto const& scatter: scatter_list){
-        Vector3D scatter_sum = Vector3D(0., 0., 0.);
-        Vector3D offset_sum = Vector3D(0., 0., 0.);
+        scatter_sum.SetCoordinates({0., 0., 0.});
+        offset_sum.SetCoordinates({0., 0., 0.});
 
         for (int n=1; n<=statistics; ++n) {
             auto coords = scatter->CalculateRandomAngle(
@@ -280,9 +278,8 @@ TEST(Scattering, FirstMomentum){
 TEST(Scattering, SecondMomentum){
     RandomGenerator::Get().SetSeed(24601);
     auto medium = StandardRock();
-    Vector3D position_init  = Vector3D(0, 0, 0);
-    Vector3D direction_init = Vector3D(0, 0, 1);
-    direction_init.CalculateSphericalCoordinates();
+    auto position_init  = Cartesian3D(0, 0, 0);
+    auto direction_init = Cartesian3D(0, 0, 1);
     auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
 
     int statistics = 1e5;
@@ -333,9 +330,8 @@ TEST(Scattering, SecondMomentum){
 TEST(Scattering, compare_integral_interpolant) {
     RandomGenerator::Get().SetSeed(24601);
     auto medium = StandardRock();
-    Vector3D position_init  = Vector3D(0, 0, 0);
-    Vector3D direction_init = Vector3D(0, 0, 1);
-    direction_init.CalculateSphericalCoordinates();
+    auto position_init  = Cartesian3D(0, 0, 0);
+    auto direction_init = Cartesian3D(0, 0, 1);
 
     std::vector<ParticleDef> particles = {EMinusDef(), MuMinusDef()};
     auto cut1 = std::make_shared<EnergyCutSettings>(500, 0.05, false);
@@ -395,11 +391,10 @@ TEST(Scattering, ScatterReproducibilityTest)
     double rnd1, rnd2, rnd3, rnd4;
     double energy_previous = -1;
     double ecut, vcut;
-    Vector3D position_init  = Vector3D(0, 0, 0);
-    Vector3D direction_init = Vector3D(1, 0, 0);
-    Vector3D position_out;
-    Vector3D direction_out;
-    direction_init.CalculateSphericalCoordinates();
+    Cartesian3D position_init  = Cartesian3D(0, 0, 0);
+    Cartesian3D direction_init = Cartesian3D(1, 0, 0);
+    Cartesian3D position_out;
+    Cartesian3D direction_out;
     double x_f, y_f, z_f;
     double radius_f, phi_f, theta_f;
 
@@ -455,9 +450,10 @@ TEST(Scattering, ScatterReproducibilityTest)
                 EXPECT_NEAR(position_out.GetY(), y_f, std::abs(error * y_f));
                 EXPECT_NEAR(position_out.GetZ(), z_f, std::abs(error * z_f));
 
-                EXPECT_NEAR(direction_out.GetRadius(), radius_f, std::abs(error * radius_f));
-                EXPECT_NEAR(direction_out.GetPhi(), phi_f, std::abs(error * phi_f));
-                EXPECT_NEAR(direction_out.GetTheta(), theta_f, std::abs(error * theta_f));
+                auto direction_out_spherical = Spherical3D(direction_out);
+                EXPECT_NEAR(direction_out_spherical.GetRadius(), radius_f, std::abs(error * radius_f));
+                EXPECT_NEAR(direction_out_spherical.GetAzimuth(), phi_f, std::abs(error * phi_f));
+                EXPECT_NEAR(direction_out_spherical.GetZenith(), theta_f, std::abs(error * theta_f));
             }
             in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >>
                 distance >> rnd1 >> rnd2 >> rnd3 >> rnd4 >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
