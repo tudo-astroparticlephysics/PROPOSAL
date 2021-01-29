@@ -29,7 +29,7 @@
 #include <exception>
 #include <functional>
 #include <string>
-#include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/math/Cartesian3D.h"
 #include "PROPOSAL/json.hpp"
 
 namespace PROPOSAL {
@@ -51,10 +51,10 @@ class Axis {
     virtual double GetEffectiveDistance(const Vector3D& xi,
                                         const Vector3D& direction) const = 0;
 
-    Vector3D GetFp0() const { return fp0_; };
+    auto GetFp0() const { return fp0_; };
 
    protected:
-    Vector3D fp0_;
+    Cartesian3D fp0_;
 };
 }  // namespace PROPOSAL
 
@@ -86,12 +86,12 @@ class CartesianAxis : public Axis {
     bool operator==(const CartesianAxis& axis) const;
     bool operator!=(const CartesianAxis& axis) const;
 
-    Vector3D GetAxis() const { return fAxis_; };
+    auto GetAxis() const { return fAxis_; };
     double GetDepth(const Vector3D& xi) const override;
     double GetEffectiveDistance(const Vector3D& xi, const Vector3D& direction) const override;
 
    private:
-    Vector3D fAxis_;
+    Cartesian3D fAxis_;
 
 };
 }  // namespace PROPOSAL

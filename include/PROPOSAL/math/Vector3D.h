@@ -27,115 +27,34 @@
  ******************************************************************************/
 
 #pragma once
-
-#include "PROPOSAL/json.hpp"
-#include <sstream>
-
+#include <array>
+#include <ostream>
 namespace PROPOSAL {
-
+class Cartesian3D;
+class Spherical3D;
 class Vector3D {
 public:
-    // constructors
-    Vector3D();
-    Vector3D(const double x, const double y, const double z);
-    Vector3D(const Vector3D& vector_3d);
-    Vector3D(Vector3D&& other);
-    Vector3D(const nlohmann::json&);
-    ~Vector3D();
+    Vector3D() : coordinates({0, 0, 0}) {};
+    Vector3D(std::array<double, 3> val) : coordinates(val) {};
+    virtual ~Vector3D() = default;
 
-    //-------------------------------------//
-    // operator functions and swap
-    Vector3D& operator=(const Vector3D& vector_3d);
-    Vector3D& operator+=(const Vector3D& vector_3d);
-    bool operator==(const Vector3D& vector_3d) const;
-    bool operator!=(const Vector3D& vector_3d) const;
-    void swap(Vector3D& vector_3d);
-    friend std::ostream& operator<<(
-        std::ostream& os, Vector3D const& vector_3d);
+    virtual bool operator==(const Vector3D&) const;
+    virtual bool operator!=(const Vector3D&) const;
+    double& operator[](size_t idx);
+    const double& operator[](size_t idx) const;
+    friend std::ostream& operator<<(std::ostream&, const Vector3D&);
 
-    //-------------------------------------//
-    // basic arithmetic
-    friend Vector3D operator+(const Vector3D& vec1, const Vector3D& vec2);
-    friend Vector3D operator-(const Vector3D& vec1, const Vector3D& vec2);
-    friend Vector3D operator*(const double factor1, const Vector3D& vec1);
-    friend Vector3D operator*(const Vector3D& vec1, const double factor1);
-    friend double operator*(const Vector3D& vec1, const Vector3D& vec2);
-    friend double scalar_product(const Vector3D& vec1, const Vector3D& vec2);
-    friend Vector3D vector_product(const Vector3D& vec1, const Vector3D& vec2);
-    Vector3D operator-() const;
-    double magnitude() const;
-    void normalise();
+    virtual double magnitude() const = 0;
+    virtual void normalize() = 0;
 
-    void deflect(double, double);
+    void SetCoordinates(std::array<double, 3> val) {coordinates = val;}
+    void SetCoordinates(double, double, double);
+    virtual std::array<double, 3> GetSphericalCoordinates() const = 0;
+    virtual std::array<double, 3> GetCartesianCoordinates() const = 0;
 
-    struct CartesianCoordinates {
-        CartesianCoordinates(){};
-        CartesianCoordinates(double, double, double);
-        CartesianCoordinates(const CartesianCoordinates&);
+protected:
+    std::array<double, 3> coordinates;
+    virtual void print(std::ostream&) const = 0;
 
-        double x_, y_, z_;
-    };
-
-    struct SphericalCoordinates {
-        SphericalCoordinates(){};
-        SphericalCoordinates(double, double, double);
-        SphericalCoordinates(const SphericalCoordinates&);
-
-        double radius_, azimuth_, zenith_;
-    };
-
-    //-------------------------------------//
-    // conversions to spherical and cylindrical coordinate
-    void CalculateCartesianFromSpherical();
-    void CalculateSphericalCoordinates();
-    // void CalculateCartesianFromCylindrical();
-    // void CalculateCylindricalCoordinates();
-
-    //-------------------------------------//
-    // setter
-    void SetCartesianCoordinates(const double x, const double y, const double z)
-    {
-        cartesian_.x_ = x;
-        cartesian_.y_ = y;
-        cartesian_.z_ = z;
-    }
-    void SetSphericalCoordinates(
-        const double radius, const double azimuth, const double zenith)
-    {
-        spherical_.radius_ = radius;
-        spherical_.azimuth_ = azimuth;
-        spherical_.zenith_ = zenith;
-    }
-    // void SetCylindricalCoordinates(const double radius, const double azimuth,
-    // const double height)
-    // {
-    //     cylindric_radius_  = radius;
-    //     cylindric_azimuth_ = azimuth;
-    //     cylindric_height_  = height;
-    // }
-
-    //-------------------------------------//
-    // getter
-    double GetX() const { return cartesian_.x_; }
-    double GetY() const { return cartesian_.y_; }
-    double GetZ() const { return cartesian_.z_; }
-    double GetRadius() const { return spherical_.radius_; }
-    double GetPhi() const { return spherical_.azimuth_; }
-    double GetTheta() const { return spherical_.zenith_; }
-    Vector3D::CartesianCoordinates GetCartesianCoordinates() const
-    {
-        return cartesian_;
-    }
-    Vector3D::SphericalCoordinates GetSphericalCoordinates() const
-    {
-        return spherical_;
-    }
-
-    //----------------------------------------------//
-private:
-    CartesianCoordinates cartesian_;
-    SphericalCoordinates spherical_;
-
-    // double cylindric_radius_, cylindric_azimuth_, cylindric_height_;
 };
 } // namespace PROPOSAL

@@ -33,13 +33,13 @@
 
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 namespace PROPOSAL {
 
 class Density_distr;
+class Geometry;
+class Vector3D;
 
 using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
             std::shared_ptr<const Density_distr>>;
@@ -72,8 +72,8 @@ public:
     ParticleState GetStateForEnergy(double) const;
     ParticleState GetStateForDistance(double) const;
 
-    std::vector<Vector3D> GetTrackPositions() const;
-    std::vector<Vector3D> GetTrackDirections() const;
+    std::vector<Cartesian3D> GetTrackPositions() const;
+    std::vector<Cartesian3D> GetTrackDirections() const;
     std::vector<double> GetTrackEnergies() const;
     std::vector<double> GetTrackTimes() const;
     std::vector<double> GetTrackPropagatedDistances() const;

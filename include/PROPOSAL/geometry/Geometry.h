@@ -31,6 +31,7 @@
 
 #include <map>
 #include <memory>
+#include <PROPOSAL/math/Cartesian3D.h>
 
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/json.hpp"
@@ -45,7 +46,7 @@ public:
     };
 
 public:
-    Geometry(const std::string, const Vector3D position);
+    Geometry(const std::string, const Vector3D& position);
     Geometry(const nlohmann::json&);
 
     virtual ~Geometry(){};
@@ -97,7 +98,7 @@ public:
 
     ParticleLocation::Enum GetLocation(const Vector3D& position, const Vector3D& direction) const;
 
-    Vector3D GetPosition() const { return position_; }
+    auto GetPosition() const { return position_; }
 
     std::string GetName() const { return name_; }
 
@@ -112,7 +113,7 @@ protected:
     virtual bool compare(const Geometry&) const = 0;
     virtual void print(std::ostream&) const     = 0;
 
-    Vector3D position_; //!< x,y,z-coordinate of origin ( center of box, cylinder, sphere)
+    Cartesian3D position_; //!< x,y,z-coordinate of origin ( center of box, cylinder, sphere)
 
     std::string name_; //!< "box" , "cylinder" , "sphere" (sphere and cylinder might be hollow)
 

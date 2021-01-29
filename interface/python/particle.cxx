@@ -3,6 +3,7 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/Secondaries.h"
+#include "PROPOSAL/geometry/Geometry.h"
 #include "pyBindings.h"
 
 #define PARTICLE_DEF(module, cls)                                                    \
@@ -257,10 +258,11 @@ void init_particle(py::module& m) {
                 type and energy. More specific information are stored in the
                 derived classes.
             )pbdoc")
-            .def(py::init<const int&, const double&>(),
-                    py::arg("type"), py::arg("loss_energy"))
-            .def_readwrite("type", &Loss::type)
-            .def_readwrite("loss_energy", &Loss::loss_energy);
+            .def(py::init<const int&, const double&, const double&>(),
+                    py::arg("type"), py::arg("energy"), py::arg("parent_particle_energy"))
+            .def_readwrite("type", &Loss::type, R"pbdoc(Type of energy loss.)pbdoc")
+            .def_readwrite("energy", &Loss::energy, R"pbdoc(Total energy loss in MeV.)pbdoc")
+            .def_readwrite("parent_particle_energy", &Loss::parent_particle_energy, R"pbdoc(Particle energy in MeV at the time of the stochastic loss or at the beginning of the continuous loss.)pbdoc");
 
     py::class_<StochasticLoss, Loss, std::shared_ptr<StochasticLoss>>(m_sub, "StochasticLoss")
             .def(py::init<const int&, const double&, const Vector3D&, const Vector3D&, const double&, const double&, const double &>(),
@@ -268,19 +270,19 @@ void init_particle(py::module& m) {
                  py::arg("direction"), py::arg("time"),
                  py::arg("propagated_distance"),
                  py::arg("parent_particle_energy"))
-            .def_readwrite("position", &StochasticLoss::position)
-            .def_readwrite("direction", &StochasticLoss::direction)
-            .def_readwrite("time", &StochasticLoss::time)
-            .def_readwrite("propagated_distance", &StochasticLoss::propagated_distance)
-            .def_readwrite("parent_particle_energy", &StochasticLoss::parent_particle_energy);
+            .def_readwrite("position", &StochasticLoss::position, R"pbdoc(Position of stochastic interaction.)pbdoc")
+            .def_readwrite("direction", &StochasticLoss::direction, R"pbdoc(Direction of stochastic loss.)pbdoc")
+            .def_readwrite("time", &StochasticLoss::time, R"pbdoc(Time when stochastic loss occured.)pbdoc")
+            .def_readwrite("propagated_distance", &StochasticLoss::propagated_distance, R"pbdoc(Distance (in cm) the parent particle has propagated when the stochastic loss occured.)pbdoc");
 
     py::class_<ContinuousLoss, Loss, std::shared_ptr<ContinuousLoss>>(m_sub, "ContinuousLoss")
-            .def(py::init<const std::pair<double, double>&, const std::pair<Vector3D, Vector3D>&, const std::pair<Vector3D, Vector3D>&, const std::pair<double, double>&>(),
-                    py::arg("energies"), py::arg("positions"), py::arg("directions"), py::arg("times"))
-            .def_readwrite("energies", &ContinuousLoss::energies)
-            .def_readwrite("positions", &ContinuousLoss::positions)
-            .def_readwrite("directions", &ContinuousLoss::directions)
-            .def_readwrite("times", &ContinuousLoss::times);
+            .def(py::init<const double&, const double&, const Vector3D&, const double&, const Vector3D&, const Vector3D&, const double&, const double&>())
+            .def_readwrite("length", &ContinuousLoss::length, R"pbdoc(Length of continuous loss in cm.)pbdoc")
+            .def_readwrite("start_position", &ContinuousLoss::start_position, R"pbdoc(Position where the continuous energy loss started.)pbdoc")
+            .def_readwrite("direction_initial", &ContinuousLoss::direction_initial, R"pbdoc(Direction of the particle at the beginning of the continuous energy loss.)pbdoc")
+            .def_readwrite("direction_final", &ContinuousLoss::direction_final, R"pbdoc(Direction of the particle at the end of the continuous energy loss.)pbdoc")
+            .def_readwrite("time_initial", &ContinuousLoss::time_initial, R"pbdoc(Time when the continuous energy loss started.)pbdoc")
+            .def_readwrite("time_final", &ContinuousLoss::time_final, R"pbdoc(Time when the continuous energy loss ended.)pbdoc");
 
     py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries", R"pbdoc(Output of Propagator.)pbdoc")
             .def("ELost", &Secondaries::GetELost)

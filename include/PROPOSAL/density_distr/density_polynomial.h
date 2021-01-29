@@ -60,6 +60,7 @@ class Density_polynomial : public Density_distr {
                      const Vector3D& direction,
                      double distance) const override;
 
+   protected:
     double Helper_function(const Vector3D& xi,
                            const Vector3D& direction,
                            double res,
@@ -69,7 +70,6 @@ class Density_polynomial : public Density_distr {
                            double res,
                            double l) const;
 
-   protected:
     Polynom polynom_;
     Polynom Polynom_;
 
