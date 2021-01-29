@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/Logging.h"
+/* #include "PROPOSAL/Logging.h" */
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
 #include <memory>
@@ -17,10 +17,10 @@ public:
     CrossSectionDEDX(T1 const& _param, ParticleDef const& _p, T2 const& _target,
         EnergyCutSettings const& _cut)
         : hash(0)
-        , logger(Logging::Get("PROPOSAL.CrossSectionDEDX"))
+        /* , logger(Logging::Get("PROPOSAL.CrossSectionDEDX")) */
     {
-        logger->info("Building {} {} dEdx for target {}.", _p.name, _param.name,
-            _target.GetName());
+        /* logger->info("Building {} {} dEdx for target {}.", _p.name, _param.name, */
+        /*     _target.GetName()); */
 
         hash_combine(hash, _param.GetHash(), _p.GetHash(), _target.GetHash(),
             _cut.GetHash());

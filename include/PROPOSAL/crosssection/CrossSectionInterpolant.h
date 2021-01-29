@@ -38,7 +38,8 @@ template <typename Param, typename P, typename M>
 class CrossSectionInterpolant : public crosssection_t<P, M>,
                                 public CrossSectionInterpolantBase {
 
-    using param_t = typename std::decay<Param>::type;
+    using comp_wise = crosssection::is_component_wise<Param>;
+    using only_stochastic = crosssection::is_only_stochastic<Param>;
 
 public:
     CrossSectionInterpolant(Param _param, P _p_def, M _medium,
@@ -51,7 +52,8 @@ public:
             detail::build_de2dx(crosssection::is_component_wise<Param> {}, true,
                 _param, _p_def, _medium, _cut))
     {
-        if (crosssection::is_only_stochastic<Param> {} == true and _cut != nullptr) {
+        if (crosssection::is_only_stochastic<Param> {} == true
+            and _cut != nullptr) {
             throw std::invalid_argument(
                 "CrossSections of parametrizations that are only "
                 "stochastic do "
@@ -62,17 +64,15 @@ public:
     inline double CalculatedNdx(double energy,
         std::shared_ptr<const Component> comp_ptr = nullptr) override
     {
-        return this->CalculatedNdx_impl(energy,
-            typename param_t::base_param_t::component_wise {}, comp_ptr);
+        return this->CalculatedNdx_impl(energy, comp_wise {}, comp_ptr);
     }
 
     inline double CalculateStochasticLoss(
         std::shared_ptr<const Component> const& comp, double energy,
         double rate) override
     {
-        return this->CalculateStochasticLoss_impl(comp, energy, rate,
-            typename param_t::base_param_t::component_wise {},
-            typename param_t::base_param_t::only_stochastic {});
+        return this->CalculateStochasticLoss_impl(
+            comp, energy, rate, comp_wise {}, only_stochastic {});
     }
 };
 

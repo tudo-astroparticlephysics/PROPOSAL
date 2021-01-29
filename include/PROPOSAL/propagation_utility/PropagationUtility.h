@@ -31,20 +31,17 @@
 #include <vector>
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/particle/Particle.h"
-
+#include "PROPOSAL/particle/ParticleDef.h"
 
 namespace PROPOSAL {
-    namespace Components {
-        class Component;
-    }
-    class Interaction;
-    class Displacement;
-    class Time;
-    class Scattering;
-    class Decay;
-    class ContRand;
+class Component;
+class Interaction;
+class Displacement;
+class Time;
+class Scattering;
+class Decay;
+class ContRand;
 }
 
 namespace PROPOSAL {
@@ -68,7 +65,8 @@ public:
 
     PropagationUtility(Collection const& collection);
 
-    std::tuple<InteractionType, std::shared_ptr<const Components::Component>, double>
+    std::tuple<InteractionType, std::shared_ptr<Component>,
+        double>
     EnergyStochasticloss(double, double);
     double EnergyDecay(double, std::function<double()>, double);
     double EnergyInteraction(double, std::function<double()>);

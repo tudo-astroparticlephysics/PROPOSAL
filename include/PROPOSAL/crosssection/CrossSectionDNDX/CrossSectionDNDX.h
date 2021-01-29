@@ -1,14 +1,14 @@
 #pragma once
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/Logging.h"
+/* #include "PROPOSAL/Logging.h" */
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
 #include <memory>
 
 namespace PROPOSAL {
 class CrossSectionDNDX {
-    std::function<std::tuple<double, double>(double)> kinematic_limits;
+    std::function<crosssection::KinematicLimits(double)> kinematic_limits;
     std::shared_ptr<const EnergyCutSettings> cut;
     size_t hash;
 
@@ -26,8 +26,8 @@ public:
         : kinematic_limits(define_kinematic_limits(_param, _particle, _target))
         , hash(0)
     {
-        auto logger = Logging::Get("PROPOSAL.CrossSection.dNdx");
-        logger->info("Building {} dNdx.", _param.name);
+        /* auto logger = Logging::Get("PROPOSAL.CrossSection.dNdx"); */
+        /* logger->info("Building {} dNdx.", _param.name); */
         hash_combine(
             hash, _param.GetHash(), _particle.GetHash(), _target.GetHash());
     }

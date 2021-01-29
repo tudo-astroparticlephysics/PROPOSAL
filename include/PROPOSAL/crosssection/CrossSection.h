@@ -44,8 +44,6 @@
 
 namespace PROPOSAL {
 
-using Components::Component;
-
 using rates_t = std::unordered_map<std::shared_ptr<const Component>, double>;
 
 struct CrossSectionBase {
@@ -202,16 +200,18 @@ protected:
 public:
     template <typename Param, typename T1, typename T2, typename T3>
     CrossSection(
-        Param _param, P _p_def, M _medium, T1&& _dndx, T2&& _dedx, T3&& _de2dx)
+        Param _param, P _p_def, M, T1&& _dndx, T2&& _dedx, T3&& _de2dx)
         : hash(0)
         , dndx(std::forward<T1>(_dndx))
         , dedx(std::forward<T2>(_dedx))
         , de2dx(std::forward<T3>(_de2dx))
         , lower_energy_lim(_param.GetLowerEnergyLim(_p_def))
-        , interaction_type(_param.interaction_type)
+        , interaction_type(static_cast<InteractionType>(
+              crosssection::ParametrizationId<Param>::value))
     {
         auto logger = Logging::Get("PROPOSAL.CrossSection");
-        logger->info("Building {} crosssection.", _param.name);
+        logger->info("Building {} crosssection.",
+            crosssection::ParametrizationName<Param>::value);
         for (auto const& i : dndx)
             hash_combine(hash, std::get<1>(i.second)->GetHash());
         if (dedx) {

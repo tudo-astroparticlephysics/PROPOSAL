@@ -28,16 +28,16 @@
 
 #pragma once
 
+#include "PROPOSAL/medium/Components.h"
+#include <array>
 #include <memory>
 #include <string>
 #include <vector>
-#include <array>
-#include "PROPOSAL/medium/Components.h"
 
 #define MEDIUM_DEF(cls)                                                        \
     class cls : public Medium {                                                \
-       public:                                                                 \
-        cls();                                                 \
+    public:                                                                    \
+        cls();                                                                 \
     };
 
 namespace PROPOSAL {
@@ -47,21 +47,13 @@ namespace PROPOSAL {
  ******************************************************************************/
 
 class Medium {
-   public:
+public:
     // class Builder;
 
-   public:
-    Medium() {}
-    Medium(std::string name,
-           double I,
-           double C,
-           double a,
-           double m,
-           double X0,
-           double X1,
-           double d0,
-           double massDensity,
-           std::vector<Components::Component>);
+public:
+    Medium() { }
+    Medium(std::string name, double I, double C, double a, double m, double X0,
+        double X1, double d0, double massDensity, std::vector<Component>);
 
     // Operators
     bool operator==(const Medium& medium) const;
@@ -74,9 +66,7 @@ class Medium {
 
     // Getter
     int GetNumComponents() const { return numComponents_; }
-    const std::vector<Components::Component>& GetComponents() const {
-        return components_;
-    }
+    std::vector<Component> GetComponents() const { return components_; }
     double GetSumCharge() const { return sumCharge_; }
     double GetZA() const { return ZA_; }
     double GetI() const { return I_; }
@@ -108,12 +98,11 @@ class Medium {
     void SetMassDensity(double massDensity);
     void SetMolDensity(double molDensity);
     void SetAverageNucleonWeight(std::vector<double> M);
-    void SetComponents(
-        std::vector<Components::Component> components);
+    void SetComponents(std::vector<Component> components);
     void SetMM(double MM);
     void SetSumNucleons(double sumNucleons);
 
-   protected:
+protected:
     // Methods
     void init();
     double X0_inv(unsigned int Z, double M);
@@ -121,24 +110,24 @@ class Medium {
     // Protected member
     std::string name_;
 
-    int numComponents_;                               ///< number of components
+    int numComponents_; ///< number of components
 
-    double sumCharge_;  ///< sum of charges of all nuclei
+    double sumCharge_; ///< sum of charges of all nuclei
 
-    double ZA_;                // <Z/A>
-    double I_;                 // mean excitation energy [eV]
-    double C_, a_;             //< ionization formula constants
-    double m_, X0_, X1_;       //< ionization formula constants (continued)
-    double d0_;                // sternheimer et al density effect parameters
+    double ZA_;          // <Z/A>
+    double I_;           // mean excitation energy [eV]
+    double C_, a_;       //< ionization formula constants
+    double m_, X0_, X1_; //< ionization formula constants (continued)
+    double d0_;          // sternheimer et al density effect parameters
 
-    double massDensity_;      ///< mass density (20° C, 1 atm) [g/cm3]
-    double molDensity_;       ///< molecule density [number/cm3]
-    double radiationLength_;  ///< radiation length [cm]
+    double massDensity_;     ///< mass density (20° C, 1 atm) [g/cm3]
+    double molDensity_;      ///< molecule density [number/cm3]
+    double radiationLength_; ///< radiation length [cm]
 
-    double MM_;           ///< average all-component nucleon weight
-    double sumNucleons_;  ///< sum of nucleons of all nuclei
+    double MM_;          ///< average all-component nucleon weight
+    double sumNucleons_; ///< sum of nucleons of all nuclei
 
-    std::vector<Components::Component> components_;  ///< Components of Medium
+    std::vector<Component> components_; ///< Components of Medium
 };
 
 MEDIUM_DEF(Water)
@@ -193,14 +182,41 @@ MEDIUM_DEF(CascadiaBasinWater)
 #undef MEDIUM_DEF
 
 namespace PROPOSAL {
-enum Medium_Type { WATER, ICE, SALT, STANDARDROCK, FREJUSROCK, IRON, HYDROGEN, LEAD,
-    COPPER, URANIUM, AIR, PARAFFIN, ANTARESWATER, CASCADIABASINWATER, };
+enum Medium_Type {
+    WATER,
+    ICE,
+    SALT,
+    STANDARDROCK,
+    FREJUSROCK,
+    IRON,
+    HYDROGEN,
+    LEAD,
+    COPPER,
+    URANIUM,
+    AIR,
+    PARAFFIN,
+    ANTARESWATER,
+    CASCADIABASINWATER,
+};
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-static const std::array<std::string, 14>  Medium_Name = { "water", "ice", "salt", "standardrock",
-    "frejusrock", "iron", "hydrogen", "lead", "copper", "uranium", "air", "paraffin",
-    "antareswater", "cascadiabasinwater", };
+static const std::array<std::string, 14> Medium_Name = {
+    "water",
+    "ice",
+    "salt",
+    "standardrock",
+    "frejusrock",
+    "iron",
+    "hydrogen",
+    "lead",
+    "copper",
+    "uranium",
+    "air",
+    "paraffin",
+    "antareswater",
+    "cascadiabasinwater",
+};
 } // namespace PROPOSAL
 
 /* namespace PROPOSAL { */

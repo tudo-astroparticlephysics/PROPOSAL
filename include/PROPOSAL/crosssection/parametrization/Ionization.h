@@ -54,6 +54,9 @@ namespace crosssection {
         static constexpr char value[36] = "ionization";
     };
 
+    template <> struct is_component_wise<Ionization> : std::false_type {
+    };
+
     class IonizBetheBlochRossi : public Ionization {
         double InelCorrection(
             ParticleDef const&, Medium const&, double, double) const;
@@ -75,6 +78,9 @@ namespace crosssection {
         static constexpr char value[36] = "ionizbetheblochrossi";
     };
 
+    template <> struct is_component_wise<IonizBetheBlochRossi> : std::false_type {
+    };
+
     template <> struct IonizationDEdxIntegration<IonizBetheBlochRossi> {
         constexpr static bool value = true;
     };
@@ -94,6 +100,9 @@ namespace crosssection {
         static constexpr char value[36] = "ionizbergerseltzerbhabha";
     };
 
+    template <> struct is_component_wise<IonizBergerSeltzerBhabha> : std::false_type {
+    };
+
     struct IonizBergerSeltzerMoller : public Ionization {
         IonizBergerSeltzerMoller(const EnergyCutSettings&);
 
@@ -107,6 +116,9 @@ namespace crosssection {
 
     template <> struct ParametrizationName<IonizBergerSeltzerMoller> {
         static constexpr char value[36] = "ionizbergerseltzermoller";
+    };
+
+    template <> struct is_component_wise<IonizBergerSeltzerMoller> : std::false_type {
     };
 
     /* // Factory pattern functions */
