@@ -33,7 +33,7 @@
 #include "PROPOSAL/crosssection/CrossSectionDE2DX/CrossSectionDE2DXBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDXBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
-#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.hpp"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/Particle.h"
@@ -90,7 +90,7 @@ namespace detail {
         using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
         auto m = std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>>();
         for (auto& c : target.GetComponents()) {
-            auto comp = std::make_shared<const Components::Component>(c);
+            auto comp = std::make_shared<const Component>(c);
             auto weight = weight_component(target, c);
             auto calc = make_dndx(interpol, c, std::forward<Args>(args)...);
             m.emplace(comp, std::make_tuple(weight, std::move(calc)));

@@ -9,8 +9,10 @@ namespace PROPOSAL {
 namespace crosssection {
     class IonizBergerSeltzerBhabha;
     class IonizBergerSeltzerMoller;
-}
+} // namespace crosssection
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
 namespace detail {
     using dedx_integral_t = std::function<double(Integral&, double)>;
 

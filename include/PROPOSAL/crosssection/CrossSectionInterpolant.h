@@ -29,28 +29,26 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/CrossSectionInterpolantBase.h"
-#include "PROPOSAL/math/Interpolant.h"
 
 namespace PROPOSAL {
 
 template <typename Param, typename P, typename M>
-class CrossSectionInterpolant : public crosssection_t<P, M>,
-                                public CrossSectionInterpolantBase {
+class CrossSectionInterpolant : public crosssection_t<P, M> {
 
-    using comp_wise = crosssection::is_component_wise<Param>;
-    using only_stochastic = crosssection::is_only_stochastic<Param>;
+    using param_t = std::remove_reference_t<std::remove_cv_t<Param>>;
+    using comp_wise = crosssection::is_component_wise<param_t>;
+    using only_stochastic = crosssection::is_only_stochastic<param_t>;
 
 public:
     CrossSectionInterpolant(Param _param, P _p_def, M _medium,
         std::shared_ptr<const EnergyCutSettings> _cut)
         : crosssection_t<P, M>(_param, _p_def, _medium,
-            detail::build_dndx(crosssection::is_component_wise<Param> {}, true,
-                _medium, _param, _p_def, _cut),
-            detail::build_dedx(crosssection::is_component_wise<Param> {}, true,
-                _param, _p_def, _medium, _cut),
-            detail::build_de2dx(crosssection::is_component_wise<Param> {}, true,
-                _param, _p_def, _medium, _cut))
+            detail::build_dndx(
+                comp_wise {}, true, _medium, _param, _p_def, _cut),
+            detail::build_dedx(
+                comp_wise {}, true, _param, _p_def, _medium, _cut),
+            detail::build_de2dx(
+                comp_wise {}, true, _param, _p_def, _medium, _cut))
     {
         if (crosssection::is_only_stochastic<Param> {} == true
             and _cut != nullptr) {

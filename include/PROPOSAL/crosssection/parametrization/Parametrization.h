@@ -34,13 +34,9 @@
 namespace PROPOSAL {
 struct ParticleDef;
 class Medium;
-namespace Components {
-    class Component;
-}
+class Component;
 enum class InteractionType;
 } // namespace PROPOSAL
-
-using PROPOSAL::Components::Component;
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -61,8 +57,7 @@ namespace crosssection {
     template <typename T> struct is_only_stochastic : std::false_type {
     };
 
-    template <typename Target>
-    class Parametrization {
+    template <typename Target> class Parametrization {
     protected:
         size_t hash;
 

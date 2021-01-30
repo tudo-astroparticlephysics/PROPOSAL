@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -54,8 +54,6 @@ namespace crosssection {
         static constexpr char value[36] = "ionization";
     };
 
-    template <> struct is_component_wise<Ionization> : std::false_type {
-    };
 
     class IonizBetheBlochRossi : public Ionization {
         double InelCorrection(
@@ -78,8 +76,6 @@ namespace crosssection {
         static constexpr char value[36] = "ionizbetheblochrossi";
     };
 
-    template <> struct is_component_wise<IonizBetheBlochRossi> : std::false_type {
-    };
 
     template <> struct IonizationDEdxIntegration<IonizBetheBlochRossi> {
         constexpr static bool value = true;
@@ -100,8 +96,6 @@ namespace crosssection {
         static constexpr char value[36] = "ionizbergerseltzerbhabha";
     };
 
-    template <> struct is_component_wise<IonizBergerSeltzerBhabha> : std::false_type {
-    };
 
     struct IonizBergerSeltzerMoller : public Ionization {
         IonizBergerSeltzerMoller(const EnergyCutSettings&);
@@ -118,8 +112,6 @@ namespace crosssection {
         static constexpr char value[36] = "ionizbergerseltzermoller";
     };
 
-    template <> struct is_component_wise<IonizBergerSeltzerMoller> : std::false_type {
-    };
 
     /* // Factory pattern functions */
 
@@ -138,8 +130,10 @@ namespace crosssection {
     /* template <typename P, typename M> */
     /* static std::map<std::string, ioniz_func_ptr<P, M>> ioniz_map = { */
     /*     { "betheblochrossi", create_ioniz<IonizBetheBlochRossi, P, M> }, */
-    /*     { "bergerseltzerbhabha", create_ioniz<IonizBergerSeltzerBhabha, P, M> }, */
-    /*     { "bergerseltzermoller", create_ioniz<IonizBergerSeltzerMoller, P, M> } */
+    /*     { "bergerseltzerbhabha", create_ioniz<IonizBergerSeltzerBhabha, P, M>
+     * }, */
+    /*     { "bergerseltzermoller", create_ioniz<IonizBergerSeltzerMoller, P, M>
+     * } */
     /* }; */
 
     /* template <typename P, typename M> */
@@ -149,10 +143,12 @@ namespace crosssection {
     /* { */
     /*     std::string name = param_name; */
     /*     std::transform( */
-    /*         param_name.begin(), param_name.end(), name.begin(), ::tolower); */
+    /*         param_name.begin(), param_name.end(), name.begin(), ::tolower);
+     */
     /*     auto it = ioniz_map<P, M>.find(name); */
     /*     if (it == ioniz_map<P, M>.end()) */
-    /*         throw std::logic_error("Unknown parametrization for ionization"); */
+    /*         throw std::logic_error("Unknown parametrization for ionization");
+     */
 
     /*     return it->second(p_def, medium, cuts, interpol); */
     /* } */
@@ -163,7 +159,8 @@ namespace crosssection {
     /*     const nlohmann::json& config) */
     /* { */
     /*     if (!config.contains("parametrization")) */
-    /*         throw std::logic_error("No parametrization passed for ionization"); */
+    /*         throw std::logic_error("No parametrization passed for
+     * ionization"); */
     /*     std::string param_name = config["parametrization"]; */
 
     /*     return make_ionization(p_def, medium, cuts, interpol, param_name); */

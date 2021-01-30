@@ -29,11 +29,11 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
+#include "PROPOSAL/math/Interpolant.h"
 
 #include <vector>
 
 namespace PROPOSAL {
-class Interpolant;
 class Component;
 } // namespace PROPOSAL
 
