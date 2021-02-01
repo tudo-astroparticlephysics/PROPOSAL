@@ -28,7 +28,6 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-#include <memory>
 
 #define BREMSSTRAHLUNG_DEF(param)                                              \
     struct Brems##param : public Bremsstrahlung {                              \
@@ -36,14 +35,18 @@
         Brems##param(bool lpm, const ParticleDef&, const Medium&,              \
             double density_correction = 1.0);                                  \
                                                                                \
-        std::unique_ptr<Parametrization<Component>> clone() const final;                  \
+        std::unique_ptr<Parametrization<Component>> clone() const final;       \
                                                                                \
         double CalculateParametrization(const ParticleDef&, const Component&,  \
             double energy, double v) const final;                              \
     };                                                                         \
                                                                                \
     template <> struct ParametrizationName<Brems##param> {                     \
-        static constexpr char value[36] = "brems" #param;                      \
+        static constexpr auto value = "brems_" #param;                         \
+    };                                                                         \
+                                                                               \
+    template <> struct ParametrizationId<Brems##param> {                       \
+        static constexpr size_t value = 1000000002;                            \
     };
 
 namespace PROPOSAL {

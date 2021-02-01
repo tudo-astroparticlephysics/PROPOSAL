@@ -14,6 +14,14 @@
         : crosssection::Photo##parent(hard_component)                          \
     {                                                                          \
         hash_combine(hash, std::string(#param));                               \
+    }                                                                          \
+                                                                               \
+    std::unique_ptr<crosssection::Parametrization<Component>>                  \
+        crosssection::Photo##param::clone() const                              \
+    {                                                                          \
+        using param_t                                                          \
+            = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;         \
+        return std::make_unique<param_t>(*this);                               \
     }
 
 using namespace PROPOSAL;

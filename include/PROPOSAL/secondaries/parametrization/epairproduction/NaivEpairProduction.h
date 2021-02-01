@@ -5,7 +5,6 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/secondaries/parametrization/epairproduction/EpairProduction.h"
 
-using PROPOSAL::Components::Component;
 
 namespace PROPOSAL {
 namespace secondaries {

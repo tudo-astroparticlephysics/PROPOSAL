@@ -51,7 +51,7 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<Ionization> {
-        static constexpr char value[36] = "ionization";
+        static constexpr auto value = "ionization";
     };
 
     class IonizBetheBlochRossi : public Ionization {
@@ -74,7 +74,11 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<IonizBetheBlochRossi> {
-        static constexpr char value[36] = "ionizbetheblochrossi";
+        static constexpr auto value = "Ioniz_BetheBlochRossi";
+    };
+
+    template <> struct ParametrizationId<IonizBetheBlochRossi> {
+        static constexpr size_t value = 1000000003;
     };
 
     template <> struct IonizationDEdxIntegration<IonizBetheBlochRossi> {
@@ -95,7 +99,11 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<IonizBergerSeltzerBhabha> {
-        static constexpr char value[36] = "ionizbergerseltzerbhabha";
+        static constexpr auto value = "Ioniz_BergerSeltzerBhabha";
+    };
+
+    template <> struct ParametrizationId<IonizBergerSeltzerBhabha> {
+        static constexpr size_t value = 1000000003;
     };
 
     struct IonizBergerSeltzerMoller : public Ionization {
@@ -112,7 +120,11 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<IonizBergerSeltzerMoller> {
-        static constexpr char value[36] = "ionizbergerseltzermoller";
+        static constexpr auto value = "Ioniz_BergerSeltzerMoller";
+    };
+
+    template <> struct ParametrizationId<IonizBergerSeltzerMoller> {
+        static constexpr size_t value = 1000000003;
     };
 
     /* // Factory pattern functions */

@@ -5,8 +5,8 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using std::get;
 using std::logic_error;
@@ -41,8 +41,8 @@ double crosssection::Ionization::Delta(
     }
 }
 
-
-crosssection::KinematicLimits crosssection::IonizBetheBlochRossi::GetKinematicLimits(
+crosssection::KinematicLimits
+crosssection::IonizBetheBlochRossi::GetKinematicLimits(
     const ParticleDef& p_def, const Medium& medium, double energy) const
 {
     auto mass_ration = ME / p_def.mass;
@@ -66,6 +66,13 @@ crosssection::IonizBetheBlochRossi::IonizBetheBlochRossi(
     : crosssection::Ionization(cuts)
 {
     hash_combine(hash, std::string("bethe_bloch_rossi"));
+}
+
+std::unique_ptr<crosssection::Parametrization<Medium>>
+crosssection::IonizBetheBlochRossi::clone() const
+{
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
 }
 
 // ------------------------------------------------------------------------- //
@@ -94,8 +101,7 @@ double crosssection::IonizBetheBlochRossi::DifferentialCrossSection(
     double spin_1_2_contribution = v / (1 + 1 / gamma);
     spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
     auto result = 1
-        - beta
-            * (v / GetKinematicLimits(p_def, medium, energy).v_max)
+        - beta * (v / GetKinematicLimits(p_def, medium, energy).v_max)
         + spin_1_2_contribution;
     result *= IONK * p_def.charge * p_def.charge
         * calculate_proton_massnumber_fraction(medium.GetComponents())
@@ -171,8 +177,8 @@ double crosssection::IonizBetheBlochRossi::InelCorrection(
 {
     double gamma = energy / p_def.mass;
     auto a = std::log(1 + 2 * v * energy / ME);
-    auto b = std::log((1 - v / GetKinematicLimits(p_def, medium, energy).v_max)
-        / (1 - v));
+    auto b = std::log(
+        (1 - v / GetKinematicLimits(p_def, medium, energy).v_max) / (1 - v));
     auto c = std::log((2 * gamma * (1 - v) * ME) / (p_def.mass * v));
     auto result = a * (2 * b + c) - b * b;
 
@@ -229,7 +235,15 @@ crosssection::IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(
     hash_combine(hash, std::string("berger_seltzer_bhabha"));
 }
 
-crosssection::KinematicLimits crosssection::IonizBergerSeltzerBhabha::GetKinematicLimits(
+std::unique_ptr<crosssection::Parametrization<Medium>>
+crosssection::IonizBergerSeltzerBhabha::clone() const
+{
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
+}
+
+crosssection::KinematicLimits
+crosssection::IonizBergerSeltzerBhabha::GetKinematicLimits(
     const ParticleDef& p_def, const Medium&, double energy) const
 {
     auto kin_lim = KinematicLimits();
@@ -350,7 +364,15 @@ crosssection::IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(
     hash_combine(hash, std::string("berger_seltzer_moller"));
 }
 
-crosssection::KinematicLimits crosssection::IonizBergerSeltzerMoller::GetKinematicLimits(
+std::unique_ptr<crosssection::Parametrization<Medium>>
+crosssection::IonizBergerSeltzerMoller::clone() const
+{
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
+}
+
+crosssection::KinematicLimits
+crosssection::IonizBergerSeltzerMoller::GetKinematicLimits(
     const ParticleDef& p_def, const Medium&, double energy) const
 {
     auto kin_lim = KinematicLimits();

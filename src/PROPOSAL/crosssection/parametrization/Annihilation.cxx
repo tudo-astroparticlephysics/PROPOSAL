@@ -1,6 +1,8 @@
 
 #include <cassert>
 #include <cmath>
+#include <memory>
+#include <type_traits>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
@@ -27,6 +29,13 @@ crosssection::KinematicLimits crosssection::Annihilation::GetKinematicLimits(
     kin_lim.v_min = 0.5 * (1. - aux);
     kin_lim.v_max = 0.5 * (1. + aux);
     return kin_lim;
+}
+
+std::unique_ptr<crosssection::Parametrization<Component>>
+crosssection::AnnihilationHeitler::clone() const
+{
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
 }
 
 double crosssection::AnnihilationHeitler::DifferentialCrossSection(

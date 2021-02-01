@@ -4,6 +4,8 @@
 
 #include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
 
+#include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -15,13 +17,22 @@
     crosssection::Epair##param::Epair##param(bool lpm)                         \
         : EpairProductionRhoIntegral(lpm)                                      \
     {                                                                          \
-        hash_combine(hash, std::string(#param));                                         \
+        hash_combine(hash, std::string(#param));                               \
     }                                                                          \
+                                                                               \
     crosssection::Epair##param::Epair##param(bool lpm, const ParticleDef& p,   \
         const Medium& medium, double density_distribution)                     \
         : EpairProductionRhoIntegral(lpm, p, medium, density_distribution)     \
     {                                                                          \
-        hash_combine(hash, std::string(#param));                                         \
+        hash_combine(hash, std::string(#param));                               \
+    }                                                                          \
+                                                                               \
+    std::unique_ptr<crosssection::Parametrization<Component>>                  \
+        crosssection::Epair##param::clone() const                              \
+    {                                                                          \
+        using param_t                                                          \
+            = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;         \
+        return std::make_unique<param_t>(*this);                               \
     }
 
 using namespace PROPOSAL;
@@ -65,7 +76,6 @@ crosssection::KinematicLimits crosssection::EpairProduction::GetKinematicLimits(
         lim.v_max = lim.v_min;
     return lim;
 }
-
 
 namespace PROPOSAL {
 namespace detail {

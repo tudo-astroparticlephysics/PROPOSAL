@@ -38,16 +38,13 @@ namespace crosssection {
         PhotoPairProduction() = default;
         virtual ~PhotoPairProduction() = default;
 
-        //using only_stochastic = std::true_type;
-        //using component_wise = std::true_type;
-
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-        KinematicLimits GetKinematicLimits(const ParticleDef&,
-            const Component&, double) const noexcept override;
+        KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&,
+            double) const noexcept override;
     };
 
     template <> struct ParametrizationName<PhotoPairProduction> {
-        static constexpr char value[36] = "photopairproduction";
+        static constexpr auto value = "photopairproduction";
     };
 
     struct PhotoPairTsai : public PhotoPairProduction {
@@ -60,7 +57,11 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<PhotoPairTsai> {
-        static constexpr char value[36] = "photopairtsai";
+        static constexpr auto value = "Photopair_Tsai";
+    };
+
+    template <> struct ParametrizationId<PhotoPairTsai> {
+        static constexpr size_t value = 1000000013;
     };
 
     /* class PhotoAngleDistribution { */

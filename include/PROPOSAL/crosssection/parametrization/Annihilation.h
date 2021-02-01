@@ -44,7 +44,7 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<Annihilation> {
-        static constexpr char value[36] = "annihilation";
+        static constexpr auto value = "annihilation";
     };
 
     struct AnnihilationHeitler : public Annihilation {
@@ -53,11 +53,15 @@ namespace crosssection {
         std::unique_ptr<Parametrization<Component>> clone() const final;
 
         double DifferentialCrossSection(
-            const ParticleDef&, const Component&, double, double) const final;
+            ParticleDef const&, Component const&, double, double) const final;
     };
 
     template <> struct ParametrizationName<AnnihilationHeitler> {
-        static constexpr char value[36] = "annihilationheitler";
+        static constexpr auto value = "annihilationheitler";
+    };
+
+    template <> struct ParametrizationId<AnnihilationHeitler> {
+        static constexpr size_t value = 1000000012;
     };
 
     /* // Factory pattern functions */

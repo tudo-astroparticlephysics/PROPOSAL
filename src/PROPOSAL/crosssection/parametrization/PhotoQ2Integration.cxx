@@ -4,8 +4,8 @@
 #include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
@@ -16,6 +16,14 @@ using namespace PROPOSAL;
         std::shared_ptr<ShadowEffect> shadow_effect)                           \
         : crosssection::PhotoQ2Integral(shadow_effect)                         \
     {                                                                          \
+    }                                                                          \
+                                                                               \
+    std::unique_ptr<crosssection::Parametrization<Component>>                  \
+        crosssection::Photo##param::clone() const                              \
+    {                                                                          \
+        using param_t                                                          \
+            = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;         \
+        return std::make_unique<param_t>(*this);                               \
     }
 
 crosssection::PhotoQ2Integral::PhotoQ2Integral(

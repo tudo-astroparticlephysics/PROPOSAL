@@ -47,12 +47,13 @@ namespace crosssection {
     };
 
     template <typename T> struct ParametrizationName {
-        static constexpr char value[36] = "";
+        static constexpr auto value = "name_not_available";
     };
 
     template <typename T> struct ParametrizationId {
         static constexpr size_t value = 0;
     };
+
 
     template <typename T> struct is_component_wise : std::true_type {
     };

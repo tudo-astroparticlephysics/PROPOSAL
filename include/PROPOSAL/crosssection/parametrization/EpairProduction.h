@@ -28,12 +28,7 @@
 
 #pragma once
 
-#include <cmath>
-#include <functional>
-
-#include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-#include "PROPOSAL/math/Integral.h"
 
 #define EPAIR_PARAM_INTEGRAL_DEC(param)                                        \
     struct Epair##param : public EpairProductionRhoIntegral {                  \
@@ -42,15 +37,24 @@
             double density_correction = 1.0);                                  \
         using base_param_t = EpairProduction;                                  \
                                                                                \
-        std::unique_ptr<Parametrization<Component>> clone() const final;                  \
+        std::unique_ptr<Parametrization<Component>> clone() const final;       \
                                                                                \
         double FunctionToIntegral(const ParticleDef&, const Component&,        \
             double energy, double v, double r) const;                          \
     };                                                                         \
                                                                                \
     template <> struct ParametrizationName<Epair##param> {                     \
-        static constexpr char value[36] = "epair" #param;                      \
+        static constexpr auto value = "epair_" #param;                         \
+    };                                                                         \
+                                                                               \
+    template <> struct ParametrizationId<Epair##param> {                       \
+        static constexpr size_t value = 1000000004;                            \
     };
+
+namespace PROPOSAL {
+class Integral;
+class EnergyCutSettings;
+} // namespace PROPOSAL
 
 namespace PROPOSAL {
 namespace crosssection {
@@ -183,42 +187,44 @@ namespace crosssection {
 
 } // namespace crosssection
 
-namespace detail {
-    double integrate_dedx_epair(Integral& integral,
-        crosssection::EpairProduction const& param, const ParticleDef& p_def,
-        const Component& comp, double energy, double v_min, double v_max);
+/* namespace detail { */
+/*     double integrate_dedx_epair(Integral& integral, */
+/*         crosssection::EpairProduction const& param, const ParticleDef& p_def,
+ */
+/*         const Component& comp, double energy, double v_min, double v_max); */
 
-    template <typename T1>
-    auto define_epair_dedx_integral(T1 param, ParticleDef const& p_def,
-        Component const& comp, EnergyCutSettings const& cut)
-    {
-        return [param, &p_def, &comp, &cut](Integral& i, double E) {
-            auto lim = param.GetKinematicLimits(p_def, comp, E);
-            auto v_cut = cut.GetCut(lim, E);
-            return integrate_dedx_epair(
-                i, param, p_def, comp, E, lim.v_min, v_cut);
-        };
-    }
+/*     template <typename T1> */
+/*     auto define_epair_dedx_integral(T1 param, ParticleDef const& p_def, */
+/*         Component const& comp, EnergyCutSettings const& cut) */
+/*     { */
+/*         return [param, &p_def, &comp, &cut](Integral& i, double E) { */
+/*             auto lim = param.GetKinematicLimits(p_def, comp, E); */
+/*             auto v_cut = cut.GetCut(lim, E); */
+/*             return integrate_dedx_epair( */
+/*                 i, param, p_def, comp, E, lim.v_min, v_cut); */
+/*         }; */
+/*     } */
 
-    inline auto define_dedx_integral(
-        crosssection::EpairSandrockSoedingreksoRhode param,
-        ParticleDef const& p_def, Component const& comp,
-        EnergyCutSettings const& cut)
-    {
-        return define_epair_dedx_integral(param, p_def, comp, cut);
-    }
-    inline auto define_dedx_integral(
-        crosssection::EpairKelnerKokoulinPetrukhin param,
-        ParticleDef const& p_def, Component const& comp,
-        EnergyCutSettings const& cut)
-    {
-        return define_epair_dedx_integral(param, p_def, comp, cut);
-    }
-    inline auto define_dedx_integral(
-        crosssection::EpairForElectronPositron param, ParticleDef const& p_def,
-        Component const& comp, EnergyCutSettings const& cut)
-    {
-        return define_epair_dedx_integral(param, p_def, comp, cut);
-    }
-}
+/*     inline auto define_dedx_integral( */
+/*         crosssection::EpairSandrockSoedingreksoRhode param, */
+/*         ParticleDef const& p_def, Component const& comp, */
+/*         EnergyCutSettings const& cut) */
+/*     { */
+/*         return define_epair_dedx_integral(param, p_def, comp, cut); */
+/*     } */
+/*     inline auto define_dedx_integral( */
+/*         crosssection::EpairKelnerKokoulinPetrukhin param, */
+/*         ParticleDef const& p_def, Component const& comp, */
+/*         EnergyCutSettings const& cut) */
+/*     { */
+/*         return define_epair_dedx_integral(param, p_def, comp, cut); */
+/*     } */
+/*     inline auto define_dedx_integral( */
+/*         crosssection::EpairForElectronPositron param, ParticleDef const&
+ * p_def, */
+/*         Component const& comp, EnergyCutSettings const& cut) */
+/*     { */
+/*         return define_epair_dedx_integral(param, p_def, comp, cut); */
+/*     } */
+/* } */
 } // namespace PROPOSAL

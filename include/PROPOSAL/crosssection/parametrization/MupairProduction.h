@@ -39,14 +39,18 @@
         Mupair##param();                                                       \
         using base_param_t = MupairProduction;                                 \
                                                                                \
-        std::unique_ptr<Parametrization<Component>> clone() const final;                  \
+        std::unique_ptr<Parametrization<Component>> clone() const final;       \
                                                                                \
         double FunctionToIntegral(const ParticleDef&, const Component&,        \
             double energy, double v, double r) const;                          \
     };                                                                         \
                                                                                \
     template <> struct ParametrizationName<Mupair##param> {                    \
-        static constexpr char value[36] = "mupair" #param;                     \
+        static constexpr auto value = "Mupair_" #param;                        \
+    };                                                                         \
+                                                                               \
+    template <> struct ParametrizationId<Mupair##param> {                      \
+        static constexpr size_t value = 1000000006;                            \
     };
 
 namespace PROPOSAL {

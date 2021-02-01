@@ -4,11 +4,11 @@
 #include <stdexcept>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/crosssection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crosssection/parametrization/ParamTables.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/Particle.h"
@@ -23,6 +23,7 @@
         lpm_ = nullptr;                                                        \
         hash_combine(hash, std::string(#param));                               \
     }                                                                          \
+                                                                               \
     crosssection::Brems##param::Brems##param(bool lpm, const ParticleDef& p,   \
         const Medium& medium, double density_correction)                       \
     {                                                                          \
@@ -33,6 +34,14 @@
             hash_combine(hash, lpm_->GetHash());                               \
         }                                                                      \
         hash_combine(hash, std::string(#param));                               \
+    }                                                                          \
+                                                                               \
+    std::unique_ptr<crosssection::Parametrization<Component>>                  \
+        crosssection::Brems##param::clone() const                              \
+    {                                                                          \
+        using param_t                                                          \
+            = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;         \
+        return std::make_unique<param_t>(*this);                               \
     }
 
 using namespace PROPOSAL;
@@ -425,6 +434,13 @@ crosssection::BremsElectronScreening::BremsElectronScreening(bool lpm,
         lpm_ = nullptr;
     }
     hash_combine(hash, std::string("electron_screening"));
+}
+
+std::unique_ptr<crosssection::Parametrization<Component>>
+crosssection::BremsElectronScreening::clone() const
+{
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
 }
 
 double crosssection::BremsElectronScreening::DifferentialCrossSection(

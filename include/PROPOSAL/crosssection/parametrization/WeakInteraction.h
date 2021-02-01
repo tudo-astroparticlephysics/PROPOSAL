@@ -74,7 +74,11 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<WeakCooperSarkarMertsch> {
-        static constexpr char value[36] = "weak_cooper_sarkar_mertsch";
+        static constexpr auto value = "Weak_CooperSarkarMertsch";
+    };
+
+    template <> struct ParametrizationId<WeakCooperSarkarMertsch> {
+        static constexpr size_t value = 1000000009;
     };
 } // namespace crosssection
 } // namespace PROPOSAL

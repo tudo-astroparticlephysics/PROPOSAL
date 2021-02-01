@@ -56,7 +56,11 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<ComptonKleinNishina> {
-        static constexpr char value[36] = "comptonkleinnishina";
+        static constexpr auto value = "compton_KleinNishina";
+    };
+
+    template <> struct ParametrizationId<ComptonKleinNishina> {
+        static constexpr size_t value = 1000000010;
     };
 
 } // namespace crosssection

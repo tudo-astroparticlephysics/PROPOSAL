@@ -42,6 +42,14 @@
                                                                                \
         virtual double CalculateParametrization(                               \
             const Component&, double nu) const;                                \
+    };                                                                         \
+                                                                               \
+    template <> struct ParametrizationName<Photo##param> {                     \
+        static constexpr auto value = "PhotoPair_" #param;                     \
+    };                                                                         \
+                                                                               \
+    template <> struct ParametrizationId<Photo##param> {                       \
+        static constexpr size_t value = 1000000013;                            \
     };
 
 namespace PROPOSAL {

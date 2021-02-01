@@ -8,7 +8,8 @@
 
 using namespace PROPOSAL;
 
-double crosssection::Compton::GetLowerEnergyLim(const ParticleDef&) const noexcept
+double crosssection::Compton::GetLowerEnergyLim(
+    const ParticleDef&) const noexcept
 {
     return ME;
 }
@@ -21,6 +22,13 @@ crosssection::KinematicLimits crosssection::Compton::GetKinematicLimits(
     kin_lim.v_min = 0;
     kin_lim.v_max = 1. - 1. / (1. + 2. * energy / ME);
     return kin_lim;
+}
+
+std::unique_ptr<crosssection::Parametrization<Component>>
+crosssection::ComptonKleinNishina::clone() const
+{
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
 }
 
 double crosssection::ComptonKleinNishina::DifferentialCrossSection(

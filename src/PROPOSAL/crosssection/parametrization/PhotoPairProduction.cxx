@@ -7,20 +7,21 @@
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
 using std::make_tuple;
 
-double crosssection::PhotoPairProduction::GetLowerEnergyLim(const ParticleDef&) const noexcept
+double crosssection::PhotoPairProduction::GetLowerEnergyLim(
+    const ParticleDef&) const noexcept
 {
     return 2 * ME;
 }
 
-crosssection::KinematicLimits crosssection::PhotoPairProduction::GetKinematicLimits(
-    const ParticleDef&, const Component&, double energy) const
-    noexcept
+crosssection::KinematicLimits
+crosssection::PhotoPairProduction::GetKinematicLimits(
+    const ParticleDef&, const Component&, double energy) const noexcept
 {
     // x is the integration variable here
     KinematicLimits lim;
@@ -32,6 +33,13 @@ crosssection::KinematicLimits crosssection::PhotoPairProduction::GetKinematicLim
         lim.v_max = 1. - ME / energy;
     }
     return lim;
+}
+
+std::unique_ptr<crosssection::Parametrization<Component>>
+crosssection::PhotoPairTsai::clone() const
+{
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
 }
 
 double crosssection::PhotoPairTsai::DifferentialCrossSection(
@@ -77,7 +85,7 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
             + 50. * std::pow(C, 2.) * std::log(1. + std::pow(C, -2.))
             - 24. * std::pow(C, 2.)
                 * (-std::log(std::pow(C, 2.)) * std::log(1 + std::pow(C, -2.))
-                      + dilog(1. + std::pow(C, -2.)) - dilog(1)); // (3.28)
+                    + dilog(1. + std::pow(C, -2.)) - dilog(1)); // (3.28)
     } else if (Z <= 4.5) {
         // Lithium or Berylium
         double a, b, ap, bp;
@@ -93,32 +101,32 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 
         Phi1 = 2.
                 * (1.
-                      + std::log(std::pow(a, 2.) * std::pow(Z, 2. / 3.)
-                            * std::pow(ME, 2.)))
+                    + std::log(std::pow(a, 2.) * std::pow(Z, 2. / 3.)
+                        * std::pow(ME, 2.)))
             - 2. * std::log(1. + std::pow(b, 2.))
             - 4. * b * std::atan(1. / b); // (3.46)
         Phi2 = 2.
                 * (2. / 3.
-                      + std::log(std::pow(a, 2.) * std::pow(Z, 2. / 3.)
-                            * std::pow(ME, 2.)))
+                    + std::log(std::pow(a, 2.) * std::pow(Z, 2. / 3.)
+                        * std::pow(ME, 2.)))
             - 2. * std::log(1. + std::pow(b, 2.))
             + 8. * std::pow(b, 2.)
                 * (1 - b * std::atan(1. / b)
-                      - 0.75 * std::log(1 + std::pow(b, -2.))); // (3.47)
+                    - 0.75 * std::log(1 + std::pow(b, -2.))); // (3.47)
         Psi1 = 2.
                 * (1.
-                      + std::log(std::pow(ap, 2.) * std::pow(Z, 4. / 3.)
-                            * std::pow(ME, 2.)))
+                    + std::log(std::pow(ap, 2.) * std::pow(Z, 4. / 3.)
+                        * std::pow(ME, 2.)))
             - 2. * std::log(1 + std::pow(bp, 2.))
             - 4. * bp * std::atan(1. / b); // (3.48)
         Psi2 = 2.
                 * (2. / 3.
-                      + std::log(std::pow(ap, 2.) * std::pow(Z, 4. / 3.)
-                            * std::pow(ME, 2.)))
+                    + std::log(std::pow(ap, 2.) * std::pow(Z, 4. / 3.)
+                        * std::pow(ME, 2.)))
             - 2. * std::log(1. + std::pow(bp, 2.))
             + 8. * std::pow(bp, 2.)
                 * (1. - b * std::atan(1. / bp)
-                      - 0.75 * std::log(1 + std::pow(bp, -2.))); // (3.49)
+                    - 0.75 * std::log(1 + std::pow(bp, -2.))); // (3.49)
     } else {
         // Heavier elements
         double gamma = 200. * delta / (ME * std::pow(Z, 1. / 3.));   // (3.30)
@@ -127,14 +135,14 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
         Phi1 = 20.863 - 2. * std::log(1. + std::pow(0.55846 * gamma, 2.))
             - 4.
                 * (1. - 0.6 * std::exp(-0.9 * gamma)
-                      - 0.4 * std::exp(-1.5 * gamma)); // (3.38)
+                    - 0.4 * std::exp(-1.5 * gamma)); // (3.38)
         Phi2 = Phi1
             - 2. / 3. * 1.
                 / (1. + 6.5 * gamma + 6. * std::pow(gamma, 2.)); // (3.39)
         Psi1 = 28.340 - 2. * std::log(1. + std::pow(3.621 * epsilon, 2.))
             - 4.
                 * (1. - 0.7 * std::exp(-8. * epsilon)
-                      - 0.3 * std::exp(-29.2 * epsilon)); // (3.40)
+                    - 0.3 * std::exp(-29.2 * epsilon)); // (3.40)
         Psi2 = Psi1
             - 2. / 3. * 1.
                 / (1. + 40. * epsilon + 400. * std::pow(epsilon, 2.)); // (3.41)
@@ -146,7 +154,7 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 
     double aux = (4. / 3. * std::pow(x, 2.) - 4. / 3. * x + 1.)
             * (std::pow(Z, 2.) * (Phi1 - 4. / 3. * logZ - 4. * f)
-                  + Z * (Psi1 - 8. / 3. * logZ))
+                + Z * (Psi1 - 8. / 3. * logZ))
         - 2. / 3. * x * (1. - x)
             * (std::pow(Z, 2.) * (Phi1 - Phi2) + Z * (Psi1 - Psi2)); // (3.9)
 
@@ -167,7 +175,8 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 /* { */
 /* } */
 
-/* PhotoAngleDistribution::DeflectionAngles PhotoAngleTsaiIntegral::SampleAngles( */
+/* PhotoAngleDistribution::DeflectionAngles
+ * PhotoAngleTsaiIntegral::SampleAngles( */
 /*     const Component& comp, double energy, double rho) */
 /* { */
 /*     PhotoAngleDistribution::DeflectionAngles angles; */
@@ -178,22 +187,26 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 
 /*     double subst = std::max(1., std::log10(energy)); */
 
-/*     auto integrand_substitution = [&](double energy, double rho, double t) { */
+/*     auto integrand_substitution = [&](double energy, double rho, double t) {
+ */
 /*         return subst * std::pow(t, subst - 1.) */
-/*             * this->FunctionToIntegral(comp, energy, rho, std::pow(t, subst)); */
+/*             * this->FunctionToIntegral(comp, energy, rho, std::pow(t,
+ * subst)); */
 /*     }; */
 
 /*     double t_min = 0; */
 /*     double t_max = std::pow(PI, 1. / subst); */
 
 /*     static_cast<void>(integral_.IntegrateWithRandomRatio(t_min, t_max, */
-/*         std::bind(integrand_substitution, energy, rho, std::placeholders::_1), */
+/*         std::bind(integrand_substitution, energy, rho,
+ * std::placeholders::_1), */
 /*         3, rnd1)); */
 
 /*     angles.cosphi0 = std::cos(std::pow(integral_.GetUpperLimit(), subst)); */
 
 /*     static_cast<void>(integral_.IntegrateWithRandomRatio(t_min, t_max, */
-/*         std::bind(integrand_substitution, energy, rho, std::placeholders::_1), */
+/*         std::bind(integrand_substitution, energy, rho,
+ * std::placeholders::_1), */
 /*         3, rnd2)); */
 
 /*     angles.cosphi1 = std::cos(std::pow(integral_.GetUpperLimit(), subst)); */
@@ -217,7 +230,8 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 /*     const Component& comp, double energy, double x, double theta) */
 /* { */
 
-/*     // Pair production and bremsstrahlung of chraged leptons, Yung-Su Tsai, */
+/*     // Pair production and bremsstrahlung of chraged leptons, Yung-Su Tsai,
+ */
 /*     // Review of Modern Physics, Vol. 46, No. 4, October 1974 */
 /*     // see formula (3.5) */
 
@@ -227,7 +241,8 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 /*     double Z = comp.GetNucCharge(); */
 /*     double Z3 = std::pow(comp.GetNucCharge(), -1. / 3); */
 /*     double G2 = Z * Z + Z; */
-/*     double tminprimesqrt = (ME * ME * (1. + l)) / (2. * energy * x * (1. - x)); */
+/*     double tminprimesqrt = (ME * ME * (1. + l)) / (2. * energy * x * (1. -
+ * x)); */
 
 /*     double z = std::pow(Z / 137., 2.); */
 /*     double f = 1.202 * z - 1.0369 * std::pow(z, 2.) */
@@ -253,8 +268,10 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 /*             - (4. / 3.) / (1. + B * B) */
 /*             + (1. / 6.) / std::pow(1. + B * B, 2.); // (3.18) with erratum */
 /*         Xel *= Z * Z; */
-/*         Xinel = 2. * std::log(ME / delta) - std::log(1. + B * B) + 11. / 6. */
-/*             - 4. / (B * B) * std::log(1. + B * B) + (4. / 3.) / (1. + B * B) */
+/*         Xinel = 2. * std::log(ME / delta) - std::log(1. + B * B) + 11. / 6.
+ */
+/*             - 4. / (B * B) * std::log(1. + B * B) + (4. / 3.) / (1. + B * B)
+ */
 /*             - (1. / 6.) / std::pow(1. + B * B, 2.); // (3.19) with erratum */
 /*         Xinel *= Z; */
 /*     } else { */
@@ -285,7 +302,8 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 /*             - 1.; */
 /*         Xel *= Z * Z; // (3.44) */
 /*         Xinel = std::log(aprime * aprime * ME * ME * std::pow(1. + l, 2.) */
-/*                     / (aprime * aprime * tminprimesqrt * tminprimesqrt + 1.)) */
+/*                     / (aprime * aprime * tminprimesqrt * tminprimesqrt + 1.))
+ */
 /*             - 1.; */
 /*         Xinel *= Z; // (3.45) */
 /*     } */
@@ -309,7 +327,8 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 /*     return aux; */
 /* } */
 
-/* PhotoAngleDistribution::DeflectionAngles PhotoAngleNoDeflection::SampleAngles( */
+/* PhotoAngleDistribution::DeflectionAngles
+ * PhotoAngleNoDeflection::SampleAngles( */
 /*     const Component&, double energy, double rho) */
 /* { */
 /*     (void)energy; */

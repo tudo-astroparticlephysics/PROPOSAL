@@ -5,8 +5,8 @@
 
 #include "PROPOSAL/crosssection/parametrization/ParamTables.h"
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/methods.h"
@@ -28,6 +28,13 @@ crosssection::KinematicLimits crosssection::WeakInteraction::GetKinematicLimits(
     kin_lim.v_min = 1e6 / (aux); // q^2_min = 1e6 MeV for experimental reasons
     kin_lim.v_max = 1.f;
     return kin_lim;
+}
+
+std::unique_ptr<crosssection::Parametrization<Component>>
+crosssection::WeakCooperSarkarMertsch::clone() const
+{
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
 }
 
 crosssection::WeakCooperSarkarMertsch::WeakCooperSarkarMertsch()

@@ -12,7 +12,15 @@
     crosssection::Mupair##param::Mupair##param()                               \
         : crosssection::MupairProductionRhoIntegral()                          \
     {                                                                          \
-        hash_combine(hash, std::string(#param));                                \
+        hash_combine(hash, std::string(#param));                               \
+    }                                                                          \
+                                                                               \
+    std::unique_ptr<crosssection::Parametrization<Component>>                  \
+        crosssection::Mupair##param::clone() const                             \
+    {                                                                          \
+        using param_t                                                          \
+            = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;         \
+        return std::make_unique<param_t>(*this);                               \
     }
 
 using namespace PROPOSAL;
@@ -25,15 +33,15 @@ crosssection::MupairProduction::MupairProduction()
 {
 }
 
-double crosssection::MupairProduction::GetLowerEnergyLim(const ParticleDef& p_def) const
-    noexcept
+double crosssection::MupairProduction::GetLowerEnergyLim(
+    const ParticleDef& p_def) const noexcept
 {
     return p_def.mass + 2.f * MMU;
 }
 
-crosssection::KinematicLimits crosssection::MupairProduction::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& , double energy) const
-    noexcept
+crosssection::KinematicLimits
+crosssection::MupairProduction::GetKinematicLimits(
+    const ParticleDef& p_def, const Component&, double energy) const noexcept
 {
     KinematicLimits lim;
     lim.v_min = 2 * MMU / energy;
@@ -64,9 +72,10 @@ double crosssection::MupairProductionRhoIntegral::DifferentialCrossSection(
     Integral integral(IROMB, IMAXS, IPREC);
     return NA / comp.GetAtomicNum() * p_def.charge * p_def.charge
         * (integral.Integrate(0, rMax,
-              std::bind(&crosssection::MupairProductionRhoIntegral::FunctionToIntegral, this,
-                  p_def, comp, energy, v, std::placeholders::_1),
-              2));
+            std::bind(
+                &crosssection::MupairProductionRhoIntegral::FunctionToIntegral,
+                this, p_def, comp, energy, v, std::placeholders::_1),
+            2));
 }
 
 MUPAIR_PARAM_INTEGRAL_IMPL(KelnerKokoulinPetrukhin)
@@ -116,8 +125,9 @@ double crosssection::MupairKelnerKokoulinPetrukhin::FunctionToIntegral(
 
     U = aux / (1 + aux1 / aux2);
 
-    xi      = v * v * (1 - rMax * rMax)/(4 * (1 - v));
-    aux1 = (1 + rMax * rMax) * (1 + 1.5 * beta) - 1. / xi * (1 + 2 * beta) * (1 - rMax * rMax);
+    xi = v * v * (1 - rMax * rMax) / (4 * (1 - v));
+    aux1 = (1 + rMax * rMax) * (1 + 1.5 * beta)
+        - 1. / xi * (1 + 2 * beta) * (1 - rMax * rMax);
     aux2 = ME * energy * v * (1 - rMax * rMax);
     U_max = aux / (1 + aux1 / aux2);
 
