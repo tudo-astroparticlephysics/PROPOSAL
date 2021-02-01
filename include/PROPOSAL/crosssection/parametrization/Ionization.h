@@ -54,7 +54,6 @@ namespace crosssection {
         static constexpr char value[36] = "ionization";
     };
 
-
     class IonizBetheBlochRossi : public Ionization {
         double InelCorrection(
             ParticleDef const&, Medium const&, double, double) const;
@@ -63,6 +62,8 @@ namespace crosssection {
 
     public:
         IonizBetheBlochRossi(const EnergyCutSettings&);
+
+        std::unique_ptr<Parametrization<Medium>> clone() const final;
 
         KinematicLimits GetKinematicLimits(
             ParticleDef const&, Medium const&, double) const final;
@@ -76,13 +77,14 @@ namespace crosssection {
         static constexpr char value[36] = "ionizbetheblochrossi";
     };
 
-
     template <> struct IonizationDEdxIntegration<IonizBetheBlochRossi> {
         constexpr static bool value = true;
     };
 
     struct IonizBergerSeltzerBhabha : public Ionization {
         IonizBergerSeltzerBhabha(const EnergyCutSettings&);
+
+        std::unique_ptr<Parametrization<Medium>> clone() const final;
 
         KinematicLimits GetKinematicLimits(
             const ParticleDef&, const Medium&, double) const final;
@@ -96,9 +98,10 @@ namespace crosssection {
         static constexpr char value[36] = "ionizbergerseltzerbhabha";
     };
 
-
     struct IonizBergerSeltzerMoller : public Ionization {
         IonizBergerSeltzerMoller(const EnergyCutSettings&);
+
+        std::unique_ptr<Parametrization<Medium>> clone() const final;
 
         KinematicLimits GetKinematicLimits(
             const ParticleDef&, const Medium&, double) const final;
@@ -111,7 +114,6 @@ namespace crosssection {
     template <> struct ParametrizationName<IonizBergerSeltzerMoller> {
         static constexpr char value[36] = "ionizbergerseltzermoller";
     };
-
 
     /* // Factory pattern functions */
 

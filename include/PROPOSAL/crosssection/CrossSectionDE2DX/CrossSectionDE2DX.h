@@ -1,9 +1,16 @@
 #pragma once
 
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
+#include <cstddef>
 
-#include <memory>
+namespace PROPOSAL {
+namespace crosssection {
+    template <typename Target> class Parametrization;
+}
+class ParticleDef;
+class Medium;
+class Component;
+class EnergyCutSettings;
+} // namespace PROPOSAL
 
 namespace PROPOSAL {
 class CrossSectionDE2DX {
@@ -11,18 +18,17 @@ protected:
     size_t hash;
 
 public:
-    template <typename T1, typename T2>
-    CrossSectionDE2DX(T1 const& param, ParticleDef const& p_def,
-        T2 const& target, EnergyCutSettings const& cut)
-        : hash(0)
-    {
-        hash_combine(hash, param.GetHash(), p_def.GetHash(), target.GetHash(),
-            cut.GetHash());
-    }
+    CrossSectionDE2DX(crosssection::Parametrization<Component> const&,
+        ParticleDef const&, Component const&, EnergyCutSettings const&);
+
+    CrossSectionDE2DX(crosssection::Parametrization<Medium> const&,
+        ParticleDef const&, Medium const&, EnergyCutSettings const&);
+
     virtual ~CrossSectionDE2DX() = default;
 
-    virtual double Calculate(double energy) = 0;
+    virtual double Calculate(double energy) const = 0;
 
     virtual size_t GetHash() const noexcept { return hash; }
 };
+
 } // namespace PROPOSAL

@@ -29,18 +29,13 @@
 #pragma once
 
 #include "PROPOSAL/json.hpp"
-#include <iostream>
-#include <memory>
-#include <tuple>
+#include <ostream>
 
 namespace PROPOSAL {
-
 namespace crosssection {
-    struct KinematicLimits {
-        double v_min;
-        double v_max;
-    };
+    struct KinematicLimits;
 }
+
 /**
  * \brief Class containing the energy cut such as ecut and vcut.
  *
@@ -63,15 +58,8 @@ public:
 
     bool operator==(const EnergyCutSettings& energyCutSettings) const noexcept;
 
-    inline double GetCut(double energy) const
-    {
-        assert(energy > 0);
-        return std::min(ecut_ / energy, vcut_);
-    }
-    inline double GetCut(const crosssection::KinematicLimits& lim, double energy) const
-    {
-        return std::min(std::max(lim.v_min, GetCut(energy)), lim.v_max);
-    }
+    double GetCut(double energy) const;
+    double GetCut(const crosssection::KinematicLimits&, double energy) const;
     size_t GetHash() const noexcept;
     double GetEcut() const noexcept { return ecut_; }
     double GetVcut() const noexcept { return vcut_; }

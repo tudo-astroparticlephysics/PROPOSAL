@@ -49,6 +49,8 @@ namespace crosssection {
     struct ComptonKleinNishina : public Compton {
         ComptonKleinNishina() = default;
 
+        std::unique_ptr<Parametrization<Component>> clone() const final;
+
         double DifferentialCrossSection(const ParticleDef&, const Component&,
             double energy, double v) const final;
     };

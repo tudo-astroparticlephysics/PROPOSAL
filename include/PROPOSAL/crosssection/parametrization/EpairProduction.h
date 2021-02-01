@@ -31,10 +31,9 @@
 #include <cmath>
 #include <functional>
 
+#include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/EnergyCutSettings.h"
-
 
 #define EPAIR_PARAM_INTEGRAL_DEC(param)                                        \
     struct Epair##param : public EpairProductionRhoIntegral {                  \
@@ -43,12 +42,14 @@
             double density_correction = 1.0);                                  \
         using base_param_t = EpairProduction;                                  \
                                                                                \
+        std::unique_ptr<Parametrization<Component>> clone() const final;                  \
+                                                                               \
         double FunctionToIntegral(const ParticleDef&, const Component&,        \
             double energy, double v, double r) const;                          \
     };                                                                         \
                                                                                \
     template <> struct ParametrizationName<Epair##param> {                     \
-        static constexpr char value[36] = "epair"#param;                       \
+        static constexpr char value[36] = "epair" #param;                      \
     };
 
 namespace PROPOSAL {
@@ -65,12 +66,12 @@ namespace crosssection {
             double density_correction = 1.0);
         virtual ~EpairProduction() = default;
 
-        //using only_stochastic = std::false_type;
-        //using component_wise = std::true_type;
+        // using only_stochastic = std::false_type;
+        // using component_wise = std::true_type;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-        KinematicLimits GetKinematicLimits(const ParticleDef&,
-            const Component&, double energy) const noexcept override;
+        KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&,
+            double energy) const noexcept override;
     };
 
     template <> struct ParametrizationName<EpairProduction> {
@@ -112,13 +113,13 @@ namespace crosssection {
         double density_correction_;
         double eLpm_;
         size_t hash;
+
     public:
         EpairLPM(
             const ParticleDef&, const Medium&, double density_correction = 1.0);
         double suppression_factor(
             double E, double v, double r2, double beta, double xi) const;
-        size_t GetHash() const noexcept { return hash;}
-
+        size_t GetHash() const noexcept { return hash; }
     };
 
     // Factory pattern functions
@@ -194,8 +195,8 @@ namespace detail {
         return [param, &p_def, &comp, &cut](Integral& i, double E) {
             auto lim = param.GetKinematicLimits(p_def, comp, E);
             auto v_cut = cut.GetCut(lim, E);
-            return integrate_dedx_epair(i, param, p_def, comp, E,
-                lim.v_min, v_cut);
+            return integrate_dedx_epair(
+                i, param, p_def, comp, E, lim.v_min, v_cut);
         };
     }
 
@@ -206,15 +207,16 @@ namespace detail {
     {
         return define_epair_dedx_integral(param, p_def, comp, cut);
     }
-    inline auto define_dedx_integral(crosssection::EpairKelnerKokoulinPetrukhin param,
+    inline auto define_dedx_integral(
+        crosssection::EpairKelnerKokoulinPetrukhin param,
         ParticleDef const& p_def, Component const& comp,
         EnergyCutSettings const& cut)
     {
         return define_epair_dedx_integral(param, p_def, comp, cut);
     }
-    inline auto define_dedx_integral(crosssection::EpairForElectronPositron param,
-        ParticleDef const& p_def, Component const& comp,
-        EnergyCutSettings const& cut)
+    inline auto define_dedx_integral(
+        crosssection::EpairForElectronPositron param, ParticleDef const& p_def,
+        Component const& comp, EnergyCutSettings const& cut)
     {
         return define_epair_dedx_integral(param, p_def, comp, cut);
     }

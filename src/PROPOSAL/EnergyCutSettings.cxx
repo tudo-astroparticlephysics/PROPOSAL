@@ -1,7 +1,8 @@
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/Constants.h"
 
 #include <sstream>
 #include <stdexcept>
@@ -29,9 +30,10 @@ EnergyCutSettings::EnergyCutSettings(
             "Relative EnergyCut (vcut) must be between (0, 1]. \nINF0: If a vc"
             "ut = 1 is set, the particle is only propagate continous.");
 
-    Logging::Get("proposal.cut")->debug(
-        "EnergyCut set to ecut {}, vcut {}, continuous_randomization {}",
-        ecut_, vcut_, continuous_randomization_);
+    Logging::Get("proposal.cut")
+        ->debug(
+            "EnergyCut set to ecut {}, vcut {}, continuous_randomization {}",
+            ecut_, vcut_, continuous_randomization_);
 }
 
 EnergyCutSettings::EnergyCutSettings(const nlohmann::json& config)
@@ -47,9 +49,10 @@ EnergyCutSettings::EnergyCutSettings(const nlohmann::json& config)
     double ecut, vcut;
     bool cont_rand;
 
-    if(config["e_cut"].is_string()) {
+    if (config["e_cut"].is_string()) {
         std::string setting = config["e_cut"];
-        std::transform(setting.begin(), setting.end(), setting.begin(), ::tolower);
+        std::transform(
+            setting.begin(), setting.end(), setting.begin(), ::tolower);
         if (setting == "inf" or setting == "infinity") {
             ecut = INF;
         } else {
@@ -80,6 +83,17 @@ bool EnergyCutSettings::operator==(const EnergyCutSettings& cut) const noexcept
     return true;
 }
 
+double EnergyCutSettings::GetCut(double energy) const
+{
+    assert(energy > 0);
+    return std::min(ecut_ / energy, vcut_);
+}
+
+double EnergyCutSettings::GetCut(
+    const crosssection::KinematicLimits& lim, double energy) const
+{
+    return std::min(std::max(lim.v_min, GetCut(energy)), lim.v_max);
+}
 
 size_t EnergyCutSettings::GetHash() const noexcept
 {

@@ -5,11 +5,11 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
 using namespace PROPOSAL;
-using std::get;
-using std::make_tuple;
 
 #define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                    \
     crosssection::Photo##param::Photo##param(                                  \
@@ -605,11 +605,6 @@ double crosssection::PhotoRenoSarcevicSu::FunctionToQ2Integral(
 }
 #undef Q2_PHOTO_PARAM_INTEGRAL_IMPL
 
-const std::string crosssection::ShadowDuttaRenoSarcevicSeckel::name_
-    = "ShadowDuttaRenoSarcevicSeckel";
-const std::string crosssection::ShadowButkevichMikheyev::name_
-    = "ShadowButkevichMikheyev";
-
 // ------------------------------------------------------------------------- //
 // Dutta, Reno, Sarcevic, Seckel
 // Phys Rev D 63 (2001), 094020
@@ -631,15 +626,6 @@ double crosssection::ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(
     } else {
         return 1;
     }
-}
-
-// ------------------------------------------------------------------------- //
-size_t crosssection::ShadowDuttaRenoSarcevicSeckel::GetHash() const
-{
-    size_t seed = 0;
-    hash_combine(seed, std::string("ShadowDuttaRenoSarcevicSeckel"));
-
-    return seed;
 }
 
 // Butkevich, Mikheyev
@@ -696,45 +682,4 @@ double crosssection::ShadowButkevichMikheyev::CalculateShadowEffect(
     }
 
     return G;
-}
-
-size_t crosssection::ShadowButkevichMikheyev::GetHash() const
-{
-    size_t seed = 0;
-    hash_combine(seed, std::string("ShadowButkevichMikheyev"));
-
-    return seed;
-}
-
-crosssection::Photonuclear::Photonuclear()
-    : crosssection::Parametrization(
-        InteractionType::Photonuclear, "photonuclear")
-{
-}
-
-double crosssection::Photonuclear::GetLowerEnergyLim(
-    const ParticleDef& p_def) const noexcept
-{
-    return p_def.mass;
-}
-
-KinematicLimits crosssection::Photonuclear::GetKinematicLimits(
-    const ParticleDef& p_def, const Component& comp, double energy) const
-{
-    auto kin_lim = KinematicLimits();
-    kin_lim.v_min
-        = (MPI + MPI * MPI / (2 * comp.GetAverageNucleonWeight())) / energy;
-    kin_lim.v_max = 1.f;
-    if (p_def.mass < MPI) {
-        auto aux = p_def.mass / comp.GetAverageNucleonWeight();
-        kin_lim.v_max
-            -= comp.GetAverageNucleonWeight() * (1 + aux * aux) / (2 * energy);
-    }
-    // vMax calculated above is always smaller than 1-m/E
-    // in comparison, the following inequality arise
-    // (M-m)^2 >= 0
-    // limits.vMax = std::min(limits.vMax, 1 - p_def.mass/energy);
-    if (kin_lim.v_max < kin_lim.v_min)
-        kin_lim.v_max = kin_lim.v_min;
-    return kin_lim;
 }

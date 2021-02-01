@@ -1,34 +1,35 @@
 #pragma once
 
-#include "PROPOSAL/EnergyCutSettings.h"
-/* #include "PROPOSAL/Logging.h" */
-#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
-
 #include <memory>
+#include <spdlog/fwd.h>
+
+namespace PROPOSAL {
+namespace crosssection {
+    template <typename Target> class Parametrization;
+} // namespace crosssection
+
+class ParticleDef;
+class Medium;
+class Component;
+class EnergyCutSettings;
+} // namespace PROPOSAL
 
 namespace PROPOSAL {
 class CrossSectionDEDX {
 protected:
     size_t hash;
-    logger_ptr logger;
+    std::shared_ptr<spdlog::logger> logger;
 
 public:
-    template <typename T1, typename T2>
-    CrossSectionDEDX(T1 const& _param, ParticleDef const& _p, T2 const& _target,
-        EnergyCutSettings const& _cut)
-        : hash(0)
-        /* , logger(Logging::Get("PROPOSAL.CrossSectionDEDX")) */
-    {
-        /* logger->info("Building {} {} dEdx for target {}.", _p.name, _param.name, */
-        /*     _target.GetName()); */
+    CrossSectionDEDX(crosssection::Parametrization<Medium> const&,
+        ParticleDef const&, Medium const&, EnergyCutSettings const&);
 
-        hash_combine(hash, _param.GetHash(), _p.GetHash(), _target.GetHash(),
-            _cut.GetHash());
-    }
+    CrossSectionDEDX(crosssection::Parametrization<Component> const&,
+        ParticleDef const&, Component const&, EnergyCutSettings const&);
 
     virtual ~CrossSectionDEDX() = default;
 
-    virtual double Calculate(double energy) = 0;
+    virtual double Calculate(double energy) const = 0;
 
     size_t GetHash() const noexcept { return hash; }
 };

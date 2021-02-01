@@ -50,6 +50,8 @@ namespace crosssection {
     struct AnnihilationHeitler : public Annihilation {
         AnnihilationHeitler() = default;
 
+        std::unique_ptr<Parametrization<Component>> clone() const final;
+
         double DifferentialCrossSection(
             const ParticleDef&, const Component&, double, double) const final;
     };

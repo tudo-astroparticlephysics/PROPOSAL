@@ -39,7 +39,7 @@ public:
             std::forward<T2>(_particle), std::forward<T3>(_target))
     {
         cut = std::make_shared<const EnergyCutSettings>(_cut);
-        hash_combine(hash, _cut.GetHash());
+        /* hash_combine(hash, _cut.GetHash()); */
     }
 
     virtual ~CrossSectionDNDX() = default;

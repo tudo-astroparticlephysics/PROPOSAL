@@ -6,6 +6,7 @@
 #include "PROPOSAL/crosssection/parametrization/ParamTables.h"
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/medium/Components.h"
 
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/methods.h"
@@ -18,7 +19,7 @@ double crosssection::WeakInteraction::GetLowerEnergyLim(
     return p_def.mass;
 }
 
-KinematicLimits crosssection::WeakInteraction::GetKinematicLimits(
+crosssection::KinematicLimits crosssection::WeakInteraction::GetKinematicLimits(
     ParticleDef const&, Component const&, double energy) const
 {
     double aux = (MP + MN) / 2; // for isoscalar targets

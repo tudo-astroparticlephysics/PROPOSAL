@@ -1,16 +1,14 @@
 #pragma once
 
-#include <tuple>
-#include <memory>
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
+#include "PROPOSAL/particle/Particle.h"
+#include <memory>
+#include <tuple>
 
 namespace PROPOSAL {
-    class CrossSectionBase;
-    namespace Components {
-        class Component;
-    }
-    class Displacement;
+class CrossSectionBase;
+class Component;
+class Displacement;
 }
 
 namespace PROPOSAL {
@@ -18,7 +16,7 @@ class Interaction {
     size_t hash;
 
 protected:
-    using comp_ptr = std::shared_ptr<const Components::Component>;
+    using comp_ptr = std::shared_ptr<const Component>;
     using cross_ptr = std::shared_ptr<CrossSectionBase>;
     using rate_t = std::tuple<cross_ptr, comp_ptr, double>;
     using loss_t = std::tuple<InteractionType, comp_ptr, double>;

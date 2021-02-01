@@ -2,6 +2,8 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/Constants.h"
 
+#include <cassert>
+
 using namespace PROPOSAL;
 
 UtilityIntegral::UtilityIntegral(

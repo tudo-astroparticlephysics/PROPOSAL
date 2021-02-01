@@ -53,6 +53,7 @@ namespace crosssection {
     struct PhotoPairTsai : public PhotoPairProduction {
         PhotoPairTsai() { hash_combine(hash, std::string("tsai")); }
         using base_param_t = PhotoPairProduction;
+        std::unique_ptr<Parametrization<Component>> clone() const final;
 
         virtual double DifferentialCrossSection(
             const ParticleDef&, const Component&, double, double) const;

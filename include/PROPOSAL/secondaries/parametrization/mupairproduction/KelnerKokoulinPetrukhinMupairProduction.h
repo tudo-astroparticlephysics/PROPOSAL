@@ -5,8 +5,6 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/MupairProduction.h"
 
-using PROPOSAL::Components::Component;
-
 namespace PROPOSAL {
 namespace secondaries {
     class KelnerKokoulinPetrukhinMupairProduction

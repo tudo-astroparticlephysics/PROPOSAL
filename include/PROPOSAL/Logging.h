@@ -38,6 +38,7 @@
 namespace PROPOSAL {
 
 using logger_ptr = std::shared_ptr<spdlog::logger>;
+
 struct Logging {
     static std::unordered_map<std::string, logger_ptr> logger;
     static std::shared_ptr<spdlog::sinks::sink> sink;

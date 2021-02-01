@@ -8,8 +8,6 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 
-using PROPOSAL::Components::Component;
-
 namespace PROPOSAL {
 namespace secondaries {
     class PhotoTsai : public PhotopairProduction,

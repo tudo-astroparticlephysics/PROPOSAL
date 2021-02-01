@@ -1,14 +1,10 @@
 #pragma once
 
 #include "PROPOSAL/RegisteredInDefault.h"
-#include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/particle/Particle.h"
 
 #include <array>
 #include <memory>
 #include <vector>
-
-using PROPOSAL::Components::Component;
 
 namespace PROPOSAL {
 namespace stochastic_deflection {

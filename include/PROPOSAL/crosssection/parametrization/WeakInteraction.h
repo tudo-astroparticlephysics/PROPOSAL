@@ -67,6 +67,8 @@ namespace crosssection {
     public:
         WeakCooperSarkarMertsch();
 
+        std::unique_ptr<Parametrization<Component>> clone() const final;
+
         double DifferentialCrossSection(
             ParticleDef const&, Component const&, double, double) const final;
     };

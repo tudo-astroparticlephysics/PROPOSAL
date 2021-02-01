@@ -77,6 +77,6 @@ public:
         logger->debug("Interpolationtables successfully build.");
     }
 
-    double Calculate(double E) final { return interpolant.evaluate(E); }
+    double Calculate(double E) const final { return interpolant.evaluate(E); }
 };
 } // namespace PROPOSAL

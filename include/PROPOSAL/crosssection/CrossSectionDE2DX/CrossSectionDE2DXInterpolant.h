@@ -43,6 +43,6 @@ public:
     {
     }
 
-    double Calculate(double E) final;
+    double Calculate(double E) const final;
 };
 } // namespace PROPOSAL

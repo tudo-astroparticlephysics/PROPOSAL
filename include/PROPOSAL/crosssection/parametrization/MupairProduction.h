@@ -39,12 +39,14 @@
         Mupair##param();                                                       \
         using base_param_t = MupairProduction;                                 \
                                                                                \
+        std::unique_ptr<Parametrization<Component>> clone() const final;                  \
+                                                                               \
         double FunctionToIntegral(const ParticleDef&, const Component&,        \
             double energy, double v, double r) const;                          \
     };                                                                         \
                                                                                \
     template <> struct ParametrizationName<Mupair##param> {                    \
-        static constexpr char value[36] = "mupair"#param;                      \
+        static constexpr char value[36] = "mupair" #param;                     \
     };
 
 namespace PROPOSAL {
@@ -58,15 +60,15 @@ namespace crosssection {
     public:
         MupairProduction();
         virtual ~MupairProduction() = default;
-        //using only_stochastic = std::false_type;
-        //using component_wise = std::true_type;
+        // using only_stochastic = std::false_type;
+        // using component_wise = std::true_type;
 
         virtual double FunctionToIntegral(const ParticleDef&, const Component&,
             double energy, double v, double r) const = 0;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
-        KinematicLimits GetKinematicLimits(const ParticleDef&,
-            const Component&, double) const noexcept override;
+        KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&,
+            double) const noexcept override;
     };
 
     template <> struct ParametrizationName<MupairProduction> {
@@ -84,46 +86,47 @@ namespace crosssection {
     };
 
     MUPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
-// Factory pattern functions
-/*
-template <typename P, typename M>
-using mupair_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
-        EnergyCutSettings>, bool);
+    // Factory pattern functions
+    /*
+    template <typename P, typename M>
+    using mupair_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
+            EnergyCutSettings>, bool);
 
-template <typename Param, typename P, typename M>
-cross_t_ptr<P, M> create_mupair(P p_def, M medium,std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol) {
-    auto param = Param();
-    return make_crosssection(param, p_def, medium, cuts, interpol);
-}
+    template <typename Param, typename P, typename M>
+    cross_t_ptr<P, M> create_mupair(P p_def, M medium,std::shared_ptr<const
+            EnergyCutSettings> cuts, bool interpol) {
+        auto param = Param();
+        return make_crosssection(param, p_def, medium, cuts, interpol);
+    }
 
-template<typename P, typename M>
-static std::map<std::string, mupair_func_ptr<P, M>> mupair_map = {
-        {"kelnerkokoulinpetrukhin", create_mupair<MupairKelnerKokoulinPetrukhin, P, M>},
-};
+    template<typename P, typename M>
+    static std::map<std::string, mupair_func_ptr<P, M>> mupair_map = {
+            {"kelnerkokoulinpetrukhin",
+    create_mupair<MupairKelnerKokoulinPetrukhin, P, M>},
+    };
 
-template<typename P, typename M>
-cross_t_ptr<P, M> make_mupairproduction(P p_def, M medium, std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol, const std::string& param_name){
-    std::string name = param_name;
-    std::transform(param_name.begin(), param_name.end(), name.begin(), ::tolower);
-    auto it = mupair_map<P, M>.find(name);
-    if (it == mupair_map<P, M>.end())
-        throw std::logic_error("Unknown parametrization for mupairproduction");
+    template<typename P, typename M>
+    cross_t_ptr<P, M> make_mupairproduction(P p_def, M medium,
+    std::shared_ptr<const EnergyCutSettings> cuts, bool interpol, const
+    std::string& param_name){ std::string name = param_name;
+        std::transform(param_name.begin(), param_name.end(), name.begin(),
+    ::tolower); auto it = mupair_map<P, M>.find(name); if (it == mupair_map<P,
+    M>.end()) throw std::logic_error("Unknown parametrization for
+    mupairproduction");
 
-    return it->second(p_def, medium, cuts, interpol);
-}
+        return it->second(p_def, medium, cuts, interpol);
+    }
 
-template<typename P, typename M>
-cross_t_ptr<P, M> make_mupairproduction(P p_def, M medium, std::shared_ptr<const
-        EnergyCutSettings> cuts, bool interpol, const nlohmann::json& config){
-    if (!config.contains("parametrization"))
-        throw std::logic_error("No parametrization passed for mupairproduction");
-    std::string param_name = config["parametrization"];
+    template<typename P, typename M>
+    cross_t_ptr<P, M> make_mupairproduction(P p_def, M medium,
+    std::shared_ptr<const EnergyCutSettings> cuts, bool interpol, const
+    nlohmann::json& config){ if (!config.contains("parametrization")) throw
+    std::logic_error("No parametrization passed for mupairproduction");
+        std::string param_name = config["parametrization"];
 
-    return make_mupairproduction(p_def, medium, cuts, interpol, param_name);
-}
-*/
+        return make_mupairproduction(p_def, medium, cuts, interpol, param_name);
+    }
+    */
 
 } // namespace crosssection
 } // namespace PROPOSAL

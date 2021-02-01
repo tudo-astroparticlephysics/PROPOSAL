@@ -3,6 +3,7 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/medium/Components.h"
@@ -60,4 +61,25 @@ double crosssection::HardComponent::CalculateHardComponent(
 double crosssection::SoftComponent::CalculateHardComponent(double, double)
 {
     return 0;
+}
+
+crosssection::KinematicLimits crosssection::Photonuclear::GetKinematicLimits(
+    const ParticleDef& p_def, const Component& comp, double energy) const
+{
+    auto kin_lim = KinematicLimits();
+    kin_lim.v_min
+        = (MPI + MPI * MPI / (2 * comp.GetAverageNucleonWeight())) / energy;
+    kin_lim.v_max = 1.f;
+    if (p_def.mass < MPI) {
+        auto aux = p_def.mass / comp.GetAverageNucleonWeight();
+        kin_lim.v_max
+            -= comp.GetAverageNucleonWeight() * (1 + aux * aux) / (2 * energy);
+    }
+    // vMax calculated above is always smaller than 1-m/E
+    // in comparison, the following inequality arise
+    // (M-m)^2 >= 0
+    // limits.vMax = std::min(limits.vMax, 1 - p_def.mass/energy);
+    if (kin_lim.v_max < kin_lim.v_min)
+        kin_lim.v_max = kin_lim.v_min;
+    return kin_lim;
 }

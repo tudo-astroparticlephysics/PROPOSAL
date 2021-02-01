@@ -6,8 +6,6 @@
 
 #include <vector>
 
-using PROPOSAL::Components::Component;
-
 namespace PROPOSAL {
 namespace secondaries {
     struct Parametrization {

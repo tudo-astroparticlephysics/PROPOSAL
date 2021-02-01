@@ -170,12 +170,12 @@ crosssection::PhotoRhode::PhotoRhode(bool hard_component)
         248.921, 262.631, 277.006, 292.046, 307.751, 324.121, 341.157, 358.857,
         377.222, 396.253, 415.948, 436.309, 457.334, 479.025 };
 
-    interpolant_ = Interpolant(x, y, 4, false, false);
+    interpolant_ = std::make_shared<Interpolant>(x, y, 4, false, false);
 }
 
 double crosssection::PhotoRhode::MeasuredSgN(double e) const
 {
-    return interpolant_.InterpolateArray(e);
+    return interpolant_->InterpolateArray(e);
 }
 
 double crosssection::PhotoRhode::CalculateParametrization(

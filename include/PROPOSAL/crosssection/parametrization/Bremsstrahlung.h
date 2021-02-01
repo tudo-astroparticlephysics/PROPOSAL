@@ -36,12 +36,14 @@
         Brems##param(bool lpm, const ParticleDef&, const Medium&,              \
             double density_correction = 1.0);                                  \
                                                                                \
+        std::unique_ptr<Parametrization<Component>> clone() const final;                  \
+                                                                               \
         double CalculateParametrization(const ParticleDef&, const Component&,  \
             double energy, double v) const final;                              \
     };                                                                         \
                                                                                \
     template <> struct ParametrizationName<Brems##param> {                     \
-        static constexpr char value[36] = "brems"#param;                       \
+        static constexpr char value[36] = "brems" #param;                      \
     };
 
 namespace PROPOSAL {
@@ -91,6 +93,8 @@ namespace crosssection {
         BremsElectronScreening(bool lpm = false);
         BremsElectronScreening(bool lpm, const ParticleDef&, const Medium&,
             double density_correction = 1.0);
+
+        std::unique_ptr<Parametrization<Component>> clone() const final;
 
         double CalculateParametrization(const ParticleDef&, const Component&,
             double energy, double v) const final;

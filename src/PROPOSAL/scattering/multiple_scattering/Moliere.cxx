@@ -57,7 +57,7 @@ std::array<double, 4> Moliere::CalculateRandomAngle(
         //  Check for inappropriate values of B. If B < 4.5 it is practical to
         //  assume no deviation.
         if ((xn < 4.5) || xn != xn) {
-            return std::array<double, 4>{0,0,0,0};
+            return std::array<double, 4> { 0, 0, 0, 0 };
         }
 
         B_[i] = xn;
@@ -77,7 +77,7 @@ std::array<double, 4> Moliere::CalculateRandomAngle(
     auto sy = 0.5 * (rnd1 / SQRT3 + rnd2);
     auto ty = rnd2;
 
-    return std::array<double, 4>{sx, sy, tx, ty};
+    return std::array<double, 4> { sx, sy, tx, ty };
 }
 
 //----------------------------------------------------------------------------//
@@ -106,7 +106,7 @@ Moliere::Moliere(const ParticleDef& particle_def, Medium const& medium)
     double A_sum = 0.;
 
     for (int i = 0; i < numComp_; i++) {
-        Components::Component component = medium.GetComponents().at(i);
+        Component component = medium.GetComponents().at(i);
         Zi_[i] = component.GetNucCharge();
         ki[i] = component.GetAtomInMolecule();
         Ai[i] = component.GetAtomicNum();
@@ -299,7 +299,8 @@ double F2Mlarge(double x)
 
     for (int p = 2; p < 13; p++) {
         sum += -0.5 * PROPOSAL::c2large[p] / p
-            * (0.5 / p + 0.5 * std::log(x) + PROPOSAL::s2large[p]) * std::pow(x, -p);
+            * (0.5 / p + 0.5 * std::log(x) + PROPOSAL::s2large[p])
+            * std::pow(x, -p);
     }
 
     return sum;

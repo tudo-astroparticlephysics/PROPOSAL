@@ -8,6 +8,7 @@
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/medium/Components.h"
 
 using namespace PROPOSAL;
 using std::make_tuple;

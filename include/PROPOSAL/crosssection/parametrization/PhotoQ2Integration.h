@@ -34,6 +34,9 @@
     struct Photo##param : public PhotoQ2Integral {                             \
         Photo##param(std::shared_ptr<ShadowEffect>);                           \
         using base_param_t = Photonuclear;                                     \
+                                                                               \
+        std::unique_ptr<Parametrization<Component>> clone() const final;                  \
+                                                                               \
         double FunctionToQ2Integral(const ParticleDef&, const Component&,      \
             double energy, double v, double Q2) const;                         \
     };

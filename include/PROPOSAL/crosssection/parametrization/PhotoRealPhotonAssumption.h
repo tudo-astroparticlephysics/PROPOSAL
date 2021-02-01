@@ -38,6 +38,8 @@
         Photo##param(bool hard_component);                                     \
         using base_param_t = Photonuclear;                                     \
                                                                                \
+        std::unique_ptr<Parametrization<Component>> clone() const override;    \
+                                                                               \
         virtual double CalculateParametrization(                               \
             const Component&, double nu) const;                                \
     };
@@ -67,13 +69,16 @@ namespace crosssection {
     PHOTO_PARAM_REAL_DEC(Kokoulin, BezrukovBugaev)
 
     class PhotoRhode : public PhotoRealPhotonAssumption {
-        Interpolant interpolant_;
+        std::shared_ptr<Interpolant> interpolant_;
 
         double MeasuredSgN(double e) const;
 
     public:
         PhotoRhode(bool hard_component);
         using base_param_t = Photonuclear;
+
+        std::unique_ptr<Parametrization<Component>> clone() const final;
+
         double CalculateParametrization(
             const Component&, double nu) const override;
     };

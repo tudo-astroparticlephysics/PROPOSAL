@@ -29,10 +29,10 @@
 #pragma once
 
 #include <vector>
+#include <memory>
+#include <tuple>
+#include <functional>
 
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/particle/ParticleDef.h"
 
 namespace PROPOSAL {
 class Component;
@@ -42,6 +42,8 @@ class Time;
 class Scattering;
 class Decay;
 class ContRand;
+class Vector3D;
+enum class InteractionType;
 }
 
 namespace PROPOSAL {
@@ -65,8 +67,7 @@ public:
 
     PropagationUtility(Collection const& collection);
 
-    std::tuple<InteractionType, std::shared_ptr<Component>,
-        double>
+    std::tuple<InteractionType, std::shared_ptr<const Component>, double>
     EnergyStochasticloss(double, double);
     double EnergyDecay(double, std::function<double()>, double);
     double EnergyInteraction(double, std::function<double()>);

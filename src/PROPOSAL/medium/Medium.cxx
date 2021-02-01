@@ -42,7 +42,7 @@ std::ostream& operator<<(std::ostream& os, Medium const& medium) {
        << std::endl;
     os << "radiation Length:\t\t" << medium.radiationLength_ << std::endl;
 
-    for (std::vector<Components::Component>::const_iterator iter =
+    for (std::vector<Component>::const_iterator iter =
              medium.components_.begin();
          iter != medium.components_.end(); ++iter) {
         os << *iter << std::endl;
@@ -67,7 +67,7 @@ Medium::Medium(std::string name,
                double X1,
                double d0,
                double massDensity,
-               std::vector<Components::Component> components)
+               std::vector<Component> components)
     : name_(name),
       numComponents_(components.size()),
       sumCharge_(0),
@@ -151,7 +151,7 @@ void Medium::init() {
 
     numComponents_ = components_.size();
 
-    for (std::vector<Components::Component>::iterator iter =
+    for (std::vector<Component>::iterator iter =
              components_.begin();
          iter != components_.end(); ++iter) {
         aux1 += (iter)->GetAtomInMolecule() * (iter)->GetNucCharge();
@@ -171,7 +171,7 @@ void Medium::init() {
     aux1 = 0;
     aux2 = 0;
 
-    for (std::vector<Components::Component>::iterator iter =
+    for (std::vector<Component>::iterator iter =
              components_.begin();
          iter != components_.end(); ++iter) {
         aux1 += X0_inv((iter)->GetNucCharge(), (iter)->GetAtomicNum()) *
@@ -203,7 +203,7 @@ size_t Medium::GetHash() const noexcept
 // Setter
 // ------------------------------------------------------------------------- //
 
-void Medium::SetComponents(std::vector<Components::Component> components)
+void Medium::SetComponents(std::vector<Component> components)
 {
 
     components_ = components;

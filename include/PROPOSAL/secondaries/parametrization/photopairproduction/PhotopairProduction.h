@@ -4,8 +4,6 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/secondaries/parametrization/Parametrization.h"
 
-using PROPOSAL::Components::Component;
-
 namespace PROPOSAL {
 namespace secondaries {
     struct PhotopairProduction : public secondaries::Parametrization {

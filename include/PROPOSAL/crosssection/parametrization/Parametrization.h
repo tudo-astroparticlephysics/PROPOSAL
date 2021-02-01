@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <cstddef>
+#include <memory>
 #include <type_traits>
 
 namespace PROPOSAL {
@@ -41,7 +41,10 @@ enum class InteractionType;
 namespace PROPOSAL {
 namespace crosssection {
 
-    struct KinematicLimits;
+    struct KinematicLimits {
+        double v_min;
+        double v_max;
+    };
 
     template <typename T> struct ParametrizationName {
         static constexpr char value[36] = "";
@@ -68,6 +71,8 @@ namespace crosssection {
         }
 
         virtual ~Parametrization() = default;
+
+        virtual std::unique_ptr<Parametrization<Target>> clone() const = 0;
 
         virtual double DifferentialCrossSection(
             ParticleDef const&, Target const&, double, double) const = 0;

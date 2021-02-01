@@ -7,7 +7,6 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/secondaries/parametrization/annihilation/Annihilation.h"
 
-using PROPOSAL::Components::Component;
 
 namespace PROPOSAL {
 namespace secondaries {
