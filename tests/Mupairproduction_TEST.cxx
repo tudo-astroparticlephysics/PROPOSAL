@@ -3,7 +3,8 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/Factories/MupairProductionFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
@@ -196,16 +197,14 @@ TEST(Mupairproduction, Test_of_dEdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_mupairproduction(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_mupairproduction(particle_def, *medium, ecuts, false,
+                                           config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        std::cout << energy << ", " << particleName << ", " << ecut << ", " << vcut << std::endl;
-        std::cout << "ratio: " << dEdx_new / dEdx_stored << std::endl;
         EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
     }
 }
@@ -239,11 +238,11 @@ TEST(Mupairproduction, Test_of_dNdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_mupairproduction(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_mupairproduction(particle_def, *medium, ecuts, false,
+                                           config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -285,11 +284,11 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_mupairproduction(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_mupairproduction(particle_def, *medium, ecuts, false,
+                                           config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();
@@ -392,11 +391,11 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_mupairproduction(particle_def,
-                *medium,
-                ecuts,
-                true,
-                parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_mupairproduction(particle_def, *medium, ecuts, true,
+                                           config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
@@ -433,11 +432,11 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_mupairproduction(particle_def,
-            *medium,
-            ecuts,
-            true,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_mupairproduction(particle_def, *medium, ecuts, true,
+                                           config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -478,11 +477,11 @@ TEST(Mupairproduction, Test_of_e_interpol)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_mupairproduction(particle_def,
-            *medium,
-            ecuts,
-            true,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_mupairproduction(particle_def, *medium, ecuts, true,
+                                           config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();

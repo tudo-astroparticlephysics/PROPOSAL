@@ -1,8 +1,5 @@
 
 #include <iostream>
-// #include <string>
-// #include <cmath>
-
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/Constants.h"

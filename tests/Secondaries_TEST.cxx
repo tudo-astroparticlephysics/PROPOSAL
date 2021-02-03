@@ -2,7 +2,11 @@
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/geometry/Sphere.h"
 #include "PROPOSAL/Secondaries.h"
+#include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
+#include "PROPOSAL/propagation_utility/TimeBuilder.h"
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
 #include "PROPOSAL/density_distr/density_homogeneous.h"
 

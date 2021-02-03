@@ -2,10 +2,12 @@
 #include "gtest/gtest.h"
 
 #include <fstream>
-#include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/Factories/PhotoPairProductionFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 using namespace PROPOSAL;
 
@@ -210,10 +212,11 @@ TEST(PhotoPair, Test_of_dNdx)
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
-        auto cross = crosssection::make_photopairproduction(particle_def,
-            *medium,
-            false,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_photopairproduction(particle_def, *medium, false,
+                                              config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -241,10 +244,11 @@ TEST(PhotoPair, Test_of_dNdx_Interpolant)
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
-        auto cross = crosssection::make_photopairproduction(particle_def,
-            *medium,
-            true,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_photopairproduction(particle_def, *medium, true,
+                                              config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 

@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
+#include <cmath>
+#include <array>
 
-#include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 
 using namespace PROPOSAL;
 

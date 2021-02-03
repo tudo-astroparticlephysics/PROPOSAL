@@ -3,10 +3,12 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crosssection/parametrization/Ionization.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/Factories/IonizationFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 using namespace PROPOSAL;
 
@@ -160,11 +162,11 @@ TEST(Ionization, Test_of_dEdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_ionization(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_ionization(particle_def, *medium, ecuts, false,
+                                     config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
@@ -202,11 +204,11 @@ TEST(Ionization, Test_of_dNdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_ionization(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_ionization(particle_def, *medium, ecuts, false,
+                                     config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
         if (parametrization != "BetheBlochRossi")
@@ -248,11 +250,11 @@ TEST(Ionization, Test_Stochastic_Loss)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_ionization(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_ionization(particle_def, *medium, ecuts, false,
+                                     config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();
@@ -307,11 +309,11 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_ionization(particle_def,
-            *medium,
-            ecuts,
-            true,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_ionization(particle_def, *medium, ecuts, true,
+                                     config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
@@ -349,11 +351,11 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_ionization(particle_def,
-            *medium,
-            ecuts,
-            true,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_ionization(particle_def, *medium, ecuts, true,
+                                     config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
         if (parametrization != "BetheBlochRossi")
@@ -395,11 +397,11 @@ TEST(Ionization, Test_of_e_interpol)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_ionization(particle_def,
-            *medium,
-            ecuts,
-            true,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_ionization(particle_def, *medium, ecuts, true,
+                                     config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();

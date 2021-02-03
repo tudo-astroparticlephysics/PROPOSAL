@@ -1,15 +1,13 @@
-
-// #include <iostream>
-// #include <string>
-
 #include "gtest/gtest.h"
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crosssection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crosssection/Factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 using namespace PROPOSAL;
 
@@ -189,12 +187,12 @@ TEST(Bremsstrahlung, Test_of_dEdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_bremsstrahlung(particle_def,
-            *medium,
-            ecuts,
-            false,
-            lpm,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["lpm"] = lpm;
+
+        auto cross = make_bremsstrahlung(particle_def, *medium, ecuts, false,
+                                         config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
@@ -235,12 +233,12 @@ TEST(Bremsstrahlung, Test_of_dNdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_bremsstrahlung(particle_def,
-            *medium,
-            ecuts,
-            false,
-            lpm,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["lpm"] = lpm;
+
+        auto cross = make_bremsstrahlung(particle_def, *medium, ecuts, false,
+                                         config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -284,12 +282,12 @@ TEST(Bremsstrahlung, Test_of_e)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_bremsstrahlung(particle_def,
-            *medium,
-            ecuts,
-            false,
-            lpm,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["lpm"] = lpm;
+
+        auto cross = make_bremsstrahlung(particle_def, *medium, ecuts, false,
+                                         config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();
@@ -348,12 +346,12 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_bremsstrahlung(particle_def,
-            *medium,
-            ecuts,
-            true,
-            lpm,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["lpm"] = lpm;
+
+        auto cross = make_bremsstrahlung(particle_def, *medium, ecuts, true,
+                                         config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
@@ -395,12 +393,12 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_bremsstrahlung(particle_def,
-            *medium,
-            ecuts,
-            true,
-            lpm,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["lpm"] = lpm;
+
+        auto cross = make_bremsstrahlung(particle_def, *medium, ecuts, true,
+                                         config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -445,12 +443,12 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_bremsstrahlung(particle_def,
-            *medium,
-            ecuts,
-            true,
-            lpm,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["lpm"] = lpm;
+
+        auto cross = make_bremsstrahlung(particle_def, *medium, ecuts, true,
+                                         config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();

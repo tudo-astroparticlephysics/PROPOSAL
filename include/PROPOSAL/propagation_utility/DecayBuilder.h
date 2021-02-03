@@ -1,6 +1,8 @@
 #pragma once
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/propagation_utility/Decay.h"
+#include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include <cmath>
 
 namespace PROPOSAL {

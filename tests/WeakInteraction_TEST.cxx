@@ -2,10 +2,12 @@
 #include "gtest/gtest.h"
 
 #include <fstream>
-#include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/Factories/WeakInteractionFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 using namespace PROPOSAL;
 
@@ -179,10 +181,10 @@ TEST(WeakInteraction, Test_of_dNdx)
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
-        auto cross = crosssection::make_weakinteraction(particle_def,
-            *medium,
-            false,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_weakinteraction(particle_def, *medium, false, config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -215,10 +217,10 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
-        auto cross = crosssection::make_weakinteraction(particle_def,
-            *medium,
-            false,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_weakinteraction(particle_def, *medium, false, config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();
@@ -259,10 +261,10 @@ TEST(WeakInteraction, Test_of_dNdx_Interpolant)
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
-        auto cross = crosssection::make_weakinteraction(particle_def,
-            *medium,
-            true,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_weakinteraction(particle_def, *medium, true, config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -294,10 +296,10 @@ TEST(WeakInteraction, Test_of_e_interpol)
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
-        auto cross = crosssection::make_weakinteraction(particle_def,
-            *medium,
-            true,
-            parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+
+        auto cross = make_weakinteraction(particle_def, *medium, true, config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();

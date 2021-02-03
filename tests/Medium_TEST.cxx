@@ -77,8 +77,8 @@ TEST(Assignment, AssignmentOperator)
 
     EXPECT_TRUE(a == b);
 
-    std::unique_ptr<Components::Component> c(new Components::Hydrogen());
-    std::unique_ptr<Components::Component> d(new Components::Hydrogen());
+    std::unique_ptr<Component> c(new Components::Hydrogen());
+    std::unique_ptr<Component> d(new Components::Hydrogen());
     *c                       = *d;
 
     EXPECT_TRUE(*c == *d);

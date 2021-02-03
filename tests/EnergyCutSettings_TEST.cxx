@@ -3,7 +3,6 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/json.hpp"
 #include <stdexcept>
-#include <string>
 #include <vector>
 #include <numeric>
 

@@ -3,11 +3,12 @@
 
 #include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
-#include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/Factories/PhotonuclearFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 using namespace PROPOSAL;
 
@@ -268,12 +269,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearreal(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization,
-            hard_component);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["hard_component"] = hard_component;
+
+        auto cross = make_photonuclearreal(particle_def, *medium, ecuts, false,
+                                           config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
@@ -313,12 +314,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearreal(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization,
-            hard_component);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["hard_component"] = hard_component;
+
+        auto cross = make_photonuclearreal(particle_def, *medium, ecuts, false,
+                                           config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -360,12 +361,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearreal(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization,
-            hard_component);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["hard_component"] = hard_component;
+
+        auto cross = make_photonuclearreal(particle_def, *medium, ecuts, false,
+                                           config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();
@@ -423,12 +424,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearreal(particle_def,
-            *medium,
-            ecuts,
-            true,
-            parametrization,
-            hard_component);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["hard_component"] = hard_component;
+
+        auto cross = make_photonuclearreal(particle_def, *medium, ecuts, true,
+                                           config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
@@ -468,12 +469,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearreal(particle_def,
-            *medium,
-            ecuts,
-            true,
-            parametrization,
-            hard_component);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["hard_component"] = hard_component;
+
+        auto cross = make_photonuclearreal(particle_def, *medium, ecuts, true,
+                                           config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -515,12 +516,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearreal(particle_def,
-            *medium,
-            ecuts,
-            true,
-            parametrization,
-            hard_component);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["hard_component"] = hard_component;
+
+        auto cross = make_photonuclearreal(particle_def, *medium, ecuts, true,
+                                           config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();
@@ -581,12 +582,12 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearQ2(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization,
-            shadowing);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["shadow"] = shadowing;
+
+        auto cross = make_photonuclearQ2(particle_def, *medium, ecuts, false,
+                                         config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
@@ -627,12 +628,12 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearQ2(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization,
-            shadowing);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["shadow"] = shadowing;
+
+        auto cross = make_photonuclearQ2(particle_def, *medium, ecuts, false,
+                                         config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -675,12 +676,12 @@ TEST(PhotoQ2Integration, Test_of_e)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearQ2(particle_def,
-            *medium,
-            ecuts,
-            false,
-            parametrization,
-            shadowing);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["shadow"] = shadowing;
+
+        auto cross = make_photonuclearQ2(particle_def, *medium, ecuts, false,
+                                         config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();
@@ -739,12 +740,12 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearQ2(particle_def,
-            *medium,
-            ecuts,
-            true,
-            parametrization,
-            shadowing);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["shadow"] = shadowing;
+
+        auto cross = make_photonuclearQ2(particle_def, *medium, ecuts, true,
+                                         config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
@@ -785,12 +786,12 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearQ2(particle_def,
-            *medium,
-            ecuts,
-            true,
-            parametrization,
-            shadowing);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["shadow"] = shadowing;
+
+        auto cross = make_photonuclearQ2(particle_def, *medium, ecuts, true,
+                                         config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -833,12 +834,12 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        auto cross = crosssection::make_photonuclearQ2(particle_def,
-            *medium,
-            ecuts,
-            true,
-            parametrization,
-            shadowing);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
+        config["shadow"] = shadowing;
+
+        auto cross = make_photonuclearQ2(particle_def, *medium, ecuts, true,
+                                         config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = cross->GetTargets();
