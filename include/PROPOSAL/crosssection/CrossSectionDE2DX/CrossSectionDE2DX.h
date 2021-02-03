@@ -6,7 +6,7 @@ namespace PROPOSAL {
 namespace crosssection {
     template <typename Target> class Parametrization;
 }
-class ParticleDef;
+struct ParticleDef;
 class Medium;
 class Component;
 class EnergyCutSettings;

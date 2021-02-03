@@ -59,7 +59,7 @@ public:
     UtilityInterpolant(std::function<double(double)>, double, size_t);
 
     template <typename T>
-    void BuildTables(const std::string name, T&& def, bool reverse = false)
+    void BuildTables(const std::string, T&& def, bool reverse = false)
     {
         auto reference_x = lower_lim;
         if (reverse)

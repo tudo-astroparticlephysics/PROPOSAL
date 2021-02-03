@@ -82,7 +82,7 @@ target_compile_options(PROPOSAL PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic
     -fdiagnostics-show-option -Wno-format-security -ftemplate-backtrace-limit=0
     )
 install(
-    TARGETS PROPOSAL spdlog cubic_interpolation
+    TARGETS PROPOSAL spdlog CubicInterpolation
     EXPORT PROPOSALTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )

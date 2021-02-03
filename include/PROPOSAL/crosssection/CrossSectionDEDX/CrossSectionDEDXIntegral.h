@@ -6,8 +6,8 @@
 
 namespace PROPOSAL {
 namespace crosssection {
-    class IonizBergerSeltzerBhabha;
-    class IonizBergerSeltzerMoller;
+    struct IonizBergerSeltzerBhabha;
+    struct IonizBergerSeltzerMoller;
 } // namespace crosssection
 class Integral;
 } // namespace PROPOSAL

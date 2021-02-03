@@ -41,7 +41,7 @@
         std::unique_ptr<Parametrization<Component>> clone() const override;    \
                                                                                \
         virtual double CalculateParametrization(                               \
-            const Component&, double nu) const;                                \
+            const Component&, double nu) const override;                       \
     };                                                                         \
                                                                                \
     template <> struct ParametrizationName<Photo##param> {                     \

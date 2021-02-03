@@ -5,7 +5,7 @@
 #include "PROPOSAL/Secondaries.h"
 
 namespace PROPOSAL {
-    class ParticleDef;
+    struct ParticleDef;
 
     class Geometry;
 

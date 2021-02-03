@@ -2,7 +2,7 @@
 
 namespace PROPOSAL {
 namespace crosssection {
-    class IonizBergerSeltzerBhabha;
+    struct IonizBergerSeltzerBhabha;
     template <>
     struct is_component_wise<IonizBergerSeltzerBhabha> : std::false_type {
     };
@@ -12,7 +12,7 @@ namespace crosssection {
     struct is_component_wise<IonizBetheBlochRossi> : std::false_type {
     };
 
-    class IonizBergerSeltzerMoller;
+    struct IonizBergerSeltzerMoller;
     template <>
     struct is_component_wise<IonizBergerSeltzerMoller> : std::false_type {
     };
