@@ -3,7 +3,7 @@
 #include "pyBindings.h"
 
 #define COMPONENT_DEF(module, cls)                             \
-    py::class_<Components::cls, Components::Component,         \
+    py::class_<Components::cls, Component,         \
                std::shared_ptr<Components::cls>>(module, #cls) \
         .def(py::init<double>(), py::arg("atom_in_molecule") = 1.0);
 
@@ -45,7 +45,7 @@ void init_components(py::module& m) {
         Otherwise you have to initalize the component yourself.
     )pbdoc";
 
-    py::class_<Components::Component, std::shared_ptr<Components::Component>>(
+    py::class_<Component, std::shared_ptr<Component>>(
         m_sub, "Component")
         .def(py::init<std::string, double, double, double>(), py::arg("name"),
              py::arg("charge"), py::arg("atomic_num"),
@@ -58,8 +58,8 @@ void init_components(py::module& m) {
                atomic_num (float): Atom number in periodic table.
                atomic_in_molecule (float): Number of atoms in molecule.
         )pbdoc")
-        .def("__str__", &py_print<Components::Component>)
-        .def_property_readonly("name", &Components::Component::GetName,
+        .def("__str__", &py_print<Component>)
+        .def_property_readonly("name", &Component::GetName,
                                R"pbdoc(
                     Get name of component.
 
@@ -67,7 +67,7 @@ void init_components(py::module& m) {
                         str: Name of component
                 )pbdoc")
         .def_property_readonly("nuclear_charge",
-                               &Components::Component::GetNucCharge,
+                               &Component::GetNucCharge,
                                R"pbdoc(
                     Get nuclear charge of component.
 
@@ -75,7 +75,7 @@ void init_components(py::module& m) {
                         float: Nuclear charge of component
                 )pbdoc")
         .def_property_readonly("atomic_number",
-                               &Components::Component::GetAtomicNum,
+                               &Component::GetAtomicNum,
                                R"pbdoc(
                     Get atomic number of component.
 
@@ -83,7 +83,7 @@ void init_components(py::module& m) {
                         float: Atomic number of component
                 )pbdoc")
         .def_property_readonly("atoms_in_molecule",
-                               &Components::Component::GetAtomInMolecule,
+                               &Component::GetAtomInMolecule,
                                R"pbdoc(
                     Get number of atoms in one molecule.
 
@@ -91,20 +91,20 @@ void init_components(py::module& m) {
                         float: number of atoms in molecule
                 )pbdoc")
         .def_property_readonly("log_constant",
-                               &Components::Component::GetLogConstant,
+                               &Component::GetLogConstant,
                                R"pbdoc(
                     Explanation still has to be added.
                 )pbdoc")
-        .def_property_readonly("bprime", &Components::Component::GetBPrime,
+        .def_property_readonly("bprime", &Component::GetBPrime,
                                R"pbdoc(
                     Explanation still has to be added.
                 )pbdoc")
         .def_property_readonly("average_nucleon_weight",
-                               &Components::Component::GetAverageNucleonWeight,
+                               &Component::GetAverageNucleonWeight,
                                R"pbdoc(
                     Explanation still has to be added.
                 )pbdoc")
-        .def_property_readonly("wood_saxon", &Components::Component::GetWoodSaxon,
+        .def_property_readonly("wood_saxon", &Component::GetWoodSaxon,
                                R"pbdoc(
                     Explanation still has to be added.
                 )pbdoc");

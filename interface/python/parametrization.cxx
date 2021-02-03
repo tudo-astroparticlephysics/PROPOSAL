@@ -11,6 +11,8 @@
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 #include "pyBindings.h"
+#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/medium/Medium.h"
 
 #define BREMS_DEF(module, cls)                                                 \
     py::class_<crosssection::Brems##cls,                                       \
@@ -56,8 +58,7 @@ void init_parametrization(py::module& m)
 {
     py::module m_sub = m.def_submodule("parametrization");
 
-    constexpr static std::string parametrization_cstr_doc =
-        R"pbdoc(
+    auto param_docstring_class = R"pbdoc(
             Parametrization objects provide the theoretical input for physical
             cross section used in PROPOSAL, whereas
             :meth:`~proposal.crosssection.CrossSection` provides the numerical
@@ -66,19 +67,9 @@ void init_parametrization(py::module& m)
             For each physical process in PROPOSAL there are several different
             parametrizations available, so the user can check how the
             theoretical input influences the simulation.
-            )pbdoc";
+    )pbdoc";
 
-    py::class_<crosssection::Parametrization<Medium>,
-        std::shared_ptr<crosssection::Parametrization>>(
-        m_sub, "Parametrization", parametrization_cstr_doc)
-        .def("differential_crosssection",
-            py::overload_cast<ParticleDef const&, Components::Component const&,
-                double, double>(
-                &crosssection::Parametrization::DifferentialCrossSection,
-                py::const_),
-            py::arg("particle_def"), py::arg("component"), py::arg("energy"),
-            py::arg("v"),
-            R"pbdoc(
+    auto param_docstring_diff_cross = R"pbdoc(
             Calculate the value
 
             .. math::
@@ -99,13 +90,9 @@ void init_parametrization(py::module& m)
             Return:
                 differential_crosssection (float): returns the differential
                     crosssection in v
+    )pbdoc";
 
-                )pbdoc")
-        .def("dEdx_integrand",
-            &crosssection::Parametrization::FunctionToDEdxIntegral,
-            py::arg("particle_def"), py::arg("component"), py::arg("energy"),
-            py::arg("v"),
-            R"pbdoc(
+    auto param_docstring_dEdx_integrand = R"pbdoc(
             Calculate the value
 
             .. math::
@@ -129,13 +116,9 @@ void init_parametrization(py::module& m)
 
             PROPOSAL uses this function internally, for example to calcuate
                 :math:`\langle\frac{dE}{dx}\rangle`
+    )pbdoc";
 
-                )pbdoc")
-        .def("dE2dx_integrand",
-            &crosssection::Parametrization::FunctionToDE2dxIntegral,
-            py::arg("particle_def"), py::arg("component"), py::arg("energy"),
-            py::arg("v"),
-            R"pbdoc(
+    auto param_docstring_dE2dx_integrand = R"pbdoc(
             Calculate the value
 
             .. math::
@@ -159,17 +142,59 @@ void init_parametrization(py::module& m)
 
             PROPOSAL uses this function internally, for example in the
             calculation of the countinous randomization.
+    )pbdoc";
 
-                )pbdoc")
-        .def("kinematic_limits",
-            &crosssection::Parametrization::GetKinematicLimits,
-            py::arg("particle_def"), py::arg("component"), py::arg("energy"))
-        .def_property_readonly("hash", &crosssection::Parametrization::GetHash,
-            R"pbdoc(
-
+    auto param_docstring_kinematic_limits = R"pbdoc(
             Get internal hash corresponding to the current parametrization
+    )pbdoc";
 
-                )pbdoc");
+    py::class_<crosssection::Parametrization<Medium>,
+        std::shared_ptr<crosssection::Parametrization<Medium>>>(
+        m_sub, "ParametrizationForMedium", param_docstring_class)
+        .def("differential_crosssection",
+            py::overload_cast<ParticleDef const&, Medium const&,
+                double, double>(
+                &crosssection::Parametrization<Medium>::DifferentialCrossSection,
+                py::const_),
+            py::arg("particle_def"), py::arg("medium"), py::arg("energy"),
+            py::arg("v"), param_docstring_diff_cross)
+        .def("dEdx_integrand",
+            &crosssection::Parametrization<Medium>::FunctionToDEdxIntegral,
+            py::arg("particle_def"), py::arg("medium"), py::arg("energy"),
+            py::arg("v"), param_docstring_dEdx_integrand)
+        .def("dE2dx_integrand",
+            &crosssection::Parametrization<Medium>::FunctionToDE2dxIntegral,
+            py::arg("particle_def"), py::arg("medium"), py::arg("energy"),
+            py::arg("v"), param_docstring_dE2dx_integrand)
+        .def("kinematic_limits",
+            &crosssection::Parametrization<Medium>::GetKinematicLimits,
+            py::arg("particle_def"), py::arg("medium"), py::arg("energy"))
+        .def_property_readonly("hash", &crosssection::Parametrization<Medium>::GetHash,
+            param_docstring_kinematic_limits);
+
+    py::class_<crosssection::Parametrization<Component>,
+            std::shared_ptr<crosssection::Parametrization<Component>>>(
+            m_sub, "ParametrizationForComponent", param_docstring_class)
+            .def("differential_crosssection",
+                 py::overload_cast<ParticleDef const&, Component const&,
+                         double, double>(
+                         &crosssection::Parametrization<Component>::DifferentialCrossSection,
+                         py::const_),
+                 py::arg("particle_def"), py::arg("component"), py::arg("energy"),
+                 py::arg("v"), param_docstring_diff_cross)
+            .def("dEdx_integrand",
+                 &crosssection::Parametrization<Component>::FunctionToDEdxIntegral,
+                 py::arg("particle_def"), py::arg("component"), py::arg("energy"),
+                 py::arg("v"), param_docstring_dEdx_integrand)
+            .def("dE2dx_integrand",
+                 &crosssection::Parametrization<Component>::FunctionToDE2dxIntegral,
+                 py::arg("particle_def"), py::arg("component"), py::arg("energy"),
+                 py::arg("v"), param_docstring_dE2dx_integrand)
+            .def("kinematic_limits",
+                 &crosssection::Parametrization<Component>::GetKinematicLimits,
+                 py::arg("particle_def"), py::arg("component"), py::arg("energy"))
+            .def_property_readonly("hash", &crosssection::Parametrization<Component>::GetHash,
+                                   param_docstring_kinematic_limits);
 
     // ---------------------------------------------------------------------
     // // Bremsstrahlung
@@ -179,7 +204,7 @@ void init_parametrization(py::module& m)
     py::module m_sub_brems = m_sub.def_submodule("bremsstrahlung");
     py::class_<crosssection::Bremsstrahlung,
         std::shared_ptr<crosssection::Bremsstrahlung>,
-        crosssection::Parametrization>(m_sub_brems, "Bremsstrahlung",
+        crosssection::Parametrization<Component>>(m_sub_brems, "Bremsstrahlung",
         R"pbdoc(
 
             Virtual class for the Bremsstrahlung parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
@@ -236,7 +261,7 @@ void init_parametrization(py::module& m)
     py::module m_sub_epair = m_sub.def_submodule("pairproduction");
     py::class_<crosssection::EpairProduction,
         std::shared_ptr<crosssection::EpairProduction>,
-        crosssection::Parametrization>(m_sub_epair, "EpairProduction",
+        crosssection::Parametrization<Component>>(m_sub_epair, "EpairProduction",
         R"pbdoc(
 
             Virtual class for the electron pair production parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
@@ -302,7 +327,7 @@ void init_parametrization(py::module& m)
     py::module m_sub_annihilation = m_sub.def_submodule("annihilation");
     py::class_<crosssection::Annihilation,
         std::shared_ptr<crosssection::Annihilation>,
-        crosssection::Parametrization>(m_sub_annihilation, "Annihilation",
+        crosssection::Parametrization<Component>>(m_sub_annihilation, "Annihilation",
         R"pbdoc(
 
             Virtual class for the annihilation parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
@@ -337,7 +362,7 @@ void init_parametrization(py::module& m)
     py::module m_sub_mupair = m_sub.def_submodule("mupairproduction");
     py::class_<crosssection::MupairProduction,
         std::shared_ptr<crosssection::MupairProduction>,
-        crosssection::Parametrization>(m_sub_mupair, "MupairProduction",
+        crosssection::Parametrization<Component>>(m_sub_mupair, "MupairProduction",
         R"pbdoc(
 
             Virtual class for the muon pair production parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
@@ -385,7 +410,7 @@ void init_parametrization(py::module& m)
     py::module m_sub_weak = m_sub.def_submodule("weakinteraction");
     py::class_<crosssection::WeakInteraction,
         std::shared_ptr<crosssection::WeakInteraction>,
-        crosssection::Parametrization>(m_sub_weak, "WeakInteraction",
+        crosssection::Parametrization<Component>>(m_sub_weak, "WeakInteraction",
         R"pbdoc(
 
             Virtual class for the weak interaction parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
@@ -420,7 +445,7 @@ void init_parametrization(py::module& m)
     py::module m_sub_photo = m_sub.def_submodule("photonuclear");
     py::class_<crosssection::Photonuclear,
         std::shared_ptr<crosssection::Photonuclear>,
-        crosssection::Parametrization>(m_sub_photo, "Photonuclear");
+        crosssection::Parametrization<Component>>(m_sub_photo, "Photonuclear");
 
     // Shadow Effect
     py::class_<crosssection::ShadowEffect,
@@ -451,10 +476,6 @@ void init_parametrization(py::module& m)
                 x (float): Bjorken x
                 nu (float): Fraction of energy transfered from the particle via the photon
 
-                )pbdoc")
-        .def_property_readonly("name", &crosssection::ShadowEffect::GetName,
-            R"pbdoc(
-            Return the name of the current parametrization of the shadow effect
                 )pbdoc");
 
     py::class_<crosssection::ShadowDuttaRenoSarcevicSeckel,
@@ -472,8 +493,7 @@ void init_parametrization(py::module& m)
     py::class_<crosssection::RealPhoton,
         std::shared_ptr<crosssection::RealPhoton>>(m_sub_photo, "RealPhoton")
         .def("calculate_hard_component",
-            &crosssection::RealPhoton::CalculateHardComponent)
-        .def_property_readonly("name", &crosssection::RealPhoton::GetName);
+            &crosssection::RealPhoton::CalculateHardComponent);
 
     py::class_<crosssection::SoftComponent,
         std::shared_ptr<crosssection::SoftComponent>, crosssection::RealPhoton>(
@@ -585,7 +605,7 @@ void init_parametrization(py::module& m)
 
     py::class_<crosssection::Ionization,
         std::shared_ptr<crosssection::Ionization>,
-        crosssection::Parametrization>(m_sub_ioniz, "Ionization",
+        crosssection::Parametrization<Medium>>(m_sub_ioniz, "Ionization",
         R"pbdoc(
 
             Virtual class for the Ionization parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
@@ -647,7 +667,7 @@ void init_parametrization(py::module& m)
     py::module m_sub_compton = m_sub.def_submodule("compton");
 
     py::class_<crosssection::Compton, std::shared_ptr<crosssection::Compton>,
-        crosssection::Parametrization>(m_sub_compton, "Compton",
+        crosssection::Parametrization<Component>>(m_sub_compton, "Compton",
         R"pbdoc(
 
             Virtual class for the Compton scattering parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
@@ -684,7 +704,7 @@ void init_parametrization(py::module& m)
 
     py::class_<crosssection::PhotoPairProduction,
         std::shared_ptr<crosssection::PhotoPairProduction>,
-        crosssection::Parametrization>(m_sub_photopair, "PhotoPair",
+        crosssection::Parametrization<Component>>(m_sub_photopair, "PhotoPair",
         R"pbdoc(
 
             Virtual class for the PhotoPairProduction parametrizations. They can be initialized by using one of the given parametrizations with the following parameters

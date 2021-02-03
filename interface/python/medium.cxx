@@ -62,7 +62,7 @@ void init_medium(py::module& m) {
         .def(py::init<
                  std::string,  double, double, double, double, double,
                  double, double, double,
-                 const std::vector<Components::Component>&>(),
+                 const std::vector<Component>&>(),
              py::arg("name"),  py::arg("I"), py::arg("C"),
              py::arg("a"), py::arg("m"), py::arg("X0"), py::arg("X1"),
              py::arg("d0"), py::arg("massDensity"), py::arg("components"))

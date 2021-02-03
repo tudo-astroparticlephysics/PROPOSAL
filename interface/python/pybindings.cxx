@@ -7,6 +7,7 @@
 #include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
 #include "PROPOSAL/propagation_utility/ContRandBuilder.h"
+#include "PROPOSAL/scattering/Scattering.h"
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
 #include "PROPOSAL/propagation_utility/DecayBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
@@ -115,7 +116,7 @@ PYBIND11_MODULE(proposal, m)
                         float: v_cut
                 )pbdoc")
                                           .def("cut", overload_cast_<double>()(&EnergyCutSettings::GetCut, py::const_))
-                                          .def("cut", overload_cast_<std::tuple<double, double> const&, double>()(&EnergyCutSettings::GetCut, py::const_));
+                                          .def("cut", overload_cast_<const crosssection::KinematicLimits&, double>()(&EnergyCutSettings::GetCut, py::const_));
 
     py::class_<Interaction, std::shared_ptr<Interaction>>(m, "Interaction")
         .def("energy_interaction", py::vectorize(&Interaction::EnergyInteraction),
