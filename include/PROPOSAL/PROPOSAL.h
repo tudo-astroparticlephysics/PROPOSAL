@@ -57,6 +57,16 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
 
+#include "PROPOSAL/crosssection/Factories/AnnihilationFactory.h"
+#include "PROPOSAL/crosssection/Factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crosssection/Factories/ComptonFactory.h"
+#include "PROPOSAL/crosssection/Factories/EpairProductionFactory.h"
+#include "PROPOSAL/crosssection/Factories/IonizationFactory.h"
+#include "PROPOSAL/crosssection/Factories/MupairProductionFactory.h"
+#include "PROPOSAL/crosssection/Factories/PhotonuclearFactory.h"
+#include "PROPOSAL/crosssection/Factories/PhotoPairProductionFactory.h"
+#include "PROPOSAL/crosssection/Factories/WeakInteractionFactory.h"
+
 #include "PROPOSAL/secondaries/parametrization/Parametrization.h"
 #include "PROPOSAL/secondaries/parametrization/annihilation/Annihilation.h"
 #include "PROPOSAL/secondaries/parametrization/annihilation/HeitlerAnnihilation.h"

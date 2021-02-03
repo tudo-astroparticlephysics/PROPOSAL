@@ -74,7 +74,7 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<WeakCooperSarkarMertsch> {
-        static constexpr auto value = "Weak_CooperSarkarMertsch";
+        static constexpr auto value = "CooperSarkarMertsch";
     };
 
     template <> struct ParametrizationId<WeakCooperSarkarMertsch> {
@@ -82,49 +82,3 @@ namespace crosssection {
     };
 } // namespace crosssection
 } // namespace PROPOSAL
-
-/* // Factory pattern functions */
-
-/* template <typename P, typename M> */
-/* using weak_func_ptr = cross_t_ptr<P, M> (*)(P, M, bool); */
-
-/* template <typename Param, typename P, typename M> */
-/* cross_t_ptr<P, M> create_weak(P p_def, M medium, bool interpol) */
-/* { */
-/*     auto param = Param(); */
-/*     return make_crosssection(param, p_def, medium, nullptr, interpol); */
-/* } */
-
-/* template <typename P, typename M> */
-/* static std::map<std::string, weak_func_ptr<P, M>> weak_map = { */
-/*     { "coopersarkarmertsch", create_weak<WeakCooperSarkarMertsch, P, M> }
- */
-/* }; */
-
-/* template <typename P, typename M> */
-/* cross_t_ptr<P, M> make_weakinteraction( */
-/*     P p_def, M medium, bool interpol, const std::string& param_name) */
-/* { */
-/*     std::string name = param_name; */
-/*     std::transform( */
-/*         param_name.begin(), param_name.end(), name.begin(), ::tolower);
- */
-/*     auto it = weak_map<P, M>.find(name); */
-/*     if (it == weak_map<P, M>.end()) */
-/*         throw std::logic_error( */
-/*             "Unknown parametrization for weak interaction"); */
-
-/*     return it->second(p_def, medium, interpol); */
-/* } */
-
-/* template <typename P, typename M> */
-/* cross_t_ptr<P, M> make_weakinteraction( */
-/*     P p_def, M medium, bool interpol, const nlohmann::json& config) */
-/* { */
-/*     if (!config.contains("parametrization")) */
-/*         throw std::logic_error( */
-/*             "No parametrization passed for weak interaction"); */
-/*     std::string param_name = config["parametrization"]; */
-
-/*     return make_weakinteraction(p_def, medium, interpol, param_name); */
-/* } */

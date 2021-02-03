@@ -196,4 +196,9 @@ double crosssection::PhotoRhode::CalculateParametrization(
     }
 }
 
+std::unique_ptr<crosssection::Parametrization<Component>> crosssection::PhotoRhode::clone() const {
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
+}
+
 #undef Q2_PHOTO_PARAM_INTEGRAL_IMPL

@@ -42,7 +42,7 @@
     };                                                                         \
                                                                                \
     template <> struct ParametrizationName<Brems##param> {                     \
-        static constexpr auto value = "brems_" #param;                         \
+        static constexpr auto value = #param;                                  \
     };                                                                         \
                                                                                \
     template <> struct ParametrizationId<Brems##param> {                       \
@@ -80,7 +80,7 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<Bremsstrahlung> {
-        static constexpr char value[36] = "bremsstrahlung";
+        static constexpr auto value = "bremsstrahlung";
     };
 
     BREMSSTRAHLUNG_DEF(PetrukhinShestakov)
@@ -106,7 +106,7 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<BremsElectronScreening> {
-        static constexpr char value[36] = "bremselectronscreening";
+        static constexpr auto value = "ElectronScreening";
     };
 
     // LPM effect object
@@ -126,76 +126,6 @@ namespace crosssection {
             double energy, double v, const Component&) const;
         size_t GetHash() const noexcept { return hash; }
     };
-
-    /* // Factory pattern functions */
-
-    /* template <typename P, typename M> */
-    /* using brems_func_ptr = cross_t_ptr<P, M>(*)(P, M, std::shared_ptr<const
-     */
-    /*         EnergyCutSettings>, bool, bool, double); */
-
-    /* template <typename Param, typename P, typename M> */
-    /* cross_t_ptr<P, M> create_brems(P p_def, M medium, */
-    /*                                std::shared_ptr<const EnergyCutSettings>
-     * cuts, */
-    /*                                bool lpm, bool interpol, */
-    /*                                double density_correction = 1.0) { */
-    /*         auto param = Param(lpm, p_def, medium, density_correction); */
-    /*         return make_crosssection(param, p_def, medium, cuts, interpol);
-     */
-    /* } */
-
-    /* template<typename P, typename M> */
-    /* static std::map<std::string, brems_func_ptr<P, M>> brems_map = { */
-    /*         {"kelnerkokoulinpetrukhin",
-     * create_brems<BremsKelnerKokoulinPetrukhin, P, M>}, */
-    /*         {"petrukhinshestakov", create_brems<BremsPetrukhinShestakov, P,
-     * M>}, */
-    /*         {"completescreening", create_brems<BremsCompleteScreening, P,
-     * M>}, */
-    /*         {"andreevbezrukovbugaev",
-     * create_brems<BremsAndreevBezrukovBugaev, P, M>}, */
-    /*         {"sandrocksoedingreksorhode",
-     * create_brems<BremsSandrockSoedingreksoRhode, P, M>}, */
-    /*         {"electronscreening", create_brems<BremsElectronScreening, P, M>}
-     */
-    /* }; */
-
-    /* template<typename P, typename M> */
-    /* cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium,
-     * std::shared_ptr<const */
-    /*         EnergyCutSettings> cuts, bool interpol, bool lpm, std::string
-     * param_name, */
-    /*         double density_correction = 1.0){ */
-    /*     std::string name = param_name; */
-    /*     std::transform(param_name.begin(), param_name.end(), name.begin(),
-     * ::tolower); */
-    /*     auto it = brems_map<P, M>.find(name); */
-    /*     if (it == brems_map<P, M>.end()) */
-    /*         throw std::logic_error("Unknown parametrization for
-     * bremsstrahlung"); */
-
-    /*     return it->second(p_def, medium, cuts, lpm, interpol,
-     * density_correction); */
-    /* } */
-
-    /* template<typename P, typename M> */
-    /* cross_t_ptr<P, M> make_bremsstrahlung(P p_def, M medium,
-     * std::shared_ptr<const */
-    /*         EnergyCutSettings> cuts, bool interpol, const nlohmann::json&
-     * config, */
-    /*         double density_correction = 1.0){ */
-    /*     if (!config.contains("parametrization")) */
-    /*         throw std::logic_error("No parametrization passed for
-     * bremsstrahlung"); */
-
-    /*     std::string param_name = config["parametrization"]; */
-    /*     bool lpm = config.value("lpm", true); */
-
-    /*     return make_bremsstrahlung(p_def, medium, cuts, interpol, lpm,
-     * param_name, */
-    /*                                density_correction); */
-    /* } */
 
 } // namespace crosssection
 } // namespace PROPOSAL

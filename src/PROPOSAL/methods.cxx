@@ -365,6 +365,10 @@ namespace Helper {
         throw std::logic_error("Never get here");
     }
 
+    bool case_insensitive_comp::operator()(const std::string &lhs, const std::string &rhs) const {
+        return strcasecmp(lhs.c_str(), rhs.c_str()) < 0 ;
+    }
+
     /* std::vector<std::unique_ptr<Interpolant>> InitializeInterpolation( */
     /*     std::string name, const InterpolantBuilderContainer& builder_container, */
     /*     size_t hash_digest, const InterpolationDef& interpolation_def) */

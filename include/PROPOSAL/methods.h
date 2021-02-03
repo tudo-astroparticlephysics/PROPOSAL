@@ -167,6 +167,12 @@ namespace Helper {
 
     std::unique_ptr<Interpolant> InitializeInterpolation(std::string, InterpolantBuilder const&, size_t);
 
+
+    // Comparison function to be used for case-insensitive strings in a map
+    struct case_insensitive_comp : public std::binary_function<std::string, std::string, bool> {
+        bool operator()(const std::string &lhs, const std::string &rhs) const;
+    };
+
     // ----------------------------------------------------------------------------
     /// @brief Simple map structure where keys and values can be used for
     /// indexing

@@ -28,8 +28,7 @@ using namespace PROPOSAL;
 
 crosssection::PhotoQ2Integral::PhotoQ2Integral(
     std::shared_ptr<ShadowEffect> shadow_effect)
-    : crosssection::Photonuclear()
-    , shadow_effect_(shadow_effect)
+    : shadow_effect_(shadow_effect)
 {
 }
 
