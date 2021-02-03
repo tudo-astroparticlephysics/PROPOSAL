@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.15)
 
 project(PROPOSAL VERSION 7.0.0 LANGUAGES CXX)
 
@@ -10,6 +10,7 @@ ENDIF(APPLE)
 
 # sets standard installtion paths
 include(GNUInstallDirs)
+include(FetchContent)
 
 ### full RPATH
 ### copied from https://cmake.org/Wiki/CMake_RPATH_handling
@@ -41,6 +42,19 @@ OPTION(ADD_PYTHON "Choose to compile the python wrapper library" ON)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory("vendor/spdlog")
+
+#################################################################
+############           Cubic Interpolation        ###############
+#################################################################
+
+FetchContent_Declare(
+    cubic_interpolation
+    GIT_REPOSITORY https://github.com/MaxSac/cubic_interpolation.git
+    GIT_SHALLOW TRUE
+    GIT_PROGRESS TRUE
+    GIT_TAG main
+    )
+FetchContent_MakeAvailable(cubic_interpolation)
 
 #################################################################
 ####################       PROPOSAL      ########################
