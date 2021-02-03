@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.15)
 
 project(PROPOSAL VERSION 7.0.0 LANGUAGES CXX)
 
@@ -10,6 +10,7 @@ ENDIF(APPLE)
 
 # sets standard installtion paths
 include(GNUInstallDirs)
+include(FetchContent)
 
 ### full RPATH
 ### copied from https://cmake.org/Wiki/CMake_RPATH_handling
@@ -35,12 +36,33 @@ OPTION(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Some additional options
 OPTION(ADD_PYTHON "Choose to compile the python wrapper library" ON)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 #################################################################
 #################           spdlog        #######################
 #################################################################
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-add_subdirectory("vendor/spdlog")
+FetchContent_Declare(
+    spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_SHALLOW TRUE
+    GIT_PROGRESS TRUE
+    GIT_TAG v1.8.2
+    )
+FetchContent_MakeAvailable(spdlog)
+
+#################################################################
+############           Cubic Interpolation        ###############
+#################################################################
+
+FetchContent_Declare(
+    cubic_interpolation
+    GIT_REPOSITORY https://github.com/MaxSac/cubic_interpolation.git
+    GIT_SHALLOW TRUE
+    GIT_PROGRESS TRUE
+    GIT_TAG main
+    )
+FetchContent_MakeAvailable(cubic_interpolation)
 
 #################################################################
 ####################       PROPOSAL      ########################
@@ -48,7 +70,7 @@ add_subdirectory("vendor/spdlog")
 file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/src/PROPOSAL/*)
 add_library(PROPOSAL ${SRC_FILES})
 add_library(PROPOSAL::PROPOSAL ALIAS PROPOSAL)
-target_link_libraries(PROPOSAL PUBLIC spdlog)
+target_link_libraries(PROPOSAL PUBLIC spdlog::spdlog CubicInterpolation::CubicInterpolation)
 target_compile_features(PROPOSAL PUBLIC cxx_std_14)
 set_target_properties(PROPOSAL PROPERTIES CXX_EXTENSIONS OFF)
 target_include_directories(
@@ -60,7 +82,7 @@ target_compile_options(PROPOSAL PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic
     -fdiagnostics-show-option -Wno-format-security -ftemplate-backtrace-limit=0
     )
 install(
-    TARGETS PROPOSAL spdlog
+    TARGETS PROPOSAL spdlog cubic_interpolation
     EXPORT PROPOSALTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
@@ -97,8 +119,6 @@ endif()
 
 
 
-find_package(CubicInterpolation)
-target_link_libraries(PROPOSAL PUBLIC CubicInterpolation::CubicInterpolation)
 
 #################################################################
 #################           Tests        ########################
@@ -132,9 +152,7 @@ IF(ADD_PYTHON)
     set_target_properties(pyproposal PROPERTIES OUTPUT_NAME proposal)
     target_include_directories(pyproposal PRIVATE ${PYTHON_INCLUDE_DIRS})
     target_include_directories(pyproposal PRIVATE ${PROJECT_SOURCE_DIR}/interface/python)
-    target_link_libraries(pyproposal PRIVATE PROPOSAL)
-    target_link_libraries(pyproposal PRIVATE spdlog)
-    target_link_libraries(PROPOSAL PRIVATE CubicInterpolation::CubicInterpolation)
+    target_link_libraries(pyproposal PRIVATE PROPOSAL spdlog::spdlog CubicInterpolation::CubicInterpolation)
     target_compile_options(pyproposal PRIVATE -fvisibility=hidden)
     install(TARGETS pyproposal EXPORT PROPOSALTargets DESTINATION ${CMAKE_INSTALL_LIBDIR})
 ELSE(ADD_PYTHON)
