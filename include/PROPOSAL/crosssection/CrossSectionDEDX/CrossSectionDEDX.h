@@ -8,7 +8,7 @@ namespace crosssection {
     template <typename Target> class Parametrization;
 } // namespace crosssection
 
-class ParticleDef;
+struct ParticleDef;
 class Medium;
 class Component;
 class EnergyCutSettings;

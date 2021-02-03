@@ -5,7 +5,7 @@
 
 namespace PROPOSAL {
     class Displacement;
-    class CrossSectionBase;
+    struct CrossSectionBase;
 }
 
 namespace PROPOSAL {

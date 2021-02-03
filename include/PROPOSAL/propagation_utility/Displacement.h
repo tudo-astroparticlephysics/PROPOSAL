@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace PROPOSAL {
-    class CrossSectionBase;
+    struct CrossSectionBase;
 }
 
 namespace PROPOSAL {

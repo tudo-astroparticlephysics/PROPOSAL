@@ -6,7 +6,7 @@
 #include <tuple>
 
 namespace PROPOSAL {
-class CrossSectionBase;
+struct CrossSectionBase;
 class Component;
 class Displacement;
 }

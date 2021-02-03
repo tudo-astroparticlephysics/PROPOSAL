@@ -41,7 +41,7 @@ class Displacement;
 class Time;
 class Scattering;
 class Decay;
-class ContRand;
+struct ContRand;
 class Vector3D;
 enum class InteractionType;
 }

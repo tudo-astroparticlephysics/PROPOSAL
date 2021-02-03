@@ -15,10 +15,10 @@ namespace secondaries {
 
         using comp_ptr = std::shared_ptr<const Component>;
         using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
-        std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>> dndx;
 
         Integral integral;
         Medium medium;
+        std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>> dndx;
 
         double FunctionToIntegral(
             double energy, double x, double theta, const Component&);
