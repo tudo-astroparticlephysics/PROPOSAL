@@ -74,7 +74,7 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<IonizBetheBlochRossi> {
-        static constexpr auto value = "Ioniz_BetheBlochRossi";
+        static constexpr auto value = "BetheBlochRossi";
     };
 
     template <> struct ParametrizationId<IonizBetheBlochRossi> {
@@ -99,7 +99,7 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<IonizBergerSeltzerBhabha> {
-        static constexpr auto value = "Ioniz_BergerSeltzerBhabha";
+        static constexpr auto value = "BergerSeltzerBhabha";
     };
 
     template <> struct ParametrizationId<IonizBergerSeltzerBhabha> {
@@ -120,65 +120,12 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<IonizBergerSeltzerMoller> {
-        static constexpr auto value = "Ioniz_BergerSeltzerMoller";
+        static constexpr auto value = "BergerSeltzerMoller";
     };
 
     template <> struct ParametrizationId<IonizBergerSeltzerMoller> {
         static constexpr size_t value = 1000000003;
     };
-
-    /* // Factory pattern functions */
-
-    /* template <typename P, typename M> */
-    /* using ioniz_func_ptr = cross_t_ptr<P, M> (*)( */
-    /*     P, M, std::shared_ptr<const EnergyCutSettings>, bool); */
-
-    /* template <typename Param, typename P, typename M> */
-    /* cross_t_ptr<P, M> create_ioniz(P p_def, M medium, */
-    /*     std::shared_ptr<const EnergyCutSettings> cuts, bool interpol) */
-    /* { */
-    /*     auto param = Param(*cuts); */
-    /*     return make_crosssection(param, p_def, medium, cuts, interpol); */
-    /* } */
-
-    /* template <typename P, typename M> */
-    /* static std::map<std::string, ioniz_func_ptr<P, M>> ioniz_map = { */
-    /*     { "betheblochrossi", create_ioniz<IonizBetheBlochRossi, P, M> }, */
-    /*     { "bergerseltzerbhabha", create_ioniz<IonizBergerSeltzerBhabha, P, M>
-     * }, */
-    /*     { "bergerseltzermoller", create_ioniz<IonizBergerSeltzerMoller, P, M>
-     * } */
-    /* }; */
-
-    /* template <typename P, typename M> */
-    /* cross_t_ptr<P, M> make_ionization(P p_def, M medium, */
-    /*     std::shared_ptr<const EnergyCutSettings> cuts, bool interpol, */
-    /*     const std::string& param_name) */
-    /* { */
-    /*     std::string name = param_name; */
-    /*     std::transform( */
-    /*         param_name.begin(), param_name.end(), name.begin(), ::tolower);
-     */
-    /*     auto it = ioniz_map<P, M>.find(name); */
-    /*     if (it == ioniz_map<P, M>.end()) */
-    /*         throw std::logic_error("Unknown parametrization for ionization");
-     */
-
-    /*     return it->second(p_def, medium, cuts, interpol); */
-    /* } */
-
-    /* template <typename P, typename M> */
-    /* cross_t_ptr<P, M> make_ionization(P p_def, M medium, */
-    /*     std::shared_ptr<const EnergyCutSettings> cuts, bool interpol, */
-    /*     const nlohmann::json& config) */
-    /* { */
-    /*     if (!config.contains("parametrization")) */
-    /*         throw std::logic_error("No parametrization passed for
-     * ionization"); */
-    /*     std::string param_name = config["parametrization"]; */
-
-    /*     return make_ionization(p_def, medium, cuts, interpol, param_name); */
-    /* } */
 
 } // crosssection
 } // namespace PROPOSAL

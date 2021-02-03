@@ -211,7 +211,7 @@ public:
     {
         auto logger = Logging::Get("PROPOSAL.CrossSection");
         logger->info("Building {} crosssection.",
-            crosssection::ParametrizationName<Param>::value);
+            std::string(crosssection::ParametrizationName<Param>::value));
         for (auto const& i : dndx)
             hash_combine(hash, std::get<1>(i.second)->GetHash());
         if (dedx) {

@@ -274,7 +274,7 @@ Example where the interactions bremsstrahlung, electron-positron pair producton,
 
 Annihilation of an ingoing positron with an atomic electron. Available `annihilation` parametrizations are:
 
-* `AnnihilationHeitler`: Heitler formula
+* `Heitler`: Heitler formula
 
 ### Bremsstrahlung: `brems`
 

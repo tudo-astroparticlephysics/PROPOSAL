@@ -17,6 +17,10 @@ using std::make_shared;
 
 std::vector<double> crosssection::HardComponent::x = { 3, 4, 5, 6, 7, 8, 9 };
 
+double crosssection::Photonuclear::GetLowerEnergyLim(const ParticleDef& p_def) const noexcept {
+    return p_def.mass;
+}
+
 crosssection::HardComponent::HardComponent(const ParticleDef& particle_def)
 {
     hash_combine(hash, std::string("hard_component"));

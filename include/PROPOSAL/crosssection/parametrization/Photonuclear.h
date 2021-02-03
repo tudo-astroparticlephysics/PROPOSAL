@@ -72,7 +72,7 @@ namespace crosssection {
 
     class Photonuclear : public Parametrization<Component> {
     public:
-        Photonuclear();
+        Photonuclear() = default;
         virtual ~Photonuclear() = default;
 
         KinematicLimits GetKinematicLimits(
