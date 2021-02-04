@@ -15,15 +15,13 @@ CrossSectionDEDX::CrossSectionDEDX(size_t _hash, std::string param_name)
     , logger(Logging::Get("CrossSection.DEDX"))
 {
     hash_combine(hash, param_name);
-    std::cout << "hash: " << hash << std::endl;
-    std::cout << "name: " << param_name << std::endl;
     logger->info("Building dEdx for parametrization {}", param_name);
 }
 
 namespace PROPOSAL {
 namespace detail {
     template <typename Target>
-    size_t _dEdx_Hash(InteractionType t,
+    size_t _dEdx_Hash(size_t t,
         crosssection::Parametrization<Target> const& param,
         ParticleDef const& p, Target const& target,
         EnergyCutSettings const& cut)
@@ -34,14 +32,14 @@ namespace detail {
         return hash_diggest;
     }
 
-    size_t dEdx_Hash(InteractionType t,
+    size_t dEdx_Hash(size_t t,
         crosssection::Parametrization<Medium> const& param,
         ParticleDef const& p, Medium const& m, EnergyCutSettings const& cut)
     {
         return _dEdx_Hash(t, param, p, m, cut);
     }
 
-    size_t dEdx_Hash(InteractionType t,
+    size_t dEdx_Hash(size_t t,
         crosssection::Parametrization<Component> const& param,
         ParticleDef const& p, Component const& c, EnergyCutSettings const& cut)
     {

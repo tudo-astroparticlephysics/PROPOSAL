@@ -40,15 +40,10 @@ class CrossSectionDEDXIntegral : public CrossSectionDEDX {
     std::function<double(Integral&, double)> dedx_integral;
 
 public:
-    template <typename Param, typename... Args,
-        typename _name = crosssection::ParametrizationName<Param>,
-        typename _id = crosssection::ParametrizationId<Param>>
-    CrossSectionDEDXIntegral(Param const& _param, Args... args)
-        : CrossSectionDEDX(
-            detail::dEdx_Hash(
-                static_cast<InteractionType>(_id::value), _param, args...),
-            _name::value)
-        , dedx_integral(detail::define_dedx_integral(_param, args...))
+    template <typename... Args>
+    CrossSectionDEDXIntegral(Args... args)
+        : CrossSectionDEDX(args...)
+        , dedx_integral(detail::define_dedx_integral(args...))
     {
     }
 

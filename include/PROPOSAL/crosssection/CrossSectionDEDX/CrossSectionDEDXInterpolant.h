@@ -73,17 +73,11 @@ class CrossSectionDEDXInterpolant : public CrossSectionDEDX {
     }
 
 public:
-    template <typename Param, typename... Args,
-        typename _name = crosssection::ParametrizationName<Param>,
-        typename _id = crosssection::ParametrizationId<Param>>
-    CrossSectionDEDXInterpolant(Param const& _param, Args... args)
-        : CrossSectionDEDX(
-            detail::dEdx_Hash(
-                static_cast<InteractionType>(_id::value), _param, args...),
-            _name::value)
-        , interpolant(build_dedx_def(_param, args...), "/tmp", gen_name())
+    template <typename... Args>
+    CrossSectionDEDXInterpolant(Args... args)
+        : CrossSectionDEDX(args...)
+        , interpolant(build_dedx_def(args...), "/tmp", gen_name())
     {
-        /* logger->debug("Interpolationtables successfully build."); */
     }
 
     double Calculate(double E) const final { return interpolant.evaluate(E); }
