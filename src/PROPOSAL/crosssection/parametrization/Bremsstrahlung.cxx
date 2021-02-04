@@ -46,6 +46,13 @@
 
 using namespace PROPOSAL;
 
+crosssection::Bremsstrahlung::Bremsstrahlung()
+    : lorenz_(false)
+    , lorenz_cut_(1e6)
+    , lpm_(nullptr)
+{
+}
+
 double crosssection::Bremsstrahlung::GetLowerEnergyLim(
     const ParticleDef& p_def) const noexcept
 {

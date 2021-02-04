@@ -2,6 +2,7 @@
 
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/Time.h"
+#include "PROPOSAL/Constants.h"
 namespace PROPOSAL {
 template <typename T> class ExactTimeBuilder : public Time {
     T time_integral;

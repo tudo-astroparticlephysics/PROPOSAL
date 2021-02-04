@@ -65,7 +65,7 @@ namespace crosssection {
         std::shared_ptr<BremsLPM> lpm_;
 
     public:
-        Bremsstrahlung() = default;
+        Bremsstrahlung();
 
         virtual ~Bremsstrahlung() = default;
 

@@ -209,9 +209,9 @@ public:
         , interaction_type(static_cast<InteractionType>(
               crosssection::ParametrizationId<Param>::value))
     {
-        auto logger = Logging::Get("PROPOSAL.CrossSection");
-        logger->info("Building {} crosssection.",
-            std::string(crosssection::ParametrizationName<Param>::value));
+        /* auto logger = Logging::Get("PROPOSAL.CrossSection"); */
+        /* logger->info("Building {} crosssection.", */
+        /*     std::string(crosssection::ParametrizationName<Param>::value)); */
         for (auto const& i : dndx)
             hash_combine(hash, std::get<1>(i.second)->GetHash());
         if (dedx) {

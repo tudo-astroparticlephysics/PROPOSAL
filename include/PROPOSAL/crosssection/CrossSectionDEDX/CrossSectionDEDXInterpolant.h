@@ -74,7 +74,7 @@ public:
         : CrossSectionDEDX(args...)
         , interpolant(build_dedx_def(args...), "/tmp", gen_name())
     {
-        logger->debug("Interpolationtables successfully build.");
+        /* logger->debug("Interpolationtables successfully build."); */
     }
 
     double Calculate(double E) const final { return interpolant.evaluate(E); }
