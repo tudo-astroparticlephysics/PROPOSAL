@@ -731,6 +731,15 @@ void init_parametrization(py::module& m)
         crosssection::PhotoPairProduction>(m_sub_photopair, "Tsai")
         .def(py::init<>());
 
+    py::class_<crosssection::KinematicLimits,
+    std::shared_ptr<crosssection::KinematicLimits>>(m_sub, "KinematicLimits")
+        .def(py::init<>())
+        .def_readwrite("v_min", &crosssection::KinematicLimits::v_min)
+        .def_readwrite("v_max", &crosssection::KinematicLimits::v_max)
+        .def("__repr__",
+         [](const crosssection::KinematicLimits &lim) {
+             return "(v_min: " + std::to_string(lim.v_min) + ", v_max: " + std::to_string(lim.v_max) + ")";
+         });
     // py::class_<PhotoAngleDistribution,
     // std::shared_ptr<PhotoAngleDistribution>>(
     //     m_sub_photopair, "PhotoAngleDistribution",
