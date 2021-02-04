@@ -11,6 +11,10 @@
 #include "CubicInterpolation/Interpolant.h"
 
 namespace PROPOSAL {
+class EnergyCutSettings;
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
 
 double transform_relativ_loss(double v_cut, double v_max, double v);
 double retransform_relativ_loss(double v_cut, double v_max, double v);
@@ -69,10 +73,15 @@ class CrossSectionDEDXInterpolant : public CrossSectionDEDX {
     }
 
 public:
-    template <typename... Args>
-    CrossSectionDEDXInterpolant(Args... args)
-        : CrossSectionDEDX(args...)
-        , interpolant(build_dedx_def(args...), "/tmp", gen_name())
+    template <typename Param, typename... Args,
+        typename _name = crosssection::ParametrizationName<Param>,
+        typename _id = crosssection::ParametrizationId<Param>>
+    CrossSectionDEDXInterpolant(Param const& _param, Args... args)
+        : CrossSectionDEDX(
+            detail::dEdx_Hash(
+                static_cast<InteractionType>(_id::value), _param, args...),
+            _name::value)
+        , interpolant(build_dedx_def(_param, args...), "/tmp", gen_name())
     {
         /* logger->debug("Interpolationtables successfully build."); */
     }

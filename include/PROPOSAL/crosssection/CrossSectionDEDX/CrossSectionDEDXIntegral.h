@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDX.h"
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include <functional>
 #include <memory>
 
@@ -31,16 +32,23 @@ namespace detail {
     dedx_integral_t define_dedx_integral(
         crosssection::IonizBergerSeltzerMoller param, ParticleDef const& p_def,
         Medium const& medium, EnergyCutSettings const&);
-}
+} // namespace detail
+} // namespace PROPOSAL
 
+namespace PROPOSAL {
 class CrossSectionDEDXIntegral : public CrossSectionDEDX {
     std::function<double(Integral&, double)> dedx_integral;
 
 public:
-    template <typename... Args>
-    CrossSectionDEDXIntegral(Args... args)
-        : CrossSectionDEDX(args...)
-        , dedx_integral(detail::define_dedx_integral(args...))
+    template <typename Param, typename... Args,
+        typename _name = crosssection::ParametrizationName<Param>,
+        typename _id = crosssection::ParametrizationId<Param>>
+    CrossSectionDEDXIntegral(Param const& _param, Args... args)
+        : CrossSectionDEDX(
+            detail::dEdx_Hash(
+                static_cast<InteractionType>(_id::value), _param, args...),
+            _name::value)
+        , dedx_integral(detail::define_dedx_integral(_param, args...))
     {
     }
 
