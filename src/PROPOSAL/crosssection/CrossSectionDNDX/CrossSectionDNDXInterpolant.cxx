@@ -33,6 +33,8 @@ double CrossSectionDNDXInterpolant::Calculate(double energy)
 
 double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
 {
+    if (energy < lower_energy_lim)
+        return 0.;
     auto lim = GetIntegrationLimits(energy);
     v = retransform_relativ_loss(lim[MIN], lim[MAX], v);
     return interpolant.evaluate(std::array<double, 2> { energy, v });

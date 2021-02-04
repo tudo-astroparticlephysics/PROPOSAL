@@ -109,6 +109,10 @@ namespace crosssection {
         static constexpr auto value = "ElectronScreening";
     };
 
+    template <> struct ParametrizationId<BremsElectronScreening> {
+        static constexpr size_t value = 1000000002;
+    };
+
     // LPM effect object
     class BremsLPM {
         size_t hash;

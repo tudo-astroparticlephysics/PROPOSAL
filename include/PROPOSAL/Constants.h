@@ -50,10 +50,13 @@ extern const double IPREC2; // integration precision
 // interpolation parameters
 static constexpr double UPPER_ENERGY_LIM_DEFAULT = 1.e14;
 static constexpr unsigned int NODES_DEDX_DEFAULT = 100;
+static constexpr unsigned int NODES_DNDX_E_DEFAULT = 100;
+static constexpr unsigned int NODES_DNDX_V_DEFAULT = 100;
 static std::unique_ptr<double> UPPER_ENERGY_LIM;
 static std::unique_ptr<unsigned int> NODES_DEDX;
 static std::unique_ptr<unsigned int> NODES_DE2DX;
-static std::unique_ptr<unsigned int> NODES_DNDX;
+static std::unique_ptr<unsigned int> NODES_DNDX_E;
+static std::unique_ptr<unsigned int> NODES_DNDX_V;
 
 // precision parameters
 extern const double COMPUTER_PRECISION;

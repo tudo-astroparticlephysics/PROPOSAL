@@ -62,6 +62,8 @@ auto build_dedx_def(T1 const& param, Args... args)
 class CrossSectionDEDXInterpolant : public CrossSectionDEDX {
     cubic_splines::Interpolant<cubic_splines::CubicSplines<double>> interpolant;
 
+    double lower_energy_lim;
+
     std::string gen_name()
     {
         return std::string("dedx_") + std::to_string(GetHash())
@@ -73,10 +75,15 @@ public:
     CrossSectionDEDXInterpolant(Args... args)
         : CrossSectionDEDX(args...)
         , interpolant(build_dedx_def(args...), "/tmp", gen_name())
+        , lower_energy_lim(interpolant.GetDefinition().GetAxis().GetLow())
     {
         /* logger->debug("Interpolationtables successfully build."); */
     }
 
-    double Calculate(double E) const final { return interpolant.evaluate(E); }
+    double Calculate(double E) const final {
+        if (E < lower_energy_lim)
+            return 0.;
+        return interpolant.evaluate(E);
+    }
 };
 } // namespace PROPOSAL

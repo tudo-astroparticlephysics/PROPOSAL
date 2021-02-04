@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
+#include "PROPOSAL/Constants.h"
 
 #include <type_traits>
 
@@ -12,16 +13,53 @@ namespace PROPOSAL {
 double transform_relativ_loss(double v_cut, double v_max, double v);
 double retransform_relativ_loss(double v_cut, double v_max, double v);
 
-template <typename T1, typename T2, typename... Args>
-auto build_dndx_def(T1 const& param, T2 const& p_def, Args... args)
+class AxisBuilder_dNdx {
+    using axis_t = cubic_splines::ExpAxis<double>;
+    double low, up;
+    size_t n;
+
+public:
+    template <typename Param, typename... Args>
+    AxisBuilder_dNdx(Param const& _param, ParticleDef const& _p, Args...)
+        : low(_param.GetLowerEnergyLim(_p))
+        , up(UPPER_ENERGY_LIM_DEFAULT)
+        , n(NODES_DNDX_E_DEFAULT)
+    {
+        if (UPPER_ENERGY_LIM)
+            up = *UPPER_ENERGY_LIM;
+        if (NODES_DNDX_E)
+            n = *NODES_DNDX_E;
+    }
+
+    template <typename T1> auto refine_definition_range(T1 func)
+    {
+        auto i = 0u;
+        auto ax = axis_t(low, up, n);
+        while (not(func(ax.back_transform(i)) > 0))
+            ++i;
+        low = ax.back_transform(i);
+    }
+
+    auto Create() const { return std::make_unique<axis_t>(low, up, n); }
+};
+
+template <typename T1, typename... Args>
+auto build_dndx_def(T1 const& param, ParticleDef const& p_def, Args... args)
 {
     auto dndx
         = std::make_shared<CrossSectionDNDXIntegral>(param, p_def, args...);
     auto def = cubic_splines::BicubicSplines<double>::Definition();
-    def.axis[0] = std::make_unique<cubic_splines::ExpAxis<double>>(
-        param.GetLowerEnergyLim(p_def), 1.e14, (size_t)100);
+
+    auto ax_energy = AxisBuilder_dNdx(param, p_def, args...);
+    ax_energy.refine_definition_range([dndx](double E) { return dndx->Calculate(E); });
+    def.axis[0] = ax_energy.Create();
+
+    auto nodes_v = NODES_DNDX_V_DEFAULT;
+    if (NODES_DNDX_V)
+        nodes_v = *NODES_DNDX_V;
     def.axis[1]
-        = std::make_unique<cubic_splines::LinAxis<double>>(0., 1., (size_t)100);
+        = std::make_unique<cubic_splines::LinAxis<double>>(0., 1., (size_t)nodes_v);
+
     def.f = [dndx](double energy, double v) {
         auto lim = dndx->GetIntegrationLimits(energy);
         v = transform_relativ_loss(
@@ -37,6 +75,8 @@ class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
     cubic_splines::Interpolant<cubic_splines::BicubicSplines<double>>
         interpolant;
 
+    double lower_energy_lim;
+
     std::string gen_name()
     {
         return std::string("dndx_") + std::to_string(GetHash())
@@ -48,6 +88,7 @@ public:
     CrossSectionDNDXInterpolant(Args... args)
         : CrossSectionDNDX(args...)
         , interpolant(build_dndx_def(args...), "/tmp", gen_name())
+        , lower_energy_lim(interpolant.GetDefinition().GetAxis().at(0)->GetLow())
     {
         /* auto logger = Logging::Get("PROPOSAL.CrossSectionDEDX"); */
         /* logger->debug("Interpolationtables successfully build."); */
