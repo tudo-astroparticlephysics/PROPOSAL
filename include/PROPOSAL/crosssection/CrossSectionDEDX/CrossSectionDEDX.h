@@ -1,17 +1,22 @@
 #pragma once
 
+#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include <memory>
 #include <spdlog/fwd.h>
 
 namespace PROPOSAL {
-namespace crosssection {
-    template <typename Target> class Parametrization;
-} // namespace crosssection
-
-struct ParticleDef;
-class Medium;
-class Component;
 class EnergyCutSettings;
+enum class InteractionType;
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+namespace detail {
+    size_t dEdx_Hash(size_t, crosssection::Parametrization<Medium> const&,
+        ParticleDef const&, Medium const&, EnergyCutSettings const&);
+
+    size_t dEdx_Hash(size_t, crosssection::Parametrization<Component> const&,
+        ParticleDef const&, Component const&, EnergyCutSettings const&);
+} // namespace detail
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
@@ -21,11 +26,16 @@ protected:
     std::shared_ptr<spdlog::logger> logger;
 
 public:
-    CrossSectionDEDX(crosssection::Parametrization<Medium> const&,
-        ParticleDef const&, Medium const&, EnergyCutSettings const&);
+    CrossSectionDEDX(size_t hash, std::string param_name);
 
-    CrossSectionDEDX(crosssection::Parametrization<Component> const&,
-        ParticleDef const&, Component const&, EnergyCutSettings const&);
+    template <typename Param, typename... Args,
+        typename _id = crosssection::ParametrizationId<Param>,
+        typename _name = crosssection::ParametrizationName<Param>>
+    CrossSectionDEDX(Param p, Args... args)
+        : CrossSectionDEDX(detail::dEdx_Hash(_id::value, p, args...),
+            std::string(_name::value))
+    {
+    }
 
     virtual ~CrossSectionDEDX() = default;
 
