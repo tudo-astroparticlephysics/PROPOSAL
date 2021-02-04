@@ -1557,6 +1557,7 @@ Integral::QuadpackResults Integral::qags(double q_limit, double q_epsabs, double
     double small  = std::abs(max_ - min_) * 0.375;
     double ertest = 0.0; // Is set in loop when last == 2
     double correc = 0.0; // Is set in loop if error is not reached
+    erlarg        = 0.0; // Initialized for real at first loop iteration
 
     int ksgn = -1;
     if (dres >= (1.0 - 50 * q_epmach) * defabs)
