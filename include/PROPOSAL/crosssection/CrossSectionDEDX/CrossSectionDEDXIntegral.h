@@ -1,9 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDX.h"
-#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include <functional>
-#include <memory>
 
 namespace PROPOSAL {
 namespace crosssection {
