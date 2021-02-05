@@ -42,6 +42,9 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 #################           spdlog        #######################
 #################################################################
 
+#FIND_PACKAGE(spdlog 1.8.2 QUIET)
+#if (NOT spdlog_FOUND)
+message(STATUS "Fetching spdlog...")
 FetchContent_Declare(
     spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
@@ -50,11 +53,14 @@ FetchContent_Declare(
     GIT_TAG v1.8.2
     )
 FetchContent_MakeAvailable(spdlog)
+#endif ()
 
 #################################################################
 ############           Cubic Interpolation        ###############
 #################################################################
-
+FIND_PACKAGE(CubicInterpolation QUIET)
+if (NOT CubicInterpolation_FOUND)
+message(STATUS "Fetching CubicInterpolation...")
 FetchContent_Declare(
     cubic_interpolation
     GIT_REPOSITORY https://github.com/MaxSac/cubic_interpolation.git
@@ -63,6 +69,7 @@ FetchContent_Declare(
     GIT_TAG main
     )
 FetchContent_MakeAvailable(cubic_interpolation)
+endif ()
 
 #################################################################
 ####################       PROPOSAL      ########################
@@ -82,7 +89,7 @@ target_compile_options(PROPOSAL PRIVATE -Wall -Wextra -Wnarrowing -Wpedantic
     -fdiagnostics-show-option -Wno-format-security -ftemplate-backtrace-limit=0
     )
 install(
-    TARGETS PROPOSAL spdlog CubicInterpolation
+    TARGETS PROPOSAL spdlog
     EXPORT PROPOSALTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )

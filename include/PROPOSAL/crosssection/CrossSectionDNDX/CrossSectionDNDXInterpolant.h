@@ -59,7 +59,7 @@ auto build_dndx_def(T1 const& param, ParticleDef const& p_def, Args... args)
     if (NODES_DNDX_V)
         nodes_v = *NODES_DNDX_V;
     def.axis[1] = std::make_unique<cubic_splines::LinAxis<double>>(
-        0., 1., (size_t)nodes_v);
+        0., 0.999, (size_t)nodes_v);
 
     def.f = [dndx](double energy, double v) {
         auto lim = dndx->GetIntegrationLimits(energy);
