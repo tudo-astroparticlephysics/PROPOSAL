@@ -14,7 +14,8 @@ enum class InteractionType;
 /*     size_t dEdx_Hash(size_t, crosssection::Parametrization<Medium> const&, */
 /*         ParticleDef const&, Medium const&, EnergyCutSettings const&); */
 
-/*     size_t dEdx_Hash(size_t, crosssection::Parametrization<Component> const&, */
+/*     size_t dEdx_Hash(size_t, crosssection::Parametrization<Component> const&,
+ */
 /*         ParticleDef const&, Component const&, EnergyCutSettings const&); */
 /* } // namespace detail */
 /* } // namespace PROPOSAL */

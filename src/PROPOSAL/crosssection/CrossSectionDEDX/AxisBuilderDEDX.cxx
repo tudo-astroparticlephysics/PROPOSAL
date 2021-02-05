@@ -14,13 +14,12 @@ AxisBuilderDEDX::AxisBuilderDEDX(double _low, double _up, size_t _node)
 }
 
 void AxisBuilderDEDX::refine_definition_range(
-    std::function<double(double)> func)
+    std::function<double(double)> func, unsigned int i)
 {
-    auto i = 0u;
     auto ax = cubic_splines::ExpAxis<double>(low, up, n);
     while (not(func(ax.back_transform(i)) > 0) and i < n)
         ++i;
-    if (i==n)
+    if (i == n)
         throw std::logic_error("No positive values to build dEdx tables!");
     low = ax.back_transform(i);
 }

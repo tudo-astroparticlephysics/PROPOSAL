@@ -71,21 +71,21 @@ namespace detail {
 
 double CrossSectionDNDXIntegral::Calculate(double energy)
 {
-    return Calculate(energy, std::get<MAX>(GetIntegrationLimits(energy)));
+    auto lim = GetIntegrationLimits(energy);
+    return Calculate(energy, lim.max);
 }
 
 double CrossSectionDNDXIntegral::Calculate(double energy, double v)
 {
     auto lim = GetIntegrationLimits(energy);
-    if (std::get<MIN>(lim) < v)
-        return dndx_integral(energy, std::get<MIN>(lim), v, 0);
+    if (lim.min < v)
+        return dndx_integral(energy, lim.min, v, 0);
     return 0;
 }
 
 double CrossSectionDNDXIntegral::GetUpperLimit(double energy, double rate)
 {
     auto lim = GetIntegrationLimits(energy);
-    auto v = dndx_upper_limit(
-        energy, std::get<MIN>(lim), std::get<MAX>(lim), -rate);
+    auto v = dndx_upper_limit(energy, lim.min, lim.max, -rate);
     return v;
 }

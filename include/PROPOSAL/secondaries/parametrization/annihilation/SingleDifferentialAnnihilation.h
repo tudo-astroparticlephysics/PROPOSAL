@@ -7,7 +7,6 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/secondaries/parametrization/annihilation/Annihilation.h"
 
-
 namespace PROPOSAL {
 namespace secondaries {
     class SingleDifferentialAnnihilation : public secondaries::Annihilation {
@@ -24,8 +23,8 @@ namespace secondaries {
         SingleDifferentialAnnihilation(Param&& param, const ParticleDef& p,
             const Medium& medium, bool interpol)
             : m(medium)
-            , dndx(detail::build_dndx(std::true_type {}, interpol, medium,
-                  std::forward<Param>(param), p))
+            , dndx(detail::build_dndx(std::true_type {}, interpol,
+                  std::forward<Param>(param), p, medium, nullptr))
         {
         }
 

@@ -29,8 +29,8 @@ namespace secondaries {
         PhotoTsai() = default;
         PhotoTsai(ParticleDef p, Medium m)
             : medium(m)
-            , dndx(detail::build_dndx(std::true_type {}, false, medium,
-                  crosssection::PhotoPairTsai(), p))
+            , dndx(detail::build_dndx(std::true_type {}, false,
+                  crosssection::PhotoPairTsai(), p, medium, nullptr))
         {
         }
 

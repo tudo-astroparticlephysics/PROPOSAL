@@ -113,10 +113,8 @@ double secondaries::PhotoTsai::CalculateRho(
     for (auto& it : dndx) {
         if (comp.GetName() == it.first->GetName()) {
             auto& calc = *std::get<1>(it.second);
-            auto rate = rnd
-                * calc.Calculate(energy,
-                    get<CrossSectionDNDX::MAX>(
-                        calc.GetIntegrationLimits(energy)));
+            auto lim = calc.GetIntegrationLimits(energy);
+            auto rate = rnd * calc.Calculate(energy, lim.max);
             auto rho = calc.GetUpperLimit(energy, rate);
             return rho;
         }

@@ -44,7 +44,7 @@ public:
         std::shared_ptr<const EnergyCutSettings> _cut)
         : crosssection_t<P, M>(_param, _p_def, _medium,
             detail::build_dndx(
-                comp_wise {}, true, _medium, _param, _p_def, _cut),
+                comp_wise {}, true, _param, _p_def, _medium, _cut),
             detail::build_dedx(
                 comp_wise {}, true, _param, _p_def, _medium, _cut),
             detail::build_de2dx(

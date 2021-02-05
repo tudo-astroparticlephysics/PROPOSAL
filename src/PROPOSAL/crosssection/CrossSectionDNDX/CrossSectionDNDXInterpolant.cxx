@@ -28,7 +28,7 @@ double retransform_relativ_loss(double v_cut, double v_max, double v)
 
 double CrossSectionDNDXInterpolant::Calculate(double energy)
 {
-    return Calculate( energy, 1.0 );
+    return Calculate(energy, 1.0);
 }
 
 double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
@@ -36,7 +36,7 @@ double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
     if (energy < lower_energy_lim)
         return 0.;
     auto lim = GetIntegrationLimits(energy);
-    v = retransform_relativ_loss(lim[MIN], lim[MAX], v);
+    v = retransform_relativ_loss(lim.min, lim.max, v);
     return interpolant.evaluate(std::array<double, 2> { energy, v });
 }
 
@@ -45,5 +45,5 @@ double CrossSectionDNDXInterpolant::GetUpperLimit(double energy, double rate)
     auto lim = GetIntegrationLimits(energy);
     auto guess = std::array<double, 2> { energy, 0.5 };
     auto v = cubic_splines::find_parameter(interpolant, rate, guess, 1);
-    return transform_relativ_loss(lim[MIN], lim[MAX], v);
+    return transform_relativ_loss(lim.min, lim.max, v);
 }

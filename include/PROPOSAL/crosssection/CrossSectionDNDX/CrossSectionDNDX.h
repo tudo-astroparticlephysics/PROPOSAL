@@ -39,8 +39,10 @@ public:
     virtual double Calculate(double energy, double v) = 0;
     virtual double GetUpperLimit(double energy, double rate) = 0;
 
-    enum { MIN, MAX };
-    std::array<double, 2> GetIntegrationLimits(double energy) const;
+    struct IntegrationLimit {
+        double min, max;
+    };
+    IntegrationLimit GetIntegrationLimits(double energy) const;
 
     size_t GetHash() const noexcept { return hash; }
 };

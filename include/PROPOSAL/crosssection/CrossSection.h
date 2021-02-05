@@ -70,32 +70,37 @@ namespace detail {
         return m.GetSumNucleons() / (c.GetAtomInMolecule() * c.GetAtomicNum());
     }
 
-    template <typename T, typename... Args>
-    inline auto build_dndx(
-        std::false_type, bool interpol, T target, Args&&... args)
+    template <typename Param>
+    inline auto build_dndx(std::false_type, bool interpol, Param param,
+        ParticleDef p, Medium m, std::shared_ptr<const EnergyCutSettings> cut,
+        size_t hash = 0)
     {
         using comp_ptr = std::shared_ptr<const Component>;
         using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
-        auto m = std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>>();
-        auto calc = make_dndx(interpol, target, std::forward<Args>(args)...);
-        m.emplace(comp_ptr(nullptr), std::make_tuple(1., std::move(calc)));
-        return m;
+        auto dndx_map
+            = std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>>();
+        auto calc = make_dndx(interpol, param, p, m, cut, hash);
+        dndx_map.emplace(
+            comp_ptr(nullptr), std::make_tuple(1., std::move(calc)));
+        return dndx_map;
     }
 
-    template <typename T, typename... Args>
-    inline auto build_dndx(
-        std::true_type, bool interpol, T target, Args&&... args)
+    template <typename Param>
+    inline auto build_dndx(std::true_type, bool interpol, Param param,
+        ParticleDef p, Medium m, std::shared_ptr<const EnergyCutSettings> cut,
+        size_t hash = 0)
     {
         using comp_ptr = std::shared_ptr<const Component>;
         using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
-        auto m = std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>>();
-        for (auto& c : target.GetComponents()) {
+        auto dndx_map
+            = std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>>();
+        for (auto& c : m.GetComponents()) {
             auto comp = std::make_shared<const Component>(c);
-            auto weight = weight_component(target, c);
-            auto calc = make_dndx(interpol, c, std::forward<Args>(args)...);
-            m.emplace(comp, std::make_tuple(weight, std::move(calc)));
+            auto weight = weight_component(m, c);
+            auto calc = make_dndx(interpol, param, p, c, cut, hash);
+            dndx_map.emplace(comp, std::make_tuple(weight, std::move(calc)));
         }
-        return m;
+        return dndx_map;
     }
 
     template <typename Cont, typename T1, typename T2, typename T3,
@@ -199,8 +204,7 @@ protected:
 
 public:
     template <typename Param, typename T1, typename T2, typename T3>
-    CrossSection(
-        Param _param, P _p_def, M, T1&& _dndx, T2&& _dedx, T3&& _de2dx)
+    CrossSection(Param _param, P _p_def, M, T1&& _dndx, T2&& _dedx, T3&& _de2dx)
         : hash(0)
         , dndx(std::forward<T1>(_dndx))
         , dedx(std::forward<T2>(_dedx))
