@@ -43,7 +43,7 @@ double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
 double CrossSectionDNDXInterpolant::GetUpperLimit(double energy, double rate)
 {
     auto lim = GetIntegrationLimits(energy);
-    auto guess = std::array<double, 2> { energy, 0. };
+    auto guess = std::array<double, 2> { energy, 0.5 };
     auto v = cubic_splines::find_parameter(interpolant, rate, guess, 1);
     return transform_relativ_loss(lim[MIN], lim[MAX], v);
 }
