@@ -1,7 +1,7 @@
 #pragma once
 
-#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
 
 #include <type_traits>
 
@@ -51,14 +51,15 @@ auto build_dndx_def(T1 const& param, ParticleDef const& p_def, Args... args)
     auto def = cubic_splines::BicubicSplines<double>::Definition();
 
     auto ax_energy = AxisBuilder_dNdx(param, p_def, args...);
-    ax_energy.refine_definition_range([dndx](double E) { return dndx->Calculate(E); });
+    ax_energy.refine_definition_range(
+        [dndx](double E) { return dndx->Calculate(E); });
     def.axis[0] = ax_energy.Create();
 
     auto nodes_v = NODES_DNDX_V_DEFAULT;
     if (NODES_DNDX_V)
         nodes_v = *NODES_DNDX_V;
-    def.axis[1]
-        = std::make_unique<cubic_splines::LinAxis<double>>(0., 1., (size_t)nodes_v);
+    def.axis[1] = std::make_unique<cubic_splines::LinAxis<double>>(
+        0., 1., (size_t)nodes_v);
 
     def.f = [dndx](double energy, double v) {
         auto lim = dndx->GetIntegrationLimits(energy);
@@ -71,7 +72,6 @@ auto build_dndx_def(T1 const& param, ParticleDef const& p_def, Args... args)
 }
 
 class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
-
     cubic_splines::Interpolant<cubic_splines::BicubicSplines<double>>
         interpolant;
 
@@ -84,14 +84,22 @@ class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
     }
 
 public:
-    template <typename... Args>
-    CrossSectionDNDXInterpolant(Args... args)
-        : CrossSectionDNDX(args...)
-        , interpolant(build_dndx_def(args...), "/tmp", gen_name())
-        , lower_energy_lim(interpolant.GetDefinition().GetAxis().at(0)->GetLow())
+    template <typename Param, typename Target>
+    CrossSectionDNDXInterpolant(Param param, ParticleDef const& p,
+        Target const& t, std::shared_ptr<const EnergyCutSettings> cut,
+        size_t hash = 0)
+        : CrossSectionDNDX(param, p, t, cut, hash)
+        , interpolant(build_dndx_def(param, p, t, cut), "/tmp", gen_name())
+        , lower_energy_lim(
+              interpolant.GetDefinition().GetAxis().at(0)->GetLow())
     {
-        /* auto logger = Logging::Get("PROPOSAL.CrossSectionDEDX"); */
-        /* logger->debug("Interpolationtables successfully build."); */
+    }
+
+    template <typename Param, typename Target>
+    CrossSectionDNDXInterpolant(
+        Param param, ParticleDef const& p, Target const& t, size_t hash = 0)
+        : CrossSectionDNDXInterpolant(param, p, t, nullptr, hash)
+    {
     }
 
     double Calculate(double E) final;

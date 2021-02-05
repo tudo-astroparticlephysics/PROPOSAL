@@ -11,9 +11,8 @@ namespace PROPOSAL {
 namespace detail {
 
     template <typename Param, typename Target>
-    std::function<double(Integral&, double)> _define_dedx_integral(
-        Param const& param, ParticleDef const& p, Target const& t,
-        EnergyCutSettings const& cut)
+    dedx_integral_t _define_dedx_integral(Param const& param,
+        ParticleDef const& p, Target const& t, EnergyCutSettings const& cut)
     {
         auto param_ptr = std::shared_ptr<Param>(param.clone());
         return [param_ptr, p, t, cut](Integral& i, double E) {
@@ -26,14 +25,14 @@ namespace detail {
         };
     }
 
-    std::function<double(Integral&, double)> define_dedx_integral(
+    dedx_integral_t define_dedx_integral(
         crosssection::Parametrization<Component> const& param,
         ParticleDef const& p, Component const& c, EnergyCutSettings const& cut)
     {
         return _define_dedx_integral(param, p, c, cut);
     }
 
-    std::function<double(Integral&, double)> define_dedx_integral(
+    dedx_integral_t define_dedx_integral(
         crosssection::Parametrization<Medium> const& param,
         ParticleDef const& p, Medium const& m, EnergyCutSettings const& cut)
     {

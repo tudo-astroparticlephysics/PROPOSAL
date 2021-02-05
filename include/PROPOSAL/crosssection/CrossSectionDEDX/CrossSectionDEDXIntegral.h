@@ -38,10 +38,11 @@ class CrossSectionDEDXIntegral : public CrossSectionDEDX {
     std::function<double(Integral&, double)> dedx_integral;
 
 public:
-    template <typename... Args>
-    CrossSectionDEDXIntegral(Args... args)
-        : CrossSectionDEDX(args...)
-        , dedx_integral(detail::define_dedx_integral(args...))
+    template <typename Param, typename Target>
+    CrossSectionDEDXIntegral(Param const& param, ParticleDef const& p,
+        Target const& t, EnergyCutSettings const& cut, size_t hash = 0)
+        : CrossSectionDEDX(hash)
+        , dedx_integral(detail::define_dedx_integral(param, p, t, cut))
     {
     }
 

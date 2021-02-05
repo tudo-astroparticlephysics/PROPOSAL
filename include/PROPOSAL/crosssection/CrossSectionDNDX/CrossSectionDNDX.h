@@ -1,46 +1,37 @@
 #pragma once
 
-#include "PROPOSAL/EnergyCutSettings.h"
-/* #include "PROPOSAL/Logging.h" */
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 
-#include <memory>
+#include <functional>
+#include <spdlog/fwd.h>
+
+namespace PROPOSAL {
+class EnergyCutSettings;
+}
 
 namespace PROPOSAL {
 class CrossSectionDNDX {
-    std::function<crosssection::KinematicLimits(double)> kinematic_limits;
-    std::shared_ptr<const EnergyCutSettings> cut;
-    size_t hash;
+    using param_medium_t = crosssection::Parametrization<Medium>;
+    using param_comp_t = crosssection::Parametrization<Component>;
+    using lim_func_t = std::function<crosssection::KinematicLimits(double)>;
 
-    template <typename T1, typename T2, typename T3>
-    inline auto define_kinematic_limits(T1 param, T2 particle, T3 target)
-    {
-        return [param, particle, target](double E) {
-            return param.GetKinematicLimits(particle, target, E);
-        };
-    }
+protected:
+    size_t hash;
+    std::shared_ptr<spdlog::logger> logger;
+
+private:
+    lim_func_t kinematic_limits;
+    std::shared_ptr<const EnergyCutSettings> cut;
+
+    CrossSectionDNDX(lim_func_t kin_lim,
+        std::shared_ptr<const EnergyCutSettings> cut, size_t hash);
 
 public:
-    template <typename T1, typename T2, typename T3>
-    CrossSectionDNDX(T1 _param, T2 _particle, T3 _target)
-        : kinematic_limits(define_kinematic_limits(_param, _particle, _target))
-        , hash(0)
-    {
-        /* auto logger = Logging::Get("PROPOSAL.CrossSection.dNdx"); */
-        /* logger->info("Building {} dNdx.", _param.name); */
-        hash_combine(
-            hash, _param.GetHash(), _particle.GetHash(), _target.GetHash());
-    }
+    CrossSectionDNDX(param_medium_t const&, ParticleDef, Medium,
+        std::shared_ptr<const EnergyCutSettings>, size_t hash);
 
-    template <typename T1, typename T2, typename T3>
-    CrossSectionDNDX(T1&& _param, T2&& _particle, T3&& _target,
-        EnergyCutSettings const& _cut)
-        : CrossSectionDNDX(std::forward<T1>(_param),
-            std::forward<T2>(_particle), std::forward<T3>(_target))
-    {
-        cut = std::make_shared<const EnergyCutSettings>(_cut);
-        /* hash_combine(hash, _cut.GetHash()); */
-    }
+    CrossSectionDNDX(param_comp_t const&, ParticleDef, Component,
+        std::shared_ptr<const EnergyCutSettings>, size_t hash);
 
     virtual ~CrossSectionDNDX() = default;
 

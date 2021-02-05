@@ -10,14 +10,6 @@
 
 using namespace PROPOSAL;
 
-CrossSectionDEDX::CrossSectionDEDX(size_t _hash, std::string param_name)
-    : hash(_hash)
-    , logger(Logging::Get("CrossSection.DEDX"))
-{
-    hash_combine(hash, param_name);
-    logger->info("Building dEdx for parametrization {}", param_name);
-}
-
 namespace PROPOSAL {
 namespace detail {
     template <typename Target>
@@ -47,3 +39,10 @@ namespace detail {
     }
 } // namespace detail
 } // namespace PROPOSAL
+
+CrossSectionDEDX::CrossSectionDEDX(size_t _hash)
+    : hash(_hash)
+    , logger(Logging::Get("CrossSection.DEDX"))
+{
+    logger->info("Creating dEdx.");
+}

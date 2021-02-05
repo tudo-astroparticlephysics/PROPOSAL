@@ -20,7 +20,7 @@ namespace detail {
     {
         if (cut)
             return std::unique_ptr<CrossSectionDNDX>(
-                std::make_unique<T>(param, p_def, target, *cut));
+                std::make_unique<T>(param, p_def, target, cut));
         return std::unique_ptr<CrossSectionDNDX>(
             std::make_unique<T>(param, p_def, target));
     }

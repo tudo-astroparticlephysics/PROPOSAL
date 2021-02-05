@@ -9,15 +9,15 @@ class EnergyCutSettings;
 enum class InteractionType;
 } // namespace PROPOSAL
 
-namespace PROPOSAL {
-namespace detail {
-    size_t dEdx_Hash(size_t, crosssection::Parametrization<Medium> const&,
-        ParticleDef const&, Medium const&, EnergyCutSettings const&);
+/* namespace PROPOSAL { */
+/* namespace detail { */
+/*     size_t dEdx_Hash(size_t, crosssection::Parametrization<Medium> const&, */
+/*         ParticleDef const&, Medium const&, EnergyCutSettings const&); */
 
-    size_t dEdx_Hash(size_t, crosssection::Parametrization<Component> const&,
-        ParticleDef const&, Component const&, EnergyCutSettings const&);
-} // namespace detail
-} // namespace PROPOSAL
+/*     size_t dEdx_Hash(size_t, crosssection::Parametrization<Component> const&, */
+/*         ParticleDef const&, Component const&, EnergyCutSettings const&); */
+/* } // namespace detail */
+/* } // namespace PROPOSAL */
 
 namespace PROPOSAL {
 class CrossSectionDEDX {
@@ -26,16 +26,7 @@ protected:
     std::shared_ptr<spdlog::logger> logger;
 
 public:
-    CrossSectionDEDX(size_t hash, std::string param_name);
-
-    template <typename Param, typename... Args,
-        typename _id = crosssection::ParametrizationId<Param>,
-        typename _name = crosssection::ParametrizationName<Param>>
-    CrossSectionDEDX(Param p, Args... args)
-        : CrossSectionDEDX(detail::dEdx_Hash(_id::value, p, args...),
-            std::string(_name::value))
-    {
-    }
+    CrossSectionDEDX(size_t hash);
 
     virtual ~CrossSectionDEDX() = default;
 
