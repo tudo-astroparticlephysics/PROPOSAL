@@ -18,8 +18,10 @@ void AxisBuilderDEDX::refine_definition_range(
 {
     auto i = 0u;
     auto ax = cubic_splines::ExpAxis<double>(low, up, n);
-    while (not(func(ax.back_transform(i)) > 0))
+    while (not(func(ax.back_transform(i)) > 0) and i < n)
         ++i;
+    if (i==n)
+        throw std::logic_error("No positive values to build dEdx tables!");
     low = ax.back_transform(i);
 }
 

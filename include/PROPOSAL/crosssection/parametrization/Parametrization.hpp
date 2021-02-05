@@ -16,5 +16,18 @@ namespace crosssection {
     template <>
     struct is_component_wise<IonizBergerSeltzerMoller> : std::false_type {
     };
+
+    struct AnnihilationHeitler;
+    template <>
+    struct is_only_stochastic<AnnihilationHeitler> : std::true_type {};
+
+    struct PhotoPairTsai;
+    template <>
+    struct is_only_stochastic<PhotoPairTsai> : std::true_type {};
+
+    struct WeakInteraction;
+    template <>
+    struct is_only_stochastic<WeakInteraction> : std::true_type {};
+
 } // namespace crosssection
 } // namespace PROPOSAL
