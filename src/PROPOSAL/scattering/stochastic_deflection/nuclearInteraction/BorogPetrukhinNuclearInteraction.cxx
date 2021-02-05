@@ -25,6 +25,5 @@ stochastic_deflection::BorogPetrukhinNuclearInteraction::CalculateStochasticDefl
     auto theta_muon = 2 * std::asin(std::sqrt(sin2));
 
 
-    //TODO: PropagationUtility will call cos() on the first return value
     return DirectionChangeAngular { theta_muon, 2 * PI * rnd[1] };
 }

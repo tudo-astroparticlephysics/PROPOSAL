@@ -32,6 +32,5 @@ stochastic_deflection::KelnerPairProduction::CalculateStochasticDeflection(
     // Need sqrt because of sampling in theta^2
     auto theta_muon = std::sqrt(SampleFromExponential(rnd[0], lambda));
 
-    //TODO: PropagationUtility will call cos() on the first return value
     return DirectionChangeAngular { theta_muon, 2 * PI * rnd[1] };
 }
