@@ -48,7 +48,7 @@ struct DefaultCrossSections{
     template <typename M, typename... Args>
     static auto Get(ParticleType const& particle, M const& medium, Args... args)
     {
-        auto cross = crosssection_list_t<ParticleType, M>();
+        auto cross = std::vector<std::shared_ptr<CrossSectionBase>>();
         DefaultCrossSections<ParticleType>::Append(cross, particle, medium, args...);
         return cross;
     }
@@ -56,7 +56,7 @@ struct DefaultCrossSections{
     template <typename M, typename... Args>
     static auto Get(ParticleDef const& particle, M const& medium, Args... args)
     {
-        auto cross = crosssection_list_t<ParticleDef, M>();
+        auto cross = std::vector<std::shared_ptr<CrossSectionBase>>();
         DefaultCrossSections<ParticleType>::Append(cross, particle, medium, args...);
         return cross;
     }

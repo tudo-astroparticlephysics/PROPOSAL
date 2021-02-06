@@ -32,45 +32,21 @@
 
 namespace PROPOSAL {
 
-template <typename Param, typename P, typename M>
-class CrossSectionInterpolant : public crosssection_t<P, M> {
-
-    using param_t = std::remove_reference_t<std::remove_cv_t<Param>>;
-    using comp_wise = crosssection::is_component_wise<param_t>;
-    using only_stochastic = crosssection::is_only_stochastic<param_t>;
+template <typename Param,
+    typename _param = std::remove_reference_t<std::remove_cv_t<Param>>,
+    typename _comp_wise =
+        typename crosssection::is_component_wise<_param>::type,
+    typename _only_stochastic =
+        typename crosssection::is_only_stochastic<_param>::type>
+class CrossSectionInterpolant
+    : public CrossSection<_comp_wise, _only_stochastic> {
 
 public:
-    CrossSectionInterpolant(Param _param, P _p_def, M _medium,
-        std::shared_ptr<const EnergyCutSettings> _cut)
-        : crosssection_t<P, M>(_param, _p_def, _medium,
-            detail::build_dndx(
-                comp_wise {}, true, _param, _p_def, _medium, _cut),
-            detail::build_dedx(
-                comp_wise {}, true, _param, _p_def, _medium, _cut),
-            detail::build_de2dx(
-                comp_wise {}, true, _param, _p_def, _medium, _cut))
+    template <typename... Args>
+    CrossSectionInterpolant(Param&& param, Args... args)
+        : CrossSection<_comp_wise, _only_stochastic>(
+            std::forward<Param>(param), std::forward<Args>(args)..., true)
     {
-        if (crosssection::is_only_stochastic<Param> {} == true
-            and _cut != nullptr) {
-            throw std::invalid_argument(
-                "CrossSections of parametrizations that are only "
-                "stochastic do "
-                "not use"
-                "EnergyCuts. Pass a nullptr as an EnergyCut instead.");
-        }
-    }
-    inline double CalculatedNdx(double energy,
-        std::shared_ptr<const Component> comp_ptr = nullptr) override
-    {
-        return this->CalculatedNdx_impl(energy, comp_wise {}, comp_ptr);
-    }
-
-    inline double CalculateStochasticLoss(
-        std::shared_ptr<const Component> const& comp, double energy,
-        double rate) override
-    {
-        return this->CalculateStochasticLoss_impl(
-            comp, energy, rate, comp_wise {}, only_stochastic {});
     }
 };
 

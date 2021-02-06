@@ -3,13 +3,12 @@
 #include "PROPOSAL/json_fwd.hpp"
 
 namespace PROPOSAL {
-    template <typename P, typename M>
-    class CrossSection;
+    class CrossSectionBase;
     struct ParticleDef;
     class Medium;
     class EnergyCutSettings;
 
-    using cross_ptr = std::unique_ptr<CrossSection<ParticleDef, Medium>>;
+    using cross_ptr = std::unique_ptr<CrossSectionBase>;
 }
 
 namespace PROPOSAL {

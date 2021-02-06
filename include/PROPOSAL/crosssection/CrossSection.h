@@ -36,7 +36,7 @@
 #include "PROPOSAL/crosssection/parametrization/Parametrization.hpp"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 #include <memory>
 #include <type_traits>
 #include <unordered_map>
@@ -186,7 +186,12 @@ namespace detail {
 
 }
 
-template <class P, class M> class CrossSection : public CrossSectionBase {
+template <typename comp_wise, typename only_stochastic>
+class CrossSection : public CrossSectionBase {
+    /* using param_t = std::remove_reference_t<std::remove_cv_t<Param>>; */
+    /* using comp_wise = crosssection::is_component_wise<param_t>; */
+    /* using only_stochastic = crosssection::is_only_stochastic<param_t>; */
+
     using comp_ptr = std::shared_ptr<const Component>;
     using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
     using dedx_ptr = std::unique_ptr<CrossSectionDEDX>;
@@ -203,76 +208,76 @@ protected:
     InteractionType interaction_type;
 
 public:
-    template <typename Param, typename T1, typename T2, typename T3>
-    CrossSection(Param _param, P _p_def, M, T1&& _dndx, T2&& _dedx, T3&& _de2dx)
+    template <typename Param>
+    CrossSection(Param param, ParticleDef p, Medium m,
+        std::shared_ptr<const EnergyCutSettings> cut, bool interpol,
+        size_t hash = 0)
         : hash(0)
-        , dndx(std::forward<T1>(_dndx))
-        , dedx(std::forward<T2>(_dedx))
-        , de2dx(std::forward<T3>(_de2dx))
-        , lower_energy_lim(_param.GetLowerEnergyLim(_p_def))
+        , dndx(detail::build_dndx(comp_wise {}, interpol, param, p, m, cut))
+        , dedx(detail::build_dedx(comp_wise {}, interpol, param, p, m, cut))
+        , de2dx(detail::build_de2dx(comp_wise {}, interpol, param, p, m, cut))
+        , lower_energy_lim(param.GetLowerEnergyLim(p))
         , interaction_type(static_cast<InteractionType>(
               crosssection::ParametrizationId<Param>::value))
     {
-        /* auto logger = Logging::Get("PROPOSAL.CrossSection"); */
-        /* logger->info("Building {} crosssection.", */
-        /*     std::string(crosssection::ParametrizationName<Param>::value)); */
-        for (auto const& i : dndx)
-            hash_combine(hash, std::get<1>(i.second)->GetHash());
-        if (dedx) {
-            for (auto const& i : *dedx)
-                hash_combine(hash, std::get<1>(i)->GetHash());
-        }
-        if (de2dx) {
-            for (auto const& i : *de2dx)
-                hash_combine(hash, std::get<1>(i)->GetHash());
-        }
     }
 
     virtual ~CrossSection() = default;
 
 protected:
-    template <typename T>
-    auto CalculatedNdx_impl(double energy, std::true_type, T comp_ptr)
+    double CalculatedNdx(
+        double E, std::shared_ptr<const Component> c, std::true_type)
     {
-        if (comp_ptr) {
-            return std::get<1>(dndx[comp_ptr])->Calculate(energy)
-                / std::get<0>(dndx[comp_ptr]);
-        }
-        return CalculatedNdx_impl(energy, std::true_type {}, nullptr);
-    }
-    auto CalculatedNdx_impl(double energy, std::true_type tt, std::nullptr_t)
-    {
+        if (c)
+            return std::get<1>(dndx[c])->Calculate(E) / std::get<0>(dndx[c]);
         auto dNdx_all = 0.;
         for (auto& it : dndx)
-            dNdx_all += CalculatedNdx_impl(energy, tt, it.first);
+            dNdx_all += std::get<1>(dndx[it.first])->Calculate(E)
+                / std::get<0>(dndx[it.first]);
         return dNdx_all;
     }
-    template <typename T>
-    auto CalculatedNdx_impl(double energy, std::false_type, T)
+
+    double CalculatedNdx(
+        double E, std::shared_ptr<const Component>, std::false_type)
     {
-        return std::get<1>(dndx[nullptr])->Calculate(energy);
+        return std::get<1>(dndx[nullptr])->Calculate(E);
     }
 
-    auto CalculateStochasticLoss_impl(
-        std::shared_ptr<const Component> const& comp, double energy,
-        double rate, std::true_type, std::false_type)
+    double CalculateStochasticLoss_impl(
+        std::shared_ptr<const Component> const& c, double E, double rate,
+        std::true_type, std::false_type)
     {
-        return std::get<1>(dndx[comp])
-            ->GetUpperLimit(energy, rate * std::get<0>(dndx[comp]));
+        return std::get<1>(dndx[c])->GetUpperLimit(
+            E, rate * std::get<0>(dndx[c]));
     }
-    auto CalculateStochasticLoss_impl(
-        std::shared_ptr<const Component> const& comp, double energy,
-        double rate, std::false_type, std::false_type)
+
+    double CalculateStochasticLoss_impl(
+        std::shared_ptr<const Component> const& c, double E, double rate,
+        std::false_type, std::false_type)
     {
-        return std::get<1>(dndx[comp])->GetUpperLimit(energy, rate);
+        return std::get<1>(dndx[c])->GetUpperLimit(E, rate);
     }
-    auto CalculateStochasticLoss_impl(std::shared_ptr<const Component> const&,
+
+    double CalculateStochasticLoss_impl(std::shared_ptr<const Component> const&,
         double, double, bool, std::true_type)
     {
         return 1.;
     }
 
 public:
+    double CalculatedNdx(
+        double E, std::shared_ptr<const Component> c = nullptr) final
+    {
+        return CalculatedNdx(E, c, comp_wise {});
+    };
+
+    double CalculateStochasticLoss(
+        std::shared_ptr<const Component> const& c, double E, double rate)
+    {
+        return CalculateStochasticLoss_impl(
+            c, E, rate, comp_wise {}, only_stochastic {});
+    }
+
     inline double CalculatedEdx(double energy) override
     {
         auto loss = 0.;
@@ -315,13 +320,8 @@ public:
     }
 };
 
-template <typename P, typename M>
-using crosssection_t
-    = CrossSection<typename std::decay<P>::type, typename std::decay<M>::type>;
+using cross_t_ptr = std::unique_ptr<CrossSectionBase>;
 
 template <typename P, typename M>
-using cross_t_ptr = std::unique_ptr<crosssection_t<P, M>>;
-
-template <typename P, typename M>
-using crosssection_list_t = std::vector<std::shared_ptr<crosssection_t<P, M>>>;
+using crosssection_list_t = std::vector<std::shared_ptr<CrossSectionBase>>;
 } // namespace PROPOSAL
