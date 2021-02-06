@@ -31,6 +31,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 
 #define COMPONENT_DEC(cls, ATOMS)                                              \
     class cls : public PROPOSAL::Component {                                   \
@@ -61,6 +62,7 @@ public:
     double GetWoodSaxon() const { return wood_saxon_; }
 
     size_t GetHash() const noexcept;
+    static std::unique_ptr<std::map<size_t, Component>> component_map;
 
 protected:
     /*!
@@ -111,6 +113,7 @@ protected:
     double averageNucleonWeight_ = 0; ///< average nucleon weight in a nucleus
                                       ///< [MeV]
     double wood_saxon_ = 0;           ///< Woods-Saxon potential factor
+    size_t hash;
 };
 
 bool operator==(Component const&, Component const&) noexcept;

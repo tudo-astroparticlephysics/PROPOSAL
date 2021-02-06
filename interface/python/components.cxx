@@ -13,6 +13,8 @@ using namespace PROPOSAL;
 void init_components(py::module& m) {
     py::module m_sub = m.def_submodule("component");
 
+    m_sub.def("component_map", []() {return *Component::component_map;});
+
     m_sub.doc() = R"pbdoc(
         You could create a new component or select one of the implemented.
         Components are used to define a medium as part of a sector.
@@ -107,6 +109,9 @@ void init_components(py::module& m) {
         .def_property_readonly("wood_saxon", &Component::GetWoodSaxon,
                                R"pbdoc(
                     Explanation still has to be added.
+                )pbdoc")
+        .def_property_readonly("hash", &Component::GetHash, R"pbdoc(
+                    Hash value of component.
                 )pbdoc");
 
     COMPONENT_DEF(m_sub, Hydrogen)
