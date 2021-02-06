@@ -3,34 +3,41 @@
 #include "PROPOSAL/crosssection/CrossSectionDE2DX/CrossSectionDE2DX.h"
 
 #include <functional>
+#include <memory>
 
 namespace PROPOSAL {
+namespace crosssection {
+    template <typename T> class Parametrization;
+} // namespace crosssection
+class ParticleDef;
+class Medium;
+class Component;
+class EnergyCutSettings;
 class Integral;
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
 namespace detail {
-    std::function<double(Integral&, double)> define_de2dx_integral(
-        crosssection::Parametrization<Medium> const& param,
-        ParticleDef const& p_def, Medium const& target,
-        EnergyCutSettings const& cut);
+    std::function<double(double)> define_de2dx_integral(
+        crosssection::Parametrization<Medium> const&, ParticleDef const&,
+        Medium const&, EnergyCutSettings const&);
 
-    std::function<double(Integral&, double)> define_de2dx_integral(
-        crosssection::Parametrization<Component> const& param,
-        ParticleDef const& p_def, Component const& target,
-        EnergyCutSettings const& cut);
+    std::function<double(double)> define_de2dx_integral(
+        crosssection::Parametrization<Component> const&, ParticleDef const&,
+        Component const&, EnergyCutSettings const&);
 } // namespace detail
-}
+} // namespace PROPOSAL
 
 namespace PROPOSAL {
 class CrossSectionDE2DXIntegral : public CrossSectionDE2DX {
-    std::function<double(Integral&, double)> de2dx_integral;
+    std::function<double(double)> de2dx_integral;
 
 public:
-    template <typename... Args>
-    CrossSectionDE2DXIntegral(Args... args)
-        : CrossSectionDE2DX(args...)
-        , de2dx_integral(detail::define_de2dx_integral(args...))
+    template <typename Param, typename Target>
+    CrossSectionDE2DXIntegral(Param const& param, ParticleDef const& p,
+        Target const& t, EnergyCutSettings const& cut, size_t hash = 0)
+        : CrossSectionDE2DX(hash)
+        , de2dx_integral(detail::define_de2dx_integral(param, p, t, cut))
     {
     }
 
