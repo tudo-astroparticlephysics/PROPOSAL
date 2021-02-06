@@ -3,26 +3,12 @@
 #include <cstddef>
 
 namespace PROPOSAL {
-namespace crosssection {
-    template <typename Target> class Parametrization;
-}
-struct ParticleDef;
-class Medium;
-class Component;
-class EnergyCutSettings;
-} // namespace PROPOSAL
-
-namespace PROPOSAL {
 class CrossSectionDE2DX {
 protected:
     size_t hash;
 
 public:
-    CrossSectionDE2DX(crosssection::Parametrization<Component> const&,
-        ParticleDef const&, Component const&, EnergyCutSettings const&);
-
-    CrossSectionDE2DX(crosssection::Parametrization<Medium> const&,
-        ParticleDef const&, Medium const&, EnergyCutSettings const&);
+    CrossSectionDE2DX(size_t hash);
 
     virtual ~CrossSectionDE2DX() = default;
 
