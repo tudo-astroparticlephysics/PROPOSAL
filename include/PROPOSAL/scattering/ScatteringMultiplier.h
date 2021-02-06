@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/Constants.h"
 
 namespace PROPOSAL {
 class ScatteringMultiplier : public Scattering {

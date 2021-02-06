@@ -19,6 +19,8 @@
 using namespace PROPOSAL;
 using namespace PROPOSAL::Components;
 
+std::unique_ptr<std::map<size_t, Component>> Component::component_map = nullptr;
+
 #define COMPONENT_IMPL(cls, SYMBOL, NUCCHARGE, ATOMICNUM)                      \
     cls::cls(double atomInMolecule)                                            \
         : Component(#SYMBOL, NUCCHARGE, ATOMICNUM, atomInMolecule)             \
@@ -50,6 +52,17 @@ Component::Component(
         wood_saxon_
             = 1.0 - 4.0 * PI * 0.17 * WoodSaxonPotential(r0) / atomicNum_;
     }
+
+    hash = 0;
+    hash_combine(hash, nucCharge_, atomicNum_, atomInMolecule_,
+                 logConstant_, bPrime_, averageNucleonWeight_, wood_saxon_);
+
+    if (not component_map)
+        component_map = std::make_unique<std::map<size_t, Component>>();
+
+    if (component_map->find(hash) == component_map->end())
+        component_map->insert({hash, Component(*this)});
+
 }
 
 namespace PROPOSAL {
@@ -73,6 +86,8 @@ bool operator==(Component const& lhs, Component const& rhs) noexcept
         return false;
     else if (lhs.wood_saxon_ != rhs.wood_saxon_)
         return false;
+    else if (lhs.hash != rhs.hash)
+        return false;
     return true;
 }
 
@@ -90,6 +105,8 @@ std::ostream& operator<<(std::ostream& os, Component const& comp) noexcept
        << "\t\t" << comp.GetNucCharge() << std::endl;
     os << "AverageNucleonWeight:"
        << "\t" << comp.GetAverageNucleonWeight() << std::endl;
+    os << "Hash:"
+       << "\t" << comp.GetHash() << std::endl;
     os << Helper::Centered(60, "");
     return os;
 }
@@ -97,10 +114,7 @@ std::ostream& operator<<(std::ostream& os, Component const& comp) noexcept
 
 size_t Component::GetHash() const noexcept
 {
-    size_t hash_digest = 0;
-    hash_combine(hash_digest, nucCharge_, atomicNum_, atomInMolecule_,
-        logConstant_, bPrime_, averageNucleonWeight_, wood_saxon_);
-    return hash_digest;
+    return hash;
 }
 
 // ------------------------------------------------------------------------- //
