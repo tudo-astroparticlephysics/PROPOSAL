@@ -1,24 +1,17 @@
 #pragma once
 
-#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include <memory>
 #include <spdlog/fwd.h>
 
 namespace PROPOSAL {
 class EnergyCutSettings;
-enum class InteractionType;
+class ParticleDef;
+class Medium;
+class Component;
+namespace crosssection {
+    template <typename T> class Parametrization;
+} // namespace crosssection
 } // namespace PROPOSAL
-
-/* namespace PROPOSAL { */
-/* namespace detail { */
-/*     size_t dEdx_Hash(size_t, crosssection::Parametrization<Medium> const&, */
-/*         ParticleDef const&, Medium const&, EnergyCutSettings const&); */
-
-/*     size_t dEdx_Hash(size_t, crosssection::Parametrization<Component> const&,
- */
-/*         ParticleDef const&, Component const&, EnergyCutSettings const&); */
-/* } // namespace detail */
-/* } // namespace PROPOSAL */
 
 namespace PROPOSAL {
 class CrossSectionDEDX {
@@ -26,8 +19,16 @@ protected:
     size_t hash;
     std::shared_ptr<spdlog::logger> logger;
 
+    CrossSectionDEDX(size_t _hash);
+
 public:
-    CrossSectionDEDX(size_t hash);
+    CrossSectionDEDX(crosssection::Parametrization<Medium> const&,
+        ParticleDef const&, Medium const&, EnergyCutSettings const&,
+        size_t hash = 0);
+
+    CrossSectionDEDX(crosssection::Parametrization<Component> const&,
+        ParticleDef const&, Component const&, EnergyCutSettings const&,
+        size_t hash = 0);
 
     virtual ~CrossSectionDEDX() = default;
 

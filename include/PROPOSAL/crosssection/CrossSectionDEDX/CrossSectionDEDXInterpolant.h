@@ -9,9 +9,6 @@
 #include "CubicInterpolation/CubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
 
-namespace PROPOSAL {
-class EnergyCutSettings;
-} // namespace PROPOSAL
 
 namespace PROPOSAL {
 
@@ -42,7 +39,7 @@ public:
     template <typename Param, typename Target>
     CrossSectionDEDXInterpolant(Param const& param, ParticleDef const& p,
         Target const& t, EnergyCutSettings const& cut, size_t hash = 0)
-        : CrossSectionDEDX(hash)
+        : CrossSectionDEDX(param, p, t, cut, hash)
         , interpolant(build_dedx_def(param, p, t, cut), "/tmp", gen_name())
         , lower_energy_lim(interpolant.GetDefinition().GetAxis().GetLow())
     {

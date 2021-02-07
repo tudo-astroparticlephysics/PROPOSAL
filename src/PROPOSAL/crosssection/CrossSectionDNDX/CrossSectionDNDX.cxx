@@ -27,12 +27,13 @@ CrossSectionDNDX::CrossSectionDNDX(param_medium_t const& param, ParticleDef p,
 }
 
 CrossSectionDNDX::CrossSectionDNDX(param_comp_t const& param, ParticleDef p,
-    Component m, std::shared_ptr<const EnergyCutSettings> cut, size_t hash)
+    Component c, std::shared_ptr<const EnergyCutSettings> cut, size_t hash)
     : CrossSectionDNDX(
-        [ptr = std::shared_ptr<param_comp_t>(param.clone()), p, m](
-            double E) { return ptr->GetKinematicLimits(p, m, E); },
+        [ptr = std::shared_ptr<param_comp_t>(param.clone()), p, c](
+            double E) { return ptr->GetKinematicLimits(p, c, E); },
         cut, hash)
 {
+    hash_combine(hash, c.GetHash());
 }
 
 CrossSectionDNDX::IntegrationLimit CrossSectionDNDX::GetIntegrationLimits(

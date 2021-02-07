@@ -184,13 +184,17 @@ namespace detail {
         return de2dx;
     }
 
+    size_t generate_cross_hash(size_t, std::string, unsigned int,
+        crosssection::Parametrization<Medium> const&, ParticleDef const&,
+        Medium const&, std::shared_ptr<const EnergyCutSettings>);
+
+    size_t generate_cross_hash(size_t, std::string, unsigned int,
+        crosssection::Parametrization<Component> const&, ParticleDef const&,
+        Medium const&, std::shared_ptr<const EnergyCutSettings>);
 }
 
 template <typename comp_wise, typename only_stochastic>
 class CrossSection : public CrossSectionBase {
-    /* using param_t = std::remove_reference_t<std::remove_cv_t<Param>>; */
-    /* using comp_wise = crosssection::is_component_wise<param_t>; */
-    /* using only_stochastic = crosssection::is_only_stochastic<param_t>; */
 
     using comp_ptr = std::shared_ptr<const Component>;
     using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
@@ -208,14 +212,17 @@ protected:
     InteractionType interaction_type;
 
 public:
-    template <typename Param>
+    template <typename Param,
+        typename _name = crosssection::ParametrizationName<Param>,
+        typename _id = crosssection::ParametrizationId<Param>>
     CrossSection(Param param, ParticleDef p, Medium m,
         std::shared_ptr<const EnergyCutSettings> cut, bool interpol,
-        size_t hash = 0)
-        : hash(0)
-        , dndx(detail::build_dndx(comp_wise {}, interpol, param, p, m, cut))
-        , dedx(detail::build_dedx(comp_wise {}, interpol, param, p, m, cut))
-        , de2dx(detail::build_de2dx(comp_wise {}, interpol, param, p, m, cut))
+        size_t _hash = 0)
+        : hash(detail::generate_cross_hash(
+            _hash, _name::value, _id::value, param, p, m, cut))
+        , dndx(detail::build_dndx(comp_wise {}, interpol, param, p, m, cut, hash))
+        , dedx(detail::build_dedx(comp_wise {}, interpol, param, p, m, cut, hash))
+        , de2dx(detail::build_de2dx(comp_wise {}, interpol, param, p, m, cut, hash))
         , lower_energy_lim(param.GetLowerEnergyLim(p))
         , interaction_type(static_cast<InteractionType>(
               crosssection::ParametrizationId<Param>::value))

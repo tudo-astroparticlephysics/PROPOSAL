@@ -41,7 +41,7 @@ public:
     template <typename Param, typename Target>
     CrossSectionDEDXIntegral(Param const& param, ParticleDef const& p,
         Target const& t, EnergyCutSettings const& cut, size_t hash = 0)
-        : CrossSectionDEDX(hash)
+        : CrossSectionDEDX(param, p, t, cut, hash)
         , dedx_integral(detail::define_dedx_integral(param, p, t, cut))
     {
     }

@@ -1,14 +1,34 @@
 #pragma once
 
-#include <cstddef>
+#include <memory>
+#include <spdlog/fwd.h>
+
+namespace PROPOSAL {
+class EnergyCutSettings;
+class ParticleDef;
+class Medium;
+class Component;
+namespace crosssection {
+    template <typename T> class Parametrization;
+} // namespace crosssection
+} // namespace PROPOSAL
 
 namespace PROPOSAL {
 class CrossSectionDE2DX {
 protected:
     size_t hash;
+    std::shared_ptr<spdlog::logger> logger;
+
+    CrossSectionDE2DX(size_t _hash);
 
 public:
-    CrossSectionDE2DX(size_t hash);
+    CrossSectionDE2DX(crosssection::Parametrization<Medium> const&,
+        ParticleDef const&, Medium const&, EnergyCutSettings const&,
+        size_t hash = 0);
+
+    CrossSectionDE2DX(crosssection::Parametrization<Component> const&,
+        ParticleDef const&, Component const&, EnergyCutSettings const&,
+        size_t hash = 0);
 
     virtual ~CrossSectionDE2DX() = default;
 

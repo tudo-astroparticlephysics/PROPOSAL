@@ -36,7 +36,7 @@ public:
     template <typename Param, typename Target>
     CrossSectionDE2DXIntegral(Param const& param, ParticleDef const& p,
         Target const& t, EnergyCutSettings const& cut, size_t hash = 0)
-        : CrossSectionDE2DX(hash)
+        : CrossSectionDE2DX(param, p, t, cut, hash)
         , de2dx_integral(detail::define_de2dx_integral(param, p, t, cut))
     {
     }

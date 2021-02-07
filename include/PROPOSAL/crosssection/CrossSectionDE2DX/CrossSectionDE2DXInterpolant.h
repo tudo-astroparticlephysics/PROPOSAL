@@ -39,7 +39,7 @@ public:
     template <typename Param, typename Target>
     CrossSectionDE2DXInterpolant(Param const& param, ParticleDef const& p,
         Target const& t, EnergyCutSettings const& cut, size_t hash = 0)
-        : CrossSectionDE2DX(hash)
+        : CrossSectionDE2DX(param, p, t, cut, hash)
         , interpolant(build_de2dx_def(param, p, t, cut), "/tmp", gen_name())
     {
     }
