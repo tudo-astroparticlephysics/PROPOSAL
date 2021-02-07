@@ -191,6 +191,9 @@ namespace detail {
     size_t generate_cross_hash(size_t, std::string, unsigned int,
         crosssection::Parametrization<Component> const&, ParticleDef const&,
         Medium const&, std::shared_ptr<const EnergyCutSettings>);
+
+    double calculate_lower_energy_lim(
+        std::vector<std::tuple<double, std::unique_ptr<CrossSectionDEDX>>>*);
 }
 
 template <typename comp_wise, typename only_stochastic>
@@ -220,10 +223,13 @@ public:
         size_t _hash = 0)
         : hash(detail::generate_cross_hash(
             _hash, _name::value, _id::value, param, p, m, cut))
-        , dndx(detail::build_dndx(comp_wise {}, interpol, param, p, m, cut, hash))
-        , dedx(detail::build_dedx(comp_wise {}, interpol, param, p, m, cut, hash))
-        , de2dx(detail::build_de2dx(comp_wise {}, interpol, param, p, m, cut, hash))
-        , lower_energy_lim(param.GetLowerEnergyLim(p))
+        , dndx(detail::build_dndx(
+              comp_wise {}, interpol, param, p, m, cut, hash))
+        , dedx(detail::build_dedx(
+              comp_wise {}, interpol, param, p, m, cut, hash))
+        , de2dx(detail::build_de2dx(
+              comp_wise {}, interpol, param, p, m, cut, hash))
+        , lower_energy_lim(detail::calculate_lower_energy_lim(dedx.get()))
         , interaction_type(static_cast<InteractionType>(
               crosssection::ParametrizationId<Param>::value))
     {

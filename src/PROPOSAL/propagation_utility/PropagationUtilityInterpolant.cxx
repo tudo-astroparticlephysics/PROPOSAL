@@ -3,9 +3,9 @@
 #include <cmath>
 #include <functional>
 
-#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-#include "PROPOSAL/Constants.h"
 #include "CubicInterpolation/Interpolant.h"
+#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
 using namespace PROPOSAL;
 using Helper::InitializeInterpolation;
@@ -13,7 +13,7 @@ using Helper::InitializeInterpolation;
 UtilityInterpolant::UtilityInterpolant(
     std::function<double(double)> f, double lim, size_t hash)
     : UtilityIntegral(f, lim, hash)
-       , lower_lim(lim)
+    , lower_lim(lim)
     , interpolant_(nullptr)
 {
 }
@@ -51,8 +51,8 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
     assert(rnd >= 0);
 
     auto integrated_to_upper = interpolant_->evaluate(upper_limit);
-    auto x_guess
-        = cubic_splines::find_parameter(*interpolant_, rnd, integrated_to_upper - rnd);
+    auto x_guess = cubic_splines::find_parameter(
+        *interpolant_, rnd, integrated_to_upper - rnd);
 
     assert(integrated_to_upper >= rnd
         or integrated_to_upper < 0); // searched Energy is below lower_lim

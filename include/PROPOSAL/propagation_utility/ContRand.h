@@ -1,11 +1,11 @@
 #pragma once
 
-#include <vector>
 #include "PROPOSAL/math/InterpolantBuilder.h"
+#include <vector>
 
 namespace PROPOSAL {
-    class Displacement;
-    struct CrossSectionBase;
+class Displacement;
+struct CrossSectionBase;
 }
 
 namespace PROPOSAL {
@@ -18,11 +18,11 @@ struct ContRand {
 
     crossbase_list_t cross_list;
 
-    template <typename Cross>
-    ContRand(std::shared_ptr<Displacement> _disp, Cross&& cross)
+    ContRand(std::shared_ptr<Displacement> _disp,
+        std::vector<std::shared_ptr<CrossSectionBase>> const& cross)
         : disp(_disp)
         , hash(0)
-        , cross_list(std::begin(cross), std::end(cross))
+        , cross_list(cross)
     {
         CalculateHash();
     }

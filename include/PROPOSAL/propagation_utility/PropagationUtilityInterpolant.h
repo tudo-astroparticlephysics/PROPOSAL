@@ -28,10 +28,10 @@
 
 #pragma once
 
-#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-#include "PROPOSAL/methods.h"
 #include "CubicInterpolation/CubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
+#include "PROPOSAL/methods.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 
 #include <functional>
 #include <memory>
@@ -58,8 +58,8 @@ class UtilityInterpolant : public UtilityIntegral {
 public:
     UtilityInterpolant(std::function<double(double)>, double, size_t);
 
-    template <typename T>
-    void BuildTables(const std::string, T&& def, bool reverse = false)
+    template <typename Def>
+    void BuildTables(const std::string prefix, Def&& def, bool reverse = false)
     {
         auto reference_x = lower_lim;
         if (reverse)
@@ -74,11 +74,11 @@ public:
         def.axis = std::make_unique<cubic_splines::ExpAxis<double>>(
             lower_lim, 1e14, (size_t)100);
 
-        auto filename = std::string("disp") + std::to_string(this->hash)
-            + std::string(".txt");
+        auto filename
+            = prefix + std::to_string(this->hash) + std::string(".txt");
 
         interpolant_
-            = std::make_shared<interpolant_t>(std::move(def), "tmp", filename);
+            = std::make_shared<interpolant_t>(std::move(def), "/tmp", filename);
     }
 
     double Calculate(double, double);

@@ -4,18 +4,20 @@
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 namespace PROPOSAL {
+
 template <class T> class ContRandBuilder : public ContRand {
     T cont_rand_integral;
 
-    void build_tables() {};
+    void build_tables();
 
 public:
-    template <typename Cross>
-    ContRandBuilder(std::shared_ptr<Displacement> disp, Cross&& cross)
-        : ContRand(disp, std::forward<Cross>(cross))
+    ContRandBuilder(std::shared_ptr<Displacement> disp,
+        std::vector<std::shared_ptr<CrossSectionBase>> const& cross)
+        : ContRand(disp, cross)
         , cont_rand_integral([this](double E) { return FunctionToIntegral(E); },
               disp->GetLowerLim(), this->GetHash())
     {
+        build_tables();
     }
 
     inline double Variance(double initial_energy, double final_energy) final
@@ -33,23 +35,11 @@ public:
     }
 };
 
-template <typename T>
-auto make_contrand(
-    std::shared_ptr<Displacement> disp, T&& cross, bool interpolate = true)
-{
-    auto cont_rand = std::unique_ptr<ContRand>();
-    if (interpolate)
-        cont_rand = std::make_unique<ContRandBuilder<UtilityInterpolant>>(
-            disp, std::forward<T>(cross));
-    else
-        cont_rand = std::make_unique<ContRandBuilder<UtilityIntegral>>(
-            disp, std::forward<T>(cross));
-    return cont_rand;
-}
+std::unique_ptr<ContRand> make_contrand(std::shared_ptr<Displacement>,
+    std::vector<std::shared_ptr<CrossSectionBase>> const&,
+    bool interpolate = true);
 
-template <typename T> auto make_contrand(T&& cross, bool interpolate = true)
-{
-    auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
-    return make_contrand(disp, cross, interpolate);
-}
+std::unique_ptr<ContRand> make_contrand(
+    std::vector<std::shared_ptr<CrossSectionBase>> const&,
+    bool interpolate = true);
 } // namespace PROPOSAL

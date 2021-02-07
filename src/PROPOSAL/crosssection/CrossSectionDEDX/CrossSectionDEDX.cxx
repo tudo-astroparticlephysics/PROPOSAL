@@ -1,10 +1,10 @@
 #include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDX.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Logging.h"
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
 using namespace PROPOSAL;
@@ -19,22 +19,25 @@ namespace detail {
 } // namespace detail
 } // namespace PROPOSAL
 
-CrossSectionDEDX::CrossSectionDEDX(size_t _hash)
+CrossSectionDEDX::CrossSectionDEDX(double _lower_energy_lim, size_t _hash)
     : hash(_hash)
     , logger(Logging::Get("CrossSection.DEDX"))
+    , lower_energy_lim(_lower_energy_lim)
 {
     logger->info("Creating dEdx.");
 }
 
-CrossSectionDEDX::CrossSectionDEDX(crosssection::Parametrization<Medium> const&,
-    ParticleDef const&, Medium const&, EnergyCutSettings const&, size_t hash)
-    : CrossSectionDEDX(hash)
+CrossSectionDEDX::CrossSectionDEDX(
+    crosssection::Parametrization<Medium> const& param, ParticleDef const& p,
+    Medium const&, EnergyCutSettings const&, size_t hash)
+    : CrossSectionDEDX(param.GetLowerEnergyLim(p), hash)
 {
 }
 
 CrossSectionDEDX::CrossSectionDEDX(
-    crosssection::Parametrization<Component> const&, ParticleDef const&,
+    crosssection::Parametrization<Component> const& param, ParticleDef const& p,
     Component const& c, EnergyCutSettings const&, size_t hash)
-    : CrossSectionDEDX(detail::generate_dedx_hash(hash, c))
+    : CrossSectionDEDX(
+        param.GetLowerEnergyLim(p), detail::generate_dedx_hash(hash, c))
 {
 }

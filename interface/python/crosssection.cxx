@@ -32,7 +32,7 @@ template <typename T> void build_crosssection(py::module& m_sub)
         "make_crosssection",
         [](T& param, ParticleDef& p, Medium& m,
             std::shared_ptr<const EnergyCutSettings> c, bool i) {
-            return std::shared_ptr<CrossSection<ParticleDef, Medium>>(
+            return std::shared_ptr<CrossSectionBase>(
                 make_crosssection(param, p, m, c, i));
         },
         py::arg("parametrization"), py::arg("particle_def"), py::arg("target"),
@@ -54,18 +54,17 @@ template <typename T> void build_std_crosssection(py::module& m_sub)
 
 void init_crosssection(py::module& m)
 {
-    using CrossSectionContainer = CrossSection<ParticleDef, Medium>;
     py::module m_sub = m.def_submodule("crosssection");
 
     py::class_<CrossSectionBase, std::shared_ptr<CrossSectionBase>>(
-        m_sub, "CrossSectionBase")
+        m_sub, "CrossSection")
         .def_property_readonly(
             "lower_energy_limit", &CrossSectionBase::GetLowerEnergyLim)
         .def_property_readonly("type", &CrossSectionBase::GetInteractionType)
         .def_property_readonly("hash", &CrossSectionBase::GetHash)
         .def_property_readonly("targets", &CrossSectionBase::GetTargets)
         .def("calculate_dEdx",
-            py::vectorize(&CrossSectionContainer::CalculatedEdx),
+            py::vectorize(&CrossSectionBase::CalculatedEdx),
             py::arg("energy"),
             R"pbdoc(
 
@@ -85,7 +84,7 @@ void init_crosssection(py::module& m)
 
                 )pbdoc")
         .def("calculate_dE2dx",
-            py::vectorize(&CrossSectionContainer::CalculatedE2dx),
+            py::vectorize(&CrossSectionBase::CalculatedE2dx),
             py::arg("energy"),
             R"pbdoc(
 
@@ -106,7 +105,8 @@ void init_crosssection(py::module& m)
             energy (float): energy in MeV
 
             )pbdoc")
-        .def("calculate_dNdx", py::vectorize(&CrossSectionContainer::CalculatedNdx),
+        .def("calculate_dNdx",
+            py::vectorize(&CrossSectionBase::CalculatedNdx),
             py::arg("energy"), py::arg("component") = nullptr,
             R"pbdoc(
 
@@ -129,7 +129,7 @@ void init_crosssection(py::module& m)
 
             )pbdoc")
         .def("calculate_stochastic_loss",
-            &CrossSectionContainer::CalculateStochasticLoss,
+            &CrossSectionBase::CalculateStochasticLoss,
             py::arg("component"), py::arg("energy"), py::arg("rate"),
             R"pbdoc(
 
@@ -151,59 +151,59 @@ void init_crosssection(py::module& m)
         to determine the component of the current medium for which the
         stochatic energy loss is calculated.)pbdoc");
 
-    py::class_<CrossSectionContainer, CrossSectionBase,
-        std::shared_ptr<CrossSectionContainer>>(m_sub, "CrossSection",
-        R"pbdoc(
+    /* py::class_<CrossSectionBase, CrossSectionBase, */
+    /*     std::shared_ptr<CrossSectionBase>>(m_sub, "CrossSection", */
+    /*     R"pbdoc( */
 
-            Virtual class for crosssections. The crosssection class provides
-            all mathematical methods to process the theoretical, differential
-            crosssections that are given by the parametrizations. A cross
-            section class can be initialized with the following parameters
+    /*         Virtual class for crosssections. The crosssection class provides */
+    /*         all mathematical methods to process the theoretical, differential */
+    /*         crosssections that are given by the parametrizations. A cross */
+    /*         section class can be initialized with the following parameters */
 
-            Args:
-                param (:meth:`~proposal.parametrization`): parametrization for
-                    the crosssection, including the chosen theoretical model
-                interpolation_def (:meth:`~proposal.InterpolationDef`): Only
-                    needed by Interpolant parametrizations. Includes settings
-                    for the interpolation
+    /*         Args: */
+    /*             param (:meth:`~proposal.parametrization`): parametrization for */
+    /*                 the crosssection, including the chosen theoretical model */
+    /*             interpolation_def (:meth:`~proposal.InterpolationDef`): Only */
+    /*                 needed by Interpolant parametrizations. Includes settings */
+    /*                 for the interpolation */
 
-            The crosssection class can either work with interpolation tables
-            or with exact intergration for every single calculation.  Since the
-            usage of interpolation tables can improve the speed of the
-            propagation by several orders of magnitude (with neglible decline
-            in accuracy) it is highly recommended to use the interpolation
-            methods.
+    /*         The crosssection class can either work with interpolation tables */
+    /*         or with exact intergration for every single calculation.  Since the */
+    /*         usage of interpolation tables can improve the speed of the */
+    /*         propagation by several orders of magnitude (with neglible decline */
+    /*         in accuracy) it is highly recommended to use the interpolation */
+    /*         methods. */
 
-            There are specific crosssection classes for every interaction that
-            can be used.
+    /*         There are specific crosssection classes for every interaction that */
+    /*         can be used. */
 
-            For propagation of massive leptons, there are the following
-            crosssections:
+    /*         For propagation of massive leptons, there are the following */
+    /*         crosssections: */
 
-            * AnnihilationIntegral / AnnihilationInterpolant
-            * BremsIntegral / BremsInterpolant
-            * EpairIntegral / EpairInterpolant
-            * IonizIntegral / IonizInterpolant
-            * MupairIntegral / MupairInterpolant
-            * PhotoIntegral / PhotoInterpolant
-            * WeakIntegral / WeakInterpolant
+    /*         * AnnihilationIntegral / AnnihilationInterpolant */
+    /*         * BremsIntegral / BremsInterpolant */
+    /*         * EpairIntegral / EpairInterpolant */
+    /*         * IonizIntegral / IonizInterpolant */
+    /*         * MupairIntegral / MupairInterpolant */
+    /*         * PhotoIntegral / PhotoInterpolant */
+    /*         * WeakIntegral / WeakInterpolant */
 
-            For propagation of photons, there are the following crosssections:
+    /*         For propagation of photons, there are the following crosssections: */
 
-            * ComptonIntegral / ComptonInterpolant
-            * PhotoPairIntegral / PhotoPairInterpolant
+    /*         * ComptonIntegral / ComptonInterpolant */
+    /*         * PhotoPairIntegral / PhotoPairInterpolant */
 
-            Example:
-                To create a bremsstrahlung CrossSection
+    /*         Example: */
+    /*             To create a bremsstrahlung CrossSection */
 
-                >>> mu = proposal.particle.MuMinusDef.get()
-                >>> medium = proposal.medium.StandardRock(1.0)
-                >>> cuts = proposal.EnergyCutSettings(-1, -1)
-                >>> interpol = proposal.InterpolationDef
-                >>> param = proposal.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
-                >>> cross = proposal.crosssection.BremsInterpolant(param, interpol)
-                >>> cross.calculate_dEdx(1e6) # exmaple usage of the created crosssection class...
-                )pbdoc");
+    /*             >>> mu = proposal.particle.MuMinusDef.get() */
+    /*             >>> medium = proposal.medium.StandardRock(1.0) */
+    /*             >>> cuts = proposal.EnergyCutSettings(-1, -1) */
+    /*             >>> interpol = proposal.InterpolationDef */
+    /*             >>> param = proposal.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False) */
+    /*             >>> cross = proposal.crosssection.BremsInterpolant(param, interpol) */
+    /*             >>> cross.calculate_dEdx(1e6) # exmaple usage of the created crosssection class... */
+    /*             )pbdoc"); */
     /* .def("__str__", &py_print<CrossSectionContainer>) */
 
     build_crosssection<crosssection::AnnihilationHeitler>(m_sub);

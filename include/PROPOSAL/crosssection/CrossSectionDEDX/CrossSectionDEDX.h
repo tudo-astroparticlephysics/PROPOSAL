@@ -19,7 +19,9 @@ protected:
     size_t hash;
     std::shared_ptr<spdlog::logger> logger;
 
-    CrossSectionDEDX(size_t _hash);
+    double lower_energy_lim;
+
+    CrossSectionDEDX(double lower_energy_lim, size_t _hash);
 
 public:
     CrossSectionDEDX(crosssection::Parametrization<Medium> const&,
@@ -35,5 +37,7 @@ public:
     virtual double Calculate(double energy) const = 0;
 
     size_t GetHash() const noexcept { return hash; }
+
+    double GetLowerEnergyLim() const { return lower_energy_lim; }
 };
 } // namespace PROPOSAL

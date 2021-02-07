@@ -9,7 +9,6 @@
 #include "CubicInterpolation/CubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
 
-
 namespace PROPOSAL {
 
 double transform_relativ_loss(double v_cut, double v_max, double v);
@@ -31,7 +30,6 @@ auto build_dedx_def(T1 const& param, ParticleDef const& p, Args... args)
 
 class CrossSectionDEDXInterpolant : public CrossSectionDEDX {
     cubic_splines::Interpolant<cubic_splines::CubicSplines<double>> interpolant;
-    double lower_energy_lim;
 
     std::string gen_name();
 
@@ -41,8 +39,8 @@ public:
         Target const& t, EnergyCutSettings const& cut, size_t hash = 0)
         : CrossSectionDEDX(param, p, t, cut, hash)
         , interpolant(build_dedx_def(param, p, t, cut), "/tmp", gen_name())
-        , lower_energy_lim(interpolant.GetDefinition().GetAxis().GetLow())
     {
+        lower_energy_lim = interpolant.GetDefinition().GetAxis().GetLow();
     }
 
     double Calculate(double E) const final;

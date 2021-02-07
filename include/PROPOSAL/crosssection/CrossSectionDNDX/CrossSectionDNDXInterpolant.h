@@ -41,8 +41,6 @@ class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
     cubic_splines::Interpolant<cubic_splines::BicubicSplines<double>>
         interpolant;
 
-    double lower_energy_lim;
-
     std::string gen_name()
     {
         return std::string("dndx_") + std::to_string(GetHash())
@@ -56,9 +54,9 @@ public:
         size_t hash = 0)
         : CrossSectionDNDX(param, p, t, cut, hash)
         , interpolant(build_dndx_def(param, p, t, cut), "/tmp", gen_name())
-        , lower_energy_lim(
-              interpolant.GetDefinition().GetAxis().at(0)->GetLow())
     {
+        lower_energy_lim
+            = interpolant.GetDefinition().GetAxis().at(0)->GetLow();
     }
 
     double Calculate(double E) final;

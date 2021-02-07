@@ -18,12 +18,13 @@ class CrossSectionDNDX {
 protected:
     size_t hash;
     std::shared_ptr<spdlog::logger> logger;
+    double lower_energy_lim;
 
 private:
     lim_func_t kinematic_limits;
     std::shared_ptr<const EnergyCutSettings> cut;
 
-    CrossSectionDNDX(lim_func_t kin_lim,
+    CrossSectionDNDX(lim_func_t kin_lim, double lower_energy_lim,
         std::shared_ptr<const EnergyCutSettings> cut, size_t hash);
 
 public:
@@ -43,7 +44,7 @@ public:
         double min, max;
     };
     IntegrationLimit GetIntegrationLimits(double energy) const;
-
+    double GetLowerEnergyLim() const;
     size_t GetHash() const noexcept { return hash; }
 };
 } // namespace PROPOSAL

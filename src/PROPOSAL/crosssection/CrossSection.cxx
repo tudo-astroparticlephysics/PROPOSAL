@@ -33,5 +33,20 @@ namespace detail {
     {
         return _generate_cross_hash(hash, name, id, param, p, m, cut);
     }
+
+    double calculate_lower_energy_lim(
+        std::vector<std::tuple<double, std::unique_ptr<CrossSectionDEDX>>>*
+            dedx_ptr)
+    {
+        if (not dedx_ptr)
+            return 0.;
+        auto min = std::numeric_limits<double>::infinity();
+        for (auto& it : *dedx_ptr) {
+            auto n = std::get<1>(it)->GetLowerEnergyLim();
+            std::cout << n << std::endl;
+            min = (min < n) ? min : n;
+        }
+        return min;
+    }
 } // namespace detail
 } // namespace PROPOSAL

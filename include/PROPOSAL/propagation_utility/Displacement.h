@@ -26,6 +26,7 @@ public:
         , lower_lim(CrossSectionVector::GetLowerLim(cross))
         , hash(CrossSectionVector::GetHash(cross))
     {
+        std::cout << "lower_lim disp: " << lower_lim << std::endl;
         if (cross.size() < 1)
             throw std::invalid_argument(
                 "At least one crosssection is required.");

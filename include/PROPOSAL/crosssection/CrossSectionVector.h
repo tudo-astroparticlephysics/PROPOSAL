@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 #include <algorithm>
 #include <type_traits>
