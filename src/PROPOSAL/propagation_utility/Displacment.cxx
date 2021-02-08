@@ -1,9 +1,7 @@
-#include "PROPOSAL/propagation_utility/Displacement.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/propagation_utility/Displacement.h"
 
 using namespace PROPOSAL;
-
-Interpolant1DBuilder::Definition Displacement::interpol_def = { 1000 };
 
 double Displacement::FunctionToIntegral(double energy)
 {
@@ -11,5 +9,5 @@ double Displacement::FunctionToIntegral(double energy)
     for (auto& cr : cross_list)
         result += cr->CalculatedEdx(energy);
 
-    return -1.0 / result;
+    return (result > 0) ? -1.0 / result : 0.;
 }

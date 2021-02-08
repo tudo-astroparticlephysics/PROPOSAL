@@ -135,8 +135,7 @@ PYBIND11_MODULE(proposal, m)
     py::class_<Displacement, std::shared_ptr<Displacement>>(m, "Displacement")
         .def("solve_track_integral", py::vectorize(&Displacement::SolveTrackIntegral), py::arg("upper_lim"), py::arg("lower_lim"))
         .def("upper_limit_track_integral", py::vectorize(&Displacement::UpperLimitTrackIntegral), py::arg("energy"), py::arg("distance"))
-        .def("function_to_integral", py::vectorize(&Displacement::FunctionToIntegral), py::arg("energy"))
-        .def_readwrite_static("interpol_def", &Displacement::interpol_def);
+        .def("function_to_integral", py::vectorize(&Displacement::FunctionToIntegral), py::arg("energy"));
 
     m.def("make_displacement", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
             return shared_ptr<Displacement>(make_displacement(cross, interpolate));

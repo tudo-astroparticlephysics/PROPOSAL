@@ -1,7 +1,6 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/CrossSectionVector.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
 #include <vector>
 
 namespace PROPOSAL {
@@ -32,8 +31,6 @@ public:
                 "At least one crosssection is required.");
     }
     virtual ~Displacement() = default;
-
-    static Interpolant1DBuilder::Definition interpol_def;
 
     double FunctionToIntegral(double);
     virtual double SolveTrackIntegral(double, double) = 0;
