@@ -1,25 +1,25 @@
 
-#include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/version.h"
-#include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/propagation_utility/Interaction.h"
-#include "PROPOSAL/Propagator.h"
-#include "PROPOSAL/density_distr/density_distr.h"
-#include "PROPOSAL/propagation_utility/InteractionBuilder.h"
-#include "PROPOSAL/propagation_utility/ContRandBuilder.h"
-#include "PROPOSAL/scattering/Scattering.h"
-#include "PROPOSAL/propagation_utility/TimeBuilder.h"
-#include "PROPOSAL/propagation_utility/DecayBuilder.h"
-#include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "pyBindings.h"
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/density_distr/density_distr.h"
+#include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/propagation_utility/ContRandBuilder.h"
+#include "PROPOSAL/propagation_utility/DecayBuilder.h"
+#include "PROPOSAL/propagation_utility/Interaction.h"
+#include "PROPOSAL/propagation_utility/InteractionBuilder.h"
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/propagation_utility/TimeBuilder.h"
+#include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/version.h"
 #include <spdlog/spdlog.h>
-#include "pyBindings.h"
 
 namespace py = pybind11;
 using namespace PROPOSAL;
 using std::shared_ptr;
-
 
 void init_components(py::module& m);
 void init_medium(py::module& m);
@@ -56,7 +56,7 @@ PYBIND11_MODULE(proposal, m)
     py::class_<Vector3D, std::shared_ptr<Vector3D>>(m, "Vector3D")
         .def(py::init<>())
         .def(py::init<double, double, double>(), py::arg("x"), py::arg("y"),
-                py::arg("z"))
+            py::arg("z"))
         .def(py::init<const Vector3D&>())
         .def("__str__", &py_print<Vector3D>)
         .def(py::self + py::self)
@@ -76,13 +76,13 @@ PYBIND11_MODULE(proposal, m)
         .def("normalize", &Vector3D::normalise)
         .def("magnitude", &Vector3D::magnitude)
         .def("cartesian_from_spherical",
-                &Vector3D::CalculateCartesianFromSpherical)
+            &Vector3D::CalculateCartesianFromSpherical)
         .def("spherical_from_cartesian",
-                &Vector3D::CalculateSphericalCoordinates);
+            &Vector3D::CalculateSphericalCoordinates);
 
     py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings>>(m,
-            "EnergyCutSettings",
-            R"pbdoc(
+        "EnergyCutSettings",
+        R"pbdoc(
             Settings for the lower integration limit.
             Losses below the cut will be handeled continously and the
             other stochasticaly.
@@ -91,8 +91,9 @@ PYBIND11_MODULE(proposal, m)
 
                 \text{cut} = \begin{cases} e_\text{cut} & E * v_\text{cut} \geq e_\text{cut} \\ v_\text{cut} & \, \text{else} \end{cases}
         )pbdoc")
-        .def(py::init<double, double, bool>(), py::arg("ecut"), py::arg("vcut"), py::arg("continuous_random"),
-                R"pbdoc(
+        .def(py::init<double, double, bool>(), py::arg("ecut"), py::arg("vcut"),
+            py::arg("continuous_random"),
+            R"pbdoc(
                     Set the cut values manualy.
 
                     Args:
@@ -100,94 +101,120 @@ PYBIND11_MODULE(proposal, m)
                         vcut (float): relativ energy cut.
                 )pbdoc")
         .def(py::init<const EnergyCutSettings&>())
-                                      .def("__str__", &py_print<EnergyCutSettings>)
-                                      .def_property_readonly("ecut", &EnergyCutSettings::GetEcut,
-                                              R"pbdoc(
+        .def("__str__", &py_print<EnergyCutSettings>)
+        .def_property_readonly("ecut", &EnergyCutSettings::GetEcut,
+            R"pbdoc(
                     Return set e_cut.
 
                     Returns:
                         float: e_cut
                 )pbdoc")
-                                      .def_property_readonly("vcut", &EnergyCutSettings::GetVcut,
-                                              R"pbdoc(
+        .def_property_readonly("vcut", &EnergyCutSettings::GetVcut,
+            R"pbdoc(
                     Return set v_cut.
 
                     Returns:
                         float: v_cut
                 )pbdoc")
-                                          .def("cut", overload_cast_<double>()(&EnergyCutSettings::GetCut, py::const_))
-                                          .def("cut", overload_cast_<const crosssection::KinematicLimits&, double>()(&EnergyCutSettings::GetCut, py::const_));
+        .def("cut",
+            overload_cast_<double>()(&EnergyCutSettings::GetCut, py::const_))
+        .def("cut",
+            overload_cast_<const crosssection::KinematicLimits&, double>()(
+                &EnergyCutSettings::GetCut, py::const_));
 
     py::class_<Interaction, std::shared_ptr<Interaction>>(m, "Interaction")
-        .def("energy_interaction", py::vectorize(&Interaction::EnergyInteraction),
-                py::arg("energy"), py::arg("random number"))
+        .def("energy_interaction",
+            py::vectorize(&Interaction::EnergyInteraction), py::arg("energy"),
+            py::arg("random number"))
         .def("rates", &Interaction::Rates, py::arg("energy"))
-        .def("sample_loss", &Interaction::SampleLoss,
-                py::arg("energy"), py::arg("rates"), py::arg("random number"))
+        .def("sample_loss", &Interaction::SampleLoss, py::arg("energy"),
+            py::arg("rates"), py::arg("random number"))
         .def("mean_free_path", py::vectorize(&Interaction::MeanFreePath),
-                py::arg("energy"))
+            py::arg("energy"))
         .def_readwrite_static("interpol_def", &Interaction::interpol_def);
 
-    m.def("make_interaction", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
-            return shared_ptr<Interaction>(make_interaction(cross, interpolate));
-            });
+    m.def("make_interaction",
+        [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate) {
+            return shared_ptr<Interaction>(
+                make_interaction(cross, interpolate));
+        });
 
     py::class_<Displacement, std::shared_ptr<Displacement>>(m, "Displacement")
-        .def("solve_track_integral", py::vectorize(&Displacement::SolveTrackIntegral), py::arg("upper_lim"), py::arg("lower_lim"))
-        .def("upper_limit_track_integral", py::vectorize(&Displacement::UpperLimitTrackIntegral), py::arg("energy"), py::arg("distance"))
-        .def("function_to_integral", py::vectorize(&Displacement::FunctionToIntegral), py::arg("energy"));
+        .def("solve_track_integral",
+            py::vectorize(&Displacement::SolveTrackIntegral),
+            py::arg("upper_lim"), py::arg("lower_lim"))
+        .def("upper_limit_track_integral",
+            py::vectorize(&Displacement::UpperLimitTrackIntegral),
+            py::arg("energy"), py::arg("distance"))
+        .def("function_to_integral",
+            py::vectorize(&Displacement::FunctionToIntegral),
+            py::arg("energy"));
 
-    m.def("make_displacement", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
-            return shared_ptr<Displacement>(make_displacement(cross, interpolate));
-            });
+    m.def("make_displacement",
+        [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate) {
+            return shared_ptr<Displacement>(
+                make_displacement(cross, interpolate));
+        });
 
+    py::class_<InterpolationSettings, std::shared_ptr<InterpolationSettings>>(
+        m, "InterpolationSettings")
+        .def_readwrite_static(
+            "tables_path", &InterpolationSettings::TABLES_PATH)
+        .def_readwrite_static(
+            "upper_energy_lim", &InterpolationSettings::UPPER_ENERGY_LIM)
+        .def_readwrite_static("nodes_dedx", &InterpolationSettings::NODES_DEDX)
+        .def_readwrite_static(
+            "nodes_dndx_e", &InterpolationSettings::NODES_DNDX_E)
+        .def_readwrite_static(
+            "nodes_dndx_v", &InterpolationSettings::NODES_DNDX_V);
 
-    py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m,
-            "InterpolationDef",
-            R"pbdoc(
-                The set standard values have been optimized for performance
-                and accuracy. They should not be changed any further
-                without a good reason.
-                Example:
-                    For speed savings it makes sense to specify a path to
-                    the tables, to reuse build tables if possible.
-                    Sometimes it is usefull to look in the tables for a check.
-                    To do this binary tables can be diabled.
-                    >>> interpolDef = pp.InterpolationDef()
-                    >>> interpolDef.do_binary_tables = False
-                    >>> interpolDef.path_to_tables = "./custom/table/path"
-                    >>> interpolDef.path_to_tables_readonly = "./custom/table/path"
-            )pbdoc")
-        .def(py::init<>())
-        .def_readwrite_static("path_to_tables",
-                &InterpolationDef::path_to_tables,
-                R"pbdoc(
-                Path where tables can be written from memory to disk to
-                reuse it if possible.
-            )pbdoc")
-        .def_readwrite_static("path_to_tables_readonly",
-                &InterpolationDef::path_to_tables_readonly,
-                R"pbdoc(
-                Path where tables can be read from disk to avoid to rebuild
-                it.
-            )pbdoc")
-        .def_readwrite_static("do_binary_tables", &InterpolationDef::do_binary_tables,
-                R"pbdoc(
-                Should binary tables be used to store the data.
-                This will increase performance, but are not readable for a
-                crosscheck by human. Default: xxx
-            )pbdoc")
-        .def_readwrite_static("just_use_readonly_path",
-                &InterpolationDef::just_use_readonly_path,
-                R"pbdoc(
-                Just the readonly path to the interpolation tables is used.
-                This will stop the program, if the required table is not
-                in the readonly path. The (writable) path_to_tables will be
-                ignored. Default: xxx
-            )pbdoc");
+    /* py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m, */
+    /*     "InterpolationDef", */
+    /*     R"pbdoc( */
+    /*             The set standard values have been optimized for performance */
+    /*             and accuracy. They should not be changed any further */
+    /*             without a good reason. */
+    /*             Example: */
+    /*                 For speed savings it makes sense to specify a path to */
+    /*                 the tables, to reuse build tables if possible. */
+    /*                 Sometimes it is usefull to look in the tables for a check. */
+    /*                 To do this binary tables can be diabled. */
+    /*                 >>> interpolDef = pp.InterpolationDef() */
+    /*                 >>> interpolDef.do_binary_tables = False */
+    /*                 >>> interpolDef.path_to_tables = "./custom/table/path" */
+    /*                 >>> interpolDef.path_to_tables_readonly = "./custom/table/path" */
+    /*         )pbdoc") */
+    /*     .def(py::init<>()) */
+    /*     .def_readwrite_static("path_to_tables", */
+    /*         &InterpolationDef::path_to_tables, */
+    /*         R"pbdoc( */
+    /*             Path where tables can be written from memory to disk to */
+    /*             reuse it if possible. */
+    /*         )pbdoc") */
+    /*     .def_readwrite_static("path_to_tables_readonly", */
+    /*         &InterpolationDef::path_to_tables_readonly, */
+    /*         R"pbdoc( */
+    /*             Path where tables can be read from disk to avoid to rebuild */
+    /*             it. */
+    /*         )pbdoc") */
+    /*     .def_readwrite_static("do_binary_tables", */
+    /*         &InterpolationDef::do_binary_tables, */
+    /*         R"pbdoc( */
+    /*             Should binary tables be used to store the data. */
+    /*             This will increase performance, but are not readable for a */
+    /*             crosscheck by human. Default: xxx */
+    /*         )pbdoc") */
+    /*     .def_readwrite_static("just_use_readonly_path", */
+    /*         &InterpolationDef::just_use_readonly_path, */
+    /*         R"pbdoc( */
+    /*             Just the readonly path to the interpolation tables is used. */
+    /*             This will stop the program, if the required table is not */
+    /*             in the readonly path. The (writable) path_to_tables will be */
+    /*             ignored. Default: xxx */
+    /*         )pbdoc"); */
 
-        py::class_<ContRand, std::shared_ptr<ContRand>>(m, "ContinuousRandomizer",
-                R"pbdoc(
+    py::class_<ContRand, std::shared_ptr<ContRand>>(m, "ContinuousRandomizer",
+        R"pbdoc(
                 If :math:`v_\text{cut}` is large, the spectrum is not continously any
                 more. Particles which has no stochastic loss crossing the medium has
                 all the same energy :math:`E_\text{peak}` after propagating through
@@ -214,10 +241,11 @@ PYBIND11_MODULE(proposal, m)
                 This small losses can be added in form of a perturbation from
                 average energy loss.
             )pbdoc")
-        .def("variance", py::vectorize(&ContRand::Variance), py::arg("initial_energy"), py::arg("final_energy"))
+        .def("variance", py::vectorize(&ContRand::Variance),
+            py::arg("initial_energy"), py::arg("final_energy"))
         .def("randomize", py::vectorize(&ContRand::EnergyRandomize),
-                py::arg("initial_energy"), py::arg("final_energy"), py::arg("rand"),
-                R"pbdoc(
+            py::arg("initial_energy"), py::arg("final_energy"), py::arg("rand"),
+            R"pbdoc(
                     Calculates the stochastical smering of the distribution based on
                     the second momentum of the parametrizations, the final and intial
                     energy.
@@ -250,41 +278,57 @@ PYBIND11_MODULE(proposal, m)
                 )pbdoc")
         .def_readwrite_static("interpol_def", &ContRand::interpol_def);
 
-        m.def("make_contrand", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
-                return shared_ptr<ContRand>(make_contrand(cross, interpolate));
-                });
+    m.def("make_contrand",
+        [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate) {
+            return shared_ptr<ContRand>(make_contrand(cross, interpolate));
+        });
 
     py::class_<Decay, std::shared_ptr<Decay>>(m, "Decay")
-        .def("energy_decay", py::vectorize(&Decay::EnergyDecay), py::arg("energy"), py::arg("rnd"), py::arg("density"))
+        .def("energy_decay", py::vectorize(&Decay::EnergyDecay),
+            py::arg("energy"), py::arg("rnd"), py::arg("density"))
         .def_readwrite_static("interpol_def", &Decay::interpol_def);
 
-    m.def("make_decay", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
+    m.def("make_decay",
+        [](crosssection_list_t<ParticleDef, Medium> cross,
+            ParticleDef const& particle, bool interpolate) {
             return shared_ptr<Decay>(make_decay(cross, particle, interpolate));
-            });
+        });
 
     py::class_<Time, std::shared_ptr<Time>>(m, "Time")
-        .def("elapsed", &Time::TimeElapsed, py::arg("initial_energy"), py::arg("final_energy"), py::arg("grammage"), py::arg("local_density"))
+        .def("elapsed", &Time::TimeElapsed, py::arg("initial_energy"),
+            py::arg("final_energy"), py::arg("grammage"),
+            py::arg("local_density"))
         .def_readwrite_static("interpol_def", &Time::interpol_def);
 
-    m.def("make_time", [](crosssection_list_t<ParticleDef, Medium> cross, ParticleDef const& particle, bool interpolate){
+    m.def("make_time",
+        [](crosssection_list_t<ParticleDef, Medium> cross,
+            ParticleDef const& particle, bool interpolate) {
             return shared_ptr<Time>(make_time(cross, particle, interpolate));
-            });
+        });
 
-    m.def("make_time_approximate", [](){
-        return shared_ptr<Time>(PROPOSAL::make_unique<ApproximateTimeBuilder>());
+    m.def("make_time_approximate", []() {
+        return shared_ptr<Time>(
+            PROPOSAL::make_unique<ApproximateTimeBuilder>());
     });
 
-    py::class_<PropagationUtility::Collection, std::shared_ptr<PropagationUtility::Collection>>(m, "PropagationUtilityCollection")
+    py::class_<PropagationUtility::Collection,
+        std::shared_ptr<PropagationUtility::Collection>>(
+        m, "PropagationUtilityCollection")
         .def(py::init<>())
-        .def_readwrite("interaction", &PropagationUtility::Collection::interaction_calc)
-        .def_readwrite("displacement", &PropagationUtility::Collection::displacement_calc)
+        .def_readwrite(
+            "interaction", &PropagationUtility::Collection::interaction_calc)
+        .def_readwrite(
+            "displacement", &PropagationUtility::Collection::displacement_calc)
         .def_readwrite("time", &PropagationUtility::Collection::time_calc)
-        .def_readwrite("scattering", &PropagationUtility::Collection::scattering)
+        .def_readwrite(
+            "scattering", &PropagationUtility::Collection::scattering)
         .def_readwrite("decay", &PropagationUtility::Collection::decay_calc)
         .def_readwrite("cont_rand", &PropagationUtility::Collection::cont_rand);
 
-    py::class_<PropagationUtility, std::shared_ptr<PropagationUtility>>(m, "PropagationUtility")
-        .def(py::init<PropagationUtility::Collection const&>(), py::arg("collection"))
+    py::class_<PropagationUtility, std::shared_ptr<PropagationUtility>>(
+        m, "PropagationUtility")
+        .def(py::init<PropagationUtility::Collection const&>(),
+            py::arg("collection"))
         .def("energy_stochasticloss", &PropagationUtility::EnergyStochasticloss)
         .def("energy_decay", &PropagationUtility::EnergyDecay)
         .def("energy_interaction", &PropagationUtility::EnergyInteraction)
@@ -293,42 +337,50 @@ PYBIND11_MODULE(proposal, m)
         .def("length_continuous", &PropagationUtility::LengthContinuous)
         .def("directions_scatter", &PropagationUtility::DirectionsScatter);
 
-
     /* .def(py::init<const Utility&, const InterpolationDef>(), */
     /*     py::arg("utility"), py::arg("interpolation_def"), */
     /*     R"pbdoc( */
-        /*             Initalize a continous randomization calculator. */
-        /*             This may take some minutes because for all parametrization */
-        /*             the continous randomization interpolation tables have to be */
-        /*             build. */
+    /*             Initalize a continous randomization calculator. */
+    /*             This may take some minutes because for all parametrization */
+    /*             the continous randomization interpolation tables have to be
+     */
+    /*             build. */
 
-        /*             Note: */
-        /*                 .. math:: */
+    /*             Note: */
+    /*                 .. math:: */
 
-        /*                     \langle ( \Delta ( \Delta E ) )^2 \rangle = */
-        /*                         \int^{e_\text{cut}}_{e_0} \frac{d\text{E}}{-f(E)} */
-        /*                         \left( \int_0^{e_{cut}} e^2 p(e;E) d\text{e} \right) */
+    /*                     \langle ( \Delta ( \Delta E ) )^2 \rangle = */
+    /*                         \int^{e_\text{cut}}_{e_0} \frac{d\text{E}}{-f(E)}
+     */
+    /*                         \left( \int_0^{e_{cut}} e^2 p(e;E) d\text{e}
+     * \right) */
 
-        /*             Args: */
-        /*                 interpolation_def (interpolation_def): specify the number of interpolation points for cont-integral */
-        /*                 utility (utility): specify the parametrization and energy cuts */
-        /*         )pbdoc") */
+    /*             Args: */
+    /*                 interpolation_def (interpolation_def): specify the number
+     * of interpolation points for cont-integral */
+    /*                 utility (utility): specify the parametrization and energy
+     * cuts */
+    /*         )pbdoc") */
 
-
-    /* py::class_<RandomGenerator, std::unique_ptr<RandomGenerator, py::nodelete>>( */
+    /* py::class_<RandomGenerator, std::unique_ptr<RandomGenerator,
+     * py::nodelete>>( */
     /*     m, "RandomGenerator") */
     /*     .def("random_double", &RandomGenerator::RandomDouble) */
     /*     .def("set_seed", &RandomGenerator::SetSeed, py::arg("seed") = 0) */
-    /*     .def("set_random_function", &RandomGenerator::SetRandomNumberGenerator, */
+    /*     .def("set_random_function",
+     * &RandomGenerator::SetRandomNumberGenerator, */
     /*         py::arg("function")) */
     /*     .def_static( */
-    /*         "get", &RandomGenerator::Get, py::return_value_policy::reference); */
+    /*         "get", &RandomGenerator::Get,
+     * py::return_value_policy::reference); */
 
     py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
         .def(py::init<const ParticleDef&, std::vector<Sector>>())
-        .def(py::init<const ParticleDef&, const std::string&>(), py::arg("particle_def"), py::arg("path_to_config_file"))
-        .def("propagate", &Propagator::Propagate, py::arg("initial_particle"), py::arg("max_distance") = 1.e20, py::arg("min_energy") = 0., py::arg("hierarchy_condition") = 0);
-
+        .def(py::init<const ParticleDef&, const std::string&>(),
+            py::arg("particle_def"), py::arg("path_to_config_file"))
+        .def("propagate", &Propagator::Propagate, py::arg("initial_particle"),
+            py::arg("max_distance") = 1.e20, py::arg("min_energy") = 0.,
+            py::arg("hierarchy_condition") = 0);
 
     /* py::class_<PropagatorService, std::shared_ptr<PropagatorService>>( */
     /*     m, "PropagatorService") */
@@ -336,19 +388,19 @@ PYBIND11_MODULE(proposal, m)
     /*     .def("propagate", &PropagatorService::Propagate, */
     /*         py::arg("particle_definition"), py::arg("particle_condition"), */
     /*         py::arg("max_distance") = 1e20, py::arg("min_energy") = 1e20) */
-    /*     .def("register_propagator", &PropagatorService::RegisterPropagator, */
+    /*     .def("register_propagator", &PropagatorService::RegisterPropagator,
+     */
     /*         py::arg("propagator")); */
 
     py::module m_sub = m.def_submodule("logging");
     m_sub.def("set_loglevel", &Logging::SetGlobalLoglevel, "Set logging level");
 
     py::enum_<spdlog::level::level_enum>(m_sub, "loglevel")
-            .value("debug", spdlog::level::level_enum::debug)
-            .value("critical", spdlog::level::level_enum::critical)
-            .value("warn", spdlog::level::level_enum::warn)
-            .value("err", spdlog::level::level_enum::err)
-            .value("info", spdlog::level::level_enum::info)
-            .value("off", spdlog::level::level_enum::off)
-            .value("trace", spdlog::level::level_enum::trace);
-
+        .value("debug", spdlog::level::level_enum::debug)
+        .value("critical", spdlog::level::level_enum::critical)
+        .value("warn", spdlog::level::level_enum::warn)
+        .value("err", spdlog::level::level_enum::err)
+        .value("info", spdlog::level::level_enum::info)
+        .value("off", spdlog::level::level_enum::off)
+        .value("trace", spdlog::level::level_enum::trace);
 }

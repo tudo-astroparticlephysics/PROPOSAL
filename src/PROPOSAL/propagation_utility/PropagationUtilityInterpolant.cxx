@@ -10,6 +10,16 @@
 using namespace PROPOSAL;
 using Helper::InitializeInterpolation;
 
+std::string UtilityInterpolant::gen_path() const
+{
+    return std::string(InterpolationSettings::TABLES_PATH);
+}
+
+std::string UtilityInterpolant::gen_name(std::string prefix) const
+{
+    return std::string(prefix) + std::to_string(this->GetHash())
+        + std::string(".txt");
+}
 UtilityInterpolant::UtilityInterpolant(
     std::function<double(double)> f, double lim, size_t hash)
     : UtilityIntegral(f, lim, hash)
