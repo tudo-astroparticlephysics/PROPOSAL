@@ -67,7 +67,7 @@ public:
 
     PropagationUtility(Collection const& collection);
 
-    std::tuple<InteractionType, std::shared_ptr<const Component>, double>
+    std::tuple<InteractionType, size_t, double>
     EnergyStochasticloss(double, double);
     double EnergyDecay(double, std::function<double()>, double);
     double EnergyInteraction(double, std::function<double()>);

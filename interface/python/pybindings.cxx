@@ -128,6 +128,18 @@ PYBIND11_MODULE(proposal, m)
                 py::arg("energy"))
         .def_readwrite_static("interpol_def", &Interaction::interpol_def);
 
+    py::class_<Interaction::Rate,
+            std::shared_ptr<Interaction::Rate>>(m, "InteractionRate")
+            .def_readwrite("comp_hash", &Interaction::Rate::comp_hash)
+            .def_readwrite("crosssection", &Interaction::Rate::crosssection)
+            .def_readwrite("rate", &Interaction::Rate::rate);
+
+    py::class_<Interaction::Loss,
+            std::shared_ptr<Interaction::Loss>>(m, "InteractionLoss")
+            .def_readwrite("comp_hash", &Interaction::Loss::comp_hash)
+            .def_readwrite("type", &Interaction::Loss::type)
+            .def_readwrite("v_loss", &Interaction::Loss::v_loss);
+
     m.def("make_interaction", [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate){
             return shared_ptr<Interaction>(make_interaction(cross, interpolate));
             });

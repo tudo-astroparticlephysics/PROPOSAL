@@ -44,24 +44,19 @@
 
 namespace PROPOSAL {
 
-using rates_t = std::unordered_map<std::shared_ptr<const Component>, double>;
-
 struct CrossSectionBase {
 
     virtual ~CrossSectionBase() = default;
     virtual double CalculatedEdx(double) = 0;
     virtual double CalculatedE2dx(double) = 0;
-    virtual double CalculatedNdx(
-        double, std::shared_ptr<const Component> = nullptr)
-        = 0;
-    virtual double CalculateStochasticLoss(
-        std::shared_ptr<const Component> const&, double, double)
-        = 0;
+    virtual double CalculatedNdx(double) = 0;
+    virtual double CalculatedNdx(double, size_t) = 0;
+    virtual std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(double) = 0;
+    virtual double CalculateStochasticLoss(size_t, double, double) = 0;
     virtual double GetLowerEnergyLim() const = 0;
     virtual size_t GetHash() const noexcept = 0;
     virtual InteractionType GetInteractionType() const noexcept = 0;
-    virtual std::vector<std::shared_ptr<const Component>>
-    GetTargets() const noexcept = 0;
+
 };
 
 namespace detail {
@@ -75,13 +70,15 @@ namespace detail {
         ParticleDef p, Medium m, std::shared_ptr<const EnergyCutSettings> cut,
         size_t hash = 0)
     {
-        using comp_ptr = std::shared_ptr<const Component>;
         using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
         auto dndx_map
-            = std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>>();
-        auto calc = make_dndx(interpol, param, p, m, cut, hash);
-        dndx_map.emplace(
-            comp_ptr(nullptr), std::make_tuple(1., std::move(calc)));
+                = std::make_unique<std::unordered_map<size_t, std::tuple<double, dndx_ptr>>>();
+        if (cut->GetEcut() == INF and cut->GetVcut() == 1) {
+            dndx_map = nullptr;
+        } else {
+            auto calc = make_dndx(interpol, param, p, m, cut, hash);
+            dndx_map->emplace(m.GetHash(), std::make_tuple(1., std::move(calc)));
+        }
         return dndx_map;
     }
 
@@ -90,15 +87,18 @@ namespace detail {
         ParticleDef p, Medium m, std::shared_ptr<const EnergyCutSettings> cut,
         size_t hash = 0)
     {
-        using comp_ptr = std::shared_ptr<const Component>;
         using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
         auto dndx_map
-            = std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>>();
-        for (auto& c : m.GetComponents()) {
-            auto comp = std::make_shared<const Component>(c);
-            auto weight = weight_component(m, c);
-            auto calc = make_dndx(interpol, param, p, c, cut, hash);
-            dndx_map.emplace(comp, std::make_tuple(weight, std::move(calc)));
+                = std::make_unique<std::unordered_map<size_t, std::tuple<double, dndx_ptr>>>();
+        if (cut->GetEcut() == INF and cut->GetVcut() == 1) {
+            dndx_map = nullptr;
+        } else {
+            for (auto& c : m.GetComponents()) {
+                auto comp_hash = c.GetHash();
+                auto weight = weight_component(m, c);
+                auto calc = make_dndx(interpol, param, p, c, cut, hash);
+                dndx_map->emplace(comp_hash, std::make_tuple(weight, std::move(calc)));
+            }
         }
         return dndx_map;
     }
@@ -207,7 +207,7 @@ class CrossSection : public CrossSectionBase {
 protected:
     size_t hash;
 
-    std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>> dndx;
+    std::unique_ptr<std::unordered_map<size_t, std::tuple<double, dndx_ptr>>> dndx;
     std::unique_ptr<std::vector<std::tuple<double, dedx_ptr>>> dedx;
     std::unique_ptr<std::vector<std::tuple<double, de2dx_ptr>>> de2dx;
 
@@ -238,57 +238,52 @@ public:
     virtual ~CrossSection() = default;
 
 protected:
-    double CalculatedNdx(
-        double E, std::shared_ptr<const Component> c, std::true_type)
+    double CalculateStochasticLoss_impl(size_t target_hash, double E, double rate, std::false_type)
     {
-        if (c)
-            return std::get<1>(dndx[c])->Calculate(E) / std::get<0>(dndx[c]);
-        auto dNdx_all = 0.;
-        for (auto& it : dndx)
-            dNdx_all += std::get<1>(dndx[it.first])->Calculate(E)
-                / std::get<0>(dndx[it.first]);
-        return dNdx_all;
+        return std::get<1>((*dndx)[target_hash])->GetUpperLimit(
+            E, rate * std::get<0>((*dndx)[target_hash]));
     }
 
-    double CalculatedNdx(
-        double E, std::shared_ptr<const Component>, std::false_type)
-    {
-        return std::get<1>(dndx[nullptr])->Calculate(E);
-    }
-
-    double CalculateStochasticLoss_impl(
-        std::shared_ptr<const Component> const& c, double E, double rate,
-        std::true_type, std::false_type)
-    {
-        return std::get<1>(dndx[c])->GetUpperLimit(
-            E, rate * std::get<0>(dndx[c]));
-    }
-
-    double CalculateStochasticLoss_impl(
-        std::shared_ptr<const Component> const& c, double E, double rate,
-        std::false_type, std::false_type)
-    {
-        return std::get<1>(dndx[c])->GetUpperLimit(E, rate);
-    }
-
-    double CalculateStochasticLoss_impl(std::shared_ptr<const Component> const&,
-        double, double, bool, std::true_type)
+    double CalculateStochasticLoss_impl(size_t, double, double, std::true_type)
     {
         return 1.;
     }
 
 public:
-    double CalculatedNdx(
-        double E, std::shared_ptr<const Component> c = nullptr) final
+    double CalculatedNdx(double E) final
     {
-        return CalculatedNdx(E, c, comp_wise {});
+        auto dNdx_all = 0.;
+        if (dndx)
+            for (auto& it : *dndx) {
+                dNdx_all += std::get<1>((*dndx)[it.first])->Calculate(E)
+                            / std::get<0>((*dndx)[it.first]);
+            }
+        return dNdx_all;
     };
 
-    double CalculateStochasticLoss(
-        std::shared_ptr<const Component> const& c, double E, double rate)
+    double CalculatedNdx(double E, size_t target_hash) final
     {
-        return CalculateStochasticLoss_impl(
-            c, E, rate, comp_wise {}, only_stochastic {});
+        if (dndx)
+            return std::get<1>((*dndx)[target_hash])->Calculate(E) / std::get<0>((*dndx)[target_hash]);
+        return 0.;
+    };
+
+    std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(double E) override {
+        std::vector<std::pair<size_t, double>> rates = {};
+        if (dndx) {
+            for (auto& c : *dndx)
+                rates.push_back({c.first, CalculatedNdx(E, c.first)});
+        }
+        return rates;
+    }
+
+    double CalculateStochasticLoss(size_t hash, double E, double rate)
+    {
+        if (dndx)
+            return CalculateStochasticLoss_impl(hash, E, rate, only_stochastic {});
+        throw std::logic_error("Can not calculate stochastic loss if dndx"
+                               "calculator is not defined. The crosssection"
+                               "is probably defined to be only-continuous.");
     }
 
     inline double CalculatedEdx(double energy) override
@@ -309,15 +304,6 @@ public:
         for (auto& [weight, calc] : *de2dx)
             loss += calc->Calculate(energy) / weight;
         return loss;
-    }
-
-    std::vector<std::shared_ptr<const Component>>
-    GetTargets() const noexcept final
-    {
-        std::vector<std::shared_ptr<const Component>> targets;
-        for (auto& it : this->dndx)
-            targets.emplace_back(it.first);
-        return targets;
     }
 
     size_t GetHash() const noexcept final { return hash; }

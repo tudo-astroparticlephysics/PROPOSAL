@@ -14,7 +14,7 @@ namespace secondaries {
         using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
 
         Medium m;
-        std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>> dndx;
+        std::unique_ptr<std::unordered_map<size_t, std::tuple<double, dndx_ptr>>> dndx;
 
     public:
         static constexpr int n_rnd = 2;

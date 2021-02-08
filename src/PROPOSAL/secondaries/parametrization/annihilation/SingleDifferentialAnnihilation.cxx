@@ -15,8 +15,10 @@ using namespace PROPOSAL;
 double secondaries::SingleDifferentialAnnihilation::CalculateRho(
     double energy, double rnd, const Component& comp)
 {
-    for (auto& it : dndx) {
-        if (comp.GetName() == it.first->GetName()) {
+    if (not dndx)
+        throw std::logic_error("dndx Interpolant for SingleDifferentialAnnihilation not defined.");
+    for (auto& it : *dndx) {
+        if (comp.GetHash() == it.first) {
             auto rate = std::get<1>(it.second)->Calculate(energy);
             return std::get<1>(it.second)->GetUpperLimit(energy, rnd * rate);
         }

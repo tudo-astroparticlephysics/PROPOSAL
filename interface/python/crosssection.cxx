@@ -62,7 +62,6 @@ void init_crosssection(py::module& m)
             "lower_energy_limit", &CrossSectionBase::GetLowerEnergyLim)
         .def_property_readonly("type", &CrossSectionBase::GetInteractionType)
         .def_property_readonly("hash", &CrossSectionBase::GetHash)
-        .def_property_readonly("targets", &CrossSectionBase::GetTargets)
         .def("calculate_dEdx",
             py::vectorize(&CrossSectionBase::CalculatedEdx),
             py::arg("energy"),
@@ -106,8 +105,8 @@ void init_crosssection(py::module& m)
 
             )pbdoc")
         .def("calculate_dNdx",
-            py::vectorize(&CrossSectionBase::CalculatedNdx),
-            py::arg("energy"), py::arg("component") = nullptr,
+            py::vectorize(py::overload_cast<double>(&CrossSectionBase::CalculatedNdx)),
+            py::arg("energy"),
             R"pbdoc(
 
         Calculates the total cross section
@@ -128,19 +127,49 @@ void init_crosssection(py::module& m)
             energy (float): energy in MeV
 
             )pbdoc")
+        .def("calculate_dNdx",
+            py::vectorize(py::overload_cast<double, size_t>(&CrossSectionBase::CalculatedNdx)),
+            py::arg("energy"), py::arg("target_hash"),
+            R"pbdoc(
+
+        Calculates the total cross section
+
+            .. math:: \frac{N_A}{A} \cdot \int_{v_{cut}}^{v_{max}} \frac{d\sigma}{dv} dv
+
+        with the particle energy E, the relative energy loss v and the
+        crosssection :math:`\sigma` for a single component with a given hash.
+        The value v_{cut} is the energy cut to
+        differentiate between continous and stochastic losses in PROPOSAL,
+        see :meth:`~proposal.EnergyCutSettings` for more information on the
+        energy cuts.
+
+        Note that this integral only includes the v values about our cut,
+        therefore this values represents only the total crosssection for the
+        stochastic energy losses.
+
+        Args:
+            energy (float): energy in MeV
+            target_hash (float): hash of the component or medium to calculate dNdx
+
+            )pbdoc")
+        .def("calculate_dNdx_PerTarget", &CrossSectionBase::CalculatedNdx_PerTarget,
+             py::arg("energy"),
+             R"pbdoc(
+                Return a list of pairs, containing the hashes of the components (or the
+                medium) with the corresponding total cross section (see docstring of
+                :meth:`~proposal.crosssection.Calculate_dNdx`).
+            )pbdoc")
         .def("calculate_stochastic_loss",
             &CrossSectionBase::CalculateStochasticLoss,
-            py::arg("component"), py::arg("energy"), py::arg("rate"),
+            py::arg("target_hash"), py::arg("energy"), py::arg("rate"),
             R"pbdoc(
 
         Samples a stochastic energy loss for a particle of the energy E.
 
         Args:
-            energy (float): energy in MeV
-            rnd1 (float): random number between 0 and 1, samples the energy
-                loss fraction
-            rnd2 (float): random number between 0 and 1, sampled the
-                component where the energy loss in occuring
+            target_hash (size_t): Hash of component or medium to calculate stochastic loss
+            energy (float): energy of primary particle
+            rate (float): fraction of the total rate to calculate stochastic loss
 
         Returns:
             sampled energy loss for the current particle in MeV

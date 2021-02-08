@@ -68,9 +68,7 @@ Component::Component(
 namespace PROPOSAL {
 bool operator==(Component const& lhs, Component const& rhs) noexcept
 {
-    if (typeid(lhs) != typeid(rhs))
-        return false;
-    else if (lhs.name_ != rhs.name_)
+    if (lhs.name_ != rhs.name_)
         return false;
     else if (lhs.nucCharge_ != rhs.nucCharge_)
         return false;

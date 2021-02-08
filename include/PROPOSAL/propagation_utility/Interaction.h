@@ -39,12 +39,20 @@ public:
 
     virtual double EnergyInteraction(double, double) = 0;
 
-    enum { INTERACTION_TYPE, COMPONENT, FRACTIONAL_LOSS };
-    std::vector<rate_t> Rates(double energy);
+    struct Rate {
+        cross_ptr crosssection;
+        size_t comp_hash;
+        double rate;
+    };
+    std::vector<Rate> Rates(double energy);
 
-    enum { CROSS, COMP, RATE };
-    loss_t SampleLoss(
-        double energy, std::vector<rate_t> const& rates, double rnd);
+    struct Loss {
+        InteractionType type;
+        size_t comp_hash;
+        double v_loss;
+    };
+    Loss SampleLoss(
+        double energy, std::vector<Rate> const& rates, double rnd);
 
     double MeanFreePath(double energy);
     auto GetHash() const noexcept { return hash; }

@@ -24,34 +24,31 @@ double Interaction::MeanFreePath(double energy)
     return 1 / total_rate;
 }
 
-Interaction::loss_t Interaction::SampleLoss(
-    double energy, std::vector<rate_t> const& rates, double rnd)
+Interaction::Loss Interaction::SampleLoss(
+    double energy, std::vector<Rate> const& rates, double rnd)
 {
     auto sampled_rate = rnd
         * std::accumulate(rates.begin(), rates.end(), 0.,
-            [](double a, rate_t r) { return a + std::get<RATE>(r); });
+            [](double a, Rate r) { return a + r.rate; });
     for (auto& r : rates) {
-        sampled_rate -= std::get<RATE>(r);
+        sampled_rate -= r.rate;
         if (sampled_rate < 0.) {
-            auto loss = std::get<CROSS>(r)->CalculateStochasticLoss(
-                std::get<COMP>(r), energy, -sampled_rate);
-            return std::make_tuple(std::get<CROSS>(r)->GetInteractionType(),
-                std::get<COMP>(r), loss);
+            auto loss = r.crosssection->CalculateStochasticLoss(
+                r.comp_hash, energy, -sampled_rate);
+            return {r.crosssection->GetInteractionType(), r.comp_hash, loss};
         }
     }
     throw std::logic_error(
         "Given rate is larger than overall crosssection rate.");
 }
 
-std::vector<Interaction::rate_t> Interaction::Rates(double energy)
+std::vector<Interaction::Rate> Interaction::Rates(double energy)
 {
-    auto rates = std::vector<rate_t>();
+    auto rates = std::vector<Interaction::Rate>();
     for (auto& c : cross_list) {
-        auto comp_list = c->GetTargets();
-        for (auto comp : comp_list) {
-            auto rates_comp = c->CalculatedNdx(energy, comp);
-            rates.emplace_back(c, comp, rates_comp);
-        }
+        auto dndx_per_target = c->CalculatedNdx_PerTarget(energy);
+        for (auto dndx : dndx_per_target)
+            rates.emplace_back(Interaction::Rate{c, dndx.first, dndx.second});
     }
     return rates;
 }

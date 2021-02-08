@@ -110,8 +110,10 @@ double secondaries::PhotoTsai::FunctionToIntegral(
 double secondaries::PhotoTsai::CalculateRho(
     double energy, double rnd, const Component& comp)
 {
-    for (auto& it : dndx) {
-        if (comp.GetName() == it.first->GetName()) {
+    if (not dndx)
+        throw std::logic_error("dndx Interpolant for PhotoTsai not defined.");
+    for (auto& it : *dndx) {
+        if (comp.GetHash() == it.first) {
             auto& calc = *std::get<1>(it.second);
             auto lim = calc.GetIntegrationLimits(energy);
             auto rate = rnd * calc.Calculate(energy, lim.max);

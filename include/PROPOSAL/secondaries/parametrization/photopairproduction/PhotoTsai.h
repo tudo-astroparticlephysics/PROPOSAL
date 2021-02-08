@@ -18,7 +18,7 @@ namespace secondaries {
 
         Integral integral;
         Medium medium;
-        std::unordered_map<comp_ptr, std::tuple<double, dndx_ptr>> dndx;
+        std::unique_ptr<std::unordered_map<size_t, std::tuple<double, dndx_ptr>>> dndx;
 
         double FunctionToIntegral(
             double energy, double x, double theta, const Component&);

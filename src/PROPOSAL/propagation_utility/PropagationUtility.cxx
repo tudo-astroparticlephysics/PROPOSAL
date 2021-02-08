@@ -87,14 +87,13 @@ PropagationUtility::PropagationUtility(
     }
 }
 
-std::tuple<InteractionType, std::shared_ptr<const Component>, double>
+std::tuple<InteractionType, size_t, double>
 PropagationUtility::EnergyStochasticloss(double energy, double rnd)
 {
     auto rates = collection.interaction_calc->Rates(energy);
     auto loss = collection.interaction_calc->SampleLoss(energy, rates, rnd);
 
-    std::get<Interaction::FRACTIONAL_LOSS>(loss) *= energy;
-    return loss;
+    return {loss.type, loss.comp_hash, loss.v_loss};
 }
 
 double PropagationUtility::EnergyDecay(
