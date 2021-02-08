@@ -43,7 +43,6 @@ namespace detail {
         auto min = std::numeric_limits<double>::infinity();
         for (auto& it : *dedx_ptr) {
             auto n = std::get<1>(it)->GetLowerEnergyLim();
-            std::cout << n << std::endl;
             min = (min < n) ? min : n;
         }
         return min;

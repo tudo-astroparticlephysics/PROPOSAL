@@ -10,8 +10,8 @@ class AxisBuilderDEDX {
     size_t n;
 
 public:
-    AxisBuilderDEDX(double _low, double _up = UPPER_ENERGY_LIM_DEFAULT,
-        size_t _nodes = NODES_DEDX_DEFAULT);
+    AxisBuilderDEDX(double _low, double _up = InterpolationSettings::UPPER_ENERGY_LIM,
+        size_t _nodes = InterpolationSettings::NODES_DEDX);
 
     void refine_definition_range(
         std::function<double(double)> func, unsigned int i = 0);

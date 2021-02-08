@@ -29,18 +29,15 @@ class CrossSectionDE2DXInterpolant : public CrossSectionDE2DX {
 
     cubic_splines::Interpolant<cubic_splines::CubicSplines<double>> interpolant;
 
-    std::string gen_name()
-    {
-        return std::string("de2dx_") + std::to_string(GetHash())
-            + std::string(".txt");
-    }
+    std::string gen_name() const;
+    std::string gen_path() const;
 
 public:
     template <typename Param, typename Target>
     CrossSectionDE2DXInterpolant(Param const& param, ParticleDef const& p,
         Target const& t, EnergyCutSettings const& cut, size_t hash = 0)
         : CrossSectionDE2DX(param, p, t, cut, hash)
-        , interpolant(build_de2dx_def(param, p, t, cut), "/tmp", gen_name())
+        , interpolant(build_de2dx_def(param, p, t, cut), gen_path(), gen_name())
     {
     }
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/CrossSectionVector.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
 #include <vector>
 
 namespace PROPOSAL {
@@ -26,14 +25,11 @@ public:
         , lower_lim(CrossSectionVector::GetLowerLim(cross))
         , hash(CrossSectionVector::GetHash(cross))
     {
-        std::cout << "lower_lim disp: " << lower_lim << std::endl;
         if (cross.size() < 1)
             throw std::invalid_argument(
                 "At least one crosssection is required.");
     }
     virtual ~Displacement() = default;
-
-    static Interpolant1DBuilder::Definition interpol_def;
 
     double FunctionToIntegral(double);
     virtual double SolveTrackIntegral(double, double) = 0;

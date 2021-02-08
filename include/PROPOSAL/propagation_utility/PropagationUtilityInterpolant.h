@@ -55,6 +55,9 @@ class UtilityInterpolant : public UtilityIntegral {
     // Interpolant1DBuilder builder_diff;
     // std::unique_ptr<Interpolant> interpolant_diff_;
 
+    std::string gen_path() const;
+    std::string gen_name(std::string prefix) const;
+
 public:
     UtilityInterpolant(std::function<double(double)>, double, size_t);
 
@@ -74,11 +77,8 @@ public:
         def.axis = std::make_unique<cubic_splines::ExpAxis<double>>(
             lower_lim, 1e14, (size_t)100);
 
-        auto filename
-            = prefix + std::to_string(this->hash) + std::string(".txt");
-
-        interpolant_
-            = std::make_shared<interpolant_t>(std::move(def), "/tmp", filename);
+        interpolant_ = std::make_shared<interpolant_t>(
+            std::move(def), gen_path(), gen_name(prefix));
     }
 
     double Calculate(double, double);

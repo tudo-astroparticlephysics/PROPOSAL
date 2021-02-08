@@ -7,10 +7,6 @@ AxisBuilderDEDX::AxisBuilderDEDX(double _low, double _up, size_t _node)
     , up(_up)
     , n(_node)
 {
-    if (UPPER_ENERGY_LIM)
-        up = *UPPER_ENERGY_LIM;
-    if (NODES_DEDX)
-        n = *NODES_DEDX;
 }
 
 void AxisBuilderDEDX::refine_definition_range(

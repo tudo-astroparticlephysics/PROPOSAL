@@ -26,6 +26,17 @@ double retransform_relativ_loss(double v_cut, double v_max, double v)
 }
 }
 
+std::string CrossSectionDNDXInterpolant::gen_path() const
+{
+    return std::string(InterpolationSettings::TABLES_PATH);
+}
+
+std::string CrossSectionDNDXInterpolant::gen_name() const
+{
+    return std::string("dndx_") + std::to_string(GetHash())
+        + std::string(".txt");
+}
+
 double CrossSectionDNDXInterpolant::Calculate(double energy)
 {
     return Calculate(energy, 1.0);

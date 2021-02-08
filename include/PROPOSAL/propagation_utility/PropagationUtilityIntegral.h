@@ -44,5 +44,7 @@ public:
 
     virtual double Calculate(double, double);
     virtual double GetUpperLimit(double, double);
+
+    virtual size_t GetHash() const {return hash;}
 };
 } // namespace PROPOSAL
