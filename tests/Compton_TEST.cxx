@@ -237,21 +237,21 @@ TEST(Compton, Test_of_e)
         auto cross = make_compton(particle_def, *medium, ecuts, false, config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
-        auto components = cross->GetTargets();
+        auto components = medium->GetComponents();
         double sum = 0;
 
         for (auto comp : components)
         {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
                     EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
                     break;
                 }
@@ -385,21 +385,21 @@ TEST(Compton, Test_of_e_Interpolant)
         auto cross = make_compton(particle_def, *medium, ecuts, false, config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
-        auto components = cross->GetTargets();
+        auto components = medium->GetComponents();
         double sum = 0;
 
         for (auto comp : components)
         {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
                     EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
                     break;
                 }

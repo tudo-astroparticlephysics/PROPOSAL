@@ -57,7 +57,7 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<PhotoPairTsai> {
-        static constexpr auto value = "Photopair_Tsai";
+        static constexpr auto value = "Tsai";
     };
 
     template <> struct ParametrizationId<PhotoPairTsai> {

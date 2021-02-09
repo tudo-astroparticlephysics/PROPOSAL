@@ -196,7 +196,7 @@ TEST(Bremsstrahlung, Test_of_dEdx)
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, interpolation_precision * dEdx_stored);
+        EXPECT_NEAR(dEdx_new, dEdx_stored, interpolation_precision * dEdx_stored);
     }
 }
 
@@ -242,7 +242,7 @@ TEST(Bremsstrahlung, Test_of_dNdx)
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, interpolation_precision * dNdx_stored);
+        EXPECT_NEAR(dNdx_new, dNdx_stored, interpolation_precision * dNdx_stored);
     }
 }
 
@@ -355,7 +355,7 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, interpolation_precision * dEdx_stored);
+        EXPECT_NEAR(dEdx_new, dEdx_stored, interpolation_precision * dEdx_stored);
     }
 }
 
@@ -402,7 +402,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, interpolation_precision * dNdx_stored);
+        EXPECT_NEAR(dNdx_new, dNdx_stored, interpolation_precision * dNdx_stored);
     }
 }
 

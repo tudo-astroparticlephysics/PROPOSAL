@@ -92,7 +92,11 @@ namespace crosssection {
     };
 
     template <> struct ParametrizationName<PhotoRhode> {
-        static constexpr auto value = "PhotoRhode";
+        static constexpr auto value = "Rhode";
+    };
+
+    template <> struct ParametrizationId<PhotoRhode> {
+        static constexpr auto value = 1000000013;
     };
 
 } // namespace crosssection

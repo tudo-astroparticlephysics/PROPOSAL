@@ -369,21 +369,21 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
                                            config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
-        auto components = cross->GetTargets();
+        auto components = medium->GetComponents();
         double sum = 0;
 
         for (auto comp : components)
         {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
                     EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
                     break;
                 }
@@ -524,21 +524,21 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
                                            config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
-        auto components = cross->GetTargets();
+        auto components = medium->GetComponents();
         double sum = 0;
 
         for (auto comp : components)
         {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
                     EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
                     break;
                 }
@@ -572,7 +572,11 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
     while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization >> shadowing)
     {
         parametrization.erase(0,5);
+        if (parametrization == "ButkevichMikhailov")
+            parametrization = "ButkevichMikheyev";
         shadowing.erase(0,6);
+        if (shadowing == "ButkevichMikhailov")
+            shadowing = "ButkevichMikheyev";
         if (vcut == -1)
             vcut = 1;
         if (ecut == -1)
@@ -618,7 +622,11 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
     while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization >> shadowing)
     {
         parametrization.erase(0,5);
+        if (parametrization == "ButkevichMikhailov")
+            parametrization = "ButkevichMikheyev";
         shadowing.erase(0,6);
+        if (shadowing == "ButkevichMikhailov")
+            shadowing = "ButkevichMikheyev";
         if (vcut == -1)
             vcut = 1;
         if (ecut == -1)
@@ -666,7 +674,11 @@ TEST(PhotoQ2Integration, Test_of_e)
     while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization >> shadowing)
     {
         parametrization.erase(0,5);
+        if (parametrization == "ButkevichMikhailov")
+            parametrization = "ButkevichMikheyev";
         shadowing.erase(0,6);
+        if (shadowing == "ButkevichMikhailov")
+            shadowing = "ButkevichMikheyev";
         if (vcut == -1)
             vcut = 1;
         if (ecut == -1)
@@ -684,21 +696,21 @@ TEST(PhotoQ2Integration, Test_of_e)
                                          config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
-        auto components = cross->GetTargets();
+        auto components = medium->GetComponents();
         double sum = 0;
 
         for (auto comp : components)
         {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
                     EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
                     break;
                 }
@@ -730,7 +742,11 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
     while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization >> shadowing)
     {
         parametrization.erase(0,5);
+        if (parametrization == "ButkevichMikhailov")
+            parametrization = "ButkevichMikheyev";
         shadowing.erase(0,6);
+        if (shadowing == "ButkevichMikhailov")
+            shadowing = "ButkevichMikheyev";
         if (vcut == -1)
             vcut = 1;
         if (ecut == -1)
@@ -776,7 +792,11 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
     while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization >> shadowing)
     {
         parametrization.erase(0,5);
+        if (parametrization == "ButkevichMikhailov")
+            parametrization = "ButkevichMikheyev";
         shadowing.erase(0,6);
+        if (shadowing == "ButkevichMikhailov")
+            shadowing = "ButkevichMikheyev";
         if (vcut == -1)
             vcut = 1;
         if (ecut == -1)
@@ -824,7 +844,11 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
     while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization >> shadowing)
     {
         parametrization.erase(0,5);
+        if (parametrization == "ButkevichMikhailov")
+            parametrization = "ButkevichMikheyev";
         shadowing.erase(0,6);
+        if (shadowing == "ButkevichMikhailov")
+            shadowing = "ButkevichMikheyev";
         if (vcut == -1)
             vcut = 1;
         if (ecut == -1)
@@ -842,21 +866,21 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
                                          config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
-        auto components = cross->GetTargets();
+        auto components = medium->GetComponents();
         double sum = 0;
 
         for (auto comp : components)
         {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
                     EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
                     break;
                 }
