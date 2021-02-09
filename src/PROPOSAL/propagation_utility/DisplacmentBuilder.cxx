@@ -2,9 +2,43 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 using namespace PROPOSAL;
 
-template <> void DisplacementBuilder<UtilityIntegral>::build_tables() { }
-
-template <> void DisplacementBuilder<UtilityInterpolant>::build_tables()
+DisplacementBuilder::DisplacementBuilder(
+    crossbase_list_t const& _cross, std::false_type)
+    : Displacement(_cross)
+    , disp_integral(std::make_unique<UtilityIntegral>(
+          [this](double E) { return FunctionToIntegral(E); },
+          this->GetLowerLim(), this->GetHash()))
 {
-    disp_integral.BuildTables("disp_", false);
 }
+
+DisplacementBuilder::DisplacementBuilder(
+    crossbase_list_t const& _cross, std::true_type)
+    : Displacement(_cross)
+    , disp_integral(std::make_unique<UtilityInterpolant>(
+          [this](double E) { return FunctionToIntegral(E); },
+          this->GetLowerLim(), this->GetHash()))
+{
+}
+
+double DisplacementBuilder::SolveTrackIntegral(
+    double lower_lim, double upper_lim)
+{
+    return disp_integral->Calculate(lower_lim, upper_lim);
+}
+
+double DisplacementBuilder::UpperLimitTrackIntegral(
+    double lower_lim, double sum)
+{
+    return disp_integral->GetUpperLimit(lower_lim, sum);
+}
+
+namespace PROPOSAL {
+std::unique_ptr<Displacement> make_displacement(
+    std::vector<std::shared_ptr<CrossSectionBase>> const& cross,
+    bool interpolate)
+{
+    if (interpolate)
+        return std::make_unique<DisplacementBuilder>(cross, std::true_type {});
+    return std::make_unique<DisplacementBuilder>(cross, std::false_type {});
+}
+} // namespace PROPOSAL

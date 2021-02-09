@@ -1,9 +1,8 @@
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
 using namespace PROPOSAL;
-
-void InteractionBuilder::build_tables() { }
 
 InteractionBuilder::InteractionBuilder(std::shared_ptr<Displacement> _disp,
     std::vector<cross_ptr> const& _cross, std::false_type)
@@ -18,9 +17,7 @@ InteractionBuilder::InteractionBuilder(std::shared_ptr<Displacement> _disp,
     std::vector<cross_ptr> const& _cross, std::true_type)
     : Interaction(_disp, _cross)
     , interaction_integral(std::make_unique<UtilityInterpolant>(
-          [i = std::make_shared<InteractionBuilder>(
-               _disp, _cross, std::false_type {}),
-              _disp](double E) { return i->FunctionToIntegral(E); },
+          [this](double E) { return FunctionToIntegral(E); },
           _disp->GetLowerLim(), this->GetHash()))
 {
     interaction_integral->BuildTables("inter_", false);

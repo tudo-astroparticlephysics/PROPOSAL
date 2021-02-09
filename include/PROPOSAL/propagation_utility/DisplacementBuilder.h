@@ -1,45 +1,24 @@
 #pragma once
 #include "PROPOSAL/propagation_utility/Displacement.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
 namespace PROPOSAL {
-template <typename T> class DisplacementBuilder : public Displacement {
-    T disp_integral;
+class UtilityIntegral;
+} // namespace PROPOSAL
 
-    void build_tables();
+namespace PROPOSAL {
+class DisplacementBuilder : public Displacement {
+    std::unique_ptr<UtilityIntegral> disp_integral;
 
 public:
-    template <typename Cross>
-    DisplacementBuilder(Cross&& cross)
-        : Displacement(std::forward<Cross>(cross))
-        , disp_integral(
-              [this](double energy) { return FunctionToIntegral(energy); },
-              this->lower_lim, this->hash)
-    {
-        build_tables();
-    }
+    DisplacementBuilder(crossbase_list_t const&, std::false_type);
+    DisplacementBuilder(crossbase_list_t const&, std::true_type);
 
-    inline double SolveTrackIntegral(double lower_lim, double upper_lim) final
-    {
-        return disp_integral.Calculate(lower_lim, upper_lim);
-    }
+    double SolveTrackIntegral(double lower_lim, double upper_lim) final;
 
-    inline double UpperLimitTrackIntegral(double lower_lim, double sum) final
-    {
-        return disp_integral.GetUpperLimit(lower_lim, sum);
-    }
+    double UpperLimitTrackIntegral(double lower_lim, double sum) final;
 };
 
-template <> void DisplacementBuilder<UtilityIntegral>::build_tables();
-template <> void DisplacementBuilder<UtilityInterpolant>::build_tables();
-
-template <typename T>
-std::unique_ptr<Displacement> make_displacement(T&& cross, bool interpolate)
-{
-    if (interpolate)
-        return PROPOSAL::make_unique<DisplacementBuilder<UtilityInterpolant>>(
-            std::forward<T>(cross));
-    return PROPOSAL::make_unique<DisplacementBuilder<UtilityIntegral>>(
-        std::forward<T>(cross));
-}
+std::unique_ptr<Displacement> make_displacement(
+    std::vector<std::shared_ptr<CrossSectionBase>> const&,
+    bool interpolate = false);
 } // namespace PROPOSAL

@@ -12,11 +12,6 @@ namespace PROPOSAL {
 class InteractionBuilder : public Interaction {
     std::unique_ptr<UtilityIntegral> interaction_integral;
 
-    void build_tables();
-
-    InteractionBuilder(std::shared_ptr<Displacement>,
-        crosssection_list_t const&, std::unique_ptr<UtilityIntegral>);
-
 public:
     InteractionBuilder(std::shared_ptr<Displacement>,
         crosssection_list_t const&, std::false_type);
