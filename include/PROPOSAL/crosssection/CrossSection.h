@@ -70,35 +70,32 @@ namespace detail {
         ParticleDef p, Medium m, std::shared_ptr<const EnergyCutSettings> cut,
         size_t hash = 0)
     {
-        using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
-        auto dndx_map
-                = std::make_unique<std::unordered_map<size_t, std::tuple<double, dndx_ptr>>>();
-        if (cut->GetEcut() == INF and cut->GetVcut() == 1) {
-            dndx_map = nullptr;
-        } else {
-            auto calc = make_dndx(interpol, param, p, m, cut, hash);
-            dndx_map->emplace(m.GetHash(), std::make_tuple(1., std::move(calc)));
-        }
+        using dndx_ptr_t = std::unique_ptr<CrossSectionDNDX>;
+        using dndx_map_t = std::unordered_map<size_t, std::tuple<double, dndx_ptr_t>>;
+        if (cut)
+            if (cut->GetEcut() == INF and cut->GetVcut() == 1)
+                return std::unique_ptr<dndx_map_t>();
+        auto calc = make_dndx(interpol, param, p, m, cut, hash);
+        auto dndx_map = std::make_unique<dndx_map_t>();
+        dndx_map->emplace(m.GetHash(), std::make_tuple(1., std::move(calc)));
         return dndx_map;
     }
 
     template <typename Param>
     inline auto build_dndx(std::true_type, bool interpol, Param param,
         ParticleDef p, Medium m, std::shared_ptr<const EnergyCutSettings> cut,
-        size_t hash = 0)
-    {
-        using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
-        auto dndx_map
-                = std::make_unique<std::unordered_map<size_t, std::tuple<double, dndx_ptr>>>();
-        if (cut->GetEcut() == INF and cut->GetVcut() == 1) {
-            dndx_map = nullptr;
-        } else {
-            for (auto& c : m.GetComponents()) {
-                auto comp_hash = c.GetHash();
-                auto weight = weight_component(m, c);
-                auto calc = make_dndx(interpol, param, p, c, cut, hash);
-                dndx_map->emplace(comp_hash, std::make_tuple(weight, std::move(calc)));
-            }
+        size_t hash = 0) {
+        using dndx_ptr_t = std::unique_ptr<CrossSectionDNDX>;
+        using dndx_map_t = std::unordered_map<size_t, std::tuple<double, dndx_ptr_t>>;
+        if (cut)
+            if (cut->GetEcut() == INF and cut->GetVcut() == 1)
+                return std::unique_ptr<dndx_map_t>();
+        auto dndx_map = std::make_unique<dndx_map_t>();
+        for (auto &c : m.GetComponents()) {
+            auto comp_hash = c.GetHash();
+            auto weight = weight_component(m, c);
+            auto calc = make_dndx(interpol, param, p, c, cut, hash);
+            dndx_map->emplace(comp_hash, std::make_tuple(weight, std::move(calc)));
         }
         return dndx_map;
     }

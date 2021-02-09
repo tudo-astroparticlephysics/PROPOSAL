@@ -28,15 +28,14 @@
 
 #pragma once
 
+#include "PROPOSAL/propagation_utility/Interaction.h"
 #include <vector>
 #include <memory>
 #include <tuple>
 #include <functional>
 
-
 namespace PROPOSAL {
 class Component;
-class Interaction;
 class Displacement;
 class Time;
 class Scattering;
@@ -67,8 +66,7 @@ public:
 
     PropagationUtility(Collection const& collection);
 
-    std::tuple<InteractionType, size_t, double>
-    EnergyStochasticloss(double, double);
+    Interaction::Loss EnergyStochasticloss(double, double);
     double EnergyDecay(double, std::function<double()>, double);
     double EnergyInteraction(double, std::function<double()>);
     double EnergyRandomize(double, double, std::function<double()>);
