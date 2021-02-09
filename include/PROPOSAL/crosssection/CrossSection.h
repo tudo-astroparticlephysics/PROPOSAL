@@ -51,12 +51,13 @@ struct CrossSectionBase {
     virtual double CalculatedE2dx(double) = 0;
     virtual double CalculatedNdx(double) = 0;
     virtual double CalculatedNdx(double, size_t) = 0;
-    virtual std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(double) = 0;
+    virtual std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(
+        double)
+        = 0;
     virtual double CalculateStochasticLoss(size_t, double, double) = 0;
     virtual double GetLowerEnergyLim() const = 0;
     virtual size_t GetHash() const noexcept = 0;
     virtual InteractionType GetInteractionType() const noexcept = 0;
-
 };
 
 namespace detail {
@@ -71,13 +72,14 @@ namespace detail {
         size_t hash = 0)
     {
         using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
-        auto dndx_map
-                = std::make_unique<std::unordered_map<size_t, std::tuple<double, dndx_ptr>>>();
+        auto dndx_map = std::make_unique<
+            std::unordered_map<size_t, std::tuple<double, dndx_ptr>>>();
         if (cut->GetEcut() == INF and cut->GetVcut() == 1) {
             dndx_map = nullptr;
         } else {
             auto calc = make_dndx(interpol, param, p, m, cut, hash);
-            dndx_map->emplace(m.GetHash(), std::make_tuple(1., std::move(calc)));
+            dndx_map->emplace(
+                m.GetHash(), std::make_tuple(1., std::move(calc)));
         }
         return dndx_map;
     }
@@ -88,8 +90,8 @@ namespace detail {
         size_t hash = 0)
     {
         using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
-        auto dndx_map
-                = std::make_unique<std::unordered_map<size_t, std::tuple<double, dndx_ptr>>>();
+        auto dndx_map = std::make_unique<
+            std::unordered_map<size_t, std::tuple<double, dndx_ptr>>>();
         if (cut->GetEcut() == INF and cut->GetVcut() == 1) {
             dndx_map = nullptr;
         } else {
@@ -97,7 +99,8 @@ namespace detail {
                 auto comp_hash = c.GetHash();
                 auto weight = weight_component(m, c);
                 auto calc = make_dndx(interpol, param, p, c, cut, hash);
-                dndx_map->emplace(comp_hash, std::make_tuple(weight, std::move(calc)));
+                dndx_map->emplace(
+                    comp_hash, std::make_tuple(weight, std::move(calc)));
             }
         }
         return dndx_map;
@@ -194,6 +197,9 @@ namespace detail {
 
     double calculate_lower_energy_lim(
         std::vector<std::tuple<double, std::unique_ptr<CrossSectionDEDX>>>*);
+
+    std::shared_ptr<spdlog::logger> init_logger(std::string const&, size_t,
+        ParticleDef const&, Medium const&, std::shared_ptr<const EnergyCutSettings>);
 }
 
 template <typename comp_wise, typename only_stochastic>
@@ -206,8 +212,10 @@ class CrossSection : public CrossSectionBase {
 
 protected:
     size_t hash;
+    std::shared_ptr<spdlog::logger> logger;
 
-    std::unique_ptr<std::unordered_map<size_t, std::tuple<double, dndx_ptr>>> dndx;
+    std::unique_ptr<std::unordered_map<size_t, std::tuple<double, dndx_ptr>>>
+        dndx;
     std::unique_ptr<std::vector<std::tuple<double, dedx_ptr>>> dedx;
     std::unique_ptr<std::vector<std::tuple<double, de2dx_ptr>>> de2dx;
 
@@ -223,6 +231,7 @@ public:
         size_t _hash = 0)
         : hash(detail::generate_cross_hash(
             _hash, _name::value, _id::value, param, p, m, cut))
+        , logger(detail::init_logger(_name::value, _id::value, p, m, cut))
         , dndx(detail::build_dndx(
               comp_wise {}, interpol, param, p, m, cut, hash))
         , dedx(detail::build_dedx(
@@ -238,10 +247,11 @@ public:
     virtual ~CrossSection() = default;
 
 protected:
-    double CalculateStochasticLoss_impl(size_t target_hash, double E, double rate, std::false_type)
+    double CalculateStochasticLoss_impl(
+        size_t target_hash, double E, double rate, std::false_type)
     {
-        return std::get<1>((*dndx)[target_hash])->GetUpperLimit(
-            E, rate * std::get<0>((*dndx)[target_hash]));
+        return std::get<1>((*dndx)[target_hash])
+            ->GetUpperLimit(E, rate * std::get<0>((*dndx)[target_hash]));
     }
 
     double CalculateStochasticLoss_impl(size_t, double, double, std::true_type)
@@ -256,7 +266,7 @@ public:
         if (dndx)
             for (auto& it : *dndx) {
                 dNdx_all += std::get<1>((*dndx)[it.first])->Calculate(E)
-                            / std::get<0>((*dndx)[it.first]);
+                    / std::get<0>((*dndx)[it.first]);
             }
         return dNdx_all;
     };
@@ -264,15 +274,18 @@ public:
     double CalculatedNdx(double E, size_t target_hash) final
     {
         if (dndx)
-            return std::get<1>((*dndx)[target_hash])->Calculate(E) / std::get<0>((*dndx)[target_hash]);
+            return std::get<1>((*dndx)[target_hash])->Calculate(E)
+                / std::get<0>((*dndx)[target_hash]);
         return 0.;
     };
 
-    std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(double E) override {
+    std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(
+        double E) override
+    {
         std::vector<std::pair<size_t, double>> rates = {};
         if (dndx) {
             for (auto& c : *dndx)
-                rates.push_back({c.first, CalculatedNdx(E, c.first)});
+                rates.push_back({ c.first, CalculatedNdx(E, c.first) });
         }
         return rates;
     }
@@ -280,7 +293,8 @@ public:
     double CalculateStochasticLoss(size_t hash, double E, double rate)
     {
         if (dndx)
-            return CalculateStochasticLoss_impl(hash, E, rate, only_stochastic {});
+            return CalculateStochasticLoss_impl(
+                hash, E, rate, only_stochastic {});
         throw std::logic_error("Can not calculate stochastic loss if dndx"
                                "calculator is not defined. The crosssection"
                                "is probably defined to be only-continuous.");

@@ -24,7 +24,7 @@ CrossSectionDEDX::CrossSectionDEDX(double _lower_energy_lim, size_t _hash)
     , logger(Logging::Get("CrossSection.DEDX"))
     , lower_energy_lim(_lower_energy_lim)
 {
-    logger->info("Creating dEdx.");
+    logger->debug("Creating dEdx.");
 }
 
 CrossSectionDEDX::CrossSectionDEDX(
