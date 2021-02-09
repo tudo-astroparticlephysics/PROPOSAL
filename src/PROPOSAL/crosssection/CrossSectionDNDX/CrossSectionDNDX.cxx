@@ -19,23 +19,23 @@ CrossSectionDNDX::CrossSectionDNDX(lim_func_t _kin_lim,
     logger->debug("Creating dNdx.");
 }
 
-CrossSectionDNDX::CrossSectionDNDX(param_medium_t const& param, ParticleDef p,
-    Medium m, std::shared_ptr<const EnergyCutSettings> cut, size_t hash)
+CrossSectionDNDX::CrossSectionDNDX(param_medium_t const& _param, ParticleDef _p,
+    Medium _m, std::shared_ptr<const EnergyCutSettings> _cut, size_t _hash)
     : CrossSectionDNDX(
-        [ptr = std::shared_ptr<param_medium_t>(param.clone()), p, m](
-            double E) { return ptr->GetKinematicLimits(p, m, E); },
-        param.GetLowerEnergyLim(p), cut, hash)
+        [ptr = std::shared_ptr<param_medium_t>(_param.clone()), _p, _m](
+            double E) { return ptr->GetKinematicLimits(_p, _m, E); },
+        _param.GetLowerEnergyLim(_p), _cut, _hash)
 {
 }
 
-CrossSectionDNDX::CrossSectionDNDX(param_comp_t const& param, ParticleDef p,
-    Component c, std::shared_ptr<const EnergyCutSettings> cut, size_t hash)
+CrossSectionDNDX::CrossSectionDNDX(param_comp_t const& _param, ParticleDef _p,
+    Component _c, std::shared_ptr<const EnergyCutSettings> _cut, size_t _hash)
     : CrossSectionDNDX(
-        [ptr = std::shared_ptr<param_comp_t>(param.clone()), p, c](
-            double E) { return ptr->GetKinematicLimits(p, c, E); },
-        param.GetLowerEnergyLim(p), cut, hash)
+        [ptr = std::shared_ptr<param_comp_t>(_param.clone()), _p, _c](
+            double E) { return ptr->GetKinematicLimits(_p, _c, E); },
+        _param.GetLowerEnergyLim(_p), _cut, _hash)
 {
-    hash_combine(hash, c.GetHash());
+    hash_combine(this->hash, _c.GetHash());
 }
 
 CrossSectionDNDX::IntegrationLimit CrossSectionDNDX::GetIntegrationLimits(
