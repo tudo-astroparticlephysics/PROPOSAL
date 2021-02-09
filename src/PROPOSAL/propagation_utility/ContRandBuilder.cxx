@@ -6,8 +6,7 @@ template <> void ContRandBuilder<UtilityIntegral>::build_tables() { }
 
 template <> void ContRandBuilder<UtilityInterpolant>::build_tables()
 {
-    auto def = cubic_splines::CubicSplines<double>::Definition();
-    cont_rand_integral.BuildTables("cont_rand", std::move(def), false);
+    cont_rand_integral.BuildTables("cont_rand_", false);
 }
 
 namespace PROPOSAL {

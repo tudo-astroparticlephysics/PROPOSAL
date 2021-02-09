@@ -131,11 +131,10 @@ PYBIND11_MODULE(proposal, m)
         .def("sample_loss", &Interaction::SampleLoss, py::arg("energy"),
             py::arg("rates"), py::arg("random number"))
         .def("mean_free_path", py::vectorize(&Interaction::MeanFreePath),
-            py::arg("energy"))
-        .def_readwrite_static("interpol_def", &Interaction::interpol_def);
+            py::arg("energy"));
 
     m.def("make_interaction",
-        [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate) {
+        [](crosssection_list_t cross, bool interpolate) {
             return shared_ptr<Interaction>(
                 make_interaction(cross, interpolate));
         });
@@ -164,7 +163,7 @@ PYBIND11_MODULE(proposal, m)
             py::arg("energy"));
 
     m.def("make_displacement",
-        [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate) {
+        [](crosssection_list_t cross, bool interpolate) {
             return shared_ptr<Displacement>(
                 make_displacement(cross, interpolate));
         });
@@ -292,7 +291,7 @@ PYBIND11_MODULE(proposal, m)
         .def_readwrite_static("interpol_def", &ContRand::interpol_def);
 
     m.def("make_contrand",
-        [](crosssection_list_t<ParticleDef, Medium> cross, bool interpolate) {
+        [](crosssection_list_t cross, bool interpolate) {
             return shared_ptr<ContRand>(make_contrand(cross, interpolate));
         });
 
@@ -302,7 +301,7 @@ PYBIND11_MODULE(proposal, m)
         .def_readwrite_static("interpol_def", &Decay::interpol_def);
 
     m.def("make_decay",
-        [](crosssection_list_t<ParticleDef, Medium> cross,
+        [](crosssection_list_t cross,
             ParticleDef const& particle, bool interpolate) {
             return shared_ptr<Decay>(make_decay(cross, particle, interpolate));
         });
@@ -314,7 +313,7 @@ PYBIND11_MODULE(proposal, m)
         .def_readwrite_static("interpol_def", &Time::interpol_def);
 
     m.def("make_time",
-        [](crosssection_list_t<ParticleDef, Medium> cross,
+        [](crosssection_list_t cross,
             ParticleDef const& particle, bool interpolate) {
             return shared_ptr<Time>(make_time(cross, particle, interpolate));
         });

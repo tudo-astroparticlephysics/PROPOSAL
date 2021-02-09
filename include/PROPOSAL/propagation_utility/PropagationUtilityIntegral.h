@@ -29,6 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/math/Integral.h"
+#include <string>
 
 namespace PROPOSAL {
 class UtilityIntegral {
@@ -40,11 +41,14 @@ protected:
     size_t hash;
 
 public:
+    UtilityIntegral() = default;
     UtilityIntegral(std::function<double(double)>, double, size_t);
+
+    virtual void BuildTables(const std::string, bool) {};
 
     virtual double Calculate(double, double);
     virtual double GetUpperLimit(double, double);
 
-    virtual size_t GetHash() const {return hash;}
+    virtual size_t GetHash() const { return hash; }
 };
 } // namespace PROPOSAL

@@ -1,54 +1,37 @@
 #pragma once
-#include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
 
-namespace PROPOSAL {
-template <class I> class InteractionBuilder : public Interaction {
-    I interaction_integral;
+#include <type_traits>
+#include <vector>
 
-    void build_tables() {};
+namespace PROPOSAL {
+class UtilityIntegral;
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
+class InteractionBuilder : public Interaction {
+    std::unique_ptr<UtilityIntegral> interaction_integral;
+
+    void build_tables();
+
+    InteractionBuilder(std::shared_ptr<Displacement>,
+        crosssection_list_t const&, std::unique_ptr<UtilityIntegral>);
 
 public:
+    InteractionBuilder(std::shared_ptr<Displacement>,
+        crosssection_list_t const&, std::false_type);
 
-    template <typename Cross>
-    InteractionBuilder(std::shared_ptr<Displacement> _disp, Cross&& _cross)
-        : Interaction(_disp, std::forward<Cross>(_cross))
-        , interaction_integral(
-              [this](double E) { return FunctionToIntegral(E); },
-              disp->GetLowerLim(), this->GetHash())
-    {
-    }
+    InteractionBuilder(std::shared_ptr<Displacement>,
+        crosssection_list_t const&, std::true_type);
 
-    double EnergyInteraction(double energy, double rnd) final
-    {
-        assert(energy >= disp->GetLowerLim());
-        auto rndi = -std::log(rnd);
-        auto rndiMin
-            = interaction_integral.Calculate(energy, disp->GetLowerLim());
-        if (rndi >= rndiMin)
-            return disp->GetLowerLim();
-        return interaction_integral.GetUpperLimit(energy, rndi);
-    }
+    double EnergyInteraction(double energy, double rnd) final;
 };
+} // namespace PROPOSAL
 
-template <typename T>
-auto make_interaction(
-    std::shared_ptr<Displacement> disp, T&& cross, bool interpolate)
-{
-    auto inter = std::unique_ptr<Interaction>();
-    if (interpolate)
-        inter.reset(new InteractionBuilder<UtilityInterpolant>(
-            disp, std::forward<T>(cross)));
-    else
-        inter.reset(new InteractionBuilder<UtilityIntegral>(
-            disp, std::forward<T>(cross)));
-    return inter;
-}
+namespace PROPOSAL {
+std::unique_ptr<Interaction> make_interaction(std::shared_ptr<Displacement>,
+    std::vector<std::shared_ptr<CrossSectionBase>> const&, bool);
 
-template <typename T> auto make_interaction(T&& cross, bool interpolate)
-{
-    auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
-    return make_interaction(disp, cross, interpolate);
-}
-
+std::unique_ptr<Interaction> make_interaction(
+    std::vector<std::shared_ptr<CrossSectionBase>> const&, bool);
 } // namespace PROPOSAL

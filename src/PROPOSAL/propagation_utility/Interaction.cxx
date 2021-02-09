@@ -4,9 +4,14 @@
 
 using namespace PROPOSAL;
 
-Interpolant1DBuilder::Definition Interaction::interpol_def = { 1000 };
+Interaction::Interaction(
+    std::shared_ptr<Displacement> _disp, std::vector<cross_ptr> const& _cross)
+    : disp(_disp)
+    , cross_list(_cross)
+{
+}
 
-double Interaction::FunctionToIntegral(double energy)
+double Interaction::FunctionToIntegral(double energy) const
 {
     auto total_rate = 0.;
     for (auto& c : cross_list)
@@ -35,7 +40,7 @@ Interaction::Loss Interaction::SampleLoss(
         if (sampled_rate < 0.) {
             auto loss = r.crosssection->CalculateStochasticLoss(
                 r.comp_hash, energy, -sampled_rate);
-            return {r.crosssection->GetInteractionType(), r.comp_hash, loss};
+            return { r.crosssection->GetInteractionType(), r.comp_hash, loss };
         }
     }
     throw std::logic_error(
@@ -44,11 +49,12 @@ Interaction::Loss Interaction::SampleLoss(
 
 std::vector<Interaction::Rate> Interaction::Rates(double energy)
 {
-    auto rates = std::vector<Interaction::Rate>();
+    auto rates = std::vector<Rate>();
     for (auto& c : cross_list) {
         auto dndx_per_target = c->CalculatedNdx_PerTarget(energy);
         for (auto dndx : dndx_per_target)
-            rates.emplace_back(Interaction::Rate{c, dndx.first, dndx.second});
+            rates.emplace_back(
+                Interaction::Rate { c, dndx.first, dndx.second });
     }
     return rates;
 }

@@ -50,7 +50,7 @@ void init_scattering(py::module& m)
     m.def(
         "make_multiple_scattering",
         [](std::string const& n, ParticleDef const& p, Medium const& m,
-            crosssection_list_t<ParticleDef, Medium> c, bool i) {
+            crosssection_list_t c, bool i) {
             return std::shared_ptr<multiple_scattering::Parametrization>(
                 make_multiple_scattering(n, p, m, c, i));
         },

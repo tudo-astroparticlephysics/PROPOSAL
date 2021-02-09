@@ -35,7 +35,6 @@
 
 #include <functional>
 #include <memory>
-#include <string>
 
 namespace PROPOSAL {
 class Integral;
@@ -61,9 +60,9 @@ class UtilityInterpolant : public UtilityIntegral {
 public:
     UtilityInterpolant(std::function<double(double)>, double, size_t);
 
-    template <typename Def>
-    void BuildTables(const std::string prefix, Def&& def, bool reverse = false)
+    void BuildTables(const std::string prefix, bool reverse = false)
     {
+        auto def = cubic_splines::CubicSplines<double>::Definition();
         auto reference_x = lower_lim;
         if (reverse)
             reference_x = 1.e14;
@@ -81,7 +80,7 @@ public:
             std::move(def), gen_path(), gen_name(prefix));
     }
 
-    double Calculate(double, double);
-    double GetUpperLimit(double, double);
+    double Calculate(double, double) final;
+    double GetUpperLimit(double, double) final;
 };
 } // namespace PROPOSAL

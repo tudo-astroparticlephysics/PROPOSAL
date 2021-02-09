@@ -321,6 +321,5 @@ public:
 
 using cross_t_ptr = std::unique_ptr<CrossSectionBase>;
 
-template <typename P, typename M>
 using crosssection_list_t = std::vector<std::shared_ptr<CrossSectionBase>>;
 } // namespace PROPOSAL
