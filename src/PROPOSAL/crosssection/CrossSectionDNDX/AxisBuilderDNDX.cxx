@@ -14,9 +14,9 @@ void AxisBuilderDNDX::refine_definition_range(
     auto ax = energy_axis_t(energy_lim.low, energy_lim.up, energy_lim.nodes);
     while (not(func(ax.back_transform(i)) > 0) and i < energy_lim.nodes)
         ++i;
-    if (i == v_lim.nodes)
+    if (i == energy_lim.nodes)
         throw std::logic_error("No positive values to build dNdx tables!");
-    v_lim.low = ax.back_transform(i);
+    energy_lim.low = ax.back_transform(i);
 }
 
 std::array<std::unique_ptr<AxisBuilderDNDX::axis_t>, 2>
