@@ -46,11 +46,13 @@ namespace detail {
         auto param_ptr = std::shared_ptr<param_t>(param.clone());
         return [param_ptr, p, c](double E, double v_min, double v_max) {
             Integral i;
-            auto dNdx = [ptr = param_ptr.get(), &p, &c, E](double v) {
-                double t = std::log(1. - v);
-                return ptr->DifferentialCrossSection(p, c, E, t);
+            double t_min = std::log(1. - v_min);
+            double t_max = std::log(1. - v_max);
+            auto dNdx = [ptr = param_ptr.get(), &p, &c, E](double t) {
+                return std::exp(t)
+                    * ptr->DifferentialCrossSection(p, c, E, 1. - std::exp(t));
             };
-            return i.Integrate(v_min, v_max, dNdx, 2);
+            return i.Integrate(t_max, t_min, dNdx, 2);
         };
     }
 
@@ -92,16 +94,18 @@ namespace detail {
         return [param_ptr, p, c](
                    double E, double v_min, double v_max, double rate) {
             Integral i;
-            auto dNdx = [ptr = param_ptr.get(), &p, &c, E](double v) {
-                double t = std::log(1. - v);
-                return ptr->DifferentialCrossSection(p, c, E, t);
+            double t_min = std::log(1. - v_min);
+            double t_max = std::log(1. - v_max);
+            auto dNdx = [ptr = param_ptr.get(), &p, &c, E](double t) {
+                return std::exp(t)
+                    * ptr->DifferentialCrossSection(p, c, E, 1. - std::exp(t));
             };
-            i.IntegrateWithRandomRatio(v_min, v_max, dNdx, 3, rate);
-            return i.GetUpperLimit();
+            i.IntegrateWithRandomRatio(t_min, t_max, dNdx, 3, rate);
+            return 1. - std::exp(i.GetUpperLimit());
         };
     }
-} // namespace PROPOSAL
 } // namespace detail
+} // namespace PROPOSAL
 
 double CrossSectionDNDXIntegral::Calculate(double energy)
 {

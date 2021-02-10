@@ -4,14 +4,17 @@
 
 #include "gtest/gtest.h"
 
-#include <fstream>
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/Factories/ComptonFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+
+#include <fstream>
+#include <spdlog/spdlog.h>
 
 using namespace PROPOSAL;
 
@@ -26,8 +29,8 @@ const std::string testfile_dir = "bin/TestFiles/";
 
 // ComptonKleinNishina* Compton_A =
 //         new ComptonKleinNishina(particle_def, medium, ecuts, multiplier);
-// Parametrization* Compton_B = new ComptonKleinNishina(particle_def, medium, ecuts, multiplier);
-// EXPECT_TRUE(*Compton_A == *Compton_B);
+// Parametrization* Compton_B = new ComptonKleinNishina(particle_def, medium,
+// ecuts, multiplier); EXPECT_TRUE(*Compton_A == *Compton_B);
 
 // ComptonKleinNishina param(particle_def, medium, ecuts, multiplier);
 // EXPECT_TRUE(param == *Compton_A);
@@ -37,9 +40,10 @@ const std::string testfile_dir = "bin/TestFiles/";
 // EXPECT_TRUE(*Int_A == *Int_B);
 
 // InterpolationDef InterpolDef;
-// ComptonInterpolant* Interpol_A        = new ComptonInterpolant(param, InterpolDef);
-// CrossSectionInterpolant* Interpol_B = new ComptonInterpolant(param, InterpolDef);
-// EXPECT_TRUE(*Interpol_A == *Interpol_B);
+// ComptonInterpolant* Interpol_A        = new ComptonInterpolant(param,
+// InterpolDef); CrossSectionInterpolant* Interpol_B = new
+// ComptonInterpolant(param, InterpolDef); EXPECT_TRUE(*Interpol_A ==
+// *Interpol_B);
 
 // delete Compton_A;
 // delete Compton_B;
@@ -115,8 +119,9 @@ const std::string testfile_dir = "bin/TestFiles/";
 TEST(Compton, Test_of_dEdx)
 {
     std::string filename = testfile_dir + "Compton_dEdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    std::ifstream in { filename };
+    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
+                           << "' could not be opened";
 
     std::string mediumName;
     double ecut;
@@ -130,9 +135,9 @@ TEST(Compton, Test_of_dEdx)
 
     std::cout.precision(16);
 
-    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization)
-    {
-        parametrization.erase(0,7);
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
+        >> dEdx_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
         if (vcut == -1)
             vcut = 1;
@@ -157,8 +162,9 @@ TEST(Compton, Test_of_dEdx)
 TEST(Compton, Test_of_dNdx)
 {
     std::string filename = testfile_dir + "Compton_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    std::ifstream in { filename };
+    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
+                           << "' could not be opened";
 
     std::string mediumName;
     double ecut;
@@ -172,9 +178,9 @@ TEST(Compton, Test_of_dNdx)
 
     std::cout.precision(16);
 
-    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization)
-    {
-        parametrization.erase(0,7);
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
+        >> dNdx_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
         if (vcut == -1)
             vcut = 1;
@@ -199,8 +205,9 @@ TEST(Compton, Test_of_dNdx)
 TEST(Compton, Test_of_e)
 {
     std::string filename = testfile_dir + "Compton_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    std::ifstream in { filename };
+    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
+                           << "' could not be opened";
 
     std::string mediumName;
     double ecut;
@@ -218,9 +225,9 @@ TEST(Compton, Test_of_e)
 
     RandomGenerator::Get().SetSeed(0);
 
-    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization)
-    {
-        parametrization.erase(0,7);
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1
+        >> rnd2 >> stochastic_loss_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
         if (vcut == -1)
             vcut = 1;
@@ -240,19 +247,23 @@ TEST(Compton, Test_of_e)
         auto components = medium->GetComponents();
         double sum = 0;
 
-        for (auto comp : components)
-        {
+        for (auto comp : components) {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1 ) {
-                    #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
-                    #endif
+                if (ecut == INF and vcut == 1) {
+#ifndef NDEBUG
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(
+                                     comp.GetHash(), energy, rate_new),
+                        "");
+#endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    stochastic_loss_new = energy
+                        * cross->CalculateStochasticLoss(
+                            comp.GetHash(), energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
+                        1E-4 * stochastic_loss_stored);
                     break;
                 }
             }
@@ -262,9 +273,10 @@ TEST(Compton, Test_of_e)
 
 TEST(Compton, Test_of_dEdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Compton_dEdx_interpol.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    std::string filename = testfile_dir + "Compton_dEdx.txt";
+    std::ifstream in { filename };
+    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
+                           << "' could not be opened";
 
     std::string mediumName;
     double ecut;
@@ -278,9 +290,9 @@ TEST(Compton, Test_of_dEdx_Interpolant)
 
     std::cout.precision(16);
 
-    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization)
-    {
-        parametrization.erase(0,7);
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
+        >> dEdx_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
         if (vcut == -1)
             vcut = 1;
@@ -304,9 +316,10 @@ TEST(Compton, Test_of_dEdx_Interpolant)
 
 TEST(Compton, Test_of_dNdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Compton_dNdx_interpol.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    std::string filename = testfile_dir + "Compton_dNdx.txt";
+    std::ifstream in { filename };
+    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
+                           << "' could not be opened";
 
     std::string mediumName;
     double ecut;
@@ -320,9 +333,9 @@ TEST(Compton, Test_of_dNdx_Interpolant)
 
     std::cout.precision(16);
 
-    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization)
-    {
-        parametrization.erase(0,7);
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
+        >> dNdx_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
         if (vcut == -1)
             vcut = 1;
@@ -346,9 +359,10 @@ TEST(Compton, Test_of_dNdx_Interpolant)
 
 TEST(Compton, Test_of_e_Interpolant)
 {
-    std::string filename = testfile_dir + "Compton_e_interpol.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    std::string filename = testfile_dir + "Compton_e.txt";
+    std::ifstream in { filename };
+    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
+                           << "' could not be opened";
 
     std::string mediumName;
     double ecut;
@@ -366,9 +380,9 @@ TEST(Compton, Test_of_e_Interpolant)
 
     RandomGenerator::Get().SetSeed(0);
 
-    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization)
-    {
-        parametrization.erase(0,7);
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1
+        >> rnd2 >> stochastic_loss_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
         if (vcut == -1)
             vcut = 1;
@@ -388,19 +402,23 @@ TEST(Compton, Test_of_e_Interpolant)
         auto components = medium->GetComponents();
         double sum = 0;
 
-        for (auto comp : components)
-        {
+        for (auto comp : components) {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1 ) {
-                    #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
-                    #endif
+                if (ecut == INF and vcut == 1) {
+#ifndef NDEBUG
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(
+                                     comp.GetHash(), energy, rate_new),
+                        "");
+#endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    stochastic_loss_new = energy
+                        * cross->CalculateStochasticLoss(
+                            comp.GetHash(), energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
+                        1E-4 * stochastic_loss_stored);
                     break;
                 }
             }
@@ -410,6 +428,11 @@ TEST(Compton, Test_of_e_Interpolant)
 
 int main(int argc, char** argv)
 {
+    if (argc > 1) {
+        auto debug = std::atof(argv[1]);
+        if (debug)
+            Logging::SetGlobalLoglevel(spdlog::level::level_enum::trace);
+    }
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
