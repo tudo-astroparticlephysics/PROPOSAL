@@ -3,31 +3,45 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDX.h"
 
 namespace PROPOSAL {
-namespace crosssection {
-    struct Ionization;
-} // namespace crosssection
+    namespace crosssection {
+        struct Ionization;
+        struct ComptonKleinNishina;
+    }
+} // namespace PROPOSAL
+
+namespace PROPOSAL {
 namespace detail {
     using dndx_integrand_t
-        = std::function<double(double, double, double, double)>;
+        = std::function<double(double, double, double)>;
     using dndx_upper_lim_t
         = std::function<double(double, double, double, double)>;
 
     dndx_integrand_t define_dndx_integral(
-        crosssection::Parametrization<Medium> const&, ParticleDef, Medium);
+        crosssection::Parametrization<Medium> const&, ParticleDef const&,
+        Medium const&);
 
     dndx_integrand_t define_dndx_integral(
-        crosssection::Parametrization<Component> const&, ParticleDef,
-        Component);
+        crosssection::Parametrization<Component> const&, ParticleDef const&,
+        Component const&);
 
     dndx_integrand_t define_dndx_integral(
-        crosssection::Ionization const&, ParticleDef, Medium);
+        crosssection::ComptonKleinNishina const&, ParticleDef const&,
+        Component const&);
 
     dndx_upper_lim_t define_dndx_upper_lim(
-        crosssection::Parametrization<Medium> const&, ParticleDef, Medium);
+        crosssection::Parametrization<Medium> const&, ParticleDef const&,
+        Medium const&);
 
     dndx_upper_lim_t define_dndx_upper_lim(
-        crosssection::Parametrization<Component> const&, ParticleDef,
-        Component);
+        crosssection::Parametrization<Component> const&, ParticleDef const&,
+        Component const&);
+
+    dndx_upper_lim_t define_dndx_upper_lim(
+        crosssection::ComptonKleinNishina const&, ParticleDef const&,
+        Component const&);
+
+    dndx_integrand_t define_dndx_integral(
+            crosssection::Ionization const&, ParticleDef const&, Medium const&);
 } // namespace detail
 } // namespace PROPOSAL
 
