@@ -162,6 +162,9 @@ TEST(Ionization, Test_of_dEdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
+
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
@@ -204,6 +207,9 @@ TEST(Ionization, Test_of_dNdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
+
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
@@ -211,8 +217,6 @@ TEST(Ionization, Test_of_dNdx)
                                      config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
-        if (parametrization != "BetheBlochRossi")
-            dNdx_new *= ME / particle_def.mass; // For muons and taus, a kinematic variable has been wrongly defined in the old version of PROPOSAL
         EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-6 * dNdx_stored);
     }
 }
@@ -250,6 +254,9 @@ TEST(Ionization, Test_Stochastic_Loss)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
+
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
@@ -278,7 +285,7 @@ TEST(Ionization, Test_Stochastic_Loss)
 
 TEST(Ionization, Test_of_dEdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Ioniz_dEdx_interpol.txt";
+    std::string filename = testfile_dir + "Ioniz_dEdx.txt";
 	std::ifstream in{filename};
 	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -308,19 +315,24 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
+
         auto cross = make_ionization(particle_def, *medium, ecuts, true,
                                      config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
-
-        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-6 * dEdx_stored);
+        if (vcut * energy == ecut)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-2 * dEdx_stored); // kink in interpolated function in this case
+        else
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-4 * dEdx_stored);
 
     }
 }
 
 TEST(Ionization, Test_of_dNdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Ioniz_dNdx_interpol.txt";
+    std::string filename = testfile_dir + "Ioniz_dNdx.txt";
 	std::ifstream in{filename};
 	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -350,19 +362,23 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
+
         auto cross = make_ionization(particle_def, *medium, ecuts, true,
                                      config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
-        if (parametrization != "BetheBlochRossi")
-            dNdx_new *= ME / particle_def.mass; // For muons and taus, a kinematic variable has been wrongly defined in the old version of PROPOSAL
-        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-6 * dNdx_stored);
+        if (vcut * energy == ecut)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored);
+        else
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 5e-4 * dNdx_stored);
     }
 }
 
 TEST(Ionization, Test_of_e_interpol)
 {
-    std::string filename = testfile_dir + "Ioniz_e_interpol.txt";
+    std::string filename = testfile_dir + "Ioniz_e.txt";
 	std::ifstream in{filename};
 	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -395,6 +411,9 @@ TEST(Ionization, Test_of_e_interpol)
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
+
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
 
         auto cross = make_ionization(particle_def, *medium, ecuts, true,
                                      config);

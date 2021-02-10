@@ -7,6 +7,7 @@ namespace PROPOSAL {
 namespace crosssection {
     struct IonizBergerSeltzerBhabha;
     struct IonizBergerSeltzerMoller;
+    struct IonizBetheBlochRossi;
     struct ComptonKleinNishina;
 } // namespace crosssection
 } // namespace PROPOSAL
@@ -30,6 +31,10 @@ namespace detail {
     dedx_integral_t define_dedx_integral(
         crosssection::IonizBergerSeltzerMoller const&, ParticleDef const&,
         Medium const&, EnergyCutSettings const&);
+
+    dedx_integral_t define_dedx_integral(
+        crosssection::IonizBetheBlochRossi const&, ParticleDef const&,
+        Medium const& medium, EnergyCutSettings const&);
 
     dedx_integral_t define_dedx_integral(
         crosssection::ComptonKleinNishina const&, ParticleDef const&,

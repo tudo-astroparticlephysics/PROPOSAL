@@ -1,5 +1,6 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
 #include "PROPOSAL/crosssection/parametrization/Compton.h"
+#include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -32,15 +33,15 @@ namespace detail {
         return _define_dndx_integral(param, p, m);
     }
 
-    dndx_integrand_t define_dndx_integral(param_t<Component> const& param,
-        ParticleDef const& p, Component const& c)
+    dndx_integrand_t define_dndx_integral(
+        param_t<Component> const& param, ParticleDef const& p, Component const& c)
     {
         return _define_dndx_integral(param, p, c);
     }
 
     dndx_integrand_t define_dndx_integral(
-        crosssection::ComptonKleinNishina const& param, ParticleDef const& p,
-        Component const& c)
+            crosssection::ComptonKleinNishina const& param, ParticleDef const& p,
+            Component const& c)
     {
         using param_t = crosssection::Parametrization<Component>;
         auto param_ptr = std::shared_ptr<param_t>(param.clone());
@@ -50,9 +51,22 @@ namespace detail {
             double t_max = std::log(1. - v_max);
             auto dNdx = [ptr = param_ptr.get(), &p, &c, E](double t) {
                 return std::exp(t)
-                    * ptr->DifferentialCrossSection(p, c, E, 1. - std::exp(t));
+                       * ptr->DifferentialCrossSection(p, c, E, 1. - std::exp(t));
             };
             return i.Integrate(t_max, t_min, dNdx, 2);
+        };
+    }
+
+    dndx_integrand_t define_dndx_integral(crosssection::Ionization const& param,
+                                          ParticleDef const& p, Medium const& m)
+    {
+        return [ptr = std::shared_ptr<param_t<Medium>>(param.clone()), p, m](
+                double E, double v_min, double v_max) {
+            Integral i;
+            auto dNdx = [param_ptr = ptr.get(), &p, &m, E](double v) {
+                return param_ptr->DifferentialCrossSection(p, m, E, v);
+            };
+            return i.Integrate(v_min, v_max, dNdx, 3, 1);
         };
     }
 

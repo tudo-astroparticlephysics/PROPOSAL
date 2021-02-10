@@ -3,9 +3,10 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDX.h"
 
 namespace PROPOSAL {
-namespace crosssection {
-    struct ComptonKleinNishina;
-}
+    namespace crosssection {
+        struct Ionization;
+        struct ComptonKleinNishina;
+    }
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
@@ -38,6 +39,9 @@ namespace detail {
     dndx_upper_lim_t define_dndx_upper_lim(
         crosssection::ComptonKleinNishina const&, ParticleDef const&,
         Component const&);
+
+    dndx_integrand_t define_dndx_integral(
+            crosssection::Ionization const&, ParticleDef const&, Medium const&);
 } // namespace detail
 } // namespace PROPOSAL
 
