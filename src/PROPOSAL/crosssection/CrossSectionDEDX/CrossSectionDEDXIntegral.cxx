@@ -44,12 +44,13 @@ namespace detail {
         return _define_dedx_integral(param, p, m, cut);
     }
 
-    dedx_integral_t define_dedx_integral(crosssection::IonizBetheBlochRossi param,
+    dedx_integral_t define_dedx_integral(crosssection::IonizBetheBlochRossi const &param,
         ParticleDef const& p, Medium const& m, EnergyCutSettings const& cut)
     {
         using param_t = crosssection::Parametrization<Medium>;
         auto param_ptr = std::shared_ptr<param_t>(param.clone());
-        return [param_ptr, p, m, cut](Integral& i, double E) {
+        return [param_ptr, p, m, cut](double E) {
+            auto i = Integral();
             auto lim = param_ptr->GetKinematicLimits(p, m, E);
             auto v_cut = cut.GetCut(lim, E);
             auto dEdx = [_param_ptr = param_ptr.get(), &p, &m, E](double v) {
