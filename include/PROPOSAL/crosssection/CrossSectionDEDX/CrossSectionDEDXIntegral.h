@@ -7,6 +7,7 @@ namespace PROPOSAL {
 namespace crosssection {
     struct IonizBergerSeltzerBhabha;
     struct IonizBergerSeltzerMoller;
+    struct IonizBetheBlochRossi;
 } // namespace crosssection
 class Integral;
 } // namespace PROPOSAL
@@ -29,6 +30,10 @@ namespace detail {
 
     dedx_integral_t define_dedx_integral(
         crosssection::IonizBergerSeltzerMoller param, ParticleDef const& p_def,
+        Medium const& medium, EnergyCutSettings const&);
+
+    dedx_integral_t define_dedx_integral(
+        crosssection::IonizBetheBlochRossi param, ParticleDef const& p_def,
         Medium const& medium, EnergyCutSettings const&);
 } // namespace detail
 } // namespace PROPOSAL

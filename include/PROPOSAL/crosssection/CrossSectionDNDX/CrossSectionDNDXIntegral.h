@@ -3,6 +3,9 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDX.h"
 
 namespace PROPOSAL {
+namespace crosssection {
+    struct Ionization;
+} // namespace crosssection
 namespace detail {
     using dndx_integrand_t
         = std::function<double(double, double, double, double)>;
@@ -15,6 +18,9 @@ namespace detail {
     dndx_integrand_t define_dndx_integral(
         crosssection::Parametrization<Component> const&, ParticleDef,
         Component);
+
+    dndx_integrand_t define_dndx_integral(
+        crosssection::Ionization const&, ParticleDef, Medium);
 
     dndx_upper_lim_t define_dndx_upper_lim(
         crosssection::Parametrization<Medium> const&, ParticleDef, Medium);

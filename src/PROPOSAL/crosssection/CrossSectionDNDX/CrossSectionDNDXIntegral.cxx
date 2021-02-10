@@ -1,4 +1,5 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
+#include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -35,6 +36,18 @@ namespace detail {
         param_t<Component> const& param, ParticleDef p, Component c)
     {
         return _define_dndx_integral(param, p, c);
+    }
+
+    dndx_integrand_t define_dndx_integral(crosssection::Ionization const& param, ParticleDef p, Medium m)
+    {
+        return [ptr = std::shared_ptr<param_t<Medium>>(param.clone()), p, m](
+                double E, double v_min, double v_max, double rate) {
+            Integral i;
+            auto dNdx = [param_ptr = ptr.get(), &p, &m, E](double v) {
+                return param_ptr->DifferentialCrossSection(p, m, E, v);
+            };
+            return i.IntegrateWithRandomRatio(v_min, v_max, dNdx, 3, rate, 1);
+        };
     }
 
     template <typename Target>
