@@ -2,11 +2,13 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crosssection/parametrization/Compton.h"
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
+#include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/Constants.h"
 #include <memory>
 
 using namespace PROPOSAL;
@@ -101,6 +103,44 @@ namespace detail {
                     * ptr->FunctionToDEdxIntegral(p, c, E, 1 - std::exp(t));
             };
             return i.Integrate(t_min, t_max, dEdx, 2);
+        };
+    }
+
+    dedx_integral_t define_dedx_integral(
+        crosssection::EpairProduction const& param, ParticleDef const& p,
+        Component const& c, EnergyCutSettings const& cut)
+    {
+        using param_t = crosssection::Parametrization<Component>;
+        auto param_ptr = std::shared_ptr<param_t>(param.clone());
+        return [param_ptr, p, c, cut](double E) {
+            auto lim = param_ptr->GetKinematicLimits(p, c, E);
+            auto i = Integral();
+            auto v_cut = cut.GetCut(lim, E);
+            auto dEdx = [_param_ptr = param_ptr.get(), &p, &c, E](double v) {
+                return _param_ptr->FunctionToDEdxIntegral(p, c, E, v);
+            };
+            auto dEdx_reverse= [_param_ptr = param_ptr.get(), &p, &c, E](double v) {
+                return (1 - v) * _param_ptr->DifferentialCrossSection(p, c, E, 1 - v);
+            };
+            auto r1 = 0.8;
+            auto rUp = v_cut * (1 - HALF_PRECISION);
+            auto rflag = false;
+            if (r1 < rUp)
+                if (2 * param_ptr->FunctionToDEdxIntegral(p, c, E, r1) <
+                     param_ptr->FunctionToDEdxIntegral(p, c, E, rUp))
+                    rflag = true;
+            if (rflag) {
+                if (r1 > v_cut)
+                    r1 = v_cut;
+                if (r1 < lim.v_min)
+                    r1 = lim.v_min;
+                auto r2 = std::max(1 - v_cut, COMPUTER_PRECISION);
+                if (r2 > 1 - r1)
+                    r2 = 1 - r1;
+                return (i.Integrate(lim.v_min, r1, dEdx, 4) + i.Integrate(1 - v_cut, r2, dEdx_reverse, 2) + i.Integrate(r2, 1 - r1, dEdx_reverse, 4));
+            } else {
+                return i.Integrate(lim.v_min, v_cut, dEdx, 4);
+            }
         };
     }
 }

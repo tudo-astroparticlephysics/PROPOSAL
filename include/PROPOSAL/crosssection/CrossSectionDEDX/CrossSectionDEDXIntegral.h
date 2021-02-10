@@ -9,6 +9,7 @@ namespace crosssection {
     struct IonizBergerSeltzerMoller;
     struct IonizBetheBlochRossi;
     struct ComptonKleinNishina;
+    struct EpairProduction;
 } // namespace crosssection
 } // namespace PROPOSAL
 
@@ -38,6 +39,10 @@ namespace detail {
 
     dedx_integral_t define_dedx_integral(
         crosssection::ComptonKleinNishina const&, ParticleDef const&,
+        Component const&, EnergyCutSettings const&);
+
+    dedx_integral_t define_dedx_integral(
+        crosssection::EpairProduction const&, ParticleDef const&,
         Component const&, EnergyCutSettings const&);
 } // namespace detail
 } // namespace PROPOSAL

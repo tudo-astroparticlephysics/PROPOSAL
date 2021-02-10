@@ -211,8 +211,7 @@ TEST(Epairproduction, Test_of_dEdx)
                                           false, config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
-
-        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
+        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-5 * dEdx_stored);
     }
 }
 
@@ -302,21 +301,21 @@ TEST(Epairproduction, Test_Stochastic_Loss)
                                           config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
-        auto components = cross->GetTargets();
+        auto components = medium->GetComponents();
         double sum = 0;
 
         for (auto comp : components)
         {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
                     EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
                     break;
                 }
@@ -327,7 +326,7 @@ TEST(Epairproduction, Test_Stochastic_Loss)
 
 TEST(Epairproduction, Test_of_dEdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Epair_dEdx_interpol.txt";
+    std::string filename = testfile_dir + "Epair_dEdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -365,14 +364,16 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
                                           config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
-
-        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
+        if (vcut * energy == ecut)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-2 * dEdx_stored); // kink in interpolated function
+        else
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-5 * dEdx_stored);
     }
 }
 
 TEST(Epairproduction, Test_of_dNdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Epair_dNdx_interpol.txt";
+    std::string filename = testfile_dir + "Epair_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -410,14 +411,16 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
                                           config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
-
-        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        if (vcut * energy == ecut)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored);
+        else
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-5 * dNdx_stored);
     }
 }
 
 TEST(Epairproduction, Test_of_e_interpol)
 {
-    std::string filename = testfile_dir + "Epair_e_interpol.txt";
+    std::string filename = testfile_dir + "Epair_e.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -458,22 +461,22 @@ TEST(Epairproduction, Test_of_e_interpol)
                                           config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
-        auto components = cross->GetTargets();
+        auto components = medium->GetComponents();
         double sum = 0;
 
         for (auto comp : components)
         {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp);
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * (1. - rnd2)) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp, energy, rate_new), "");
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp, energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-5 * stochastic_loss_stored);
                     break;
                 }
             }
