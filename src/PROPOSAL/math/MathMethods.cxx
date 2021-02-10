@@ -272,6 +272,35 @@ double NewtonRaphson(std::function<double(double)> func,
     return rts;
 }
 
+double Bisection(std::function<double(double)> f, double x1, double x2,
+                 double xacc, double MAX_ITER) {
+    if (f(x1) * f(x2) > 0.)
+        throw MathException("Root must be bracketed in Bisection method!");
+
+    double dx;
+    double root_guess;
+
+    if (f(x1) <= 0.0) {
+        dx = x2 - x1;
+        root_guess = x1;
+    } else {
+        dx = x1 - x2;
+        root_guess = x2;
+    }
+
+    for (int i = 0; i<=MAX_ITER; i++) {
+        dx *= 0.5;
+        double x_mid = root_guess + dx;
+        double f_mid = f(x_mid);
+        if (f_mid <= 0.)
+            root_guess = x_mid;
+        if (std::abs(dx) < xacc)
+            return root_guess;
+    }
+    Logging::Get("proposal.math")->warn("Maximum number of iteration exeeded in Bisection");
+    return root_guess;
+}
+
 std::vector<SplineCoefficients> CalculateSpline(std::vector<double> x,
                                                 std::vector<double> y) {
     // Algorithm from https://en.wikipedia.org/wiki/Spline_(mathematics)
