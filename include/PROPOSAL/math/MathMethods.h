@@ -107,6 +107,9 @@ double dilog(double x);
 double NewtonRaphson(std::function<double(double)> f, std::function<double(double)> df, double x1, double x2,
         double xinit, int MAX_STEPS = 101, double xacc = 1.e-6);
 
+double Bisection(std::function<double(double)> f, double x1, double x2,
+                 double xacc, double MAX_ITER);
+
 struct SplineCoefficients{
     SplineCoefficients()
         : _a(0)

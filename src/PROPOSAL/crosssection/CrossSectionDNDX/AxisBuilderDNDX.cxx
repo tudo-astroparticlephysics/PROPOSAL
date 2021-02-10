@@ -1,5 +1,6 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/AxisBuilderDNDX.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/math/MathMethods.h"
 
 using namespace PROPOSAL;
 
@@ -19,11 +20,16 @@ void AxisBuilderDNDX::refine_definition_range(
     std::function<double(double)> func, unsigned int i)
 {
     auto ax = energy_axis_t(energy_lim.low, energy_lim.up, energy_lim.nodes);
-    while (not(func(ax.back_transform(i+1)) > 0) and i < energy_lim.nodes)
+    while (not(func(ax.back_transform(i)) > 0) and i < energy_lim.nodes)
         ++i;
     if (i == energy_lim.nodes)
         throw std::logic_error("No positive values to build dNdx tables!");
     energy_lim.low = ax.back_transform(i);
+
+    // double i_accuracy = 0.1;
+    // auto f = [&func, &ax](double i) {return func(ax.back_transform(i));};
+    // auto i_low = Bisection(f, i-1, i, i_accuracy, 100);
+    // energy_lim.low = ax.back_transform(i_low + i_accuracy);
 }
 
 std::array<std::unique_ptr<AxisBuilderDNDX::axis_t>, 2>

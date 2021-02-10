@@ -1,5 +1,4 @@
 #include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/crosssection/CrossSectionInterpolantBase.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 

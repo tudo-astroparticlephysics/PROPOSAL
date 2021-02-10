@@ -43,9 +43,30 @@ aux1 = NewtonRaphson(f1, df1, -5, 15, 15);
 aux2 = NewtonRaphson(f2, df2, -3./4 * PI, 1./2 * PI, 1./2 * PI);
 
 ASSERT_NEAR(aux1, real1, 1.e-6 * real1);
-ASSERT_NEAR(aux2, 0, 1.e-6 * aux2);
+ASSERT_NEAR(aux2, real2, 1.e-6 * aux2);
 
 }
+
+TEST(Bisection, Comparison_equal)
+{
+
+    double real1 = pow(2., 2./3);
+    double real2 = 0;
+
+    double aux1 = Bisection(f1, -5, 15, 1e-6, 100);
+    double aux2 = Bisection(f2, -3./4 * PI, 1./2 * PI, 1e-6, 100);
+
+    ASSERT_NEAR(aux1, real1, 1.e-6 );
+    ASSERT_NEAR(aux2, 0, 1.e-6 );
+
+    aux1 = Bisection(f1, 15, -5, 1e-6, 100);
+    aux2 = Bisection(f2, 1./2 * PI, -3./4 * PI, 1e-6, 100);
+
+    ASSERT_NEAR(aux1, real1, 1.e-6 );
+    ASSERT_NEAR(aux2, real2, 1.e-6 );
+
+}
+
 
 TEST(SampleFromGaussian, Momenta){
     RandomGenerator::Get().SetSeed(24601);
