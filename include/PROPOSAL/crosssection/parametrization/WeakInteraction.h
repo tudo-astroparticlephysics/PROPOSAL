@@ -41,7 +41,7 @@ class Component;
 namespace PROPOSAL {
 namespace crosssection {
 
-    class WeakInteraction : public Parametrization<Component> {
+    struct WeakInteraction : public Parametrization<Component> {
     public:
         WeakInteraction() = default;
         virtual ~WeakInteraction() = default;
@@ -59,7 +59,7 @@ namespace crosssection {
         static constexpr size_t value = 1000000009;
     };
 
-    class WeakCooperSarkarMertsch : public WeakInteraction {
+    struct WeakCooperSarkarMertsch : public WeakInteraction {
         using Interpolant_t = std::shared_ptr<Interpolant>;
         std::pair<Interpolant_t, Interpolant_t> interpolants_particle;
         std::pair<Interpolant_t, Interpolant_t> interpolants_antiparticle;

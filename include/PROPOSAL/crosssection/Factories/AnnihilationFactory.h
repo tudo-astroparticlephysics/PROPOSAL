@@ -3,7 +3,7 @@
 #include <memory>
 
 namespace PROPOSAL {
-class CrossSectionBase;
+struct CrossSectionBase;
 struct ParticleDef;
 class Medium;
 

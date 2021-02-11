@@ -38,7 +38,7 @@ namespace crosssection {
         constexpr static bool value = false;
     };
 
-    class Ionization : public Parametrization<Medium> {
+    struct Ionization : public Parametrization<Medium> {
     protected:
         EnergyCutSettings cuts_;
 
@@ -54,7 +54,7 @@ namespace crosssection {
         static constexpr auto value = "ionization";
     };
 
-    class IonizBetheBlochRossi : public Ionization {
+    struct IonizBetheBlochRossi : public Ionization {
         double InelCorrection(
             ParticleDef const&, Medium const&, double, double) const;
         double CrossSectionWithoutInelasticCorrection(

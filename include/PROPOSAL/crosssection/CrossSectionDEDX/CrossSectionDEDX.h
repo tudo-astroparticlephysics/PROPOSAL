@@ -5,7 +5,7 @@
 
 namespace PROPOSAL {
 class EnergyCutSettings;
-class ParticleDef;
+struct ParticleDef;
 class Medium;
 class Component;
 namespace crosssection {
