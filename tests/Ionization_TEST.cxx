@@ -268,7 +268,7 @@ TEST(Ionization, Test_Stochastic_Loss)
 
         double dNdx_for_comp = cross->CalculatedNdx(energy, medium->GetHash());
         sum += dNdx_for_comp;
-        if (sum > dNdx_full * (1. - rnd2)) {
+        if (sum > dNdx_full * rnd2) {
             double rate_new = dNdx_for_comp * rnd1;
             if (ecut == INF and vcut == 1 ) {
                 #ifndef NDEBUG
@@ -423,7 +423,7 @@ TEST(Ionization, Test_of_e_interpol)
 
         double dNdx_for_comp = cross->CalculatedNdx(energy, medium->GetHash());
         sum += dNdx_for_comp;
-        if (sum > dNdx_full * (1. - rnd2)) {
+        if (sum > dNdx_full * rnd2) {
             double rate_new = dNdx_for_comp * rnd1;
             if (ecut == INF and vcut == 1 ) {
                 #ifndef NDEBUG

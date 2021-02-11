@@ -376,7 +376,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
         {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
-            if (sum > dNdx_full * (1. - rnd2)) {
+            if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
@@ -531,7 +531,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
         {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
-            if (sum > dNdx_full * (1. - rnd2)) {
+            if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
@@ -703,7 +703,7 @@ TEST(PhotoQ2Integration, Test_of_e)
         {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
-            if (sum > dNdx_full * (1. - rnd2)) {
+            if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
@@ -873,7 +873,7 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
         {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
-            if (sum > dNdx_full * (1. - rnd2)) {
+            if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
                 if (ecut == INF and vcut == 1 ) {
                     #ifndef NDEBUG
