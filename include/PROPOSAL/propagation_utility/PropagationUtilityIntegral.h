@@ -43,6 +43,7 @@ protected:
 public:
     UtilityIntegral() = default;
     UtilityIntegral(std::function<double(double)>, double, size_t);
+    virtual ~UtilityIntegral() = default;
 
     virtual void BuildTables(const std::string, bool) {};
 

@@ -9,7 +9,7 @@ namespace crosssection {
     struct IonizBergerSeltzerMoller;
     struct IonizBetheBlochRossi;
     struct ComptonKleinNishina;
-    struct EpairProduction;
+    class EpairProduction;
 } // namespace crosssection
 } // namespace PROPOSAL
 

@@ -76,6 +76,7 @@ protected:
 
 public:
     Scattering() = default;
+    virtual ~Scattering() = default;
 
     /**
      * @brief Storage class of objects related to particle deflection. There are

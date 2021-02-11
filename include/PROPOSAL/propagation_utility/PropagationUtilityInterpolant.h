@@ -59,6 +59,7 @@ class UtilityInterpolant : public UtilityIntegral {
 
 public:
     UtilityInterpolant(std::function<double(double)>, double, size_t);
+    virtual ~UtilityInterpolant() = default;
 
     void BuildTables(const std::string prefix, bool reverse = false)
     {

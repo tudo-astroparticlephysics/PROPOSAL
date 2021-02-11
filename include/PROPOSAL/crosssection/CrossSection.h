@@ -285,7 +285,7 @@ public:
         return rates;
     }
 
-    double CalculateStochasticLoss(size_t hash, double E, double rate)
+    double CalculateStochasticLoss(size_t hash, double E, double rate) override
     {
         if (dndx)
             return CalculateStochasticLoss_impl(
@@ -300,8 +300,11 @@ public:
         auto loss = 0.;
         if (not dedx)
             return loss;
-        for (auto& [weight, calc] : *dedx)
-            loss += calc->Calculate(energy) / weight;
+        // will produce no working in cpp17
+        // for (auto& [weight, calc] : *dedx)
+        //     loss += calc->Calculate(energy) / weight;
+        for (auto& weight_calc : *dedx)
+            loss += std::get<1>(weight_calc)->Calculate(energy) / std::get<0>(weight_calc);
         return loss;
     }
 
@@ -310,8 +313,11 @@ public:
         auto loss = 0.;
         if (not de2dx)
             return loss;
-        for (auto& [weight, calc] : *de2dx)
-            loss += calc->Calculate(energy) / weight;
+        // will produce no working in cpp17
+        // for (auto& [weight, calc] : *de2dx)
+        //     loss += calc->Calculate(energy) / weight;
+        for (auto& weight_calc : *de2dx)
+            loss += std::get<1>(weight_calc)->Calculate(energy) / std::get<0>(weight_calc);
         return loss;
     }
 

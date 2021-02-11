@@ -12,7 +12,7 @@ class Geometry;
 using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
     std::shared_ptr<const Density_distr>>;
 
-class CrossSectionBase;
+struct CrossSectionBase;
 }
 
 namespace PROPOSAL {

@@ -7,7 +7,7 @@ namespace crosssection {
     struct is_component_wise<IonizBergerSeltzerBhabha> : std::false_type {
     };
 
-    class IonizBetheBlochRossi;
+    struct IonizBetheBlochRossi;
     template <>
     struct is_component_wise<IonizBetheBlochRossi> : std::false_type {
     };

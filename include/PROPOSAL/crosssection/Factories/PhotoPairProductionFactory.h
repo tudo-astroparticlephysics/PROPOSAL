@@ -3,7 +3,7 @@
 #include "PROPOSAL/json_fwd.hpp"
 
 namespace PROPOSAL {
-    class CrossSectionBase;
+    struct CrossSectionBase;
     struct ParticleDef;
     class Medium;
 
