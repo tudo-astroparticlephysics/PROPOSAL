@@ -4,53 +4,25 @@
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include <cmath>
+#include <memory>
 
 namespace PROPOSAL {
-template <class T> class DecayBuilder : public Decay {
-    T decay_integral;
+class DecayBuilder : public Decay {
+    using disp_ptr = std::shared_ptr<Displacement>;
 
-    void build_tables() {};
-
+    std::shared_ptr<UtilityIntegral> decay_integral;
 
 public:
-    DecayBuilder(
-        std::shared_ptr<Displacement> _disp, double lifetime, double mass)
-        : Decay(_disp, lifetime, mass)
-        , decay_integral([this](double E) { return FunctionToIntegral(E); },
-              _disp->GetLowerLim(), this->GetHash())
-    {
-    }
+    DecayBuilder(disp_ptr, double, double, std::true_type);
+    DecayBuilder(disp_ptr, double, double, std::false_type);
 
-    double EnergyDecay(double energy, double rnd, double density) override
-    {
-        auto rndd = -std::log(rnd) * density;
-        auto rnddMin
-            = decay_integral.Calculate(energy, disp->GetLowerLim()) / lifetime;
-        if (rndd >= rnddMin)
-            return disp->GetLowerLim();
-        return decay_integral.GetUpperLimit(energy, rndd * lifetime);
-    }
+    double EnergyDecay(double energy, double rnd, double density) override;
 };
 
-inline auto make_decay(std::shared_ptr<Displacement> disp, const ParticleDef& p,
-    bool interpolate = true)
-{
-    auto decay = std::unique_ptr<Decay>();
-    if (interpolate)
-        decay.reset(
-            new DecayBuilder<UtilityInterpolant>(disp, p.lifetime, p.mass));
-    else
-        decay.reset(
-            new DecayBuilder<UtilityIntegral>(disp, p.lifetime, p.mass));
-    return decay;
-}
+std::unique_ptr<Decay> make_decay(
+    std::shared_ptr<Displacement>, const ParticleDef&, bool interpol = true);
 
-template <typename Cross>
-inline auto make_decay(
-    Cross&& cross, const ParticleDef& p, bool interpolate = true)
-{
-    auto disp = std::shared_ptr<Displacement>(
-        make_displacement(std::forward<Cross>(cross), false));
-    return make_decay(disp, p, interpolate);
-}
+std::unique_ptr<Decay> make_decay(
+    std::vector<std::shared_ptr<CrossSectionBase>> const&, const ParticleDef&,
+    bool interpol = true);
 } // namespace PROPOSAL

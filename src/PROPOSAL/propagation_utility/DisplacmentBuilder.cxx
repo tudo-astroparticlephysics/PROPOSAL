@@ -1,5 +1,6 @@
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
+
 using namespace PROPOSAL;
 
 DisplacementBuilder::DisplacementBuilder(
@@ -18,6 +19,7 @@ DisplacementBuilder::DisplacementBuilder(
           [this](double E) { return FunctionToIntegral(E); },
           this->GetLowerLim(), this->GetHash()))
 {
+    disp_integral->BuildTables("disp_", false);
 }
 
 double DisplacementBuilder::SolveTrackIntegral(
