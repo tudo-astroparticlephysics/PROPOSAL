@@ -230,10 +230,10 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
         {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
-            if (sum > dNdx_full * (1. - rnd2)) {
+            if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
                 stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);
                 break;
             }
         }
@@ -243,7 +243,7 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
 
 TEST(WeakInteraction, Test_of_dNdx_Interpolant)
 {
-    std::string filename = "bin/TestFiles/Weak_dNdx_interpol.txt";
+    std::string filename = "bin/TestFiles/Weak_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -268,13 +268,13 @@ TEST(WeakInteraction, Test_of_dNdx_Interpolant)
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
 }
 
 TEST(WeakInteraction, Test_of_e_interpol)
 {
-    std::string filename = "bin/TestFiles/Weak_e_interpol.txt";
+    std::string filename = "bin/TestFiles/Weak_e.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -308,10 +308,10 @@ TEST(WeakInteraction, Test_of_e_interpol)
         {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
-            if (sum >= dNdx_full * rnd1) {
-                double rnd_new = (sum + dNdx_for_comp * (rnd2 - 1.)) / dNdx_full;
-                stochastic_loss_new = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd_new * dNdx_full);
-                ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+            if (sum >= dNdx_full * rnd2) {
+                double rate_new = dNdx_for_comp * rnd1;
+                stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
+                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);
                 break;
             }
         }
