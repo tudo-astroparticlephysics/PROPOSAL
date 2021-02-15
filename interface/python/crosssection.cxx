@@ -261,10 +261,10 @@ void init_crosssection(py::module& m)
     build_crosssection<crosssection::PhotoButkevichMikheyev>(m_sub);
     build_crosssection<crosssection::PhotoRenoSarcevicSu>(m_sub);
 
-    /* build_crosssection<crosssection::PhotoZeus>(m_sub); */
-    /* build_crosssection<crosssection::PhotoBezrukovBugaev>(m_sub); */
-    /* build_crosssection<crosssection::PhotoKokoulin>(m_sub); */
-    /* build_crosssection<crosssection::PhotoRhode>(m_sub); */
+    build_crosssection<crosssection::PhotoZeus>(m_sub);
+    build_crosssection<crosssection::PhotoBezrukovBugaev>(m_sub);
+    build_crosssection<crosssection::PhotoKokoulin>(m_sub);
+    build_crosssection<crosssection::PhotoRhode>(m_sub);
 
     build_crosssection<crosssection::WeakCooperSarkarMertsch>(m_sub);
 

@@ -30,6 +30,7 @@ crosssection::PhotoQ2Integral::PhotoQ2Integral(
     std::shared_ptr<ShadowEffect> shadow_effect)
     : shadow_effect_(shadow_effect)
 {
+    hash_combine(hash, shadow_effect_->GetHash());
 }
 
 double crosssection::PhotoQ2Integral::DifferentialCrossSection(

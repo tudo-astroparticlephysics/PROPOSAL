@@ -31,6 +31,7 @@ crosssection::PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(
     : crosssection::Photonuclear()
     , hard_component_(hard_component)
 {
+    hash_combine(hash, hard_component);
 }
 
 // ------------------------------------------------------------------------- //

@@ -2,7 +2,7 @@
 
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
 
 using namespace PROPOSAL;
@@ -57,12 +57,12 @@ TEST(ExactTimeBuilder, Constructor)
 {
     auto disp = GetMuonDisp();
     Time* time_exact1
-        = new ExactTimeBuilder<UtilityIntegral>(disp, MuMinusDef().mass);
+        = new ExactTimeBuilder(disp, MuMinusDef().mass, std::false_type());
     Time* time_exact2
-        = new ExactTimeBuilder<UtilityInterpolant>(disp, MuMinusDef().mass);
+        = new ExactTimeBuilder(disp, MuMinusDef().mass, std::true_type());
 
-    ExactTimeBuilder<UtilityIntegral> time_exact3(disp, MuMinusDef().mass);
-    ExactTimeBuilder<UtilityInterpolant> time_exact4(disp, MuMinusDef().mass);
+    ExactTimeBuilder time_exact3(disp, MuMinusDef().mass, std::false_type());
+    ExactTimeBuilder time_exact4(disp, MuMinusDef().mass, std::true_type());
 
     delete time_exact1;
     delete time_exact2;
@@ -127,10 +127,10 @@ TEST(TimeBuilder, HighEnergies)
 
     auto disp = GetMuonDisp();
     auto time_exact
-        = ExactTimeBuilder<UtilityIntegral>(disp, MuMinusDef().mass);
+        = ExactTimeBuilder(disp, MuMinusDef().mass, std::false_type());
     auto time_approx = ApproximateTimeBuilder();
 
-    auto displacement = DisplacementBuilder<UtilityIntegral>(cross);
+    auto displacement = DisplacementBuilder(cross, std::false_type());
 
     double elapsed_time_exact
         = time_exact.TimeElapsed(1e13, 1e12, 0, medium.GetMassDensity());
@@ -156,7 +156,7 @@ TEST(TimeBuilder, MasslessParticles)
     auto time_exact = make_time(cross, GammaDef(), false);
     auto time_approx = ApproximateTimeBuilder();
 
-    auto displacement = DisplacementBuilder<UtilityIntegral>(cross);
+    auto displacement = DisplacementBuilder(cross, std::false_type());
     double prop_grammage = displacement.SolveTrackIntegral(1e6, 1e4);
 
     double elapsed_time_exact = time_exact->TimeElapsed(
@@ -177,9 +177,9 @@ TEST(ExactTimeBuilder, CompareIntegralInterpolant)
 
     auto disp = GetMuonDisp();
     auto time_integral
-        = ExactTimeBuilder<UtilityIntegral>(disp, MuMinusDef().mass);
+        = ExactTimeBuilder(disp, MuMinusDef().mass, std::false_type());
     auto time_interpolant
-        = ExactTimeBuilder<UtilityInterpolant>(disp, MuMinusDef().mass);
+        = ExactTimeBuilder(disp, MuMinusDef().mass, std::true_type());
 
     double E_f = 1e5;
     double integrated_time, interpolated_time;

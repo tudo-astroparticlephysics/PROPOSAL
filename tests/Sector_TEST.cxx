@@ -24,7 +24,7 @@ ParticleDef getParticleDef(const std::string& name)
 
 auto GetCrossSections(const ParticleDef& p_def, const Medium& med, std::shared_ptr<const EnergyCutSettings> cuts, bool interpolate) {
     // old TestFiles were created using the old StandardCrossSections that are recreated here
-    crosssection_list_t<ParticleDef, Medium> cross;
+    crosssection_list_t cross;
 
     auto brems = crosssection::BremsKelnerKokoulinPetrukhin{ true, p_def, med };
     cross.push_back(make_crosssection(brems, p_def, med, cuts, interpolate));
@@ -172,12 +172,12 @@ TEST(Sector, Stochastic)
                     type = c->GetInteractionType(); // save interaction_type
                     // 2: c is the right cross section, find the component
                     double rates_comp_sum = 0;
-                    for (auto comp : c->GetTargets()) {
-                        double rate_for_comp = c->CalculatedNdx(initial_energy, comp);
+                    for (auto comp : medium->GetComponents()) {
+                        double rate_for_comp = c->CalculatedNdx(initial_energy, comp.GetHash());
                         rates_comp_sum += rate_for_comp;
                         if (rates_comp_sum > rate_c * rnd3) {
                             // 3: comp is the right component. calculate loss
-                            v_loss = c->CalculateStochasticLoss(comp, initial_energy, rnd2 * rate_for_comp);
+                            v_loss = c->CalculateStochasticLoss(comp.GetHash(), initial_energy, rnd2 * rate_for_comp);
                             break;
                         }
                     }

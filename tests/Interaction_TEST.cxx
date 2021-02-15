@@ -7,6 +7,7 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 
 #include <memory>
 
@@ -24,12 +25,12 @@ TEST(Interaction, Constructor)
     auto cross = GetCrossSections();
     auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
     auto interaction1
-        = std::make_unique<InteractionBuilder<UtilityIntegral>>(disp, cross);
+        = std::make_unique<InteractionBuilder>(disp, cross, std::false_type());
     auto interaction2
-        = std::make_unique<InteractionBuilder<UtilityInterpolant>>(disp, cross);
+        = std::make_unique<InteractionBuilder>(disp, cross, std::true_type());
 
-    InteractionBuilder<UtilityIntegral> interaction_3(disp, cross);
-    InteractionBuilder<UtilityInterpolant> interaction_4(disp, cross);
+    InteractionBuilder interaction_3(disp, cross, std::false_type());
+    InteractionBuilder interaction_4(disp, cross, std::true_type());
 }
 
 class HistogramInteraction {
@@ -96,12 +97,12 @@ TEST(TypeInteraction, Ratios)
         auto rates_low = interaction->Rates(1e3);
         auto interaction_low
             = interaction->SampleLoss(1e3, rates_low, rnd_number());
-        histogram_low.AddEntry(std::get<0>(interaction_low));
+        histogram_low.AddEntry(interaction_low.type);
 
         auto rates_high = interaction->Rates(1e10);
         auto interaction_high
             = interaction->SampleLoss(1e10, rates_high, rnd_number());
-        histogram_high.AddEntry(std::get<0>(interaction_high));
+        histogram_high.AddEntry(interaction_high.type);
     }
 
     EXPECT_EQ(histogram_low.HighestCounter(), InteractionType::Ioniz);

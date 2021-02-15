@@ -9,12 +9,14 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/multiple_scattering/Highland.h"
 #include "PROPOSAL/scattering/multiple_scattering/HighlandIntegral.h"
 #include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
@@ -37,7 +39,7 @@ ParticleDef getParticleDef(const std::string& name)
 
 auto GetCrossSections(const ParticleDef& p_def, const Medium& med, std::shared_ptr<const EnergyCutSettings> cuts, bool interpolate) {
     // old TestFiles were created using the old StandardCrossSections that are recreated here
-    crosssection_list_t<ParticleDef, Medium> cross;
+    crosssection_list_t cross;
 
     auto brems = crosssection::BremsKelnerKokoulinPetrukhin{ true, p_def, med };
     cross.push_back(make_crosssection(brems, p_def, med, cuts, interpolate));
@@ -298,7 +300,7 @@ TEST(Scattering, SecondMomentum){
     double offset_sum;
     double displacement;
     double old_displacement;
-    auto displacement_calculator = DisplacementBuilder<UtilityIntegral>(cross);
+    auto displacement_calculator = DisplacementBuilder(cross, std::false_type());
     std::array<double, 2> variances = {0,0};
     std::array<double, 2> old_variances;
 
@@ -425,7 +427,7 @@ TEST(Scattering, ScatterReproducibilityTest)
 
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
 
-        crosssection_list_t<ParticleDef, Medium> cross;
+        crosssection_list_t cross;
 
         std::unique_ptr<multiple_scattering::Parametrization> scattering = NULL;
         if (parametrization == "NoScattering")

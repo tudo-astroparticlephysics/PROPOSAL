@@ -18,18 +18,18 @@ auto GetCrossSections() {
 
 TEST(constructor, integral)
 {
-    DisplacementBuilder<UtilityIntegral> disp(GetCrossSections());
+    DisplacementBuilder disp(GetCrossSections(), std::false_type());
 }
 
 TEST(constructor, interpolant)
 {
-    DisplacementBuilder<UtilityInterpolant> disp(GetCrossSections());
+    DisplacementBuilder disp(GetCrossSections(), std::true_type());
 }
 
 TEST(constructor, error)
 {
-    auto cross = crosssection_list_t<ParticleDef, Medium>();
-    ASSERT_THROW(DisplacementBuilder<UtilityIntegral> disp(cross),
+    auto cross = crosssection_list_t();
+    ASSERT_THROW(DisplacementBuilder disp(cross, std::false_type()),
         std::invalid_argument);
 }
 
@@ -37,7 +37,7 @@ TEST(SolveTrackIntegral, ConsistencyCheck)
 {
     // If the energy difference increases, the result of SolveTrack integral
     // (e.g. the grammage) should increase as well
-    DisplacementBuilder<UtilityIntegral> disp(GetCrossSections());
+    DisplacementBuilder disp(GetCrossSections(), std::false_type());
     double E_f = 1e3;
     double displacement;
     double displacement_previous = -1.;
@@ -51,15 +51,15 @@ TEST(SolveTrackIntegral, ConsistencyCheck)
 TEST(SolveTrackIntegral, ZeroDisplacement)
 {
     // no energy difference should equal to no displacement
-    DisplacementBuilder<UtilityIntegral> disp(GetCrossSections());
+    DisplacementBuilder disp(GetCrossSections(), std::false_type());
     EXPECT_TRUE(disp.SolveTrackIntegral(1e6, 1e6) == 0.);
 }
 
 TEST(SolveTrackIntegral, CompareIntegralInterpolant)
 {
     // comparing intergral and interpolant values
-    DisplacementBuilder<UtilityIntegral> disp_calc_integral(GetCrossSections());
-    DisplacementBuilder<UtilityInterpolant> disp_calc_interpol(GetCrossSections());
+    DisplacementBuilder disp_calc_integral(GetCrossSections(), std::false_type());
+    DisplacementBuilder disp_calc_interpol(GetCrossSections(), std::true_type());
     double E_f = 1e3;
     for (double logE_i = 3.; logE_i < 8; logE_i+=1.e-3) {
         double E_i = std::pow(logE_i, 10.);
@@ -72,7 +72,7 @@ TEST(SolveTrackIntegral, CompareIntegralInterpolant)
 TEST(UpperLimitTrackIntegral, ConsistencyCheck)
 {
     // The final energy should become smaller for increasing displacements
-    DisplacementBuilder<UtilityIntegral> disp_calc(GetCrossSections());
+    DisplacementBuilder disp_calc(GetCrossSections(), std::false_type());
     double E_i = 1.e8;
     double E_f_old = E_i;
     for (double logDisp = 1; logDisp < 5; logDisp+=1.e-2) {
@@ -85,15 +85,15 @@ TEST(UpperLimitTrackIntegral, ConsistencyCheck)
 
 TEST(UpperLimitTrackIntegral, ZeroDisplacement)
 {
-    DisplacementBuilder<UtilityIntegral> disp_calc(GetCrossSections());
+    DisplacementBuilder disp_calc(GetCrossSections(), std::false_type());
     EXPECT_NEAR( disp_calc.UpperLimitTrackIntegral(1e6, 0.), 1e6, 1e-6);
 }
 
 TEST(UpperLimitTrackIntegral, CompareIntegralInterpolant)
 {
     // comparing intergral and interpolant values
-    DisplacementBuilder<UtilityIntegral> disp_calc_integral(GetCrossSections());
-    DisplacementBuilder<UtilityInterpolant> disp_calc_interpol(GetCrossSections());
+    DisplacementBuilder disp_calc_integral(GetCrossSections(), std::false_type());
+    DisplacementBuilder disp_calc_interpol(GetCrossSections(), std::true_type());
     double E_i = 1e8;
     for (double logDisp = 1; logDisp < 5; logDisp+=1.e-2) {
         double disp = std::pow(logDisp, 10.);

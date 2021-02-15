@@ -3,6 +3,7 @@
 #include "PROPOSAL/crosssection/parametrization/Compton.h"
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
@@ -141,6 +142,22 @@ namespace detail {
             } else {
                 return i.Integrate(lim.v_min, v_cut, dEdx, 4);
             }
+        };
+    }
+
+    dedx_integral_t define_dedx_integral(crosssection::Photonuclear const& param,
+        ParticleDef const& p, Component const& c, EnergyCutSettings const& cut)
+    {
+        using param_t = crosssection::Parametrization<Component>;
+        auto param_ptr = std::shared_ptr<param_t>(param.clone());
+        return [param_ptr, p, c, cut](double E) {
+            auto i = Integral();
+            auto lim = param_ptr->GetKinematicLimits(p, c, E);
+            auto v_cut = cut.GetCut(lim, E);
+            auto dEdx = [_param_ptr = param_ptr.get(), &p, &c, E](double v) {
+                return _param_ptr->FunctionToDEdxIntegral(p, c, E, v);
+            };
+            return i.Integrate(lim.v_min, v_cut, dEdx, 4);
         };
     }
 }

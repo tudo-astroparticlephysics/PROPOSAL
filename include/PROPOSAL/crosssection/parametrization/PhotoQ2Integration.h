@@ -29,6 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
+#include "PROPOSAL/methods.h"
 
 #define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                     \
     struct Photo##param : public PhotoQ2Integral {                             \
@@ -60,7 +61,7 @@ namespace crosssection {
         size_t hash;
 
     public:
-        ShadowEffect() = default;
+        ShadowEffect() : hash(0) {};
         virtual ~ShadowEffect() = default;
 
         virtual double CalculateShadowEffect(
@@ -72,14 +73,18 @@ namespace crosssection {
 
     class ShadowDuttaRenoSarcevicSeckel : public ShadowEffect {
     public:
-        ShadowDuttaRenoSarcevicSeckel() = default;
+        ShadowDuttaRenoSarcevicSeckel() : ShadowEffect() {
+            hash_combine(hash, std::string("duttarenosarcevicseckel"));
+        };
 
         double CalculateShadowEffect(const Component&, double x, double nu);
     };
 
     class ShadowButkevichMikheyev : public ShadowEffect {
     public:
-        ShadowButkevichMikheyev() = default;
+        ShadowButkevichMikheyev() : ShadowEffect() {
+            hash_combine(hash, std::string("butkevichmikheyev"));
+        };
 
         double CalculateShadowEffect(const Component&, double x, double nu);
     };
