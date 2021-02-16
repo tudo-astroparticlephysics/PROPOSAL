@@ -41,6 +41,8 @@ crosssection::HardComponent::HardComponent(const ParticleDef& particle_def)
 double crosssection::HardComponent::CalculateHardComponent(
     double energy, double v)
 {
+    //TODO: This hard cutoff in v causes kinks in dNdx for higher energies
+    //TODO: And the hard cutoff in energy causes a kink in dEdx for E=1e5
     if (energy < 1.0e5 || v < 1.0e-7) {
         return 0;
     }
