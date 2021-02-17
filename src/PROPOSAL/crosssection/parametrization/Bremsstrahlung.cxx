@@ -560,7 +560,7 @@ crosssection::BremsLPM::BremsLPM(const ParticleDef& p_def, const Medium& medium,
     , density_correction_(density_correction)
 {
     hash_combine(hash, mass_, mol_density_, mass_density_, sum_charge_,
-        density_correction_, eLpm_);
+        density_correction_, param.GetHash());
     double upper_energy = 1e14;
     Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
     auto components = medium.GetComponents();

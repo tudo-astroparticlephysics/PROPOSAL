@@ -565,7 +565,7 @@ crosssection::EpairLPM::EpairLPM(
     eLpm_ *= (eLpm_ * eLpm_) * ALPHA * mass_
         / (2 * PI * mol_density_ * density_correction * charge_ * charge_
             * sum);
-    hash_combine(hash, mass_, charge_, mol_density_, density_correction_);
+    hash_combine(hash, mass_, std::abs(charge_), mol_density_, density_correction_);
 }
 
 // ------------------------------------------------------------------------- //

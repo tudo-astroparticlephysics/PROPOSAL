@@ -11,6 +11,7 @@ namespace crosssection {
     struct ComptonKleinNishina;
     class EpairProduction;
     class Photonuclear;
+    class MupairProduction;
 } // namespace crosssection
 } // namespace PROPOSAL
 
@@ -48,6 +49,10 @@ namespace detail {
 
     dedx_integral_t define_dedx_integral(
         crosssection::Photonuclear const&, ParticleDef const&,
+        Component const&, EnergyCutSettings const&);
+
+    dedx_integral_t define_dedx_integral(
+        crosssection::MupairProduction const&, ParticleDef const&,
         Component const&, EnergyCutSettings const&);
 } // namespace detail
 } // namespace PROPOSAL

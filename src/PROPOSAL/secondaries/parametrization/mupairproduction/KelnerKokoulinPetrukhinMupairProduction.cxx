@@ -30,9 +30,9 @@ double secondaries::KelnerKokoulinPetrukhinMupairProduction::CalculateRho(
         3, rnd1);
     auto rho_tmp = integral.GetUpperLimit();
     if (rnd2 < 0.5) {
-        return rho_tmp;
-    } else {
         return -rho_tmp;
+    } else {
+        return rho_tmp;
     }
 }
 

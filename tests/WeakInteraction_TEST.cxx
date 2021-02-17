@@ -286,7 +286,6 @@ TEST(WeakInteraction, Test_of_e_interpol)
     double rnd1;
     double rnd2;
     double stochastic_loss_stored;
-    double stochastic_loss_new;
 
     RandomGenerator::Get().SetSeed(0);
 
@@ -310,8 +309,12 @@ TEST(WeakInteraction, Test_of_e_interpol)
             sum += dNdx_for_comp;
             if (sum >= dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);
+                auto v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
+                EXPECT_NEAR(energy * v, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
+
+                // cross check
+                auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), v);
+                EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-4);
                 break;
             }
         }

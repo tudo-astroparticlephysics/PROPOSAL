@@ -3,6 +3,7 @@
 #include "PROPOSAL/crosssection/parametrization/Compton.h"
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
@@ -33,6 +34,22 @@ namespace detail {
         };
     }
 
+    template <typename Param, typename Target>
+    dedx_integral_t _define_dedx_integral_log(Param const& param,
+        ParticleDef const& p, Target const& t, EnergyCutSettings const& cut)
+    {
+        auto param_ptr = std::shared_ptr<crosssection::Parametrization<Target>>(param.clone());
+        return [param_ptr, p, t, cut](double E) {
+            auto i = Integral(IROMB, IMAXS, IPREC);
+            auto lim = param_ptr->GetKinematicLimits(p, t, E);
+            auto v_cut = cut.GetCut(lim, E);
+            auto dEdx = [_param_ptr = param_ptr.get(), &p, &t, E](double v) {
+                return _param_ptr->FunctionToDEdxIntegral(p, t, E, v);
+            };
+            return i.Integrate(lim.v_min, v_cut, dEdx, 4);
+        };
+    }
+
     dedx_integral_t define_dedx_integral(
         crosssection::Parametrization<Component> const& param,
         ParticleDef const& p, Component const& c, EnergyCutSettings const& cut)
@@ -50,16 +67,16 @@ namespace detail {
     dedx_integral_t define_dedx_integral(crosssection::IonizBetheBlochRossi const &param,
         ParticleDef const& p, Medium const& m, EnergyCutSettings const& cut)
     {
+        return _define_dedx_integral_log(param, p, m, cut);
+    }
+
+    template <typename Param>
+    dedx_integral_t _define_dedx_integral_ionization(Param const& param,
+        ParticleDef const& p, Medium const& m) {
         using param_t = crosssection::Parametrization<Medium>;
         auto param_ptr = std::shared_ptr<param_t>(param.clone());
-        return [param_ptr, p, m, cut](double E) {
-            auto i = Integral();
-            auto lim = param_ptr->GetKinematicLimits(p, m, E);
-            auto v_cut = cut.GetCut(lim, E);
-            auto dEdx = [_param_ptr = param_ptr.get(), &p, &m, E](double v) {
-                return _param_ptr->FunctionToDEdxIntegral(p, m, E, v);
-            };
-            return i.Integrate(lim.v_min, v_cut, dEdx, 4);
+        return [param_ptr, p, m](double E) {
+            return param_ptr->FunctionToDEdxIntegral(p, m, E, 0.) / E;
         };
     }
 
@@ -67,22 +84,14 @@ namespace detail {
         crosssection::IonizBergerSeltzerBhabha const& param,
         ParticleDef const& p, Medium const& m, EnergyCutSettings const&)
     {
-        using param_t = crosssection::Parametrization<Medium>;
-        auto param_ptr = std::shared_ptr<param_t>(param.clone());
-        return [param_ptr, p, m](double E) {
-            return param_ptr->FunctionToDEdxIntegral(p, m, E, 0.) / E;
-        };
+        return _define_dedx_integral_ionization(param, p, m);
     }
 
     dedx_integral_t define_dedx_integral(
         crosssection::IonizBergerSeltzerMoller const& param,
         ParticleDef const& p, Medium const& m, EnergyCutSettings const&)
     {
-        using param_t = crosssection::Parametrization<Medium>;
-        auto param_ptr = std::shared_ptr<param_t>(param.clone());
-        return [param_ptr, p, m](double E) {
-            return param_ptr->FunctionToDEdxIntegral(p, m, E, 0.) / E;
-        };
+        return _define_dedx_integral_ionization(param, p, m);
     }
 
     dedx_integral_t define_dedx_integral(
@@ -148,17 +157,13 @@ namespace detail {
     dedx_integral_t define_dedx_integral(crosssection::Photonuclear const& param,
         ParticleDef const& p, Component const& c, EnergyCutSettings const& cut)
     {
-        using param_t = crosssection::Parametrization<Component>;
-        auto param_ptr = std::shared_ptr<param_t>(param.clone());
-        return [param_ptr, p, c, cut](double E) {
-            auto i = Integral();
-            auto lim = param_ptr->GetKinematicLimits(p, c, E);
-            auto v_cut = cut.GetCut(lim, E);
-            auto dEdx = [_param_ptr = param_ptr.get(), &p, &c, E](double v) {
-                return _param_ptr->FunctionToDEdxIntegral(p, c, E, v);
-            };
-            return i.Integrate(lim.v_min, v_cut, dEdx, 4);
-        };
+        return _define_dedx_integral_log(param, p, c, cut);
+    }
+
+    dedx_integral_t define_dedx_integral(crosssection::MupairProduction const& param,
+        ParticleDef const& p, Component const& c, EnergyCutSettings const& cut)
+    {
+        return _define_dedx_integral_log(param, p, c, cut);
     }
 }
 }
