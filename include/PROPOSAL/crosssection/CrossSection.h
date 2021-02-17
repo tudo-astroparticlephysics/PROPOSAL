@@ -273,7 +273,7 @@ public:
         return 0.;
     };
 
-    double CalculateCumulativeCrosssection(double E, size_t hash, double v) {
+    double CalculateCumulativeCrosssection(double E, size_t hash, double v) override {
         if (dndx)
             return std::get<1>((*dndx)[hash])->Calculate(E, v) / std::get<0>((*dndx)[hash]);
         return 0.;
