@@ -1,6 +1,7 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
 #include "PROPOSAL/crosssection/parametrization/Compton.h"
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -67,6 +68,20 @@ namespace detail {
                 return param_ptr->DifferentialCrossSection(p, m, E, v);
             };
             return i.Integrate(v_min, v_max, dNdx, 3, 1);
+        };
+    }
+
+    dndx_integrand_t define_dndx_integral(
+            crosssection::PhotoPairProduction const& param, ParticleDef const& p,
+            Component const& c)
+    {
+        return [ptr = std::shared_ptr<param_t<Component>>(param.clone()), p, c](
+                double E, double v_min, double v_max) {
+            Integral i;
+            auto dNdx = [param_ptr = ptr.get(), &p, &c, E](double v) {
+                return param_ptr->DifferentialCrossSection(p, c, E, v);
+            };
+            return i.Integrate(v_min, v_max, dNdx, 3);
         };
     }
 

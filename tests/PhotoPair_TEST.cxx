@@ -219,14 +219,16 @@ TEST(PhotoPair, Test_of_dNdx)
                                               config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
-
-        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        if (energy <= 10000)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored); //integration method changed
+        else
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
 }
 
 TEST(PhotoPair, Test_of_dNdx_Interpolant)
 {
-    std::string filename = "bin/TestFiles/PhotoPair_dNdx_interpol.txt";
+    std::string filename = "bin/TestFiles/PhotoPair_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -251,8 +253,10 @@ TEST(PhotoPair, Test_of_dNdx_Interpolant)
                                               config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
-
-        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        if (energy <= 10000)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored); // integration method changed
+        else
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
 }
 

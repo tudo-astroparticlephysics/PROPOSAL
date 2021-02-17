@@ -6,6 +6,7 @@ namespace PROPOSAL {
     namespace crosssection {
         struct Ionization;
         struct ComptonKleinNishina;
+        class PhotoPairProduction;
     }
 } // namespace PROPOSAL
 
@@ -41,7 +42,11 @@ namespace detail {
         Component const&);
 
     dndx_integrand_t define_dndx_integral(
-            crosssection::Ionization const&, ParticleDef const&, Medium const&);
+        crosssection::Ionization const&, ParticleDef const&, Medium const&);
+
+    dndx_integrand_t define_dndx_integral(
+        crosssection::PhotoPairProduction const&, ParticleDef const&,
+        Component const&);
 } // namespace detail
 } // namespace PROPOSAL
 
