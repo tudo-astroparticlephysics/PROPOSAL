@@ -345,7 +345,6 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
     double rnd1;
     double rnd2;
     double stochastic_loss_stored;
-    double stochastic_loss_new;
 
     std::cout.precision(16);
     int failed_ctr = 0;
@@ -384,14 +383,19 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
+                    auto v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
                     // Results of CalculateStochasticLoss are not identical to PROPOSAL6
                     // because PROPOSAL6 used random numbers instead of rates to sample
                     // dNdx, which causes different (although not necessarily less accurate)
                     // results in some cases (in all cases I cross-checked by hand, PROPOSAL7 provided better results)
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-1 * stochastic_loss_stored);
-                    if (std::abs(stochastic_loss_new - stochastic_loss_stored) > 1e-3 * stochastic_loss_stored )
+                    EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-1 * stochastic_loss_stored);
+                    if (std::abs(v * energy - stochastic_loss_stored) > 1e-3 * stochastic_loss_stored )
                         failed_ctr++; // number of cases where this happens should be limited
+
+                    // cross check where I am suprised that the accuracy is not actually better,
+                    // but since this calculation is not even used in normal calculations I am fine with it
+                    auto rate_calculated = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), v);
+                    EXPECT_NEAR(rate_calculated/dNdx_for_comp, rnd1, 5e-3);
                     break;
                 }
             }
@@ -443,7 +447,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
         if (hard_component == 1 and energy == 1e5)
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored); // kink in function
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored); // kink in function (see issue #124)
         else if (vcut * energy == ecut)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored); // kink in function
         else if (parametrization == "Rhode" and energy <= 10000)
@@ -497,9 +501,9 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
         if (energy * vcut == ecut)
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // kink in function
         else if (hard_component == 1 and energy >= 1e10)
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored); // for high E, high_component correction produces artefacts due to hard cutoff for v=1e-7 in differential cross section
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored); // for high E, high_component correction produces artefacts due to hard cutoff for v=1e-7 in differential cross section (see issue #124)
         else if (hard_component == 1 and energy == 1e5)
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // kink in hard_component for E=1e5
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // kink in hard_component for E=1e5 (see issue #124)
         else
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
@@ -523,7 +527,6 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
     double rnd1;
     double rnd2;
     double stochastic_loss_stored;
-    double stochastic_loss_new;
 
     std::cout.precision(16);
 
@@ -545,7 +548,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
 
         auto cross = make_photonuclearreal(particle_def, *medium, ecuts, true,
                                            config);
-
+        auto cross_integral = make_photonuclearreal(particle_def, *medium, ecuts, true,
+                                                    config);
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = medium->GetComponents();
         double sum = 0;
@@ -561,8 +565,14 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);
+                    double v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
+                    // expect correct order of magnitude compared with old PROPOSAL
+                    EXPECT_NEAR(v * energy, stochastic_loss_stored, 1.1E-1 * stochastic_loss_stored);
+
+                    // Crosscheck by comparing with integrated value
+                    auto rate_calculated = cross_integral->CalculateCumulativeCrosssection(energy, comp.GetHash(), v);
+                    EXPECT_NEAR(rate_calculated/dNdx_for_comp, rnd1, 1e-5);
+
                     break;
                 }
             }
@@ -733,8 +743,12 @@ TEST(PhotoQ2Integration, Test_of_e)
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);
+                    auto v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
+                    EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);
+
+                    // cross check
+                    auto rate_new = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), v);
+                    EXPECT_NEAR(rate_new/dNdx_for_comp, rnd1, 1e-5);
                     break;
                 }
             }
@@ -867,7 +881,6 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
     double rnd1;
     double rnd2;
     double stochastic_loss_stored;
-    double stochastic_loss_new;
 
     std::cout.precision(16);
 
@@ -894,6 +907,8 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
 
         auto cross = make_photonuclearQ2(particle_def, *medium, ecuts, true,
                                          config);
+        auto cross_integral = make_photonuclearQ2(particle_def, *medium, ecuts, false,
+                                         config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = medium->GetComponents();
@@ -910,8 +925,17 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);
+                    auto v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
+                    // expect same order of magnitude compared to old PROPOSAL
+                    EXPECT_NEAR(energy * v, stochastic_loss_stored, 5E-1 * stochastic_loss_stored);
+
+                    // cross check
+                    auto rate_rnd = cross_integral->CalculateCumulativeCrosssection(energy, comp.GetHash(), v);
+                    if (energy * vcut == ecut or rnd1 < 0.05)
+                        EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-2); // kink in integral / TODO: not working too well for small rnd
+                    else
+                        EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-3);
+
                     break;
                 }
             }

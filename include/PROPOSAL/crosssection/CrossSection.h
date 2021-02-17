@@ -51,9 +51,8 @@ struct CrossSectionBase {
     virtual double CalculatedE2dx(double) = 0;
     virtual double CalculatedNdx(double) = 0;
     virtual double CalculatedNdx(double, size_t) = 0;
-    virtual std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(
-        double)
-        = 0;
+    virtual double CalculateCumulativeCrosssection(double, size_t, double) = 0;
+    virtual std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(double) = 0;
     virtual double CalculateStochasticLoss(size_t, double, double) = 0;
     virtual double GetLowerEnergyLim() const = 0;
     virtual size_t GetHash() const noexcept = 0;
@@ -273,6 +272,12 @@ public:
                 / std::get<0>((*dndx)[target_hash]);
         return 0.;
     };
+
+    double CalculateCumulativeCrosssection(double E, size_t hash, double v) {
+        if (dndx)
+            return std::get<1>((*dndx)[hash])->Calculate(E, v) / std::get<0>((*dndx)[hash]);
+        return 0.;
+    }
 
     std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(
         double E) override

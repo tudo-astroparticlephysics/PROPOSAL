@@ -126,6 +126,12 @@ void init_crosssection(py::module& m)
             energy (float): energy in MeV
 
             )pbdoc")
+        .def("calculate_cumulative_crosssection", py::vectorize(&CrossSectionBase::CalculateCumulativeCrosssection),
+             py::arg("energy"), py::arg("target_hash"), py::arg("v"), R"pbdoc(
+                Integrate differential cross section from v_cut to v (e.g. for
+                v = v_max, you could get the same result as :meth:`~proposal.crosssection.Calculate_dNdx`).
+                )pbdoc"
+             )
         .def("calculate_dNdx",
             py::vectorize(py::overload_cast<double, size_t>(&CrossSectionBase::CalculatedNdx)),
             py::arg("energy"), py::arg("target_hash"),

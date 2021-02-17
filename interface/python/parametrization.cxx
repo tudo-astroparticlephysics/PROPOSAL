@@ -502,7 +502,8 @@ void init_parametrization(py::module& m)
     py::class_<crosssection::HardComponent,
         std::shared_ptr<crosssection::HardComponent>>(
         m_sub_photo, "HardComponent")
-        .def(py::init<const ParticleDef&>(), py::arg("particle_def"));
+        .def(py::init<const ParticleDef&>(), py::arg("particle_def"))
+        .def("calculate_hard_component", &crosssection::HardComponent::CalculateHardComponent);
 
     py::class_<crosssection::PhotoRealPhotonAssumption,
         std::shared_ptr<crosssection::PhotoRealPhotonAssumption>,
