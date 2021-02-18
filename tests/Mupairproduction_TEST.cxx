@@ -193,6 +193,9 @@ TEST(Mupairproduction, Test_of_dEdx)
         if (ecut == -1)
             ecut = INF;
 
+        if (particleName != "MuMinus")
+            continue; // parametrization at the moment only optimized for ingoing muons
+
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
@@ -204,8 +207,10 @@ TEST(Mupairproduction, Test_of_dEdx)
                                            config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
-
-        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
+        if (energy <= 10000)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored); // there have been changes in the cross section parametrization
+        else
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
     }
 }
 
@@ -234,6 +239,9 @@ TEST(Mupairproduction, Test_of_dNdx)
         if (ecut == -1)
             ecut = INF;
 
+        if (particleName != "MuMinus")
+            continue; // parametrization at the moment only optimized for ingoing muons
+
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
@@ -246,7 +254,10 @@ TEST(Mupairproduction, Test_of_dNdx)
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        if (energy <= 10000)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored); // there have been changes in the cross section parametrization
+        else
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
 }
 
@@ -267,7 +278,6 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
     double rnd1;
     double rnd2;
     double stochastic_loss_stored;
-    double stochastic_loss_new;
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(0);
@@ -279,6 +289,9 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
             vcut = 1;
         if (ecut == -1)
             ecut = INF;
+
+        if (particleName != "MuMinus")
+            continue; // parametrization at the moment only optimized for ingoing muons
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -300,13 +313,20 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1 ) {
+                if (ecut == INF and vcut == 1) {
                     #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    auto v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
+                    if (energy <= 10000)
+                        EXPECT_NEAR(energy * v, stochastic_loss_stored, 1E-2 * stochastic_loss_stored); // there have been changes in the cross section parametrization
+                    else
+                        EXPECT_NEAR(energy * v, stochastic_loss_stored, 1E-3 * stochastic_loss_stored); // there have been changes in the cross section parametrization
+
+                    // cross_check
+                    auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), v);
+                    EXPECT_NEAR(rate_rnd / dNdx_for_comp, rnd1, 1e-3);
                     break;
                 }
             }
@@ -347,6 +367,9 @@ while (in >> particleName >> mediumName >> ecut >> vcut >> v >> multiplier >> en
     if (ecut == -1)
         ecut = INF;
 
+if (particleName != "MuMinus")
+    continue; // parametrization at the moment only optimized for ingoing muons
+
 ParticleDef particle_def = getParticleDef(particleName);
 std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
@@ -357,14 +380,20 @@ rho = fac.CalculateRho(energy, v, medium->GetComponents().front(), rnd1, rnd2);
 E1_new = 0.5 * v * energy * (1 + rho);
 E2_new = 0.5 * v * energy * (1 - rho);
 
-ASSERT_NEAR(E1_new, E1_stored, 1E-6 * E1_stored);
-ASSERT_NEAR(E2_new, E2_stored, 1E-6 * E2_stored);
+
+if (energy <= 1e5) {
+    EXPECT_NEAR(E1_new, E1_stored, 5E-2 * E1_stored);
+    EXPECT_NEAR(E2_new, E2_stored, 5E-2 * E2_stored);
+} else {
+    EXPECT_NEAR(E1_new, E1_stored, 1E-3 * E1_stored);
+    EXPECT_NEAR(E2_new, E2_stored, 1E-3 * E2_stored);
+}
 }
 }
 
 TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Mupair_dEdx_interpol.txt";
+    std::string filename = testfile_dir + "Mupair_dEdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -387,6 +416,9 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
         if (ecut == -1)
             ecut = INF;
 
+        if (particleName != "MuMinus")
+            continue; // parametrization at the moment only optimized for ingoing muons
+
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
@@ -396,16 +428,30 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 
         auto cross = make_mupairproduction(particle_def, *medium, ecuts, true,
                                            config);
+        auto cross_integral = make_mupairproduction(particle_def, *medium, ecuts,
+                                                    false, config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
+        auto dEdx_integral = cross_integral->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
+        if (energy * vcut == ecut) {
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 2e-1 * dEdx_stored);
+            EXPECT_NEAR(dEdx_new, dEdx_integral, 2e-1 * dEdx_integral);
+        } else if (energy <= 10000) {
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-2 * dEdx_stored);
+            EXPECT_NEAR(dEdx_new, dEdx_integral, 5e-2 * dEdx_integral);
+        } else {
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+            EXPECT_NEAR(dEdx_new, dEdx_integral, 1e-3 * dEdx_integral);
+        }
+
+        // cross check
     }
 }
 
 TEST(Mupairproduction, Test_of_dNdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Mupair_dNdx_interpol.txt";
+    std::string filename = testfile_dir + "Mupair_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -428,6 +474,9 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
         if (ecut == -1)
             ecut = INF;
 
+        if (particleName != "MuMinus")
+            continue; // parametrization at the moment only optimized for ingoing muons
+
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
@@ -437,16 +486,28 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
 
         auto cross = make_mupairproduction(particle_def, *medium, ecuts, true,
                                            config);
-
+        auto cross_integral = make_mupairproduction(particle_def, *medium, ecuts,
+                                                    false, config);
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
+        auto dNdx_integral = cross_integral->CalculatedNdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        if (energy * vcut == ecut) {
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // kink in integrand
+            EXPECT_NEAR(dNdx_new, dNdx_integral, 1e-1 * dNdx_integral);
+        } else if (energy <= 10000) {
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored); // parametrization changed for small energies
+            EXPECT_NEAR(dNdx_new, dNdx_integral, 1e-3 * dNdx_integral);
+        } else {
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+            EXPECT_NEAR(dNdx_new, dNdx_integral, 1e-3 * dNdx_integral);
+        }
+
     }
 }
 
 TEST(Mupairproduction, Test_of_e_interpol)
 {
-    std::string filename = testfile_dir + "Mupair_e_interpol.txt";
+    std::string filename = testfile_dir + "Mupair_e.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -473,6 +534,9 @@ TEST(Mupairproduction, Test_of_e_interpol)
         if (ecut == -1)
             ecut = INF;
 
+        if (particleName != "MuMinus")
+            continue; // parametrization at the moment only optimized for ingoing muons
+
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
@@ -498,8 +562,15 @@ TEST(Mupairproduction, Test_of_e_interpol)
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
-                    stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                    auto v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
+                    if (energy <= 10000)
+                        EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-2 * stochastic_loss_stored); // parametrization changed for small energies
+                    else
+                        EXPECT_NEAR(v * energy, stochastic_loss_stored, 5E-3 * stochastic_loss_stored);
+
+                    // cross check
+                    auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), v);
+                    EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-4);
                     break;
                 }
             }
