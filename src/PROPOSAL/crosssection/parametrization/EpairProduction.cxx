@@ -552,6 +552,7 @@ crosssection::EpairLPM::EpairLPM(
     , charge_(p_def.charge)
     , mol_density_(medium.GetMolDensity())
     , density_correction_(density_correction)
+    , hash(0)
 {
     double sum = 0.;
     auto components = medium.GetComponents();
