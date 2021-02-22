@@ -18,6 +18,7 @@ class CrossSectionDE2DX {
 protected:
     size_t hash;
     std::shared_ptr<spdlog::logger> logger;
+    double lower_energy_lim;
 
     CrossSectionDE2DX(size_t _hash);
 

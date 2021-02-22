@@ -175,6 +175,7 @@ PYBIND11_MODULE(proposal, m)
         .def_readwrite_static(
             "upper_energy_lim", &InterpolationSettings::UPPER_ENERGY_LIM)
         .def_readwrite_static("nodes_dedx", &InterpolationSettings::NODES_DEDX)
+        .def_readwrite_static("nodes_de2dx", &InterpolationSettings::NODES_DE2DX)
         .def_readwrite_static(
             "nodes_dndx_e", &InterpolationSettings::NODES_DNDX_E)
         .def_readwrite_static(
@@ -288,7 +289,8 @@ PYBIND11_MODULE(proposal, m)
                     Returns:
                         float: randomized final energy
                 )pbdoc")
-        .def_readwrite_static("interpol_def", &ContRand::interpol_def);
+        .def_readwrite_static("interpol_def", &ContRand::interpol_def)
+        .def("function_to_integral", &ContRand::FunctionToIntegral);
 
     m.def("make_contrand",
         [](crosssection_list_t cross, bool interpolate) {

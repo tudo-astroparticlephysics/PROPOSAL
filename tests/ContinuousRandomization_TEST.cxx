@@ -14,15 +14,15 @@
 
 using namespace PROPOSAL;
 
-// ParticleDef getParticleDef(const std::string& name) {
-//     if (name == "MuMinus") {
-//         return MuMinusDef();
-//     } else if (name == "TauMinus") {
-//         return TauMinusDef();
-//     } else {
-//         return EMinusDef();
-//     }
-// }
+ParticleDef getParticleDef(const std::string& name) {
+    if (name == "MuMinus") {
+        return MuMinusDef();
+    } else if (name == "TauMinus") {
+        return TauMinusDef();
+    } else {
+        return EMinusDef();
+    }
+}
 
 
 TEST(ContinuousRandomization, Constructor) {
@@ -108,18 +108,21 @@ TEST(ContinuousRandomization, Constraints){
     auto contrand = make_contrand(cross, false);
 
     RandomGenerator::Get().SetSeed(24601);
-    double energy = 1e5;
     int statistics = 1e3;
     double randomized;
 
     for(int n=1; n<statistics; n++){
         randomized = contrand->EnergyRandomize(1e4, p_def.mass, RandomGenerator::Get().RandomDouble());
-        EXPECT_TRUE(randomized >= p_def.mass);
-        EXPECT_TRUE(randomized <= 1e4);
+        EXPECT_GE(randomized, p_def.mass);
+        EXPECT_LT(randomized, 1e4);
+
+        randomized = contrand->EnergyRandomize(250, p_def.mass, RandomGenerator::Get().RandomDouble());
+        EXPECT_GT(randomized, p_def.mass);
+        EXPECT_LT(randomized, 250);
 
         randomized = contrand->EnergyRandomize(110, p_def.mass, RandomGenerator::Get().RandomDouble());
-        EXPECT_TRUE(randomized <= 110);
-        EXPECT_TRUE(randomized > p_def.mass);
+        EXPECT_LT(randomized, 110);
+        EXPECT_GE(randomized, p_def.mass);
     }
 
 }
@@ -139,7 +142,7 @@ TEST(ContinuousRandomization, compare_integral_interpolant) {
         double rnd = RandomGenerator::Get().RandomDouble();
         double randomized_integral = contrand_integral->EnergyRandomize(E_i, 1e5, rnd);
         double randomized_interpol = contrand_interpol->EnergyRandomize(E_i, 1e5, rnd);
-        EXPECT_NEAR(randomized_integral, randomized_interpol, 1e-5 * E_i);
+        EXPECT_NEAR(randomized_integral, randomized_interpol, 1e-3 * E_i);
     }
 }
 
@@ -175,10 +178,7 @@ TEST(ContinuousRandomization, Randomize_interpol) {
         first = false;
         energy_old = -1;
 
-        // TODO: should should not be hard coded and also work for a particle name str
-        // auto p_def = getParticleDef(particleName);
-        // the above line produces a linker error
-        auto p_def = MuMinusDef();
+        auto p_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
         //reprouce old behaviour
@@ -192,17 +192,18 @@ TEST(ContinuousRandomization, Randomize_interpol) {
         auto cuts = std::make_shared<EnergyCutSettings>(ecut, vcut, true);
 
         auto cross = GetStdCrossSections(p_def, *medium, cuts, true);
-        auto contrand = make_contrand(cross, false);
+        auto contrand = make_contrand(cross, true);
+        auto contrand_integral = make_contrand(cross, false);
 
         while (energy_old < initial_energy) {
             energy_old = initial_energy;
-
             randomized_energy_new =
                 contrand->EnergyRandomize(initial_energy, final_energy, rnd);
 
-            ASSERT_NEAR(randomized_energy_new, randomized_energy,
-                        1e-1 * randomized_energy);
-
+            if (initial_energy > 1e6) // dE2dx for ionization has been underestimated for previous versions of PROPOSAL
+                EXPECT_NEAR(randomized_energy_new, randomized_energy, 1e-3 * randomized_energy);
+            auto randomized_energy_integral = contrand_integral->EnergyRandomize(initial_energy, final_energy, rnd);
+            EXPECT_NEAR(randomized_energy_new, randomized_energy_integral, randomized_energy_integral * 1e-3);
             in >> rnd >> particleName >> mediumName >> ecut >> vcut >>
                 initial_energy >> final_energy >> randomized_energy;
         }

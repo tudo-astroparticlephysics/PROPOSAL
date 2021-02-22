@@ -44,5 +44,5 @@ namespace detail {
 
 double CrossSectionDE2DXIntegral::Calculate(double E) const
 {
-    return de2dx_integral(E);
+    return de2dx_integral(E) * E * E;
 }

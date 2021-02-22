@@ -53,6 +53,7 @@ struct InterpolationSettings {
     static std::string TABLES_PATH;
     static double UPPER_ENERGY_LIM;
     static unsigned int NODES_DEDX;
+    static unsigned int NODES_DE2DX;
     static unsigned int NODES_DNDX_E;
     static unsigned int NODES_DNDX_V;
 };

@@ -27,6 +27,7 @@ const double PROPOSAL::IPREC2 = 1.e-6 * 10; // integration precision
 std::string InterpolationSettings::TABLES_PATH = "/tmp";
 double InterpolationSettings::UPPER_ENERGY_LIM = 1.e14;
 unsigned int InterpolationSettings::NODES_DEDX = 100;
+unsigned int InterpolationSettings::NODES_DE2DX = 200;
 unsigned int InterpolationSettings::NODES_DNDX_E = 100;
 unsigned int InterpolationSettings::NODES_DNDX_V = 100;
 

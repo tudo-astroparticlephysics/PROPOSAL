@@ -49,6 +49,8 @@ class UtilityInterpolant : public UtilityIntegral {
     double lower_lim;
     interpolant_ptr interpolant_;
 
+    const double bias = 1.; // bias to be able to use log substitution for f. should cancel out in every calculation.
+
     // maybe interpolate function to integral will give a performance boost.
     // in general this function should be underfrequently called
     // Interpolant1DBuilder builder_diff;
@@ -71,9 +73,10 @@ public:
         hash_combine(this->hash, reverse);
 
         def.f = [&](double energy) {
-            return UtilityIntegral::Calculate(energy, reference_x);
+            return UtilityIntegral::Calculate(energy, reference_x) + bias;
         };
 
+        def.f_trafo = std::make_unique<cubic_splines::ExpAxis<double>>(1., 0.);
         def.axis = std::make_unique<cubic_splines::ExpAxis<double>>(
             lower_lim, 1e14, (size_t)100);
 

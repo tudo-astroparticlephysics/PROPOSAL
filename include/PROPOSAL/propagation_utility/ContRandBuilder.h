@@ -30,8 +30,9 @@ public:
         double initial_energy, double final_energy, double rnd) final
     {
         auto std = std::sqrt(Variance(initial_energy, final_energy));
-        return SampleFromGaussian(
-            final_energy, std, rnd, disp->GetLowerLim(), initial_energy);
+        return SampleFromGaussian(final_energy, std, rnd,
+                                  std::min(disp->GetLowerLim(), final_energy),
+                                  initial_energy);
     }
 };
 

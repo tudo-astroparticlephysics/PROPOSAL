@@ -16,5 +16,7 @@ std::string CrossSectionDE2DXInterpolant::gen_name() const
 }
 double CrossSectionDE2DXInterpolant::Calculate(double energy) const
 {
+    if (energy < lower_energy_lim)
+        return 0.;
     return interpolant.evaluate(energy);
 }

@@ -71,7 +71,11 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
     if (std::abs(upper_limit - lower_lim) > upper_limit * IPREC)
         return lower_lim;
 
+    return x_guess;
+    // TODO: Check whether this is already accurate enough
+    /*
     auto step = upper_limit + 0.5 * rnd / FunctionToIntegral(upper_limit);
 
     return upper_limit + rnd / FunctionToIntegral(step);
+     */
 }
