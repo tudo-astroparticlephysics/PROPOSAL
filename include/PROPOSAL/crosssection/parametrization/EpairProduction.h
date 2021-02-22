@@ -70,8 +70,6 @@ namespace crosssection {
             double density_correction = 1.0);
         virtual ~EpairProduction() = default;
 
-        // using only_stochastic = std::false_type;
-        // using component_wise = std::true_type;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
         KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&,
@@ -128,44 +126,8 @@ namespace crosssection {
 
 } // namespace crosssection
 
-/* namespace detail { */
-/*     double integrate_dedx_epair(Integral& integral, */
-/*         crosssection::EpairProduction const& param, const ParticleDef& p_def,
- */
-/*         const Component& comp, double energy, double v_min, double v_max); */
+template <>
+double integrate_dedx(Integral&, crosssection::EpairProduction&, const ParticleDef&,
+    const Component&, double, double, double);
 
-/*     template <typename T1> */
-/*     auto define_epair_dedx_integral(T1 param, ParticleDef const& p_def, */
-/*         Component const& comp, EnergyCutSettings const& cut) */
-/*     { */
-/*         return [param, &p_def, &comp, &cut](Integral& i, double E) { */
-/*             auto lim = param.GetKinematicLimits(p_def, comp, E); */
-/*             auto v_cut = cut.GetCut(lim, E); */
-/*             return integrate_dedx_epair( */
-/*                 i, param, p_def, comp, E, lim.v_min, v_cut); */
-/*         }; */
-/*     } */
-
-/*     inline auto define_dedx_integral( */
-/*         crosssection::EpairSandrockSoedingreksoRhode param, */
-/*         ParticleDef const& p_def, Component const& comp, */
-/*         EnergyCutSettings const& cut) */
-/*     { */
-/*         return define_epair_dedx_integral(param, p_def, comp, cut); */
-/*     } */
-/*     inline auto define_dedx_integral( */
-/*         crosssection::EpairKelnerKokoulinPetrukhin param, */
-/*         ParticleDef const& p_def, Component const& comp, */
-/*         EnergyCutSettings const& cut) */
-/*     { */
-/*         return define_epair_dedx_integral(param, p_def, comp, cut); */
-/*     } */
-/*     inline auto define_dedx_integral( */
-/*         crosssection::EpairForElectronPositron param, ParticleDef const&
- * p_def, */
-/*         Component const& comp, EnergyCutSettings const& cut) */
-/*     { */
-/*         return define_epair_dedx_integral(param, p_def, comp, cut); */
-/*     } */
-/* } */
 } // namespace PROPOSAL

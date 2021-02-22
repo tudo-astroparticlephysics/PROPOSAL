@@ -366,8 +366,14 @@ double crosssection::BremsSandrockSoedingreksoRhode::CalculateParametrization(
         / (1.0 + rad_log * Z13 * exp(0.5) * delta / ME));
     double phi2 = std::log(rad_log * Z13 * exp(-1 / 6.) * (p_def.mass / ME)
         / (1.0 + rad_log * Z13 * exp(1. / 3.) * delta / ME));
-    phi1 -= delta1 * (1. - 1. / Z);
-    phi2 -= delta2 * (1. - 1. / Z);
+    
+    if (Z == 1) {
+        phi1 = phi1 - delta1;
+        phi2 = phi2 - delta2;
+    } else {
+        phi1 = phi1 - delta1 * (1. - 1. / Z);
+        phi2 = phi2 - delta2 * (1. - 1. / Z);
+    }
 
     // s_atomic
     double square_momentum = (energy - p_def.mass) * (energy + p_def.mass);
@@ -597,11 +603,11 @@ double crosssection::BremsLPM::suppression_factor(
 
     double Dn = 1.54 * std::pow(comp.GetAtomicNum(), 0.27);
     s1 = ME * Dn / (mass_ * Z3 * comp.GetLogConstant());
-    s1 *= s1 * SQRT2;
+    s1 = s1 * s1 * SQRT2; // TODO: is SQRT2 correct here, this factor is not in the paper?
 
     // Calc xi(s') from Stanev, Vankow, Streitmatter, Ellsworth, Bowen
     // Phys. Rev. D 25 (1982), 1291
-    double sp = std::sqrt(eLpm_ * v / (8 * energy * (1 - v)));
+    double sp = 0.125*std::sqrt(eLpm_ * v / (energy * (1 - v)));
     double h = std::log(sp) / std::log(s1);
 
     if (sp < s1) {

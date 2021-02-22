@@ -46,7 +46,7 @@ enum class InteractionType;
 }
 
 namespace PROPOSAL {
-
+class Cartesian3D;
 class PropagationUtility {
 public:
     struct Collection {
@@ -80,10 +80,10 @@ public:
     // there could be a possible access with the position of the object stored
     // in an enum.
 
-    std::tuple<Vector3D, Vector3D> DirectionsScatter(
+    std::tuple<Cartesian3D, Cartesian3D> DirectionsScatter(
         double, double, double, const Vector3D&, std::function<double()>);
-    Vector3D DirectionDeflect(InteractionType, double, double, Vector3D,
-        std::function<double()>) const;
+    Cartesian3D DirectionDeflect(InteractionType, double, double,
+                                 const Vector3D&, std::function<double()>) const;
 
     Collection collection;
 };

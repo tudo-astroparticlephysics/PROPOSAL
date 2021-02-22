@@ -17,8 +17,8 @@ namespace PROPOSAL {
             static constexpr int n_rnd = 3;
 
             double CalculateRho(double, double, const Component&, double, double);
-            std::tuple<Vector3D, Vector3D> CalculateDirections(
-                    Vector3D, double, double, double);
+            std::tuple<Cartesian3D, Cartesian3D> CalculateDirections(
+                    const Vector3D&, double, double, double);
             std::tuple<double, double> CalculateEnergy(double, double);
 
         public:

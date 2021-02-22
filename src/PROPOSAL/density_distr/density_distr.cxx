@@ -7,6 +7,7 @@
 #include "PROPOSAL/density_distr/density_polynomial.h"
 #include "PROPOSAL/density_distr/density_splines.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/math/Cartesian3D.h"
 
 using namespace PROPOSAL;
 
@@ -64,7 +65,7 @@ Axis::Axis(const Vector3D& fp0) : fp0_(fp0) {}
 
 Axis::Axis(const nlohmann::json& config) {
     if(not config.contains("fp0")) throw std::invalid_argument("Axis: No fp0 found.");
-    fp0_ = Vector3D(config.at("fp0"));
+    fp0_ = Cartesian3D(config.at("fp0"));
 }
 
 
@@ -85,7 +86,7 @@ bool Axis::operator!=(const Axis& axis) const {
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 RadialAxis::RadialAxis() : Axis() {
-    fp0_.SetCartesianCoordinates(0, 0, 0);
+    fp0_.SetCoordinates({0, 0, 0});
 }
 
 RadialAxis::RadialAxis(const Vector3D& fp0) : Axis(fp0) {}
@@ -97,8 +98,8 @@ double RadialAxis::GetDepth(const Vector3D& xi) const {
 }
 
 double RadialAxis::GetEffectiveDistance(const Vector3D& xi, const Vector3D& direction) const {
-    Vector3D aux{xi - fp0_};
-    aux.normalise();
+    Cartesian3D aux{Cartesian3D(xi) - fp0_};
+    aux.normalize();
 
     return -aux * direction;
 }
@@ -108,15 +109,15 @@ double RadialAxis::GetEffectiveDistance(const Vector3D& xi, const Vector3D& dire
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 CartesianAxis::CartesianAxis() : Axis() {
-    fAxis_.SetCartesianCoordinates(1, 0, 0);
-    fp0_.SetCartesianCoordinates(0, 0, 0);
+    fAxis_.SetCoordinates({1, 0, 0});
+    fp0_.SetCoordinates({0, 0, 0});
 }
 
 CartesianAxis::CartesianAxis(const Vector3D& fAxis, const Vector3D& fp0) :  Axis(fp0) , fAxis_(fAxis) {}
 
 CartesianAxis::CartesianAxis(const nlohmann::json& config) : Axis(config) {
     if(not config.contains("fAxis")) throw std::invalid_argument("Axis: No fAxis found.");
-    fAxis_ = Vector3D(config.at("fAxis"));
+    fAxis_ = Cartesian3D(config.at("fAxis"));
 }
 
 bool CartesianAxis::operator==(const CartesianAxis& axis) const {

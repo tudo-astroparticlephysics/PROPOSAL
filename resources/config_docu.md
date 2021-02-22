@@ -44,7 +44,7 @@ All keywords with `-` as a default option are mandatory and need to be defined e
 | `geometries` | Array | `-` | List of geometry objects describing the geometry of the Sector. |
 | `do_interpolation` | Boolean | `true`  | Defines if interpolation tables should be used for propagation. Note that not using interpolation tables will increase the runtime by several orders of magnitude! |
 | `exact_time` | Boolean | `true`  | Defines if the elapsed time will be calculated exactly using the actual particle velocity or by using the approximation that all particles travel with the speed of light. |
-| `scattering` | String | `NoScattering`  | Multiple Scattering model to be used. |
+| `scattering` | Object | No scattering  | Object to define multiple scattering and stochastic deflection behaviour. Per default, multiple scattering and stochastic deflection are disabled. |
 | `density_distribution`   | Object | Homogeneous density distribution | Distribution of the mass density of the Sector. |
 | `CrossSections` | Object | Standard cross sections | Cross sections that will be used in this Sector. |
 
@@ -142,13 +142,62 @@ Each sector consists of at least one **geometry**. Three different geometry type
 ```
 
 ## Scattering
+Particles in PROPOSAL may be deflected both during continuous propagation steps (multiple scattering) and in stochastic interactions (stochastic deflection).
+The behaviour for both processes can be set individually using the `scattering` object.
 
-PROPOSAL provides different multiple scattering models, which can be set with the `scattering` parameter, namely:
+| Keyword                            |  Type  | Default        | Description                                                |
+| ---------------------------------- | ------ | -------------- | ---------------------------------------------------------- |
+| `multiple_scattering`              | String | `NoScattering` | Parametrization used to describe multiple scattering interactions. |
+| `multiple_scattering_multiplier`   | Number | `1.0`          | Factor to scale the multiple scattering effects by a constant factor. |
+| `stochastic_deflection`            | Array  | `[]`           | List of parametrizations to describe stochastic deflection effects for different interaction types, or list of interaction types (indicated with the prefix `default`) where PROPOSAL will use default parametrizations to describe stochastic deflections. |
+| `stochastic_deflection_multiplier` | Object | `1.0` for each interaction type | Object with multipliers to scale stochastic deflection effects for each interaction type. Names of keys must correspond to the interaction types where the multiplier should be applied. |
+
+If no scattering object is defined, neither multiple scattering nor stochastic deflections will be considered during propagation.
+
+### Multiple scattering
+PROPOSAL provides different multiple scattering models, which can be set with the `multiple_scattering` parameter, namely:
 
 * `NoScattering`: No multiple scattering effects.
-* `HighlandIntegral `: Gaussian approximation of Molière theory, derived by [Highland](https://doi.org/10.1016/0029-554X(75)90743-0) and corrected by [Lynch/Dahl](https://doi.org/10.1016/0168-583X(91)95671-Y). 
+* `HighlandIntegral`: Gaussian approximation of Molière theory, derived by [Highland](https://doi.org/10.1016/0029-554X(75)90743-0) and corrected by [Lynch/Dahl](https://doi.org/10.1016/0168-583X(91)95671-Y). 
 * `Highland`: Same as `HighlandIntegral`, but with the approximation that the particle energy is constant during a propagation step. *This parametrization should only be used for small step sizes where this approximation is valid.*
 * `Moliere`: Scattering based on [Molière's theory](https://zfn.mpdl.mpg.de/data/Reihe_A/3/ZNA-1948-3a-0078.pdf). *Significantly slower compared to other scattering models.*
+
+Multiple scattering effects can be scaled with a constant factor using the option `multiple_scattering_multiplier`.
+This scales the sampled deflections, which are described by their displacement in cartesian coordinates, with a constant factor for each component. 
+
+### Stochastic deflection
+PROPOSAL provides different parametrizations for stochastic deflection interactions, where an individual parametrization must be chosen for each interaction type.
+These parametrizations can be set with the option `stochastic_deflection`. 
+This array is expected to either include a list of parametrization names or a list of interaction types, indicated with the prefix `default`.
+In the latter case, PROPOSAL will use an appropriate default parametrization for this interaction type.
+For interaction types that are not covered in this Array, stochastic deflection will not be considered. 
+
+Stochastic deflections may be scaled using the option `stochastic_deflection_multiplier`.
+This object consists of multipliers, where each key should correspond to the interaction type and eac value to the scaling factor for this interaction type.
+These multipliers will multiply a constant factor to the stochastic deflection, described by a radial deflection angle.
+Interaction types that are not covered in this object will not be scaled (i.e. factor `1.0`).
+
+#### Examples
+
+Scattering object where we only want to consider multiple scattering, described by the `HighlandIntegral` parametrization:
+
+```json5
+"scattering":
+{
+	"multiple_scattering": "HighlandIntegral"
+}
+```
+
+Scattering object where we want to consider, additional to multiple scattering, stochastic deflections.
+Here, we want PROPOSAL to choose default parametrizations for the stochastic deflection:
+
+```json5
+"scattering":
+{
+	"multiple_scattering": "HighlandIntegral", 
+	"stochastic_deflection": ["DefaultIoniz", "DefaultBrems", "DefaultEpair", "DefaultPhotonuclear"]
+}
+```
 
 ## Density distribution
 
@@ -239,6 +288,7 @@ PROPOSAL provides the option to consider additional interaction types as well as
 To use alternative parametrizations or to enable additional interaction types, the `CrossSections` object needs to contain one object with the appropriate name for each interaction type (e.g. `annihilation`, `brems`, etc.). If there is no object for an specific interaction type, this interaction type will be disabled.
 
 Each of the defined objects has to contain the keyword `parametrization`, specifying the parametrization that should be used, as well as additional, type-specific keywords.
+For each interaction type, a `multiplier` can be defined which scales the total cross section by a constant coefficient.
 
 #### Example
 
@@ -271,6 +321,7 @@ Example where the interactions bremsstrahlung, electron-positron pair producton,
 | Keyword           |  Type  | Default | Description                |
 | ----------------- | ------ | ------- | -------------------------- |
 | `parametrization` | String | `-`     | Parametrization to be used |
+| `multiplier`      | Number | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Annihilation of an ingoing positron with an atomic electron. Available `annihilation` parametrizations are:
 
@@ -281,6 +332,7 @@ Annihilation of an ingoing positron with an atomic electron. Available `annihila
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 | `lpm`             | Boolean | `true`  | Enabling or disabling the reduction of the cross section at high energies by the Landau-Pomeranchuk-Migdal effect.  |
 
 Note that the LPM correction currently only supports the correct description of homogeneous media.
@@ -300,6 +352,7 @@ Available `brems` parametrizations are:
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Compton scattering of photons on free electrons. Available `compton` parametrizations are:
 
@@ -310,6 +363,7 @@ Compton scattering of photons on free electrons. Available `compton` parametriza
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 | `lpm`             | Boolean | `true`  | Enabling or disabling the reduction of the cross section at high energies by the Landau-Pomeranchuk-Migdal effect.  |
 
 Creation of electron-positron pairs by ingoing leptons.
@@ -327,6 +381,7 @@ Available `epair` parametrizations are:
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Available `ioniz` parametrizations are:
 
@@ -339,6 +394,7 @@ Available `ioniz` parametrizations are:
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Creation of muon-antimuon pairs by ingoing leptons. Available `mupair` parametrizations:
 
@@ -349,6 +405,7 @@ Creation of muon-antimuon pairs by ingoing leptons. Available `mupair` parametri
 | Keyword           |  Type   | Default              | Description                |
 | ----------------- | ------- | -------------------- | -------------------------- |
 | `parametrization` | String  | `-`                  | Parametrization to be used |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 | `hard_component`  | Boolean | `true`               | Enabling or disabling the hard component for parametrizations using the real photon approximation |
 | `shadow`          | String  | `ButkevichMikheyev`  | Parametrization of the shadowing effect, relevant for parametrizations using the momentum integration approach |
 
@@ -380,6 +437,7 @@ For there parametrizations, the parametrization of the shadowing effect can be c
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Creation of an electron-positron pair by an ingoing photon. Available `photopair` parametrizations are:
 
@@ -390,6 +448,7 @@ Creation of an electron-positron pair by an ingoing photon. Available `photopair
 | Keyword           |  Type   | Default | Description                |
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
 
 Weak interaction of an ingoing charged lepton. Available `weak` parametrizations are:
 

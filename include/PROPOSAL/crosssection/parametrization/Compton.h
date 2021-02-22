@@ -65,4 +65,3 @@ namespace crosssection {
 
 } // namespace crosssection
 } // namespace PROPOSAL
-

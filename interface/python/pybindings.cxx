@@ -4,6 +4,8 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/math/Spherical3D.h"
+#include "PROPOSAL/version.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/math/Vector3D.h"
@@ -15,6 +17,11 @@
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
 #include "PROPOSAL/scattering/Scattering.h"
 #include "PROPOSAL/version.h"
+#include "PROPOSAL/propagation_utility/DecayBuilder.h"
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/math/RandomGenerator.h"
+#include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/Logging.h"
 #include <spdlog/spdlog.h>
 
 namespace py = pybind11;
@@ -55,31 +62,42 @@ PYBIND11_MODULE(proposal, m)
     m.attr("__version__") = &PROPOSAL_VERSION;
 
     py::class_<Vector3D, std::shared_ptr<Vector3D>>(m, "Vector3D")
-        .def(py::init<>())
-        .def(py::init<double, double, double>(), py::arg("x"), py::arg("y"),
-            py::arg("z"))
-        .def(py::init<const Vector3D&>())
         .def("__str__", &py_print<Vector3D>)
+        .def("normalize", &Vector3D::normalize)
+        .def("__getitem__", [](Vector3D& v, size_t index) { return v[index];})
+        .def("__setitem__", [](Vector3D& v, size_t index, const double val) { v[index] = val;})
+        .def("__iter__", [](Vector3D& v) {return py::make_iterator(&v[0], &v[2]+1);}, py::keep_alive<0, 1>())
+        .def("set_coordinates", py::overload_cast<std::array<double, 3>>(&Vector3D::SetCoordinates))
+        .def("set_coordinates", py::overload_cast<double, double, double>(&Vector3D::SetCoordinates))
+        .def_property_readonly("magnitude", &Vector3D::magnitude)
+        .def_property_readonly("spherical_coordinates", &Vector3D::GetSphericalCoordinates)
+        .def_property_readonly("cartesian_coordinates", &Vector3D::GetCartesianCoordinates);
+
+    py::class_<Cartesian3D, std::shared_ptr<Cartesian3D>, Vector3D>(m, "Cartesian3D")
+        .def(py::init<>())
+        .def(py::init<double, double, double>(), py::arg("x"), py::arg("y"), py::arg("z"))
+        .def(py::init<std::array<double, 3>>(), py::arg("cartesian coordinates"))
+        .def(py::init<const Vector3D&>())
+        .def_property("x", &Cartesian3D::GetX, &Cartesian3D::SetX)
+        .def_property("y", &Cartesian3D::GetY, &Cartesian3D::SetY)
+        .def_property("z", &Cartesian3D::GetZ, &Cartesian3D::SetZ)
         .def(py::self + py::self)
+        .def(py::self += py::self)
         .def(py::self - py::self)
         .def(py::self * float())
         .def(float() * py::self)
         .def(py::self * py::self)
         .def(-py::self)
-        .def_property_readonly("x", &Vector3D::GetX)
-        .def_property_readonly("y", &Vector3D::GetY)
-        .def_property_readonly("z", &Vector3D::GetZ)
-        .def_property_readonly("radius", &Vector3D::GetRadius)
-        .def_property_readonly("phi", &Vector3D::GetPhi)
-        .def_property_readonly("theta", &Vector3D::GetTheta)
-        .def("set_cartesian_coordinates", &Vector3D::SetCartesianCoordinates)
-        .def("set_spherical_coordinates", &Vector3D::SetSphericalCoordinates)
-        .def("normalize", &Vector3D::normalise)
-        .def("magnitude", &Vector3D::magnitude)
-        .def("cartesian_from_spherical",
-            &Vector3D::CalculateCartesianFromSpherical)
-        .def("spherical_from_cartesian",
-            &Vector3D::CalculateSphericalCoordinates);
+        .def("deflect", &Cartesian3D::deflect);
+
+    py::class_<Spherical3D, std::shared_ptr<Spherical3D>, Vector3D>(m, "Spherical3D")
+        .def(py::init<>())
+        .def(py::init<double, double, double>(), py::arg("radius"), py::arg("azimuth"), py::arg("zenith"))
+        .def(py::init<std::array<double, 3>>(), py::arg("spherical coordinates"))
+        .def(py::init<const Vector3D&>())
+        .def_property("radius", &Spherical3D::GetRadius, &Spherical3D::SetRadius)
+        .def_property("azimuth", &Spherical3D::GetAzimuth, &Spherical3D::SetAzimuth)
+        .def_property("zenith", &Spherical3D::GetZenith, &Spherical3D::SetZenith);
 
     py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings>>(m,
         "EnergyCutSettings",

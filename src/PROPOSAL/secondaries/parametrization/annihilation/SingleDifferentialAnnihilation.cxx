@@ -29,9 +29,9 @@ double secondaries::SingleDifferentialAnnihilation::CalculateRho(
     throw std::out_of_range(s.str());
 }
 
-std::tuple<Vector3D, Vector3D>
+std::tuple<Cartesian3D, Cartesian3D>
 secondaries::SingleDifferentialAnnihilation::CalculateDirections(
-    Vector3D primary_dir, double energy, double rho, double rnd)
+    const Vector3D& primary_dir, double energy, double rho, double rnd)
 {
     auto com_energy = energy + ME; // center of mass energy
     auto kin_energy = energy - ME; // kinetic energy
@@ -40,8 +40,8 @@ secondaries::SingleDifferentialAnnihilation::CalculateDirections(
     auto cosphi1
         = (com_energy * rho - ME) / (rho * sqrt(com_energy * kin_energy));
     auto rnd_theta = rnd * 2. * PI;
-    auto dir_1 = primary_dir;
-    auto dir_2 = primary_dir;
+    auto dir_1 = Cartesian3D(primary_dir);
+    auto dir_2 = Cartesian3D(primary_dir);
     dir_1.deflect(cosphi0, rnd_theta);
     dir_2.deflect(cosphi1, fmod(rnd_theta + PI, 2. * PI));
     return make_tuple(dir_1, dir_2);

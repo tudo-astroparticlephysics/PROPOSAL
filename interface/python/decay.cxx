@@ -59,7 +59,7 @@ void init_decay(py::module& m) {
         .def(py::init<const DecayTable&>())
         .def("__str__", &py_print<DecayTable>)
         .def("add_channel", &DecayTable::addChannel, "Add an decay channel")
-        .def("select_channel", &DecayTable::SelectChannel, py::arg("rnd"),
+        .def("select_channel", &DecayTable::SelectChannel, py::return_value_policy::reference_internal, py::arg("rnd"),
              "Select an decay channel according to given branching ratios")
         .def("set_stable", &DecayTable::SetStable,
              "Define decay table for stable particles")

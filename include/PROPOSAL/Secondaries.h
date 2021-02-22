@@ -33,13 +33,13 @@
 
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 namespace PROPOSAL {
 
 class Density_distr;
+class Geometry;
+class Vector3D;
 
 using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
             std::shared_ptr<const Density_distr>>;
@@ -61,9 +61,10 @@ public:
 
     // Track functions
     double GetELost(const Geometry&) const;
-    std::unique_ptr<ParticleState> GetEntryPoint(const Geometry&) const;
-    std::unique_ptr<ParticleState> GetExitPoint(const Geometry&) const;
-    std::unique_ptr<ParticleState> GetClosestApproachPoint(const Geometry&) const;
+    //TODO: These methods should return unique_ptr instead of shared_ptr, but pybind11 seems to have problems with them
+    std::shared_ptr<ParticleState> GetEntryPoint(const Geometry&) const;
+    std::shared_ptr<ParticleState> GetExitPoint(const Geometry&) const;
+    std::shared_ptr<ParticleState> GetClosestApproachPoint(const Geometry&) const;
 
     std::vector<ParticleState> GetTrack() const { return track_; };
     std::vector<ParticleState> GetTrack(const Geometry&) const;
@@ -71,8 +72,8 @@ public:
     ParticleState GetStateForEnergy(double) const;
     ParticleState GetStateForDistance(double) const;
 
-    std::vector<Vector3D> GetTrackPositions() const;
-    std::vector<Vector3D> GetTrackDirections() const;
+    std::vector<Cartesian3D> GetTrackPositions() const;
+    std::vector<Cartesian3D> GetTrackDirections() const;
     std::vector<double> GetTrackEnergies() const;
     std::vector<double> GetTrackTimes() const;
     std::vector<double> GetTrackPropagatedDistances() const;

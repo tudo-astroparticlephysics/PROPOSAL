@@ -45,14 +45,12 @@
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/ParamTables.h"
-#include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 
-#include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDX.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
@@ -89,20 +87,19 @@
 #include "PROPOSAL/secondaries/SecondariesCalculator.h"
 
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionIntegral.h"
 #include "PROPOSAL/crosssection/CrossSectionInterpolant.h"
 
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 
-#include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/decay/DecayTable.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
 #include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 
-#include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/density_distr/density_exponential.h"
 #include "PROPOSAL/density_distr/density_homogeneous.h"
 #include "PROPOSAL/density_distr/density_polynomial.h"
@@ -116,7 +113,8 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/math/Spline.h"
 #include "PROPOSAL/math/TableWriter.h"
-#include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/math/Cartesian3D.h"
+#include "PROPOSAL/math/Spherical3D.h"
 
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
@@ -137,7 +135,6 @@
 #include "PROPOSAL/propagation_utility/Time.h"
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
 
-#include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
 #include "PROPOSAL/scattering/stochastic_deflection/ScatteringFactory.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/Bremsstrahlung.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
@@ -145,7 +142,6 @@
 #include "PROPOSAL/scattering/stochastic_deflection/ionization/NaivIonization.h"
 
 #include "PROPOSAL/scattering/multiple_scattering/Coefficients.h"
-#include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/multiple_scattering/Highland.h"
 #include "PROPOSAL/scattering/multiple_scattering/HighlandIntegral.h"

@@ -4,17 +4,17 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/math/Cartesian3D.h"
+#include "PROPOSAL/math/Spherical3D.h"
 
 using namespace PROPOSAL;
 
-Vector3D position(1., 1., 1.);
-Vector3D direction(0., 0., 0.);
+Cartesian3D position(1., 1., 1.);
+Spherical3D direction(0., 0., 0.);
 
 TEST(Comparison, Comparison_equal)
 {
-    direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
-    direction.CalculateCartesianFromSpherical();
+    direction.SetCoordinates({1, 20 * PI / 180., 20 * PI / 180.});
 
     ParticleState A;
     ParticleState B;
@@ -31,8 +31,8 @@ TEST(Comparison, Comparison_equal)
     D->energy = 1e6;
     EXPECT_TRUE(*C == *D);
 
-    position    = Vector3D();
-    direction   = Vector3D();
+    position    = Cartesian3D();
+    direction   = Cartesian3D();
     ParticleState* E = new ParticleState();
     E->position = position;
     E->direction = direction;
@@ -41,8 +41,7 @@ TEST(Comparison, Comparison_equal)
 
 TEST(Comparison, Comparison_not_equal)
 {
-    direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
-    direction.CalculateCartesianFromSpherical();
+    direction.SetCoordinates({1, 20 * PI / 180., 20 * PI / 180.});
 
     ParticleState A;
     ParticleState B;
@@ -71,8 +70,7 @@ TEST(Assignment, Copyconstructor)
 
 TEST(Assignment, Copyconstructor2)
 {
-    direction.SetSphericalCoordinates(1, 20 * PI / 180., 20 * PI / 180.);
-    direction.CalculateCartesianFromSpherical();
+    direction.SetCoordinates({1, 20 * PI / 180., 20 * PI / 180.});
     ParticleState A;
     A.SetType(ParticleType::TauMinus);
     A.position = position;

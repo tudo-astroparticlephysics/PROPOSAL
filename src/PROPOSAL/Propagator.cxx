@@ -163,7 +163,7 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
     auto max_distance_left = max_distance - state.propagated_distance;
     assert(max_distance_left > 0);
 
-    Vector3D mean_direction, new_direction;
+    Cartesian3D mean_direction, new_direction;
     std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
         grammage_next_interaction, state.energy, E_f, state.direction, rnd);
 
@@ -280,11 +280,13 @@ Sector Propagator::GetCurrentSector(
             potential_sec.push_back(&sector);
     }
 
-    if (potential_sec.empty())
-        Logging::Get("proposal.propagator")
-            ->critical("No sector defined at particle position {}, {}, {}.",
-                position.GetY(), position.GetY(), position.GetZ());
-
+    if (potential_sec.empty()) {
+        auto spherical_position = Cartesian3D(position);
+        Logging::Get("proposal.propagator")->critical("No sector defined at particle position {}, {}, {}.",
+                                                      spherical_position.GetX(),
+                                                      spherical_position.GetY(),
+                                                      spherical_position.GetZ());
+    }
     auto highest_sector_iter = std::max_element(
         potential_sec.begin(), potential_sec.end(), [](Sector* a, Sector* b) {
             return get<GEOMETRY>(*a)->GetHierarchy()
@@ -305,8 +307,7 @@ nlohmann::json Propagator::ParseConfig(const string& config_file)
         std::ifstream infilestream(expanded_config_file_path);
         infilestream >> json_config;
     } catch (const nlohmann::json::parse_error& e) {
-        Logging::Get("proposal.propagator")
-            ->critical("Unable parse \"%s\" as json file", config_file.c_str());
+        Logging::Get("proposal.propagator")->critical("Unable parse {} as json file", config_file.c_str());
     }
     return json_config;
 }

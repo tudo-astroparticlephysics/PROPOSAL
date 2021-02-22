@@ -16,8 +16,8 @@ namespace secondaries {
         {
         }
 
-        std::tuple<Vector3D, Vector3D> CalculateDirections(
-            Vector3D, double, double, double) final;
+        std::tuple<Cartesian3D, Cartesian3D> CalculateDirections(
+            const Vector3D&, double, double, double) final;
         std::tuple<double, double> CalculateEnergy(double, double) final;
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }

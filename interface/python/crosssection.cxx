@@ -1,4 +1,7 @@
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
+#include "PROPOSAL/crosssection/CrossSectionInterpolantBase.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
@@ -54,6 +57,13 @@ template <typename T> void build_std_crosssection(py::module& m_sub)
 void init_crosssection(py::module& m)
 {
     py::module m_sub = m.def_submodule("crosssection");
+
+    m_sub.def("make_crosssection_multiplier",
+              [](std::shared_ptr<CrossSection<ParticleDef, Medium>> c, double m) {
+                  return std::shared_ptr<CrossSection<ParticleDef, Medium>>(
+                          make_crosssection_multiplier(c, m));
+              },
+              py::arg("crosssection"), py::arg("multiplier"));
 
     py::class_<CrossSectionBase, std::shared_ptr<CrossSectionBase>>(
         m_sub, "CrossSection")

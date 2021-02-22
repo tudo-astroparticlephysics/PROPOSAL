@@ -5,12 +5,10 @@
  *      Author: koehne
  */
 
-#include <cmath>
-#include "PROPOSAL/Constants.h"
+#include <sstream>
 #include "PROPOSAL/geometry/Geometry.h"
 
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 
@@ -43,7 +41,7 @@ std::ostream& operator<<(std::ostream& os, Geometry const& geometry)
  *                                  Geometry                                   *
  ******************************************************************************/
 
-Geometry::Geometry(const std::string name, const Vector3D position)
+Geometry::Geometry(const std::string name, const Vector3D& position)
     : position_(position)
     , name_(name)
     , hierarchy_(0)
@@ -59,7 +57,7 @@ Geometry::Geometry(const nlohmann::json& config)
 
     if(not config.contains("origin"))
         throw std::invalid_argument("No geometry origin found.");
-    position_ = Vector3D(config.at("origin"));
+    position_ = Cartesian3D(config.at("origin"));
 }
 
 
@@ -130,7 +128,7 @@ bool Geometry::IsBehind(const Vector3D& position, const Vector3D& direction) con
 // ------------------------------------------------------------------------- //
 bool Geometry::IsEntering(const Vector3D &position, const Vector3D &direction) const {
     auto dist_forward = DistanceToBorder(position, direction);
-    auto dist_backward = DistanceToBorder(position, -direction);
+    auto dist_backward = DistanceToBorder(position, -Cartesian3D(direction));
     if (dist_forward.first >= 0 and dist_forward.second == -1) {
         if (dist_backward.first == -1 and dist_backward.second == -1) {
             return true;
@@ -142,7 +140,7 @@ bool Geometry::IsEntering(const Vector3D &position, const Vector3D &direction) c
 // ------------------------------------------------------------------------- //
 bool Geometry::IsLeaving(const Vector3D &position, const Vector3D &direction) const {
     auto dist_forward = DistanceToBorder(position, direction);
-    auto dist_backward = DistanceToBorder(position, -direction);
+    auto dist_backward = DistanceToBorder(position, -Cartesian3D(direction));
     if (dist_forward.first == -1 and dist_forward.second == -1) {
         if (dist_backward.first >= 0 and dist_backward.second == -1) {
             return true;
@@ -163,5 +161,5 @@ Geometry::ParticleLocation::Enum Geometry::GetLocation(const Vector3D& position,
 // ------------------------------------------------------------------------- //
 double Geometry::DistanceToClosestApproach(const Vector3D& position, const Vector3D& direction) const
 {
-    return scalar_product(position_ - position, direction);
+    return (position_ - position) * direction;
 }

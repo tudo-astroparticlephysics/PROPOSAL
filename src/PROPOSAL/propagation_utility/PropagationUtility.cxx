@@ -6,6 +6,8 @@
 #include "PROPOSAL/propagation_utility/Interaction.h"
 #include "PROPOSAL/propagation_utility/Time.h"
 #include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/math/Spherical3D.h"
 
 using namespace PROPOSAL;
 
@@ -135,7 +137,7 @@ double PropagationUtility::TimeElapsed(
         initial_energy, final_energy, distance, density);
 }
 
-std::tuple<Vector3D, Vector3D> PropagationUtility::DirectionsScatter(
+std::tuple<Cartesian3D, Cartesian3D> PropagationUtility::DirectionsScatter(
     double displacement, double initial_energy, double final_energy,
     const Vector3D& direction, std::function<double()> rnd)
 {
@@ -153,34 +155,34 @@ std::tuple<Vector3D, Vector3D> PropagationUtility::DirectionsScatter(
         auto sz = std::sqrt(std::max(1. - (sx * sx + sy * sy), 0.));
         auto tz = std::sqrt(std::max(1. - (tx * tx + ty * ty), 0.));
 
-        auto sinth = std::sin(direction.GetTheta());
-        auto costh = std::cos(direction.GetTheta());
-        auto sinph = std::sin(direction.GetPhi());
-        auto cosph = std::cos(direction.GetPhi());
+        auto direction_spherical = Spherical3D(direction);
+        auto sinth = std::sin(direction_spherical.GetZenith());
+        auto costh = std::cos(direction_spherical.GetZenith());
+        auto sinph = std::sin(direction_spherical.GetAzimuth());
+        auto cosph = std::cos(direction_spherical.GetAzimuth());
 
-        auto rotate_vector_x
-            = PROPOSAL::Vector3D(costh * cosph, costh * sinph, -sinth);
-        auto rotate_vector_y = PROPOSAL::Vector3D(-sinph, cosph, 0.);
+        auto rotate_vector_x = Cartesian3D(costh * cosph, costh * sinph, -sinth);
+        auto rotate_vector_y = Cartesian3D(-sinph, cosph, 0.);
 
         // Rotation towards all tree axes
-        auto mean_direction = sz * direction;
+        auto direction_cartesian = Cartesian3D(direction);
+        auto mean_direction = sz * direction_cartesian;
         mean_direction += sx * rotate_vector_x;
         mean_direction += sy * rotate_vector_y;
-        mean_direction.CalculateSphericalCoordinates();
 
         // Rotation towards all tree axes
-        auto final_direction = tz * direction;
+        auto final_direction = tz * direction_cartesian;
         final_direction += tx * rotate_vector_x;
         final_direction += ty * rotate_vector_y;
-        final_direction.CalculateSphericalCoordinates();
 
         return std::make_tuple(mean_direction, final_direction);
     }
-    return std::make_tuple(direction, direction); // no scattering
+    auto dir = Cartesian3D(direction.GetCartesianCoordinates());
+    return std::make_tuple(dir, dir); // no scattering
 }
 
-Vector3D PropagationUtility::DirectionDeflect(InteractionType type,
-    double initial_energy, double final_energy, Vector3D direction,
+Cartesian3D PropagationUtility::DirectionDeflect(InteractionType type,
+    double initial_energy, double final_energy, const Vector3D& direction,
     std::function<double()> rnd) const
 {
     if (collection.scattering) {
@@ -190,7 +192,8 @@ Vector3D PropagationUtility::DirectionDeflect(InteractionType type,
             r = rnd();
         auto angles = collection.scattering->CalculateStochasticDeflection(
             type, initial_energy, final_energy, v_rnd);
-        direction.deflect(std::cos(angles[0]), angles[1]);
+        auto direction_new = Cartesian3D(direction);
+        direction_new.deflect(std::cos(angles[0]), angles[1]);
     }
     return direction;
 }

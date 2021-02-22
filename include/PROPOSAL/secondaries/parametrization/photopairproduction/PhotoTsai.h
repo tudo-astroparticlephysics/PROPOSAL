@@ -35,10 +35,11 @@ namespace secondaries {
         }
 
         double CalculateRho(double, double, const Component&) override;
-        std::tuple<Vector3D, Vector3D> CalculateDirections(Vector3D, double,
-            double, const Component&, std::vector<double>) override;
+        std::tuple<Cartesian3D, Cartesian3D> CalculateDirections(
+                const Vector3D&,double, double, const Component&,
+                std::vector<double>) override;
         std::tuple<double, double> CalculateEnergy(
-            double, double, double) override;
+                double, double, double) override;
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
         std::vector<ParticleState> CalculateSecondaries(
