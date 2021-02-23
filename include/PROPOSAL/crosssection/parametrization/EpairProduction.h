@@ -126,8 +126,4 @@ namespace crosssection {
 
 } // namespace crosssection
 
-template <>
-double integrate_dedx(Integral&, crosssection::EpairProduction&, const ParticleDef&,
-    const Component&, double, double, double);
-
 } // namespace PROPOSAL

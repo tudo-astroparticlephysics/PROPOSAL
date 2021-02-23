@@ -1,6 +1,7 @@
 #include "PROPOSAL/crosssection/Factories/PhotoPairProductionFactory.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 
 using namespace PROPOSAL;
 using photopair_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&, bool);
@@ -30,6 +31,11 @@ namespace PROPOSAL {
         if (it == photopair_map.end())
             throw std::logic_error("Unknown parametrization for photopairproduction");
 
-        return it->second(p_def, medium, interpol);
+        auto cross = it->second(p_def, medium, interpol);
+
+        double multiplier = config.value("multiplier", 1.0);
+        if (multiplier != 1.0)
+            return make_crosssection_multiplier(std::shared_ptr<CrossSectionBase>(std::move(cross)), multiplier);
+        return cross;
     }
 }

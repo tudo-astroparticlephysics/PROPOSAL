@@ -2,6 +2,7 @@
 #include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 
 using namespace PROPOSAL;
 using photoQ2_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&, std::shared_ptr<const EnergyCutSettings>, std::shared_ptr<crosssection::ShadowEffect>, bool);
@@ -75,7 +76,12 @@ namespace PROPOSAL {
         auto it_shadow = shadow_map.find(shadow_name);
         if (it_shadow == shadow_map.end())
             throw std::logic_error("Shadow effect name unknown");
-        return it->second(p_def, medium, cuts, it_shadow->second(), interpol);
+        auto cross = it->second(p_def, medium, cuts, it_shadow->second(), interpol);
+
+        double multiplier = config.value("multiplier", 1.0);
+        if (multiplier != 1.0)
+            return make_crosssection_multiplier(std::shared_ptr<CrossSectionBase>(std::move(cross)), multiplier);
+        return cross;
     }
 }
 
@@ -93,6 +99,11 @@ namespace PROPOSAL {
         if (it == photoreal_map.end())
             throw std::invalid_argument("Unknown parametrization for photonuclear");
 
-        return it->second(p_def, medium, cuts, hard_component, interpol);
+        auto cross = it->second(p_def, medium, cuts, hard_component, interpol);
+
+        double multiplier = config.value("multiplier", 1.0);
+        if (multiplier != 1.0)
+            return make_crosssection_multiplier(std::shared_ptr<CrossSectionBase>(std::move(cross)), multiplier);
+        return cross;
     }
 }

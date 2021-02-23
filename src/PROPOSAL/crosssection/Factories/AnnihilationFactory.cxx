@@ -1,6 +1,7 @@
 #include "PROPOSAL/crosssection/Factories/AnnihilationFactory.h"
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 
 using namespace PROPOSAL;
 using annih_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&, bool);
@@ -30,7 +31,11 @@ namespace PROPOSAL {
         auto it = annih_map.find(param_name);
         if (it == annih_map.end())
             throw std::logic_error("Unknown parametrization for annihilation");
+        auto cross = it->second(p_def, medium, interpol);
 
-        return it->second(p_def, medium, interpol);
+        double multiplier = config.value("multiplier", 1.0);
+        if (multiplier != 1.0)
+            return make_crosssection_multiplier(std::shared_ptr<CrossSectionBase>(std::move(cross)), multiplier);
+        return cross;
     }
 }

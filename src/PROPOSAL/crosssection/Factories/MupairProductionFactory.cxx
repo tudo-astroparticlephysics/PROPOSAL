@@ -1,6 +1,7 @@
 #include "PROPOSAL/crosssection/Factories/MupairProductionFactory.h"
 #include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 
 using namespace PROPOSAL;
 using mupair_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&, std::shared_ptr<const EnergyCutSettings>, bool);
@@ -34,6 +35,11 @@ namespace PROPOSAL {
         if (it == mupair_map.end())
             throw std::logic_error("Unknown parametrization for mupairproduction");
 
-        return it->second(p_def, medium, cuts, interpol);
+        auto cross = it->second(p_def, medium, cuts, interpol);
+
+        double multiplier = config.value("multiplier", 1.0);
+        if (multiplier != 1.0)
+            return make_crosssection_multiplier(std::shared_ptr<CrossSectionBase>(std::move(cross)), multiplier);
+        return cross;
     }
 }

@@ -1,6 +1,7 @@
 #include "PROPOSAL/crosssection/Factories/EpairProductionFactory.h"
 #include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 
 using namespace PROPOSAL;
 using epair_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&,
@@ -39,6 +40,11 @@ namespace PROPOSAL {
         if (it == epair_map.end())
             throw std::logic_error("Unknown parametrization for epairproduction");
 
-        return it->second(p_def, medium, cuts, lpm, interpol, density_correction);
+        auto cross = it->second(p_def, medium, cuts, lpm, interpol, density_correction);
+
+        double multiplier = config.value("multiplier", 1.0);
+        if (multiplier != 1.0)
+            return make_crosssection_multiplier(std::shared_ptr<CrossSectionBase>(std::move(cross)), multiplier);
+        return cross;
     }
 }

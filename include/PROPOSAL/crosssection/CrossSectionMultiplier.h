@@ -1,10 +1,8 @@
 #pragma once
-
+#include "PROPOSAL/crosssection/CrossSection.h"
 namespace PROPOSAL {
-    template <typename T>
-    class CrossSectionMultiplier : public T {
-    public:
-        CrossSectionMultiplier(std::shared_ptr<CrossSectionBase> cross, double multiplier) : cross_(cross), multiplier_(multiplier) {}
+    struct CrossSectionMultiplier : public CrossSectionBase {
+        CrossSectionMultiplier(std::shared_ptr<CrossSectionBase> cross, double multiplier) : CrossSectionBase(), cross_(cross), multiplier_(multiplier) {}
 
         double CalculatedEdx(double energy) override {
             return multiplier_ * cross_->CalculatedEdx(energy);
@@ -14,12 +12,27 @@ namespace PROPOSAL {
             return multiplier_ * cross_->CalculatedE2dx(energy);
         }
 
-        double CalculatedNdx(double energy, std::shared_ptr<const Component> comp = nullptr) override {
-            return multiplier_ * cross_->CalculatedNdx(energy, comp);
+        double CalculatedNdx(double energy) override {
+            return multiplier_ * cross_->CalculatedNdx(energy);
+        }
+
+        double CalculatedNdx(double energy, size_t comp_hash) override {
+            return multiplier_ * cross_->CalculatedNdx(energy, comp_hash);
         };
 
-        double CalculateStochasticLoss(std::shared_ptr<const Component> const& comp, double energy, double rate) override {
-            return cross_->CalculateStochasticLoss(comp, energy, rate/multiplier_);
+        double CalculateCumulativeCrosssection(double energy, size_t comp_hash, double v) override {
+            return multiplier_ * cross_->CalculateCumulativeCrosssection(energy, comp_hash, v);
+        }
+
+        std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(double energy) override {
+            auto rates = cross_->CalculatedNdx_PerTarget(energy);
+            for (auto &val : rates)
+                val.second *= multiplier_;
+            return rates;
+        }
+
+        double CalculateStochasticLoss(size_t comp_hash, double energy, double rate) override {
+            return cross_->CalculateStochasticLoss(comp_hash, energy, rate/multiplier_);
         };
 
         double GetLowerEnergyLim() const override {
@@ -36,18 +49,15 @@ namespace PROPOSAL {
             return cross_->GetInteractionType();
         }
 
-        std::vector<std::shared_ptr<const Component>> GetTargets() const noexcept override {
-            return cross_->GetTargets();
-        }
     private:
         std::shared_ptr<CrossSectionBase> cross_;
         double multiplier_;
-
     };
 
-    template <typename T>
-    auto make_crosssection_multiplier(std::shared_ptr<T> cross, double multiplier) {
-        return std::unique_ptr<T>(new CrossSectionMultiplier<T>(cross, multiplier));
-    }
+}
 
+namespace PROPOSAL {
+    inline auto make_crosssection_multiplier(std::shared_ptr<CrossSectionBase> cross, double multiplier) {
+        return std::unique_ptr<CrossSectionBase>(new CrossSectionMultiplier(cross, multiplier));
+    }
 }

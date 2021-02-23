@@ -1,6 +1,7 @@
 #include "PROPOSAL/crosssection/Factories/WeakInteractionFactory.h"
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
 
 using namespace PROPOSAL;
 using weak_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&, bool);
@@ -30,6 +31,11 @@ namespace PROPOSAL {
         if (it == weak_map.end())
             throw std::logic_error("Unknown parametrization for weak interaction");
 
-        return it->second(p_def, medium, interpol);
+        auto cross = it->second(p_def, medium, interpol);
+
+        double multiplier = config.value("multiplier", 1.0);
+        if (multiplier != 1.0)
+            return make_crosssection_multiplier(std::shared_ptr<CrossSectionBase>(std::move(cross)), multiplier);
+        return cross;
     }
 }

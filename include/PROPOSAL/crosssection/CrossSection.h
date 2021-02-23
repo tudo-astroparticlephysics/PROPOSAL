@@ -254,7 +254,7 @@ protected:
     }
 
 public:
-    double CalculatedNdx(double E) final
+    double CalculatedNdx(double E) override
     {
         auto dNdx_all = 0.;
         if (dndx)
@@ -265,7 +265,7 @@ public:
         return dNdx_all;
     };
 
-    double CalculatedNdx(double E, size_t target_hash) final
+    double CalculatedNdx(double E, size_t target_hash) override
     {
         if (dndx)
             return std::get<1>((*dndx)[target_hash])->Calculate(E)
@@ -326,7 +326,7 @@ public:
         return loss;
     }
 
-    size_t GetHash() const noexcept final { return hash; }
+    size_t GetHash() const noexcept override { return hash; }
 
     inline double GetLowerEnergyLim() const override
     {

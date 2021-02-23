@@ -16,6 +16,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
 #include "PROPOSAL/scattering/Scattering.h"
+#include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/version.h"
 #include "PROPOSAL/propagation_utility/DecayBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
