@@ -1,4 +1,3 @@
-
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/Propagator.h"

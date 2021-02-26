@@ -60,7 +60,7 @@ PYBIND11_MODULE(proposal, m)
     init_math(m);
     init_secondaries(m);
 
-    m.attr("__version__") = &PROPOSAL_VERSION;
+    m.attr("__version__") = getPROPOSALVersion();
 
     py::class_<Vector3D, std::shared_ptr<Vector3D>>(m, "Vector3D")
         .def("__str__", &py_print<Vector3D>)

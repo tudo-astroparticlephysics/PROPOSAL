@@ -62,7 +62,7 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
 
     auto integrated_to_upper = interpolant_->evaluate(upper_limit);
     auto x_guess = cubic_splines::find_parameter(
-        *interpolant_, rnd, integrated_to_upper - rnd);
+        *interpolant_, integrated_to_upper - rnd, rnd);
 
     assert(integrated_to_upper >= rnd
         or integrated_to_upper < 0); // searched Energy is below lower_lim

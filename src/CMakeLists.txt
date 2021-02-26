@@ -1,2 +1,5 @@
 add_subdirectory(PROPOSAL)
-# add_subdirectory(pyPROPOSAL)
+
+if(ADD_PYTHON)
+    add_subdirectory(pyPROPOSAL)
+endif()

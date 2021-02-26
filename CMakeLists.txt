@@ -17,14 +17,20 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
 set(CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR} ${CMAKE_PREFIX_PATH})
 
+option(ADD_PYTHON "python interface" OFF)
+option(BUILD_EXAMPLE "build example" OFF)
+option(BUILD_DOCUMENTATION "build documentation" OFF)
+
 add_subdirectory(src)
 
-option(BUILD_EXAMPLE "build example" OFF)
 if(BUILD_EXAMPLE)
     add_subdirectory(example)
 endif()
 
-option(BUILD_DOCUMENTATION "build documentation" OFF)
 if(BUILD_DOCUMENTATION)
     add_subdirectory(docs)
+endif()
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
 endif()
