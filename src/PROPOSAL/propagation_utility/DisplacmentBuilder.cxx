@@ -19,7 +19,7 @@ DisplacementBuilder::DisplacementBuilder(
           [this](double E) { return FunctionToIntegral(E); },
           this->GetLowerLim(), this->GetHash()))
 {
-    disp_integral->BuildTables("disp_", false);
+    disp_integral->BuildTables("disp_", 500, false);
 }
 
 double DisplacementBuilder::SolveTrackIntegral(

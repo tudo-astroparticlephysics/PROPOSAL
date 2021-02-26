@@ -8,7 +8,10 @@ Interaction::Interaction(
     std::shared_ptr<Displacement> _disp, std::vector<cross_ptr> const& _cross)
     : disp(_disp)
     , cross_list(_cross)
+    , hash(CrossSectionVector::GetHash(cross_list))
 {
+    if (cross_list.size() < 1)
+        throw std::invalid_argument("At least one crosssection is required.");
 }
 
 double Interaction::FunctionToIntegral(double energy) const

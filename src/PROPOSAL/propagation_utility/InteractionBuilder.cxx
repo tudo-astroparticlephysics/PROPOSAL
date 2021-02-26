@@ -20,7 +20,7 @@ InteractionBuilder::InteractionBuilder(std::shared_ptr<Displacement> _disp,
           [this](double E) { return FunctionToIntegral(E); },
           _disp->GetLowerLim(), this->GetHash()))
 {
-    interaction_integral->BuildTables("inter_", false);
+    interaction_integral->BuildTables("inter_", 500, false);
 }
 
 double InteractionBuilder::EnergyInteraction(double energy, double rnd)
@@ -31,6 +31,10 @@ double InteractionBuilder::EnergyInteraction(double energy, double rnd)
     if (rndi >= rndiMin)
         return disp->GetLowerLim();
     return interaction_integral->GetUpperLimit(energy, rndi);
+}
+
+double InteractionBuilder::EnergyIntegral(double E_i, double E_f) {
+    return interaction_integral->Calculate(E_i, E_f);
 }
 
 namespace PROPOSAL {

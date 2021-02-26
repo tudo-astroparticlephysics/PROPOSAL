@@ -45,7 +45,7 @@ public:
     UtilityIntegral(std::function<double(double)>, double, size_t);
     virtual ~UtilityIntegral() = default;
 
-    virtual void BuildTables(const std::string, bool) {};
+    virtual void BuildTables(const std::string, size_t, bool) {};
 
     virtual double Calculate(double, double);
     virtual double GetUpperLimit(double, double);

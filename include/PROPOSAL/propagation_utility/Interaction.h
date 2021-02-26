@@ -12,7 +12,6 @@ enum class InteractionType;
 
 namespace PROPOSAL {
 class Interaction {
-    size_t hash;
 
 protected:
     using cross_ptr = std::shared_ptr<CrossSectionBase>;
@@ -20,14 +19,16 @@ protected:
 
     std::shared_ptr<Displacement> disp;
     crosssection_list_t cross_list;
+    size_t hash;
 
-    double FunctionToIntegral(double) const;
 
 public:
     Interaction(std::shared_ptr<Displacement>, crosssection_list_t const&);
     virtual ~Interaction() = default;
 
     virtual double EnergyInteraction(double, double) = 0;
+    virtual double EnergyIntegral(double, double) = 0;
+    double FunctionToIntegral(double) const;
 
     struct Rate {
         cross_ptr crosssection;

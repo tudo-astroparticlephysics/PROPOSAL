@@ -20,6 +20,7 @@ public:
         crosssection_list_t const&, std::true_type);
 
     double EnergyInteraction(double energy, double rnd) final;
+    double EnergyIntegral(double E_i, double E_f) final;
 };
 } // namespace PROPOSAL
 

@@ -6,7 +6,7 @@ template <> void ContRandBuilder<UtilityIntegral>::build_tables() { }
 
 template <> void ContRandBuilder<UtilityInterpolant>::build_tables()
 {
-    cont_rand_integral.BuildTables("cont_rand_", false);
+    cont_rand_integral.BuildTables("cont_rand_", 200, false);
 }
 
 namespace PROPOSAL {
