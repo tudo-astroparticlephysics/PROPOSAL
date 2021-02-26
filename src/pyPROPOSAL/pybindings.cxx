@@ -146,6 +146,10 @@ PYBIND11_MODULE(proposal, m)
         .def("energy_interaction",
             py::vectorize(&Interaction::EnergyInteraction), py::arg("energy"),
             py::arg("random number"))
+        .def("energy_integral", py::vectorize(&Interaction::EnergyIntegral),
+             py::arg("E_i"), py::arg("E_f"))
+        .def("function_to_integral", py::vectorize(&Interaction::FunctionToIntegral),
+             py::arg("energy"))
         .def("rates", &Interaction::Rates, py::arg("energy"))
         .def("sample_loss", &Interaction::SampleLoss, py::arg("energy"),
             py::arg("rates"), py::arg("random number"))

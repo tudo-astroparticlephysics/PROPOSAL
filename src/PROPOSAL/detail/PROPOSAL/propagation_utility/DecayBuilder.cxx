@@ -19,7 +19,7 @@ DecayBuilder::DecayBuilder(
           [this](double E) { return FunctionToIntegral(E); },
           disp->GetLowerLim(), this->GetHash()))
 {
-    decay_integral->BuildTables("decay_", false);
+    decay_integral->BuildTables("decay_", 500, false);
 }
 
 double DecayBuilder::EnergyDecay(double energy, double rnd, double density)

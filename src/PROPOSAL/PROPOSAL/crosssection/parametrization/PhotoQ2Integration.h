@@ -47,7 +47,7 @@
     };                                                                         \
                                                                                \
     template <> struct ParametrizationId<Photo##param> {                       \
-        static constexpr size_t value = 1000000013;                            \
+        static constexpr size_t value = 1000000005;                            \
     };
 
 namespace PROPOSAL {

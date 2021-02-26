@@ -118,7 +118,7 @@ TEST(EnergyInteraction, Constraints)
     auto interaction = make_interaction(cross, false);
     int statistics = 1e3;
 
-    auto energies = std::array<double, 5> { 106, 1e4, 1e6, 1e8, 1e10 };
+    auto energies = std::array<double, 5> { 200, 1e4, 1e6, 1e8, 1e10 };
     for (int i = 0; i < statistics; i++) {
         for (auto E_i : energies) {
             double tmp = interaction->EnergyInteraction(
@@ -131,19 +131,29 @@ TEST(EnergyInteraction, Constraints)
 
 TEST(EnergyInteraction, CompareIntegralInterpolant)
 {
-    // comparing intergral and interpolant values
+    // comparing integral and interpolant values
     RandomGenerator::Get().SetSeed(24601);
     auto cross = GetCrossSections();
+    auto low = CrossSectionVector::GetLowerLim(cross);
     auto interaction_integral = make_interaction(cross, false);
     auto interaction_interpol = make_interaction(cross, true);
 
     double rnd, energy_integral, energy_interpol;
-    for (double Elog_i = 3; Elog_i < 10; Elog_i += 1e-2) {
-        double E_i = std::pow(Elog_i, 10.);
+    for (double Elog_i = std::log10(low); Elog_i < 14; Elog_i += 5e-2) {
+        double E_i = std::pow(10., Elog_i);
         rnd = RandomGenerator::Get().RandomDouble();
         energy_integral = interaction_integral->EnergyInteraction(E_i, rnd);
         energy_interpol = interaction_interpol->EnergyInteraction(E_i, rnd);
-        EXPECT_NEAR(energy_integral, energy_interpol, energy_integral * 1e-4);
+        auto lower_lim = CrossSectionVector::GetLowerLim(cross);
+        auto rnd_integral = std::min(interaction_integral->EnergyIntegral(E_i, lower_lim), -std::log(rnd));
+        auto rnd_interpol = std::min(interaction_interpol->EnergyIntegral(E_i, lower_lim), -std::log(rnd));
+        double precision = 1e-3;
+        if (E_i < 1e6)
+            precision = 5e-3; // integrand hard to interpolate
+        EXPECT_NEAR(energy_integral, energy_interpol, energy_integral * precision);
+        EXPECT_NEAR(interaction_integral->EnergyIntegral(E_i, energy_integral), rnd_integral, 1e-5);
+        EXPECT_NEAR(interaction_interpol->EnergyIntegral(E_i, energy_interpol), rnd_interpol, 1e-5);
+
     }
 }
 

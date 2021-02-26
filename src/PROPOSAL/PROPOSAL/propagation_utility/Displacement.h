@@ -22,12 +22,12 @@ public:
     template <typename Cross>
     Displacement(Cross const& cross)
         : cross_list(std::begin(cross), std::end(cross))
-        , lower_lim(CrossSectionVector::GetLowerLim(cross))
         , hash(CrossSectionVector::GetHash(cross))
     {
         if (cross.size() < 1)
             throw std::invalid_argument(
                 "At least one crosssection is required.");
+        lower_lim = CrossSectionVector::GetLowerLim(cross);
     }
     virtual ~Displacement() = default;
 

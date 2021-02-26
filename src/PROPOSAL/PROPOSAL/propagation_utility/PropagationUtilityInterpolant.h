@@ -48,8 +48,7 @@ class UtilityInterpolant : public UtilityIntegral {
 
     double lower_lim;
     interpolant_ptr interpolant_;
-
-    const double bias = 1.; // bias to be able to use log substitution for f. should cancel out in every calculation.
+    bool reverse_;
 
     // maybe interpolate function to integral will give a performance boost.
     // in general this function should be underfrequently called
@@ -63,22 +62,29 @@ public:
     UtilityInterpolant(std::function<double(double)>, double, size_t);
     virtual ~UtilityInterpolant() = default;
 
-    void BuildTables(const std::string prefix, bool reverse = false)
+    void BuildTables(const std::string prefix, size_t nodes = 100, bool reverse = false)
     {
         auto def = cubic_splines::CubicSplines<double>::Definition();
         auto reference_x = lower_lim;
-        if (reverse)
-            reference_x = 1.e14;
+        if (reverse) {
+            reference_x = InterpolationSettings::UPPER_ENERGY_LIM;
+            reverse_ = reverse;
+        }
 
         hash_combine(this->hash, reverse);
 
-        def.f = [&](double energy) {
-            return UtilityIntegral::Calculate(energy, reference_x) + bias;
-        };
-
+        if (reverse) {
+            def.f = [&](double energy) {
+                return UtilityIntegral::Calculate(reference_x, energy);
+            };
+        } else {
+            def.f = [&](double energy) {
+                return UtilityIntegral::Calculate(energy, reference_x);
+            };
+        }
         def.f_trafo = std::make_unique<cubic_splines::ExpAxis<double>>(1., 0.);
         def.axis = std::make_unique<cubic_splines::ExpAxis<double>>(
-            lower_lim, 1e14, (size_t)100);
+            lower_lim, InterpolationSettings::UPPER_ENERGY_LIM, nodes);
 
         interpolant_ = std::make_shared<interpolant_t>(
             std::move(def), gen_path(), gen_name(prefix));

@@ -52,6 +52,8 @@ double UtilityInterpolant::Calculate(double energy_initial, double energy_final)
     auto integral_upper_limit = interpolant_->evaluate(energy_initial);
     auto integral_lower_limit = interpolant_->evaluate(energy_final);
 
+    if (reverse_)
+        return integral_lower_limit - integral_upper_limit;
     return integral_upper_limit - integral_lower_limit;
 }
 
@@ -60,22 +62,15 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
 {
     assert(rnd >= 0);
 
+    if (reverse_)
+        rnd = -rnd;
+
     auto integrated_to_upper = interpolant_->evaluate(upper_limit);
     auto x_guess = cubic_splines::find_parameter(
-        *interpolant_, integrated_to_upper - rnd, rnd);
-
-    assert(integrated_to_upper >= rnd
-        or integrated_to_upper < 0); // searched Energy is below lower_lim
-                                     // or we use reverse interpolation
-
-    if (std::abs(upper_limit - lower_lim) > upper_limit * IPREC)
-        return lower_lim;
+        *interpolant_, integrated_to_upper - rnd, integrated_to_upper - rnd);
 
     return x_guess;
     // TODO: Check whether this is already accurate enough
-    /*
-    auto step = upper_limit + 0.5 * rnd / FunctionToIntegral(upper_limit);
-
-    return upper_limit + rnd / FunctionToIntegral(step);
-     */
+    // (see e.g. version at a81e54f62f4383936cb046da4cad7429a48bb750 for old
+    // version)
 }
