@@ -2,7 +2,7 @@
 #include "PROPOSAL/geometry/Box.h"
 #include "PROPOSAL/geometry/Cylinder.h"
 #include "PROPOSAL/geometry/Sphere.h"
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 
 namespace py = pybind11;
 using namespace PROPOSAL;

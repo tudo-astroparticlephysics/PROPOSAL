@@ -4,7 +4,7 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/geometry/Geometry.h"
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 
 #define PARTICLE_DEF(module, cls)                                                    \
     py::class_<cls##Def, ParticleDef, std::shared_ptr<cls##Def>>(module, #cls "Def") \

@@ -1,5 +1,5 @@
 
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Logging.h"

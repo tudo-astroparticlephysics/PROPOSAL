@@ -2,7 +2,7 @@
 #include "PROPOSAL/density_distr/density_homogeneous.h"
 #include "PROPOSAL/density_distr/density_polynomial.h"
 #include "PROPOSAL/density_distr/density_splines.h"
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 
 namespace py = pybind11;
 using namespace PROPOSAL;

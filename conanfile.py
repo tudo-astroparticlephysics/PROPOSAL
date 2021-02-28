@@ -1,45 +1,58 @@
-from conans import ConanFile, CMake
+from conans import ConanFile, CMake, tools
+import os
 
 
 class PROPOSALConan(ConanFile):
     name = "PROPOSAL"
-    version = "7.0.0"
-    license = "GNU"
-    author = "Maximilian Sackel mail@maxsac.de"
-    url = "https://github.com/tudo-astroparticlephysics/PROPOSAL"
-    description = "PROPOSAL (Propagator with optimal precision and optimized speed for all leptons) is presented as a public tool for propagating leptons and gamma rays through media. Up-to-date cross sections for ionization, bremsstrahlung, photonuclear interactions, electron pair production, Landau–Pomeranchuk–Migdal and Ter-Mikaelian effects, muon and tau decay, as well as Molière scattering are implemented for different parametrizations.  The full Paper can be found here."
-    topics = ("lepton", "gamma", "propagator", "crosssection", "proposal")
+    homepage = "https://github.com/tudo-astroparticlephysics/PROPOSAL"
+    license = "GNU Lesser General Public License v3.0"
+    description = "the very best lepton and photon propagator"
+    topics = ("propagator", "lepton", "photon", "stochastic")
     settings = "os", "compiler", "build_type", "arch"
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
+        "build_testing": [True, False],
+        "build_python": [True, False],
     }
-    default_options = {"shared": False, "fPIC": True}
-    generators = "cmake_find_package"
-    exports_sources = "*"
+    default_options = {
+        "shared": False,
+        "fPIC": True,
+        "build_testing": False,
+        "build_python": False,
+    }
+    generators = "cmake"
+    _cmake = None
 
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
 
     def requirements(self):
-        self.requires("CubicInterpolation/0.1")
+        self.requires("cubic-interpolation/0.1.1")
         self.requires("spdlog/1.8.2")
+        if self.options.build_python:
+            self.requires("pybind11/2.6.2")
+        if self.options.build_testing:
+            self.requires("gtest/1.10.0")
+
+    def _configure_cmake(self):
+        if self._cmake:
+            return self._cmake
+        self._cmake = CMake(self)
+        self._cmake.definitions["BUILD_TESTING"] = self.options.build_testing
+        self._cmake.definitions["BUILD_PYTHON"] = self.options.build_python
+        self._cmake.configure()
+        return self._cmake
 
     def build(self):
-        cmake = CMake(self)
-        cmake.configure()
+        cmake = self._configure_cmake()
         cmake.build()
 
     def package(self):
-        self.copy("license*", dst="licenses", ignore_case=True, keep_path=False)
-        self.copy("*.h", dst="include", src="src/PROPOSAL")
-        self.copy("*.hpp", dst="include", src="src/PROPOSAL")
-        self.copy("*.lib", dst="lib", keep_path=False)
-        self.copy("*.dll", dst="bin", keep_path=False)
-        self.copy("*.dylib*", dst="lib", keep_path=False)
-        self.copy("*.so", dst="lib", keep_path=False)
-        self.copy("*.a", dst="lib", keep_path=False)
+        self.copy("LICENSE", dst="licenses")
+        cmake = self._configure_cmake()
+        cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["PROPOSAL"]
+        self.cpp_info.libs = tools.collect_libs(self)

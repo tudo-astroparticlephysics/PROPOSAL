@@ -1,7 +1,7 @@
 
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 
 #define MEDIUM_DEF(module, cls)                                 \
     py::class_<cls, Medium, std::shared_ptr<cls>>(module, #cls) \

@@ -5,7 +5,7 @@ add_library(PROPOSAL::PROPOSAL ALIAS PROPOSAL)
 
 set_target_properties(PROPOSAL PROPERTIES
     POSITION_INDEPENDENT_CODE ON
-)
+    )
 
 target_include_directories(PROPOSAL PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -16,13 +16,9 @@ target_include_directories(PROPOSAL PUBLIC
 add_subdirectory(PROPOSAL)
 add_subdirectory(detail)
 
-find_package(CubicInterpolation REQUIRED)
-find_package(spdlog REQUIRED)
-
 target_link_libraries(PROPOSAL
-    PUBLIC
-    CubicInterpolation::CubicInterpolation
-    spdlog::spdlog
+    CONAN_PKG::cubic-interpolation
+    CONAN_PKG::spdlog
     )
 
 install(TARGETS PROPOSAL EXPORT PROPOSALTargets

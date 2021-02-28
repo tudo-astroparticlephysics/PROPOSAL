@@ -2,7 +2,7 @@
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/math/Function.h"
 #include "PROPOSAL/math/Spline.h"
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 
 namespace py = pybind11;
 using namespace PROPOSAL;
