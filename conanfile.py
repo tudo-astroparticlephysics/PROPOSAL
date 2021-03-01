@@ -9,6 +9,7 @@ class PROPOSALConan(ConanFile):
     description = "the very best lepton and photon propagator"
     topics = ("propagator", "lepton", "photon", "stochastic")
     settings = "os", "compiler", "build_type", "arch"
+    exports_sources = "*"
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
@@ -58,6 +59,3 @@ class PROPOSALConan(ConanFile):
         self.copy("LICENSE", dst="licenses")
         cmake = self._configure_cmake()
         cmake.install()
-
-    def package_info(self):
-        self.cpp_info.libs = tools.collect_libs(self)
