@@ -10,7 +10,7 @@
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
 #include "PROPOSAL/crosssection/parametrization/WeakInteraction.h"
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/medium/Medium.h"
 

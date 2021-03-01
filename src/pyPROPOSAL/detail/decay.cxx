@@ -6,7 +6,7 @@
 #include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 
 namespace py = pybind11;
 using namespace PROPOSAL;

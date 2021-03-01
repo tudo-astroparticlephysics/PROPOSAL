@@ -9,7 +9,7 @@
 
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
 
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 
 #include <pybind11/stl.h>
 

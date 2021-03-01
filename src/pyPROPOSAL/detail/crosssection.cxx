@@ -21,7 +21,7 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 #include <type_traits>
 
 namespace py = pybind11;

@@ -11,7 +11,7 @@
 
 #include "PROPOSAL/secondaries/SecondariesCalculator.h"
 
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 
 namespace py = pybind11;
 using namespace PROPOSAL;

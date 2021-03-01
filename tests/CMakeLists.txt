@@ -1,18 +1,21 @@
 include(GoogleTest)
 enable_testing()
 
-include(FetchContent)
-file(DOWNLOAD
-    https://proposal.app.tu-dortmund.de/resources/TestFiles_2020-10-21.tar.gz
-    ${CMAKE_CURRENT_BINARY_DIR}/TestFiles.tar.gz)
-execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvzf TestFiles.tar.gz
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+SET(RESOURCE_URL https://proposal.app.tu-dortmund.de/resources)
+SET(TEST_FILES TestFiles-2021-01-13.tar.gz)
 
-find_package(GTest REQUIRED)
+# download the test files
+add_custom_command(OUTPUT TestFiles
+    COMMAND curl --silent ${RESOURCE_URL}/${TEST_FILES} -o TestFiles.tar.gz
+    COMMAND ${CMAKE_COMMAND} -E tar xzf TestFiles.tar.gz
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Downloading and extractiong test files."
+    )
 
+# creat test binary and link against proposal and gtest
 macro(package_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
-    target_link_libraries(${TESTNAME} PROPOSAL::PROPOSAL GTest::GTest)
+    target_link_libraries(${TESTNAME} PROPOSAL::PROPOSAL CONAN_PKG::gtest)
     gtest_discover_tests(${TESTNAME})
 endmacro()
 

@@ -1,23 +1,25 @@
 cmake_minimum_required(VERSION 3.9)
 
-project(PROPOSAL VERSION 7.0.0 LANGUAGES CXX)
-
-project(PROPOSAL LANGUAGES CXX)
-
 set(PROPOSAL_VERSION_MAJOR 7)
 set(PROPOSAL_VERSION_MINOR 0)
 set(PROPOSAL_VERSION_PATCH 0)
 set(PROPOSAL_VERSION ${PROPOSAL_VERSION_MAJOR}.${PROPOSAL_VERSION_MINOR}.${PROPOSAL_VERSION_PATCH})
+
+project(PROPOSAL
+    VERSION ${PROPOSAL_VERSION}
+    LANGUAGES CXX
+    DESCRIPTION "The very best photon and lepton propagator."
+    )
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 
-set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
-set(CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR} ${CMAKE_PREFIX_PATH})
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
 
-option(ADD_PYTHON "python interface" OFF)
+option(BUILD_PYTHON "build python interface" OFF)
 option(BUILD_EXAMPLE "build example" OFF)
 option(BUILD_DOCUMENTATION "build documentation" OFF)
 

@@ -1,6 +1,6 @@
 
 #include "PROPOSAL/medium/Components.h"
-#include "pyBindings.h"
+#include "pyPROPOSAL/pyBindings.h"
 
 #define COMPONENT_DEF(module, cls)                             \
     py::class_<Components::cls, Component,         \
