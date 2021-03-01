@@ -8,9 +8,6 @@ listed documentations.
 - [conan documentation](https://docs.conan.io/en/latest/)
 - [cmake documentation](https://cmake.org/cmake/help/latest/)
 
-In fact there is no good reason why a simple user must interact with cmake more
-than a simple installation of a version which is capable with the requirements. 
-
 There are different targets which can be build by the building process. 
 The targets can be activated or deactivated by the installation process
 
@@ -19,18 +16,19 @@ The targets can be activated or deactivated by the installation process
 - `build_testing`: testing of the source code
 
 
-## Build Prequesites
+## I. Build Prequesites
 
 Requiremenst will be handled by conan.
-Simply pass the optional targets behind the conan install process 
-and let it do the work for you.
+Clone the repository and pass the optional targets behind the conan install 
+process and let it do the work for you.
 
 ```sh
 $ mkdir build && cd build                   
 $ conan install .. -o build_python=True     # other optional dependencies
 ```
 
-## Building PROPOSAL
+
+## II. Building 
 
 Building could be achieved by using conan or cmake. 
 The more straight forward approach is, that conan do the work for you.
@@ -41,20 +39,21 @@ $ conan build ..
 
 That will populate the build directory with the set targets.
 
-## Packageing and installation at relocatable place
 
-It's very common to locate package at place where the compiler and linker can
-find them. 
-For that choose a place (`/usr/local/` for example is often a good choice) and 
-create the package there. 
-Dependend where you want to store the package, the necessary privileques are
-required. 
+## III. Installation 
+
+There are two possibilities to install the package. 
+One is to create and conan package and link against it. 
+If that's the case please use the package provided by the conan-center.
+Otherwise use cmake to install the package at a relocatable place.
+Dependent on the installation location, root privileges are required.
 
 ```sh
-# conan package .. -pf /usr/local
+# cmake --install .
 ```
 
-## Minimal working example
+
+# Minimal working example
 
 If you had installed PROPOSAL at a relocatable place place linking against it
 should be straight forward.
