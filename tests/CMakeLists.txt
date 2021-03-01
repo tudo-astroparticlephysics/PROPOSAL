@@ -9,6 +9,7 @@ add_custom_command(OUTPUT TestFiles
     COMMAND curl --silent ${RESOURCE_URL}/${TEST_FILES} -o TestFiles.tar.gz
     COMMAND ${CMAKE_COMMAND} -E tar xzf TestFiles.tar.gz
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Downloading and extractiong test files."
     )
 
 # creat test binary and link against proposal and gtest
