@@ -163,7 +163,7 @@ ParticleDef getParticleDef(const std::string& name)
 
 TEST(WeakInteraction, Test_of_dNdx)
 {
-    std::string filename = "bin/TestFiles/Weak_dNdx.txt";
+    std::string filename = "tests/TestFiles/Weak_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -194,7 +194,7 @@ TEST(WeakInteraction, Test_of_dNdx)
 
 TEST(WeakInteraction, Test_Stochastic_Loss)
 {
-    std::string filename = "bin/TestFiles/Weak_e.txt";
+    std::string filename = "tests/TestFiles/Weak_e.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -243,7 +243,7 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
 
 TEST(WeakInteraction, Test_of_dNdx_Interpolant)
 {
-    std::string filename = "bin/TestFiles/Weak_dNdx.txt";
+    std::string filename = "tests/TestFiles/Weak_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -274,7 +274,7 @@ TEST(WeakInteraction, Test_of_dNdx_Interpolant)
 
 TEST(WeakInteraction, Test_of_e_interpol)
 {
-    std::string filename = "bin/TestFiles/Weak_e.txt";
+    std::string filename = "tests/TestFiles/Weak_e.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 

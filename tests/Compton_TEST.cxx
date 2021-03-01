@@ -18,7 +18,7 @@
 
 using namespace PROPOSAL;
 
-const std::string testfile_dir = "bin/TestFiles/";
+const std::string testfile_dir = "tests/TestFiles/";
 
 // TEST(Comparison, Comparison_equal)
 // {

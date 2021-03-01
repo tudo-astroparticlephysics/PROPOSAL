@@ -133,7 +133,7 @@ ParticleDef getParticleDef(const std::string& name)
 
 TEST(Annihilation, Test_of_dNdx) {
 
-    std::string filename = "bin/TestFiles/Anni_dNdx.txt";
+    std::string filename = "tests/TestFiles/Anni_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -171,7 +171,7 @@ TEST(Annihilation, Test_of_dNdx) {
 
 TEST(Annihilation, Test_Stochastic_Loss)
 {
-    std::string filename = "bin/TestFiles/Anni_e.txt";
+    std::string filename = "tests/TestFiles/Anni_e.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -227,7 +227,7 @@ TEST(Annihilation, Test_Stochastic_Loss)
 
 TEST(Annihilation, Test_of_dNdx_Interpolant)
 {
-    std::string filename = "bin/TestFiles/Anni_dNdx.txt";
+    std::string filename = "tests/TestFiles/Anni_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -258,7 +258,7 @@ TEST(Annihilation, Test_of_dNdx_Interpolant)
 
 TEST(Annihilation, Test_of_e_interpol)
 {
-    std::string filename = "bin/TestFiles/Anni_e.txt";
+    std::string filename = "tests/TestFiles/Anni_e.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 

@@ -147,7 +147,7 @@ TEST(ContinuousRandomization, compare_integral_interpolant) {
 }
 
 TEST(ContinuousRandomization, Randomize_interpol) {
-    std::string filename = "bin/TestFiles/continous_randomization.txt";
+    std::string filename = "tests/TestFiles/continous_randomization.txt";
 	std::ifstream in{filename};
 	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 

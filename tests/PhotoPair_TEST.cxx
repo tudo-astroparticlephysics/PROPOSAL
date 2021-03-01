@@ -192,7 +192,7 @@ ParticleDef getParticleDef(const std::string& name)
 
 TEST(PhotoPair, Test_of_dNdx)
 {
-    std::string filename = "bin/TestFiles/PhotoPair_dNdx.txt";
+    std::string filename = "tests/TestFiles/PhotoPair_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -228,7 +228,7 @@ TEST(PhotoPair, Test_of_dNdx)
 
 TEST(PhotoPair, Test_of_dNdx_Interpolant)
 {
-    std::string filename = "bin/TestFiles/PhotoPair_dNdx.txt";
+    std::string filename = "tests/TestFiles/PhotoPair_dNdx.txt";
     std::ifstream in{filename};
     EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 

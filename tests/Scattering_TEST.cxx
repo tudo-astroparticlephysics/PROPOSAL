@@ -381,7 +381,7 @@ TEST(Scattering, compare_integral_interpolant) {
 
 TEST(Scattering, ScatterReproducibilityTest)
 {
-    std::string filename = "bin/TestFiles/Scattering_scatter.txt";
+    std::string filename = "tests/TestFiles/Scattering_scatter.txt";
 	std::ifstream in{filename};
 	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 

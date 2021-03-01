@@ -50,7 +50,7 @@ ParticleDef getParticleDef(const std::string& name)
     }
 }
 
-const std::string testfile_dir = "TestFiles/";
+const std::string testfile_dir = "tests/TestFiles/";
 
 ParticleDef mu  = MuMinusDef();
 ParticleDef tau = TauMinusDef();

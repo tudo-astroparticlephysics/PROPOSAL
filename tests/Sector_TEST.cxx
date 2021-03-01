@@ -41,7 +41,7 @@ auto GetCrossSections(const ParticleDef& p_def, const Medium& med, std::shared_p
 
 TEST(Sector, Continuous)
 {
-    std::string filename = "bin/TestFiles/Sector_ContinousLoss.txt";
+    std::string filename = "tests/TestFiles/Sector_ContinousLoss.txt";
 	std::ifstream in{filename};
 	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -102,7 +102,7 @@ TEST(Sector, Continuous)
 
 TEST(Sector, Stochastic)
 {
-    std::string filename = "bin/TestFiles/Sector_StochasticLoss.txt";
+    std::string filename = "tests/TestFiles/Sector_StochasticLoss.txt";
 	std::ifstream in{filename};
 	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 
@@ -197,7 +197,7 @@ TEST(Sector, Stochastic)
 
 TEST(Sector, EnergyDisplacement)
 {
-    std::string filename = "bin/TestFiles/Sector_Energy_Distance.txt";
+    std::string filename = "tests/TestFiles/Sector_Energy_Distance.txt";
 	std::ifstream in{filename};
 	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
 

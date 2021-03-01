@@ -27,7 +27,7 @@ ParticleDef getParticleDef(const std::string& name)
     }
 }
 
-const std::string testfile_dir = "bin/TestFiles/";
+const std::string testfile_dir = "tests/TestFiles/";
 
 // TEST(Comparison, Comparison_equal)
 // {

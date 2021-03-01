@@ -7,14 +7,17 @@ SET(TEST_FILES TestFiles-2021-01-13.tar.gz)
 # download the test files
 add_custom_command(OUTPUT TestFiles
     COMMAND curl --silent ${RESOURCE_URL}/${TEST_FILES} -o TestFiles.tar.gz
-    COMMAND ${CMAKE_COMMAND} -E tar xzf TestFiles.tar.gz
+    COMMAND ${CMAKE_COMMAND} -E tar -xzf TestFiles.tar.gz
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Downloading and extractiong test files."
+    COMMENT "Downloading and extracting test files."
     )
+
+add_custom_target(testfiles DEPENDS TestFiles)
 
 # creat test binary and link against proposal and gtest
 macro(package_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
+    add_dependencies(${TESTNAME} testfiles)
     target_link_libraries(${TESTNAME} PROPOSAL::PROPOSAL CONAN_PKG::gtest)
     gtest_discover_tests(${TESTNAME})
 endmacro()
