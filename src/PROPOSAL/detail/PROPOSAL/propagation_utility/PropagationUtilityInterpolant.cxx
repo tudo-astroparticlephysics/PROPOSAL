@@ -6,6 +6,7 @@
 #include "CubicInterpolation/Interpolant.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 using Helper::InitializeInterpolation;
@@ -28,17 +29,34 @@ UtilityInterpolant::UtilityInterpolant(
 {
 }
 
-/* void UtilityInterpolant::BuildTables(std::string name, */
-/*     Interpolant1DBuilder::Definition interpol_def, bool reverse) */
-/* { */
-/* interpol_def.xmin = lower_lim; */
-/* double reference_x; */
-/* if (reverse) { */
-/*     reference_x = interpol_def.xmax; */
-/* } else { */
-/*     reference_x = interpol_def.xmin; */
-/* } */
-/* } */
+void UtilityInterpolant::BuildTables(const std::string prefix, size_t nodes,
+                                     bool reverse) {
+    auto def = cubic_splines::CubicSplines<double>::Definition();
+    auto reference_x = lower_lim;
+    reverse_ = reverse;
+    if (reverse_) {
+        reference_x = InterpolationSettings::UPPER_ENERGY_LIM;
+    }
+
+    hash_combine(this->hash, reverse);
+
+    if (reverse) {
+        def.f = [&](double energy) {
+            return UtilityIntegral::Calculate(reference_x, energy);
+        };
+    } else {
+        def.f = [&](double energy) {
+            return UtilityIntegral::Calculate(energy, reference_x);
+        };
+    }
+    def.f_trafo = std::make_unique<cubic_splines::ExpAxis<double>>(1., 0.);
+    def.axis = std::make_unique<cubic_splines::ExpAxis<double>>(
+            lower_lim, InterpolationSettings::UPPER_ENERGY_LIM, nodes);
+
+    interpolant_ = std::make_shared<interpolant_t>(
+            std::move(def), gen_path(), gen_name(prefix));
+}
+
 
 double UtilityInterpolant::Calculate(double energy_initial, double energy_final)
 {
