@@ -67,7 +67,7 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
 
     auto integrated_to_upper = interpolant_->evaluate(upper_limit);
     auto x_guess = cubic_splines::find_parameter(
-        *interpolant_, integrated_to_upper - rnd, integrated_to_upper - rnd);
+        *interpolant_, integrated_to_upper - rnd, NAN);
 
     return x_guess;
     // TODO: Check whether this is already accurate enough
