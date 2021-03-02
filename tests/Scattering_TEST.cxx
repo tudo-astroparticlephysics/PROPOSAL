@@ -21,6 +21,7 @@
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
+#include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 
 using namespace PROPOSAL;
 
@@ -362,18 +363,18 @@ TEST(Scattering, compare_integral_interpolant) {
                 auto vec_interpol = DirectionsScatter(direction_init, coords_interpol);
 
                 EXPECT_NEAR(std::get<0>(vec_integral).GetX(), std::get<0>(vec_interpol).GetX(),
-                            std::abs(std::get<0>(vec_integral).GetX() * 1e-5));
+                            std::abs(std::get<0>(vec_integral).GetX() * 1e-3));
                 EXPECT_NEAR(std::get<0>(vec_integral).GetY(), std::get<0>(vec_interpol).GetY(),
-                            std::abs(std::get<0>(vec_integral).GetY() * 1e-5));
+                            std::abs(std::get<0>(vec_integral).GetY() * 1e-3));
                 EXPECT_NEAR(std::get<0>(vec_integral).GetZ(), std::get<0>(vec_interpol).GetZ(),
-                            std::abs(std::get<0>(vec_integral).GetZ() * 1e-5));
+                            std::abs(std::get<0>(vec_integral).GetZ() * 1e-3));
 
                 EXPECT_NEAR(std::get<1>(vec_integral).GetX(), std::get<1>(vec_interpol).GetX(),
-                            std::abs(std::get<1>(vec_integral).GetX() * 1e-5));
+                            std::abs(std::get<1>(vec_integral).GetX() * 1e-3));
                 EXPECT_NEAR(std::get<1>(vec_integral).GetY(), std::get<1>(vec_interpol).GetY(),
-                            std::abs(std::get<1>(vec_integral).GetY() * 1e-5));
+                            std::abs(std::get<1>(vec_integral).GetY() * 1e-3));
                 EXPECT_NEAR(std::get<1>(vec_integral).GetZ(), std::get<1>(vec_interpol).GetZ(),
-                            std::abs(std::get<1>(vec_integral).GetZ() * 1e-5));
+                            std::abs(std::get<1>(vec_integral).GetZ() * 1e-3));
             }
         }
     }

@@ -65,39 +65,39 @@ namespace detail {
     constexpr static char multiple_scattering_msg[]
         = "This constructor is not provided.";
 
+    inline std::unique_ptr<multiple_scattering::Parametrization> make_multiple_scattering(ScatteringType t)
+    {
+        switch (t) {
+            case ScatteringType::NoScattering:
+                return std::unique_ptr<multiple_scattering::Parametrization>(
+                        nullptr);
+            default:
+                throw std::out_of_range(multiple_scattering_msg);
+        }
+    }
+
+    inline std::unique_ptr<multiple_scattering::Parametrization> make_multiple_scattering(
+            ScatteringType t, ParticleDef const& p, Medium const& m)
+    {
+        switch (t) {
+            case ScatteringType::Highland:
+                return make_highland(p, m);
+            case ScatteringType::Moliere:
+                return make_moliere(p, m);
+            default:
+                return make_multiple_scattering(t);
+        }
+    }
+
     template <typename... Args>
-    inline auto make_multiple_scattering(
+    inline std::unique_ptr<multiple_scattering::Parametrization> make_multiple_scattering(
         ScatteringType t, ParticleDef const& p, Medium const& m, Args&&... args)
     {
         switch (t) {
         case ScatteringType::HighlandIntegral:
             return make_highland_integral(p, m, std::forward<Args>(args)...);
         default:
-            throw std::out_of_range(multiple_scattering_msg);
-        }
-    }
-
-    inline auto make_multiple_scattering(
-        ScatteringType t, ParticleDef const& p, Medium const& m)
-    {
-        switch (t) {
-        case ScatteringType::Highland:
-            return make_highland(p, m);
-        case ScatteringType::Moliere:
-            return make_moliere(p, m);
-        default:
-            throw std::out_of_range(multiple_scattering_msg);
-        }
-    }
-
-    inline auto make_multiple_scattering(ScatteringType t)
-    {
-        switch (t) {
-        case ScatteringType::NoScattering:
-            return std::unique_ptr<multiple_scattering::Parametrization>(
-                nullptr);
-        default:
-            throw std::out_of_range(multiple_scattering_msg);
+            return make_multiple_scattering(t, p, m);
         }
     }
 }
