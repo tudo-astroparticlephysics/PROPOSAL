@@ -32,7 +32,7 @@ class PROPOSALConan(ConanFile):
             del self.options.fPIC
 
     def requirements(self):
-        self.requires("cubic-interpolation/0.1.1")
+        self.requires("cubicinterpolation/0.1.2")
         self.requires("spdlog/1.8.2")
         if self.options.build_python:
             self.requires("pybind11/2.6.2")
