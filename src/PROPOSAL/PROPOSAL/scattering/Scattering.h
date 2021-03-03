@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace PROPOSAL {
-class ParticleDef;
+struct ParticleDef;
 class Medium;
 } // namespace PROPOSAL
 

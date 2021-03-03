@@ -77,8 +77,6 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
     auto InteractionEnergy
         = std::array<double, 3> { std::max(min_energy, p_def.mass), 0., 0. };
     while (continue_propagation) {
-        // std::cout << "E: " << state.GetEnergy() << ", d: "  <<
-        // state.GetPropagatedDistance() << std::endl;
         auto& utility = get<UTILITY>(current_sector);
         auto& density = get<DENSITY_DISTR>(current_sector);
 
@@ -86,9 +84,6 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
             state.energy, rnd, density->Evaluate(state.position));
         InteractionEnergy[Stochastic]
             = utility.EnergyInteraction(state.energy, rnd);
-
-        // std::cout << "Decay: " << InteractionEnergy[Decay] << ", " <<
-        // "Stochastic: " << InteractionEnergy[Stochastic] << std::endl;
 
         auto next_interaction_type = maximize(InteractionEnergy);
         auto energy_at_next_interaction
@@ -192,8 +187,6 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
 
     if (advancement_type != ReachedInteraction) {
         double control_distance;
-        // std::cout << "AdvanceParticle can't reach interaction, varying
-        // propagation step..." << std::endl;
         do {
             advance_distance = AdvanceDistance[advancement_type];
             advance_grammage = density->Calculate(
@@ -215,13 +208,8 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
                 state.position, mean_direction, *geometry);
             advancement_type = minimize(AdvanceDistance);
             control_distance = AdvanceDistance[advancement_type];
-            // std::cout << "Step - old_distance: " << advance_distance << ",
-            // new distance: " << control_distance << ", advancement type " <<
-            // advancement_type << std::endl;
         } while (std::abs(advance_distance - control_distance)
             > PARTICLE_POSITION_RESOLUTION);
-        // std::cout << "Difference negligible, use control_distance" <<
-        // std::endl;
         advance_distance = control_distance;
         advance_grammage = density->Calculate(
             state.position, mean_direction, advance_distance);
