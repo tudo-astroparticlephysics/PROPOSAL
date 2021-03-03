@@ -2,12 +2,18 @@
 
 #include "PROPOSAL/DefaultFactory.h"
 #include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"
-#include "PROPOSAL/scattering/stochastic_deflection/ScatteringFactory.h"
+#include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/ScatteringFactory.h"
 
 #include <memory>
 #include <unordered_map>
 #include <vector>
+
+namespace PROPOSAL {
+class ParticleDef;
+class Medium;
+} // namespace PROPOSAL
 
 namespace PROPOSAL {
 class Scattering {
@@ -151,35 +157,25 @@ template <> inline auto Scattering::init_multiple_scatter(std::nullptr_t&&)
     return nullptr;
 }
 
-/**
- * @brief Creates a default deflection of specific type.
- *
- * @tparam Args InteractionType and stochastic_deflection::Parametrization
- * cstr. arguments
- * @param args interaction type and the arguments of the corresponding cstr.
- */
-template <typename... Args> inline auto make_default_stochastic_deflection(Args... args)
+template <typename... Args>
+inline auto make_scattering(MultipleScatteringType ms_t,
+    std::vector<InteractionType> st_t, ParticleDef const& p, Medium const& m,
+    Args... args)
 {
-    return DefaultFactory<stochastic_deflection::Parametrization>::Create(
-        args...);
+    using ms_param = multiple_scattering::Parametrization;
+    using st_param = stochastic_deflection::Parametrization;
+
+    auto ms = std::unique_ptr<ms_param>();
+    if (ms_t != MultipleScatteringType::NoScattering)
+        ms = make_multiple_scattering(ms_t, p, m, std::forward<Args>(args)...);
+
+    auto st = std::vector<std::shared_ptr<st_param>>();
+    if (not st_t.empty()) {
+        for (auto const& t : st_t)
+            st.emplace_back(make_default_stochastic_deflection(t, p, m));
+    }
+
+    return Scattering(std::move(ms), std::move(st));
 }
 
-/**
- * @brief Creates a vector of default deflection for a vector of types.
- *
- * @tparam Args std::vector<InteractionType> and
- * stochastic_deflection::Parametrization cstr. arguments
- * @param types list of interaction types
- * @param args the corresponding cstr. argmuents
- */
-template <typename... Args>
-inline auto make_default_stochastic_deflection(
-    std::vector<InteractionType> const& types, Args... args)
-{
-    using param_ptr = std::unique_ptr<stochastic_deflection::Parametrization>;
-    auto v = std::vector<param_ptr>();
-    for (auto t : types)
-        v.emplace_back(make_default_stochastic_deflection(t, args...));
-    return v;
-}
 } // namespace PROPOSAL
