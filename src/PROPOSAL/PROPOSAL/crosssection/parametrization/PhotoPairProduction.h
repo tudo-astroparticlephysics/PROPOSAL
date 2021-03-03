@@ -38,7 +38,7 @@ namespace crosssection {
         PhotoPairProduction() = default;
         virtual ~PhotoPairProduction() = default;
 
-        double GetLowerEnergyLim(const ParticleDef&) const noexcept override;
+        double GetLowerEnergyLim(const ParticleDef&) const noexcept final;
         KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&,
             double) const noexcept override;
     };

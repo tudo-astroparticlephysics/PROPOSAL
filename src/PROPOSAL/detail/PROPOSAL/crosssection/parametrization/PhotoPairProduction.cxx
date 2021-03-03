@@ -16,7 +16,7 @@ using std::make_tuple;
 double crosssection::PhotoPairProduction::GetLowerEnergyLim(
     const ParticleDef&) const noexcept
 {
-    return 2 * ME;
+    return 2. * ME;
 }
 
 crosssection::KinematicLimits

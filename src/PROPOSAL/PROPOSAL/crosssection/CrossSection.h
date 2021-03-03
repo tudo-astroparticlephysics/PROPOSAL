@@ -232,7 +232,7 @@ public:
               comp_wise {}, interpol, param, p, m, cut, hash))
         , de2dx(detail::build_de2dx(
               comp_wise {}, interpol, param, p, m, cut, hash))
-        , lower_energy_lim(detail::calculate_lower_energy_lim(dedx.get()))
+        , lower_energy_lim(param.GetLowerEnergyLim(p))
         , interaction_type(static_cast<InteractionType>(
               crosssection::ParametrizationId<Param>::value))
     {

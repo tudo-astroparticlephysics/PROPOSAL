@@ -19,6 +19,9 @@ void AxisBuilderDEDX::refine_definition_range(
     if (i == n)
         throw std::logic_error("No positive values to build dEdx tables!");
 
+    if (i==0)
+        return;
+
     double i_accuracy = 0.1;
     auto f = [&func, &ax](double i) {return func(ax.back_transform(i));};
     auto i_low = Bisection(f, i-1, i, i_accuracy, 100);
