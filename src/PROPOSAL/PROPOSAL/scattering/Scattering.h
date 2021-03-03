@@ -175,7 +175,7 @@ inline auto make_scattering(MultipleScatteringType ms_t,
             st.emplace_back(make_default_stochastic_deflection(t, p, m));
     }
 
-    return Scattering(std::move(ms), std::move(st));
+    return std::make_unique<Scattering>(std::move(ms), std::move(st));
 }
 
 } // namespace PROPOSAL
