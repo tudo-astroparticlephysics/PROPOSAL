@@ -18,12 +18,11 @@ void AxisBuilderDEDX::refine_definition_range(
         ++i;
     if (i == n)
         throw std::logic_error("No positive values to build dEdx tables!");
-    low = ax.back_transform(i);
 
-    // double i_accuracy = 0.1;
-    // auto f = [&func, &ax](double i) {return func(ax.back_transform(i));};
-    // auto i_low = Bisection(f, i-1, i, i_accuracy, 100);
-    // low = ax.back_transform(i_low + i_accuracy);
+    double i_accuracy = 0.1;
+    auto f = [&func, &ax](double i) {return func(ax.back_transform(i));};
+    auto i_low = Bisection(f, i-1, i, i_accuracy, 100);
+    low = ax.back_transform(i_low + i_accuracy);
      }
 
 std::unique_ptr<cubic_splines::ExpAxis<double>> AxisBuilderDEDX::Create() const
