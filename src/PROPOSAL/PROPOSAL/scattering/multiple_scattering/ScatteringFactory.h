@@ -47,18 +47,18 @@
 
 namespace PROPOSAL {
 
-enum class ScatteringType : int {
+enum class MultipleScatteringType : int {
     NoScattering,
     Moliere,
     Highland,
     HighlandIntegral
 };
 
-static const std::unordered_map<std::string, ScatteringType>
-    MultipleScatteringTable = { { "moliere", ScatteringType::Moliere },
-        { "highland", ScatteringType::Highland },
-        { "highlandintegral", ScatteringType::HighlandIntegral },
-        { "noscattering", ScatteringType::NoScattering } };
+static const std::unordered_map<std::string, MultipleScatteringType>
+    MultipleScatteringTable = { { "moliere", MultipleScatteringType::Moliere },
+        { "highland", MultipleScatteringType::Highland },
+        { "highlandintegral", MultipleScatteringType::HighlandIntegral },
+        { "noscattering", MultipleScatteringType::NoScattering } };
 
 namespace detail {
 
@@ -67,10 +67,10 @@ namespace detail {
 
     template <typename... Args>
     inline auto make_multiple_scattering(
-        ScatteringType t, ParticleDef const& p, Medium const& m, Args&&... args)
+        MultipleScatteringType t, ParticleDef const& p, Medium const& m, Args&&... args)
     {
         switch (t) {
-        case ScatteringType::HighlandIntegral:
+        case MultipleScatteringType::HighlandIntegral:
             return make_highland_integral(p, m, std::forward<Args>(args)...);
         default:
             throw std::out_of_range(multiple_scattering_msg);
@@ -78,24 +78,13 @@ namespace detail {
     }
 
     inline auto make_multiple_scattering(
-        ScatteringType t, ParticleDef const& p, Medium const& m)
+        MultipleScatteringType t, ParticleDef const& p, Medium const& m)
     {
         switch (t) {
-        case ScatteringType::Highland:
+        case MultipleScatteringType::Highland:
             return make_highland(p, m);
-        case ScatteringType::Moliere:
+        case MultipleScatteringType::Moliere:
             return make_moliere(p, m);
-        default:
-            throw std::out_of_range(multiple_scattering_msg);
-        }
-    }
-
-    inline auto make_multiple_scattering(ScatteringType t)
-    {
-        switch (t) {
-        case ScatteringType::NoScattering:
-            return std::unique_ptr<multiple_scattering::Parametrization>(
-                nullptr);
         default:
             throw std::out_of_range(multiple_scattering_msg);
         }

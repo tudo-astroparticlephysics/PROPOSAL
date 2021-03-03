@@ -82,5 +82,4 @@ std::unique_ptr<Scattering> make_scattering(const nlohmann::json& config,
     }
 
 }
-
 }

@@ -43,35 +43,73 @@
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
 #include "PROPOSAL/scattering/stochastic_deflection/ionization/NaivIonization.h"
 
-
 namespace PROPOSAL {
 
-    using func_ptr = std::unique_ptr<stochastic_deflection::Parametrization>(*)(const ParticleDef&, const Medium&);
+/**
+ * @brief Creates a default deflection of specific type.
+ *
+ * @tparam Args InteractionType and stochastic_deflection::Parametrization
+ * cstr. arguments
+ * @param args interaction type and the arguments of the corresponding cstr.
+ */
+template <typename... Args>
+inline auto make_default_stochastic_deflection(Args... args)
+{
+    return DefaultFactory<stochastic_deflection::Parametrization>::Create(
+        args...);
+}
 
-    template <typename Param>
-    std::unique_ptr<stochastic_deflection::Parametrization> create_deflection(
-            const ParticleDef& p_def, const Medium& medium) {
-        return make_unique<Param>(p_def, medium);
+/**
+ * @brief Creates a vector of default deflection for a vector of types.
+ *
+ * @tparam Args std::vector<InteractionType> and
+ * stochastic_deflection::Parametrization cstr. arguments
+ * @param types list of interaction types
+ * @param args the corresponding cstr. argmuents
+ */
+template <typename... Args>
+inline auto make_default_stochastic_deflection(
+    std::vector<InteractionType> const& types, Args... args)
+{
+    using param_ptr = std::unique_ptr<stochastic_deflection::Parametrization>;
+    auto v = std::vector<param_ptr>();
+    for (auto t : types)
+        v.emplace_back(make_default_stochastic_deflection(t, args...));
+    return v;
+}
+
+using func_ptr = std::unique_ptr<stochastic_deflection::Parametrization> (*)(
+    const ParticleDef&, const Medium&);
+
+template <typename Param>
+std::unique_ptr<stochastic_deflection::Parametrization> create_deflection(
+    const ParticleDef& p_def, const Medium& medium)
+{
+    return make_unique<Param>(p_def, medium);
+}
+
+static const std::map<std::string, func_ptr> DeflectionTable
+    = { { "naivbremsstrahlung",
+            create_deflection<stochastic_deflection::NaivBremsstrahlung> },
+          { "naivionization",
+              create_deflection<stochastic_deflection::NaivIonization> }
+
+      };
+
+template <typename Cross = std::nullptr_t>
+std::unique_ptr<stochastic_deflection::Parametrization>
+make_stochastic_deflection(
+    std::string const& name, ParticleDef const& p_def, Medium const& medium)
+{
+    std::string name_lower = name;
+    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
+
+    auto it = DeflectionTable.find(name_lower);
+    if (it != DeflectionTable.end()) {
+        return it->second(p_def, medium);
     }
-
-    static const std::map<std::string, func_ptr> DeflectionTable = {
-                {"naivbremsstrahlung", create_deflection<stochastic_deflection::NaivBremsstrahlung>},
-                {"naivionization", create_deflection<stochastic_deflection::NaivIonization>}
-
-    };
-
-    template <typename Cross = std::nullptr_t>
-    std::unique_ptr<stochastic_deflection::Parametrization> make_stochastic_deflection(
-            std::string const& name, ParticleDef const& p_def, Medium const& medium)
-    {
-        std::string name_lower = name;
-        std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
-
-        auto it = DeflectionTable.find(name_lower);
-        if (it != DeflectionTable.end()) {
-            return it->second(p_def, medium);
-        }
-        throw std::out_of_range("This stochastic deflection model is not provided.");
-    }
+    throw std::out_of_range(
+        "This stochastic deflection model is not provided.");
+}
 
 } // namespace PROPOSAL
