@@ -32,7 +32,7 @@ class PROPOSALConan(ConanFile):
             del self.options.fPIC
 
     def requirements(self):
-        self.requires("cubicinterpolation/0.1.2")
+        self.requires("cubicinterpolation/0.1.3")
         self.requires("spdlog/1.8.2")
         if self.options.build_python:
             self.requires("pybind11/2.6.2")
@@ -59,3 +59,8 @@ class PROPOSALConan(ConanFile):
         self.copy("LICENSE", dst="licenses")
         cmake = self._configure_cmake()
         cmake.install()
+        tools.rmdir(os.path.join(self.package_folder, "lib", "cmake"))
+
+    def package_info(self):
+        self.cpp_info.names["cmake_find_package"] = "PROPOSAL"
+        self.cpp_info.libs =  ["PROPOSAL"]
