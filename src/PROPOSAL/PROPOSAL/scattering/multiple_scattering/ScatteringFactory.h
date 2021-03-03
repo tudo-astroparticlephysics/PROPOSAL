@@ -93,7 +93,7 @@ auto make_multiple_scattering(std::string const& name, Args... args)
 
     auto it = MultipleScatteringTable.find(name_lower);
     if (it != MultipleScatteringTable.end()) {
-        return detail::make_multiple_scattering(it->second, args...);
+        return make_multiple_scattering(it->second, args...);
     }
     throw std::out_of_range("This scattering model is not provided.");
 }
