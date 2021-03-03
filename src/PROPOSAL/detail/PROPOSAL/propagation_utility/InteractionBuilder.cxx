@@ -1,6 +1,7 @@
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
 
 using namespace PROPOSAL;
 
