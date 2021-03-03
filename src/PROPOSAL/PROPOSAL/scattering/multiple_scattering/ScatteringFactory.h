@@ -60,34 +60,28 @@ static const std::unordered_map<std::string, MultipleScatteringType>
         { "highlandintegral", MultipleScatteringType::HighlandIntegral },
         { "noscattering", MultipleScatteringType::NoScattering } };
 
-namespace detail {
-
-    constexpr static auto multiple_scattering_msg
-        = "This constructor is not provided.";
-
-    inline auto make_multiple_scattering(
-        MultipleScatteringType t, ParticleDef const& p, Medium const& m)
-    {
-        switch (t) {
-        case MultipleScatteringType::Highland:
-            return make_highland(p, m);
-        case MultipleScatteringType::Moliere:
-            return make_moliere(p, m);
-        default:
-            throw std::out_of_range(multiple_scattering_msg);
-        }
+inline auto make_multiple_scattering(
+    MultipleScatteringType t, ParticleDef const& p, Medium const& m)
+{
+    switch (t) {
+    case MultipleScatteringType::Highland:
+        return make_highland(p, m);
+    case MultipleScatteringType::Moliere:
+        return make_moliere(p, m);
+    default:
+        throw std::out_of_range("This constructor is not provided.");
     }
+}
 
-    template <typename... Args>
-    inline auto make_multiple_scattering(MultipleScatteringType t,
-        ParticleDef const& p, Medium const& m, Args&&... args)
-    {
-        switch (t) {
-        case MultipleScatteringType::HighlandIntegral:
-            return make_highland_integral(p, m, std::forward<Args>(args)...);
-        default:
-            make_multiple_scattering(t, p, m);
-        }
+template <typename... Args>
+inline auto make_multiple_scattering(MultipleScatteringType t,
+    ParticleDef const& p, Medium const& m, Args&&... args)
+{
+    switch (t) {
+    case MultipleScatteringType::HighlandIntegral:
+        return make_highland_integral(p, m, std::forward<Args>(args)...);
+    default:
+        make_multiple_scattering(t, p, m);
     }
 }
 
