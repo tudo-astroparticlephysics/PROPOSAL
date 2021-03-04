@@ -787,6 +787,8 @@ void init_parametrization(py::module& m) {
 
             * RenoSarcevicSu
 
+            * AbtFT
+
             * AbramowiczLevinLevyMaor91Interpolant
 
             * AbramowiczLevinLevyMaor97Interpolant
@@ -794,6 +796,8 @@ void init_parametrization(py::module& m) {
             * ButkevichMikhailovInterpolant
 
             * RenoSarcevicSuInterpolant
+
+            * AbtFTInterpolant
 
             The parametrization with "Interpolant" as a suffix creates an interpolation table for the :math:`Q^2` integration, which improved the perfomance.
 
@@ -818,11 +822,13 @@ void init_parametrization(py::module& m) {
     PHOTO_Q2_DEF(m_sub_photo, AbramowiczLevinLevyMaor97)
     PHOTO_Q2_DEF(m_sub_photo, ButkevichMikhailov)
     PHOTO_Q2_DEF(m_sub_photo, RenoSarcevicSu)
+    PHOTO_Q2_DEF(m_sub_photo, AbtFT)
 
     PHOTO_Q2_INTERPOL_DEF(m_sub_photo, AbramowiczLevinLevyMaor91)
     PHOTO_Q2_INTERPOL_DEF(m_sub_photo, AbramowiczLevinLevyMaor97)
     PHOTO_Q2_INTERPOL_DEF(m_sub_photo, ButkevichMikhailov)
     PHOTO_Q2_INTERPOL_DEF(m_sub_photo, RenoSarcevicSu)
+    PHOTO_Q2_INTERPOL_DEF(m_sub_photo, AbtFT)
 
     py::enum_<PhotonuclearFactory::Enum>(m_sub_photo, "PhotoParametrization")
         .value("Zeus", PhotonuclearFactory::Zeus)
@@ -835,6 +841,7 @@ void init_parametrization(py::module& m) {
                PhotonuclearFactory::AbramowiczLevinLevyMaor97)
         .value("ButkevichMikhailov", PhotonuclearFactory::ButkevichMikhailov)
         .value("RenoSarcevicSu", PhotonuclearFactory::RenoSarcevicSu)
+        .value("AbtFT", PhotonuclearFactory::AbtFT)
         .value("None", PhotonuclearFactory::None);
 
     py::enum_<PhotonuclearFactory::Shadow>(m_sub_photo, "PhotoShadow")

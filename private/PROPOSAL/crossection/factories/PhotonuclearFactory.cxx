@@ -49,6 +49,9 @@ PhotonuclearFactory::PhotonuclearFactory()
     RegisterQ2("photorenosarcevicsu",
                RenoSarcevicSu,
                std::make_pair(&PhotoRenoSarcevicSu::create, &PhotoQ2Interpolant<PhotoRenoSarcevicSu>::create));
+    RegisterQ2("photoabtft",
+               AbtFT,
+               std::make_pair(&PhotoAbtFT::create, &PhotoQ2Interpolant<PhotoAbtFT>::create));
 }
 
 PhotonuclearFactory::~PhotonuclearFactory()
