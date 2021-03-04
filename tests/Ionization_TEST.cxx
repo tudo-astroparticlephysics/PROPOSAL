@@ -172,8 +172,10 @@ TEST(Ionization, Test_of_dEdx)
                                      config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
-
-        EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-6 * dEdx_stored);
+        if (parametrization == "BetheBlochRossi")
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-4 * dEdx_stored); // integration routine changed
+        else
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-6 * dEdx_stored);
 
     }
 }

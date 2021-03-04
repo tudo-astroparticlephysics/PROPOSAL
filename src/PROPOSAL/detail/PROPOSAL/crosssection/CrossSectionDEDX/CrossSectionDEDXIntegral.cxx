@@ -67,7 +67,16 @@ namespace detail {
     dedx_integral_t define_dedx_integral(crosssection::IonizBetheBlochRossi const &param,
         ParticleDef const& p, Medium const& m, EnergyCutSettings const& cut)
     {
-        return _define_dedx_integral_log(param, p, m, cut);
+        auto param_ptr = std::make_shared<crosssection::IonizBetheBlochRossi>(param);
+        return [param_ptr, p, m, cut](double E) {
+            auto i = Integral(IROMB, IMAXS, IPREC);
+            auto lim = param_ptr->GetKinematicLimits(p, m, E);
+            auto v_cut = cut.GetCut(lim, E);
+            auto dEdx = [_param_ptr = param_ptr.get(), &p, &m, E](double v) {
+                return _param_ptr->FunctionToDEdxIntegral(p, m, E, v);
+            };
+            return i.Integrate(lim.v_min, v_cut, dEdx, 4) + param_ptr->IonizationLoss(p, m, E) / E;
+        };
     }
 
     template <typename Param>

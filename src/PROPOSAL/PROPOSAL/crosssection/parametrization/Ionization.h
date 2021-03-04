@@ -71,6 +71,8 @@ namespace crosssection {
             ParticleDef const&, Medium const&, double, double) const final;
         double FunctionToDEdxIntegral(
             ParticleDef const&, Medium const&, double, double) const final;
+        double IonizationLoss(
+                ParticleDef const&, Medium const&, double) const;
     };
 
     template <> struct ParametrizationName<IonizBetheBlochRossi> {

@@ -115,6 +115,13 @@ double crosssection::IonizBetheBlochRossi::FunctionToDEdxIntegral(
     const ParticleDef& p_def, const Medium& medium, double energy,
     double variable) const
 {
+    return variable
+      * CrossSectionWithoutInelasticCorrection(p_def, medium, energy, variable)
+      * InelCorrection(p_def, medium, energy, variable);
+}
+
+double crosssection::IonizBetheBlochRossi::IonizationLoss(
+        const ParticleDef& p_def, const Medium& medium, double energy) const {
     double result, aux;
 
     auto limits = GetKinematicLimits(p_def, medium, energy);
@@ -140,22 +147,15 @@ double crosssection::IonizBetheBlochRossi::FunctionToDEdxIntegral(
 
     if (result > 0) {
         result *= IONK * p_def.charge * p_def.charge
-            * calculate_proton_massnumber_fraction(medium.GetComponents())
-            / (2 * aux);
+                  * calculate_proton_massnumber_fraction(medium.GetComponents())
+                  / (2 * aux);
     } else {
         result = 0;
     }
 
     if (v_up == limits.v_min)
         return 0;
-
-    result /= (v_up - limits.v_min);
-
-    return result / energy
-        + variable
-        * CrossSectionWithoutInelasticCorrection(
-            p_def, medium, energy, variable)
-        * InelCorrection(p_def, medium, energy, variable);
+    return result;
 }
 
 // ------------------------------------------------------------------------- //
