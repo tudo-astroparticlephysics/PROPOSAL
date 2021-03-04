@@ -8,6 +8,7 @@
 
 #include "CubicInterpolation/CubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
+#include "PROPOSAL/crosssection/parametrization/Compton.h"
 
 namespace PROPOSAL {
 
@@ -23,6 +24,21 @@ auto build_dedx_def(T1 const& param, ParticleDef const& p, Args... args)
 
     auto def = cubic_splines::CubicSplines<double>::Definition();
     def.f_trafo = std::make_unique<cubic_splines::ExpAxis<double>>(1., 0.);
+    def.f = [dedx](double E) { return dedx->Calculate(E); };
+    def.axis = ax.Create();
+    return def;
+}
+
+//TODO: This template specification is a temporary solution for Compton
+template <typename... Args>
+auto build_dedx_def(crosssection::ComptonKleinNishina const& param, ParticleDef const& p, Args... args)
+{
+    auto dedx = std::make_shared<CrossSectionDEDXIntegral>(param, p, args...);
+    auto ax = AxisBuilderDEDX(param.GetLowerEnergyLim(p));
+    ax.refine_definition_range([dedx](double E) { return dedx->Calculate(E); });
+
+    auto def = cubic_splines::CubicSplines<double>::Definition();
+    def.f_trafo = std::make_unique<cubic_splines::ExpAxis<double>>(1e-10, 0.);
     def.f = [dedx](double E) { return dedx->Calculate(E); };
     def.axis = ax.Create();
     return def;
