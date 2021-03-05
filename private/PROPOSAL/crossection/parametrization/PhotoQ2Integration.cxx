@@ -633,10 +633,6 @@ double PhotoAbtFT::FunctionToQ2Integral(double energy, double v, double Q2)
     // --------------------------------------------------------------------- //
     // Evaluate form factor F_2 for the nucleus same like ALLM91
     // but using new parameters
-    // the parameters were updated on 19.08.2004 on arXiv
-    // because the values of b1_pomeron, b2_pomeron, b1_reggeon, b2_reggeon
-    // and the Q20_free_param were misprinted
-    // the corrected parameters are used here
     // --------------------------------------------------------------------- //
 
     // Parameter for Pomeron and Reggeon
