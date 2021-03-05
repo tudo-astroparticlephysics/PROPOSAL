@@ -292,10 +292,18 @@ nlohmann::json Propagator::ParseConfig(const string& config_file)
     try {
         string expanded_config_file_path
             = Helper::ResolvePath(config_file, true);
+        if (expanded_config_file_path == "")
+            throw std::invalid_argument("Resolved path empty.");
         std::ifstream infilestream(expanded_config_file_path);
         infilestream >> json_config;
     } catch (const nlohmann::json::parse_error& e) {
-        Logging::Get("proposal.propagator")->critical("Unable parse {} as json file", config_file.c_str());
+        Logging::Get("proposal.propagator")->critical("Unable to parse {} as "
+            "json file", config_file.c_str());
+        throw;
+    } catch (const std::invalid_argument& e) {
+        Logging::Get("proposal.propagator")->critical("Could not find json"
+            " file in path {}.", config_file.c_str());
+        throw;
     }
     return json_config;
 }
