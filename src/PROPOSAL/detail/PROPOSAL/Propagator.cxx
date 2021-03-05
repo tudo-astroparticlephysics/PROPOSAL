@@ -73,13 +73,13 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
     int advancement_type;
     auto continue_propagation = true;
 
-    // TODO: How to get accurate low information?
-    auto InteractionEnergy
-        = std::array<double, 3> { std::max(min_energy, p_def.mass), 0., 0. };
+    std::array<double, 3> InteractionEnergy;
     while (continue_propagation) {
         auto& utility = get<UTILITY>(current_sector);
         auto& density = get<DENSITY_DISTR>(current_sector);
 
+        InteractionEnergy[MinimalE] = std::max(
+                min_energy, utility.collection.displacement_calc->GetLowerLim());
         InteractionEnergy[Decay] = utility.EnergyDecay(
             state.energy, rnd, density->Evaluate(state.position));
         InteractionEnergy[Stochastic]

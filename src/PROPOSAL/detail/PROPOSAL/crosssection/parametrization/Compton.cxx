@@ -11,7 +11,7 @@ using namespace PROPOSAL;
 double crosssection::Compton::GetLowerEnergyLim(
     const ParticleDef&) const noexcept
 {
-    return ME;
+    return 2. * ME;
 }
 
 crosssection::KinematicLimits crosssection::Compton::GetKinematicLimits(
