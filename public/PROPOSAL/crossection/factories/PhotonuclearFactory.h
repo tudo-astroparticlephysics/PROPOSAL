@@ -69,6 +69,7 @@ public:
         ButkevichMikhailov,
         RenoSarcevicSu,
         AbtFT,
+        BlockDurandHa,
     };
 
     enum Shadow

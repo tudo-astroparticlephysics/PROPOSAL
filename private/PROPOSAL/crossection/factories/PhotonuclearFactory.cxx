@@ -52,6 +52,9 @@ PhotonuclearFactory::PhotonuclearFactory()
     RegisterQ2("photoabtft",
                AbtFT,
                std::make_pair(&PhotoAbtFT::create, &PhotoQ2Interpolant<PhotoAbtFT>::create));
+    RegisterQ2("photoblockdurandha",
+               BlockDurandHa,
+               std::make_pair(&PhotoBlockDurandHa::create, &PhotoQ2Interpolant<PhotoBlockDurandHa>::create));
 }
 
 PhotonuclearFactory::~PhotonuclearFactory()

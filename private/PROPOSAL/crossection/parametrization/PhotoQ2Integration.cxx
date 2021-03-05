@@ -140,6 +140,7 @@ Q2_PHOTO_PARAM_INTEGRAL_IMPL(AbramowiczLevinLevyMaor97)
 Q2_PHOTO_PARAM_INTEGRAL_IMPL(ButkevichMikhailov)
 Q2_PHOTO_PARAM_INTEGRAL_IMPL(RenoSarcevicSu)
 Q2_PHOTO_PARAM_INTEGRAL_IMPL(AbtFT)
+Q2_PHOTO_PARAM_INTEGRAL_IMPL(BlockDurandHa)
 
 // ------------------------------------------------------------------------- //
 // Abramowicz Levin Levy Maor 91
@@ -741,4 +742,89 @@ double PhotoAbtFT::FunctionToQ2Integral(double energy, double v, double Q2)
     return result;
 }
 
+// ------------------------------------------------------------------------- //
+// Martin M. Block, Loyal Durand, Phuoc Ha
+// Phys. Rev. D 89 (2014) 094027
+// ------------------------------------------------------------------------- //
+double PhotoBlockDurandHa::FunctionToQ2Integral(double energy, double v,
+  double Q2)
+{
+
+    Components::Component component = components_[component_index_];
+
+    double mass_nucleus = component.GetAverageNucleonWeight();
+
+    // Bjorken x = \frac{Q^2}{2pq}
+    double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
+
+    // Parameters of BDH fit from Table I
+    // Dimensionless parameter values
+    const double a0 = 8.205e-4;
+    const double a1 = -5.148e-2;
+    const double a2 = -4.725e-3;
+
+    const double b0 = 2.217e-3;
+    const double b1 = 1.244e-2;
+    const double b2 = 5.958e-4;
+
+    const double c0 = 0.255;
+    const double c1 = 1.475e-1;
+
+    const double lambda = 2.430;
+    const double n      = 11.49;
+
+    // parameters with Conversion from GeV^2 to MeV^2
+    const double M2  = 0.753 * 1e6;
+    const double mu2 = 2.82  * 1e6;
+
+    // R(x, Q^2) is approximated to 0
+    // relation between structure functions F_1 and F_2
+    const double R = 0;
+
+    // eq. 8, 10
+    double aux = std::log(1 + Q2/mu2);
+    double A   = a0 + a1 * aux + a2 * aux * aux;
+    double B   = b0 + b1 * aux + b2 * aux * aux;
+    double C   = c0 + c1 * aux;
+
+    double D = Q2 * (Q2 + lambda * M2)/std::pow((Q2 + M2), 2);
+
+    double aux1 = std::log(Q2/bjorken_x/(Q2 + mu2));
+    double structure_function_proton = D * std::pow(1 - bjorken_x, n)
+      * (C + A * aux1 + B * aux1 * aux1);
+
+    // Relation between structure function of proton and structure function of neutron
+    // from the BCDMS Collaboration
+    // Phys. Lett. B 237 (1990), 599
+    // eq. 4
+    // P(x) = 1 - 1.85x + 2.45x^2 - 2.35x^3 + x^4
+    double relation_proton_neutron = bjorken_x * bjorken_x;
+    relation_proton_neutron        = 1 - 1.85 * bjorken_x + 2.45 * relation_proton_neutron -
+                              2.35 * relation_proton_neutron * bjorken_x +
+                              relation_proton_neutron * relation_proton_neutron;
+
+    // structure function from Dutta et al
+    // Phys. Rev. D 63 (2001), 094020
+    // eq. 3.11
+    // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
+    double structure_function_nucleus =
+        structure_function_proton * shadow_effect_->CalculateShadowEffect(component, bjorken_x, v * energy) *
+        (component.GetNucCharge() + (component.GetAtomicNum() - component.GetNucCharge()) * relation_proton_neutron);
+
+    // differential cross section from Dutta et al.
+    // Phys. Rev. D 63 (2001), 094020
+    // eq. 3.11
+    // eq. 3.4
+    // \frac{d^2 \sigma}{dQ^2 dx} = \frac{4\pi\alpha^2}{Q^4} \frac{F_{2, Proton}}{v}
+    //     ( 1 - v + \frac{M x v}{2E}
+    //     - \frac{v^2}{2} (1 - \frac{2m_{particle}}{Q^2})
+    //          \frac{1 + \frac{4 M^2 x^2}{Q^2}}{1 + R})
+    double result = ME * RE / Q2;
+    result *= result * 4 * PI * structure_function_nucleus / v *
+              (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
+               (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
+                   (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
+
+    return result;
+}
 #undef Q2_PHOTO_PARAM_INTEGRAL_IMPL
