@@ -1,7 +1,7 @@
 #include "PROPOSAL/scattering/stochastic_deflection/pairProd/KelnerPairProduction.h"
 #include "PROPOSAL/Constants.h"
-#include "math.h"
-#include "random"
+#include <cmath>
+#include <random>
 #include "PROPOSAL/math/MathMethods.h" 
 
 using namespace PROPOSAL;
