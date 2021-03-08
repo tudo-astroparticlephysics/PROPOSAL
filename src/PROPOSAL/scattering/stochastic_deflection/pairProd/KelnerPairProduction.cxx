@@ -14,7 +14,7 @@ stochastic_deflection::KelnerPairProduction::CalculateStochasticDeflection(
     e_i = e_i / 1000.0;
     e_f = e_f / 1000.0;
     auto electron_mass = ME / 1000.0;
-    auto muon_mass = MMU / 1000.0;
+    auto muon_mass = mass / 1000.0;
 
     // Muon values
     auto n = -1.0;

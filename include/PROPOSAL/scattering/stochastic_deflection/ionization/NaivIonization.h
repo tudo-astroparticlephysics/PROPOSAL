@@ -18,7 +18,7 @@ namespace PROPOSAL {
             }
 
         public:
-            NaivIonization(ParticleDef p_def, Medium) : mass(p_def.mass) {};
+            NaivIonization(const ParticleDef& p_def, const Medium&) : mass(p_def.mass) {};
 
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 

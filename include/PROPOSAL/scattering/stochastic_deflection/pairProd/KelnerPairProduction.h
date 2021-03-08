@@ -8,6 +8,7 @@ namespace PROPOSAL {
                                public DefaultDeflection<KelnerPairProduction> {
 
             static constexpr int n_rnd = 2;
+            double mass;
 
             std::unique_ptr<Parametrization> clone() const final
             {
@@ -16,7 +17,8 @@ namespace PROPOSAL {
             }
 
         public:
-            KelnerPairProduction(ParticleDef, Medium) {};
+            KelnerPairProduction(const ParticleDef& p_def, const Medium&)
+                : mass(p_def.mass){};
 
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 

@@ -9,6 +9,7 @@ namespace PROPOSAL {
                                public DefaultDeflection<BorogPetrukhinNuclearInteraction> {
 
             static constexpr int n_rnd = 2;
+            double mass;
 
             std::unique_ptr<Parametrization> clone() const final
             {
@@ -17,7 +18,8 @@ namespace PROPOSAL {
             }
 
         public:
-            BorogPetrukhinNuclearInteraction(ParticleDef, Medium) {};
+            BorogPetrukhinNuclearInteraction(const ParticleDef& p_def, const Medium&)
+                : mass(p_def.mass) {};
 
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 
