@@ -1,4 +1,4 @@
-
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/math/Spherical3D.h"
 #include "PROPOSAL/version.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
@@ -335,14 +335,14 @@ PYBIND11_MODULE(proposal, m)
         /*         )pbdoc") */
 
 
-    py::class_<RandomGenerator, std::unique_ptr<RandomGenerator, py::nodelete>>(
-        m, "RandomGenerator")
-        .def("random_double", &RandomGenerator::RandomDouble)
-        .def("set_seed", &RandomGenerator::SetSeed, py::arg("seed") = 0)
-        .def("set_random_function", &RandomGenerator::SetRandomNumberGenerator,
-            py::arg("function"))
-        .def_static(
-            "get", &RandomGenerator::Get, py::return_value_policy::reference);
+     py::class_<RandomGenerator, std::unique_ptr<RandomGenerator, py::nodelete>>( 
+         m, "RandomGenerator") 
+         .def("random_double", &RandomGenerator::RandomDouble) 
+         .def("set_seed", &RandomGenerator::SetSeed, py::arg("seed") = 0) 
+         .def("set_random_function", &RandomGenerator::SetRandomNumberGenerator, 
+             py::arg("function")) 
+         .def_static( 
+             "get", &RandomGenerator::Get, py::return_value_policy::reference); 
 
     py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
         .def(py::init<ParticleDef const&, std::vector<Sector>>())

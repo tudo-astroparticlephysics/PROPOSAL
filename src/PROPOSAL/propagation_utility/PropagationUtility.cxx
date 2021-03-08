@@ -2,6 +2,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/math/Spherical3D.h"
+#include "PROPOSAL/math/Cartesian3D.h"
 #include "PROPOSAL/math/MathMethods.h"
 
 using namespace PROPOSAL;
@@ -189,7 +190,8 @@ Cartesian3D PropagationUtility::DirectionDeflect(InteractionType type,
         auto angles = collection.scattering->CalculateStochasticDeflection(
             type, initial_energy, final_energy, v_rnd);
         auto direction_new = Cartesian3D(direction);
-        direction_new.deflect(std::cos(angles[0]), angles[1]);
+        direction_new.deflect(std::cos(angles.zenith), angles.azimuth);
+        return direction_new;
     }
     return direction;
 }

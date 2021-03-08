@@ -35,6 +35,7 @@
 #include <exception>
 #include <string>
 #include <limits>
+#include "PROPOSAL/Constants.h"
 
 class MathException: public std::exception {
     public:
@@ -171,7 +172,13 @@ std::pair<double, double> welfords_online_algorithm(double& newValue, unsigned i
 /// @return         Sampled value
 
 double SampleFromGaussian(double mean, double sigma, double rnd,
-                          double min = -std::numeric_limits<double>::infinity(),
-                          double max = std::numeric_limits<double>::infinity());
+                          double min = -INF,
+                          double max = INF);
+
+
+/// @brief          Sample a value from exponential distribution with a given lambda 
+/// @param p        Random number between 0 and 1 for sampling 
+/// @param lambda   Rate parameter, lambda = 1 / beta
+double SampleFromExponential(double p, double lambda);                          
 
 } // namespace PROPOSAL

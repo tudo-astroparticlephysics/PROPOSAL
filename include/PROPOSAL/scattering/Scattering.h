@@ -47,8 +47,8 @@ class Scattering {
     }
 
 protected:
-    virtual std::array<double, 2> _scale_deflect(
-        std::array<double, 2>& a, InteractionType)
+    virtual DirectionChangeAngular _scale_deflect(
+        DirectionChangeAngular& a, InteractionType)
     {
         return a;
     }
@@ -118,13 +118,13 @@ public:
      * understanding.
      */
     template <typename... Args>
-    std::array<double, 2> CalculateStochasticDeflection(
+    DirectionChangeAngular CalculateStochasticDeflection(
         InteractionType t, Args... args)
     {
         auto it = stochastic_deflection.find(t);
         if (it != stochastic_deflection.end())
             return _stochastic_deflect(*it->second, args...);
-        return std::array<double, 2> { 0., 0. };
+        return DirectionChangeAngular { 0., 0. };
     }
 
     /**
