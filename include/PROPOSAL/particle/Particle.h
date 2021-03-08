@@ -32,7 +32,7 @@
 #include <memory>
 #include <string>
 
-#include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/math/Cartesian3D.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
 namespace PROPOSAL {
@@ -90,14 +90,14 @@ public:
                   const double&, const double&);
     ParticleState(const ParticleType&, const Vector3D&, const Vector3D&, const double&,
                   const double&, const double&);
-    virtual ~ParticleState() = default;
+    ~ParticleState() = default;
     bool operator==(const ParticleState&) const;
     bool operator!=(const ParticleState&) const;
     friend std::ostream& operator<<(std::ostream&, ParticleState const&);
 
     int type;
-    Vector3D position;  //!< position coordinates [cm]
-    Vector3D direction; //!< direction vector, angles in [rad]
+    Cartesian3D position;  //!< position coordinates [cm]
+    Cartesian3D direction; //!< direction vector, angles in [rad]
     double energy;                 //!< energy [MeV]
     double time;                   //!< age [sec]
     double propagated_distance;    //!< propagation distance [cm]
@@ -107,32 +107,35 @@ public:
     double GetMomentum() const;
     ParticleDef GetParticleDef() const;
 
-protected:
-    virtual void print(std::ostream&) const {}
+private:
+    void print(std::ostream&) const {}
 
 };
 
 struct Loss {
-    Loss(int type, double loss_energy) : type(type), loss_energy(loss_energy){};
+    Loss(int type, double energy, double parent_particle_energy)
+        : type(type), energy(energy), parent_particle_energy(parent_particle_energy) {};
     int type;
-    double loss_energy;
-};
-
-struct StochasticLoss : public Loss {
-    StochasticLoss(int, double, Vector3D, Vector3D, double, double, double);
-    Vector3D position;
-    Vector3D direction;
-    double time;
-    double propagated_distance;
+    double energy;
     double parent_particle_energy;
 };
 
+struct StochasticLoss : public Loss {
+    StochasticLoss(int, double, const Vector3D&, const Vector3D&, double, double, double);
+    Cartesian3D position;
+    Cartesian3D direction;
+    double time;
+    double propagated_distance;
+};
+
 struct ContinuousLoss : public Loss {
-    ContinuousLoss(std::pair<double, double>, std::pair<Vector3D, Vector3D>,
-            std::pair<Vector3D, Vector3D>, std::pair<double, double>);
-    std::pair<double, double> energies;
-    std::pair<Vector3D, Vector3D> positions;
-    std::pair<Vector3D, Vector3D> directions;
-    std::pair<double, double> times;
+    ContinuousLoss(double, double, const Vector3D&, double, const Vector3D&,
+            const Vector3D&, double, double);
+    Cartesian3D start_position;
+    double length;
+    Cartesian3D direction_initial;
+    Cartesian3D direction_final;
+    double time_initial;
+    double time_final;
 };
 } // namespace PROPOSAL

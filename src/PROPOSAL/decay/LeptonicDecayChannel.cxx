@@ -127,8 +127,7 @@ std::vector<ParticleState> LeptonicDecayChannelApprox::Decay(const ParticleDef& 
     double momentum_neutrinos = 0.5 * virtual_mass;
 
 
-    Vector3D direction = GenerateRandomDirection();
-    direction.CalculateSphericalCoordinates();
+    auto direction = GenerateRandomDirection();
 
     ParticleState neutrino((ParticleType)neutrino_.particle_type,
                            p_condition.position,
@@ -137,8 +136,7 @@ std::vector<ParticleState> LeptonicDecayChannelApprox::Decay(const ParticleDef& 
                            p_condition.time,
                            0.);
 
-    Vector3D opposite_direction = -direction;
-    opposite_direction.CalculateSphericalCoordinates();
+    Cartesian3D opposite_direction = -direction;
 
     ParticleState anti_neutrino((ParticleType)anti_neutrino_.particle_type,
                                 p_condition.position,

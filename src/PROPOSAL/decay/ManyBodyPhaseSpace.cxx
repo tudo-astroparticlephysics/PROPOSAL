@@ -148,13 +148,12 @@ std::vector<ParticleState> ManyBodyPhaseSpace::Decay(const ParticleDef& p_def, c
 void ManyBodyPhaseSpace::GenerateEvent(std::vector<ParticleState>& products, const PhaseSpaceKinematics& kinematics)
 {
     // Calculate first momentum in R2
-    Vector3D direction = GenerateRandomDirection();
+    Cartesian3D direction = GenerateRandomDirection();
 
     products[1].direction = direction;
     products[1].SetMomentum(kinematics.momenta[0]);
 
-    Vector3D opposite_direction = -direction;
-    opposite_direction.CalculateSphericalCoordinates();
+    Cartesian3D opposite_direction = -direction;
     products[0].direction = opposite_direction;
     products[0].SetMomentum(kinematics.momenta[0]);
 

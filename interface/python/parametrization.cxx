@@ -38,7 +38,7 @@
     py::class_<crosssection::Epair##cls,                                       \
     std::shared_ptr<crosssection::Epair##cls>,                                 \
     crosssection::EpairProductionRhoIntegral>(module, #cls)                    \
-    .def(py::init<bool>(), py::arg("lpm_effect") = false)                      \
+    .def(py::init<bool>(), py::arg("lpm") = false)                      \
     .def(py::init<bool, const ParticleDef&, const Medium&, double>(),           \
     py::arg("lpm"), py::arg("particle_def"), py::arg("medium"),                \
     py::arg("density_correction") = 1.0);
@@ -184,7 +184,7 @@ void init_parametrization(py::module& m)
                 medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges
                 energy_cuts (:meth:`~proposal.EnergyCutSettings`): energy cut setting for the parametrization
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
-                lpm_effect (bool): Enable or disable the corrections due to the Ter-Mikaelian and Landau-Pomeranchuk effect.
+                lpm (bool): Enable or disable the corrections due to the Ter-Mikaelian and Landau-Pomeranchuk effect.
 
             The following parametrizations are currently implemented:
 
@@ -242,7 +242,7 @@ void init_parametrization(py::module& m)
                 medium (:meth:`~proposal.medium`): includes all medium information for the parametrization such as densities or nucleon charges
                 energy_cuts (:meth:`~proposal.EnergyCutSettings`): energy cut setting for the parametrization
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
-                lpm_effect (bool): Enable or disable the corrections due to the Ter-Mikaelian and Landau-Pomeranchuk effect.
+                lpm (bool): Enable or disable the corrections due to the Ter-Mikaelian and Landau-Pomeranchuk effect.
                 interpolation_def (:meth:`~proposal.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation
 
             Since the differential cross section is given in :math:`\rho` as well, an intergration over this parameter is needed.
@@ -276,7 +276,9 @@ void init_parametrization(py::module& m)
         crosssection::EpairProduction>(
                 m_sub_epair, "EpairProductionRhoIntegral")
             .def("function_to_integral",
-                    &crosssection::EpairProductionRhoIntegral::FunctionToIntegral);
+                    &crosssection::EpairProductionRhoIntegral::FunctionToIntegral,
+                    py::arg("particle_def"), py::arg("component"), py::arg("energy"),
+                    py::arg("v"), py::arg("rho"));
 
         EPAIR_DEF(m_sub_epair, KelnerKokoulinPetrukhin)
         EPAIR_DEF(m_sub_epair, SandrockSoedingreksoRhode)
@@ -369,7 +371,9 @@ void init_parametrization(py::module& m)
         crosssection::MupairProduction>(
                 m_sub_mupair, "MupairProductionRhoIntegral")
             .def("function_to_integral",
-                    &crosssection::MupairProductionRhoIntegral::FunctionToIntegral);
+                    &crosssection::MupairProductionRhoIntegral::FunctionToIntegral,
+                    py::arg("particle_def"), py::arg("component"), py::arg("energy"),
+                    py::arg("v"), py::arg("rho"));
 
     MUPAIR_DEF(m_sub_mupair, KelnerKokoulinPetrukhin)
 

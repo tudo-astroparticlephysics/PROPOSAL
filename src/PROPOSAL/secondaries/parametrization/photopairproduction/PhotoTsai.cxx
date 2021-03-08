@@ -123,8 +123,8 @@ double secondaries::PhotoTsai::CalculateRho(
     throw std::out_of_range(s.str());
 }
 
-std::tuple<Vector3D, Vector3D> secondaries::PhotoTsai::CalculateDirections(
-    Vector3D dir, double energy, double rho, const Component& comp,
+std::tuple<Cartesian3D, Cartesian3D> secondaries::PhotoTsai::CalculateDirections(
+    const Vector3D& dir, double energy, double rho, const Component& comp,
     std::vector<double> rnd)
 {
     auto subst = std::max(1., std::log10(energy));
@@ -147,9 +147,9 @@ std::tuple<Vector3D, Vector3D> secondaries::PhotoTsai::CalculateDirections(
         cosphi0 *= (-1);
     if (cosphi1 == -1.)
         cosphi1 *= (-1);
-    auto dir_0 = dir;
+    auto dir_0 = Cartesian3D(dir);
     dir_0.deflect(cosphi0, theta0);
-    auto dir_1 = dir;
+    auto dir_1 = Cartesian3D(dir);
     dir_1.deflect(cosphi1, theta1);
     return make_tuple(dir_0, dir_1);
 }

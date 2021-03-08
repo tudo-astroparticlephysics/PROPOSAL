@@ -183,8 +183,8 @@ TEST(DecaySpectrum, MuMinus_Rest){
     double max_energy = gamma * v_max + betagamma * std::sqrt( std::pow(v_max, 2) - std::pow(p0.mass,2));
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0.;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
@@ -236,8 +236,8 @@ TEST(DecaySpectrum, MuMinus_Rest){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
@@ -294,8 +294,8 @@ TEST(DecaySpectrum, MuMinus_Rest){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);
@@ -384,8 +384,8 @@ TEST(DecaySpectrum, MuMinus_Energy){
     double max_energy = gamma * v_max + betagamma * std::sqrt( std::pow(v_max, 2) - std::pow(p0.mass,2));
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
@@ -438,8 +438,8 @@ TEST(DecaySpectrum, MuMinus_Energy){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
@@ -496,8 +496,8 @@ TEST(DecaySpectrum, MuMinus_Energy){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);
@@ -585,8 +585,8 @@ TEST(DecaySpectrum, TauMinus_Rest){
     double max_energy = gamma * v_max + betagamma * std::sqrt( std::pow(v_max, 2) - std::pow(p0.mass,2));
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
@@ -638,8 +638,8 @@ TEST(DecaySpectrum, TauMinus_Rest){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
@@ -696,8 +696,8 @@ TEST(DecaySpectrum, TauMinus_Rest){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);
@@ -786,8 +786,8 @@ TEST(DecaySpectrum, TauMinus_energy){
     double max_energy = gamma * v_max + betagamma * std::sqrt( std::pow(v_max, 2) - std::pow(p0.mass,2));
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;
         auto aux = lep_approx.Decay(init_particle_def, init_particle);
@@ -839,8 +839,8 @@ TEST(DecaySpectrum, TauMinus_energy){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;
         auto aux = lep.Decay(init_particle_def, init_particle);
@@ -897,8 +897,8 @@ TEST(DecaySpectrum, TauMinus_energy){
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for(int i=0; i<statistic; i++){
-        init_particle.direction = Vector3D(0, 0, -1);
-        init_particle.position = Vector3D(0, 0, -1);
+        init_particle.direction = Cartesian3D(0, 0, -1);
+        init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
         init_particle.propagated_distance = 0;
         auto aux = many_body.Decay(init_particle_def, init_particle);

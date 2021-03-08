@@ -5,6 +5,7 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/math/Cartesian3D.h"
 
 #include <memory>
 #include <vector>
@@ -109,17 +110,17 @@ ParticleState Secondaries::GetStateForDistance(double propagated_distance) const
     return track_.back();
 }
 
-std::vector<Vector3D> Secondaries::GetTrackPositions() const
+std::vector<Cartesian3D> Secondaries::GetTrackPositions() const
 {
-    std::vector<Vector3D> vec;
+    std::vector<Cartesian3D> vec;
     for (auto i : track_)
         vec.emplace_back(i.position);
     return vec;
 }
 
-std::vector<Vector3D> Secondaries::GetTrackDirections() const
+std::vector<Cartesian3D> Secondaries::GetTrackDirections() const
 {
-    std::vector<Vector3D> vec;
+    std::vector<Cartesian3D> vec;
     for (auto i : track_)
         vec.emplace_back(i.direction);
     return vec;
@@ -156,7 +157,7 @@ double Secondaries::GetELost(const Geometry& geometry) const
     return entry_point->energy - exit_point->energy;
 }
 
-std::unique_ptr<ParticleState> Secondaries::GetEntryPoint(
+std::shared_ptr<ParticleState> Secondaries::GetEntryPoint(
         const Geometry& geometry) const
 {
     auto pos_0 = track_.front().position;
@@ -183,7 +184,7 @@ std::unique_ptr<ParticleState> Secondaries::GetEntryPoint(
     return nullptr; // No entry point found
 }
 
-std::unique_ptr<ParticleState> Secondaries::GetExitPoint(
+std::shared_ptr<ParticleState> Secondaries::GetExitPoint(
         const Geometry &geometry) const
 {
     auto pos_end = track_.back().position;
@@ -217,7 +218,7 @@ std::unique_ptr<ParticleState> Secondaries::GetExitPoint(
     return nullptr; // No exit point found
 }
 
-std::unique_ptr<ParticleState> Secondaries::GetClosestApproachPoint(const Geometry& geometry) const
+std::shared_ptr<ParticleState> Secondaries::GetClosestApproachPoint(const Geometry& geometry) const
 {
     for (unsigned int i = 0; i < track_.size(); i++) {
         auto sec_pos = track_.at(i).position;
@@ -244,7 +245,6 @@ ParticleState Secondaries::RePropagateEnergy(const ParticleState& init,
                                              double energy_lost,
                                              double max_distance) const
 {
-    std::cout << init.energy << ", " << init.propagated_distance << std::endl;
     auto current_sector = GetCurrentSector(init.position,
                                            init.direction);
     auto& utility = get<Propagator::UTILITY>(current_sector);
@@ -265,7 +265,6 @@ ParticleState Secondaries::RePropagateEnergy(const ParticleState& init,
             init.energy, E_f, displacement ,density->Evaluate(init.position));
     auto new_position = init.position + init.direction * displacement;
     auto new_propagated_distance = init.propagated_distance + displacement;
-    std::cout << E_f << ", " << new_propagated_distance << std::endl;
 
     return ParticleState((ParticleType)primary_def_->particle_type, new_position,
                          init.direction, E_f, new_time, new_propagated_distance);
@@ -396,12 +395,11 @@ std::vector<ContinuousLoss> Secondaries::GetContinuousLosses() const
     std::vector<ContinuousLoss> losses;
     for (unsigned int i=1; i<track_.size(); i++) {
         if (types_[i] == InteractionType::ContinuousEnergyLoss) {
-            losses.emplace_back(
-                    std::make_pair(track_[i-1].energy, track_[i].energy),
-                    std::make_pair(track_[i-1].position, track_[i].position),
-                    std::make_pair(track_[i-1].direction, track_[i].direction),
-                    std::make_pair(track_[i-1].time, track_[i].time)
-                    );
+            losses.emplace_back( track_[i].energy - track_[i-1].energy,
+                                 track_[i-1].energy, track_[i-1].position,
+                                 (track_[i].position - track_[i-1].position).magnitude(),
+                                 track_[i-1].direction, track_[i].direction,
+                                 track_[i-1].time, track_[i].time);
         }
     }
     return losses;
@@ -418,11 +416,11 @@ std::vector<ContinuousLoss> Secondaries::GetContinuousLosses(const Geometry& geo
         if (geometry.IsInside(track_[i].position, track_[i].direction)) {
             if (types_[i] == InteractionType::ContinuousEnergyLoss) {
                 losses.emplace_back(
-                        std::make_pair(track_[i-1].energy, track_[i].energy),
-                        std::make_pair(track_[i-1].position, track_[i].position),
-                        std::make_pair(track_[i-1].direction, track_[i].direction),
-                        std::make_pair(track_[i-1].time, track_[i].time)
-                        );
+                        track_[i].energy - track_[i-1].energy,
+                        track_[i-1].energy, track_[i-1].position,
+                        (track_[i].position - track_[i-1].position).magnitude(),
+                        track_[i-1].direction, track_[i].direction,
+                        track_[i-1].time, track_[i].time);
             }
         }
     }

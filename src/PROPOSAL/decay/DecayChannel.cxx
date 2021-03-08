@@ -1,5 +1,7 @@
 
 #include <cmath>
+#include <string>
+#include <sstream>
 #include <iostream>
 
 #include "PROPOSAL/decay/DecayChannel.h"
@@ -51,21 +53,20 @@ std::ostream& operator<<(std::ostream& os, DecayChannel const& channel)
 // ------------------------------------------------------------------------- //
 void DecayChannel::Boost(ParticleState& particle, const Vector3D& direction_unnormalized, double gamma, double betagamma)
 {
-    Vector3D direction = direction_unnormalized;
-    direction.normalise();
+    Cartesian3D direction = direction_unnormalized;
+    direction.normalize();
 
-    Vector3D momentum_vec(particle.GetMomentum() * particle.direction);
+    Cartesian3D momentum_vec(particle.GetMomentum() * particle.direction);
 
     double direction_correction =
-        (gamma - 1.0) * scalar_product(momentum_vec, direction) - betagamma * particle.energy;
+        (gamma - 1.0) * (momentum_vec * direction) - betagamma * particle.energy;
 
     momentum_vec = momentum_vec + direction_correction * direction;
 
     // Energy will be implicit corrected with respect to the mass:
     particle.SetMomentum(momentum_vec.magnitude());
 
-    momentum_vec.normalise();
-    momentum_vec.CalculateSphericalCoordinates();
+    momentum_vec.normalize();
     particle.direction = momentum_vec;
 }
 
@@ -105,14 +106,12 @@ double DecayChannel::Momentum(double m1, double m2, double m3)
 }
 
 // ------------------------------------------------------------------------- //
-Vector3D DecayChannel::GenerateRandomDirection()
+Cartesian3D DecayChannel::GenerateRandomDirection()
 {
     double phi       = 2.0 * PI * RandomGenerator::Get().RandomDouble();
     double cos_theta = 2.0 * RandomGenerator::Get().RandomDouble() - 1.0;
     double sin_theta = std::sqrt((1.0 - cos_theta) * (1.0 + cos_theta));
-    Vector3D direction = Vector3D(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta);
-    direction.CalculateSphericalCoordinates();
-    // direction.SetSphericalCoordinates(1.0, phi, std::acos(cos_theta));
+    Cartesian3D direction(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta);
     return direction;
 }
 

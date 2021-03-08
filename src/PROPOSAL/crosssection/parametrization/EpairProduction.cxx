@@ -156,7 +156,7 @@ double crosssection::EpairProductionRhoIntegral::DifferentialCrossSection(
         return FunctionToIntegral(p_def, comp, energy, v, r);
     };
 
-    return NA / comp.GetAtomicNum() * p_def.charge * p_def.charge
+    return NA / comp.GetAtomicNum()
         * (integral.Integrate(1 - rMax, aux, func, 2)
               + integral.Integrate(aux, 1, func, 4));
 }

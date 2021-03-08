@@ -25,8 +25,8 @@ std::shared_ptr<Propagator> GetPropagator() {
         auto prop_utility = PropagationUtility(collection);
 
         auto density_distr = std::make_shared<Density_homogeneous>(medium);
-        auto world = std::make_shared<Sphere>(Vector3D(0, 0, 0), 1e20);
-        auto sphere = std::make_shared<Sphere>(Vector3D(0, 0, 10000), 1000);
+        auto world = std::make_shared<Sphere>(Cartesian3D(0, 0, 0), 1e20);
+        auto sphere = std::make_shared<Sphere>(Cartesian3D(0, 0, 10000), 1000);
 
         auto sector1 = std::make_tuple(world, prop_utility, density_distr);
         auto sector2 = std::make_tuple(sphere, prop_utility, density_distr);
@@ -41,36 +41,36 @@ TEST(SecondaryVector, EntryPointExitPoint)
 {
     auto prop = GetPropagator();
 
-    Vector3D position(0, 0, 0);
-    Vector3D direction(0, 0, 1);
+    Cartesian3D position(0, 0, 0);
+    Cartesian3D direction(0, 0, 1);
     auto energy = 1e8; // MeV
     auto init_state = ParticleState(position, direction, energy, 0., 0.);
 
     auto secondaries = prop->Propagate(init_state, 50000);
 
     // Test for geometry in front of track
-    auto sphere_infront = Sphere(Vector3D(0, 0, -1000), 10);
+    auto sphere_infront = Sphere(Cartesian3D(0, 0, -1000), 10);
     EXPECT_TRUE(secondaries.GetEntryPoint(sphere_infront) == nullptr);
     EXPECT_TRUE(secondaries.GetExitPoint(sphere_infront) == nullptr);
 
     // Test for geometry behin track
-    auto sphere_behind = Sphere(Vector3D(0, 0, 100000), 10);
+    auto sphere_behind = Sphere(Cartesian3D(0, 0, 100000), 10);
     EXPECT_TRUE(secondaries.GetEntryPoint(sphere_behind) == nullptr);
     EXPECT_TRUE(secondaries.GetExitPoint(sphere_behind) == nullptr);
 
     // Test for track beginning in geometry
-    auto sphere_start = Sphere(Vector3D(0, 0, 100), 100);
+    auto sphere_start = Sphere(Cartesian3D(0, 0, 100), 100);
     EXPECT_TRUE(secondaries.GetEntryPoint(sphere_start)->energy == energy);
     EXPECT_TRUE(secondaries.GetEntryPoint(sphere_start)->position == position);
 
     // Test for track ending in geometry
-    auto sphere_end = Sphere(Vector3D(0, 0, 49000), 1000);
+    auto sphere_end = Sphere(Cartesian3D(0, 0, 49000), 1000);
     EXPECT_TRUE(secondaries.GetExitPoint(sphere_end)->energy == secondaries.back().energy);
     EXPECT_TRUE(secondaries.GetExitPoint(sphere_end)->propagated_distance == secondaries.back().propagated_distance);
     EXPECT_TRUE(secondaries.GetExitPoint(sphere_end)->position == secondaries.back().position);
 
     // Test points where interaction points should be equal to entry/exit points
-    auto sphere = Sphere(Vector3D(0, 0, 10000), 1000);
+    auto sphere = Sphere(Cartesian3D(0, 0, 10000), 1000);
     EXPECT_TRUE(secondaries.GetEntryPoint(sphere)->propagated_distance == 9000);
     EXPECT_TRUE(secondaries.GetExitPoint(sphere)->propagated_distance == 11000);
 }
@@ -79,14 +79,14 @@ TEST(SecondaryVector, EntryPointExitPointRePropagation)
 {
     auto prop = GetPropagator();
 
-    Vector3D position(0, 0, 0);
-    Vector3D direction(0, 0, 1);
+    Cartesian3D position(0, 0, 0);
+    Cartesian3D direction(0, 0, 1);
     auto energy = 1e8; // MeV
     auto init_state = ParticleState(position, direction, energy, 0., 0.);
 
     auto secondaries = prop->Propagate(init_state, 1e5);
 
-    auto sphere = Sphere(Vector3D(0, 0, 5e4), 500);
+    auto sphere = Sphere(Cartesian3D(0, 0, 5e4), 500);
     auto entry_point = secondaries.GetEntryPoint(sphere);
     auto exit_point = secondaries.GetExitPoint(sphere);
     int i = 0;

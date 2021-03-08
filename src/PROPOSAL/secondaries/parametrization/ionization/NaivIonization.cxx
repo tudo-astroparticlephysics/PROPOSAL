@@ -13,10 +13,10 @@ using namespace PROPOSAL;
 
 
 
-std::tuple<Vector3D, Vector3D> secondaries::NaivIonization::CalculateDirections(
-    Vector3D dir, double, double, double)
+std::tuple<Cartesian3D, Cartesian3D> secondaries::NaivIonization::CalculateDirections(
+    const Vector3D& dir, double, double, double)
 {
-    return make_tuple(dir, dir);
+    return make_tuple(Cartesian3D(dir), Cartesian3D(dir));
 }
 
 std::tuple<double, double> secondaries::NaivIonization::CalculateEnergy(
@@ -28,9 +28,9 @@ std::tuple<double, double> secondaries::NaivIonization::CalculateEnergy(
 std::vector<ParticleState> secondaries::NaivIonization::CalculateSecondaries(
     StochasticLoss loss, const Component&, std::vector<double> &rnd)
 {
-    auto v = loss.loss_energy / loss.parent_particle_energy;
+    auto v = loss.energy / loss.parent_particle_energy;
     auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, v);
-    auto secondary_dir = CalculateDirections( loss.direction, loss.loss_energy,
+    auto secondary_dir = CalculateDirections( loss.direction, loss.energy,
                                               v, rnd[1]);
 
     auto sec = std::vector<ParticleState>();

@@ -41,11 +41,11 @@ double secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateRho(
     }
 }
 
-std::tuple<Vector3D, Vector3D>
+std::tuple<Cartesian3D, Cartesian3D>
 secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateDirections(
-        Vector3D primary_dir, double, double, double)
+        const Vector3D& primary_dir, double, double, double)
 {
-    return make_tuple(primary_dir, primary_dir);
+    return make_tuple(Cartesian3D(primary_dir), Cartesian3D(primary_dir));
 }
 
 std::tuple<double, double>
@@ -61,16 +61,16 @@ std::vector<ParticleState>
 secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateSecondaries(
         StochasticLoss loss, const Component& comp, std::vector<double> &rnd)
 {
-    auto v = loss.loss_energy / loss.parent_particle_energy;
+    auto v = loss.energy / loss.parent_particle_energy;
     auto rho = CalculateRho(loss.parent_particle_energy, v, comp, rnd[0], rnd[1]);
-    auto secondary_energies = CalculateEnergy(loss.loss_energy, rho);
-    auto secondary_dir = CalculateDirections(loss.direction, loss.loss_energy,
+    auto secondary_energies = CalculateEnergy(loss.energy, rho);
+    auto secondary_dir = CalculateDirections(loss.direction, loss.energy,
                                              rho, rnd[2]);
 
     auto sec = std::vector<ParticleState>();
     sec.emplace_back(static_cast<const ParticleType>(p_def.particle_type),
                      loss.position, loss.direction,
-                     loss.parent_particle_energy - loss.loss_energy, loss.time,
+                     loss.parent_particle_energy - loss.energy, loss.time,
                      loss.propagated_distance);
 
     sec.emplace_back(ParticleType::EMinus, loss.position, get<0>(secondary_dir),

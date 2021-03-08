@@ -1,9 +1,8 @@
 
-#include <algorithm>
 #include <functional>
-#include <iostream>
 #include "PROPOSAL/density_distr/density_splines.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/math/Cartesian3D.h"
 using namespace PROPOSAL;
 
 Density_splines::Density_splines(const Axis& axis, const Spline& splines, double massDensity)
@@ -61,20 +60,16 @@ double Density_splines::helper_function(const Vector3D& xi,
                                         double res,
                                         double l) const {
     (void)res;
-    return Evaluate(xi) - Evaluate(xi + l * direction);
+    auto dir_cartesian = Cartesian3D(direction);
+    return Evaluate(xi) - Evaluate(xi + l * dir_cartesian);
 }
 
 double Density_splines::Correct(const Vector3D& xi,
                                 const Vector3D& direction,
                                 double res,
                                 double distance_to_border) const {
-    std::function<double(double)> F =
-        std::bind(&Density_splines::Helper_function, this, xi, direction, res,
-                  std::placeholders::_1);
-
-    std::function<double(double)> dF =
-        std::bind(&Density_splines::helper_function, this, xi, direction, res,
-                  std::placeholders::_1);
+    auto F = [&](double l) {return Helper_function(xi, direction, res, l);};
+    auto dF = [&](double l) {return helper_function(xi, direction, res, l);};
 
     try {
         res =
