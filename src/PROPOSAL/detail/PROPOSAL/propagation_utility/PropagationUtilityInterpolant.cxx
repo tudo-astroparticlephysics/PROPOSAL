@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "CubicInterpolation/Interpolant.h"
+#include "CubicInterpolation/FindParameter.hpp"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include "PROPOSAL/methods.h"
@@ -84,10 +85,13 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
         rnd = -rnd;
 
     auto integrated_to_upper = interpolant_->evaluate(upper_limit);
-    auto x_guess = cubic_splines::find_parameter(
-        *interpolant_, integrated_to_upper - rnd, NAN);
+    auto initial_guess = cubic_splines::ParameterGuess<double> {
+        .x = NAN, .upper = upper_limit
+    };
 
-    return x_guess;
+    return cubic_splines::find_parameter(
+        *interpolant_, integrated_to_upper - rnd, initial_guess);
+
     // TODO: Check whether this is already accurate enough
     // (see e.g. version at a81e54f62f4383936cb046da4cad7429a48bb750 for old
     // version)

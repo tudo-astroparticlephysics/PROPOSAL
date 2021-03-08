@@ -81,7 +81,7 @@ inline auto make_multiple_scattering(MultipleScatteringType t,
     case MultipleScatteringType::HighlandIntegral:
         return make_highland_integral(p, m, std::forward<Args>(args)...);
     default:
-        make_multiple_scattering(t, p, m);
+        return make_multiple_scattering(t, p, m);
     }
 }
 

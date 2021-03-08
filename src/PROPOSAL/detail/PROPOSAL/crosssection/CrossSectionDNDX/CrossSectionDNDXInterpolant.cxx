@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "CubicInterpolation/Axis.h"
-
+#include "CubicInterpolation/FindParameter.hpp"
 using namespace PROPOSAL;
 
 namespace PROPOSAL {
@@ -56,7 +56,11 @@ double CrossSectionDNDXInterpolant::GetUpperLimit(double energy, double rate)
     if (energy < lower_energy_lim)
         throw std::invalid_argument("no dNdx for this energy defined.");
     auto lim = GetIntegrationLimits(energy);
-    auto guess = std::array<double, 2> { energy, NAN };
-    auto v = cubic_splines::find_parameter(interpolant, rate, guess, 1);
+
+    auto initial_guess = cubic_splines::ParameterGuess<std::array<double, 2>>{
+        .x = {energy, NAN}, .n = 1,
+        };
+
+    auto v = cubic_splines::find_parameter(interpolant, rate, initial_guess);
     return transform_relativ_loss(lim.min, lim.max, v);
 }
