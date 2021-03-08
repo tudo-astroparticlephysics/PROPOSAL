@@ -2,6 +2,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/math/Spherical3D.h"
+#include "PROPOSAL/math/Cartesian3D.h"
 #include "PROPOSAL/math/MathMethods.h"
 
 using namespace PROPOSAL;

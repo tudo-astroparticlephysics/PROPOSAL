@@ -71,6 +71,23 @@ TEST(SampleFromGaussian, Inf){
     EXPECT_DOUBLE_EQ(mean, sampled);
 }
 
+TEST(SampleFromExponential, Momenta){
+    RandomGenerator::Get().SetSeed(24601);
+    double lambda = 10;
+    double mean = 1./lambda;
+    double sigma = 1./lambda;
+    int statistics = 1e7;
+    auto average = std::pair<double, double>{0., 0.};
+
+    for(unsigned int n=1; n<=statistics; n++){
+        double sampled = SampleFromExponential(RandomGenerator::Get().RandomDouble(), lambda);
+        average = welfords_online_algorithm(sampled, n, average.first, average.second);
+    }
+    EXPECT_NEAR(average.first, mean, 1e-3 * mean);
+    EXPECT_NEAR(std::sqrt(average.second), sigma, 1e-3 * sigma);
+
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
