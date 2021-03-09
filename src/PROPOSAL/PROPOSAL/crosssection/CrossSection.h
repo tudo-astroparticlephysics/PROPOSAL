@@ -52,7 +52,9 @@ struct CrossSectionBase {
     virtual double CalculatedNdx(double) = 0;
     virtual double CalculatedNdx(double, size_t) = 0;
     virtual double CalculateCumulativeCrosssection(double, size_t, double) = 0;
-    virtual std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(double) = 0;
+    virtual std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(
+        double)
+        = 0;
     virtual double CalculateStochasticLoss(size_t, double, double) = 0;
     virtual double GetLowerEnergyLim() const = 0;
     virtual size_t GetHash() const noexcept = 0;
@@ -71,7 +73,8 @@ namespace detail {
         size_t hash = 0)
     {
         using dndx_ptr_t = std::unique_ptr<CrossSectionDNDX>;
-        using dndx_map_t = std::unordered_map<size_t, std::tuple<double, dndx_ptr_t>>;
+        using dndx_map_t
+            = std::unordered_map<size_t, std::tuple<double, dndx_ptr_t>>;
         if (cut)
             if (cut->GetEcut() == INF and cut->GetVcut() == 1)
                 return std::unique_ptr<dndx_map_t>();
@@ -84,18 +87,22 @@ namespace detail {
     template <typename Param>
     inline auto build_dndx(std::true_type, bool interpol, Param param,
         ParticleDef p, Medium m, std::shared_ptr<const EnergyCutSettings> cut,
-        size_t hash = 0) {
+        size_t hash = 0)
+    {
         using dndx_ptr_t = std::unique_ptr<CrossSectionDNDX>;
-        using dndx_map_t = std::unordered_map<size_t, std::tuple<double, dndx_ptr_t>>;
-        if (cut) // TODO: is this branch realy necessary, why is a dndx created for these settings?
+        using dndx_map_t
+            = std::unordered_map<size_t, std::tuple<double, dndx_ptr_t>>;
+        if (cut) // TODO: is this branch realy necessary, why is a dndx created
+                 // for these settings?
             if (cut->GetEcut() == INF and cut->GetVcut() == 1)
                 return std::unique_ptr<dndx_map_t>();
         auto dndx_map = std::make_unique<dndx_map_t>();
-        for (auto &c : m.GetComponents()) {
+        for (auto& c : m.GetComponents()) {
             auto comp_hash = c.GetHash();
             auto weight = weight_component(m, c);
             auto calc = make_dndx(interpol, param, p, c, cut, hash);
-            dndx_map->emplace(comp_hash, std::make_tuple(weight, std::move(calc)));
+            dndx_map->emplace(
+                comp_hash, std::make_tuple(weight, std::move(calc)));
         }
         return dndx_map;
     }
@@ -105,10 +112,13 @@ namespace detail {
     inline auto _build_dedx(Cont container, std::true_type, bool interpol,
         T1&& param, T2&& p_def, T3 const& target, Args&&... args)
     {
-        for (auto& c : target.GetComponents())
-            container->emplace_back(weight_component(target, c),
-                make_dedx(interpol, std::forward<T1>(param),
-                    std::forward<T2>(p_def), c, args...));
+        for (auto& c : target.GetComponents()) {
+            auto weight_comp = weight_component(target, c);
+            auto dedx = make_dedx(interpol, std::forward<T1>(param),
+                std::forward<T2>(p_def), c, args...);
+            if (dedx)
+                container->emplace_back(weight_comp, std::move(dedx));
+        }
     }
 
     template <typename Cont, typename T1, typename T2, typename T3,
@@ -116,9 +126,11 @@ namespace detail {
     inline auto _build_dedx(Cont container, std::false_type, bool interpol,
         T1&& param, T2&& p_def, T3 const& target, Args&&... args)
     {
-        container->emplace_back(1.,
-            make_dedx(interpol, std::forward<T1>(param),
-                std::forward<T2>(p_def), target, args...));
+        auto weight_comp = 1.;
+        auto dedx = make_dedx(interpol, std::forward<T1>(param),
+            std::forward<T2>(p_def), target, args...);
+        if (dedx)
+            container->emplace_back(weight_comp, std::move(dedx));
     }
 
     template <typename Type, typename T1, typename T2, typename T3, typename T4,
@@ -193,7 +205,8 @@ namespace detail {
         std::vector<std::tuple<double, std::unique_ptr<CrossSectionDEDX>>>*);
 
     std::shared_ptr<spdlog::logger> init_logger(std::string const&, size_t,
-        ParticleDef const&, Medium const&, std::shared_ptr<const EnergyCutSettings>);
+        ParticleDef const&, Medium const&,
+        std::shared_ptr<const EnergyCutSettings>);
 }
 
 template <typename comp_wise, typename only_stochastic>
@@ -273,9 +286,12 @@ public:
         return 0.;
     };
 
-    double CalculateCumulativeCrosssection(double E, size_t hash, double v) override {
+    double CalculateCumulativeCrosssection(
+        double E, size_t hash, double v) override
+    {
         if (dndx)
-            return std::get<1>((*dndx)[hash])->Calculate(E, v) / std::get<0>((*dndx)[hash]);
+            return std::get<1>((*dndx)[hash])->Calculate(E, v)
+                / std::get<0>((*dndx)[hash]);
         return 0.;
     }
 
@@ -309,7 +325,8 @@ public:
         // for (auto& [weight, calc] : *dedx)
         //     loss += calc->Calculate(energy) / weight;
         for (auto& weight_calc : *dedx)
-            loss += std::get<1>(weight_calc)->Calculate(energy) / std::get<0>(weight_calc);
+            loss += std::get<1>(weight_calc)->Calculate(energy)
+                / std::get<0>(weight_calc);
         return loss;
     }
 
@@ -322,7 +339,8 @@ public:
         // for (auto& [weight, calc] : *de2dx)
         //     loss += calc->Calculate(energy) / weight;
         for (auto& weight_calc : *de2dx)
-            loss += std::get<1>(weight_calc)->Calculate(energy) / std::get<0>(weight_calc);
+            loss += std::get<1>(weight_calc)->Calculate(energy)
+                / std::get<0>(weight_calc);
         return loss;
     }
 
