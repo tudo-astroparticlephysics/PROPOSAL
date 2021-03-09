@@ -87,7 +87,7 @@ namespace detail {
         size_t hash = 0) {
         using dndx_ptr_t = std::unique_ptr<CrossSectionDNDX>;
         using dndx_map_t = std::unordered_map<size_t, std::tuple<double, dndx_ptr_t>>;
-        if (cut)
+        if (cut) // TODO: is this branch realy necessary, why is a dndx created for these settings?
             if (cut->GetEcut() == INF and cut->GetVcut() == 1)
                 return std::unique_ptr<dndx_map_t>();
         auto dndx_map = std::make_unique<dndx_map_t>();
