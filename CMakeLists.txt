@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(PROPOSAL VERSION 6.1.5 LANGUAGES CXX)
+project(PROPOSAL VERSION 6.1.6 LANGUAGES CXX)
 
 
 IF(I3_PROJECTS)
