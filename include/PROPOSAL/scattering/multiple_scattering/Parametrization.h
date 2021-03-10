@@ -33,6 +33,17 @@
 
 namespace PROPOSAL {
 namespace multiple_scattering {
+
+    struct ScatteringAngles {
+        ScatteringAngles() : s_phi(0.), s_theta(0.), t_phi(0.), t_theta(0.) {};
+        // mean_direction:
+        double s_phi;
+        double s_theta;
+        // final direction:
+        double t_phi;
+        double t_theta;
+    };
+
     class Parametrization {
     protected:
         double mass;
@@ -47,9 +58,7 @@ namespace multiple_scattering {
         virtual bool compare(const Parametrization&) const = 0;
         virtual void print(std::ostream&) const = 0;
 
-        enum { SX, SY, TX, TY };
-
-        virtual std::array<double, 4> CalculateRandomAngle(double grammage,
+        virtual ScatteringAngles CalculateRandomAngle(double grammage,
             double ei, double ef, const std::array<double, 4>& rnd)
             = 0;
 

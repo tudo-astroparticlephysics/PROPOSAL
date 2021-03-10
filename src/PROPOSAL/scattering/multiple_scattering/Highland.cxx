@@ -66,7 +66,7 @@ double Highland::CalculateTheta0(double grammage, double ei, double ef)
 
 //----------------------------------------------------------------------------//
 
-std::array<double, 4> Highland::CalculateRandomAngle(
+ScatteringAngles Highland::CalculateRandomAngle(
     double grammage, double ei, double ef, const std::array<double, 4>& rnd)
 {
     auto Theta0 = CalculateTheta0(grammage, ei, ef);
@@ -83,5 +83,11 @@ std::array<double, 4> Highland::CalculateRandomAngle(
     auto sy = 0.5 * (rnd1 / SQRT3 + rnd2);
     auto ty = rnd2;
 
-    return std::array<double, 4> { sx, sy, tx, ty };
+    multiple_scattering::ScatteringAngles angles{};
+    angles.s_phi = std::asin(std::sqrt(sx * sx + sy * sy));
+    angles.s_theta = std::atan2(sy, sx);
+    angles.t_phi = std::asin(std::sqrt(tx * tx + ty * ty));
+    angles.t_theta = std::atan2(ty, tx);
+
+    return angles;
 }

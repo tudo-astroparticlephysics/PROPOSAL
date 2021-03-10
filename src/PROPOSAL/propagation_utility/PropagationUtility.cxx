@@ -145,32 +145,11 @@ std::tuple<Cartesian3D, Cartesian3D> PropagationUtility::DirectionsScatter(
         auto random_angles = collection.scattering->CalculateMultipleScattering(
             displacement, initial_energy, final_energy, random_numbers);
 
-        auto& sx = random_angles[multiple_scattering::Parametrization::SX];
-        auto& sy = random_angles[multiple_scattering::Parametrization::SY];
-        auto& tx = random_angles[multiple_scattering::Parametrization::TX];
-        auto& ty = random_angles[multiple_scattering::Parametrization::TY];
-        auto sz = std::sqrt(std::max(1. - (sx * sx + sy * sy), 0.));
-        auto tz = std::sqrt(std::max(1. - (tx * tx + ty * ty), 0.));
+        auto mean_direction = Cartesian3D(direction);
+        mean_direction.deflect(std::cos(random_angles.s_phi), random_angles.s_theta);
 
-        auto direction_spherical = Spherical3D(direction);
-        auto sinth = std::sin(direction_spherical.GetZenith());
-        auto costh = std::cos(direction_spherical.GetZenith());
-        auto sinph = std::sin(direction_spherical.GetAzimuth());
-        auto cosph = std::cos(direction_spherical.GetAzimuth());
-
-        auto rotate_vector_x = Cartesian3D(costh * cosph, costh * sinph, -sinth);
-        auto rotate_vector_y = Cartesian3D(-sinph, cosph, 0.);
-
-        // Rotation towards all tree axes
-        auto direction_cartesian = Cartesian3D(direction);
-        auto mean_direction = sz * direction_cartesian;
-        mean_direction += sx * rotate_vector_x;
-        mean_direction += sy * rotate_vector_y;
-
-        // Rotation towards all tree axes
-        auto final_direction = tz * direction_cartesian;
-        final_direction += tx * rotate_vector_x;
-        final_direction += ty * rotate_vector_y;
+        auto final_direction = Cartesian3D(direction);
+        final_direction.deflect(std::cos(random_angles.t_phi), random_angles.t_theta);
 
         return std::make_tuple(mean_direction, final_direction);
     }

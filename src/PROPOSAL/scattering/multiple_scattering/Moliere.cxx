@@ -10,7 +10,7 @@
 
 using namespace PROPOSAL::multiple_scattering;
 
-std::array<double, 4> Moliere::CalculateRandomAngle(
+ScatteringAngles Moliere::CalculateRandomAngle(
     double grammage, double ei, double ef, const std::array<double, 4>& rnd)
 {
     (void)ef;
@@ -57,7 +57,7 @@ std::array<double, 4> Moliere::CalculateRandomAngle(
         //  Check for inappropriate values of B. If B < 4.5 it is practical to
         //  assume no deviation.
         if ((xn < 4.5) || xn != xn) {
-            return std::array<double, 4>{0,0,0,0};
+            return {};
         }
 
         B_[i] = xn;
@@ -77,7 +77,13 @@ std::array<double, 4> Moliere::CalculateRandomAngle(
     auto sy = 0.5 * (rnd1 / SQRT3 + rnd2);
     auto ty = rnd2;
 
-    return std::array<double, 4>{sx, sy, tx, ty};
+    multiple_scattering::ScatteringAngles angles{};
+    angles.s_phi = std::asin(std::sqrt(sx * sx + sy * sy));
+    angles.s_theta = std::atan2(sy, sx);
+    angles.t_phi = std::asin(std::sqrt(tx * tx + ty * ty));
+    angles.t_theta = std::atan2(ty, tx);
+
+    return angles;
 }
 
 //----------------------------------------------------------------------------//
