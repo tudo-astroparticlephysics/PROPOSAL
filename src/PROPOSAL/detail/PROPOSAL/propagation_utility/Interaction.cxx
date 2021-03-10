@@ -2,6 +2,8 @@
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/propagation_utility/Displacement.h"
 
+#include <sstream>
+
 using namespace PROPOSAL;
 
 Interaction::Interaction(
@@ -35,9 +37,9 @@ double Interaction::MeanFreePath(double energy)
 Interaction::Loss Interaction::SampleLoss(
     double energy, std::vector<Rate> const& rates, double rnd)
 {
-    auto sampled_rate = rnd
-        * std::accumulate(rates.begin(), rates.end(), 0.,
-            [](double a, Rate r) { return a + r.rate; });
+    auto overall_rate = std::accumulate(rates.begin(), rates.end(), 0.,
+        [](double a, Rate r) { return a + r.rate; });
+    auto sampled_rate = rnd * overall_rate;
     for (auto& r : rates) {
         sampled_rate -= r.rate;
         if (sampled_rate < 0.) {
@@ -46,8 +48,15 @@ Interaction::Loss Interaction::SampleLoss(
             return { r.crosssection->GetInteractionType(), r.comp_hash, loss };
         }
     }
-    throw std::logic_error(
-        "Given rate is larger than overall crosssection rate.");
+
+    std::stringstream ss;
+    ss << "Given rate (" << std::to_string(sampled_rate)
+       << ") for given energy (" << std::to_string(energy)
+       << ") by drawen random numer (" << std::to_string(rnd)
+       << ") is larger than the overall crosssection rate ("
+       << std::to_string(overall_rate) << ").";
+
+    throw std::logic_error(ss.str());
 }
 
 std::vector<Interaction::Rate> Interaction::Rates(double energy)
