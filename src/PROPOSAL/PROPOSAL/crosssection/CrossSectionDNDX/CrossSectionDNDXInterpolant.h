@@ -12,7 +12,28 @@
 namespace PROPOSAL {
 
 double transform_relativ_loss(double v_cut, double v_max, double v);
+inline double transform_loss_linear(double v_cut, double v_max, double v)
+{
+    return (v_max - v_cut) * v + v_cut;
+}
 double retransform_relativ_loss(double v_cut, double v_max, double v);
+
+template <typename Param> struct transform_loss {
+    static std::function<double(double, double, double)> func;
+};
+
+template <typename Param>
+std::function<double(double, double, double)> transform_loss<Param>::func
+    = [](double v_cut, double v_max, double v) {
+          return transform_relativ_loss(v_cut, v_max, v);
+      };
+
+class ComptonKleinNishina;
+template <>
+std::function<double(double, double, double)> transform_loss<ComptonKleinNishina>::func;
+    /* = [](double v_cut, double v_max, double v) { */
+    /*       return transform_loss_linear(v_cut, v_max, v); */
+    /*   }; */
 
 template <typename T1, typename... Args>
 auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)
@@ -32,7 +53,7 @@ auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)
     def.axis = axis_builder.Create();
     def.f = [dndx](double energy, double v) {
         auto lim = dndx->GetIntegrationLimits(energy);
-        v = transform_relativ_loss(lim.min, lim.max, v);
+        v = transform_loss<T1>::func(lim.min, lim.max, v);
         return dndx->Calculate(energy, v);
     };
     def.approx_derivates = true;

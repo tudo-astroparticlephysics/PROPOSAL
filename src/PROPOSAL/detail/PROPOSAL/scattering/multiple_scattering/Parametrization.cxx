@@ -65,7 +65,7 @@ namespace PROPOSAL {
             final_direction += tx * rotate_vector_x;
             final_direction += ty * rotate_vector_y;
 
-            return std::make_tuple(mean_direction, final_direction);
+            return std::make_pair(mean_direction, final_direction);
         }
     }
 }
