@@ -11,29 +11,39 @@
 
 namespace PROPOSAL {
 
-double transform_relativ_loss(double v_cut, double v_max, double v);
-inline double transform_loss_linear(double v_cut, double v_max, double v)
-{
-    return (v_max - v_cut) * v + v_cut;
-}
-double retransform_relativ_loss(double v_cut, double v_max, double v);
+double transform_relative_loss(double v_cut, double v_max, double v);
+double retransform_relative_loss(double v_cut, double v_max, double v);
+double transform_loss_log(double v_cut, double v_max, double v);
+double retransform_loss_log(double v_cut, double v_max, double v);
 
 template <typename Param> struct transform_loss {
+    static std::function<double(double, double, double)> func;
+};
+
+template <typename Param> struct retransform_loss {
     static std::function<double(double, double, double)> func;
 };
 
 template <typename Param>
 std::function<double(double, double, double)> transform_loss<Param>::func
     = [](double v_cut, double v_max, double v) {
-          return transform_relativ_loss(v_cut, v_max, v);
+          return transform_relative_loss(v_cut, v_max, v);
       };
 
-class ComptonKleinNishina;
+template <typename Param>
+std::function<double(double, double, double)> retransform_loss<Param>::func
+    = [](double v_cut, double v_max, double v) {
+          return retransform_relative_loss(v_cut, v_max, v);
+      };
+
+namespace crosssection {
+    struct ComptonKleinNishina;
+}
 template <>
-std::function<double(double, double, double)> transform_loss<ComptonKleinNishina>::func;
-    /* = [](double v_cut, double v_max, double v) { */
-    /*       return transform_loss_linear(v_cut, v_max, v); */
-    /*   }; */
+std::function<double(double, double, double)> transform_loss<crosssection::ComptonKleinNishina>::func;
+
+template <>
+std::function<double(double, double, double)> retransform_loss<crosssection::ComptonKleinNishina>::func;
 
 template <typename T1, typename... Args>
 auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)
@@ -61,6 +71,8 @@ auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)
 }
 
 class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
+    std::function<double(double, double, double)> transform_v;
+    std::function<double(double, double, double)> retransform_v;
     cubic_splines::Interpolant<cubic_splines::BicubicSplines<double>>
         interpolant;
 
@@ -73,6 +85,8 @@ public:
         Target const& t, std::shared_ptr<const EnergyCutSettings> cut,
         size_t hash = 0)
         : CrossSectionDNDX(param, p, t, cut, hash)
+        , transform_v(transform_loss<Param>::func)
+        , retransform_v(retransform_loss<Param>::func)
         , interpolant(build_dndx_def(param, p, t, cut), gen_path(), gen_name())
     {
         lower_energy_lim

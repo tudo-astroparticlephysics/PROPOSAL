@@ -955,7 +955,7 @@ double Integral::RombergIntegrateOpened()
             result = Trapezoid3(k, result);
             if (result != result)
             {
-                Logging::Get("proposal.integral")->error("Function Value of is nan! Returning 0!");
+                Logging::Get("proposal.integral")->error("Function Value is nan! Returning 0!");
                 return 0;
             }
 

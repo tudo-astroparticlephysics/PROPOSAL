@@ -11,9 +11,6 @@
 
 namespace PROPOSAL {
 
-double transform_relativ_loss(double v_cut, double v_max, double v);
-double retransform_relativ_loss(double v_cut, double v_max, double v);
-
 template <typename T1, typename T2, typename... Args>
 auto build_de2dx_def(T1 const& param, T2 const& p_def, Args... args)
 {

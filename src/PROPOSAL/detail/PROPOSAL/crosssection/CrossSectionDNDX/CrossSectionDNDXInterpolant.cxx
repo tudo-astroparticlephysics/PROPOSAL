@@ -7,27 +7,45 @@
 using namespace PROPOSAL;
 
 template <>
-std::function<double(double, double, double)> transform_loss<ComptonKleinNishina>::func
+std::function<double(double, double, double)> transform_loss<crosssection::ComptonKleinNishina>::func
     = [](double v_cut, double v_max, double v) {
-          return transform_loss_linear(v_cut, v_max, v);
+          return transform_loss_log(v_cut, v_max, v);
       };
 
-double transform_relativ_loss(double v_cut, double v_max, double v)
-{
-    if (v < 0 or v_max == 0)
-        return v_cut;
-    if (v >= 1)
-        return v_max;
-    return v_cut * std::exp(v * std::log(v_max / v_cut));
-}
+template <>
+std::function<double(double, double, double)> retransform_loss<crosssection::ComptonKleinNishina>::func
+    = [](double v_cut, double v_max, double v) {
+          return retransform_loss_log(v_cut, v_max, v);
+      };
 
-double retransform_relativ_loss(double v_cut, double v_max, double v)
-{
-    if (v <= v_cut)
-        return 0;
-    if (v >= v_max)
-        return 1;
-    return std::log(v / v_cut) / std::log(v_max / v_cut);
+namespace PROPOSAL {
+    double transform_relative_loss(double v_cut, double v_max, double v) {
+        if (v < 0 or v_max == 0)
+            return v_cut;
+        if (v >= 1)
+            return v_max;
+        return v_cut * std::exp(v * std::log(v_max / v_cut));
+    }
+
+    double retransform_relative_loss(double v_cut, double v_max, double v) {
+        if (v <= v_cut)
+            return 0;
+        if (v >= v_max)
+            return 1;
+        return std::log(v / v_cut) / std::log(v_max / v_cut);
+    }
+
+    double transform_loss_log(double v_cut, double v_max, double v)
+    {
+        auto xi = std::log((1. - v_cut)/(1 - v_max));
+        return 1. - (1. - v_max) * std::exp((1. - v) * xi);
+    }
+
+    double retransform_loss_log(double v_cut, double v_max, double v)
+    {
+        auto xi = std::log((1. - v_cut)/(1 - v_max));
+        return 1. - std::log((1. - v)/(1. - v_max)) / xi;
+    }
 }
 
 std::string CrossSectionDNDXInterpolant::gen_path() const
@@ -43,7 +61,8 @@ std::string CrossSectionDNDXInterpolant::gen_name() const
 
 double CrossSectionDNDXInterpolant::Calculate(double energy)
 {
-    return Calculate(energy, 1.0);
+    auto lim = GetIntegrationLimits(energy);
+    return Calculate(energy, lim.max);
 }
 
 double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
@@ -51,7 +70,7 @@ double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
     if (energy < lower_energy_lim)
         return 0.;
     auto lim = GetIntegrationLimits(energy);
-    v = retransform_relativ_loss(lim.min, lim.max, v);
+    v = retransform_v(lim.min, lim.max, v);
     return interpolant.evaluate(std::array<double, 2> { energy, v });
 }
 
@@ -67,5 +86,5 @@ double CrossSectionDNDXInterpolant::GetUpperLimit(double energy, double rate)
     };
 
     auto v = cubic_splines::find_parameter(interpolant, rate, initial_guess);
-    return transform_relativ_loss(lim.min, lim.max, v);
+    return transform_v(lim.min, lim.max, v);
 }
