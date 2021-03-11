@@ -35,6 +35,7 @@ public:
         size_t comp_hash;
         double rate;
     };
+
     std::vector<Rate> Rates(double energy);
 
     struct Loss {
