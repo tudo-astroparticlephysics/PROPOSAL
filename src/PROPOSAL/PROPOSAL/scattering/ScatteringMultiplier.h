@@ -20,10 +20,13 @@ class ScatteringMultiplier : public Scattering {
         return angles;
     }
 
-    std::array<double, 4> _scale_scatter(std::array<double, 4>& angles) override
+    multiple_scattering::ScatteringOffset _scale_scatter(
+            multiple_scattering::ScatteringOffset& angles) override
     {
-        for (auto& a : angles)
-            a *= multiple_scatt;
+        angles.sx *= multiple_scatt;
+        angles.sy *= multiple_scatt;
+        angles.tx *= multiple_scatt;
+        angles.ty *= multiple_scatt;
         return angles;
     }
 

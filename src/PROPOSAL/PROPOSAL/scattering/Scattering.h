@@ -67,7 +67,8 @@ protected:
         return _scale_deflect(angles, p.GetInteractionType());
     }
 
-    virtual std::array<double, 4> _scale_scatter(std::array<double, 4>& a)
+    virtual multiple_scattering::ScatteringOffset _scale_scatter(
+            multiple_scattering::ScatteringOffset& a)
     {
         return a;
     }
@@ -139,11 +140,11 @@ public:
      * understanding.
      */
     template <typename... Args>
-    std::array<double, 4> CalculateMultipleScattering(Args... args)
+    multiple_scattering::ScatteringOffset CalculateMultipleScattering(Args... args)
     {
         if (m_scatter_ptr)
             return _multiple_scatter(*m_scatter_ptr, args...);
-        return std::array<double, 4> { 0, 0, 0, 0 };
+        return multiple_scattering::ScatteringOffset();
     }
 };
 

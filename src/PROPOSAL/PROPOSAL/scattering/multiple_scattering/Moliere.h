@@ -79,7 +79,7 @@ namespace multiple_scattering {
         // constructor
         Moliere(const ParticleDef&, Medium const&);
 
-        std::array<double, 4> CalculateRandomAngle(double grammage, double ei,
+        ScatteringOffset CalculateRandomAngle(double grammage, double ei,
             double ef, const std::array<double, 4>& rnd) override;
     };
 } // namespace multiple_scattering

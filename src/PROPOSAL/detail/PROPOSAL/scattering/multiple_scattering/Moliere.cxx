@@ -10,10 +10,11 @@
 
 using namespace PROPOSAL::multiple_scattering;
 
-std::array<double, 4> Moliere::CalculateRandomAngle(
+ScatteringOffset Moliere::CalculateRandomAngle(
     double grammage, double ei, double ef, const std::array<double, 4>& rnd)
 {
     (void)ef;
+    ScatteringOffset offsets;
 
     double momentum_Sq = (ei - mass) * (ei + mass);
     double beta_Sq = 1. / (1. + mass * mass / momentum_Sq); // beta^2 = (v/c)^2
@@ -57,7 +58,7 @@ std::array<double, 4> Moliere::CalculateRandomAngle(
         //  Check for inappropriate values of B. If B < 4.5 it is practical to
         //  assume no deviation.
         if ((xn < 4.5) || xn != xn) {
-            return std::array<double, 4> { 0, 0, 0, 0 };
+            return offsets;
         }
 
         B_[i] = xn;
@@ -68,16 +69,16 @@ std::array<double, 4> Moliere::CalculateRandomAngle(
     auto rnd1 = GetRandom(pre_factor, rnd[0]);
     auto rnd2 = GetRandom(pre_factor, rnd[1]);
 
-    auto sx = 0.5 * (rnd1 / SQRT3 + rnd2);
-    auto tx = rnd2;
+    offsets.sx = 0.5 * (rnd1 / SQRT3 + rnd2);
+    offsets.tx = rnd2;
 
     rnd1 = GetRandom(pre_factor, rnd[2]);
     rnd2 = GetRandom(pre_factor, rnd[3]);
 
-    auto sy = 0.5 * (rnd1 / SQRT3 + rnd2);
-    auto ty = rnd2;
+    offsets.sy = 0.5 * (rnd1 / SQRT3 + rnd2);
+    offsets.ty = rnd2;
 
-    return std::array<double, 4> { sx, sy, tx, ty };
+    return offsets;
 }
 
 //----------------------------------------------------------------------------//

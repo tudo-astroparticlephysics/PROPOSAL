@@ -33,6 +33,17 @@
 
 namespace PROPOSAL {
 namespace multiple_scattering {
+    struct ScatteringOffset {
+        ScatteringOffset() : sx(0.), sy(0.), tx(0.), ty(0.) {};
+        double sx;
+        double sy;
+        double tx;
+        double ty;
+    };
+
+    std::pair<Cartesian3D, Cartesian3D> ScatterInitialDirection(
+            const Vector3D&, const ScatteringOffset&);
+
     class Parametrization {
     protected:
         double mass;
@@ -47,9 +58,7 @@ namespace multiple_scattering {
         virtual bool compare(const Parametrization&) const = 0;
         virtual void print(std::ostream&) const = 0;
 
-        enum { SX, SY, TX, TY };
-
-        virtual std::array<double, 4> CalculateRandomAngle(double grammage,
+        virtual ScatteringOffset CalculateRandomAngle(double grammage,
             double ei, double ef, const std::array<double, 4>& rnd)
             = 0;
 

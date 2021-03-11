@@ -36,6 +36,14 @@ void init_scattering(py::module& m)
                     ef(double): final energy
             )pbdoc");
 
+    py::class_<multiple_scattering::ScatteringOffset>(m_sub, "scattering_offset")
+            .def_readwrite("sx", &multiple_scattering::ScatteringOffset::sx)
+            .def_readwrite("sy", &multiple_scattering::ScatteringOffset::sy)
+            .def_readwrite("tx", &multiple_scattering::ScatteringOffset::tx)
+            .def_readwrite("ty", &multiple_scattering::ScatteringOffset::ty);
+
+    m_sub.def("scatter_initial_direction", &multiple_scattering::ScatterInitialDirection);
+
     auto scattering_doc
         = R"pbdoc(Factory method for a MultipleScattering object.
 
@@ -136,7 +144,7 @@ void init_scattering(py::module& m)
         .def("stochastic_deflection",
             &Scattering::CalculateStochasticDeflection<double, double,
                 std::vector<double> const&>,
-            py::arg("type"), py::arg("inital_energy"), py::arg("final_energy"),
+            py::arg("type"), py::arg("initial_energy"), py::arg("final_energy"),
             py::arg("rnd"),
             R"pbdoc(Sample stochastic defleciton angles in radians.
             Args:
