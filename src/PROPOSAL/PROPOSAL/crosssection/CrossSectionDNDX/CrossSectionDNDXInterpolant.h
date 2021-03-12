@@ -78,13 +78,14 @@ class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
 
     std::string gen_path() const;
     std::string gen_name() const;
+    size_t gen_hash(size_t) const;
 
 public:
     template <typename Param, typename Target>
     CrossSectionDNDXInterpolant(Param param, ParticleDef const& p,
         Target const& t, std::shared_ptr<const EnergyCutSettings> cut,
         size_t hash = 0)
-        : CrossSectionDNDX(param, p, t, cut, hash)
+        : CrossSectionDNDX(param, p, t, cut, gen_hash(hash))
         , transform_v(transform_loss<Param>::func)
         , retransform_v(retransform_loss<Param>::func)
         , interpolant(build_dndx_def(param, p, t, cut), gen_path(), gen_name())

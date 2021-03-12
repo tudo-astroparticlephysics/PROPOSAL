@@ -249,6 +249,20 @@ public:
         , interaction_type(static_cast<InteractionType>(
               crosssection::ParametrizationId<Param>::value))
     {
+        // initialize hash
+        hash = 0;
+        if (dndx) {
+            for (auto& dndx_: *dndx)
+                hash_combine(hash, std::get<1>(dndx_.second)->GetHash());
+        }
+        if (dedx) {
+            for (auto& dedx_: *dedx)
+                hash_combine(hash, std::get<1>(dedx_)->GetHash());
+        }
+        if (de2dx) {
+            for (auto& de2dx_: *de2dx)
+                hash_combine(hash, std::get<1>(de2dx_)->GetHash());
+        }
     }
 
     virtual ~CrossSection() = default;

@@ -32,12 +32,13 @@ class CrossSectionDE2DXInterpolant : public CrossSectionDE2DX {
 
     std::string gen_name() const;
     std::string gen_path() const;
+    size_t gen_hash(size_t) const;
 
 public:
     template <typename Param, typename Target>
     CrossSectionDE2DXInterpolant(Param const& param, ParticleDef const& p,
         Target const& t, EnergyCutSettings const& cut, size_t hash = 0)
-        : CrossSectionDE2DX(param, p, t, cut, hash)
+        : CrossSectionDE2DX(param, p, t, cut, gen_hash(hash))
         , interpolant(build_de2dx_def(param, p, t, cut), gen_path(), gen_name())
     {
             lower_energy_lim = interpolant.GetDefinition().GetAxis().GetLow();

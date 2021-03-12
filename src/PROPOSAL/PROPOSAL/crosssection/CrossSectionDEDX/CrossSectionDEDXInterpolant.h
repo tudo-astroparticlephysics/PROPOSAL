@@ -46,12 +46,13 @@ class CrossSectionDEDXInterpolant : public CrossSectionDEDX {
 
     std::string gen_path() const;
     std::string gen_name() const;
+    size_t gen_hash(size_t) const;
 
 public:
     template <typename Param, typename Target>
     CrossSectionDEDXInterpolant(Param const& param, ParticleDef const& p,
         Target const& t, EnergyCutSettings const& cut, size_t hash = 0)
-        : CrossSectionDEDX(param, p, t, cut, hash)
+        : CrossSectionDEDX(param, p, t, cut, gen_hash(hash))
         , interpolant(build_dedx_def(param, p, t, cut), gen_path(), gen_name())
     {
         lower_energy_lim = interpolant.GetDefinition().GetAxis().GetLow();

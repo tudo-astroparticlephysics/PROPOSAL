@@ -1,5 +1,6 @@
 #include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDXInterpolant.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
@@ -12,6 +13,13 @@ std::string CrossSectionDEDXInterpolant::gen_name() const
 {
     return std::string("dedx_") + std::to_string(GetHash())
         + std::string(".txt");
+}
+
+size_t CrossSectionDEDXInterpolant::gen_hash(size_t hash) const {
+    hash_combine(hash,
+                 InterpolationSettings::NODES_DEDX,
+                 InterpolationSettings::UPPER_ENERGY_LIM);
+    return hash;
 }
 
 double CrossSectionDEDXInterpolant::Calculate(double E) const

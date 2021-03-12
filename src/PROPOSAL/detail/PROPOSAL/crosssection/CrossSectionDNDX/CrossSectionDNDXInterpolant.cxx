@@ -1,4 +1,5 @@
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
+#include "PROPOSAL/methods.h"
 
 #include <cmath>
 
@@ -57,6 +58,14 @@ std::string CrossSectionDNDXInterpolant::gen_name() const
 {
     return std::string("dndx_") + std::to_string(GetHash())
         + std::string(".txt");
+}
+
+size_t CrossSectionDNDXInterpolant::gen_hash(size_t hash) const {
+    hash_combine(hash,
+                 InterpolationSettings::NODES_DNDX_E,
+                 InterpolationSettings::NODES_DNDX_V,
+                 InterpolationSettings::UPPER_ENERGY_LIM);
+    return hash;
 }
 
 double CrossSectionDNDXInterpolant::Calculate(double energy)
