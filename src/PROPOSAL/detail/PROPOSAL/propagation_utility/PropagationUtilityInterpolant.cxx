@@ -50,7 +50,7 @@ void UtilityInterpolant::BuildTables(const std::string prefix, size_t nodes,
             return UtilityIntegral::Calculate(energy, reference_x);
         };
     }
-    def.f_trafo = std::make_unique<cubic_splines::ExpAxis<double>>(1., 0.);
+    def.f_trafo = std::make_unique<cubic_splines::ExpM1Axis<double>>(1., 0.);
     def.axis = std::make_unique<cubic_splines::ExpAxis<double>>(
             lower_lim, InterpolationSettings::UPPER_ENERGY_LIM, nodes);
 
