@@ -261,8 +261,7 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
     //     ( 1 - v + \frac{M x v}{2E}
     //     - \frac{v^2}{2} (1 - \frac{2m_{particle}}{Q^2})
     //          \frac{1 + \frac{4 M^2 x^2}{Q^2}}{1 + R})
-    double result = ME * RE / Q2;
-    result *= result * 4 * PI * structure_function_nucleus / v *
+    double result = std::pow(ME * RE / Q2, 2) * 4 * PI * structure_function_nucleus / v *
               (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
                (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
                    (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
@@ -389,8 +388,7 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
     //     ( 1 - v + \frac{M x v}{2E}
     //     - \frac{v^2}{2} (1 - \frac{2m_{particle}}{Q^2})
     //          \frac{1 + \frac{4 M^2 x^2}{Q^2}}{1 + R})
-    double result = ME * RE / Q2;
-    result *= result * 4 * PI * structure_function_nucleus / v *
+    double result = std::pow(ME * RE / Q2, 2) * 4 * PI * structure_function_nucleus / v *
               (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
                (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
                    (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
@@ -478,8 +476,7 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, do
     //     ( 1 - v + \frac{M x v}{2E}
     //     - \frac{v^2}{2} (1 - \frac{2m_{particle}}{Q^2})
     //          \frac{1 + \frac{4 M^2 x^2}{Q^2}}{1 + R})
-    double result = ME * RE / Q2;
-    result *= result * 4 * PI * structure_function_nucleus / v *
+    double result = std::pow(ME * RE / Q2, 2) * 4 * PI * structure_function_nucleus / v *
               (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
                (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
                    (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
@@ -609,8 +606,7 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
     //     ( 1 - v + \frac{v^2}{4}
     //     - \frac{v^2}{4} (1 - \frac{4m_{particle}}{Q^2})
     //          \frac{1 + \frac{4M^2x^2}{Q^2}}{1 + R})
-    double result = ME * RE / Q2;
-    result *= result * 4 * PI * structure_function_nucleus / v *
+    double result = std::pow(ME * RE / Q2, 2) * 4 * PI * structure_function_nucleus / v *
               (1 - v + 0.25 * v * v -
                (1 + 4 * particle_def_.mass * particle_def_.mass / Q2) * 0.25 * v * v *
                    (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (1 + R));
@@ -745,8 +741,7 @@ double PhotoAbtFT::FunctionToQ2Integral(double energy, double v, double Q2)
     //     ( 1 - v + \frac{M x v}{2E}
     //     - \frac{v^2}{2} (1 - \frac{2m_{particle}}{Q^2})
     //          \frac{1 + \frac{4 M^2 x^2}{Q^2}}{1 + R})
-    double result = ME * RE / Q2;
-    result *= result * 4 * PI * structure_function_nucleus / v *
+    double result = std::pow(ME * RE / Q2, 2) * 4 * PI * structure_function_nucleus / v *
               (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
                (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
                    (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
@@ -831,8 +826,7 @@ double PhotoBlockDurandHa::FunctionToQ2Integral(double energy, double v,
     //     ( 1 - v + \frac{M x v}{2E}
     //     - \frac{v^2}{2} (1 - \frac{2m_{particle}}{Q^2})
     //          \frac{1 + \frac{4 M^2 x^2}{Q^2}}{1 + R})
-    double result = ME * RE / Q2;
-    result *= result * 4 * PI * structure_function_nucleus / v *
+    double result = std::pow(ME * RE / Q2, 2) * 4 * PI * structure_function_nucleus / v *
               (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
                (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
                    (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
