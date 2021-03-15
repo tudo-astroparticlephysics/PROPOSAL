@@ -262,6 +262,7 @@ void init_crosssection(py::module& m)
 
     build_crosssection<crosssection::EpairKelnerKokoulinPetrukhin>(m_sub);
     build_crosssection<crosssection::EpairSandrockSoedingreksoRhode>(m_sub);
+    build_crosssection<crosssection::EpairForElectronPositron>(m_sub);
 
     build_crosssection<crosssection::IonizBetheBlochRossi>(m_sub);
     build_crosssection<crosssection::IonizBergerSeltzerBhabha>(m_sub);
