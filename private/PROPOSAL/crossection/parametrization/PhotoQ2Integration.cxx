@@ -684,15 +684,18 @@ double PhotoAbtFT::FunctionToQ2Integral(double energy, double v, double Q2)
     // f(t) = f_1 + f_2 t^{f_3}
     double b_reggeon = b1_reggeon + b2_reggeon * std::pow(t, b3_reggeon);
     double b_pomeron = b1_pomeron + b2_pomeron * std::pow(t, b3_pomeron);
-    double a_reggeon = 0.;
-    double c_reggeon = 0.;
+    double a_reggeon;
+    double c_reggeon;
     // handle the case if t = 0
     // since a3_reggeon and c3_reggeon are < 0
-    // resulting in a_reggeon and c_reggeon being inf instead of 0
+    // resulting in a_reggeon and c_reggeon being inf
     if (t>0)
     {
         a_reggeon = a1_reggeon + a2_reggeon * std::pow(t, a3_reggeon);
         c_reggeon = c1_reggeon + c2_reggeon * std::pow(t, c3_reggeon);
+    } else {
+        a_reggeon = a1_reggeon;
+        c_reggeon = c1_reggeon;
     }
 
     // parameter, that decrease with Q^2
