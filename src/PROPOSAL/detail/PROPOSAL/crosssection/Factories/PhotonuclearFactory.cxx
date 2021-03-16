@@ -35,7 +35,9 @@ std::map<std::string, photoQ2_func_ptr, Helper::case_insensitive_comp> photoQ2_m
     init_param_Q2<crosssection::PhotoAbramowiczLevinLevyMaor91>,
     init_param_Q2<crosssection::PhotoAbramowiczLevinLevyMaor97>,
     init_param_Q2<crosssection::PhotoButkevichMikheyev>,
-    init_param_Q2<crosssection::PhotoRenoSarcevicSu>
+    init_param_Q2<crosssection::PhotoRenoSarcevicSu>,
+    init_param_Q2<crosssection::PhotoAbtFT>,
+    init_param_Q2<crosssection::PhotoBlockDurandHa>
 };
 
 template <typename Param>

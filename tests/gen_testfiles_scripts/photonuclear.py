@@ -35,7 +35,9 @@ photo_q2 = [
     pp.parametrization.photonuclear.AbramowiczLevinLevyMaor91,
     pp.parametrization.photonuclear.AbramowiczLevinLevyMaor97,
     pp.parametrization.photonuclear.ButkevichMikheyev,
-    pp.parametrization.photonuclear.RenoSarcevicSu
+    pp.parametrization.photonuclear.RenoSarcevicSu,
+    pp.parametrization.photonuclear.AbtFT,
+    pp.parametrization.photonuclear.BlockDurandHa
 ]
 
 photo_q2_interpol = [
@@ -43,6 +45,8 @@ photo_q2_interpol = [
     pp.parametrization.photonuclear.AbramowiczLevinLevyMaor97Interpolant,
     pp.parametrization.photonuclear.ButkevichMikheyevInterpolant,
     pp.parametrization.photonuclear.RenoSarcevicSuInterpolant
+    pp.parametrization.photonuclear.AbtFTInterpolant
+    pp.parametrization.photonuclear.BlockDurandHaInterpolant
 ]
 
 shadows = [
