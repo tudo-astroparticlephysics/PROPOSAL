@@ -43,6 +43,12 @@ if __name__ == "__main__":
         ),
         parametrization.photonuclear.ButkevichMikhailovInterpolant(
             *param_defs
+        ),
+        parametrization.photonuclear.AbtFTInterpolant(
+            *param_defs
+        ),
+        parametrization.photonuclear.BlockDurandHaInterpolant(
+            *param_defs
         )
     ]
 
@@ -58,7 +64,7 @@ if __name__ == "__main__":
             interpolation_def
         ))
 
-    print(crosssections[0])
+    # print(crosssections[0])
 
     # =========================================================
     # 	Calculate DE/dx at the given energies
