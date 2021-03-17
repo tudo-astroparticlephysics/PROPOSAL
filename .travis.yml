@@ -86,8 +86,8 @@ before_install:
   - ci/install_cmake.sh
   - export PATH="$HOME/cmake/bin:$PATH"
   - cmake --version
-  - python -m pip --version
-  - pip install conan
+  - pip3 --version
+  - pip3 install conan
 
 install:
   - mkdir build
