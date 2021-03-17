@@ -72,7 +72,7 @@ class build_ext_cmake(build_ext):
             'install',
             ext.source_dir,
             '-o build_python=True',
-            '-o build_testing=True',
+            '-o build_testing=False',
         ]
         sp.run(conan_call, cwd=self.build_temp, check=True)
         cmake_call = [

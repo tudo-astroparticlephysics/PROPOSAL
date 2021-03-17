@@ -9,12 +9,12 @@ git:
 env:
   global:
     - GTEST_COLOR=1
-    - CMAKE_VERSION=3.15.7
+    - CMAKE_VERSION=3.9
 
 jobs:
   include:
     - os: linux
-      dist: xenial
+      dist: bionic
       name: Python
       language: python
       python: 3.8
@@ -26,70 +26,73 @@ jobs:
         - python -m pytest tests/python -v
 
     - os: linux
-      dist: xenial
-      name: Linux gcc 4.8
+      dist: bionic
+      name: Linux gcc 5
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-4.8
+            - g++-5
       env:
-        - CC=gcc-4.8
-        - CXX=g++-4.8
+        - CC=gcc-5
+        - CXX=g++-5
 
     - os: linux
-      dist: xenial
-      name: Linux gcc 9
+      dist: bionic
+      name: Linux gcc 10
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-9
+            - g++-10
       env:
-        - CC=gcc-9
-        - CXX=g++-9
+        - CC=gcc-10
+        - CXX=g++-10
 
     - os: linux
-      dist: xenial
+      dist: bionic
       name: Linux clang 3.6
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-3.6
+            - llvm-toolchain-bionic-3.6
           packages:
             - clang-3.6
-            - g++-4.9
+            - g++-5
       env:
         - CC=clang-3.6
         - CXX=clang++-3.6
 
     - os: linux
-      dist: xenial
-      name: Linux clang 8
+      dist: bionic
+      name: Linux clang 10
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-8
+            - llvm-toolchain-bionic-10
           packages:
-            - clang-8
-            - g++-8
+            - clang-10
+            - g++-10
       env:
-        - CC=clang-8
-        - CXX=clang++-8
+        - CC=clang-10
+        - CXX=clang++-10
 
 
 before_install:
   - ci/install_cmake.sh
   - export PATH="$HOME/cmake/bin:$PATH"
   - cmake --version
+  - python -m pip --version
+  - pip install conan
 
 install:
   - mkdir build
   - cd build
+  - conan install ..
   - cmake .. -DADD_PYTHON=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/proposal
   - cmake --build . -- VERBOSE=1 -j2
   - cmake --build . --target install
