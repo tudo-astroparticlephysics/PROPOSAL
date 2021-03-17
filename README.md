@@ -107,8 +107,8 @@ and if you want to cite the latest improvements
 
 ## Requirements
 
-- CMake 3.8 or higher
-- C++11 compatible compiler
+- CMake 3.9 or higher
+- C++14 compatible compiler
 
 ## Recommended
 
