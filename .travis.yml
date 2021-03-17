@@ -53,18 +53,18 @@ jobs:
 
     - os: linux
       dist: bionic
-      name: Linux clang 3.6
+      name: Linux clang 5.0
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-bionic-3.6
+            - llvm-toolchain-bionic-5.0
           packages:
-            - clang-3.6
+            - clang-5.0
             - g++-5
       env:
-        - CC=clang-3.6
-        - CXX=clang++-3.6
+        - CC=clang-5.0
+        - CXX=clang++-5.0
 
     - os: linux
       dist: bionic
