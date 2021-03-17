@@ -9,7 +9,7 @@ git:
 env:
   global:
     - GTEST_COLOR=1
-    - CMAKE_VERSION=3.9.2
+    - CMAKE_VERSION=3.10.3
 
 jobs:
   include:
@@ -118,7 +118,7 @@ deploy:
     on:
       repo: tudo-astroparticlephysics/PROPOSAL
       tags: true
-      condition: $CXX = g++-9
+      condition: $CXX = g++-10
   - provider: pypi
     username: "__token__"
     skip_existing: true

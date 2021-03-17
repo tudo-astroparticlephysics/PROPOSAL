@@ -35,7 +35,7 @@ Recent improvements are documented [here](https://doi.org/10.1016/j.cpc.2019.03.
 PROPOSAL is developed and tested on macOS and linux. 
 Continuous integration is setup on travis and tests several version of gcc and clang.
 
-PROPOSAL is now a C++11 library using pybind11 Python bindings!
+PROPOSAL is now a C++14 library using pybind11 Python bindings!
 
 
 ## How to cite PROPOSAL?
@@ -107,7 +107,7 @@ and if you want to cite the latest improvements
 
 ## Requirements
 
-- CMake 3.9 or higher
+- CMake 3.9 or higher (to build the tests CMake 3.10 is required)
 - C++14 compatible compiler
 
 ## Recommended
