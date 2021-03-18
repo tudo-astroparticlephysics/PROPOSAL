@@ -93,9 +93,10 @@ before_install:
   - export PATH="$HOME/cmake/bin:$PATH"
   - cmake --version
   - pip --version
-  - pip install conan
 
 install:
+  - pip install conan
+  - conan user
   - mkdir build
   - cd build
   - conan install .. -o build_testing=True
