@@ -35,7 +35,6 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - gcc-7-test-results
-            - libgtest-dev
       env:
         - CC=gcc
         - CXX=g++
@@ -50,7 +49,6 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - gcc-10-test-results
-            - libgtest-dev
       env:
         - CC=gcc
         - CXX=g++
@@ -66,7 +64,6 @@ jobs:
             - llvm-toolchain-6.0
           packages:
             - clang-6.0
-            - libgtest-dev
       env:
         - CC=clang
         - CXX=clang++
@@ -82,7 +79,6 @@ jobs:
             - llvm-toolchain-focal-10
           packages:
             - clang-10
-            - libgtest-dev
       env:
         - CC=clang
         - CXX=clang++
