@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
 include(GoogleTest)
-enable_testing()
 
 SET(RESOURCE_URL https://proposal.app.tu-dortmund.de/resources)
 SET(TEST_FILES TestFiles-2021-01-13.tar.gz)
