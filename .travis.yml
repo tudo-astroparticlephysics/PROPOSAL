@@ -37,8 +37,8 @@ jobs:
             - gcc-7-test-results
             - libgtest-dev
       env:
-        - CC=gcc-7
-        - CXX=g++-7
+        - CC=gcc
+        - CXX=g++
 
     - os: linux
       dist: focal
@@ -52,8 +52,8 @@ jobs:
             - gcc-10-test-results
             - libgtest-dev
       env:
-        - CC=gcc-10
-        - CXX=g++-10
+        - CC=gcc
+        - CXX=g++
 
     - os: linux
       dist: focal
@@ -68,8 +68,8 @@ jobs:
             - clang-6.0
             - libgtest-dev
       env:
-        - CC=clang-6.0
-        - CXX=clang++-6.0
+        - CC=clang
+        - CXX=clang++
 
     - os: linux
       dist: focal
@@ -84,8 +84,8 @@ jobs:
             - clang-10
             - libgtest-dev
       env:
-        - CC=clang-10
-        - CXX=clang++-10
+        - CC=clang
+        - CXX=clang++
 
 
 before_install:
