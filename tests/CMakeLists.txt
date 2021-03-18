@@ -15,13 +15,13 @@ add_custom_command(OUTPUT TestFiles
     )
 
 add_custom_target(testfiles DEPENDS TestFiles)
+# find_package(PROPOSAL REQUIRED)
 
 # creat test binary and link against proposal and gtest
 macro(package_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
     add_dependencies(${TESTNAME} testfiles)
-    target_link_libraries(${TESTNAME} PUBLIC PROPOSAL::PROPOSAL
-        CONAN_PKG::spdlog CONAN_PKG::cubicinterpolation CONAN_PKG::gtest)
+    target_link_libraries(${TESTNAME} PROPOSAL::PROPOSAL CONAN_PKG::gtest)
     gtest_discover_tests(${TESTNAME})
 endmacro()
 

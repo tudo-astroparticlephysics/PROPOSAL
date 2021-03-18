@@ -17,9 +17,7 @@ add_subdirectory(PROPOSAL)
 add_subdirectory(detail)
 
 target_link_libraries(PROPOSAL
-    PUBLIC
     CONAN_PKG::cubicinterpolation
-    PRIVATE
     CONAN_PKG::spdlog
     )
 
