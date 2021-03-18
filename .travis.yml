@@ -84,12 +84,6 @@ jobs:
         - CXX=clang++
 
 
-before_install:
-  - ci/install_cmake.sh
-  - export PATH="$HOME/cmake/bin:$PATH"
-  - cmake --version
-  - pip --version
-
 install:
   - pip install conan
   - conan profile new default --detect
