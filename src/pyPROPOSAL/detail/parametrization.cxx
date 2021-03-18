@@ -570,6 +570,10 @@ void init_parametrization(py::module& m)
 
             * RenoSarcevicSu
 
+            * AbtFT
+
+            * BlockDurandHa
+
             * AbramowiczLevinLevyMaor91Interpolant
 
             * AbramowiczLevinLevyMaor97Interpolant
@@ -577,6 +581,10 @@ void init_parametrization(py::module& m)
             * ButkevichMikheyevInterpolant
 
             * RenoSarcevicSuInterpolant
+
+            * AbtFTInterpolant
+
+            * BlockDurandHaInterpolant
 
             The parametrization with "Interpolant" as a suffix creates an interpolation table for the :math:`Q^2` integration, which improved the perfomance.
 
@@ -601,6 +609,8 @@ void init_parametrization(py::module& m)
     PHOTO_Q2_DEF(m_sub_photo, AbramowiczLevinLevyMaor97)
     PHOTO_Q2_DEF(m_sub_photo, ButkevichMikheyev)
     PHOTO_Q2_DEF(m_sub_photo, RenoSarcevicSu)
+    PHOTO_Q2_DEF(m_sub_photo, AbtFT)
+    PHOTO_Q2_DEF(m_sub_photo, BlockDurandHa)
 
     // --------------------------------------------------------------------- //
     // Ionization

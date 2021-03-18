@@ -11,8 +11,6 @@
 
 #include "pyPROPOSAL/pyBindings.h"
 
-#include <pybind11/stl.h>
-
 namespace py = pybind11;
 using namespace PROPOSAL;
 

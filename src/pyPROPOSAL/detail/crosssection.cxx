@@ -262,6 +262,7 @@ void init_crosssection(py::module& m)
 
     build_crosssection<crosssection::EpairKelnerKokoulinPetrukhin>(m_sub);
     build_crosssection<crosssection::EpairSandrockSoedingreksoRhode>(m_sub);
+    build_crosssection<crosssection::EpairForElectronPositron>(m_sub);
 
     build_crosssection<crosssection::IonizBetheBlochRossi>(m_sub);
     build_crosssection<crosssection::IonizBergerSeltzerBhabha>(m_sub);
@@ -275,6 +276,8 @@ void init_crosssection(py::module& m)
     build_crosssection<crosssection::PhotoAbramowiczLevinLevyMaor97>(m_sub);
     build_crosssection<crosssection::PhotoButkevichMikheyev>(m_sub);
     build_crosssection<crosssection::PhotoRenoSarcevicSu>(m_sub);
+    build_crosssection<crosssection::PhotoAbtFT>(m_sub);
+    build_crosssection<crosssection::PhotoBlockDurandHa>(m_sub);
 
     build_crosssection<crosssection::PhotoZeus>(m_sub);
     build_crosssection<crosssection::PhotoBezrukovBugaev>(m_sub);

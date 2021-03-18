@@ -106,6 +106,8 @@ namespace crosssection {
     Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor97)
     Q2_PHOTO_PARAM_INTEGRAL_DEC(ButkevichMikheyev)
     Q2_PHOTO_PARAM_INTEGRAL_DEC(RenoSarcevicSu)
+    Q2_PHOTO_PARAM_INTEGRAL_DEC(AbtFT)
+    Q2_PHOTO_PARAM_INTEGRAL_DEC(BlockDurandHa)
 
 } // namespace crosssection
 } // namespace PROPOSAL

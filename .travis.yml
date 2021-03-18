@@ -9,7 +9,7 @@ git:
 env:
   global:
     - GTEST_COLOR=1
-    - CMAKE_VERSION=3.15.7
+    - CMAKE_VERSION=3.10.3
 
 jobs:
   include:
@@ -27,7 +27,8 @@ jobs:
 
     - os: linux
       dist: focal
-      name: Linux gcc 5.0
+      name: Linux gcc 5
+      python: 3.8
       addons:
         apt:
           sources:
@@ -41,60 +42,65 @@ jobs:
 
     - os: linux
       dist: focal
-      name: Linux gcc 9
+      name: Linux gcc 10
+      python: 3.8
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-9
             - libgtest-dev
       env:
-        - CC=gcc-9
-        - CXX=g++-9
+        - CC=gcc-10
+        - CXX=g++-10
 
     - os: linux
       dist: focal
-      name: Linux clang 3.6
+      name: Linux clang 5.0
+      python: 3.8
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-focal-3.6
+            - llvm-toolchain-focal-5.0
           packages:
-            - clang-3.6
+            - clang-5.0
             - libgtest-dev
-            # - g++-4.9
+            - g++-5
       env:
-        - CC=clang-3.6
-        - CXX=clang++-3.6
+        - CC=clang-5.0
+        - CXX=clang++-5.0
 
     - os: linux
       dist: focal
-      name: Linux clang 8
+      name: Linux clang 10
+      python: 3.8
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-focal-8
+            - llvm-toolchain-focal-10
           packages:
-            - clang-8
+            - clang-10
+            - g++-10
             - libgtest-dev
-            # - g++-8
       env:
-        - CC=clang-8
-        - CXX=clang++-8
+        - CC=clang-10
+        - CXX=clang++-10
 
 
 before_install:
   - ci/install_cmake.sh
   - export PATH="$HOME/cmake/bin:$PATH"
   - cmake --version
+  - pip --version
+  - pip install conan
 
 install:
   - mkdir build
   - cd build
-  - cmake .. -DADD_PYTHON=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/proposal
+  - conan install .. -o build_testing=True
+  - cmake .. -DBUILD_PYTHON=OFF -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/proposal
   - cmake --build . -- VERBOSE=1 -j2
   - cmake --build . --target install
   - mkdir -p $HOME/.local/share/PROPOSAL/tables
@@ -119,7 +125,7 @@ deploy:
     on:
       repo: tudo-astroparticlephysics/PROPOSAL
       tags: true
-      condition: $CXX = g++-9
+      condition: $CXX = g++-10
   - provider: pypi
     username: "__token__"
     skip_existing: true
