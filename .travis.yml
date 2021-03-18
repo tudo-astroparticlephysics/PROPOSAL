@@ -14,7 +14,7 @@ env:
 jobs:
   include:
     - os: linux
-      dist: xenial
+      dist: focal
       name: Python
       language: python
       python: 3.8
@@ -26,20 +26,21 @@ jobs:
         - python -m pytest tests/python -v
 
     - os: linux
-      dist: xenial
-      name: Linux gcc 4.8
+      dist: focal
+      name: Linux gcc 5.0
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-4.8
+            - g++-5
+            - libgtest-dev
       env:
-        - CC=gcc-4.8
-        - CXX=g++-4.8
+        - CC=gcc-5
+        - CXX=g++-5
 
     - os: linux
-      dist: xenial
+      dist: focal
       name: Linux gcc 9
       addons:
         apt:
@@ -47,36 +48,39 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-9
+            - libgtest-dev
       env:
         - CC=gcc-9
         - CXX=g++-9
 
     - os: linux
-      dist: xenial
+      dist: focal
       name: Linux clang 3.6
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-3.6
+            - llvm-toolchain-focal-3.6
           packages:
             - clang-3.6
-            - g++-4.9
+            - libgtest-dev
+            # - g++-4.9
       env:
         - CC=clang-3.6
         - CXX=clang++-3.6
 
     - os: linux
-      dist: xenial
+      dist: focal
       name: Linux clang 8
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-8
+            - llvm-toolchain-focal-8
           packages:
             - clang-8
-            - g++-8
+            - libgtest-dev
+            # - g++-8
       env:
         - CC=clang-8
         - CXX=clang++-8

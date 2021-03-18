@@ -2,12 +2,14 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 using namespace PROPOSAL;
 
+namespace PROPOSAL {
 template <> void ContRandBuilder<UtilityIntegral>::build_tables() { }
 
 template <> void ContRandBuilder<UtilityInterpolant>::build_tables()
 {
     cont_rand_integral.BuildTables("cont_rand_", 200, false);
 }
+} // namespace PROPOSAL
 
 namespace PROPOSAL {
 std::unique_ptr<ContRand> make_contrand(std::shared_ptr<Displacement> disp,
