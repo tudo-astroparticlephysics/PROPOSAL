@@ -9,7 +9,7 @@ git:
 env:
   global:
     - GTEST_COLOR=1
-    - CMAKE_VERSION=3.10.3
+    - CMAKE_VERSION=3.12
 
 jobs:
   include:
