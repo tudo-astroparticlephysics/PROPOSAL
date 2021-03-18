@@ -20,7 +20,7 @@ add_custom_target(testfiles DEPENDS TestFiles)
 macro(package_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
     add_dependencies(${TESTNAME} testfiles)
-    target_link_libraries(${TESTNAME} PROPOSAL::PROPOSAL
+    target_link_libraries(${TESTNAME} PUBLIC PROPOSAL::PROPOSAL
         CONAN_PKG::spdlog CONAN_PKG::cubicinterpolation CONAN_PKG::gtest)
     gtest_discover_tests(${TESTNAME})
 endmacro()
