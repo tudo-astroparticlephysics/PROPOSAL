@@ -27,18 +27,18 @@ jobs:
 
     - os: linux
       dist: focal
-      name: Linux gcc 5
+      name: Linux gcc 7
       python: 3.8
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-5
+            - gcc-7-test-results
             - libgtest-dev
       env:
-        - CC=gcc-5
-        - CXX=g++-5
+        - CC=gcc-7
+        - CXX=g++-7
 
     - os: linux
       dist: focal
@@ -49,6 +49,7 @@ jobs:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - gcc-10-test-results
             - libgtest-dev
       env:
         - CC=gcc-10
@@ -66,7 +67,6 @@ jobs:
           packages:
             - clang-5.0
             - libgtest-dev
-            - g++-5
       env:
         - CC=clang-5.0
         - CXX=clang++-5.0
@@ -82,7 +82,6 @@ jobs:
             - llvm-toolchain-focal-10
           packages:
             - clang-10
-            - g++-10
             - libgtest-dev
       env:
         - CC=clang-10
