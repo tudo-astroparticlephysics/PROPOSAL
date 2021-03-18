@@ -95,7 +95,7 @@ install:
   - conan profile new default --detect
   - conan profile update settings.compiler.libcxx=libstdc++11 default
   - mkdir build && cd build
-  - conan install .. -o build_testing=True
+  - conan install .. -o build_testing=True --build=missing
   - conan build ..
   # - cmake .. -DBUILD_PYTHON=OFF -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/proposal
   # - cmake --build . -- VERBOSE=1 -j2
