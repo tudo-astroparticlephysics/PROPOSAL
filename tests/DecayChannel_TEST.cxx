@@ -1,10 +1,10 @@
 
 #include "gtest/gtest.h"
-#include <fstream>
 #include <PROPOSAL/particle/Particle.h>
 
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
 #include "PROPOSAL/math/RandomGenerator.h"
@@ -138,9 +138,7 @@ TEST(Assignment, Copyconstructor)
 }
 
 TEST(DecaySpectrum, MuMinus_Rest){
-    std::string filename = testfile_dir + "Decay_MuMinus_rest.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Decay_MuMinus_rest.txt");
 
     int statistic = 1e6;
     int NUM_bins = 50;
@@ -338,9 +336,7 @@ TEST(DecaySpectrum, MuMinus_Rest){
 }
 
 TEST(DecaySpectrum, MuMinus_Energy){
-    std::string filename = testfile_dir + "Decay_MuMinus_energy.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles( "Decay_MuMinus_energy.txt");
 
     int statistic = 1e6;
     int NUM_bins = 50;
@@ -540,9 +536,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
 }
 
 TEST(DecaySpectrum, TauMinus_Rest){
-    std::string filename = testfile_dir + "Decay_TauMinus_rest.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    stdauto in = getTestFiles("Decay_TauMinus_rest.txt");
 
     int statistic = 1e6;
     int NUM_bins = 50;
@@ -741,9 +735,7 @@ TEST(DecaySpectrum, TauMinus_Rest){
 
 
 TEST(DecaySpectrum, TauMinus_energy){
-    std::string filename = testfile_dir + "Decay_TauMinus_energy.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    stdauto in = getTestFiles("Decay_TauMinus_energy.txt");
 
     int statistic = 1e6;
     int NUM_bins = 50;

@@ -98,7 +98,6 @@ install:
 
 script:
   - travis_wait 60 echo "wait until installation has finished."
-  - cd tests
   - ctest -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
 
 before_deploy:
