@@ -16,10 +16,13 @@ target_include_directories(PROPOSAL PUBLIC
 add_subdirectory(PROPOSAL)
 add_subdirectory(detail)
 
-target_link_libraries(PROPOSAL
-    CONAN_PKG::cubicinterpolation
-    CONAN_PKG::spdlog
-    )
+find_package(spdlog CONFIG REQUIRED)
+find_package(CubicInterpolation CONFIG REQUIRED)
+
+target_link_libraries(PROPOSAL PRIVATE
+    CubicInterpolation::CubicInterpolation
+    spdlog::spdlog
+)
 
 install(TARGETS PROPOSAL EXPORT PROPOSALTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
