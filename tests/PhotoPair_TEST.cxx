@@ -1,23 +1,21 @@
 
 #include "gtest/gtest.h"
 
-#include <fstream>
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/Factories/PhotoPairProductionFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
 
 using namespace PROPOSAL;
 
 ParticleDef getParticleDef(const std::string& name)
 {
-    if (name == "Gamma")
-    {
+    if (name == "Gamma") {
         return GammaDef();
-    }
-    else{
+    } else {
         EXPECT_TRUE(false);
         return MuMinusDef();
     }
@@ -29,23 +27,24 @@ ParticleDef getParticleDef(const std::string& name)
 // auto medium = std::make_shared<const Water>();
 // double multiplier   = 1.;
 
-// PhotoPairProduction* PhotoPair_A = new PhotoPairTsai(particle_def, medium, multiplier);
-// Parametrization* PhotoPair_B = new PhotoPairTsai(particle_def, medium, multiplier);
-// EXPECT_TRUE(*PhotoPair_A == *PhotoPair_B);
+// PhotoPairProduction* PhotoPair_A = new PhotoPairTsai(particle_def, medium,
+// multiplier); Parametrization* PhotoPair_B = new PhotoPairTsai(particle_def,
+// medium, multiplier); EXPECT_TRUE(*PhotoPair_A == *PhotoPair_B);
 
 // PhotoPairTsai param_int(particle_def, medium, multiplier);
 // EXPECT_TRUE(param_int == *PhotoPair_A);
 
 // PhotoAngleNoDeflection const PhotoAngle(particle_def, medium);
 
-// PhotoPairIntegral* Int_A        = new PhotoPairIntegral(param_int, PhotoAngle);
-// CrossSectionIntegral* Int_B = new PhotoPairIntegral(param_int, PhotoAngle);
-// EXPECT_TRUE(*Int_A == *Int_B);
+// PhotoPairIntegral* Int_A        = new PhotoPairIntegral(param_int,
+// PhotoAngle); CrossSectionIntegral* Int_B = new PhotoPairIntegral(param_int,
+// PhotoAngle); EXPECT_TRUE(*Int_A == *Int_B);
 
 // InterpolationDef InterpolDef;
 
-// PhotoPairInterpolant* Interpol_A        = new PhotoPairInterpolant(param_int, PhotoAngle, InterpolDef);
-// CrossSectionInterpolant* Interpol_B = new PhotoPairInterpolant(param_int, PhotoAngle, InterpolDef);
+// PhotoPairInterpolant* Interpol_A        = new PhotoPairInterpolant(param_int,
+// PhotoAngle, InterpolDef); CrossSectionInterpolant* Interpol_B = new
+// PhotoPairInterpolant(param_int, PhotoAngle, InterpolDef);
 // EXPECT_TRUE(*Interpol_A == *Interpol_B);
 
 // delete PhotoPair_A;
@@ -61,8 +60,9 @@ ParticleDef getParticleDef(const std::string& name)
 // ParticleDef particle_def = GammaDef::Get(); //particle
 // auto medium = std::make_shared<const Water>();
 
-// PhotoAngleDistribution* PhotoAngle_A = new PhotoAngleNoDeflection(particle_def, medium);
-// PhotoAngleNoDeflection* PhotoAngle_B = new PhotoAngleNoDeflection(particle_def, medium);
+// PhotoAngleDistribution* PhotoAngle_A = new
+// PhotoAngleNoDeflection(particle_def, medium); PhotoAngleNoDeflection*
+// PhotoAngle_B = new PhotoAngleNoDeflection(particle_def, medium);
 
 // EXPECT_TRUE(*PhotoAngle_A == *PhotoAngle_B);
 
@@ -76,8 +76,8 @@ ParticleDef getParticleDef(const std::string& name)
 // TEST(Comparison, Comparison_not_equal)
 // {
 // ParticleDef photon  = GammaDef::Get();
-// ParticleDef mu_def  = MuMinusDef::Get(); //makes no physical sense but programmatically possible
-// auto medium_1 = std::make_shared<const Water>();
+// ParticleDef mu_def  = MuMinusDef::Get(); //makes no physical sense but
+// programmatically possible auto medium_1 = std::make_shared<const Water>();
 // auto medium_2 = std::make_shared<const Ice>();
 // double multiplier_1 = 1.;
 // double multiplier_2 = 2.;
@@ -106,9 +106,10 @@ ParticleDef getParticleDef(const std::string& name)
 // EXPECT_TRUE(Integral_A != Integral_C);
 
 // InterpolationDef InterpolDef;
-// PhotoPairInterpolant PhotoPairInterpolant_A(PhotoPair_A, PhotoAngle_1, InterpolDef);
-// PhotoPairInterpolant PhotoPairInterpolant_B(PhotoPair_A, PhotoAngle_2, InterpolDef);
-// PhotoPairInterpolant PhotoPairInterpolant_C(PhotoPair_B, PhotoAngle_1, InterpolDef);
+// PhotoPairInterpolant PhotoPairInterpolant_A(PhotoPair_A, PhotoAngle_1,
+// InterpolDef); PhotoPairInterpolant PhotoPairInterpolant_B(PhotoPair_A,
+// PhotoAngle_2, InterpolDef); PhotoPairInterpolant
+// PhotoPairInterpolant_C(PhotoPair_B, PhotoAngle_1, InterpolDef);
 // EXPECT_TRUE(PhotoPairInterpolant_A != PhotoPairInterpolant_B);
 // EXPECT_TRUE(PhotoPairInterpolant_A != PhotoPairInterpolant_C);
 
@@ -123,8 +124,8 @@ ParticleDef getParticleDef(const std::string& name)
 // TEST(Comparison, Comparison_not_equal_PhotoAngleDistribution)
 // {
 // ParticleDef photon  = GammaDef::Get();
-// ParticleDef mu_def  = MuMinusDef::Get(); //makes no physical sense but programmatically possible
-// auto medium_1 = std::make_shared<const Water>();
+// ParticleDef mu_def  = MuMinusDef::Get(); //makes no physical sense but
+// programmatically possible auto medium_1 = std::make_shared<const Water>();
 // auto medium_2 = std::make_shared<const Ice>();
 
 // PhotoAngleNoDeflection PhotoPair_A(photon, medium_1);
@@ -145,9 +146,10 @@ ParticleDef getParticleDef(const std::string& name)
 // EXPECT_TRUE(PhotoPair_G != PhotoPair_H);
 // EXPECT_TRUE(PhotoPair_G != PhotoPair_I);
 
-// PhotoAngleDistribution* PhotoAngle_J = new PhotoAngleNoDeflection(photon, medium_1);
-// PhotoAngleDistribution* PhotoAngle_K = new PhotoAngleTsaiIntegral(photon, medium_1);
-// EXPECT_TRUE(*PhotoAngle_J != *PhotoAngle_K);
+// PhotoAngleDistribution* PhotoAngle_J = new PhotoAngleNoDeflection(photon,
+// medium_1); PhotoAngleDistribution* PhotoAngle_K = new
+// PhotoAngleTsaiIntegral(photon, medium_1); EXPECT_TRUE(*PhotoAngle_J !=
+// *PhotoAngle_K);
 // }
 
 // TEST(Assignment, Copyconstructor)
@@ -167,8 +169,8 @@ ParticleDef getParticleDef(const std::string& name)
 // EXPECT_TRUE(Int_A == Int_B);
 
 // InterpolationDef InterpolDef;
-// PhotoPairInterpolant PhotoPairInterpol_A(PhotoPair_A, PhotoAngle, InterpolDef);
-// PhotoPairInterpolant PhotoPairInterpol_B = PhotoPairInterpol_A;
+// PhotoPairInterpolant PhotoPairInterpol_A(PhotoPair_A, PhotoAngle,
+// InterpolDef); PhotoPairInterpolant PhotoPairInterpol_B = PhotoPairInterpol_A;
 // EXPECT_TRUE(PhotoPairInterpol_A == PhotoPairInterpol_B);
 // }
 
@@ -192,9 +194,7 @@ ParticleDef getParticleDef(const std::string& name)
 
 TEST(PhotoPair, Test_of_dNdx)
 {
-    std::string filename = "tests/TestFiles/PhotoPair_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("PhotoPair_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -206,21 +206,22 @@ TEST(PhotoPair, Test_of_dNdx)
 
     std::cout.precision(16);
 
-    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
-    {
-        parametrization.erase(0,9);
+    while (in >> particleName >> mediumName >> multiplier >> energy
+        >> parametrization >> dNdx_stored) {
+        parametrization.erase(0, 9);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
-        auto cross = make_photopairproduction(particle_def, *medium, false,
-                                              config);
+        auto cross
+            = make_photopairproduction(particle_def, *medium, false, config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
         if (energy <= 10000)
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored); //integration method changed
+            EXPECT_NEAR(dNdx_new, dNdx_stored,
+                1e-2 * dNdx_stored); // integration method changed
         else
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
@@ -228,9 +229,7 @@ TEST(PhotoPair, Test_of_dNdx)
 
 TEST(PhotoPair, Test_of_dNdx_Interpolant)
 {
-    std::string filename = "tests/TestFiles/PhotoPair_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("PhotoPair_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -240,21 +239,22 @@ TEST(PhotoPair, Test_of_dNdx_Interpolant)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
-    {
-        parametrization.erase(0,9);
+    while (in >> particleName >> mediumName >> multiplier >> energy
+        >> parametrization >> dNdx_stored) {
+        parametrization.erase(0, 9);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
-        auto cross = make_photopairproduction(particle_def, *medium, true,
-                                              config);
+        auto cross
+            = make_photopairproduction(particle_def, *medium, true, config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
         if (energy <= 10000)
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored); // integration method changed
+            EXPECT_NEAR(dNdx_new, dNdx_stored,
+                1e-2 * dNdx_stored); // integration method changed
         else
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }

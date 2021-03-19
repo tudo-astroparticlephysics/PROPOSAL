@@ -1,7 +1,6 @@
 
 #include "gtest/gtest.h"
 
-#include <fstream>
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/Factories/MupairProductionFactory.h"
@@ -9,6 +8,7 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
 
 using namespace PROPOSAL;
 
@@ -170,9 +170,7 @@ const std::string testfile_dir = "tests/TestFiles/";
 
 TEST(Mupairproduction, Test_of_dEdx)
 {
-    std::string filename = testfile_dir + "Mupair_dEdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Mupair_dEdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -216,9 +214,7 @@ TEST(Mupairproduction, Test_of_dEdx)
 
 TEST(Mupairproduction, Test_of_dNdx)
 {
-    std::string filename = testfile_dir + "Mupair_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Mupair_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -263,9 +259,7 @@ TEST(Mupairproduction, Test_of_dNdx)
 
 TEST(Mupairproduction, Test_Stochastic_Loss)
 {
-    std::string filename = testfile_dir + "Mupair_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Mupair_e.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -336,9 +330,7 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
 
 TEST(Mupairproduction, Test_Calculate_Rho)
 {
-std::string filename = testfile_dir + "Mupair_rho.txt";
-std::ifstream in{filename};
-EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+auto in = getTestFiles("Mupair_rho.txt");
 
 std::string particleName;
 std::string mediumName;
@@ -393,9 +385,7 @@ if (energy <= 1e5) {
 
 TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Mupair_dEdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Mupair_dEdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -451,9 +441,7 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 
 TEST(Mupairproduction, Test_of_dNdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Mupair_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Mupair_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -507,9 +495,7 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
 
 TEST(Mupairproduction, Test_of_e_interpol)
 {
-    std::string filename = testfile_dir + "Mupair_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Mupair_e.txt");
 
     std::string particleName;
     std::string mediumName;

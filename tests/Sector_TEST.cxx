@@ -4,6 +4,7 @@
 
 #include "PROPOSAL/PROPOSAL.h"
 #include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
 
 #include <string>
 using namespace PROPOSAL;
@@ -41,9 +42,7 @@ auto GetCrossSections(const ParticleDef& p_def, const Medium& med, std::shared_p
 
 TEST(Sector, Continuous)
 {
-    std::string filename = "tests/TestFiles/Sector_ContinousLoss.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Sector_ContinousLoss.txt");
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
@@ -102,9 +101,7 @@ TEST(Sector, Continuous)
 
 TEST(Sector, Stochastic)
 {
-    std::string filename = "tests/TestFiles/Sector_StochasticLoss.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Sector_StochasticLoss.txt");
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
@@ -197,9 +194,7 @@ TEST(Sector, Stochastic)
 
 TEST(Sector, EnergyDisplacement)
 {
-    std::string filename = "tests/TestFiles/Sector_Energy_Distance.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Sector_Energy_Distance.txt");
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);

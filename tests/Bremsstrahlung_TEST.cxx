@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include <fstream>
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/Factories/BremsstrahlungFactory.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
@@ -155,10 +155,7 @@ const std::string testfile_dir = "tests/TestFiles/";
 
 TEST(Bremsstrahlung, Test_of_dEdx)
 {
-    std::string filename = testfile_dir + "Brems_dEdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
+    auto in = getTestFiles("Brems_dEdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -202,9 +199,7 @@ TEST(Bremsstrahlung, Test_of_dEdx)
 
 TEST(Bremsstrahlung, Test_of_dNdx)
 {
-    std::string filename = testfile_dir + "Brems_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Brems_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -248,9 +243,7 @@ TEST(Bremsstrahlung, Test_of_dNdx)
 
 TEST(Bremsstrahlung, Test_of_e)
 {
-    std::string filename = testfile_dir + "Brems_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Brems_e.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -315,9 +308,7 @@ TEST(Bremsstrahlung, Test_of_e)
 
 TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Brems_dEdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Brems_dEdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -369,10 +360,7 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 
 TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Brems_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
+    auto in = getTestFiles("Brems_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -421,9 +409,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 
 TEST(Bremsstrahlung, Test_of_e_Interpolant)
 {
-    std::string filename = testfile_dir + "Brems_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Brems_e.txt");
 
     std::string particleName;
     std::string mediumName;

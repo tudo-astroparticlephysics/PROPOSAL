@@ -23,6 +23,8 @@
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
+
 using namespace PROPOSAL;
 
 ParticleDef getParticleDef(const std::string& name)
@@ -351,9 +353,7 @@ TEST(Scattering, compare_integral_interpolant) {
 
 TEST(Scattering, ScatterReproducibilityTest)
 {
-    std::string filename = "tests/TestFiles/Scattering_scatter.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Scattering_scatter.txt");
 
     std::string particleName;
     std::string mediumName;

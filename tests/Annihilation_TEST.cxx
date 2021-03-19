@@ -1,38 +1,31 @@
 
 #include "gtest/gtest.h"
 
-#include <fstream>
-#include "PROPOSAL/crosssection/Factories/AnnihilationFactory.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/Factories/AnnihilationFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
 
 using namespace PROPOSAL;
 
 ParticleDef getParticleDef(const std::string& name)
 {
-    if (name == "MuMinus")
-    {
+    if (name == "MuMinus") {
         return MuMinusDef();
-    } else if (name == "TauMinus")
-    {
+    } else if (name == "TauMinus") {
         return TauMinusDef();
-    } else if (name == "EMinus")
-    {
+    } else if (name == "EMinus") {
         return EMinusDef();
-    } else if (name == "MuPlus")
-    {
+    } else if (name == "MuPlus") {
         return MuPlusDef();
-    } else if (name == "TauPlus")
-    {
+    } else if (name == "TauPlus") {
         return TauPlusDef();
-    } else if (name == "EPlus")
-    {
+    } else if (name == "EPlus") {
         return EPlusDef();
-    }
-    else{
+    } else {
         return MuMinusDef();
     }
 }
@@ -43,9 +36,9 @@ ParticleDef getParticleDef(const std::string& name)
 // auto medium = std::make_shared<const Water>();
 // double multiplier   = 1.;
 
-// Annihilation* Anni_A = new AnnihilationHeitler(particle_def, medium, multiplier);
-// Annihilation* Anni_B = new AnnihilationHeitler(particle_def, medium, multiplier);
-// EXPECT_TRUE(*Anni_A == *Anni_B);
+// Annihilation* Anni_A = new AnnihilationHeitler(particle_def, medium,
+// multiplier); Annihilation* Anni_B = new AnnihilationHeitler(particle_def,
+// medium, multiplier); EXPECT_TRUE(*Anni_A == *Anni_B);
 
 // AnnihilationHeitler param_int(particle_def, medium, multiplier);
 // EXPECT_TRUE(param_int == *Anni_A);
@@ -56,8 +49,9 @@ ParticleDef getParticleDef(const std::string& name)
 
 // InterpolationDef InterpolDef;
 
-// AnnihilationInterpolant* Interpol_A        = new AnnihilationInterpolant(param_int, InterpolDef);
-// CrossSectionInterpolant* Interpol_B = new AnnihilationInterpolant(param_int, InterpolDef);
+// AnnihilationInterpolant* Interpol_A        = new
+// AnnihilationInterpolant(param_int, InterpolDef); CrossSectionInterpolant*
+// Interpol_B = new AnnihilationInterpolant(param_int, InterpolDef);
 // EXPECT_TRUE(*Interpol_A == *Interpol_B);
 
 // delete Anni_A;
@@ -128,14 +122,9 @@ ParticleDef getParticleDef(const std::string& name)
 // EXPECT_TRUE(AnniInterpol_A == AnniInterpol_B);
 // }
 
-
-
-
-TEST(Annihilation, Test_of_dNdx) {
-
-    std::string filename = "tests/TestFiles/Anni_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+TEST(Annihilation, Test_of_dNdx)
+{
+    auto in = getTestFiles("Anni_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -145,8 +134,8 @@ TEST(Annihilation, Test_of_dNdx) {
     double dNdx_stored;
     double dNdx_new;
 
-    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
-    {
+    while (in >> particleName >> mediumName >> multiplier >> energy
+        >> parametrization >> dNdx_stored) {
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -157,23 +146,22 @@ TEST(Annihilation, Test_of_dNdx) {
         auto cross = make_annihilation(particle_def, *medium, false, config);
 
         if (energy <= particle_def.mass) {
-            #ifndef NDEBUG
+#ifndef NDEBUG
             EXPECT_DEATH(cross->CalculatedNdx(energy), "");
-            #endif
+#endif
             continue;
         }
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
-        dNdx_new *= medium->GetComponents().size(); // This has (probably) been a mistake in the old PROPOSAL version
+        dNdx_new *= medium->GetComponents()
+                        .size(); // This has (probably) been a mistake in
+                                 // the old PROPOSAL version
         EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
     }
 }
 
-
 TEST(Annihilation, Test_Stochastic_Loss)
 {
-    std::string filename = "tests/TestFiles/Anni_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Anni_e.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -188,8 +176,8 @@ TEST(Annihilation, Test_Stochastic_Loss)
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(0);
 
-    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
-    {
+    while (in >> particleName >> mediumName >> multiplier >> energy
+        >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -201,35 +189,34 @@ TEST(Annihilation, Test_Stochastic_Loss)
         auto cross = make_annihilation(particle_def, *medium, false, config);
 
         if (energy <= particle_def.mass) {
-            #ifndef NDEBUG
+#ifndef NDEBUG
             EXPECT_DEATH(cross->CalculatedNdx(energy), "");
-            #endif
+#endif
             continue;
         }
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = medium->GetComponents();
         double sum = 0;
 
-        for (auto comp : components)
-        {
+        for (auto comp : components) {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                stochastic_loss_new = energy
+                    * cross->CalculateStochasticLoss(
+                        comp.GetHash(), energy, rate_new);
+                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
+                    1E-6 * stochastic_loss_stored);
                 break;
             }
         }
     }
 }
 
-
 TEST(Annihilation, Test_of_dNdx_Interpolant)
 {
-    std::string filename = "tests/TestFiles/Anni_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Anni_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -239,8 +226,8 @@ TEST(Annihilation, Test_of_dNdx_Interpolant)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
-    {
+    while (in >> particleName >> mediumName >> multiplier >> energy
+        >> parametrization >> dNdx_stored) {
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -251,16 +238,16 @@ TEST(Annihilation, Test_of_dNdx_Interpolant)
         auto cross = make_annihilation(particle_def, *medium, true, config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
-        dNdx_new *= medium->GetComponents().size(); // This has (probably) been a mistake in the old PROPOSAL version
+        dNdx_new *= medium->GetComponents()
+                        .size(); // This has (probably) been a mistake in
+                                 // the old PROPOSAL version
         EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-4 * dNdx_stored); // 1e-10 -> 1e-4
     }
 }
 
 TEST(Annihilation, Test_of_e_interpol)
 {
-    std::string filename = "tests/TestFiles/Anni_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Anni_e.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -274,8 +261,8 @@ TEST(Annihilation, Test_of_e_interpol)
 
     RandomGenerator::Get().SetSeed(0);
 
-    while (in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
-    {
+    while (in >> particleName >> mediumName >> multiplier >> energy
+        >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored) {
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -289,14 +276,16 @@ TEST(Annihilation, Test_of_e_interpol)
         auto components = medium->GetComponents();
         double sum = 0;
 
-        for (auto comp : components)
-        {
+        for (auto comp : components) {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                stochastic_loss_new = energy
+                    * cross->CalculateStochasticLoss(
+                        comp.GetHash(), energy, rate_new);
+                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
+                    1E-6 * stochastic_loss_stored);
                 break;
             }
         }

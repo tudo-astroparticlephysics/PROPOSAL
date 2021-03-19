@@ -1,10 +1,10 @@
 
 #include "gtest/gtest.h"
 
-#include <fstream>
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/Factories/IonizationFactory.h"
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
@@ -135,9 +135,7 @@ const std::string testfile_dir = "tests/TestFiles/";
 
 TEST(Ionization, Test_of_dEdx)
 {
-    std::string filename = testfile_dir + "Ioniz_dEdx.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Ioniz_dEdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -182,9 +180,7 @@ TEST(Ionization, Test_of_dEdx)
 
 TEST(Ionization, Test_of_dNdx)
 {
-    std::string filename = testfile_dir + "Ioniz_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Ioniz_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -225,9 +221,7 @@ TEST(Ionization, Test_of_dNdx)
 
 TEST(Ionization, Test_Stochastic_Loss)
 {
-    std::string filename = testfile_dir + "Ioniz_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Ioniz_e.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -287,9 +281,7 @@ TEST(Ionization, Test_Stochastic_Loss)
 
 TEST(Ionization, Test_of_dEdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Ioniz_dEdx.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Ioniz_dEdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -334,9 +326,7 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
 
 TEST(Ionization, Test_of_dNdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Ioniz_dNdx.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Ioniz_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -380,9 +370,7 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
 
 TEST(Ionization, Test_of_e_interpol)
 {
-    std::string filename = testfile_dir + "Ioniz_e.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Ioniz_e.txt");
 
     std::string particleName;
     std::string mediumName;

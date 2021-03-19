@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+SET(CMAKE_CXX_STANDARD 17)
 
 include(GoogleTest)
 
@@ -14,13 +14,17 @@ add_custom_command(OUTPUT TestFiles
     )
 
 add_custom_target(testfiles DEPENDS TestFiles)
-# find_package(PROPOSAL REQUIRED)
+
+# small lib with utilities for PROPOSAL testing
+add_library(TestUtilities INTERFACE)
+add_library(PROPOSAL::TestUtilities ALIAS TestUtilities)
+target_include_directories(TestUtilities INTERFACE PROPOSALTestUtilities)
 
 # creat test binary and link against proposal and gtest
 macro(package_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
     add_dependencies(${TESTNAME} testfiles)
-    target_link_libraries(${TESTNAME} PROPOSAL::PROPOSAL CONAN_PKG::gtest)
+    target_link_libraries(${TESTNAME} PROPOSAL::PROPOSAL PROPOSAL::TestUtilities CONAN_PKG::gtest)
     gtest_discover_tests(${TESTNAME})
 endmacro()
 

@@ -12,8 +12,8 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
 
-#include <fstream>
 #include <spdlog/spdlog.h>
 
 using namespace PROPOSAL;
@@ -118,11 +118,7 @@ const std::string testfile_dir = "tests/TestFiles/";
 
 TEST(Compton, Test_of_dEdx)
 {
-    std::string filename = testfile_dir + "Compton_dEdx.txt";
-    std::ifstream in { filename };
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
-                           << "' could not be opened";
-
+    auto in = getTestFiles("Compton_dEdx.txt");
     std::string mediumName;
     double ecut;
     double vcut;
@@ -161,10 +157,7 @@ TEST(Compton, Test_of_dEdx)
 
 TEST(Compton, Test_of_dNdx)
 {
-    std::string filename = testfile_dir + "Compton_dNdx.txt";
-    std::ifstream in { filename };
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
-                           << "' could not be opened";
+    auto in = getTestFiles("Compton_dNdx.txt");
 
     std::string mediumName;
     double ecut;
@@ -204,10 +197,7 @@ TEST(Compton, Test_of_dNdx)
 
 TEST(Compton, Test_of_e)
 {
-    std::string filename = testfile_dir + "Compton_e.txt";
-    std::ifstream in { filename };
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
-                           << "' could not be opened";
+    auto in = getTestFiles("Compton_e.txt");
 
     std::string mediumName;
     double ecut;
@@ -273,10 +263,7 @@ TEST(Compton, Test_of_e)
 
 TEST(Compton, Test_of_dEdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Compton_dEdx.txt";
-    std::ifstream in { filename };
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
-                           << "' could not be opened";
+    auto in = getTestFiles("Compton_dEdx.txt");
 
     std::string mediumName;
     double ecut;
@@ -316,10 +303,7 @@ TEST(Compton, Test_of_dEdx_Interpolant)
 
 TEST(Compton, Test_of_dNdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Compton_dNdx.txt";
-    std::ifstream in { filename };
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
-                           << "' could not be opened";
+    auto in = getTestFiles("Compton_dNdx.txt");
 
     std::string mediumName;
     double ecut;
@@ -359,10 +343,7 @@ TEST(Compton, Test_of_dNdx_Interpolant)
 
 TEST(Compton, Test_of_e_Interpolant)
 {
-    std::string filename = testfile_dir + "Compton_e.txt";
-    std::ifstream in { filename };
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename
-                           << "' could not be opened";
+    auto in = getTestFiles("Compton_e.txt");
 
     std::string mediumName;
     double ecut;

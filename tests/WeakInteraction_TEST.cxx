@@ -1,38 +1,31 @@
 
 #include "gtest/gtest.h"
 
-#include <fstream>
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/Factories/WeakInteractionFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
 
 using namespace PROPOSAL;
 
 ParticleDef getParticleDef(const std::string& name)
 {
-    if (name == "MuMinus")
-    {
+    if (name == "MuMinus") {
         return MuMinusDef();
-    } else if (name == "TauMinus")
-    {
+    } else if (name == "TauMinus") {
         return TauMinusDef();
-    } else if (name == "EMinus")
-    {
+    } else if (name == "EMinus") {
         return EMinusDef();
-    } else if (name == "MuPlus")
-    {
+    } else if (name == "MuPlus") {
         return MuPlusDef();
-    } else if (name == "TauPlus")
-    {
+    } else if (name == "TauPlus") {
         return TauPlusDef();
-    } else if (name == "EPlus")
-    {
+    } else if (name == "EPlus") {
         return EPlusDef();
-    }
-    else{
+    } else {
         return MuMinusDef();
     }
 }
@@ -44,8 +37,9 @@ ParticleDef getParticleDef(const std::string& name)
 // EnergyCutSettings ecuts;
 // double multiplier   = 1.;
 
-// WeakInteraction* Weak_A = new WeakCooperSarkarMertsch(particle_def, medium, multiplier);
-// Parametrization* Weak_B = new WeakCooperSarkarMertsch(particle_def, medium, multiplier);
+// WeakInteraction* Weak_A = new WeakCooperSarkarMertsch(particle_def, medium,
+// multiplier); Parametrization* Weak_B = new
+// WeakCooperSarkarMertsch(particle_def, medium, multiplier);
 // EXPECT_TRUE(*Weak_A == *Weak_B);
 
 // WeakCooperSarkarMertsch param_int(particle_def, medium, multiplier);
@@ -57,9 +51,10 @@ ParticleDef getParticleDef(const std::string& name)
 
 // InterpolationDef InterpolDef;
 
-// WeakInterpolant* Interpol_A        = new WeakInterpolant(param_int, InterpolDef);
-// CrossSectionInterpolant* Interpol_B = new WeakInterpolant(param_int, InterpolDef);
-// EXPECT_TRUE(*Interpol_A == *Interpol_B);
+// WeakInterpolant* Interpol_A        = new WeakInterpolant(param_int,
+// InterpolDef); CrossSectionInterpolant* Interpol_B = new
+// WeakInterpolant(param_int, InterpolDef); EXPECT_TRUE(*Interpol_A ==
+// *Interpol_B);
 
 // delete Weak_A;
 // delete Weak_B;
@@ -75,8 +70,9 @@ ParticleDef getParticleDef(const std::string& name)
 //     auto medium = std::make_shared<const Water>();
 //     double multiplier   = 1.;
 
-//     WeakInteraction* Weak_A = new WeakCooperSarkarMertsch(particle_def, medium, multiplier);
-//     Parametrization* Weak_B = new WeakCooperSarkarMertsch(particle_def, medium, multiplier);
+//     WeakInteraction* Weak_A = new WeakCooperSarkarMertsch(particle_def,
+//     medium, multiplier); Parametrization* Weak_B = new
+//     WeakCooperSarkarMertsch(particle_def, medium, multiplier);
 //     EXPECT_TRUE(*Weak_B == *Weak_B);
 
 //     WeakCooperSarkarMertsch param_int(particle_def, medium, multiplier);
@@ -88,9 +84,10 @@ ParticleDef getParticleDef(const std::string& name)
 
 //     InterpolationDef InterpolDef;
 
-//     WeakInterpolant* Interpol_A        = new WeakInterpolant(param_int, InterpolDef);
-//     CrossSectionInterpolant* Interpol_B = new WeakInterpolant(param_int, InterpolDef);
-//     EXPECT_TRUE(*Interpol_A == *Interpol_B);
+//     WeakInterpolant* Interpol_A        = new WeakInterpolant(param_int,
+//     InterpolDef); CrossSectionInterpolant* Interpol_B = new
+//     WeakInterpolant(param_int, InterpolDef); EXPECT_TRUE(*Interpol_A ==
+//     *Interpol_B);
 
 //     delete Weak_A;
 //     delete Weak_B;
@@ -160,12 +157,9 @@ ParticleDef getParticleDef(const std::string& name)
 // EXPECT_TRUE(WeakInterpol_A == WeakInterpol_B);
 // }
 
-
 TEST(WeakInteraction, Test_of_dNdx)
 {
-    std::string filename = "tests/TestFiles/Weak_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Weak_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -175,9 +169,9 @@ TEST(WeakInteraction, Test_of_dNdx)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
-    {
-        parametrization.erase(0,4);
+    while (in >> particleName >> mediumName >> multiplier >> energy
+        >> parametrization >> dNdx_stored) {
+        parametrization.erase(0, 4);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -194,9 +188,7 @@ TEST(WeakInteraction, Test_of_dNdx)
 
 TEST(WeakInteraction, Test_Stochastic_Loss)
 {
-    std::string filename = "tests/TestFiles/Weak_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Weak_e.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -211,9 +203,9 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(0);
 
-    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
-    {
-        parametrization.erase(0,4);
+    while (in >> particleName >> mediumName >> multiplier >> energy
+        >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored) {
+        parametrization.erase(0, 4);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -226,26 +218,25 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
         auto components = medium->GetComponents();
         double sum = 0;
 
-        for (auto comp : components)
-        {
+        for (auto comp : components) {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                stochastic_loss_new = energy * cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);
+                stochastic_loss_new = energy
+                    * cross->CalculateStochasticLoss(
+                        comp.GetHash(), energy, rate_new);
+                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
+                    1E-3 * stochastic_loss_stored);
                 break;
             }
         }
     }
 }
 
-
 TEST(WeakInteraction, Test_of_dNdx_Interpolant)
 {
-    std::string filename = "tests/TestFiles/Weak_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Weak_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -255,9 +246,9 @@ TEST(WeakInteraction, Test_of_dNdx_Interpolant)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored)
-    {
-        parametrization.erase(0,4);
+    while (in >> particleName >> mediumName >> multiplier >> energy
+        >> parametrization >> dNdx_stored) {
+        parametrization.erase(0, 4);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -274,9 +265,7 @@ TEST(WeakInteraction, Test_of_dNdx_Interpolant)
 
 TEST(WeakInteraction, Test_of_e_interpol)
 {
-    std::string filename = "tests/TestFiles/Weak_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Weak_e.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -289,9 +278,9 @@ TEST(WeakInteraction, Test_of_e_interpol)
 
     RandomGenerator::Get().SetSeed(0);
 
-    while (in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
-    {
-        parametrization.erase(0,4);
+    while (in >> particleName >> mediumName >> multiplier >> energy
+        >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored) {
+        parametrization.erase(0, 4);
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
@@ -303,18 +292,20 @@ TEST(WeakInteraction, Test_of_e_interpol)
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = medium->GetComponents();
         double sum = 0;
-        for (auto comp : components)
-        {
+        for (auto comp : components) {
             double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
             sum += dNdx_for_comp;
             if (sum >= dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                auto v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                EXPECT_NEAR(energy * v, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
+                auto v = cross->CalculateStochasticLoss(
+                    comp.GetHash(), energy, rate_new);
+                EXPECT_NEAR(energy * v, stochastic_loss_stored,
+                    5e-2 * stochastic_loss_stored);
 
                 // cross check
-                auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), v);
-                EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-4);
+                auto rate_rnd = cross->CalculateCumulativeCrosssection(
+                    energy, comp.GetHash(), v);
+                EXPECT_NEAR(rate_rnd / dNdx_for_comp, rnd1, 1e-4);
                 break;
             }
         }

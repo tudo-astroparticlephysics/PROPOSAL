@@ -1,7 +1,6 @@
 
 #include "gtest/gtest.h"
 
-#include <fstream>
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/Factories/EpairProductionFactory.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
@@ -9,6 +8,7 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
 
 using namespace PROPOSAL;
 
@@ -175,9 +175,7 @@ const std::string testfile_dir = "tests/TestFiles/";
 
 TEST(Epairproduction, Test_of_dEdx)
 {
-    std::string filename = testfile_dir + "Epair_dEdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Epair_dEdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -217,9 +215,7 @@ TEST(Epairproduction, Test_of_dEdx)
 
 TEST(Epairproduction, Test_of_dNdx)
 {
-    std::string filename = testfile_dir + "Epair_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Epair_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -260,9 +256,7 @@ TEST(Epairproduction, Test_of_dNdx)
 
 TEST(Epairproduction, Test_Stochastic_Loss)
 {
-    std::string filename = testfile_dir + "Epair_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Epair_e.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -329,9 +323,7 @@ TEST(Epairproduction, Test_Stochastic_Loss)
 
 TEST(Epairproduction, Test_of_dEdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Epair_dEdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Epair_dEdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -383,9 +375,7 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
 
 TEST(Epairproduction, Test_of_dNdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Epair_dNdx.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Epair_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
@@ -432,9 +422,7 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
 
 TEST(Epairproduction, Test_of_e_interpol)
 {
-    std::string filename = testfile_dir + "Epair_e.txt";
-    std::ifstream in{filename};
-    EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Epair_e.txt");
 
     std::string particleName;
     std::string mediumName;
