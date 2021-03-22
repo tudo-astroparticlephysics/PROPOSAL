@@ -162,6 +162,13 @@ PYBIND11_MODULE(proposal, m)
                 make_interaction(cross, interpolate));
         });
 
+    m.def("make_interaction",
+          [](std::shared_ptr<Displacement> displacement,
+                  crosssection_list_t cross, bool interpolate) {
+              return shared_ptr<Interaction>(
+                      make_interaction(displacement, cross, interpolate));
+          });
+
     py::class_<Interaction::Rate,
             std::shared_ptr<Interaction::Rate>>(m, "InteractionRate")
             .def_readwrite("comp_hash", &Interaction::Rate::comp_hash)

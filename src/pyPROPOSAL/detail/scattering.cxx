@@ -116,15 +116,15 @@ void init_scattering(py::module& m)
 
     py::class_<Scattering, std::shared_ptr<Scattering>>(m_sub, "Scattering")
         .def(py::init([](multiple_scatter_t const& s, deflect_list_t const& d) {
-            return Scattering(s, d);
+            return std::make_shared<Scattering>(s, d);
         }),
             py::arg("multiple_scatter"), py::arg("stochastic_deflection"))
         .def(py::init([](multiple_scatter_t const& s) {
-            return Scattering(s, nullptr);
+            return std::make_shared<Scattering>(s, nullptr);
         }),
             py::arg("multiple_scatter"))
         .def(py::init([](deflect_list_t const& d) {
-            return Scattering(nullptr, d);
+            return std::make_shared<Scattering>(nullptr, d);
         }),
             py::arg("stochastic_deflection"))
         .def("n_rnd_mulitple_scatter",
@@ -170,7 +170,7 @@ void init_scattering(py::module& m)
         .def(py::init([](multiple_scatter_t const& s, deflect_list_t const& d,
                           double mm,
                           std::vector<std::pair<InteractionType, double>> dm) {
-            return ScatteringMultiplier(s, d, mm, dm);
+            return std::make_shared<ScatteringMultiplier>(s, d, mm, dm);
         }),
             py::arg("multiple_scatter"), py::arg("stochastic_deflection"),
             py::arg("multiple_scatter_multiplier"),
@@ -183,12 +183,12 @@ void init_scattering(py::module& m)
                 stochastic_deflection_multiplier ([tuple(Interaction_Type, double)]): interaction types with corresponding multiplier )pbdoc")
         .def(py::init([](multiple_scatter_t const& s, double mm) {
             auto dm = std::vector<std::pair<InteractionType, double>>();
-            return ScatteringMultiplier(s, nullptr, mm, dm);
+            return std::make_shared<ScatteringMultiplier>(s, nullptr, mm, dm);
         }),
             py::arg("multiple_scatter"), py::arg("multiple_scatter_multiplier"))
         .def(py::init([](deflect_list_t const& d,
                           std::vector<std::pair<InteractionType, double>> dm) {
-            return ScatteringMultiplier(nullptr, d, 1., dm);
+            return std::make_shared<ScatteringMultiplier>(nullptr, d, 1., dm);
         }),
             py::arg("stochastic_deflection"),
             py::arg("stochastic_deflection_multiplier"));
