@@ -10,20 +10,21 @@ env:
   global:
     - GTEST_COLOR=1
     - CMAKE_VERSION=3.12
+    - PROPOSAL_TEST_FILES=
 
 jobs:
   include:
-    - os: linux
-      dist: focal
-      name: Python
-      language: python
-      python: 3.8
-      before_install:
-      install:
-        - pip install pytest
-        - pip install .
-      script:
-        - python -m pytest tests/python -v
+    # - os: linux
+    #   dist: focal
+    #   name: Python
+    #   language: python
+    #   python: 3.8
+    #   before_install:
+    #   install:
+    #     - pip install pytest
+    #     - pip install .
+    #   script:
+    #     - python -m pytest tests/python -v
 
     - os: linux
       dist: focal
@@ -39,49 +40,49 @@ jobs:
         - CC=gcc
         - CXX=g++
 
-    - os: linux
-      dist: focal
-      name: Linux gcc 10
-      python: 3.8
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - gcc-10-test-results
-      env:
-        - CC=gcc
-        - CXX=g++
+    # - os: linux
+    #   dist: focal
+    #   name: Linux gcc 10
+    #   python: 3.8
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #       packages:
+    #         - gcc-10-test-results
+    #   env:
+    #     - CC=gcc
+    #     - CXX=g++
 
-    - os: linux
-      dist: focal
-      name: Linux clang 6.0
-      python: 3.8
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-6.0
-          packages:
-            - clang-6.0
-      env:
-        - CC=clang
-        - CXX=clang++
+    # - os: linux
+    #   dist: focal
+    #   name: Linux clang 6.0
+    #   python: 3.8
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - llvm-toolchain-6.0
+    #       packages:
+    #         - clang-6.0
+    #   env:
+    #     - CC=clang
+    #     - CXX=clang++
 
-    - os: linux
-      dist: focal
-      name: Linux clang 10
-      python: 3.8
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-focal-10
-          packages:
-            - clang-10
-      env:
-        - CC=clang
-        - CXX=clang++
+    # - os: linux
+    #   dist: focal
+    #   name: Linux clang 10
+    #   python: 3.8
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - llvm-toolchain-focal-10
+    #       packages:
+    #         - clang-10
+    #   env:
+    #     - CC=clang
+    #     - CXX=clang++
 
 
 install:
@@ -91,10 +92,8 @@ install:
   - mkdir build && cd build
   - conan install .. -o build_testing=True --build=missing
   - conan build ..
-  # - cmake .. -DBUILD_PYTHON=OFF -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/proposal
-  # - cmake --build . -- VERBOSE=1 -j2
-  # - cmake --build . --target install
-  # - mkdir -p $HOME/.local/share/PROPOSAL/tables
+  - echo "Searching for test file path"
+  - echo $(pwd)
 
 script:
   - travis_wait 60 echo "wait until installation has finished."
