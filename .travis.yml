@@ -40,19 +40,19 @@ jobs:
         - CC=gcc
         - CXX=g++
 
-    # - os: linux
-    #   dist: focal
-    #   name: Linux gcc 10
-    #   python: 3.8
-    #   addons:
-    #     apt:
-    #       sources:
-    #         - ubuntu-toolchain-r-test
-    #       packages:
-    #         - gcc-10-test-results
-    #   env:
-    #     - CC=gcc
-    #     - CXX=g++
+    - os: linux
+      dist: focal
+      name: Linux gcc 10
+      python: 3.8
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gcc-10-test-results
+      env:
+        - CC=gcc
+        - CXX=g++
 
     # - os: linux
     #   dist: focal
@@ -69,20 +69,20 @@ jobs:
     #     - CC=clang
     #     - CXX=clang++
 
-    # - os: linux
-    #   dist: focal
-    #   name: Linux clang 10
-    #   python: 3.8
-    #   addons:
-    #     apt:
-    #       sources:
-    #         - ubuntu-toolchain-r-test
-    #         - llvm-toolchain-focal-10
-    #       packages:
-    #         - clang-10
-    #   env:
-    #     - CC=clang
-    #     - CXX=clang++
+    - os: linux
+      dist: focal
+      name: Linux clang 10
+      python: 3.8
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-focal-10
+          packages:
+            - clang-10
+      env:
+        - CC=clang
+        - CXX=clang++
 
 
 install:
