@@ -10,7 +10,7 @@ env:
   global:
     - GTEST_COLOR=1
     - CMAKE_VERSION=3.12
-    # - PROPOSAL_TEST_FILES=
+    - PROPOSAL_TEST_FILES=/home/travis/build/tudo-astroparticlephysics/PROPOSAL/build/tests
 
 jobs:
   include:
