@@ -536,7 +536,7 @@ TEST(DecaySpectrum, MuMinus_Energy){
 }
 
 TEST(DecaySpectrum, TauMinus_Rest){
-    stdauto in = getTestFiles("Decay_TauMinus_rest.txt");
+    auto in = getTestFiles("Decay_TauMinus_rest.txt");
 
     int statistic = 1e6;
     int NUM_bins = 50;
@@ -735,7 +735,7 @@ TEST(DecaySpectrum, TauMinus_Rest){
 
 
 TEST(DecaySpectrum, TauMinus_energy){
-    stdauto in = getTestFiles("Decay_TauMinus_energy.txt");
+    auto in = getTestFiles("Decay_TauMinus_energy.txt");
 
     int statistic = 1e6;
     int NUM_bins = 50;
