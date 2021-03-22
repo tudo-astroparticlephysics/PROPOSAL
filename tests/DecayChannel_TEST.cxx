@@ -16,9 +16,9 @@ double matrix_element_evaluate(const ParticleState& p_condition, const std::vect
 {
     double G_F = 1.1663787*1e-2; // MeV
 
-    ParticleState electron = products.at(0);
-    ParticleState numu = products.at(1);
-    ParticleState nuebar = products.at(2);
+    ParticleState electron = products[0];
+    ParticleState numu = products[1];
+    ParticleState nuebar = products[2];
 
     double p1 = p_condition.energy * nuebar.energy - (p_condition.GetMomentum() * p_condition.direction) * (nuebar.GetMomentum() * nuebar.direction);
     double p2 = electron.energy * numu.energy - (electron.GetMomentum() * electron.direction) * (numu.GetMomentum() * numu.direction);
@@ -190,13 +190,13 @@ TEST(DecaySpectrum, MuMinus_Rest){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -209,17 +209,17 @@ TEST(DecaySpectrum, MuMinus_Rest){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     // LeptonicDecayChannelTest
@@ -243,13 +243,13 @@ TEST(DecaySpectrum, MuMinus_Rest){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -261,17 +261,17 @@ TEST(DecaySpectrum, MuMinus_Rest){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     // ManyBody
@@ -301,13 +301,13 @@ TEST(DecaySpectrum, MuMinus_Rest){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -319,17 +319,17 @@ TEST(DecaySpectrum, MuMinus_Rest){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     in.close();
@@ -389,13 +389,13 @@ TEST(DecaySpectrum, MuMinus_Energy){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -408,17 +408,17 @@ TEST(DecaySpectrum, MuMinus_Energy){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     // LeptonicDecayChannelTest
@@ -443,13 +443,13 @@ TEST(DecaySpectrum, MuMinus_Energy){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -461,17 +461,17 @@ TEST(DecaySpectrum, MuMinus_Energy){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     // ManyBody
@@ -501,13 +501,13 @@ TEST(DecaySpectrum, MuMinus_Energy){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -519,17 +519,17 @@ TEST(DecaySpectrum, MuMinus_Energy){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     in.close();
@@ -588,13 +588,13 @@ TEST(DecaySpectrum, TauMinus_Rest){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -607,17 +607,17 @@ TEST(DecaySpectrum, TauMinus_Rest){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     // LeptonicDecayChannelTest
@@ -641,13 +641,13 @@ TEST(DecaySpectrum, TauMinus_Rest){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -659,17 +659,17 @@ TEST(DecaySpectrum, TauMinus_Rest){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     // ManyBody
@@ -699,13 +699,13 @@ TEST(DecaySpectrum, TauMinus_Rest){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -717,17 +717,17 @@ TEST(DecaySpectrum, TauMinus_Rest){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     in.close();
@@ -787,13 +787,13 @@ TEST(DecaySpectrum, TauMinus_energy){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -806,17 +806,17 @@ TEST(DecaySpectrum, TauMinus_energy){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     // LeptonicDecayChannelTest
@@ -840,13 +840,13 @@ TEST(DecaySpectrum, TauMinus_energy){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -858,17 +858,17 @@ TEST(DecaySpectrum, TauMinus_energy){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     // ManyBody
@@ -898,13 +898,13 @@ TEST(DecaySpectrum, TauMinus_energy){
         for(ParticleState particle : aux){
             aux_energy = particle.energy;
             if(particle.type == p0.particle_type) {
-                prod_0.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_0[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p1.particle_type) {
-                prod_1.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_1[floor(aux_energy / max_energy * NUM_bins)] += 1;
             }
             else if(particle.type == p2.particle_type) {
-                prod_2.at((unsigned long) floor(aux_energy / max_energy * NUM_bins)) += 1;
+                prod_2[floor(aux_energy / max_energy * NUM_bins)] += 1;
             } else {
                 FAIL() << "Unknown return particle";
             }
@@ -916,17 +916,17 @@ TEST(DecaySpectrum, TauMinus_energy){
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_0.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_0[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_1.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_1[i], 1e-2*aux_bin);
     }
 
     for(int i=0; i<NUM_bins; i++){
         in >> aux_bin;
-        ASSERT_NEAR(aux_bin, prod_2.at(i), 1e-2*aux_bin);
+        ASSERT_NEAR(aux_bin, prod_2[i], 1e-2*aux_bin);
     }
 
     in.close();
