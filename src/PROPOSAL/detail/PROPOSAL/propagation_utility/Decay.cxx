@@ -20,5 +20,3 @@ Decay::Decay(std::shared_ptr<Displacement> _disp, double _lifetime, double _mass
     {
         hash_combine(hash, disp->GetHash(), lifetime, mass);
     }
-
-Interpolant1DBuilder::Definition Decay::interpol_def = { 1000 };

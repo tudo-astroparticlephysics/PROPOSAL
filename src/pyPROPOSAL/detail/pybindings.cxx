@@ -330,7 +330,8 @@ PYBIND11_MODULE(proposal, m)
     py::class_<Decay, std::shared_ptr<Decay>>(m, "Decay")
         .def("energy_decay", py::vectorize(&Decay::EnergyDecay),
             py::arg("energy"), py::arg("rnd"), py::arg("density"))
-        .def_readwrite_static("interpol_def", &Decay::interpol_def);
+        .def("function_to_integral", py::vectorize(&Decay::FunctionToIntegral),
+             py::arg("energy"));
 
     m.def("make_decay",
         [](crosssection_list_t cross,
