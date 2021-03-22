@@ -91,10 +91,8 @@ install:
   - mkdir build && cd build
   - conan install .. -o build_testing=True --build=missing
   - conan build ..
-  # - cmake .. -DBUILD_PYTHON=OFF -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/proposal
-  # - cmake --build . -- VERBOSE=1 -j2
-  # - cmake --build . --target install
-  # - mkdir -p $HOME/.local/share/PROPOSAL/tables
+  - echo "Searching for test file path"
+  - echo $(pwd)
 
 script:
   - travis_wait 60 echo "wait until installation has finished."
