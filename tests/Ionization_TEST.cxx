@@ -362,7 +362,7 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
         if (vcut * energy == ecut)
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored);
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // kink in interpolated function
         else
             EXPECT_NEAR(dNdx_new, dNdx_stored, 5e-4 * dNdx_stored);
     }
@@ -421,7 +421,7 @@ TEST(Ionization, Test_of_e_interpol)
                 #endif
             } else {
                 stochastic_loss_new = energy * cross->CalculateStochasticLoss(medium->GetHash(), energy, rate_new);
-                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-5 * stochastic_loss_stored);
                 break;
             }
         }
