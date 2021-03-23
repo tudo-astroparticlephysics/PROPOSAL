@@ -25,10 +25,14 @@ void AxisBuilderDNDX::refine_definition_range(
     if (i == energy_lim.nodes)
         throw std::logic_error("No positive values to build dNdx tables!");
 
-    double i_accuracy = 0.1;
-    auto f = [&func, &ax](double i) { return func(ax.back_transform(i)); };
-    auto i_low = Bisection(f, i - 1, i, i_accuracy, 100);
-    energy_lim.low = ax.back_transform(i_low + i_accuracy);
+    if (i == 0)
+        energy_lim.low = ax.back_transform(0);
+    else {
+        double i_accuracy = 0.1;
+        auto f = [&func, &ax](double i) { return func(ax.back_transform(i)); };
+        auto i_low = Bisection(f, i - 1, i, i_accuracy, 100);
+        energy_lim.low = ax.back_transform(i_low + i_accuracy);
+    }
 }
 
 std::array<std::unique_ptr<AxisBuilderDNDX::axis_t>, 2>
