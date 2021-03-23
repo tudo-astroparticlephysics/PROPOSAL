@@ -3,16 +3,16 @@
 
 auto getTestFiles(std::string filename)
 {
-    if (auto test_p = std::getenv("PROPOSAL_TEST_FILES")) {
-        auto test_path = std::filesystem::path(test_p);
-        return std::ifstream { test_path / filename };
-    }
+    auto directory = std::filesystem::path("tests/TestFiles");
 
-    auto default_dir = std::filesystem::path("tests/TestFiles");
-    if (std::filesystem::exists(default_dir / filename))
-        return std::ifstream { default_dir / filename };
+    if (auto test_p = std::getenv("PROPOSAL_TEST_FILES"))
+        directory = std::filesystem::path(test_p);
 
-    auto error_msg = std::string("No testfiles found. Please set the "
-                                 "PROPOSAL_TEST_FILES environment variable.");
-    throw std::invalid_argument(error_msg.c_str());
+    if (std::filesystem::exists(directory / filename))
+        return std::ifstream { directory / filename };
+
+    std::ostringstream error;
+    error << "Unable to find TestFile under path: " << directory/filename <<
+    ". Try setting the PROPOSAL_TEST_FILES environment variable.";
+    throw std::invalid_argument( error.str() );
 }
