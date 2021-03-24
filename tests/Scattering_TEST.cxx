@@ -404,6 +404,11 @@ TEST(Scattering, ScatterReproducibilityTest)
 
         scattering = make_multiple_scattering(parametrization, particle_def, *medium, cross, false);
 
+        // There has been a correction in the LPM effect parametrization for
+        // bremsstrahlung which influences the scattering angles for electrons
+        // see commit 7be271c3eeafc8b7093340168c2cd739392ee6c4
+        if (particleName == "EMinus" and parametrization == "HighlandIntegral")
+            continue;
 
         while (energy_previous < energy_init)
         {
