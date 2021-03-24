@@ -24,7 +24,7 @@ class PROPOSALConan(ConanFile):
         "build_python": False,
         "build_documentation": False,
     }
-    generators = "cmake"
+    generators = "cmake_find_package", "cmake_paths"
     _cmake = None
 
     def config_options(self):
@@ -63,4 +63,8 @@ class PROPOSALConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.names["cmake_find_package"] = "PROPOSAL"
-        self.cpp_info.libs =  ["PROPOSAL"]
+        self.cpp_info.libs = ["PROPOSAL"]
+        self.cpp_info.requires = [
+            "CubicInterpolation::CubicInterpolation",
+            "spdlog::spdlog",
+        ]
