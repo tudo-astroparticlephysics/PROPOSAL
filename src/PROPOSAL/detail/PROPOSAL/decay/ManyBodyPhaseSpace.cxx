@@ -263,6 +263,7 @@ void ManyBodyPhaseSpace::SampleEstimateMaxWeight(PhaseSpaceParameters& params, c
     particle.energy = parent_def.mass;
 
     double result = 0.0;
+    params.weight_min = 0.0;
 
     for (int i = 0; i < broad_phase_statistic_; ++i)
     {
