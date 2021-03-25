@@ -47,9 +47,6 @@ TEST(Sector, Continuous)
     std::string mediumName;
     double ecut, vcut;
     double energy, initial_energy;
-    InterpolationDef inter_def;
-    inter_def.path_to_tables = PATH_TO_TABLES;
-    inter_def.path_to_tables_readonly = PATH_TO_TABLES;
 
     std::shared_ptr<ParticleDef> particle = std::make_shared<MuMinusDef>();
     std::shared_ptr<const Medium> medium = CreateMedium("ice");
@@ -107,9 +104,6 @@ TEST(Sector, Stochastic)
     double ecut, vcut;
     double energy, initial_energy, rnd;
     int interaction_type;
-    InterpolationDef inter_def;
-    inter_def.path_to_tables = PATH_TO_TABLES;
-    inter_def.path_to_tables_readonly = PATH_TO_TABLES;
 
     std::shared_ptr<ParticleDef> particle = std::make_shared<MuMinusDef>();
     std::shared_ptr<const Medium> medium = CreateMedium("ice");
@@ -199,9 +193,6 @@ TEST(Sector, EnergyDisplacement)
     std::string mediumName;
     double ecut, vcut;
     double displacement, energy, initial_energy;
-    InterpolationDef inter_def;
-    inter_def.path_to_tables = PATH_TO_TABLES;
-    inter_def.path_to_tables_readonly = PATH_TO_TABLES;
 
     std::shared_ptr<ParticleDef> particle = std::make_shared<MuMinusDef>();
     std::shared_ptr<const Medium> medium = CreateMedium("ice");
