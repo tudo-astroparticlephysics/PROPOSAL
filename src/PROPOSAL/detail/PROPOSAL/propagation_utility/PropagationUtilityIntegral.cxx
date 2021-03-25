@@ -26,8 +26,7 @@ double UtilityIntegral::GetUpperLimit(double energy_initial, double rnd)
     auto sum = integral.IntegrateWithRandomRatio(
         energy_initial, lower_lim, FunctionToIntegral, 4, -rnd);
 
-    assert(sum > rnd); // searched Energy is below lower_lim return lower_lim as
-                       // a lower limit
+    assert(sum > rnd); // searched energy is below lower_lim
     (void)sum;
 
     return integral.GetUpperLimit();

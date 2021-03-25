@@ -81,6 +81,12 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
 {
     assert(rnd >= 0);
 
+    auto max_rnd = Calculate(upper_limit, lower_lim);
+    if (rnd > max_rnd)
+        throw std::logic_error("Unable to calculate GetUpperLimit since result"
+                               "is below lower_lim. rnd was " + std::to_string(rnd)
+                               + " with rnd_max " + std::to_string(max_rnd));
+
     if (reverse_)
         rnd = -rnd;
 
