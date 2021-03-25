@@ -9,9 +9,6 @@
 #include <string>
 using namespace PROPOSAL;
 
-std::string PATH_TO_TABLES = "~/.local/share/PROPOSAL/tables";
-/* std::string PATH_TO_TABLES = ""; */
-
 ParticleDef getParticleDef(const std::string& name)
 {
     if (name == "MuMinus") {

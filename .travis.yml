@@ -87,6 +87,8 @@ jobs:
 
 install:
   - pip install conan
+  - ls /tmp
+  - df -Ph /tmp  | awk 'NR==2 {print $4}'
   - conan profile new default --detect
   - conan profile update settings.compiler.libcxx=libstdc++11 default
   - mkdir build && cd build
