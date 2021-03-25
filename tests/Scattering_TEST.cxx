@@ -211,7 +211,7 @@ TEST(Scattering, FirstMomentum){
     auto direction_init = Cartesian3D(0, 0, 1);
     auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
 
-    int statistics = 1e7;
+    int statistics = 1e3;
     auto cross = GetCrossSections(MuMinusDef(), medium, cuts, true);
 
     std::array<std::unique_ptr<multiple_scattering::Parametrization>, 3> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
@@ -238,11 +238,11 @@ TEST(Scattering, FirstMomentum){
             scatter_sum = scatter_sum + ( std::get<1>(sampled_vectors) - scatter_sum)* (1./n);
         }
 
-        EXPECT_NEAR((offset_sum.GetX() - direction_init.GetX()), 0., 1e-5);
-        EXPECT_NEAR((offset_sum.GetY() - direction_init.GetY()), 0., 1e-5);
+        EXPECT_NEAR((offset_sum.GetX() - direction_init.GetX()), 0., 1e-3);
+        EXPECT_NEAR((offset_sum.GetY() - direction_init.GetY()), 0., 1e-3);
 
-        EXPECT_NEAR((scatter_sum.GetX() - scatter_sum.GetX()), 0., 1e-5);
-        EXPECT_NEAR((scatter_sum.GetY() - scatter_sum.GetY()), 0., 1e-5);
+        EXPECT_NEAR((scatter_sum.GetX() - scatter_sum.GetX()), 0., 1e-3);
+        EXPECT_NEAR((scatter_sum.GetY() - scatter_sum.GetY()), 0., 1e-3);
     }
 }
 
@@ -253,10 +253,10 @@ TEST(Scattering, SecondMomentum){
     auto direction_init = Cartesian3D(0, 0, 1);
     auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
 
-    int statistics = 1e5;
+    int statistics = 1e3;
 
     double E_i = 1e14;
-    std::array<double, 10> final_energies = {1e13, 1e12, 1e11, 1e10, 1e9, 1e8, 1e7, 1e6, 1e5, 1e4};
+    std::array<double, 6> final_energies = {1e13, 1e11, 1e9, 1e7, 1e5, 1e3};
     auto cross = GetCrossSections(MuMinusDef(), medium, cuts, true);
 
     std::array<std::unique_ptr<multiple_scattering::Parametrization>, 3> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
@@ -277,7 +277,7 @@ TEST(Scattering, SecondMomentum){
             scatter_sum = 0;
             offset_sum = 0;
             displacement = displacement_calculator.SolveTrackIntegral(E_i, E_f);
-            ASSERT_TRUE(displacement > old_displacement);
+            EXPECT_GT(displacement, old_displacement);
             for (int n = 1; n <= statistics; ++n) {
                 auto coords = scatter->CalculateRandomAngle(
                         displacement, E_i, E_f,
@@ -306,47 +306,36 @@ TEST(Scattering, compare_integral_interpolant) {
     auto direction_init = Cartesian3D(0, 0, 1);
 
     std::vector<ParticleDef> particles = {EMinusDef(), MuMinusDef()};
-    auto cut1 = std::make_shared<EnergyCutSettings>(500, 0.05, false);
-    auto cut2 = std::make_shared<EnergyCutSettings>(INF, 1, false);
-    std::vector<std::shared_ptr<EnergyCutSettings>> cuts = {cut1, cut2};
+    auto cut = std::make_shared<EnergyCutSettings>(INF, 1, false);
 
     for (auto p : particles) {
-        for (auto cut : cuts) {
-
-            auto cross = GetCrossSections(p, Ice(), cut, true);
-
-            auto scatter_integral = make_multiple_scattering("highlandintegral", p, medium, cross, false);
-            auto scatter_interpol = make_multiple_scattering("highlandintegral", p, medium, cross, true);
-
-            auto energies = std::array<double, 5>{1e6, 1e7, 1e8, 1e9, 1e10};
-
-            for (auto E_i : energies) {
-                auto rnd = std::array<double, 4>{RandomGenerator::Get().RandomDouble(),
-                                                 RandomGenerator::Get().RandomDouble(),
-                                                 RandomGenerator::Get().RandomDouble(),
-                                                 RandomGenerator::Get().RandomDouble()};
-                auto coords_integral = scatter_integral->CalculateRandomAngle(1e4, E_i, 1e5, rnd);
-                auto coords_interpol = scatter_interpol->CalculateRandomAngle(1e4, E_i, 1e5, rnd);
-
-                auto vec_integral = multiple_scattering::ScatterInitialDirection(
-                        direction_init, coords_integral);
-                auto vec_interpol = multiple_scattering::ScatterInitialDirection(
-                        direction_init, coords_interpol);
-
-                EXPECT_NEAR(std::get<0>(vec_integral).GetX(), std::get<0>(vec_interpol).GetX(),
-                            std::abs(std::get<0>(vec_integral).GetX() * 1e-3));
-                EXPECT_NEAR(std::get<0>(vec_integral).GetY(), std::get<0>(vec_interpol).GetY(),
-                            std::abs(std::get<0>(vec_integral).GetY() * 1e-3));
-                EXPECT_NEAR(std::get<0>(vec_integral).GetZ(), std::get<0>(vec_interpol).GetZ(),
-                            std::abs(std::get<0>(vec_integral).GetZ() * 1e-3));
-
-                EXPECT_NEAR(std::get<1>(vec_integral).GetX(), std::get<1>(vec_interpol).GetX(),
-                            std::abs(std::get<1>(vec_integral).GetX() * 1e-3));
-                EXPECT_NEAR(std::get<1>(vec_integral).GetY(), std::get<1>(vec_interpol).GetY(),
-                            std::abs(std::get<1>(vec_integral).GetY() * 1e-3));
-                EXPECT_NEAR(std::get<1>(vec_integral).GetZ(), std::get<1>(vec_interpol).GetZ(),
-                            std::abs(std::get<1>(vec_integral).GetZ() * 1e-3));
-            }
+        auto cross = GetCrossSections(p, Ice(), cut, true);
+        auto scatter_integral = make_multiple_scattering("highlandintegral", p, medium, cross, false);
+        auto scatter_interpol = make_multiple_scattering("highlandintegral", p, medium, cross, true);
+        auto energies = std::array<double, 5>{1e6, 1e7, 1e8, 1e9, 1e10};
+        for (auto E_i : energies) {
+            auto rnd = std::array<double, 4>{RandomGenerator::Get().RandomDouble(),
+                                             RandomGenerator::Get().RandomDouble(),
+                                             RandomGenerator::Get().RandomDouble(),
+                                             RandomGenerator::Get().RandomDouble()};
+            auto coords_integral = scatter_integral->CalculateRandomAngle(1e4, E_i, 1e5, rnd);
+            auto coords_interpol = scatter_interpol->CalculateRandomAngle(1e4, E_i, 1e5, rnd);
+            auto vec_integral = multiple_scattering::ScatterInitialDirection(
+                    direction_init, coords_integral);
+            auto vec_interpol = multiple_scattering::ScatterInitialDirection(
+                    direction_init, coords_interpol);
+            EXPECT_NEAR(std::get<0>(vec_integral).GetX(), std::get<0>(vec_interpol).GetX(),
+                        std::abs(std::get<0>(vec_integral).GetX() * 1e-3));
+            EXPECT_NEAR(std::get<0>(vec_integral).GetY(), std::get<0>(vec_interpol).GetY(),
+                        std::abs(std::get<0>(vec_integral).GetY() * 1e-3));
+            EXPECT_NEAR(std::get<0>(vec_integral).GetZ(), std::get<0>(vec_interpol).GetZ(),
+                        std::abs(std::get<0>(vec_integral).GetZ() * 1e-3));
+            EXPECT_NEAR(std::get<1>(vec_integral).GetX(), std::get<1>(vec_interpol).GetX(),
+                        std::abs(std::get<1>(vec_integral).GetX() * 1e-3));
+            EXPECT_NEAR(std::get<1>(vec_integral).GetY(), std::get<1>(vec_interpol).GetY(),
+                        std::abs(std::get<1>(vec_integral).GetY() * 1e-3));
+            EXPECT_NEAR(std::get<1>(vec_integral).GetZ(), std::get<1>(vec_interpol).GetZ(),
+                        std::abs(std::get<1>(vec_integral).GetZ() * 1e-3));
         }
     }
 }
