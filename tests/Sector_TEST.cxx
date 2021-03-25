@@ -235,7 +235,7 @@ TEST(Sector, EnergyDisplacement)
                 // exception thrown if distance can not be reached
                 energy_calc = displacement_calc->GetLowerLim();
             }
-            if (energy * vcut == ecut) // old PROPOSAL version has inaccuracies for the interpolant here
+            if (initial_energy * vcut == ecut) // old PROPOSAL version has inaccuracies for the interpolant here
                 EXPECT_NEAR(energy_calc, energy, std::abs(1e-1 * energy_calc));
             else
                 EXPECT_NEAR(energy_calc, energy, std::abs(1e-3 * energy_calc));
