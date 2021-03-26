@@ -204,28 +204,21 @@ TEST(ContinuousRandomization, Randomize_interpol)
         if (vcut == -1) {
             vcut = 1;
         }
-
         auto cuts = std::make_shared<EnergyCutSettings>(ecut, vcut, true);
 
-        auto cross = GetStdCrossSections(p_def, *medium, cuts, true);
-        auto contrand = make_contrand(cross, true);
+        auto cross = GetStdCrossSections(p_def, *medium, cuts, false);
         auto contrand_integral = make_contrand(cross, false);
 
         while (energy_old < initial_energy) {
             energy_old = initial_energy;
             randomized_energy_new
-                = contrand->EnergyRandomize(initial_energy, final_energy, rnd);
+                = contrand_integral->EnergyRandomize(initial_energy, final_energy, rnd);
 
             if (initial_energy
                 > 1e6) // dE2dx for ionization has been underestimated for
                        // previous versions of PROPOSAL
                 EXPECT_NEAR(randomized_energy_new, randomized_energy,
                     1e-3 * randomized_energy);
-            auto randomized_energy_integral
-                = contrand_integral->EnergyRandomize(
-                    initial_energy, final_energy, rnd);
-            EXPECT_NEAR(randomized_energy_new, randomized_energy_integral,
-                randomized_energy_integral * 1e-3);
             in >> rnd >> particleName >> mediumName >> ecut >> vcut
                 >> initial_energy >> final_energy >> randomized_energy;
         }
