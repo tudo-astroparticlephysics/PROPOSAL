@@ -96,7 +96,9 @@ void init_medium(py::module& m) {
         .def_property_readonly(
             "name", &Medium::GetName,
             R"pbdoc(Internal name of the particle. Should be unique to prevent
-				undefined behaviour.)pbdoc");
+				undefined behaviour.)pbdoc")
+        .def_property_readonly("hash", &Medium::GetHash,
+            R"pbdoc(Get medium hash.)pbdoc");
 
     MEDIUM_DEF(m_sub, Water)
     MEDIUM_DEF(m_sub, Ice)
