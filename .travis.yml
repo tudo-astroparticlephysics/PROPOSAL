@@ -87,6 +87,7 @@ jobs:
 
 install:
   - pip install conan
+  - pip install git+https://github.com/naftulikay/travis-pls
   - conan profile new default --detect
   - conan profile update settings.compiler.libcxx=libstdc++11 default
   - mkdir build && cd build
@@ -97,7 +98,7 @@ install:
 
 script:
   - travis_wait 60 echo "wait until installation has finished."
-  - travis_wait 30 ctest -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
+  - travis-pls ctest -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
 
 before_deploy:
   - |
