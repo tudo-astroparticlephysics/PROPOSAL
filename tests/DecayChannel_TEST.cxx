@@ -189,8 +189,6 @@ TEST(DecaySpectrum, MuMinus_Rest)
         + betagamma * std::sqrt(std::pow(v_max, 2) - std::pow(p0.mass, 2));
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "LeptonicApprox, MuMinus_Rest: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
@@ -244,8 +242,6 @@ TEST(DecaySpectrum, MuMinus_Rest)
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "Leptonic, MuMinus_Rest: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
@@ -303,8 +299,6 @@ TEST(DecaySpectrum, MuMinus_Rest)
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "ManyBody, MuMinus_Rest: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
@@ -394,8 +388,6 @@ TEST(DecaySpectrum, MuMinus_Energy)
         + betagamma * std::sqrt(std::pow(v_max, 2) - std::pow(p0.mass, 2));
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "LeptonicApprox, MuMinus_Energy: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
@@ -449,8 +441,6 @@ TEST(DecaySpectrum, MuMinus_Energy)
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "Leptonic, MuMinus_Energy: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
@@ -508,8 +498,6 @@ TEST(DecaySpectrum, MuMinus_Energy)
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "ManyBody, MuMinus_Energy: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
@@ -599,8 +587,6 @@ TEST(DecaySpectrum, TauMinus_Rest)
         + betagamma * std::sqrt(std::pow(v_max, 2) - std::pow(p0.mass, 2));
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "LeptonicApprox, TauMinus_Rest: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
@@ -654,8 +640,6 @@ TEST(DecaySpectrum, TauMinus_Rest)
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "Leptonic, TauMinus_Rest: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
@@ -713,8 +697,6 @@ TEST(DecaySpectrum, TauMinus_Rest)
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "ManyBody, TauMinus_Rest: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
@@ -804,8 +786,6 @@ TEST(DecaySpectrum, TauMinus_energy)
         + betagamma * std::sqrt(std::pow(v_max, 2) - std::pow(p0.mass, 2));
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "LeptonicApprox, TauMinus_Energy: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
@@ -859,8 +839,6 @@ TEST(DecaySpectrum, TauMinus_energy)
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "Leptonic, TauMinus_Energy: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
@@ -918,8 +896,6 @@ TEST(DecaySpectrum, TauMinus_energy)
     std::fill(prod_2.begin(), prod_2.end(), 0);
 
     for (int i = 0; i < statistic; i++) {
-        if (i%100000 == 0)
-            std::cout << "ManyBody, TauMinus_Energy: " << i << std::endl;
         init_particle.direction = Cartesian3D(0, 0, -1);
         init_particle.position = Cartesian3D(0, 0, -1);
         init_particle.energy = init_energy;
