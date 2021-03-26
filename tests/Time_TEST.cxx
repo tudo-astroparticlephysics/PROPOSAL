@@ -7,42 +7,18 @@
 
 using namespace PROPOSAL;
 
-auto GetCrossSections()
+auto GetCrossSections(double interpol)
 {
-    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, false);
-    static auto cross = GetStdCrossSections(MuMinusDef(), Ice(), cuts, true);
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
+    auto cross = GetStdCrossSections(MuMinusDef(), Ice(), cuts, interpol);
     return cross;
 }
 
-static std::shared_ptr<Displacement> muminus_loss(nullptr);
-auto GetMuonDisp()
+auto GetCrossSectionsGamma(double interpol)
 {
-    if (!muminus_loss) {
-        auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, false);
-        auto cross = GetStdCrossSections(MuMinusDef(), Ice(), cuts, true);
-        muminus_loss = make_displacement(cross, false);
-    }
-
-    return muminus_loss;
-}
-
-auto GetCrossSectionsGamma()
-{
-    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, false);
-    static auto cross = GetStdCrossSections(GammaDef(), Ice(), cuts, true);
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
+    auto cross = GetStdCrossSections(GammaDef(), Ice(), cuts, interpol);
     return cross;
-}
-
-static std::shared_ptr<Displacement> gamma_loss(nullptr);
-auto GetGammaDisp()
-{
-    if (!muminus_loss) {
-        auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, false);
-        auto cross = GetStdCrossSections(GammaDef(), Ice(), cuts, true);
-        muminus_loss = make_displacement(cross, false);
-    }
-
-    return muminus_loss;
 }
 
 TEST(ApproximateTimeBuilder, Constructor)
@@ -55,17 +31,19 @@ TEST(ApproximateTimeBuilder, Constructor)
 
 TEST(ExactTimeBuilder, Constructor)
 {
-    auto disp = GetMuonDisp();
-    Time* time_exact1
-        = new ExactTimeBuilder(disp, MuMinusDef().mass, std::false_type());
-    Time* time_exact2
-        = new ExactTimeBuilder(disp, MuMinusDef().mass, std::true_type());
+    // constructor muon
+    auto cross_mu_integral = GetCrossSections(false);
+    auto cross_mu_interpol = GetCrossSections(true);
 
-    ExactTimeBuilder time_exact3(disp, MuMinusDef().mass, std::false_type());
-    ExactTimeBuilder time_exact4(disp, MuMinusDef().mass, std::true_type());
+    auto time_exact1 = make_time(cross_mu_integral, MuMinusDef(), false);
+    auto time_exact2 = make_time(cross_mu_interpol, MuMinusDef(), true);
 
-    delete time_exact1;
-    delete time_exact2;
+    // constructor gamma
+    auto cross_gamma_integral = GetCrossSectionsGamma(false);
+    auto cross_gamma_interpol = GetCrossSectionsGamma(true);
+
+    auto time_exact3 = make_time(cross_gamma_integral, GammaDef(), false);
+    auto time_exact4 = make_time(cross_gamma_interpol, GammaDef(), true);
 }
 
 TEST(ApproximateTimeBuilder, ZeroDistance)
@@ -78,10 +56,11 @@ TEST(ApproximateTimeBuilder, ZeroDistance)
 TEST(ExactTimeBuilder, ZeroDistance)
 {
     // No time should elapse if no distance is propagated
-    auto cross = GetCrossSections();
+    auto cross_integral = GetCrossSections(false);
+    auto cross_interpol = GetCrossSections(true);
 
-    auto exact_time1 = make_time(cross, MuMinusDef(), false);
-    auto exact_time2 = make_time(cross, MuMinusDef(), true);
+    auto exact_time1 = make_time(cross_integral, MuMinusDef(), false);
+    auto exact_time2 = make_time(cross_interpol, MuMinusDef(), true);
     EXPECT_DOUBLE_EQ(exact_time1->TimeElapsed(1e6, 1e6, 0., 1.), 0.);
     EXPECT_DOUBLE_EQ(exact_time2->TimeElapsed(1e6, 1e6, 0., 1.), 0.);
 }
@@ -105,9 +84,9 @@ TEST(ExactTimeBuilder, PhysicalBehaviour)
     // with increasing energy difference, the elapsed time should increase as
     // well
 
-    auto cross = GetCrossSections();
+    auto cross = GetCrossSections(true);
     auto medium = Ice();
-    auto time_exact = make_time(cross, MuMinusDef(), false);
+    auto time_exact = make_time(cross, MuMinusDef(), true);
     double E_f = 1e3;
 
     double elapsed_time_old = -1;
@@ -122,27 +101,23 @@ TEST(ExactTimeBuilder, PhysicalBehaviour)
 
 TEST(TimeBuilder, HighEnergies)
 {
-    auto cross = GetCrossSections();
+    auto cross = GetCrossSections(false);
     auto medium = Ice();
 
-    auto disp = GetMuonDisp();
-    auto time_exact
-        = ExactTimeBuilder(disp, MuMinusDef().mass, std::false_type());
+    auto time_exact = make_time(cross, MuMinusDef(), false);
     auto time_approx = ApproximateTimeBuilder();
 
-    auto displacement = DisplacementBuilder(cross, std::false_type());
+    auto displacement = make_displacement(cross, false);
 
     double elapsed_time_exact
-        = time_exact.TimeElapsed(1e13, 1e12, 0, medium.GetMassDensity());
-    double prop_grammage = displacement.SolveTrackIntegral(1e13, 1e12);
+        = time_exact->TimeElapsed(1e14, 1e12, 0, medium.GetMassDensity());
+    double prop_grammage = displacement->SolveTrackIntegral(1e14, 1e12);
 
     double elapsed_time_approx = time_approx.TimeElapsed(
-        1e13, 1e12, prop_grammage, medium.GetMassDensity());
+        1e14, 1e12, prop_grammage, medium.GetMassDensity());
 
-    EXPECT_TRUE(elapsed_time_approx
-        < elapsed_time_exact); // exact velocity must be smaller than c
-    EXPECT_FALSE(
-        elapsed_time_approx == elapsed_time_exact); // they should not be equal
+    EXPECT_LT(elapsed_time_approx, elapsed_time_exact); // exact velocity must be smaller than c
+    EXPECT_NE(elapsed_time_approx, elapsed_time_exact); // they should not be equal
     EXPECT_NEAR(elapsed_time_approx, elapsed_time_exact,
         elapsed_time_exact
             * 1e-5); //... but they should be pretty close to equal
@@ -150,7 +125,7 @@ TEST(TimeBuilder, HighEnergies)
 
 TEST(TimeBuilder, MasslessParticles)
 {
-    auto cross = GetCrossSectionsGamma();
+    auto cross = GetCrossSectionsGamma(false);
     auto medium = Ice();
 
     auto time_exact = make_time(cross, GammaDef(), false);
@@ -172,22 +147,19 @@ TEST(TimeBuilder, MasslessParticles)
 
 TEST(ExactTimeBuilder, CompareIntegralInterpolant)
 {
-    auto cross = GetCrossSections();
+    auto cross = GetCrossSections(true);
     auto medium = Ice();
 
-    auto disp = GetMuonDisp();
-    auto time_integral
-        = ExactTimeBuilder(disp, MuMinusDef().mass, std::false_type());
-    auto time_interpolant
-        = ExactTimeBuilder(disp, MuMinusDef().mass, std::true_type());
+    auto time_integral = make_time(cross, MuMinusDef(), false);
+    auto time_interpolant = make_time(cross, MuMinusDef(), true);
 
     double E_f = 1e5;
     double integrated_time, interpolated_time;
     for (double Elog_i = 5.; Elog_i < 10; Elog_i += 1.e-2) {
         double E_i = std::pow(Elog_i, 10.);
         integrated_time
-            = time_integral.TimeElapsed(E_i, E_f, 0., medium.GetMassDensity());
-        interpolated_time = time_interpolant.TimeElapsed(
+            = time_integral->TimeElapsed(E_i, E_f, 0., medium.GetMassDensity());
+        interpolated_time = time_interpolant->TimeElapsed(
             E_i, E_f, 0., medium.GetMassDensity());
         EXPECT_NEAR(integrated_time, interpolated_time, integrated_time * 1e-5);
         EXPECT_FALSE(integrated_time == interpolated_time);
