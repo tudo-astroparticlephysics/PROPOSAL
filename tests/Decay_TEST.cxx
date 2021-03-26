@@ -13,8 +13,8 @@ int main(int argc, char** argv) {
 }
 
 auto GetCrossSections(bool interpol) {
-    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, false);
-    static auto cross = GetStdCrossSections(MuMinusDef(), Ice(), cuts, interpol);
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
+    auto cross = GetStdCrossSections(MuMinusDef(), Ice(), cuts, interpol);
     return cross;
 }
 

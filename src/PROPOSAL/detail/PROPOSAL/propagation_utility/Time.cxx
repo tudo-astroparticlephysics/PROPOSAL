@@ -17,9 +17,11 @@ Time::Time(std::shared_ptr<Displacement> _disp, double _mass)
 
 double Time::FunctionToIntegral(double energy)
 {
-    assert(energy > mass);
-    auto square_momentum = (energy - mass) * (energy + mass);
+    assert(energy >= mass);
+    auto square_momentum = std::max((energy - mass) * (energy + mass), 0.);
     auto particle_momentum = std::sqrt(square_momentum);
-    return disp->FunctionToIntegral(energy) * energy
-        / (particle_momentum * SPEED);
+    auto aux = disp->FunctionToIntegral(energy);
+    if (aux == 0)
+        return 0;
+    return aux * energy / (particle_momentum * SPEED);
 }

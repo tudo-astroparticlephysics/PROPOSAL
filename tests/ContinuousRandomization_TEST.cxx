@@ -29,7 +29,7 @@ TEST(ContinuousRandomization, Constructor)
 {
     auto p_def = MuMinusDef();
     auto medium = Ice();
-    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, true);
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, true);
     auto cross = GetStdCrossSections(p_def, medium, cuts, false);
     auto cont_rand = make_contrand(cross, false);
 }
@@ -41,7 +41,7 @@ TEST(ContinuousRandomization, FirstMomentum)
     // (initial_energy) or our lower limit (mass/low)
     auto p_def = MuMinusDef();
     auto medium = Ice();
-    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, true);
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, true);
     auto cross = GetStdCrossSections(p_def, medium, cuts, true);
     auto contrand = make_contrand(cross, false);
 
@@ -69,7 +69,7 @@ TEST(ContinuousRandomization, IdenticalEnergies)
     // zero)
     auto p_def = MuMinusDef();
     auto medium = Ice();
-    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, true);
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, true);
     auto cross = GetStdCrossSections(p_def, medium, cuts, true);
     auto contrand = make_contrand(cross, false);
 
@@ -86,7 +86,7 @@ TEST(ContinuousRandomization, PhysicalProperties)
     // difference between final_energy and an fixed initial energy is increasing
     auto p_def = MuMinusDef();
     auto medium = Ice();
-    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, true);
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, true);
     auto cross = GetStdCrossSections(p_def, medium, cuts, true);
     auto contrand = make_contrand(cross, false);
 
@@ -94,7 +94,7 @@ TEST(ContinuousRandomization, PhysicalProperties)
     std::array<double, 5> final_energies = { 6e11, 5.5e11, 5e11, 4.5e11, 4e11 };
 
     RandomGenerator::Get().SetSeed(24601);
-    int statistics = 1e4;
+    unsigned int statistics = 1e4;
     auto average = std::pair<double, double> { 0., 0. };
     double old_variance = 0;
     for (auto E_f : final_energies) {
@@ -116,7 +116,7 @@ TEST(ContinuousRandomization, Constraints)
     // the initial_energy
     auto p_def = MuMinusDef();
     auto medium = Ice();
-    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, true);
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, true);
     auto cross = GetStdCrossSections(p_def, medium, cuts, true);
     auto contrand = make_contrand(cross, false);
 
@@ -146,7 +146,7 @@ TEST(ContinuousRandomization, compare_integral_interpolant)
 {
     auto p_def = MuMinusDef();
     auto medium = Ice();
-    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, true);
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, true);
     auto cross = GetStdCrossSections(p_def, medium, cuts, true);
     auto contrand_integral = make_contrand(cross, false);
     auto contrand_interpol = make_contrand(cross, true);
@@ -204,28 +204,21 @@ TEST(ContinuousRandomization, Randomize_interpol)
         if (vcut == -1) {
             vcut = 1;
         }
-
         auto cuts = std::make_shared<EnergyCutSettings>(ecut, vcut, true);
 
-        auto cross = GetStdCrossSections(p_def, *medium, cuts, true);
-        auto contrand = make_contrand(cross, true);
+        auto cross = GetStdCrossSections(p_def, *medium, cuts, false);
         auto contrand_integral = make_contrand(cross, false);
 
         while (energy_old < initial_energy) {
             energy_old = initial_energy;
             randomized_energy_new
-                = contrand->EnergyRandomize(initial_energy, final_energy, rnd);
+                = contrand_integral->EnergyRandomize(initial_energy, final_energy, rnd);
 
             if (initial_energy
                 > 1e6) // dE2dx for ionization has been underestimated for
                        // previous versions of PROPOSAL
                 EXPECT_NEAR(randomized_energy_new, randomized_energy,
                     1e-3 * randomized_energy);
-            auto randomized_energy_integral
-                = contrand_integral->EnergyRandomize(
-                    initial_energy, final_energy, rnd);
-            EXPECT_NEAR(randomized_energy_new, randomized_energy_integral,
-                randomized_energy_integral * 1e-3);
             in >> rnd >> particleName >> mediumName >> ecut >> vcut
                 >> initial_energy >> final_energy >> randomized_energy;
         }

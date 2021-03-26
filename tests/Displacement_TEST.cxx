@@ -11,8 +11,8 @@ using std::vector;
 using namespace PROPOSAL;
 
 auto GetCrossSections() {
-    auto cuts = std::make_shared<EnergyCutSettings>(500, 0.05, false);
-    static auto cross = GetStdCrossSections(MuMinusDef(), Ice(), cuts, true);
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
+    auto cross = GetStdCrossSections(MuMinusDef(), Ice(), cuts, true);
     return cross;
 }
 
@@ -78,7 +78,7 @@ TEST(UpperLimitTrackIntegral, ConsistencyCheck)
     for (double logDisp = 1; logDisp < 5; logDisp+=1.e-2) {
         double disp = std::pow(logDisp, 10.);
         double E_f = disp_calc.UpperLimitTrackIntegral(E_i, disp);
-        EXPECT_LT(E_f, E_f_old);
+        EXPECT_LE(E_f, E_f_old);
         E_f_old = E_f;
     }
 }
@@ -98,7 +98,12 @@ TEST(UpperLimitTrackIntegral, CompareIntegralInterpolant)
     for (double logDisp = 1; logDisp < 5; logDisp+=1.e-2) {
         double disp = std::pow(logDisp, 10.);
         double E_f_integral = disp_calc_integral.UpperLimitTrackIntegral(E_i, disp);
-        double E_f_interpol = disp_calc_interpol.UpperLimitTrackIntegral(E_i, disp);
+        double E_f_interpol;
+        try {
+            E_f_interpol = disp_calc_interpol.UpperLimitTrackIntegral(E_i, disp);
+        } catch (std::logic_error& e) {
+            E_f_interpol = disp_calc_interpol.GetLowerLim();
+        }
         EXPECT_NEAR(E_f_integral, E_f_interpol, E_f_integral*1e-3);
     }
 }
