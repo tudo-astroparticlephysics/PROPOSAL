@@ -178,7 +178,6 @@ TEST(ContinuousRandomization, Randomize_interpol)
     double ecut;
     std::string mediumName;
     std::string particleName;
-    std::string particleName_old;
     double rnd;
     double energy_old;
     bool first = true;
@@ -195,10 +194,6 @@ TEST(ContinuousRandomization, Randomize_interpol)
         first = false;
         energy_old = -1;
 
-        if (particleName != particleName_old) {
-            std::cout << "Run test for particle " << particleName << std::endl;
-            particleName_old = particleName;
-        }
         auto p_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
 
