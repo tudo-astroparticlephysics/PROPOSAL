@@ -224,7 +224,6 @@ namespace Helper {
     {
 
         bool storing_failed = false;
-        bool reading_worked = false;
         std::stringstream filename;
 
         // ---------------------------------------------------------------------

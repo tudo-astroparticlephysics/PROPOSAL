@@ -8,7 +8,7 @@ using namespace PROPOSAL;
 
 std::tuple<Cartesian3D, Cartesian3D>
 secondaries::PhotoTsaiForwardPeaked::CalculateDirections(const Vector3D& dir,
-    double energy, double rho, const Component& comp, std::vector<double> rnd)
+    double energy, double, const Component&, std::vector<double> rnd)
 {
     auto k = energy/ ME;
 
