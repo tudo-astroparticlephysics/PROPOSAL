@@ -268,7 +268,7 @@ void ManyBodyPhaseSpace::SampleEstimateMaxWeight(PhaseSpaceParameters& params, c
     params.weight_min = result;
     params.weight_max = result;
 
-    for (int i = 0; i < broad_phase_statistic_; ++i)
+    for (int i = 1; i < broad_phase_statistic_; ++i)
     {
         kinematics = CalculateKinematics(params.normalization, parent_def.mass);
         GenerateEvent(products, kinematics);
