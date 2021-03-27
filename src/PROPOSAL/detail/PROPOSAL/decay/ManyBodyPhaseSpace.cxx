@@ -257,13 +257,16 @@ void ManyBodyPhaseSpace::SampleEstimateMaxWeight(PhaseSpaceParameters& params, c
     }
 
     // precalculated kinematics
-    PhaseSpaceKinematics kinematics;
     ParticleState particle;
     particle.type = parent_def.particle_type;
     particle.energy = parent_def.mass;
 
-    double result = 0.0;
-    params.weight_min = 0.0;
+    // initialization of weights
+    PhaseSpaceKinematics kinematics = CalculateKinematics(params.normalization, parent_def.mass);
+    GenerateEvent(products, kinematics);
+    double result = kinematics.weight * matrix_element_(particle, products);
+    params.weight_min = result;
+    params.weight_max = result;
 
     for (int i = 0; i < broad_phase_statistic_; ++i)
     {
