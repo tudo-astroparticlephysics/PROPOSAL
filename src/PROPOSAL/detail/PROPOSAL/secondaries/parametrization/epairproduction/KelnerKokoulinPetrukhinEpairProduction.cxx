@@ -71,7 +71,7 @@ secondaries::KelnerKokoulinPetrukhinEpairProduction::CalculateSecondaries(
         = CalculateDirections(loss.direction, loss.energy, rho, rnd[2]);
 
     auto sec = std::vector<ParticleState>();
-    sec.emplace_back(static_cast<const ParticleType>(p_def.particle_type),
+    sec.emplace_back(static_cast<ParticleType>(p_def.particle_type),
         loss.position, loss.direction,
         loss.parent_particle_energy - loss.energy, loss.time,
         loss.propagated_distance);
