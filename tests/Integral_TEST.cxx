@@ -137,14 +137,13 @@ TEST(IntegralValue, MultiplePrecisions)
 {
     double xmin = 0, xmax = 3;
     double ExactIntegral = std::exp(3) - 1;
-    double CalcIntegral  = 0;
+    double CalcIntegral;
 
-    double precision = 1E-5;
     for (double precision = 1E-5; precision > 1E-16; precision /= 10)
     {
 
         Integral* Int = new Integral(5, 20, precision);
-        CalcIntegral  = Int->Integrate(xmin, xmax, Testexp, 1);
+        CalcIntegral = Int->Integrate(xmin, xmax, Testexp, 1);
 
         ASSERT_NEAR(CalcIntegral, ExactIntegral, ExactIntegral * precision);
 
@@ -156,9 +155,8 @@ TEST(IntegralValue, IntegrateWithSubstitution)
 {
     double xmin = 2, xmax = 4;
     double ExactIntegral = exp(xmax) - std::exp(xmin);
-    double CalcIntegral  = 0;
+    double CalcIntegral;
 
-    double precision = 1E-5;
     for (double precision = 1E-5; precision > 1E-11; precision /= 10)
     {
 
@@ -175,9 +173,8 @@ TEST(IntegralValue, IntegrateWithLog)
 {
     double xmin = 2, xmax = 4;
     double ExactIntegral = std::exp(xmax) - std::exp(xmin);
-    double CalcIntegral  = 0;
+    double CalcIntegral;
 
-    double precision = 1E-5;
     for (double precision = 1E-5; precision > 1E-11; precision /= 10)
     {
 
@@ -194,9 +191,8 @@ TEST(IntegralValue, IntegrateWithLogSubstitution)
 {
     double xmin = 2, xmax = 4;
     double ExactIntegral = std::exp(xmax) - std::exp(xmin);
-    double CalcIntegral  = 0;
+    double CalcIntegral;
 
-    double precision = 1E-5;
     for (double precision = 1E-5; precision > 1E-6; precision /= 10)
     {
 

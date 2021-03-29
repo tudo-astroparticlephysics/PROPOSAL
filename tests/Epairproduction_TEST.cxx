@@ -337,8 +337,6 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
     double dEdx_stored;
     double dEdx_new;
 
-    InterpolationDef InterpolDef;
-
     while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dEdx_stored)
     {
         parametrization.erase(0,5);
@@ -389,8 +387,6 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
     double dNdx_stored;
     double dNdx_new;
 
-    InterpolationDef InterpolDef;
-
     while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dNdx_stored)
     {
         parametrization.erase(0,5);
@@ -436,9 +432,6 @@ TEST(Epairproduction, Test_of_e_interpol)
     double rnd1;
     double rnd2;
     double stochastic_loss_stored;
-    double stochastic_loss_new;
-
-    InterpolationDef InterpolDef;
 
     RandomGenerator::Get().SetSeed(0);
 

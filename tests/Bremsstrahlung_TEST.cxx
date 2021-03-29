@@ -375,7 +375,6 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
     double dNdx_new;
 
     std::cout.precision(16);
-    InterpolationDef InterpolDef;
 
     while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> dNdx_stored >> parametrization)
     {
@@ -423,10 +422,8 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
     double rnd1;
     double rnd2;
     double stochastic_loss_stored;
-    double stochastic_loss_new;
 
     std::cout.precision(16);
-    InterpolationDef InterpolDef;
 
     RandomGenerator::Get().SetSeed(0);
 
