@@ -508,7 +508,6 @@ TEST(Mupairproduction, Test_of_e_interpol)
     double rnd1;
     double rnd2;
     double stochastic_loss_stored;
-    double stochastic_loss_new;
 
     RandomGenerator::Get().SetSeed(0);
 

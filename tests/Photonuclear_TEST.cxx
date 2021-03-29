@@ -726,7 +726,6 @@ TEST(PhotoQ2Integration, Test_of_e)
     double rnd1;
     double rnd2;
     double stochastic_loss_stored;
-    double stochastic_loss_new;
 
     std::cout.precision(16);
 

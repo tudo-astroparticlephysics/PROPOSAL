@@ -72,7 +72,7 @@ TEST(SampleFromGaussian, Momenta){
     RandomGenerator::Get().SetSeed(24601);
     double sigma = 2;
     double mean = 5;
-    int statistics = 1e6;
+    unsigned int statistics = 1e6;
     auto average = std::pair<double, double>{0., 0.};
 
     for(unsigned int n=1; n<=statistics; n++){

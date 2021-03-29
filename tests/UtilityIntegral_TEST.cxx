@@ -109,12 +109,11 @@ TEST(GetUpperLimit, BackwardIntegration_Outside_Range){
     auto integrand1 = [](double x)->double { return -1/x;};
     double LOW = 10;
     auto integral1 = UtilityIntegral(integrand1, LOW, hash);
-
-    double lower = 1e5;
     double xi = 10;
 
     EXPECT_TRUE(LOW * std::exp(-xi) < LOW);
     #ifndef NDEBUG
+    double lower = 1e5;
     EXPECT_DEATH(integral1.GetUpperLimit(lower, xi), "");
     #endif
 }
@@ -122,7 +121,6 @@ TEST(GetUpperLimit, BackwardIntegration_Outside_Range){
 TEST(GetUpperLimit, ListForwardIntegration){
     auto integrand1 = [](double x)->double { return 1/x;};
     auto integral = UtilityIntegral(integrand1, 1e14, hash);
-    auto limits = std::array<double, 6>{1e3, 1e5, 1e7, 1e9, 1e11, 1e13};
 
     for(double loglower = 1.; loglower < 13.; loglower+=1e-1){
         for(auto logupper = 1.; logupper < 13.; logupper+=1e-1){
@@ -140,7 +138,6 @@ TEST(GetUpperLimit, ListForwardIntegration){
 TEST(GetUpperLimit, ListBackwardIntegration){
     auto integrand1 = [](double x)->double { return -1/x;};
     auto integral = UtilityIntegral(integrand1, 1, hash);
-    auto limits = std::array<double, 4>{1e3, 1e4, 1e5, 1e6};
 
     for(double loglower = 1.; loglower < 13; loglower+=1e-1){
         for(double logupper = 1; logupper < 13; logupper+=1e-1){

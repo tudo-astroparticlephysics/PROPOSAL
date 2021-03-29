@@ -13,11 +13,11 @@ namespace secondaries {
             : primary_particle_type(p.particle_type){};
 
         static constexpr size_t n_rnd = 0;
-        size_t RequiredRandomNumbers() const noexcept { return n_rnd; }
+        size_t RequiredRandomNumbers() const noexcept override { return n_rnd; }
 
         static constexpr InteractionType type
             = PROPOSAL::InteractionType::Photonuclear;
-        InteractionType GetInteractionType() const noexcept { return type; }
+        InteractionType GetInteractionType() const noexcept override { return type; }
 
         std::vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
                                                    std::vector<double>&) override
