@@ -214,11 +214,12 @@ TEST(ContinuousRandomization, Randomize_interpol)
             randomized_energy_new
                 = contrand_integral->EnergyRandomize(initial_energy, final_energy, rnd);
 
-            if (initial_energy
-                > 1e6) // dE2dx for ionization has been underestimated for
-                       // previous versions of PROPOSAL
+            if (initial_energy > 1e6) {
                 EXPECT_NEAR(randomized_energy_new, randomized_energy,
-                    1e-3 * randomized_energy);
+                            1e-3 * randomized_energy);
+            } // dE2dx for ionization has been underestimated for
+                       // previous versions of PROPOSAL
+
             in >> rnd >> particleName >> mediumName >> ecut >> vcut
                 >> initial_energy >> final_energy >> randomized_energy;
         }

@@ -205,10 +205,12 @@ TEST(IsInside, Box)
 
         particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
-        if (particle_direction.GetZenith() < 0.5 * PI)
+        if (particle_direction.GetZenith() < 0.5 * PI) {
             EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-        if (particle_direction.GetZenith() > 0.5 * PI)
+        }
+        if (particle_direction.GetZenith() > 0.5 * PI) {
             EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
+        }
     }
 
     // Make this test for every surface of the box
@@ -222,10 +224,12 @@ TEST(IsInside, Box)
 
         particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
-        if (particle_direction.GetZenith() > 0.5 * PI)
+        if (particle_direction.GetZenith() > 0.5 * PI) {
             EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-        if (particle_direction.GetZenith() < 0.5 * PI)
+        }
+        if (particle_direction.GetZenith() < 0.5 * PI) {
             EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
+        }
     }
 
     // Surface in positiv x direction
@@ -416,7 +420,6 @@ TEST(IsInside, Cylinder)
 
     double cos;
 
-    int excluded = 0;
     for (int i = 0; i < 1e4; i++)
     {
         rnd_x = RandomGenerator::Get().RandomDouble();
@@ -457,10 +460,12 @@ TEST(IsInside, Cylinder)
                 inner_radius * inner_radius ==
             0)
         {
-            if (particle_direction.GetZenith() < PI / 2.)
+            if (particle_direction.GetZenith() < PI / 2.) {
                 EXPECT_FALSE(C.IsInside(particle_position, particle_direction));
-            if (particle_direction.GetZenith() > PI / 2.)
+            }
+            if (particle_direction.GetZenith() > PI / 2.) {
                 EXPECT_TRUE(C.IsInside(particle_position, particle_direction));
+            }
         }
     }
 
@@ -475,18 +480,18 @@ TEST(IsInside, Cylinder)
 
         particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
-        if (particle_direction.GetZenith() > PI / 2.)
+        if (particle_direction.GetZenith() > PI / 2.) {
             EXPECT_FALSE(C.IsInside(particle_position, particle_direction));
-        if (particle_direction.GetZenith() < PI / 2.)
+        }
+        if (particle_direction.GetZenith() < PI / 2.) {
             EXPECT_TRUE(C.IsInside(particle_position, particle_direction));
+        }
     }
 
     // Test inner border
     inner_radius = 5;
 
     Cylinder A(Cartesian3D(0, 0, 0), height, radius, inner_radius);
-
-    excluded = 0;
 
     for (int i = 0; i < 1e4; i++)
     {
@@ -606,7 +611,6 @@ TEST(IsInside, Sphere)
 
     double cos;
 
-    int excluded = 0;
     for (int i = 0; i < 1e4; i++)
     {
         rnd_x = RandomGenerator::Get().RandomDouble();
@@ -631,8 +635,6 @@ TEST(IsInside, Sphere)
     inner_radius = 5;
 
     Sphere B(Cartesian3D(0, 0, 0), radius, inner_radius);
-
-    excluded = 0;
 
     for (int i = 0; i < 1e4; i++)
     {
@@ -881,29 +883,31 @@ TEST(DistanceTo, Cylinder)
 
         distance = A.DistanceToBorder(particle_position, particle_direction);
 
-        //  case 1 throught inner cylinder => no intersection
-        //  ___  x    ___
-        // |   | |   |   |
-        // |   | |   |   |
-        // |   | |   |   |
-        // |   | |   |   |
-        // |   | |   |   |
-        // |___| |   |___|
-        //       |
+        /*  case 1 throught inner cylinder => no intersection
+            ___  x    ___
+           |   | |   |   |
+           |   | |   |   |
+           |   | |   |   |
+           |   | |   |   |
+           |   | |   |   |
+           |___| |   |___|
+                 |
+        */
         if (alpha < std::atan(inner_radius / (z + 0.5 * height)))
         {
             EXPECT_EQ(distance.first, -1);
             EXPECT_EQ(distance.second, -1);
         }
-        //  case 2 first inner cylinder then bottom surface
-        //  ___  x      ___
-        // |   |  \    |   |
-        // |   |   \   |   |
-        // |   |    \  |   |
-        // |   |     \ |   |
-        // |   |      *|   |
-        // |___|       |\ _|
-        //               *
+        /*  case 2 first inner cylinder then bottom surface
+            ___  x      ___
+           |   |  \    |   |
+           |   |   \   |   |
+           |   |    \  |   |
+           |   |     \ |   |
+           |   |      *|   |
+           |___|       |\ _|
+                         *
+        */
 
         else if (alpha < std::atan(radius / (z + 0.5 * height)))
         {
@@ -911,51 +915,51 @@ TEST(DistanceTo, Cylinder)
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
         }
-        //  case 3 first inner cylinder then outer cylinder
-        //  ___     x   ___
-        // |   |     \ |   |
-        // |   |      \|   |
-        // |   |       *   |
-        // |   |       |\  |
-        // |   |       | \ |
-        // |   |       |  \|
-        // |   |       |   *
-        // |___|       |___|\
-        //
+        /*  case 3 first inner cylinder then outer cylinder
+            ___     x   ___
+           |   |     \ |   |
+           |   |      \|   |
+           |   |       *   |
+           |   |       |\  |
+           |   |       | \ |
+           |   |       |  \|
+           |   |       |   *
+           |___|       |___|\
+        */
 
         else if (alpha < std::atan(inner_radius / height))
         {
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
         }
-        //  case 4 first upper surface then outer cylinder
-        //            x
-        //             \
-        //  ___         \__
-        // |   |       | * |
-        // |   |       |  \|
-        // |   |       |   *
-        // |   |       |   |\
-        // |   |       |   |
-        // |   |       |   |
-        // |___|       |___|
-        //
+        /*  case 4 first upper surface then outer cylinder
+                      x
+                       \
+            ___         \__
+           |   |       | * |
+           |   |       |  \|
+           |   |       |   *
+           |   |       |   |\
+           |   |       |   |
+           |   |       |   |
+           |___|       |___|
+        */
         else if (alpha < std::atan(radius / height))
         {
             dist1 = height / std::cos(alpha);
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
         }
-        //  case 5  no intersection
-        //      x_____________
-        //  ___      ___
-        // |   |    |   |
-        // |   |    |   |
-        // |   |    |   |
-        // |   |    |   |
-        // |   |    |   |
-        // |___|    |___|
-        //
+        /*  case 5  no intersection
+                x_____________
+            ___      ___
+           |   |    |   |
+           |   |    |   |
+           |   |    |   |
+           |   |    |   |
+           |   |    |   |
+           |___|    |___|
+        */
         else
         {
             EXPECT_EQ(distance.first, -1);
@@ -1079,18 +1083,19 @@ TEST(DistanceTo, Box)
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
 
         }
-        //
-        //                          ^
-        //                         /                        z|
-        //                       _*_____________             |
-        //                      |/              |            |_____
-        //                      *               |                  x
-        //                     /|               |
-        //                    / |               |
-        //                   /  |               |
-        //                  x   |               |
-        //                      |               |
-        //                      |_______________|
+        /*
+                                   ^
+                                  /                        z|
+                                _*_____________             |
+                               |/              |            |_____
+                               *               |                  x
+                              /|               |
+                             / |               |
+                            /  |               |
+                           x   |               |
+                               |               |
+                               |_______________|
+        */
 
         else if (phi < std::atan(width * 0.5 / (-particle_position.GetX() - 0.5 * width)))
         {
@@ -1100,17 +1105,18 @@ TEST(DistanceTo, Box)
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
 
         }
-        //                       ^
-        //                      /
-        //                     / _______________
-        //                    / |               |  z|
-        //                   /  |               |   |
-        //                  /   |               |   |_____
-        //                 /    |               |        x
-        //                /     |               |
-        //               x      |               |
-        //                      |               |
-        //                      |_______________|
+        /*                       ^
+                                /
+                               / _______________
+                              / |               |  z|
+                             /  |               |   |
+                            /   |               |   |_____
+                           /    |               |        x
+                          /     |               |
+                         x      |               |
+                                |               |
+                                |_______________|
+        */
 
         else
         {
@@ -1130,15 +1136,16 @@ TEST(DistanceTo, Box)
 
         distance = A.DistanceToBorder(particle_position, particle_direction);
 
-        //                       ________________       x|
-        //                      |               |        |
-        //                      |               |        |_____
-        //                      |               |              z
-        //     x----------------*---------------*--------->
-        //                      |               |
-        //                      |               |
-        //                      |               |
-        //                      |_______________|
+        /*                       ________________       x|
+                                |               |        |
+                                |               |        |_____
+                                |               |              z
+               x----------------*---------------*--------->
+                                |               |
+                                |               |
+                                |               |
+                                |_______________|
+        */
 
         if (particle_direction.GetZenith() < std::atan(0.5 * height / (0.5 * height - particle_position.GetZ())))
         {
@@ -1148,18 +1155,19 @@ TEST(DistanceTo, Box)
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
 
         }
-        //
-        //                          ^
-        //                         /                    x|
-        //                       _*_____________         |
-        //                      |/              |        |_____
-        //                      *               |             z
-        //                     /|               |
-        //                    / |               |
-        //                   /  |               |
-        //                  x   |               |
-        //                      |               |
-        //                      |_______________|
+        /*
+                                    ^
+                                   /                    x|
+                                 _*_____________         |
+                                |/              |        |_____
+                                *               |             z
+                               /|               |
+                              / |               |
+                             /  |               |
+                            x   |               |
+                                |               |
+                                |_______________|
+        */
 
         else if (particle_direction.GetZenith() < std::atan(height * 0.5 / (-particle_position.GetZ() - 0.5 * height)))
         {
@@ -1168,17 +1176,18 @@ TEST(DistanceTo, Box)
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
         }
-        //                       ^
-        //                      /
-        //                     / _______________        x|
-        //                    / |               |        |
-        //                   /  |               |        |_____
-        //                  /   |               |             z
-        //                 /    |               |
-        //                /     |               |
-        //               x      |               |
-        //                      |               |
-        //                      |_______________|
+        /*                       ^
+                                /
+                               / _______________        x|
+                              / |               |        |
+                             /  |               |        |_____
+                            /   |               |             z
+                           /    |               |
+                          /     |               |
+                         x      |               |
+                                |               |
+                                |_______________|
+        */
 
         else
         {

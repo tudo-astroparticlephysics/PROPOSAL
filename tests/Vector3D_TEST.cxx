@@ -272,7 +272,7 @@ TEST(CalculateCartesianFromSpherical, Conversion)
     bool test_x = std::abs(A.GetX() - C.GetX()) < std::abs(std::min(A.GetX(), C.GetX())) * epsilon * error_factor;
     bool test_y = std::abs(A.GetY() - C.GetY()) < std::abs(std::min(A.GetY(), C.GetY())) * epsilon * error_factor;
     bool test_z = std::abs(A.GetZ() - C.GetZ()) < std::abs(std::min(A.GetZ(), C.GetZ())) * epsilon * error_factor;
-    EXPECT_TRUE(A == C || test_x && test_y && test_z);
+    EXPECT_TRUE(A == C || (test_x && test_y && test_z));
 }
 
 TEST(Deflection, Deflection)

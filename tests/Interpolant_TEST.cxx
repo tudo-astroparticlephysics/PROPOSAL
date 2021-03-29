@@ -41,7 +41,6 @@ TEST(Comparison, Comparison_equal)
 {
 
     double SearchX = 5;
-    double PolValue;
     Interpolant A;
     Interpolant B;
     EXPECT_TRUE(A == B);
@@ -50,8 +49,8 @@ TEST(Comparison, Comparison_equal)
     Interpolant* D = new Interpolant(
         max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
     EXPECT_TRUE(*C == *D);
-    PolValue = C->Interpolate(SearchX);
-    PolValue = D->Interpolate(SearchX);
+    C->Interpolate(SearchX);
+    D->Interpolate(SearchX);
     EXPECT_TRUE(*C == *D);
 
     Interpolant* E = new Interpolant(max,
@@ -98,8 +97,8 @@ TEST(Comparison, Comparison_equal)
     SearchX        = 7;
     double SearchY = 11;
 
-    PolValue = E->Interpolate(SearchX, SearchY);
-    PolValue = F->Interpolate(SearchX, SearchY);
+    E->Interpolate(SearchX, SearchY);
+    F->Interpolate(SearchX, SearchY);
 
     EXPECT_TRUE(*E == *F);
 }
@@ -108,7 +107,6 @@ TEST(Comparison, Comparison_not_equal)
 {
 
     double SearchX = 5;
-    double PolValue;
     Interpolant A;
 
     Interpolant* B = new Interpolant(
@@ -116,7 +114,7 @@ TEST(Comparison, Comparison_not_equal)
     Interpolant* C = new Interpolant(
         max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
 
-    PolValue = C->Interpolate(SearchX);
+    C->Interpolate(SearchX);
 
     Interpolant* D = new Interpolant(max,
                                      xmin,
