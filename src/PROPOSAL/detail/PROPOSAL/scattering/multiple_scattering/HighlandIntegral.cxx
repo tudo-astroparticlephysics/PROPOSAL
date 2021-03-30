@@ -7,9 +7,10 @@ using namespace PROPOSAL;
 using namespace multiple_scattering;
 
 double HighlandIntegral::CalculateTheta0(double grammage, double ei, double ef) {
+    auto integral_result = highland_integral->Calculate(ei, ef);
+    assert(integral_result >= 0);
     auto aux = 13.6
-               * std::sqrt(
-            highland_integral->Calculate(ei, ef) / radiation_length)
+               * std::sqrt(std::max(integral_result, 0.) / radiation_length)
                * std::abs(charge);
     aux *= std::max(
             1. + 0.038 * std::log(grammage / radiation_length), 0.0);
@@ -36,7 +37,7 @@ HighlandIntegral::HighlandIntegral(const ParticleDef& p, Medium const& m,
         , highland_integral(std::make_unique<UtilityInterpolant>(
                 [this, disp](double E) { return Integral(*disp, E); },
                 disp->GetLowerLim(), disp->GetHash())) {
-        highland_integral->BuildTables("scattering_", 200, true);
+        highland_integral->BuildTables("scattering_", 500, true);
 };
 
 namespace PROPOSAL {
