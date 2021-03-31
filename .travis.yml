@@ -25,6 +25,7 @@ jobs:
         # fixed its problems with pybind11 (see https://github.com/conan-io/conan-center-index/issues/4407)
         - pip install "pybind11[global]" -v
         - pip install pytest
+        - pip install conan
         - conan profile update settings.compiler.libcxx=libstdc++11
         - pip install . -v
       script:
