@@ -45,7 +45,7 @@ def test_proposal():
     init_state.direction = pp.Cartesian3D(0, 0, -1)
     init_state.time = 0
 
-    #pp.RandomGenerator.get().set_seed(1234)
+    pp.RandomGenerator.get().set_seed(1234)
     for i in range(statistics):
 
         output = prop.propagate(init_state)
