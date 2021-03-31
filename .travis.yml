@@ -23,9 +23,10 @@ jobs:
       install:
         # installing pyhind11 with pip manually is necessary until conan-center-index
         # fixed its problems with pybind11 (see https://github.com/conan-io/conan-center-index/issues/4407)
-        - pip install "pybind11[global]"
+        - pip install "pybind11[global]" -v
         - pip install pytest
-        - pip install .
+        - pip install . -v
+        - cat ~/.conan/profiles/default
       script:
         - python -m pytest tests/python -v
 
