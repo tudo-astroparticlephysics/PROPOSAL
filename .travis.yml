@@ -26,6 +26,7 @@ jobs:
         - pip install "pybind11[global]" -v
         - pip install pytest
         - pip install conan
+        - conan profile new default --detect
         - conan profile update settings.compiler.libcxx=libstdc++11 default
         - pip install . -v
       script:
