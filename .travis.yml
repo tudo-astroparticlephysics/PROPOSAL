@@ -14,17 +14,23 @@ env:
 
 jobs:
   include:
-    # - os: linux
-    #   dist: focal
-    #   name: Python
-    #   language: python
-    #   python: 3.8
-    #   before_install:
-    #   install:
-    #     - pip install pytest
-    #     - pip install .
-    #   script:
-    #     - python -m pytest tests/python -v
+    - os: linux
+      dist: focal
+      name: Python
+      language: python
+      python: 3.9
+      before_install:
+      install:
+        # installing pyhind11 with pip manually is necessary until conan-center-index
+        # fixed its problems with pybind11 (see https://github.com/conan-io/conan-center-index/issues/4407)
+        - pip install "pybind11[global]" -v
+        - pip install pytest
+        - pip install conan
+        - conan profile new default --detect
+        - conan profile update settings.compiler.libcxx=libstdc++11 default
+        - pip install . -v
+      script:
+        - python -m pytest tests/python -v
 
     - os: linux
       dist: focal
