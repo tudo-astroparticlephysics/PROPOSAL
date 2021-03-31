@@ -20,11 +20,12 @@ add_library(TestUtilities INTERFACE)
 add_library(PROPOSAL::TestUtilities ALIAS TestUtilities)
 target_include_directories(TestUtilities INTERFACE PROPOSALTestUtilities)
 
+find_package(GTest REQUIRED)
 # creat test binary and link against proposal and gtest
 macro(package_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
     add_dependencies(${TESTNAME} testfiles)
-    target_link_libraries(${TESTNAME} PROPOSAL::PROPOSAL PROPOSAL::TestUtilities CONAN_PKG::gtest)
+    target_link_libraries(${TESTNAME} PROPOSAL::PROPOSAL PROPOSAL::TestUtilities GTest::GTest)
     gtest_discover_tests(${TESTNAME})
 endmacro()
 

@@ -1,8 +1,10 @@
 @PACKAGE_INIT@
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/conan_paths.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/conan_paths.cmake)
+endif()
 
-include(${CMAKE_CURRENT_LIST_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS)
+find_package(CubicInterpolation REQUIRED)
+find_package(spdlog REQUIRED)
 
 include ("${CMAKE_CURRENT_LIST_DIR}/PROPOSALTargets.cmake")
