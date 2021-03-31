@@ -13,12 +13,15 @@ target_include_directories(PROPOSAL PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
 
+find_package(CubicInterpolation REQUIRED)
+find_package(spdlog REQUIRED)
+
 add_subdirectory(PROPOSAL)
 add_subdirectory(detail)
 
 target_link_libraries(PROPOSAL
-    CONAN_PKG::cubicinterpolation
-    CONAN_PKG::spdlog
+    CubicInterpolation::CubicInterpolation
+    spdlog::spdlog
     )
 
 install(TARGETS PROPOSAL EXPORT PROPOSALTargets
@@ -46,7 +49,5 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/PROPOSALConfig.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/PROPOSAL
     )
 
-file(GLOB_RECURSE Find_Modules "${PROJECT_BINARY_DIR}/Find*.cmake")
-
-install(FILES ${Find_Modules}
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/PROPOSAL)
+file(GLOB CMAKE_FILES "${CMAKE_BINARY_DIR}/*.cmake")
+install(FILES ${CMAKE_FILES} DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/PROPOSAL)
