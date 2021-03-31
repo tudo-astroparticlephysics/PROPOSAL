@@ -60,20 +60,20 @@ jobs:
         - CC=gcc
         - CXX=g++
 
-    # - os: linux
-    #   dist: focal
-    #   name: Linux clang 6.0
-    #   python: 3.8
-    #   addons:
-    #     apt:
-    #       sources:
-    #         - ubuntu-toolchain-r-test
-    #         - llvm-toolchain-6.0
-    #       packages:
-    #         - clang-6.0
-    #   env:
-    #     - CC=clang
-    #     - CXX=clang++
+    - os: linux
+      dist: focal
+      name: Linux clang 6.0
+      python: 3.8
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-6.0
+          packages:
+            - clang-6.0
+      env:
+        - CC=clang
+        - CXX=clang++
 
     - os: linux
       dist: focal
