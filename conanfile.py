@@ -65,6 +65,6 @@ class PROPOSALConan(ConanFile):
         self.cpp_info.names["cmake_find_package"] = "PROPOSAL"
         self.cpp_info.libs = ["PROPOSAL"]
         self.cpp_info.requires = [
-            "CubicInterpolation::CubicInterpolation",
+            "cubicinterpolation::CubicInterpolation",
             "spdlog::spdlog",
         ]
