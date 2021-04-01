@@ -1,9 +1,0 @@
-[submodule "vendor/google/googletest"]
-	path = vendor/google/googletest
-	url = https://github.com/google/googletest
-[submodule "vendor/log4cplus/log4cplus"]
-	path = vendor/log4cplus/log4cplus
-	url = https://github.com/log4cplus/log4cplus
-[submodule "vendor/pybind/pybind11"]
-	path = vendor/pybind/pybind11
-	url = https://github.com/pybind/pybind11

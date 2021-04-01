@@ -35,7 +35,7 @@ Recent improvements are documented [here](https://doi.org/10.1016/j.cpc.2019.03.
 PROPOSAL is developed and tested on macOS and linux. 
 Continuous integration is setup on travis and tests several version of gcc and clang.
 
-PROPOSAL is now a C++11 library using pybind11 Python bindings!
+PROPOSAL is now a C++14 library using pybind11 Python bindings!
 
 This version is the latest not using C++14 or more modern methods.
 The next release will make use of C++14 methods.
@@ -111,8 +111,8 @@ and if you want to cite the latest improvements
 
 ## Requirements
 
-- CMake 3.8 or higher
-- C++11 compatible compiler
+- CMake 3.9 or higher (to build the tests CMake 3.10 is required)
+- C++14 compatible compiler
 
 ## Recommended
 
@@ -148,7 +148,7 @@ using namespace PROPOSAL;
 int main(){
     ParticleDef mu_def = MuMinusDef::Get();
     Propagator prop(mu_def, "resources/configuration/config.json");
-    DynamicData mu(mu_def.particle_type);
+    ParticleState mu(mu_def.particle_type);
 
     mu.SetEnergy(9e6);
     mu.SetPosition(Vector3D(0, 0, 0))
@@ -220,7 +220,7 @@ prop = pp.Propagator(
 	  config_file="path/to/config.json"
 )
 
-mu = pp.particle.DynamicData(mu_def.particle_type)
+mu = pp.particle.ParticleState(mu_def.particle_type)
 
 mu.energy = 9e6
 mu.direction = pp.Vector3D(0, 0, -1)

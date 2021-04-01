@@ -7,26 +7,26 @@ using namespace PROPOSAL;
 
 TEST(Comparison, Comparison_equal)
 {
-    ParticleDef A;
-    ParticleDef B;
+    MuMinusDef A;
+    MuMinusDef B;
     EXPECT_TRUE(A == B);
 
-    ParticleDef* C = new ParticleDef();
-    ParticleDef* D = new ParticleDef();
+    ParticleDef* C = new MuMinusDef();
+    ParticleDef* D = new MuMinusDef();
 
     EXPECT_TRUE(*C == *D);
     delete C;
     delete D;
 
-    C = new ParticleDef(MuMinusDef::Get());
-    D = new ParticleDef(MuMinusDef::Get());
+    C = new ParticleDef(MuMinusDef());
+    D = new ParticleDef(MuMinusDef());
 
     EXPECT_TRUE(*C == *D);
     delete C;
     delete D;
 
-    C = new ParticleDef(TauMinusDef::Get());
-    D = new ParticleDef(TauMinusDef::Get());
+    C = new ParticleDef(TauMinusDef());
+    D = new ParticleDef(TauMinusDef());
 
     EXPECT_TRUE(*C == *D);
     delete C;
@@ -35,15 +35,15 @@ TEST(Comparison, Comparison_equal)
 
 TEST(Comparison, Comparison_not_equal)
 {
-    ParticleDef A;
-    ParticleDef B;
+    MuMinusDef A;
+    MuMinusDef B;
     EXPECT_TRUE(A == B);
 
     ParticleDef AA = ParticleDef::Builder().SetMass(100).build();
     EXPECT_TRUE(AA != B);
 
-    ParticleDef* C = new ParticleDef(MuMinusDef::Get());
-    ParticleDef* D = new ParticleDef(TauMinusDef::Get());
+    ParticleDef* C = new ParticleDef(MuMinusDef());
+    ParticleDef* D = new ParticleDef(TauMinusDef());
 
     EXPECT_TRUE(*C != *D);
     delete C;
@@ -52,7 +52,7 @@ TEST(Comparison, Comparison_not_equal)
 
 TEST(Assignment, Copyconstructor)
 {
-    ParticleDef A;
+    MuMinusDef A;
     ParticleDef B = A;
 
     EXPECT_TRUE(A == B);
@@ -60,7 +60,7 @@ TEST(Assignment, Copyconstructor)
 
 TEST(Assignment, Copyconstructor2)
 {
-    ParticleDef A(MuMinusDef::Get());
+    auto A = MuMinusDef();
     ParticleDef B(A);
     EXPECT_TRUE(A == B);
 }

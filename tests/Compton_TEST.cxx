@@ -4,480 +4,416 @@
 
 #include "gtest/gtest.h"
 
-#include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/ComptonIntegral.h"
-#include "PROPOSAL/crossection/ComptonInterpolant.h"
-#include "PROPOSAL/crossection/factories/ComptonFactory.h"
-#include "PROPOSAL/crossection/parametrization/Compton.h"
+#include "PROPOSAL/Logging.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/Factories/ComptonFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
-#include "PROPOSAL/methods.h"
+#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
+
+#include <spdlog/spdlog.h>
 
 using namespace PROPOSAL;
 
-const std::string testfile_dir = "bin/TestFiles/";
+const std::string testfile_dir = "tests/TestFiles/";
 
-TEST(Comparison, Comparison_equal)
-{
-ParticleDef particle_def = GammaDef::Get();
-auto medium = std::make_shared<const Water>();
-EnergyCutSettings ecuts;
-double multiplier = 1.;
+// TEST(Comparison, Comparison_equal)
+// {
+// ParticleDef particle_def = GammaDef::Get();
+// auto medium = std::make_shared<const Water>();
+// EnergyCutSettings ecuts;
+// double multiplier = 1.;
 
-ComptonKleinNishina* Compton_A =
-        new ComptonKleinNishina(particle_def, medium, ecuts, multiplier);
-Parametrization* Compton_B = new ComptonKleinNishina(particle_def, medium, ecuts, multiplier);
-EXPECT_TRUE(*Compton_A == *Compton_B);
+// ComptonKleinNishina* Compton_A =
+//         new ComptonKleinNishina(particle_def, medium, ecuts, multiplier);
+// Parametrization* Compton_B = new ComptonKleinNishina(particle_def, medium,
+// ecuts, multiplier); EXPECT_TRUE(*Compton_A == *Compton_B);
 
-ComptonKleinNishina param(particle_def, medium, ecuts, multiplier);
-EXPECT_TRUE(param == *Compton_A);
+// ComptonKleinNishina param(particle_def, medium, ecuts, multiplier);
+// EXPECT_TRUE(param == *Compton_A);
 
-ComptonIntegral* Int_A        = new ComptonIntegral(param);
-CrossSectionIntegral* Int_B = new ComptonIntegral(param);
-EXPECT_TRUE(*Int_A == *Int_B);
+// ComptonIntegral* Int_A        = new ComptonIntegral(param);
+// CrossSectionIntegral* Int_B = new ComptonIntegral(param);
+// EXPECT_TRUE(*Int_A == *Int_B);
 
-InterpolationDef InterpolDef;
-ComptonInterpolant* Interpol_A        = new ComptonInterpolant(param, InterpolDef);
-CrossSectionInterpolant* Interpol_B = new ComptonInterpolant(param, InterpolDef);
-EXPECT_TRUE(*Interpol_A == *Interpol_B);
+// InterpolationDef InterpolDef;
+// ComptonInterpolant* Interpol_A        = new ComptonInterpolant(param,
+// InterpolDef); CrossSectionInterpolant* Interpol_B = new
+// ComptonInterpolant(param, InterpolDef); EXPECT_TRUE(*Interpol_A ==
+// *Interpol_B);
 
-delete Compton_A;
-delete Compton_B;
-delete Int_A;
-delete Int_B;
-delete Interpol_A;
-delete Interpol_B;
-}
+// delete Compton_A;
+// delete Compton_B;
+// delete Int_A;
+// delete Int_B;
+// delete Interpol_A;
+// delete Interpol_B;
+// }
 
-TEST(Comparison, Comparison_not_equal)
-{
-ParticleDef gamma_def  = GammaDef::Get();
-auto medium_1 = std::make_shared<const Water>();
-auto medium_2 = std::make_shared<const Ice>();
-EnergyCutSettings ecuts_1(500, -1);
-EnergyCutSettings ecuts_2(-1, 0.05);
-double multiplier_1 = 1.;
-double multiplier_2 = 2.;
+// TEST(Comparison, Comparison_not_equal)
+// {
+// ParticleDef gamma_def  = GammaDef::Get();
+// auto medium_1 = std::make_shared<const Water>();
+// auto medium_2 = std::make_shared<const Ice>();
+// EnergyCutSettings ecuts_1(500, -1);
+// EnergyCutSettings ecuts_2(-1, 0.05);
+// double multiplier_1 = 1.;
+// double multiplier_2 = 2.;
 
-ComptonKleinNishina Compton_A(gamma_def, medium_1, ecuts_1, multiplier_1);
-ComptonKleinNishina Compton_B(gamma_def, medium_2, ecuts_1, multiplier_1);
-ComptonKleinNishina Compton_C(gamma_def, medium_1, ecuts_2, multiplier_1);
-ComptonKleinNishina Compton_D(gamma_def, medium_1, ecuts_1, multiplier_2);
-EXPECT_TRUE(Compton_A != Compton_B);
-EXPECT_TRUE(Compton_A != Compton_C);
-EXPECT_TRUE(Compton_A != Compton_C);
-}
+// ComptonKleinNishina Compton_A(gamma_def, medium_1, ecuts_1, multiplier_1);
+// ComptonKleinNishina Compton_B(gamma_def, medium_2, ecuts_1, multiplier_1);
+// ComptonKleinNishina Compton_C(gamma_def, medium_1, ecuts_2, multiplier_1);
+// ComptonKleinNishina Compton_D(gamma_def, medium_1, ecuts_1, multiplier_2);
+// EXPECT_TRUE(Compton_A != Compton_B);
+// EXPECT_TRUE(Compton_A != Compton_C);
+// EXPECT_TRUE(Compton_A != Compton_C);
+// }
 
-TEST(Assignment, Copyconstructor)
-{
-ParticleDef particle_def = GammaDef::Get();
-auto medium = std::make_shared<const Water>();
-EnergyCutSettings ecuts;
-double multiplier = 1.;
+// TEST(Assignment, Copyconstructor)
+// {
+// ParticleDef particle_def = GammaDef::Get();
+// auto medium = std::make_shared<const Water>();
+// EnergyCutSettings ecuts;
+// double multiplier = 1.;
 
-ComptonKleinNishina Compton_A(particle_def, medium, ecuts, multiplier);
-ComptonKleinNishina Compton_B = Compton_A;
-EXPECT_TRUE(Compton_A == Compton_B);
+// ComptonKleinNishina Compton_A(particle_def, medium, ecuts, multiplier);
+// ComptonKleinNishina Compton_B = Compton_A;
+// EXPECT_TRUE(Compton_A == Compton_B);
 
-ComptonIntegral Int_A(Compton_A);
-ComptonIntegral Int_B = Int_A;
-EXPECT_TRUE(Int_A == Int_B);
+// ComptonIntegral Int_A(Compton_A);
+// ComptonIntegral Int_B = Int_A;
+// EXPECT_TRUE(Int_A == Int_B);
 
-InterpolationDef InterpolDef;
-ComptonInterpolant Interpol_A(Compton_A, InterpolDef);
-ComptonInterpolant Interpol_B = Interpol_A;
-EXPECT_TRUE(Interpol_A == Interpol_B);
-}
+// InterpolationDef InterpolDef;
+// ComptonInterpolant Interpol_A(Compton_A, InterpolDef);
+// ComptonInterpolant Interpol_B = Interpol_A;
+// EXPECT_TRUE(Interpol_A == Interpol_B);
+// }
 
-TEST(Assignment, Copyconstructor2)
-{
-ParticleDef particle_def = GammaDef::Get();
-auto medium = std::make_shared<const Water>();
-EnergyCutSettings ecuts;
-double multiplier = 1.;
+// TEST(Assignment, Copyconstructor2)
+// {
+// ParticleDef particle_def = GammaDef::Get();
+// auto medium = std::make_shared<const Water>();
+// EnergyCutSettings ecuts;
+// double multiplier = 1.;
 
-ComptonKleinNishina Compton_A(particle_def, medium, ecuts, multiplier);
-ComptonKleinNishina Compton_B(Compton_A);
-EXPECT_TRUE(Compton_A == Compton_B);
+// ComptonKleinNishina Compton_A(particle_def, medium, ecuts, multiplier);
+// ComptonKleinNishina Compton_B(Compton_A);
+// EXPECT_TRUE(Compton_A == Compton_B);
 
-ComptonIntegral Int_A(Compton_A);
-ComptonIntegral Int_B(Int_A);
-EXPECT_TRUE(Int_A == Int_B);
+// ComptonIntegral Int_A(Compton_A);
+// ComptonIntegral Int_B(Int_A);
+// EXPECT_TRUE(Int_A == Int_B);
 
-InterpolationDef InterpolDef;
-ComptonInterpolant Interpol_A(Compton_A, InterpolDef);
-ComptonInterpolant Interpol_B(Interpol_A);
-EXPECT_TRUE(Interpol_A == Interpol_B);
-}
+// InterpolationDef InterpolDef;
+// ComptonInterpolant Interpol_A(Compton_A, InterpolDef);
+// ComptonInterpolant Interpol_B(Interpol_A);
+// EXPECT_TRUE(Interpol_A == Interpol_B);
+// }
 
 // in polymorphism an assignment and swap operator doesn't make sense
 
 TEST(Compton, Test_of_dEdx)
 {
-std::string filename = testfile_dir + "Compton_dEdx.txt";
-std::ifstream in{filename};
-EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Compton_dEdx.txt");
+    std::string mediumName;
+    double ecut;
+    double vcut;
+    bool cont_rand = false;
+    double multiplier;
+    std::string parametrization;
+    double energy;
+    double dEdx_stored;
+    double dEdx_new;
 
-char firstLine[256];
-in.getline(firstLine, 256);
+    std::cout.precision(16);
 
-std::string mediumName;
-double ecut;
-double vcut;
-double multiplier;
-std::string parametrization;
-double energy;
-double dEdx_stored;
-double dEdx_new;
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
+        >> dEdx_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
-std::cout.precision(16);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
-while (in.good())
-{
-in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >>
-parametrization;
+        ParticleDef particle_def = GammaDef();
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-ComptonFactory::Definition compton_def;
-compton_def.multiplier      = multiplier;
-compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
+        auto cross = make_compton(particle_def, *medium, ecuts, false, config);
 
-CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-dEdx_new = Compton->CalculatedEdx(energy);
-
-ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
-
-delete Compton;
-}
+        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+    }
 }
 
 TEST(Compton, Test_of_dNdx)
 {
-std::string filename = testfile_dir + "Compton_dNdx.txt";
-std::ifstream in{filename};
-EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Compton_dNdx.txt");
 
-char firstLine[256];
-in.getline(firstLine, 256);
+    std::string mediumName;
+    double ecut;
+    double vcut;
+    bool cont_rand = false;
+    double multiplier;
+    std::string parametrization;
+    double energy;
+    double dNdx_stored;
+    double dNdx_new;
 
-std::string mediumName;
-double ecut;
-double vcut;
-double multiplier;
-std::string parametrization;
-double energy;
-double dNdx_stored;
-double dNdx_new;
+    std::cout.precision(16);
 
-std::cout.precision(16);
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
+        >> dNdx_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
-while (in.good())
-{
-in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >>
-parametrization;
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
-ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
+        ParticleDef particle_def = GammaDef();
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-ComptonFactory::Definition compton_def;
-compton_def.multiplier      = multiplier;
-compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def);
+        auto cross = make_compton(particle_def, *medium, ecuts, false, config);
 
-dNdx_new = Compton->CalculatedNdx(energy);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
-
-delete Compton;
-}
-}
-
-TEST(Compton, Test_of_dNdx_rnd)
-{
-std::string filename = testfile_dir + "Compton_dNdx_rnd.txt";
-std::ifstream in{filename};
-EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-char firstLine[256];
-in.getline(firstLine, 256);
-
-std::string mediumName;
-double ecut;
-double vcut;
-double multiplier;
-std::string parametrization;
-double energy;
-double rnd;
-double dNdx_stored;
-double dNdx_new;
-
-std::cout.precision(16);
-
-RandomGenerator::Get().SetSeed(0);
-
-while (in.good())
-{
-in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_stored >>
-parametrization;
-
-ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
-
-ComptonFactory::Definition compton_def;
-compton_def.multiplier      = multiplier;
-compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
-
-CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def);
-
-dNdx_new = Compton->CalculatedNdx(energy, rnd);
-
-ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
-
-delete Compton;
-}
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+    }
 }
 
 TEST(Compton, Test_of_e)
 {
-std::string filename = testfile_dir + "Compton_e.txt";
-std::ifstream in{filename};
-EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Compton_e.txt");
 
-char firstLine[256];
-in.getline(firstLine, 256);
+    std::string mediumName;
+    double ecut;
+    double vcut;
+    bool cont_rand = false;
+    double multiplier;
+    std::string parametrization;
+    double energy;
+    double rnd1;
+    double rnd2;
+    double stochastic_loss_stored;
+    double stochastic_loss_new;
 
-std::string mediumName;
-double ecut;
-double vcut;
-double multiplier;
-std::string parametrization;
-double energy;
-double rnd1, rnd2;
-double stochastic_loss_stored;
-double stochastic_loss_new;
+    std::cout.precision(16);
 
-std::cout.precision(16);
+    RandomGenerator::Get().SetSeed(0);
 
-RandomGenerator::Get().SetSeed(0);
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1
+        >> rnd2 >> stochastic_loss_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
-while (in.good())
-{
-in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >>
-stochastic_loss_stored >> parametrization;
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
-ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
+        ParticleDef particle_def = GammaDef();
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-ComptonFactory::Definition compton_def;
-compton_def.multiplier      = multiplier;
-compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def);
+        auto cross = make_compton(particle_def, *medium, ecuts, false, config);
 
-stochastic_loss_new = Compton->CalculateStochasticLoss(energy, rnd1, rnd2);
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = medium->GetComponents();
+        double sum = 0;
 
-ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
-
-delete Compton;
-}
+        for (auto comp : components) {
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * rnd2) {
+                double rate_new = dNdx_for_comp * rnd1;
+                if (ecut == INF and vcut == 1) {
+#ifndef NDEBUG
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(
+                                     comp.GetHash(), energy, rate_new),
+                        "");
+#endif
+                } else {
+                    stochastic_loss_new = energy
+                        * cross->CalculateStochasticLoss(
+                            comp.GetHash(), energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
+                        1E-4 * stochastic_loss_stored);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 TEST(Compton, Test_of_dEdx_Interpolant)
 {
-std::string filename = testfile_dir + "Compton_dEdx_interpol.txt";
-std::ifstream in{filename};
-EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Compton_dEdx.txt");
 
-char firstLine[256];
-in.getline(firstLine, 256);
+    std::string mediumName;
+    double ecut;
+    double vcut;
+    bool cont_rand = false;
+    double multiplier;
+    std::string parametrization;
+    double energy;
+    double dEdx_stored;
+    double dEdx_new;
 
-std::string mediumName;
-double ecut;
-double vcut;
-double multiplier;
-std::string parametrization;
-double energy;
-double dEdx_stored;
-double dEdx_new;
+    std::cout.precision(16);
 
-std::cout.precision(16);
-InterpolationDef InterpolDef;
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
+        >> dEdx_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
-while (in.good())
-{
-in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >>
-parametrization;
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
-ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
+        ParticleDef particle_def = GammaDef();
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-ComptonFactory::Definition compton_def;
-compton_def.multiplier      = multiplier;
-compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def, InterpolDef);
+        auto cross = make_compton(particle_def, *medium, ecuts, false, config);
 
-dEdx_new = Compton->CalculatedEdx(energy);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
-
-delete Compton;
-}
+        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+    }
 }
 
 TEST(Compton, Test_of_dNdx_Interpolant)
 {
-std::string filename = testfile_dir + "Compton_dNdx_interpol.txt";
-std::ifstream in{filename};
-EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Compton_dNdx.txt");
 
-std::string mediumName;
-double ecut;
-double vcut;
-double multiplier;
-std::string parametrization;
-double energy;
-double dNdx_stored;
-double dNdx_new;
+    std::string mediumName;
+    double ecut;
+    double vcut;
+    bool cont_rand = false;
+    double multiplier;
+    std::string parametrization;
+    double energy;
+    double dNdx_stored;
+    double dNdx_new;
 
-std::cout.precision(16);
-InterpolationDef InterpolDef;
+    std::cout.precision(16);
 
-while (in.good())
-{
-in >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
+        >> dNdx_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
-ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
-ComptonFactory::Definition compton_def;
-compton_def.multiplier      = multiplier;
-compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
+        ParticleDef particle_def = GammaDef();
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def, InterpolDef);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-dNdx_new = Compton->CalculatedNdx(energy);
+        auto cross = make_compton(particle_def, *medium, ecuts, false, config);
 
-ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
-delete Compton;
-}
-}
-
-TEST(Compton, Test_of_dNdx_rnd_Interpolant)
-{
-std::string filename = testfile_dir + "Compton_dNdx_rnd_interpol.txt";
-std::ifstream in{filename};
-EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-char firstLine[256];
-in.getline(firstLine, 256);
-
-std::string mediumName;
-double ecut;
-double vcut;
-double multiplier;
-std::string parametrization;
-double energy;
-double rnd;
-double dNdx_stored;
-double dNdx_new;
-
-std::cout.precision(16);
-InterpolationDef InterpolDef;
-
-RandomGenerator::Get().SetSeed(0);
-
-while (in.good())
-{
-in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_stored >> parametrization;
-
-ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
-
-ComptonFactory::Definition compton_def;
-compton_def.multiplier      = multiplier;
-compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
-
-CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def, InterpolDef);
-
-dNdx_new = Compton->CalculatedNdx(energy, rnd);
-
-ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
-
-delete Compton;
-}
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+    }
 }
 
 TEST(Compton, Test_of_e_Interpolant)
 {
-std::string filename = testfile_dir + "Compton_e_interpol.txt";
-std::ifstream in{filename};
-EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
+    auto in = getTestFiles("Compton_e.txt");
 
-char firstLine[256];
-in.getline(firstLine, 256);
+    std::string mediumName;
+    double ecut;
+    double vcut;
+    bool cont_rand = false;
+    double multiplier;
+    std::string parametrization;
+    double energy;
+    double rnd1;
+    double rnd2;
+    double stochastic_loss_stored;
+    double stochastic_loss_new;
 
-std::string mediumName;
-double ecut;
-double vcut;
-double multiplier;
-std::string parametrization;
-double energy;
-double rnd1, rnd2;
-double stochastic_loss_stored;
-double stochastic_loss_new;
+    std::cout.precision(16);
 
-std::cout.precision(16);
-InterpolationDef InterpolDef;
+    RandomGenerator::Get().SetSeed(0);
 
-RandomGenerator::Get().SetSeed(0);
+    while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1
+        >> rnd2 >> stochastic_loss_stored >> parametrization) {
+        parametrization.erase(0, 7);
 
-while (in.good())
-{
-in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization;
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
-ParticleDef particle_def = GammaDef::Get();
-std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
+        ParticleDef particle_def = GammaDef();
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-ComptonFactory::Definition compton_def;
-compton_def.multiplier      = multiplier;
-compton_def.parametrization = ComptonFactory::Get().GetEnumFromString(parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-CrossSection* Compton =
-        ComptonFactory::Get().CreateCompton(particle_def, medium, ecuts, compton_def, InterpolDef);
+        auto cross = make_compton(particle_def, *medium, ecuts, false, config);
 
-stochastic_loss_new = Compton->CalculateStochasticLoss(energy, rnd1, rnd2);
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        auto components = medium->GetComponents();
+        double sum = 0;
 
-ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
-
-delete Compton;
-}
+        for (auto comp : components) {
+            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
+            sum += dNdx_for_comp;
+            if (sum > dNdx_full * rnd2) {
+                double rate_new = dNdx_for_comp * rnd1;
+                if (ecut == INF and vcut == 1) {
+#ifndef NDEBUG
+                    EXPECT_DEATH(cross->CalculateStochasticLoss(
+                                     comp.GetHash(), energy, rate_new),
+                        "");
+#endif
+                } else {
+                    stochastic_loss_new = energy
+                        * cross->CalculateStochasticLoss(
+                            comp.GetHash(), energy, rate_new);
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
+                        1E-4 * stochastic_loss_stored);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 int main(int argc, char** argv)
 {
+    if (argc > 1) {
+        auto debug = std::atof(argv[1]);
+        if (debug)
+            Logging::SetGlobalLoglevel(spdlog::level::level_enum::trace);
+    }
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

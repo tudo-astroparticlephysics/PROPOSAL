@@ -1,0 +1,22 @@
+#pragma once
+
+#include <string>
+
+inline std::string getPROPOSALVersion() {
+    return "@PROPOSAL_VERSION@";
+}
+inline unsigned getPROPOSALVersionMajor() {
+    return @PROPOSAL_VERSION_MAJOR@+0;
+}
+inline unsigned getPROPOSALVersionMinor()
+{
+    return @PROPOSAL_VERSION_MINOR@+0;
+}
+inline unsigned getPROPOSALVersionPatch()
+{
+    return @PROPOSAL_VERSION_PATCH@+0;
+}
+inline unsigned getPROPOSALVersionTweak()
+{
+    return @PROPOSAL_VERSION_TWEAK@+0;
+}

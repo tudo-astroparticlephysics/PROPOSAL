@@ -2,11 +2,11 @@
 #include "cmath"
 #include "gtest/gtest.h"
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/crossection/IonizIntegral.h"
-#include "PROPOSAL/crossection/parametrization/Ionization.h"
-#include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/EnergyCutSettings.h"
+// #include "PROPOSAL/medium/Medium.h"
+// #include "PROPOSAL/crosssection/IonizIntegral.h"
+// #include "PROPOSAL/crosssection/parametrization/Ionization.h"
+// #include "PROPOSAL/particle/ParticleDef.h"
+// #include "PROPOSAL/EnergyCutSettings.h"
 
 using namespace PROPOSAL;
 
@@ -137,14 +137,13 @@ TEST(IntegralValue, MultiplePrecisions)
 {
     double xmin = 0, xmax = 3;
     double ExactIntegral = std::exp(3) - 1;
-    double CalcIntegral  = 0;
+    double CalcIntegral;
 
-    double precision = 1E-5;
     for (double precision = 1E-5; precision > 1E-16; precision /= 10)
     {
 
         Integral* Int = new Integral(5, 20, precision);
-        CalcIntegral  = Int->Integrate(xmin, xmax, Testexp, 1);
+        CalcIntegral = Int->Integrate(xmin, xmax, Testexp, 1);
 
         ASSERT_NEAR(CalcIntegral, ExactIntegral, ExactIntegral * precision);
 
@@ -156,9 +155,8 @@ TEST(IntegralValue, IntegrateWithSubstitution)
 {
     double xmin = 2, xmax = 4;
     double ExactIntegral = exp(xmax) - std::exp(xmin);
-    double CalcIntegral  = 0;
+    double CalcIntegral;
 
-    double precision = 1E-5;
     for (double precision = 1E-5; precision > 1E-11; precision /= 10)
     {
 
@@ -175,9 +173,8 @@ TEST(IntegralValue, IntegrateWithLog)
 {
     double xmin = 2, xmax = 4;
     double ExactIntegral = std::exp(xmax) - std::exp(xmin);
-    double CalcIntegral  = 0;
+    double CalcIntegral;
 
-    double precision = 1E-5;
     for (double precision = 1E-5; precision > 1E-11; precision /= 10)
     {
 
@@ -194,9 +191,8 @@ TEST(IntegralValue, IntegrateWithLogSubstitution)
 {
     double xmin = 2, xmax = 4;
     double ExactIntegral = std::exp(xmax) - std::exp(xmin);
-    double CalcIntegral  = 0;
+    double CalcIntegral;
 
-    double precision = 1E-5;
     for (double precision = 1E-5; precision > 1E-6; precision /= 10)
     {
 
@@ -209,33 +205,33 @@ TEST(IntegralValue, IntegrateWithLogSubstitution)
     }
 }
 
-TEST(QUADPACK, RombergIntegrationFailure)
-{
-    double precision = 1e-4;
-    IonizIntegral Ioniz_Int(IonizBetheBlochRossi(MuMinusDef::Get(), std::make_shared<const Ice>(), EnergyCutSettings(), 1.0));
+// TEST(QUADPACK, RombergIntegrationFailure)
+// {
+//     double precision = 1e-4;
+//     IonizIntegral Ioniz_Int(IonizBetheBlochRossi(MuMinusDef::Get(), std::make_shared<const Ice>(), EnergyCutSettings(), 1.0));
 
-    // --------------------------------------------------------------------- //
-    // Problematic energy for romberg integration
-    // --------------------------------------------------------------------- //
+//     // --------------------------------------------------------------------- //
+//     // Problematic energy for romberg integration
+//     // --------------------------------------------------------------------- //
 
-    double energy = 146.768; // 0.274374 + 4.63716e-10
-    double result = 2.9065825764284159;
+//     double energy = 146.768; // 0.274374 + 4.63716e-10
+//     double result = 2.9065825764284159;
 
-    double dEdx = Ioniz_Int.CalculatedEdx(energy);
+//     double dEdx = Ioniz_Int.CalculatedEdx(energy);
 
-    ASSERT_NEAR(dEdx, result, result * precision);
+//     ASSERT_NEAR(dEdx, result, result * precision);
 
-    // --------------------------------------------------------------------- //
-    // Problematic energy for gnu scientific lib gauss_quadrature integration
-    // --------------------------------------------------------------------- //
+//     // --------------------------------------------------------------------- //
+//     // Problematic energy for gnu scientific lib gauss_quadrature integration
+//     // --------------------------------------------------------------------- //
 
-    energy = 142.58; // 0.287524 - 1.01164e-8
-    result = 3.0734340510841172;
+//     energy = 142.58; // 0.287524 - 1.01164e-8
+//     result = 3.0734340510841172;
 
-    dEdx = Ioniz_Int.CalculatedEdx(energy);
+//     dEdx = Ioniz_Int.CalculatedEdx(energy);
 
-    ASSERT_NEAR(dEdx, result, result * precision);
-}
+//     ASSERT_NEAR(dEdx, result, result * precision);
+// }
 
 int main(int argc, char** argv)
 {

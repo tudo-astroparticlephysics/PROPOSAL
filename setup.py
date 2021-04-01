@@ -12,8 +12,14 @@ from setuptools.command.build_ext import build_ext
 
 SETUP_DIR = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(SETUP_DIR, 'CMakeLists.txt')) as f:
-    res = re.search(r'VERSION (\d+[.]\d+[.]\d+)', f.read())
-    version = res.group(1)
+    f_read = f.read()
+    res = re.search(r'PROPOSAL_VERSION_MAJOR (\d)', f_read)
+    v_major = res.group(1)
+    res = re.search(r'PROPOSAL_VERSION_MINOR (\d)', f_read)
+    v_minor = res.group(1)
+    res = re.search(r'PROPOSAL_VERSION_PATCH (\d)', f_read)
+    v_patch = res.group(1)
+    version = v_major + '.' + v_minor + '.' + v_patch
 
 
 def get_cmake():
@@ -26,7 +32,7 @@ def get_cmake():
 
         if ret.returncode == 0:
             return exe
-    raise OSError('You need cmake >= 3.8')
+    raise OSError('You need cmake >= 3.9')
 
 
 class CMakeExtension(Extension):
@@ -61,14 +67,25 @@ class build_ext_cmake(build_ext):
             sysconfig.get_config_var('LIBDIR'),
             sysconfig.get_config_var('INSTSONAME')
         )
+        if not os.getenv('NO_CONAN', False):
+            print("Using conan to install dependencies. Set environment variable NO_CONAN to skip conan.")
+            conan_call = [
+                'conan',
+                'install',
+                ext.source_dir,
+                '-o build_python=True',
+                '-o build_testing=False',
+            ]
+            sp.run(conan_call, cwd=self.build_temp, check=True)
+            os.remove(self.build_temp + "/Findpybind11.cmake") # bugfix
         cmake_call = [
             cmake,
             ext.source_dir,
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
             '-DCMAKE_BUILD_TYPE=' + cfg,
             '-DBUILD_TESTING=OFF',
-            '-DADD_PYTHON=ON',
-            '-DADD_CPPEXAMPLE=OFF',
+            '-DBUILD_PYTHON=ON',
+            '-DBUILD_EXAMPLE=OFF',
             '-DPYTHON_EXECUTABLE=' + sys.executable,
             '-DPYTHON_LIBRARY=' + str(python_lib),
             '-DCMAKE_INSTALL_RPATH={}'.format(rpath),
