@@ -36,9 +36,7 @@ PROPOSAL is developed and tested on macOS and linux.
 Continuous integration is setup on travis and tests several version of gcc and clang.
 
 PROPOSAL is now a C++14 library using pybind11 Python bindings!
-
-This version is the latest not using C++14 or more modern methods.
-The next release will make use of C++14 methods.
+In the next major release, C++17 methods may also be used in the core library, which is currently only used when building the tests.
 
 
 ## How to cite PROPOSAL?
@@ -119,9 +117,6 @@ and if you want to cite the latest improvements
 - Doxygen (For pdf and html documentation of the code)
 - [pybind11](https://github.com/pybind/pybind11)
   (To build the python wrapper)
-  If you decide to build the python wrapper and pybind11 is not
-  provided on your system, pybind11 will be cloned to the project
-  source folder.
 
 ## Installation
 
@@ -146,23 +141,23 @@ The parameters of the configuration file are described
 using namespace PROPOSAL;
 
 int main(){
-    ParticleDef mu_def = MuMinusDef::Get();
-    Propagator prop(mu_def, "resources/configuration/config.json");
-    ParticleState mu(mu_def.particle_type);
+    auto mu_def = MuMinusDef();
+    Propagator prop(mu_def, "path/to/config.json");
 
-    mu.SetEnergy(9e6);
-    mu.SetPosition(Vector3D(0, 0, 0))
-    mu.SetDirection(Vector3D(0, 0, -1));
+    Cartesian3D position(0, 0, 0);
+    Cartesian3D direction(0, 0, 1);
+    auto energy = 1e8; // MeV
+    auto init_state = ParticleState(position, direction, energy, 0., 0.);
 
     std::vector<double> ranges;
 
     for (int i = 0; i < 10; i++)
     {
-        Secondaries sec = prop.Propagate(mu);
+        auto track = prop.Propagate(init_state, 50000);
 
-        ranges.push_back(sec.GetPosition().back().magnitude());
+        ranges.push_back(track.back().propagated_distance);
     }
-    
+
 // ... Do stuff with ranges, e.g. plot histogram
 
 }
@@ -220,19 +215,17 @@ prop = pp.Propagator(
 	  config_file="path/to/config.json"
 )
 
-mu = pp.particle.ParticleState(mu_def.particle_type)
-
-mu.energy = 9e6
-mu.direction = pp.Vector3D(0, 0, -1)
+init_state = pp.particle.ParticleState()
+init_state.energy = 1e9 # initial energy in MeV
+init_state.position = pp.Cartesian3D(0, 0, 0)
+init_state.direction = pp.Cartesian3D(0, 0, 1)
 
 mu_length = []
-mu_secondaries = []
 
 for i in range(1000):
-    sec = prop.propagate(mu)
+    track = prop.propagate(init_state)
 
-    mu_length.append(sec.position[-1].magnitude() / 100)
-    mu_secondaries.append(sec.number_of_particles)
+    mu_length.append(track.track_propagated_distances()[-1] / 100)
 ```
 
 ## Documentation ##
