@@ -6,7 +6,9 @@ using namespace PROPOSAL;
 
 ExactTimeBuilder::ExactTimeBuilder(
     std::shared_ptr<Displacement> _disp, double _mass, std::false_type)
-    : Time(_disp, _mass)
+    : Time(_mass)
+    , disp(_disp)
+    , hash(disp->GetHash())
     , time_integral(std::make_unique<UtilityIntegral>(
           [this](double E) { return FunctionToIntegral(E); },
           _disp->GetLowerLim(), this->GetHash()))
@@ -15,7 +17,9 @@ ExactTimeBuilder::ExactTimeBuilder(
 
 ExactTimeBuilder::ExactTimeBuilder(
     std::shared_ptr<Displacement> _disp, double _mass, std::true_type)
-    : Time(_disp, _mass)
+    : Time(_mass)
+    , disp(_disp)
+    , hash(disp->GetHash())
     , time_integral(std::make_unique<UtilityInterpolant>(
           [this](double E) { return FunctionToIntegral(E); },
           _disp->GetLowerLim(), this->GetHash()))
@@ -30,6 +34,17 @@ double ExactTimeBuilder::TimeElapsed(double initial_energy, double final_energy,
     assert(initial_energy >= final_energy);
     return time_integral->Calculate(initial_energy, final_energy)
         / local_density;
+}
+
+double ExactTimeBuilder::FunctionToIntegral(double energy)
+{
+    assert(energy >= mass);
+    auto square_momentum = std::max((energy - mass) * (energy + mass), 0.);
+    auto particle_momentum = std::sqrt(square_momentum);
+    auto aux = disp->FunctionToIntegral(energy);
+    if (aux == 0)
+        return 0;
+    return aux * energy / (particle_momentum * SPEED);
 }
 
 namespace PROPOSAL {

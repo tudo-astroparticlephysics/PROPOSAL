@@ -6,6 +6,8 @@
 
 namespace PROPOSAL {
 class ExactTimeBuilder : public Time {
+    std::shared_ptr<Displacement> disp;
+    size_t hash;
     std::shared_ptr<UtilityIntegral> time_integral;
 
 public:
@@ -14,8 +16,10 @@ public:
     ExactTimeBuilder(
         std::shared_ptr<Displacement>, double mass, std::true_type);
 
+    double FunctionToIntegral(double energy);
     double TimeElapsed(double initial_energy, double final_energy,
         double grammage, double local_density) override;
+    auto GetHash() const noexcept { return hash; }
 };
 
 std::unique_ptr<Time> make_time(

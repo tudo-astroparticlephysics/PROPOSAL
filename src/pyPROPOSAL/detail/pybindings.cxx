@@ -342,8 +342,7 @@ PYBIND11_MODULE(proposal, m)
     py::class_<Time, std::shared_ptr<Time>>(m, "Time")
         .def("elapsed", &Time::TimeElapsed, py::arg("initial_energy"),
             py::arg("final_energy"), py::arg("grammage"),
-            py::arg("local_density"))
-        .def_readwrite_static("interpol_def", &Time::interpol_def);
+            py::arg("local_density"));
 
     m.def("make_time",
         [](crosssection_list_t cross,
