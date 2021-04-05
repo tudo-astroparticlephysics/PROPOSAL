@@ -454,4 +454,8 @@ double SampleFromGaussian(double mean, double sigma, double rnd, double min, dou
     return sigma * normalppf(rndtmp)  + mean;
 }
 
+double SampleFromExponential(double p, double lambda) {
+    return - log1p(-p) / lambda;
+}
+
 }  // namespace PROPOSAL
