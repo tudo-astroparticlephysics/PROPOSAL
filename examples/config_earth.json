@@ -1,7 +1,10 @@
 {
 	"global":
 	{
-		"scattering": "HighlandIntegral",
+		"scattering": 
+		{
+			"multiple_scattering": "HighlandIntegral"
+		},
 		"cuts":
 		{
 			"e_cut": "inf",

@@ -133,7 +133,7 @@ c++ project by including the header files. The following snippet uses the
 [configuration](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config.json) to propagate muons and
 store the muon ranges for further proceeds.
 The parameters of the configuration file are described
-**[here](config_docu.md)**.
+**[here](docs/config_docu.md)**.
 
 ```c++
 #include "PROPOSAL/PROPOSAL.h"
@@ -204,7 +204,7 @@ scripts you can find in
 For a short demonstration the following snippet will create data you can use to
 show the distribution of muon ranges and the number of interactions in ice.
 The parameters of the given configuration file are described
-[here](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config_docu.md).
+[here](docs/config_docu.md).
 
 ```python
 import proposal as pp
@@ -234,8 +234,6 @@ The C++ API can be built using
 
 	make doc
 
-A documentation of the configuration file can be found
-[here](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config_docu.md).
 
 ## Issues ##
 

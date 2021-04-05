@@ -1,13 +1,14 @@
 # PROPOSAL configuration file documentation
 PROPOSAL `Propagator` objects can be initialized in an easy way using a **json configuration file**, describing the propagation environment. This documentation provides an overview of the different options that can be used.
 
+Examples for configuration files can be found in the examples folder.
+
 The propagation environment of PROPOSAL is structured using `Sectors`. Each sector is defined by its `Geometry`, `Medium` and other individual properties. These properties will be described in this documentation.
 
-The top-level of the json configuration file consists of three objects:
+The top-level of the json configuration file consists of two objects:
 
 | Keyword          | Type   | Description |
 | ---------------  | ------ | ----------- |
-| `interpolation`  | Object | Includes Interpolation options that will (or will not) be used for the Propagator. |
 | `sectors`        | Array  | List of Sector objects. Each Sector object includes options that describe the Sector properties. |
 | `global`         | Object | Defines global Sector settings. First of all, each Sector will use the settings defined in the corresponding Sector object. If the Sector object does not define a setting, PROPOSAL will look whether this setting is defined in this global object. If the option is not defined here, PROPOSAL will either use a default value or throw an error when defining this option if mandatory. |
 
