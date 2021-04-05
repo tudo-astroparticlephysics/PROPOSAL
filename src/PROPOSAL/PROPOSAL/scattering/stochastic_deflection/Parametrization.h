@@ -9,7 +9,7 @@
 #include <memory>
 #include <vector>
 
-using PROPOSAL::Components::Component;
+using PROPOSAL::Component;
 
 namespace PROPOSAL {
 namespace stochastic_deflection {

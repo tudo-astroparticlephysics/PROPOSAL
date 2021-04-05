@@ -40,8 +40,10 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
-#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/NaivBremsstrahlung.h"
+#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiApproximationBremsstrahlung.h"
 #include "PROPOSAL/scattering/stochastic_deflection/ionization/NaivIonization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BorogPetrukhinNuclearInteraction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/pairProd/KelnerPairProduction.h"
 
 namespace PROPOSAL {
 
@@ -89,10 +91,14 @@ std::unique_ptr<stochastic_deflection::Parametrization> create_deflection(
 }
 
 static const std::map<std::string, func_ptr> DeflectionTable
-    = { { "naivbremsstrahlung",
-            create_deflection<stochastic_deflection::NaivBremsstrahlung> },
-          { "naivionization",
-              create_deflection<stochastic_deflection::NaivIonization> }
+    = { { "tsaiapproximationbremsstrahlung",
+            create_deflection<stochastic_deflection::TsaiApproximationBremsstrahlung> },
+        { "naivionization",
+              create_deflection<stochastic_deflection::NaivIonization> },
+        {"borogpetrukhinnuclearinteraction",
+                create_deflection<stochastic_deflection::BorogPetrukhinNuclearInteraction>},
+        {"kelnerpairproduction",
+                create_deflection<stochastic_deflection::KelnerPairProduction>}
 
       };
 

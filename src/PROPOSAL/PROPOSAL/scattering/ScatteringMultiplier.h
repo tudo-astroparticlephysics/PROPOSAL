@@ -8,12 +8,12 @@ class ScatteringMultiplier : public Scattering {
     double multiple_scatt = 1;
     std::vector<std::pair<InteractionType, double>> stochastic_deflect;
 
-    std::array<double, 2> _scale_deflect(std::array<double, 2>& angles, InteractionType t) override
+    DirectionChangeAngular _scale_deflect(DirectionChangeAngular& angles, InteractionType t) override
     {
         for (auto m : stochastic_deflect) {
             if (m.first == t) {
-                std::get<0>(angles) *= m.second;
-                assert(std::get<0>(angles) <= PI);
+                angles.zenith *= m.second;
+                assert(angles.zenith <= PI);
                 return angles;
             }
         }
