@@ -325,8 +325,8 @@ public:
         if (dndx)
             return CalculateStochasticLoss_impl(
                 hash, E, rate, only_stochastic {});
-        throw std::logic_error("Can not calculate stochastic loss if dndx"
-                               "calculator is not defined. The crosssection"
+        throw std::logic_error("Can not calculate stochastic loss if dndx "
+                               "calculator is not defined. The crosssection "
                                "is probably defined to be only-continuous.");
     }
 
