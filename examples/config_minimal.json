@@ -1,0 +1,24 @@
+{
+	"global":
+	{
+		"cuts":
+		{
+			"e_cut": 500,
+			"v_cut": 1,
+			"cont_rand": false
+		}
+	},
+	"sectors": [
+		{
+			"medium": "ice",
+			"geometries": [
+				{
+					"hierarchy": 0,
+					"shape": "sphere",
+					"origin": [0, 0, 0],
+					"outer_radius": 1e20
+				}
+			]
+		}
+	]
+}
