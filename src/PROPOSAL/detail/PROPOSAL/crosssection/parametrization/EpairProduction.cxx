@@ -272,12 +272,12 @@ double crosssection::EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
     }
 
     // combining the results
-    aux = ALPHA * RE;
+    aux = ALPHA * RE * p_def.charge;
     aux *= aux / (1.5 * PI) * 2 * medium_charge
         * (medium_charge + atomic_electron_contribution);
     aux1 = ME / p_def.mass * p_def.charge;
 
-    aux *= (1 - v) / v * (std::abs(p_def.charge)*diagram_e + aux1 * aux1 * diagram_mu);
+    aux *= (1 - v) / v * (diagram_e + aux1 * aux1 * diagram_mu);
 
     if (lpm_) {
         aux *= lpm_->suppression_factor(energy, v, r2, beta, xi);
@@ -303,7 +303,7 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
     double rad_log = comp.GetLogConstant();
 
     double const_prefactor
-        = 4.0 / (3.0 * PI) * nucl_Z * std::pow(ALPHA * RE, 2);
+        = 4.0 / (3.0 * PI) * nucl_Z * std::pow(ALPHA * RE * p_def.charge, 2);
     double Z13 = std::pow(nucl_Z, -1.0 / 3.0);
     double d_n = 1.54 * std::pow(nucl_A, 0.27);
 
@@ -401,7 +401,7 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
 
     double diagram_e = std::max(0.0,
         const_prefactor * (nucl_Z + zeta) * (1.0 - v) / v
-            * std::abs(p_def.charge) * (Ce1 * Le1 + Ce2 * Le2));
+            * (Ce1 * Le1 + Ce2 * Le2));
 
     // --------------------------------------------------------------------- //
     // Diagram mu
