@@ -34,7 +34,7 @@ energies = np.logspace(4, 13, num=10)
 vs = np.linspace(0.022, 0.98, 10) # choose v-range so that v_min < v < v_max is always fulflilled for all E in energies
 
 
-def create_tables(dir_name, interpolate=False, **kwargs):
+def create_tables(dir_name, **kwargs):
 
     pp.RandomGenerator.get().set_seed(1234)
 
@@ -55,52 +55,52 @@ def create_tables(dir_name, interpolate=False, **kwargs):
     for particle in particle_defs:
         for medium in mediums:
             for cut in cuts:
-                    for param in params:
-                        args = {
-                            "parametrization": param,
-                            "particle_def": particle,
-                            "target": medium,
-                            "cuts": cut,
-                            "interpolate": False
-                        }
+                for param in params:
+                    args = {
+                        "parametrization": param,
+                        "particle_def": particle,
+                        "target": medium,
+                        "cuts": cut,
+                        "interpolate": False
+                    }
 
-                        xsection = pp.crosssection.make_crosssection(**args)
+                    xsection = pp.crosssection.make_crosssection(**args)
 
-                        for key in buf:
-                            buf[key][1] = [""]
+                    for key in buf:
+                        buf[key][1] = [""]
 
-                            for energy in energies:
-                                if key == "dEdx":
-                                    result = [str(xsection.calculate_dEdx(energy) * medium.mass_density)]
-                                if key == "dNdx":
-                                    result = [str(xsection.calculate_dNdx(energy) * medium.mass_density)]
-                                if key == "stoch":
-                                    rnd1 = pp.RandomGenerator.get().random_double()
-                                    rnd2 = pp.RandomGenerator.get().random_double()
+                        for energy in energies:
+                            if key == "dEdx":
+                                result = [str(xsection.calculate_dEdx(energy) * medium.mass_density)]
+                            if key == "dNdx":
+                                result = [str(xsection.calculate_dNdx(energy) * medium.mass_density)]
+                            if key == "stoch":
+                                rnd1 = pp.RandomGenerator.get().random_double()
+                                rnd2 = pp.RandomGenerator.get().random_double()
 
-                                    components = medium.components
-                                    comp = components[int(rnd2*len(components))]
-                                    dNdx_for_comp = xsection.calculate_dNdx(energy, comp.hash);
+                                components = medium.components
+                                comp = components[int(rnd2*len(components))]
+                                dNdx_for_comp = xsection.calculate_dNdx(energy, comp.hash);
 
-                                    if np.isfinite(cut.ecut) or cut.vcut < 1:
-                                        result = xsection.calculate_stochastic_loss(
-                                            comp.hash, energy, rnd1*dNdx_for_comp) * energy
-                                    else:
-                                        result = 0
-                                    result = [str(rnd1), str(rnd2), str(result)]
+                                if np.isfinite(cut.ecut) or cut.vcut < 1:
+                                    result = xsection.calculate_stochastic_loss(
+                                        comp.hash, energy, rnd1*dNdx_for_comp) * energy
+                                else:
+                                    result = 0
+                                result = [str(rnd1), str(rnd2), str(result)]
 
 
-                                buf[key][1].append(particle.name)
-                                buf[key][1].append(medium.name)
-                                buf[key][1].append(str(cut.ecut))
-                                buf[key][1].append(str(cut.vcut))
-                                buf[key][1].append(str(multiplier))
-                                buf[key][1].append(str(energy))
-                                buf[key][1].append(name)
-                                buf[key][1].extend(result)
-                                buf[key][1].append("\n")
+                            buf[key][1].append(particle.name)
+                            buf[key][1].append(medium.name)
+                            buf[key][1].append(str(cut.ecut))
+                            buf[key][1].append(str(cut.vcut))
+                            buf[key][1].append(str(multiplier))
+                            buf[key][1].append(str(energy))
+                            buf[key][1].append(name)
+                            buf[key][1].extend(result)
+                            buf[key][1].append("\n")
 
-                            buf[key][0].write("\t".join(buf[key][1]))
+                        buf[key][0].write("\t".join(buf[key][1]))
 
 
 def create_table_rho(dir_name):
@@ -159,7 +159,7 @@ def create_table_rho(dir_name):
 
 
 def main(dir_name):
-    create_tables(dir_name, dEdx=True, dNdx=True, dNdx_rnd=True, stoch=True)
+    create_tables(dir_name, dEdx=True, dNdx=True, stoch=True)
     # create_table_rho(dir_name)
 
 
