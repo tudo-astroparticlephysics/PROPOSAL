@@ -38,7 +38,6 @@ double ExactTimeBuilder::TimeElapsed(double initial_energy, double final_energy,
 
 double ExactTimeBuilder::FunctionToIntegral(double energy)
 {
-    assert(energy >= mass);
     auto square_momentum = std::max((energy - mass) * (energy + mass), 0.);
     auto particle_momentum = std::sqrt(square_momentum);
     auto aux = disp->FunctionToIntegral(energy);
