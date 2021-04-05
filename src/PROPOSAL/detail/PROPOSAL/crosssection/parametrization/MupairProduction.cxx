@@ -70,7 +70,7 @@ double crosssection::MupairProductionRhoIntegral::DifferentialCrossSection(
     auto rMax = aux;
 
     Integral integral(IROMB, IMAXS, IPREC);
-    return NA / comp.GetAtomicNum() * p_def.charge * p_def.charge
+    return NA / comp.GetAtomicNum()
         * (integral.Integrate(0, rMax,
             std::bind(
                 &crosssection::MupairProductionRhoIntegral::FunctionToIntegral,

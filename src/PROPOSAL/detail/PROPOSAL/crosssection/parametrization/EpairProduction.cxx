@@ -272,12 +272,12 @@ double crosssection::EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
     }
 
     // combining the results
-    aux = ALPHA * RE * p_def.charge;
+    aux = ALPHA * RE;
     aux *= aux / (1.5 * PI) * 2 * medium_charge
         * (medium_charge + atomic_electron_contribution);
     aux1 = ME / p_def.mass * p_def.charge;
 
-    aux *= (1 - v) / v * (diagram_e + aux1 * aux1 * diagram_mu);
+    aux *= (1 - v) / v * (std::abs(p_def.charge)*diagram_e + aux1 * aux1 * diagram_mu);
 
     if (lpm_) {
         aux *= lpm_->suppression_factor(energy, v, r2, beta, xi);
@@ -303,7 +303,7 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
     double rad_log = comp.GetLogConstant();
 
     double const_prefactor
-        = 4.0 / (3.0 * PI) * nucl_Z * std::pow(ALPHA * RE, 2.0);
+        = 4.0 / (3.0 * PI) * nucl_Z * std::pow(ALPHA * RE, 2);
     double Z13 = std::pow(nucl_Z, -1.0 / 3.0);
     double d_n = 1.54 * std::pow(nucl_A, 0.27);
 
@@ -337,7 +337,7 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
     }
 
     double beta = v * v / (2.0 * (1.0 - v));
-    double xi = std::pow(m_in * v / (2.0 * ME), 2.0) * (1.0 - rho2) / (1.0 - v);
+    double xi = std::pow(m_in * v / (2.0 * ME), 2) * (1.0 - rho2) / (1.0 - v);
 
     // --------------------------------------------------------------------- //
     // Diagram e
@@ -366,7 +366,7 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
                       + 2.0 * ME * std::exp(0.5) * rad_log * Z13 * (1.0 + xi)
                           / (energy * v * (1.0 - rho2))))
             - De / Be
-            - 0.5 * std::log(Xe + std::pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
+            - 0.5 * std::log(Xe + std::pow(ME / m_in * d_n, 2) * (1.0 + xi));
 
         Le2 = std::log(rad_log * Z13 * std::exp(-1.0 / 6.0) * std::sqrt(1 + xi)
                   / (Xe
@@ -386,7 +386,7 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
             - 0.5 * De / Be
             - 0.5
                 * std::log(
-                    1. + Xe_inv * std::pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
+                    1. + Xe_inv * std::pow(ME / m_in * d_n, 2) * (1.0 + xi));
 
         Le2 = std::log(rad_log * Z13 * std::exp(-1.0 / 6.0) * std::sqrt(1 + xi)
                   / (1.
@@ -395,13 +395,13 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
             - 0.5 * De / Be
             - 0.5
                 * std::log(1.
-                    + Xe_inv * std::pow(ME / m_in * d_n, 2.0)
+                    + Xe_inv * std::pow(ME / m_in * d_n, 2)
                         * std::exp(-1.0 / 3.0) * (1.0 + xi));
     }
 
     double diagram_e = std::max(0.0,
         const_prefactor * (nucl_Z + zeta) * (1.0 - v) / v
-            * (Ce1 * Le1 + Ce2 * Le2));
+            * std::abs(p_def.charge) * (Ce1 * Le1 + Ce2 * Le2));
 
     // --------------------------------------------------------------------- //
     // Diagram mu
@@ -453,7 +453,7 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
 
     double diagram_mu = std::max(0.0,
         const_prefactor * (nucl_Z + zeta) * (1.0 - v) / v
-            * std::pow(ME / m_in, 2.0) * (Cm1 * Lm1 + Cm2 * Lm2));
+            * std::pow(ME / m_in * p_def.charge , 2) * (Cm1 * Lm1 + Cm2 * Lm2));
 
     double aux = diagram_e + diagram_mu;
 
