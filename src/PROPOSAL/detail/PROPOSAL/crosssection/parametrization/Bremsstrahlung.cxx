@@ -93,7 +93,7 @@ double crosssection::Bremsstrahlung::DifferentialCrossSection(
 
     auto result = CalculateParametrization(p_def, comp, energy, v);
 
-    auto aux = 2 * p_def.charge * (ME / p_def.mass) * RE
+    auto aux = 2 * p_def.charge * p_def.charge * (ME / p_def.mass) * RE
         * comp.GetNucCharge();
     aux *= aux * (ALPHA / v) * result;
 
@@ -462,7 +462,7 @@ double crosssection::BremsElectronScreening::DifferentialCrossSection(
 {
     auto result = CalculateParametrization(p_def, comp, energy, v);
 
-    auto aux = p_def.charge * (ME / p_def.mass) * RE;
+    auto aux = p_def.charge * p_def.charge * (ME / p_def.mass) * RE;
     aux *= aux * (ALPHA / v) * result;
 
     if (lpm_) {
