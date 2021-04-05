@@ -9,13 +9,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from pandas.core.common import flatten
-import vg
 
 
 # In[2]:
 
 
-pp.InterpolationDef.path_to_tables = "$HOME/.cache/PROPOSAL"
+pp.InterpolationSettings.tables_path = "$HOME/.cache/PROPOSAL"
 
 
 # # Define functions
