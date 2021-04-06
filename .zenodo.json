@@ -1,5 +1,5 @@
 {
-	"description": "PROPOSAL is a Monte-Carlo-Simulation library to propagate Leptons through media.",
+	"description": "PROPOSAL is a Monte-Carlo-Simulation library to propagate leptons and high energy photons through media.",
 	"license": "lgpl-3.0",
 	"keywords": ["Monte-Carlo Simulation", "Lepton Propagator", "Cross Sections"],
 	"upload_type": "software",
@@ -47,7 +47,7 @@
 		{
 			"affiliation": "University of Maryland",
 			"name": "Alex Olivas"
-		}
+		},
 		{
 			"affiliation": "TU Dortmund",
 			"name": "Maximilian Sackel"
@@ -63,7 +63,7 @@
 		{
 			"affiliation": "DESY Zeuthen",
 			"name": "Jacob van Santen"
-		},
+		}
 	],
 	"access_right": "open"
 }
