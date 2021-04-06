@@ -19,7 +19,7 @@ def test_proposal():
         "particle_def": pp.particle.MuMinusDef(),
         "target": pp.medium.Ice(),
         "interpolate": True,
-        "cuts": pp.EnergyCutSettings(500, 0.05, False)
+        "cuts": pp.EnergyCutSettings(500, 0.05)
     }
 
     cross = pp.crosssection.make_std_crosssection(**args)

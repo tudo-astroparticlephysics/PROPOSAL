@@ -31,9 +31,9 @@ def create_tables(dir_name, **kwargs):
         if key == "dNdx" and kwargs[key] is True:
             f_dNdx = open(dir_name + "PhotoPair_dNdx.txt", "w")
             buf["dNdx"] = [f_dNdx, [""]]
-        if key == "stoch" and kwargs[key] is True:
-            f_dNdx_rnd = open(dir_name + "PhotoPair_e.txt", "w")
-            buf["stoch"] = [f_dNdx_rnd, [""]]
+        # if key == "stoch" and kwargs[key] is True:
+        #     f_dNdx_rnd = open(dir_name + "PhotoPair_e.txt", "w")
+        #     buf["stoch"] = [f_dNdx_rnd, [""]]
 
     for particle in particle_defs:
         for medium in mediums:
@@ -54,17 +54,17 @@ def create_tables(dir_name, **kwargs):
                     for energy in energies:
                         if key == "dNdx":
                             result = [str(xsection.calculate_dNdx(energy) * medium.mass_density)]
-                        if key == "stoch":
-                            rnd1 = pp.RandomGenerator.get().random_double()
-                            rnd2 = pp.RandomGenerator.get().random_double()
+                        # if key == "stoch":
+                        #     rnd1 = pp.RandomGenerator.get().random_double()
+                        #     rnd2 = pp.RandomGenerator.get().random_double()
 
-                            components = medium.components
-                            comp = components[int(rnd2*len(components))]
-                            dNdx_for_comp = xsection.calculate_dNdx(energy, comp.hash);
+                        #     components = medium.components
+                        #     comp = components[int(rnd2*len(components))]
+                        #     dNdx_for_comp = xsection.calculate_dNdx(energy, comp.hash);
 
-                            result = xsection.calculate_stochastic_loss(
-                                comp.hash, energy, rnd1*dNdx_for_comp) * energy
-                            result = [str(rnd1), str(rnd2), str(result)]
+                        #     result = xsection.calculate_stochastic_loss(
+                        #         comp.hash, energy, rnd1*dNdx_for_comp) * energy
+                        #     result = [str(rnd1), str(rnd2), str(result)]
 
                         buf[key][1].append(particle.name)
                         buf[key][1].append(medium.name)
