@@ -38,7 +38,6 @@
 namespace PROPOSAL {
 class Integral;
 class Interpolant;
-struct InterpolationDef;
 
 class UtilityInterpolant : public UtilityIntegral {
     using interpolant_t

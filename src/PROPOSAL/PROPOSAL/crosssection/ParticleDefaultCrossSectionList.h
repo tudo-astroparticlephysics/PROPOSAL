@@ -22,8 +22,6 @@
 
 namespace PROPOSAL {
 
-extern InterpolationDef std_interpolation_def;
-
 template<typename CrossVec>
 CrossVec append_cross(CrossVec& cross_vec) {
     return cross_vec;

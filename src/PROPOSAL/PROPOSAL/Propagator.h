@@ -69,7 +69,6 @@ private:
         double density_correction, const nlohmann::json& config);
 
     ParticleDef p_def;
-    std::shared_ptr<InterpolationDef> interpol_def_global = nullptr;
     enum Type : int {
         MinimalE = 0,
         Decay = 1,

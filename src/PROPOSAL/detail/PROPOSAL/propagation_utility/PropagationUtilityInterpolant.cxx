@@ -10,7 +10,6 @@
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
-using Helper::InitializeInterpolation;
 
 std::string UtilityInterpolant::gen_path() const
 {

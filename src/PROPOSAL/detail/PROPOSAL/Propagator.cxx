@@ -42,12 +42,6 @@ Propagator::Propagator(const ParticleDef& p_def, const nlohmann::json& config)
     GlobalSettings global;
     if (config.contains("global"))
         global = GlobalSettings(config["global"]);
-    if (config.contains("interpolation")) {
-        interpol_def_global
-            = std::make_shared<InterpolationDef>(config["interpolation"]);
-    } else {
-        interpol_def_global = std::make_shared<InterpolationDef>();
-    }
     if (config.contains("sectors")) {
         assert(config["sectors"].is_array());
         for (const auto& json_sector : config.at("sectors")) {

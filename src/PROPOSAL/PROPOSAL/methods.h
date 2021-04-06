@@ -75,21 +75,6 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest)
     hash_combine(seed, rest...);
 }
 
-// ----------------------------------------------------------------------------
-/// @brief Definition needed to initialize interpolation
-// ----------------------------------------------------------------------------
-
-
-struct InterpolationDef {
-    static std::string path_to_tables;
-    static std::string path_to_tables_readonly;
-    static bool do_binary_tables;
-    static bool just_use_readonly_path;
-
-    InterpolationDef() = default;
-    InterpolationDef(const nlohmann::json&);
-};
-
 class Interpolant;
 struct InterpolantBuilder;
 
@@ -146,27 +131,6 @@ namespace Helper {
     /// @return the centered formatted string
     // ----------------------------------------------------------------------------
     std::string Centered(int width, const std::string& str, char fill = '=');
-
-    using InterpolantBuilderContainer
-        = std::vector<std::unique_ptr<InterpolantBuilder>>;
-
-    // ----------------------------------------------------------------------------
-    /// @brief Helper for interpolation initialization
-    ///
-    /// @param name: subject of resulting file name
-    /// @param InterpolantBuilderContainer: vector of interpolant builder
-    /// @param std::vector: vector of parametrizations used to create
-    ///        the interpolation tables with
-    ///
-    /// @return vector of unique_ptr to created interpolants
-    // ----------------------------------------------------------------------------
-
-    /* std::unique_ptr<Interpolant> InitializeInterpolation( */
-    /*     std::string, unique_ptr<InterpolantBuilder>, size_t, */
-    /*     const InterpolationDef&); */
-
-    std::unique_ptr<Interpolant> InitializeInterpolation(std::string, InterpolantBuilder const&, size_t);
-
 
     // Comparison function to be used for case-insensitive strings in a map
     struct case_insensitive_comp : public std::binary_function<std::string, std::string, bool> {
