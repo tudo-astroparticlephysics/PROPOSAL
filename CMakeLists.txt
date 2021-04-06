@@ -15,6 +15,19 @@ if (EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
     include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 endif()
 
+if(NOT CMAKE_BUILD_TYPE)
+  message(STATUS "No build type has been specified. Using default system build type. You may want to change this to"
+  	"'Release' if you are using PROPOSAL for production purposes.")
+else()
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+  		message(WARNING "Build type set to ${CMAKE_BUILD_TYPE}. This build type should only be used for development"
+  			"and debugging purposes and not for production since the runtime of PROPOSAL with be significantly higher!")
+  	else()
+		message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}.")
+  	endif()
+endif()
+
+
 set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
