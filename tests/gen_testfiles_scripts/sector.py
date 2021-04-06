@@ -145,10 +145,10 @@ def create_table_energy_displacement(dir_name):
 
 
 def main(dir_name):
-    # print("Create continous testfiles.")
-    # create_table_continous(dir_name)
-    # print("Create stochastic testfiles.")
-    # create_table_stochastic(dir_name)
+    print("Create continous testfiles.")
+    create_table_continous(dir_name)
+    print("Create stochastic testfiles.")
+    create_table_stochastic(dir_name)
     print("Create energy displacement testfiles.")
     create_table_energy_displacement(dir_name)
 
