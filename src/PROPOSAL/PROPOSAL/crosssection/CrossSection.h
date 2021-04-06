@@ -59,6 +59,7 @@ struct CrossSectionBase {
     virtual double GetLowerEnergyLim() const = 0;
     virtual size_t GetHash() const noexcept = 0;
     virtual InteractionType GetInteractionType() const noexcept = 0;
+    virtual std::string GetParametrizationName() const noexcept = 0;
 };
 
 namespace detail {
@@ -228,6 +229,7 @@ protected:
 
     double lower_energy_lim;
     InteractionType interaction_type;
+    std::string param_name;
 
 public:
     template <typename Param,
@@ -248,6 +250,7 @@ public:
         , lower_energy_lim(param.GetLowerEnergyLim(p))
         , interaction_type(static_cast<InteractionType>(
               crosssection::ParametrizationId<Param>::value))
+        , param_name(crosssection::ParametrizationName<Param>::value)
     {
         // initialize hash
         hash = 0;
@@ -368,6 +371,11 @@ public:
     inline InteractionType GetInteractionType() const noexcept override
     {
         return interaction_type;
+    }
+
+    inline std::string GetParametrizationName() const noexcept override
+    {
+        return param_name;
     }
 };
 

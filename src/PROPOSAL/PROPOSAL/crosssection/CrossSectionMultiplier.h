@@ -49,6 +49,10 @@ namespace PROPOSAL {
             return cross_->GetInteractionType();
         }
 
+        std::string GetParametrizationName() const noexcept override {
+            return cross_->GetParametrizationName();
+        }
+
     private:
         std::shared_ptr<CrossSectionBase> cross_;
         double multiplier_;
