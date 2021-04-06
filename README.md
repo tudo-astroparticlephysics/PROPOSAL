@@ -112,25 +112,23 @@ and if you want to cite the latest improvements
 - CMake 3.9 or higher (to build the tests CMake 3.10 is required)
 - C++14 compatible compiler
 
-## Recommended
+Furthermore, you either need the package manager
 
-- Doxygen (For pdf and html documentation of the code)
-- [pybind11](https://github.com/pybind/pybind11)
-  (To build the python wrapper)
+- conan
+
+which will provide all dependencies that are necessary for PROPOSAL or you need to provide these dependencies by your own. For more information, see [here](INSTALL.md).
 
 ## Installation
 
-Install and compiling instructions for the standalone installation
-are found in [install](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/INSTALL.md).
-
+Install and compiling instructions are found in [install](INSTALL.md).
 
 ## Usage
 
-### Deployment
+### Usage as a C++ library
 
 PROPOSAL is built as library. So you can include this project in your own
-c++ project by including the header files. The following snippet uses the
-[configuration](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/config.json) to propagate muons and
+C++ project by including the header files. The following snippet uses the
+[configuration](examples/config_minimal.json) to propagate muons and
 store the muon ranges for further proceeds.
 The parameters of the configuration file are described
 **[here](docs/config_docu.md)**.
@@ -153,7 +151,7 @@ int main(){
 
     for (int i = 0; i < 10; i++)
     {
-        auto track = prop.Propagate(init_state, 50000);
+        auto track = prop.Propagate(init_state, 50000); // distance to propagate in cm
 
         ranges.push_back(track.back().propagated_distance);
     }
@@ -163,43 +161,13 @@ int main(){
 }
 ```
 
-Supposing this snippet is the content of `foo.cxx` within the
-following minimal code structure
+To see an example on how to run this script with PROPOSAL using CMake, see [here](INSTALL.md).
 
-    my_program
-    ├── CMakeLists.txt
-    ├── resources
-    │   ├── configuration
-    │   └── tables
-    └── source
-        └── foo.cxx
-
-the `CMakeLists.txt` could look like
-
-```cmake
-cmake_minimum_required(VERSION 3.8)
-
-add_executable(foo source/foo.cxx)
-
-find_package(PROPOSAL REQUIRED)
-target_link_libraries(foo PRIVATE PROPOSAL::PROPOSAL)  # or PUBLIC
-```
-
-In case you did install PROPOSAL in a custom prefix, use `PROPOSAL_DIR` to tell
-cmake where to find PROPOSAL:
-
-```
-$ mkdir build && cd build
-$ PROPOSAL_DIR=/path/to/proposal/prefix cmake .. [CMAKE options]
-$ cmake --build .
-```
-
-
-### Python ###
+### Usage in Python
 
 How to use PROPOSAL within Python is demonstrated with some example
-scripts you can find in
-[resources/examples/standalone](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/resources/examples/standalone).
+jupyter notebooks you can find in the
+[examples](examples) folder.
 
 For a short demonstration the following snippet will create data you can use to
 show the distribution of muon ranges and the number of interactions in ice.
@@ -228,16 +196,12 @@ for i in range(1000):
     mu_length.append(track.track_propagated_distances()[-1] / 100)
 ```
 
-## Documentation ##
-
-The C++ API can be built using
-
-	make doc
-
 
 ## Issues ##
 
-When you encounter any errors or misunderstandings don't hesitate and write a mail to
+When you encounter any errors or misunderstandings, you can always create an issue here on GitHub.
+Furthermore, you may always contact us with your questions via
+[Jean-Marco Alameddine](mailto:jean-marco.alameddine@tu-dortmund.de),
 [Jan Soedingrekso](mailto:jan.soedingrekso@tu-dortmund.de),
 [Alexander Sandrock](mailto:alexander.sandrock@tu-dortmund.de).
 
