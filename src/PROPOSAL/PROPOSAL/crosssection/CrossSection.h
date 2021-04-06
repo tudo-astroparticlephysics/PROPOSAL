@@ -248,9 +248,8 @@ public:
         , de2dx(detail::build_de2dx(
               comp_wise {}, interpol, param, p, m, cut, hash))
         , lower_energy_lim(param.GetLowerEnergyLim(p))
-        , interaction_type(static_cast<InteractionType>(
-              crosssection::ParametrizationId<Param>::value))
-        , param_name(crosssection::ParametrizationName<Param>::value)
+        , interaction_type(static_cast<InteractionType>(_id::value))
+        , param_name(_name::value)
     {
         // initialize hash
         hash = 0;
