@@ -254,7 +254,7 @@ Here, we assume that `[0, 0, 0]` is the position of the earth's core and that th
 	"type": "exponential",
 	"mass_density" : 1.225e-3,
 	"axis_type" : "radial",
-	"fp0" : [0, 0, 0]
+	"fp0" : [0, 0, 0],
 	"sigma" : -10.4e5,
 	"d0" : 6.3781e8,
 }

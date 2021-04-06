@@ -50,6 +50,11 @@
 
 				}
 			],
+			"density_distribution":
+			{
+				"type": "homogeneous",
+				"mass_density" : 0.917
+			},
 			"cuts":
 			{
 				"e_cut": "inf",
@@ -69,6 +74,11 @@
 					"height": 1600
 				}
 			],
+			"density_distribution":
+			{
+				"type": "homogeneous",
+				"mass_density" : 0.917
+			},
 			"cuts":
 			{
 				"e_cut": 500,
