@@ -15,10 +15,10 @@ mediums = [
 particle = pp.particle.GammaDef()
 
 cuts = [
-    pp.EnergyCutSettings(np.inf, 1, False),
-    pp.EnergyCutSettings(500, 1, False),
-    pp.EnergyCutSettings(np.inf, 0.05, False),
-    pp.EnergyCutSettings(500, 0.05, False)
+    pp.EnergyCutSettings(np.inf, 1),
+    pp.EnergyCutSettings(500, 1),
+    pp.EnergyCutSettings(np.inf, 0.05),
+    pp.EnergyCutSettings(500, 0.05)
 ]
 
 multiplier = 1.
