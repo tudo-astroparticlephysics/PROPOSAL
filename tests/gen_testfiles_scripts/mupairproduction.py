@@ -111,56 +111,45 @@ def create_table_rho(dir_name):
 
         for particle in particle_defs:
             for medium in mediums:
-                for cut in cuts:
-                    for v in vs:
-                        for param in params:
-                            if interpolate:
-                                param_current = param(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    True,
-                                    interpoldef)
+                # cuts make no difference
+                # for cut in cuts:
+                for v in vs:
+                    # the constructors have not yet been pybinded
+                    # for param in params:
+                    param = pp.secondaries.make_secondary(
+                        pp.particle.Interaction_Type.mupair, particle, medium)
 
-                            else:
-                                param_current = param(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    True)
+                    buf = [""]
 
-                            buf = [""]
+                    for energy in energies:
+                        rnd1 = pp.RandomGenerator.get().random_double()
+                        rnd2 = pp.RandomGenerator.get().random_double()
 
-                            for energy in energies:
-                                rnd1 = pp.RandomGenerator.get().random_double()
-                                rnd2 = pp.RandomGenerator.get().random_double()
+                        rho = param.Calculaterho(
+                            energy, v, medium.components[0], rnd1, rnd2)
+                        E1 = 0.5 * v * energy * (1 + rho)
+                        E2 = 0.5 * v * energy * (1 - rho)
 
-                                rho = param_current.Calculaterho(energy, v, rnd1, rnd2)
-                                E1 = 0.5 * v * energy * (1 + rho)
-                                E2 = 0.5 * v * energy * (1 - rho)
+                        buf.append(particle.name)
+                        buf.append(medium.name)
+                        buf.append(str(cut.ecut))
+                        buf.append(str(cut.vcut))
+                        buf.append(str(v))
+                        buf.append(str(multiplier))
+                        buf.append(str(energy))
+                        buf.append(str(name))
+                        buf.append(str(rnd1))
+                        buf.append(str(rnd2))
+                        buf.append(str(E1))
+                        buf.append(str(E2))
+                        buf.append("\n")
 
-                                buf.append(particle.name)
-                                buf.append(medium.name)
-                                buf.append(str(cut.ecut))
-                                buf.append(str(cut.vcut))
-                                buf.append(str(v))
-                                buf.append(str(multiplier))
-                                buf.append(str(energy))
-                                buf.append(str(param_current.name))
-                                buf.append(str(rnd1))
-                                buf.append(str(rnd2))
-                                buf.append(str(E1))
-                                buf.append(str(E2))
-                                buf.append("\n")
-
-                            file.write("\t".join(buf))
+                    file.write("\t".join(buf))
 
 
 def main(dir_name):
     create_tables(dir_name, dEdx=True, dNdx=True, stoch=True)
-    # create_table_rho(dir_name)
+    create_table_rho(dir_name)
 
 
 if __name__ == "__main__":

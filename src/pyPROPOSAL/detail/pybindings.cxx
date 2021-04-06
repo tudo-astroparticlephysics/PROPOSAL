@@ -190,7 +190,8 @@ PYBIND11_MODULE(proposal, m)
             py::arg("energy"), py::arg("distance"))
         .def("function_to_integral",
             py::vectorize(&Displacement::FunctionToIntegral),
-            py::arg("energy"));
+            py::arg("energy"))
+        .def("lower_limit", &Displacement::GetLowerLim);
 
     m.def("make_displacement",
         [](crosssection_list_t cross, bool interpolate) {
