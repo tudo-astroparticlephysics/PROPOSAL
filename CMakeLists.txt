@@ -36,6 +36,7 @@ set(CMAKE_CXX_VISIBILITY_INLINES_HIDDEN YES)
 option(BUILD_PYTHON "build python interface" OFF)
 option(BUILD_EXAMPLE "build example" OFF)
 option(BUILD_DOCUMENTATION "build documentation" OFF)
+option(BUILD_TESTING "build testing" OFF)
 
 add_subdirectory(src)
 
