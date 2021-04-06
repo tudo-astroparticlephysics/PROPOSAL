@@ -53,7 +53,7 @@ class EnergyCutSettings {
     bool continuous_randomization_;
 
 public:
-    EnergyCutSettings(double, double, bool);
+    EnergyCutSettings(double, double, bool continuous_randomization = false);
     EnergyCutSettings(const nlohmann::json&);
 
     bool operator==(const EnergyCutSettings& energyCutSettings) const noexcept;
