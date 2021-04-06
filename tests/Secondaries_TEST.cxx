@@ -15,10 +15,9 @@ std::shared_ptr<Propagator> GetPropagator() {
     static std::shared_ptr<Propagator> ptr = nullptr;
     if(ptr == nullptr) {
         //create propagator
-        InterpolationDef::path_to_tables = "resources/tables";
         auto p_def = MuMinusDef();
         auto medium = Ice();
-        auto cuts = std::make_shared<EnergyCutSettings>(500, 1, false);
+        auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
         auto cross = GetStdCrossSections(p_def, medium, cuts, true);
 
         auto collection = PropagationUtility::Collection();
@@ -127,4 +126,10 @@ TEST(SecondaryVector, EntryPointExitPointRePropagation)
     EXPECT_TRUE(sec_f.propagated_distance > exit_point->propagated_distance);
     EXPECT_TRUE(sphere.IsBehind(sec_f.position, sec_f.direction));
     EXPECT_TRUE(exit_point->propagated_distance == sphere.GetPosition().GetZ() + sphere.GetRadius());
+}
+
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
