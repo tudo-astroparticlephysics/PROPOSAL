@@ -20,14 +20,19 @@ import os
 import warnings
 import subprocess
 
+import annihilation
 import bremsstrahlung
+import compton
 import continous_randomization
 import epairproduction
 import ionization
+import mupairproduction
 import photonuclear
+import photopair
 import propagation
 import scattering
 import sector
+import weak
 
 
 def main():
@@ -55,14 +60,19 @@ def main():
     pool = multiprocessing.Pool(number_processes)
     results = []
 
+    pool.apply_async(annihilation.main, (dir_name, ))
     pool.apply_async(bremsstrahlung.main, (dir_name, ))
+    pool.apply_async(compton.main, (dir_name, ))
     pool.apply_async(continous_randomization.main, (dir_name, ))
     pool.apply_async(epairproduction.main, (dir_name, ))
     pool.apply_async(ionization.main, (dir_name, ))
+    pool.apply_async(mupairproduction.main, (dir_name, ))
     pool.apply_async(photonuclear.main, (dir_name, ))
+    pool.apply_async(photopair.main, (dir_name, ))
     pool.apply_async(propagation.main, (dir_name, ))
     pool.apply_async(scattering.main, (dir_name, ))
     pool.apply_async(sector.main, (dir_name, ))
+    pool.apply_async(weak.main, (dir_name, ))
 
     pool.close()
     pool.join()

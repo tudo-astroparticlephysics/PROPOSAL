@@ -1,3 +1,4 @@
+import os
 import proposal as pp
 import numpy as np
 
@@ -122,9 +123,10 @@ def create_tables(dir_name, **kwargs):
 
 
 
-if __name__ == "__main__":
+def main(dir_name):
+    create_tables(dir_name, dEdx=True, dNdx=True, stoch=True)
 
-    import os
+if __name__ == "__main__":
 
     dir_name = "TestFiles/"
 
@@ -134,4 +136,4 @@ if __name__ == "__main__":
         os.makedirs(dir_name)
         print("Directory {} created".format(dir_name))
 
-    create_tables(dir_name, dEdx=True, dNdx=True, dNdx_rnd=True, stoch=True)
+    main(dir_name)

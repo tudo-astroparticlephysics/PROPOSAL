@@ -40,7 +40,9 @@ void init_secondaries(py::module& m)
     py::class_<secondaries::Ionization, secondaries::Parametrization, std::shared_ptr<secondaries::Ionization>>(m_sub, "Ionization");
     py::class_<secondaries::NaivIonization, secondaries::Ionization, std::shared_ptr<secondaries::NaivIonization>>(m_sub, "NaivIonization");
 
-    py::class_<secondaries::MupairProduction, secondaries::Parametrization, std::shared_ptr<secondaries::MupairProduction>>(m_sub, "MupairProduction");
+    py::class_<secondaries::MupairProduction, secondaries::Parametrization, std::shared_ptr<secondaries::MupairProduction>>(m_sub, "MupairProduction")
+        .def("calculate_rho", &secondaries::MupairProduction::CalculateRho,
+            py::arg("energy"), py::arg("v_loss"), py::arg("component"), py::arg("rnd1"), py::arg("rnd2"));
     py::class_<secondaries::KelnerKokoulinPetrukhinMupairProduction, secondaries::MupairProduction, std::shared_ptr<secondaries::KelnerKokoulinPetrukhinMupairProduction>>(m_sub, "KelnerKokoulinPetrukhinMupairProduction");
 
     py::class_<secondaries::Photonuclear, secondaries::Parametrization, std::shared_ptr<secondaries::Photonuclear>>(m_sub, "Photonuclear");

@@ -1,24 +1,25 @@
+import os
 import proposal as pp
 import numpy as np
 
 
 particle_defs = [
     pp.particle.MuMinusDef(),
-    pp.particle.TauMinusDef(),
+    # pp.particle.TauMinusDef(),
     # pp.particle.EMinusDef()
     ]
 
 mediums = [
-    pp.medium.Ice(1.0),
-    pp.medium.Hydrogen(1.0),
-    # pp.medium.Uranium(1.0)
+    pp.medium.Ice(),
+    pp.medium.Hydrogen(),
+    # pp.medium.Uranium()
     ]
 
 cuts = [
-    # pp.EnergyCutSettings(-1, -1),
-    pp.EnergyCutSettings(500, -1),
-    # pp.EnergyCutSettings(-1, 0.05),
-    pp.EnergyCutSettings(500, 0.05)
+    # pp.EnergyCutSettings(-1, -1, False),
+    pp.EnergyCutSettings(500, 1, False),
+    # pp.EnergyCutSettings(-1, 0.05, False),
+    pp.EnergyCutSettings(500, 0.05, False)
     ]
 
 statistics = 10
@@ -26,16 +27,10 @@ energies = np.logspace(4, 13, num=statistics)  # MeV
 initial_energy = 1e12 # MeV
 distance = 1000  # cm
 
-position = pp.Vector3D(0, 0, 0)
-direction = pp.Vector3D(1, 0, 0)
+position = pp.Cartesian3D(0, 0, 0)
+direction = pp.Cartesian3D(1, 0, 0)
 
-# stopping_decay = True
-# do_continuous_randomization = True
-# do_exact_time_calculation = True
-interpoldef = pp.InterpolationDef()
-interpoldef.path_to_tables = "~/.local/share/PROPOSAL/tables"
-interpoldef.path_to_tables_readonly = "~/.local/share/PROPOSAL/tables"
-
+pp.InterpolationSettings.tables_path = "~/.local/share/PROPOSAL/tables"
 
 def create_table_continous(dir_name):
     pp.RandomGenerator.get().set_seed(1234)
@@ -44,12 +39,17 @@ def create_table_continous(dir_name):
             for medium in mediums:
                 for cut in cuts:
 
-                    energy = initial_energy
-                    sector_def = pp.SectorDefinition()
-                    sector_def.cut_settings = cut
-                    sector_def.medium = medium
+                    args = {
+                        "particle_def": particle_def,
+                        "target": medium,
+                        "interpolate": True,
+                        "cuts": cut
+                    }
+                    cross = pp.crosssection.make_std_crosssection(**args)
+                    int_calc = pp.make_interaction(cross, True)
+                    dec_calc = pp.make_decay(cross, particle_def, True)
 
-                    sector = pp.Sector(particle_def, sector_def, interpoldef)
+                    energy = initial_energy
 
                     buf = [""]
                     buf.append(str(particle_def.name))
@@ -59,12 +59,13 @@ def create_table_continous(dir_name):
                     buf.append(str(energy))
 
                     for i in range(statistics):
+                        rndd = pp.RandomGenerator.get().random_double()
+                        rndi = pp.RandomGenerator.get().random_double()
+
                         energy = max(
-                            sector.energy_decay(energy,
-                                pp.RandomGenerator.get().random_double()),
-                            sector.energy_interaction(energy,
-                                pp.RandomGenerator.get().random_double())
-                                )
+                            dec_calc.energy_decay(energy, rndd, medium.mass_density),
+                            int_calc.energy_interaction(energy, rndi)
+                        )
                         buf.append(str(energy))
 
                     buf.append("\n")
@@ -77,11 +78,15 @@ def create_table_stochastic(dir_name):
             for medium in mediums:
                 for cut in cuts:
                     energy = initial_energy
-                    sector_def = pp.SectorDefinition()
-                    sector_def.cut_settings = cut
-                    sector_def.medium = medium
 
-                    sector = pp.Sector(particle_def, sector_def, interpoldef)
+                    args = {
+                        "particle_def": particle_def,
+                        "target": medium,
+                        "interpolate": True,
+                        "cuts": cut
+                    }
+                    cross = pp.crosssection.make_std_crosssection(**args)
+                    int_calc = pp.make_interaction(cross, True)
 
                     buf = [""]
                     buf.append(str(particle_def.name))
@@ -91,11 +96,14 @@ def create_table_stochastic(dir_name):
                     buf.append(str(initial_energy))
 
                     for i in range(statistics):
-                        loss, interaction_type = sector.make_stochastic_loss(energy)
-                        energy -= loss
+                        rnd = pp.RandomGenerator.get().random_double()
+                        int_loss = int_calc.sample_loss(
+                            energy, int_calc.rates(energy), rnd
+                        )
+                        energy = energy * (1 - int_loss.v_loss)
                         buf.append(str(energy))
-                        buf.append(str(interaction_type))
-                        buf.append(str(pp.RandomGenerator.get().random_double()))
+                        buf.append(str(int_loss.type))
+                        buf.append(str(rnd))
 
                     buf.append("\n")
                     file.write("\t".join(buf))
@@ -106,11 +114,14 @@ def create_table_energy_displacement(dir_name):
         for particle_def in particle_defs:
             for medium in mediums:
                 for cut in cuts:
-                    sector_def = pp.SectorDefinition()
-                    sector_def.cut_settings = cut
-                    sector_def.medium = medium
-
-                    sector = pp.Sector(particle_def, sector_def, interpoldef)
+                    args = {
+                        "particle_def": particle_def,
+                        "target": medium,
+                        "interpolate": True,
+                        "cuts": cut
+                    }
+                    cross = pp.crosssection.make_std_crosssection(**args)
+                    disp_calc = pp.make_displacement(cross, True)
 
                     for energy in energies:
                         buf = [""]
@@ -121,63 +132,27 @@ def create_table_energy_displacement(dir_name):
                         buf.append(str(energy))
 
                         for disp in np.geomspace(1e0, 1e7, statistics):
-                            energy_disp = sector.energy_distance(energy, disp)
+                            try:
+                                energy_disp = disp_calc.upper_limit_track_integral(
+                                    energy, disp * medium.mass_density)
+                            except:
+                                energy_disp = disp_calc.lower_limit()
                             buf.append(str(disp))
                             buf.append(str(energy_disp))
 
                         buf.append("\n")
                         file.write("\t".join(buf))
 
-def create_table_propagate(dir_name):
-    pp.RandomGenerator.get().set_seed(1234)
-    with open(dir_name + "Sector_Propagate.txt", "w") as file:
-        for particle_def in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    sector_def = pp.SectorDefinition()
-                    sector_def.cut_settings = cut
-                    sector_def.medium = medium
-
-                    sector = pp.Sector(particle_def, sector_def, interpoldef)
-
-                    for energy in energies:
-                        buf = [""]
-                        buf.append(str(particle_def.name))
-                        buf.append(str(medium.name))
-                        buf.append(str(cut.ecut))
-                        buf.append(str(cut.vcut))
-                        buf.append(str(energy))
-
-                        p_condition = pp.particle.DynamicData(0)
-                        p_condition.position = pp.Vector3D(0,0,0)
-                        p_condition.direction = pp.Vector3D(0,0,-1)
-                        p_condition.propagated_distance = 0
-                        p_condition.energy = energy
-                        sec = sector.propagate(p_condition, 1000, 0)
-
-                        buf.append(str(sec.number_of_particles))
-                        if(sec.particles[-1].propagated_distance < 999.99):
-                            buf.append(str(-sec.particles[-1].propagated_distance))
-                        else:
-                            buf.append(str(sec.particles[-1].energy))
-                        buf.append("\n")
-                        file.write("\t".join(buf))
-
 
 def main(dir_name):
-    print("Create continous testfiles.")
-    create_table_continous(dir_name)
-    print("Create stochastic testfiles.")
-    create_table_stochastic(dir_name)
+    # print("Create continous testfiles.")
+    # create_table_continous(dir_name)
+    # print("Create stochastic testfiles.")
+    # create_table_stochastic(dir_name)
     print("Create energy displacement testfiles.")
     create_table_energy_displacement(dir_name)
-    print("Create propagate testfiles.")
-    create_table_propagate(dir_name)
-
 
 if __name__ == "__main__":
-
-    import os
 
     dir_name = "TestFiles/"
 

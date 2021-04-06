@@ -79,6 +79,8 @@ def create_tables(dir_name, **kwargs):
                     buf[key][0].write("\t".join(buf[key][1]))
 
 
+def main(dir_name):
+    create_tables(dir_name, dNdx=True, stoch=True)
 
 if __name__ == "__main__":
 
@@ -90,4 +92,4 @@ if __name__ == "__main__":
         os.makedirs(dir_name)
         print("Directory {} created".format(dir_name))
 
-    create_tables(dir_name, dNdx=True, stoch=True)
+    main(dir_name)
