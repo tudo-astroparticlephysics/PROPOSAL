@@ -2,13 +2,6 @@ import os
 import proposal as pp
 import numpy as np
 
-names_real = [
-    "Zeus",
-    "BezrukovBugaev",
-    "Rhode",
-    "Kokoulin"
-]
-
 particle_defs = [
     pp.particle.MuMinusDef(),
     pp.particle.TauMinusDef()#,
@@ -22,24 +15,15 @@ mediums = [
 ]
 
 cuts = [
-    pp.EnergyCutSettings(np.inf, 1, False),
-    pp.EnergyCutSettings(500, 1, False),
-    pp.EnergyCutSettings(np.inf, 0.05, False),
-    pp.EnergyCutSettings(500, 0.05, False)
+    pp.EnergyCutSettings(np.inf, 1),
+    pp.EnergyCutSettings(500, 1),
+    pp.EnergyCutSettings(np.inf, 0.05),
+    pp.EnergyCutSettings(500, 0.05)
 ]
 
 multiplier = 1.
 
 hard_components = [0, 1]
-
-names_q2 = [
-    "AbramowiczLevinLevyMaor91",
-    "AbramowiczLevinLevyMaor97",
-    "ButkevichMikheyev",
-    "RenoSarcevicSu",
-    "AbtFT",
-    "BlockDurandHa"
-]
 
 shadows = [
     pp.parametrization.photonuclear.ShadowDuttaRenoSarcevicSeckel(),
@@ -84,7 +68,7 @@ def create_tables_real(dir_name, **kwargs):
                         pp.parametrization.photonuclear.Kokoulin(hard)
                     ]
 
-                    for pidx, parametrization in enumerate(parametrizations):
+                    for parametrization in parametrizations:
                         args = {
                             "parametrization": parametrization,
                             "particle_def": particle,
@@ -92,7 +76,6 @@ def create_tables_real(dir_name, **kwargs):
                             "cuts": cut,
                             "interpolate": False
                         }
-                        name = names_real[pidx]
 
                         xsection = pp.crosssection.make_crosssection(**args)
 
@@ -128,7 +111,7 @@ def create_tables_real(dir_name, **kwargs):
                                 buf[key][1].append(str(multiplier))
                                 buf[key][1].append(str(energy))
                                 buf[key][1].append(str(hard))
-                                buf[key][1].append(name)
+                                buf[key][1].append(xsection.param_name)
                                 buf[key][1].extend(result)
                                 buf[key][1].append("\n")
 
@@ -169,7 +152,7 @@ def create_tables_Q2(dir_name, **kwargs):
                     ]
                     name_shadow = names_shadow[sidx]
 
-                    for pidx, parametrization in enumerate(parametrizations):
+                    for parametrization in parametrizations:
                         args = {
                             "parametrization": parametrization,
                             "particle_def": particle,
@@ -177,7 +160,6 @@ def create_tables_Q2(dir_name, **kwargs):
                             "cuts": cut,
                             "interpolate": False
                         }
-                        name = names_q2[pidx]
 
                         xsection = pp.crosssection.make_crosssection(**args)
 
@@ -213,7 +195,7 @@ def create_tables_Q2(dir_name, **kwargs):
                                 buf[key][1].append(str(multiplier))
                                 buf[key][1].append(str(energy))
                                 buf[key][1].append(name_shadow)
-                                buf[key][1].append(name)
+                                buf[key][1].append(xsection.param_name)
                                 buf[key][1].extend(result)
                                 buf[key][1].append("\n")
 

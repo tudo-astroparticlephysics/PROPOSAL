@@ -10,14 +10,6 @@ parametrizations = [
     pp.parametrization.bremsstrahlung.SandrockSoedingreksoRhode()
 ]
 
-names = [
-    "KelnerKokoulinPetrukhin",
-    "PetrukhinShestakov",
-    "CompleteScreening",
-    "AndreevBezrukovBugaev",
-    "SandrockSoedingreksoRhode",
-]
-
 particle_defs = [
     pp.particle.MuMinusDef(),
     pp.particle.TauMinusDef(),
@@ -31,10 +23,10 @@ mediums = [
 ]
 
 cuts = [
-    pp.EnergyCutSettings(np.inf, 1, False),
-    pp.EnergyCutSettings(500, 1, False),
-    pp.EnergyCutSettings(np.inf, 0.05, False),
-    pp.EnergyCutSettings(500, 0.05, False)
+    pp.EnergyCutSettings(np.inf, 1),
+    pp.EnergyCutSettings(500, 1),
+    pp.EnergyCutSettings(np.inf, 0.05),
+    pp.EnergyCutSettings(500, 0.05)
 ]
 
 multiplier = 1.
@@ -91,7 +83,6 @@ def create_tables(dir_name, **kwargs):
                         }
 
                         xsection = pp.crosssection.make_crosssection(**args)
-                        name = names[pidx]
 
                         for key in buf:
                             buf[key][1] = [""]
@@ -124,7 +115,7 @@ def create_tables(dir_name, **kwargs):
                                 buf[key][1].append(str(multiplier))
                                 buf[key][1].append(str(lpm))
                                 buf[key][1].append(str(energy))
-                                buf[key][1].append(name)
+                                buf[key][1].append(xsection.param_name)
                                 buf[key][1].extend(result)
                                 buf[key][1].append("\n")
 

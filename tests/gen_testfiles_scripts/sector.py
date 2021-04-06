@@ -16,10 +16,10 @@ mediums = [
     ]
 
 cuts = [
-    # pp.EnergyCutSettings(-1, -1, False),
-    pp.EnergyCutSettings(500, 1, False),
-    # pp.EnergyCutSettings(-1, 0.05, False),
-    pp.EnergyCutSettings(500, 0.05, False)
+    # pp.EnergyCutSettings(-1, -1),
+    pp.EnergyCutSettings(500, 1),
+    # pp.EnergyCutSettings(-1, 0.05),
+    pp.EnergyCutSettings(500, 0.05)
     ]
 
 statistics = 10

@@ -15,10 +15,10 @@ mediums = [
 ]
 
 cuts = [
-    pp.EnergyCutSettings(np.inf, 1, False),
-    pp.EnergyCutSettings(500, 1, False),
-    pp.EnergyCutSettings(np.inf, 0.05, False),
-    pp.EnergyCutSettings(500, 0.05, False)
+    pp.EnergyCutSettings(np.inf, 1),
+    pp.EnergyCutSettings(500, 1),
+    pp.EnergyCutSettings(np.inf, 0.05),
+    pp.EnergyCutSettings(500, 0.05)
 ]
 
 multiplier = 1.
@@ -26,11 +26,6 @@ multiplier = 1.
 parametrizations = [
     pp.parametrization.pairproduction.KelnerKokoulinPetrukhin(),
     pp.parametrization.pairproduction.SandrockSoedingreksoRhode(),
-]
-
-names = [
-    "KelnerKokoulinPetrukhin",
-    "SandrockSoedingreksoRhode"
 ]
 
 lpms = [0, 1]
@@ -83,7 +78,6 @@ def create_tables(dir_name, **kwargs):
                         }
 
                         xsection = pp.crosssection.make_crosssection(**args)
-                        name = names[pidx]
 
                         for key in buf:
                             buf[key][1] = [""]
@@ -115,7 +109,7 @@ def create_tables(dir_name, **kwargs):
                                 buf[key][1].append(str(multiplier))
                                 buf[key][1].append(str(lpm))
                                 buf[key][1].append(str(energy))
-                                buf[key][1].append(name)
+                                buf[key][1].append(xsection.param_name)
                                 buf[key][1].extend(result)
                                 buf[key][1].append("\n")
 
