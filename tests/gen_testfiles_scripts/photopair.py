@@ -18,8 +18,6 @@ params = [
     pp.parametrization.photopair.Tsai(),
 ]
 
-name = "Tsai"
-
 energies = np.logspace(1, 13, num=13)
 
 
@@ -72,7 +70,7 @@ def create_tables(dir_name, **kwargs):
                         buf[key][1].append(medium.name)
                         buf[key][1].append(str(multiplier))
                         buf[key][1].append(str(energy))
-                        buf[key][1].append(name)
+                        buf[key][1].append(xsection.param_name)
                         buf[key][1].extend(result)
                         buf[key][1].append("\n")
 

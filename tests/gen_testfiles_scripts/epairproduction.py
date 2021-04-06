@@ -28,11 +28,6 @@ parametrizations = [
     pp.parametrization.pairproduction.SandrockSoedingreksoRhode(),
 ]
 
-names = [
-    "KelnerKokoulinPetrukhin",
-    "SandrockSoedingreksoRhode"
-]
-
 lpms = [0, 1]
 
 energies = np.logspace(4, 13, num=10)
@@ -83,7 +78,6 @@ def create_tables(dir_name, **kwargs):
                         }
 
                         xsection = pp.crosssection.make_crosssection(**args)
-                        name = names[pidx]
 
                         for key in buf:
                             buf[key][1] = [""]
@@ -115,7 +109,7 @@ def create_tables(dir_name, **kwargs):
                                 buf[key][1].append(str(multiplier))
                                 buf[key][1].append(str(lpm))
                                 buf[key][1].append(str(energy))
-                                buf[key][1].append(name)
+                                buf[key][1].append(xsection.param_name)
                                 buf[key][1].extend(result)
                                 buf[key][1].append("\n")
 

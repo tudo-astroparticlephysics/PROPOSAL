@@ -6,8 +6,6 @@ parametrizations = [
     pp.parametrization.compton.KleinNishina(),
 ]
 
-name = "ComptonKleinNishina"
-
 mediums = [
     pp.medium.Ice(),
     pp.medium.Hydrogen(),
@@ -87,7 +85,7 @@ def create_tables(dir_name, **kwargs):
                         buf[key][1].append(str(cut.vcut))
                         buf[key][1].append(str(multiplier))
                         buf[key][1].append(str(energy))
-                        buf[key][1].append(name)
+                        buf[key][1].append(xsection.param_name)
                         buf[key][1].extend(result)
                         buf[key][1].append("\n")
 

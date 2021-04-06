@@ -20,8 +20,6 @@ weak = [
     pp.parametrization.weakinteraction.CooperSarkarMertsch(),
 ]
 
-name = "CooperSarkarMertsch"
-
 energies = np.logspace(4, 13, num=10)
 
 
@@ -77,7 +75,7 @@ def create_tables(dir_name, **kwargs):
                         buf[key][1].append(medium.name)
                         buf[key][1].append(str(multiplier))
                         buf[key][1].append(str(energy))
-                        buf[key][1].append(name)
+                        buf[key][1].append(xsection.param_name)
                         buf[key][1].extend(result)
                         buf[key][1].append("\n")
 

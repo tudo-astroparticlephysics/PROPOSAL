@@ -27,8 +27,6 @@ params = [
     pp.parametrization.mupairproduction.KelnerKokoulinPetrukhin(),
 ]
 
-name = "KelnerKokoulinPetrukhin"
-
 energies = np.logspace(4, 13, num=10)
 
 vs = np.linspace(0.022, 0.98, 10) # choose v-range so that v_min < v < v_max is always fulflilled for all E in energies
@@ -96,7 +94,7 @@ def create_tables(dir_name, **kwargs):
                             buf[key][1].append(str(cut.vcut))
                             buf[key][1].append(str(multiplier))
                             buf[key][1].append(str(energy))
-                            buf[key][1].append(name)
+                            buf[key][1].append(xsection.param_name)
                             buf[key][1].extend(result)
                             buf[key][1].append("\n")
 
@@ -109,42 +107,38 @@ def create_table_rho(dir_name):
 
     with open(dir_name + "Mupair_rho.txt", "w") as file:
 
-        for particle in particle_defs:
-            for medium in mediums:
-                # cuts make no difference
-                # for cut in cuts:
-                for v in vs:
-                    # the constructors have not yet been pybinded
-                    # for param in params:
-                    param = pp.secondaries.make_secondary(
-                        pp.particle.Interaction_Type.mupair, particle, medium)
+        particle = pp.particle.MuMinusDef()
+        for medium in mediums:
+            for v in vs:
+                # the constructors have not yet been pybinded
+                # for param in params:
+                param = pp.secondaries.make_secondary(
+                    pp.particle.Interaction_Type.mupair, particle, medium)
 
-                    buf = [""]
+                buf = [""]
 
-                    for energy in energies:
-                        rnd1 = pp.RandomGenerator.get().random_double()
-                        rnd2 = pp.RandomGenerator.get().random_double()
+                for energy in energies:
+                    rnd1 = pp.RandomGenerator.get().random_double()
+                    rnd2 = pp.RandomGenerator.get().random_double()
 
-                        rho = param.Calculaterho(
-                            energy, v, medium.components[0], rnd1, rnd2)
-                        E1 = 0.5 * v * energy * (1 + rho)
-                        E2 = 0.5 * v * energy * (1 - rho)
+                    rho = param.calculate_rho(
+                        energy, v, medium.components[0], rnd1, rnd2)
+                    E1 = 0.5 * v * energy * (1 + rho)
+                    E2 = 0.5 * v * energy * (1 - rho)
 
-                        buf.append(particle.name)
-                        buf.append(medium.name)
-                        buf.append(str(cut.ecut))
-                        buf.append(str(cut.vcut))
-                        buf.append(str(v))
-                        buf.append(str(multiplier))
-                        buf.append(str(energy))
-                        buf.append(str(name))
-                        buf.append(str(rnd1))
-                        buf.append(str(rnd2))
-                        buf.append(str(E1))
-                        buf.append(str(E2))
-                        buf.append("\n")
+                    buf.append(particle.name)
+                    buf.append(medium.name)
+                    buf.append(str(v))
+                    buf.append(str(multiplier))
+                    buf.append(str(energy))
+                    buf.append(str(name))
+                    buf.append(str(rnd1))
+                    buf.append(str(rnd2))
+                    buf.append(str(E1))
+                    buf.append(str(E2))
+                    buf.append("\n")
 
-                    file.write("\t".join(buf))
+                file.write("\t".join(buf))
 
 
 def main(dir_name):
