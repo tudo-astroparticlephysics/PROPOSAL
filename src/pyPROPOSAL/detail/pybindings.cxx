@@ -112,7 +112,7 @@ PYBIND11_MODULE(proposal, m)
                 \text{cut} = \begin{cases} e_\text{cut} & E * v_\text{cut} \geq e_\text{cut} \\ v_\text{cut} & \, \text{else} \end{cases}
         )pbdoc")
         .def(py::init<double, double, bool>(), py::arg("ecut"), py::arg("vcut"),
-            py::arg("continuous_random"),
+            py::arg("continuous_random") = false,
             R"pbdoc(
                     Set the cut values manualy.
 
@@ -135,6 +135,13 @@ PYBIND11_MODULE(proposal, m)
 
                     Returns:
                         float: v_cut
+                )pbdoc")
+        .def_property_readonly("cont_rand", &EnergyCutSettings::GetContRand,
+            R"pbdoc(
+                    Returns cont_rand.
+
+                    Returns:
+                        bool: cont_rand
                 )pbdoc")
         .def("cut",
             overload_cast_<double>()(&EnergyCutSettings::GetCut, py::const_))
