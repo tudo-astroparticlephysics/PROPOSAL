@@ -1,3 +1,4 @@
+import os
 import proposal as pp
 import numpy as np
 
@@ -18,7 +19,7 @@ def matrix_element_evaluate(particle, products):
 def create_table(dir_name, particle_def, init_energy, decay_products, filename, statistics=int(1e6), NUM_bins=50):
     pp.RandomGenerator.get().set_seed(1234)
 
-    init_particle = pp.particle.DynamicData(particle_def.particle_type)
+    init_particle = pp.particle.ParticleState()
     init_particle.energy = init_energy
     products = decay_products
     decay_channels = [pp.decay.LeptonicDecayChannelApprox(*products),
@@ -40,13 +41,13 @@ def create_table(dir_name, particle_def, init_energy, decay_products, filename, 
         prod_1_energies = []
         prod_2_energies = []
         for i in range(statistics):
-            init_particle.position = pp.Vector3D(0, 0, 0)
-            init_particle.direction = pp.Vector3D(0, 0, -1)
+            init_particle.position = pp.Cartesian3D(0, 0, 0)
+            init_particle.direction = pp.Cartesian3D(0, 0, 1)
             init_particle.energy = init_energy
             init_particle.propagated_distance = 0
 
-            decay_products = channel.decay(particle_def, init_particle)
-            for p in decay_products.particles:
+            decay_prods = channel.decay(particle_def, init_particle)
+            for p in decay_prods:
                 if p.type==products[0].particle_type:
                     prod_0_energies.append(p.energy)
                 elif p.type==products[1].particle_type:
@@ -95,8 +96,6 @@ def main(dir_name):
     create_table(dir_name, pp.particle.TauMinusDef(), 1e5, [pp.particle.EMinusDef(), pp.particle.NuTauDef(), pp.particle.NuEBarDef()], "Decay_TauMinus_energy.txt", int(1e6), 50)
 
 if __name__ == "__main__":
-
-    import os
 
     dir_name = "TestFiles/"
 

@@ -1,20 +1,16 @@
 {
-	"description": "PROPOSAL is a Monte-Carlo-Simulation library to propagate Leptons through media.",
+	"description": "PROPOSAL is a Monte-Carlo-Simulation library to propagate leptons and high energy photons through media.",
 	"license": "lgpl-3.0",
 	"keywords": ["Monte-Carlo Simulation", "Lepton Propagator", "Cross Sections"],
 	"upload_type": "software",
 	"creators": [
 		{
 			"affiliation": "TU Dortmund",
+			"name": "Jean-Marco Alameddine"
+		},
+		{
+			"affiliation": "TU Dortmund",
 			"name": "Mario Dunsch"
-		},
-		{
-			"affiliation": "TU Dortmund",
-			"name": "Jan Soedingrekso"
-		},
-		{
-			"affiliation": "TU Dortmund",
-			"name": "Jan-Hendrik K\u00f6hne"
 		},
 		{
 			"affiliation": "TU Dortmund",
@@ -22,31 +18,11 @@
 		},
 		{
 			"affiliation": "TU Dortmund",
-			"name": "Jean-Marco Alameddine"
+			"name": "Pascal Gutjahr"
 		},
 		{
 			"affiliation": "TU Dortmund",
-			"name": "Maximilian Sackel"
-		},
-		{
-			"affiliation": "DESY Zeuthen",
-			"name": "Jacob van Santen"
-		},
-		{
-			"affiliation": "TU Dortmund",
-			"name": "Maximilian N\u00f6the"
-		},
-		{
-			"affiliation": "TU Dortmund",
-			"name": "Thorben Menne"
-		},
-		{
-			"affiliation": "TU Dortmund",
-			"name": "Alexander Sandrock"
-		},
-		{
-			"affiliation": "National Taiwan University",
-			"name": "Chung-Yun Kuo"
+			"name": "Jan-Hendrik K\u00f6hne"
 		},
 		{
 			"affiliation": "University of Alberta",
@@ -57,8 +33,36 @@
 			"name": "Kai Krings"
 		},
 		{
+			"affiliation": "National Taiwan University",
+			"name": "Chung-Yun Kuo"
+		},
+		{
+			"affiliation": "TU Dortmund",
+			"name": "Thorben Menne"
+		},
+		{
+			"affiliation": "TU Dortmund",
+			"name": "Maximilian N\u00f6the"
+		},
+		{
 			"affiliation": "University of Maryland",
 			"name": "Alex Olivas"
+		},
+		{
+			"affiliation": "TU Dortmund",
+			"name": "Maximilian Sackel"
+		},
+		{
+			"affiliation": "TU Dortmund",
+			"name": "Alexander Sandrock"
+		},
+		{
+			"affiliation": "TU Dortmund",
+			"name": "Jan Soedingrekso"
+		},
+		{
+			"affiliation": "DESY Zeuthen",
+			"name": "Jacob van Santen"
 		}
 	],
 	"access_right": "open"

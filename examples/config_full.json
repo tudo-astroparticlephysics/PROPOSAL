@@ -1,0 +1,90 @@
+{
+	"global":
+	{
+		"do_interpolation" : true,
+		"exact_time" : true,
+		"scattering": 
+		{
+			"multiple_scattering" : "HighlandIntegral",
+			"multiple_scattering_multiplier" : 1.0,
+			"stochastic_deflection" : ["DefaultIoniz", "DefaultBrems", "DefaultEpair", "DefaultPhotonuclear"],
+			"stochastic_deflection_multiplier" : {
+				"Ioniz" : 1.0,
+				"Brems" : 1.0,
+				"Epair" : 1.0,
+				"Photonuclear" : 1.0
+			}
+		},
+		"CrossSections" : {
+			"brems": {
+				"parametrization": "KelnerKokoulinPetrukhin",
+				"multiplier" : 1.0,
+				"lpm": true
+			},
+			"epair": {
+				"parametrization": "KelnerKokoulinPetrukhin",
+				"multiplier" : 1.0,
+				"lpm": true
+			},
+			"ioniz": {
+				"parametrization": "BetheBlochRossi",
+				"multiplier" : 1.0
+			},
+			"photo": {
+				"parametrization": "AbramowiczLevinLevyMaor97",
+				"multiplier" : 1.0,
+				"shadow": "ButkevichMikheyev"
+			}
+		}
+	},
+	"sectors": [
+		{
+			"medium": "ice",
+			"geometries": [
+				{
+					"hierarchy": 0,
+					"shape": "sphere",
+					"origin": [0, 0, 0],
+					"outer_radius": 1e20,
+					"inner_radius": 0
+
+				}
+			],
+			"density_distribution":
+			{
+				"type": "homogeneous",
+				"mass_density" : 0.917
+			},
+			"cuts":
+			{
+				"e_cut": "inf",
+				"v_cut": 0.05,
+				"cont_rand": true
+			}
+		},
+		{
+			"medium": "ice",
+			"geometries": [
+				{
+					"hierarchy": 1,
+					"shape": "cylinder",
+					"origin": [0, 0, 0],
+					"outer_radius": 800,
+					"inner_radius": 0,
+					"height": 1600
+				}
+			],
+			"density_distribution":
+			{
+				"type": "homogeneous",
+				"mass_density" : 0.917
+			},
+			"cuts":
+			{
+				"e_cut": 500,
+				"v_cut": 1,
+				"cont_rand": false
+			}
+		}
+	]
+}

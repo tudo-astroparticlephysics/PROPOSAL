@@ -1,16 +1,14 @@
 
 #include "gtest/gtest.h"
 
-#include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/crossection/IonizIntegral.h"
-#include "PROPOSAL/crossection/IonizInterpolant.h"
-#include "PROPOSAL/crossection/factories/IonizationFactory.h"
-#include "PROPOSAL/crossection/parametrization/Ionization.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/crosssection/Factories/IonizationFactory.h"
+#include "PROPOSALTestUtilities/TestFilesHandling.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
-#include "PROPOSAL/methods.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 using namespace PROPOSAL;
 
@@ -18,466 +16,415 @@ ParticleDef getParticleDef(const std::string& name)
 {
     if (name == "MuMinus")
     {
-        return MuMinusDef::Get();
+        return MuMinusDef();
     } else if (name == "TauMinus")
     {
-        return TauMinusDef::Get();
+        return TauMinusDef();
     } else
     {
-        return EMinusDef::Get();
+        return EMinusDef();
     }
 }
 
-const std::string testfile_dir = "bin/TestFiles/";
+const std::string testfile_dir = "tests/TestFiles/";
 
-TEST(Comparison, Comparison_equal)
-{
-    ParticleDef particle_def = MuMinusDef::Get();
-    auto medium = std::make_shared<const Water>();
-    EnergyCutSettings ecuts;
-    double multiplier = 1.;
+// TEST(Comparison, Comparison_equal)
+// {
+//     ParticleDef particle_def = MuMinusDef();
+//     auto medium = std::make_shared<const Water>();
+//     EnergyCutSettings ecuts;
+//     double multiplier = 1.;
 
-    IonizBetheBlochRossi* Ioniz_A      = new IonizBetheBlochRossi(particle_def, medium, ecuts, multiplier);
-    Parametrization* Ioniz_B = new IonizBetheBlochRossi(particle_def, medium, ecuts, multiplier);
-    EXPECT_TRUE(*Ioniz_A == *Ioniz_B);
+//     IonizBetheBlochRossi* Ioniz_A = new IonizBetheBlochRossi(particle_def, medium, ecuts, multiplier);
+//     Parametrization* Ioniz_B = new IonizBetheBlochRossi(particle_def, medium, ecuts, multiplier);
+//     EXPECT_TRUE(*Ioniz_A == *Ioniz_B);
 
-    IonizBetheBlochRossi param(particle_def, medium, ecuts, multiplier);
-    EXPECT_TRUE(param == *Ioniz_A);
+//     IonizBetheBlochRossi param(particle_def, medium, ecuts, multiplier);
+//     EXPECT_TRUE(param == *Ioniz_A);
 
-    IonizIntegral* Int_A        = new IonizIntegral(param);
-    CrossSectionIntegral* Int_B = new IonizIntegral(param);
-    EXPECT_TRUE(*Int_A == *Int_B);
+//     IonizIntegral* Int_A        = new IonizIntegral(param);
+//     CrossSectionIntegral* Int_B = new IonizIntegral(param);
+//     EXPECT_TRUE(*Int_A == *Int_B);
 
-    InterpolationDef InterpolDef;
-    IonizInterpolant* Interpol_A        = new IonizInterpolant(param, InterpolDef);
-    CrossSectionInterpolant* Interpol_B = new IonizInterpolant(param, InterpolDef);
-    EXPECT_TRUE(*Interpol_A == *Interpol_B);
+//     InterpolationDef InterpolDef;
+//     IonizInterpolant* Interpol_A        = new IonizInterpolant(param, InterpolDef);
+//     CrossSectionInterpolant* Interpol_B = new IonizInterpolant(param, InterpolDef);
+//     EXPECT_TRUE(*Interpol_A == *Interpol_B);
 
-    delete Ioniz_A;
-    delete Ioniz_B;
-    delete Int_A;
-    delete Int_B;
-    delete Interpol_A;
-    delete Interpol_B;
-}
+//     delete Ioniz_A;
+//     delete Ioniz_B;
+//     delete Int_A;
+//     delete Int_B;
+//     delete Interpol_A;
+//     delete Interpol_B;
+// }
 
-TEST(Comparison, Comparison_not_equal)
-{
-    ParticleDef mu_def  = MuMinusDef::Get();
-    ParticleDef tau_def = TauMinusDef::Get();
-    auto medium_1 = std::make_shared<const Water>();
-    auto medium_2 = std::make_shared<const Ice>();
-    EnergyCutSettings ecuts_1(500, -1);
-    EnergyCutSettings ecuts_2(-1, 0.05);
-    double multiplier_1 = 1.;
-    double multiplier_2 = 2.;
+// TEST(Comparison, Comparison_not_equal)
+// {
+//     ParticleDef mu_def  = MuMinusDef();
+//     ParticleDef tau_def = TauMinusDef();
+//     auto medium_1 = std::make_shared<const Water>();
+//     auto medium_2 = std::make_shared<const Ice>();
+//     EnergyCutSettings ecuts_1(500, -1);
+//     EnergyCutSettings ecuts_2(-1, 0.05);
+//     double multiplier_1 = 1.;
+//     double multiplier_2 = 2.;
 
-    IonizBetheBlochRossi Ioniz_A(mu_def, medium_1, ecuts_1, multiplier_1);
-    IonizBetheBlochRossi Ioniz_B(tau_def, medium_1, ecuts_1, multiplier_1);
-    IonizBetheBlochRossi Ioniz_C(mu_def, medium_2, ecuts_1, multiplier_1);
-    IonizBetheBlochRossi Ioniz_D(mu_def, medium_1, ecuts_2, multiplier_1);
-    IonizBetheBlochRossi Ioniz_E(mu_def, medium_1, ecuts_1, multiplier_2);
-    EXPECT_TRUE(Ioniz_A != Ioniz_B);
-    EXPECT_TRUE(Ioniz_A != Ioniz_C);
-    EXPECT_TRUE(Ioniz_A != Ioniz_D);
-    EXPECT_TRUE(Ioniz_A != Ioniz_E);
+//     IonizBetheBlochRossi Ioniz_A(mu_def, medium_1, ecuts_1, multiplier_1);
+//     IonizBetheBlochRossi Ioniz_B(tau_def, medium_1, ecuts_1, multiplier_1);
+//     IonizBetheBlochRossi Ioniz_C(mu_def, medium_2, ecuts_1, multiplier_1);
+//     IonizBetheBlochRossi Ioniz_D(mu_def, medium_1, ecuts_2, multiplier_1);
+//     IonizBetheBlochRossi Ioniz_E(mu_def, medium_1, ecuts_1, multiplier_2);
+//     EXPECT_TRUE(Ioniz_A != Ioniz_B);
+//     EXPECT_TRUE(Ioniz_A != Ioniz_C);
+//     EXPECT_TRUE(Ioniz_A != Ioniz_D);
+//     EXPECT_TRUE(Ioniz_A != Ioniz_E);
 
-    IonizIntegral Int_A(Ioniz_A);
-    IonizIntegral Int_B(Ioniz_B);
-    EXPECT_TRUE(Int_A != Int_B);
+//     IonizIntegral Int_A(Ioniz_A);
+//     IonizIntegral Int_B(Ioniz_B);
+//     EXPECT_TRUE(Int_A != Int_B);
 
-    InterpolationDef InterpolDef;
-    IonizInterpolant Interpol_A(Ioniz_A, InterpolDef);
-    IonizInterpolant Interpol_B(Ioniz_B, InterpolDef);
-    EXPECT_TRUE(Interpol_A != Interpol_B);
-}
+//     InterpolationDef InterpolDef;
+//     IonizInterpolant Interpol_A(Ioniz_A, InterpolDef);
+//     IonizInterpolant Interpol_B(Ioniz_B, InterpolDef);
+//     EXPECT_TRUE(Interpol_A != Interpol_B);
+// }
 
-TEST(Assignment, Copyconstructor)
-{
-    ParticleDef mu_def = MuMinusDef::Get();
-    auto medium = std::make_shared<const Water>();
-    EnergyCutSettings ecuts(500, -1);
-    double multiplier = 1.;
+// TEST(Assignment, Copyconstructor)
+// {
+//     ParticleDef mu_def = MuMinusDef();
+//     auto medium = std::make_shared<const Water>();
+//     EnergyCutSettings ecuts(500, -1);
+//     double multiplier = 1.;
 
-    IonizBetheBlochRossi Ioniz_A(mu_def, medium, ecuts, multiplier);
-    IonizBetheBlochRossi Ioniz_B = Ioniz_A;
+//     IonizBetheBlochRossi Ioniz_A(mu_def, medium, ecuts, multiplier);
+//     IonizBetheBlochRossi Ioniz_B = Ioniz_A;
 
-    IonizIntegral Int_A(Ioniz_A);
-    IonizIntegral Int_B = Int_A;
-    EXPECT_TRUE(Int_A == Int_B);
+//     IonizIntegral Int_A(Ioniz_A);
+//     IonizIntegral Int_B = Int_A;
+//     EXPECT_TRUE(Int_A == Int_B);
 
-    InterpolationDef InterpolDef;
-    IonizInterpolant Interpol_A(Ioniz_A, InterpolDef);
-    IonizInterpolant Interpol_B = Interpol_A;
-    EXPECT_TRUE(Interpol_A == Interpol_B);
-}
+//     InterpolationDef InterpolDef;
+//     IonizInterpolant Interpol_A(Ioniz_A, InterpolDef);
+//     IonizInterpolant Interpol_B = Interpol_A;
+//     EXPECT_TRUE(Interpol_A == Interpol_B);
+// }
 
-TEST(Assignment, Copyconstructor2)
-{
+// TEST(Assignment, Copyconstructor2)
+// {
 
-    ParticleDef mu_def = MuMinusDef::Get();
-    auto medium = std::make_shared<const Water>();
-    EnergyCutSettings ecuts(500, -1);
-    double multiplier = 1.;
+//     ParticleDef mu_def = MuMinusDef();
+//     auto medium = std::make_shared<const Water>();
+//     EnergyCutSettings ecuts(500, -1);
+//     double multiplier = 1.;
 
-    IonizBetheBlochRossi Ioniz_A(mu_def, medium, ecuts, multiplier);
-    IonizBetheBlochRossi Ioniz_B(Ioniz_A);
+//     IonizBetheBlochRossi Ioniz_A(mu_def, medium, ecuts, multiplier);
+//     IonizBetheBlochRossi Ioniz_B(Ioniz_A);
 
-    IonizIntegral Int_A(Ioniz_A);
-    IonizIntegral Int_B(Int_A);
-    EXPECT_TRUE(Int_A == Int_B);
+//     IonizIntegral Int_A(Ioniz_A);
+//     IonizIntegral Int_B(Int_A);
+//     EXPECT_TRUE(Int_A == Int_B);
 
-    InterpolationDef InterpolDef;
-    IonizInterpolant Interpol_A(Ioniz_A, InterpolDef);
-    IonizInterpolant Interpol_B(Interpol_A);
-    EXPECT_TRUE(Interpol_A == Interpol_B);
-}
+//     InterpolationDef InterpolDef;
+//     IonizInterpolant Interpol_A(Ioniz_A, InterpolDef);
+//     IonizInterpolant Interpol_B(Interpol_A);
+//     EXPECT_TRUE(Interpol_A == Interpol_B);
+// }
 
 // in polymorphism an assignmant and swap operator doesn't make sense
 
 TEST(Ionization, Test_of_dEdx)
 {
-    std::string filename = testfile_dir + "Ioniz_dEdx.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
+    auto in = getTestFiles("Ioniz_dEdx.txt");
 
     std::string particleName;
     std::string mediumName;
     double ecut;
     double vcut;
+    bool cont_rand = false;
     double multiplier;
     std::string parametrization;
     double energy;
     double dEdx_stored;
     double dEdx_new;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut, vcut);
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        IonizationFactory::Definition ioniz_def;
-        ioniz_def.multiplier        = multiplier;
-        ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
 
-        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, medium, ecuts, ioniz_def);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-        dEdx_new = Ioniz->CalculatedEdx(energy);
+        auto cross = make_ionization(particle_def, *medium, ecuts, false,
+                                     config);
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
+        if (parametrization == "BetheBlochRossi")
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-4 * dEdx_stored); // integration routine changed
+        else
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-6 * dEdx_stored);
 
     }
 }
 
 TEST(Ionization, Test_of_dNdx)
 {
-    std::string filename = testfile_dir + "Ioniz_dNdx.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
+    auto in = getTestFiles("Ioniz_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
     double ecut;
     double vcut;
+    bool cont_rand = false;
     double multiplier;
     std::string parametrization;
     double energy;
     double dNdx_stored;
     double dNdx_new;
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
-
-        ParticleDef particle_def                = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium    = CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut, vcut);
-
-        IonizationFactory::Definition ioniz_def;
-        ioniz_def.multiplier        = multiplier;
-        ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
-
-        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, medium, ecuts, ioniz_def);
-
-        dNdx_new = Ioniz->CalculatedNdx(energy);
-
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
-    }
-}
-
-TEST(Ionization, Test_of_dNdx_rnd)
-{
-    std::string filename = testfile_dir + "Ioniz_dNdx_rnd.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
-    std::string particleName;
-    std::string mediumName;
-    double ecut;
-    double vcut;
-    double multiplier;
-    std::string parametrization;
-    double energy;
-    double rnd;
-    double dNdx_rnd_stored;
-    double dNdx_rnd_new;
-
-    RandomGenerator::Get().SetSeed(0);
-
-    while (in.good())
-    {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_rnd_stored >>
-            parametrization;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium    = CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut, vcut);
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        IonizationFactory::Definition ioniz_def;
-        ioniz_def.multiplier        = multiplier;
-        ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
 
-        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, medium, ecuts, ioniz_def);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-        dNdx_rnd_new = Ioniz->CalculatedNdx(energy, rnd);
+        auto cross = make_ionization(particle_def, *medium, ecuts, false,
+                                     config);
 
-        ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
-
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-6 * dNdx_stored);
     }
 }
 
 TEST(Ionization, Test_Stochastic_Loss)
 {
-    std::string filename = testfile_dir + "Ioniz_e.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
+    auto in = getTestFiles("Ioniz_e.txt");
 
     std::string particleName;
     std::string mediumName;
     double ecut;
     double vcut;
+    bool cont_rand = false;
     double multiplier;
     std::string parametrization;
     double energy;
-    double rnd1, rnd2;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
     RandomGenerator::Get().SetSeed(0);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >>
-            stochastic_loss_stored >> parametrization;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut, vcut);
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        IonizationFactory::Definition ioniz_def;
-        ioniz_def.multiplier        = multiplier;
-        ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
 
-        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, medium, ecuts, ioniz_def);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-        stochastic_loss_new = Ioniz->CalculateStochasticLoss(energy, rnd1, rnd2);
+        auto cross = make_ionization(particle_def, *medium, ecuts, false,
+                                     config);
 
-        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        double sum = 0;
 
+        double dNdx_for_comp = cross->CalculatedNdx(energy, medium->GetHash());
+        sum += dNdx_for_comp;
+        if (sum > dNdx_full * rnd2) {
+            double rate_new = dNdx_for_comp * rnd1;
+            if (ecut == INF and vcut == 1 ) {
+                #ifndef NDEBUG
+                EXPECT_DEATH(cross->CalculateStochasticLoss(medium->GetHash(), energy, rate_new), "");
+                #endif
+            } else {
+                stochastic_loss_new = energy * cross->CalculateStochasticLoss(medium->GetHash(), energy, rate_new);
+                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+                break;
+            }
+        }
     }
 }
 
 TEST(Ionization, Test_of_dEdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Ioniz_dEdx_interpol.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
+    auto in = getTestFiles("Ioniz_dEdx.txt");
 
     std::string particleName;
     std::string mediumName;
     double ecut;
     double vcut;
+    bool cont_rand = false;
     double multiplier;
     std::string parametrization;
     double energy;
     double dEdx_stored;
     double dEdx_new;
 
-    InterpolationDef InterpolDef;
-
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut, vcut);
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        IonizationFactory::Definition ioniz_def;
-        ioniz_def.multiplier      = multiplier;
-        ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-        CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
-                particle_def, medium, ecuts, ioniz_def, InterpolDef);
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
 
-        dEdx_new = Ioniz->CalculatedEdx(energy);
+        auto cross = make_ionization(particle_def, *medium, ecuts, true,
+                                     config);
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
+        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
+        if (vcut * energy == ecut)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-2 * dEdx_stored); // kink in interpolated function in this case
+        else
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-4 * dEdx_stored);
 
     }
 }
 
 TEST(Ionization, Test_of_dNdx_Interpolant)
 {
-    std::string filename = testfile_dir + "Ioniz_dNdx_interpol.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
+    auto in = getTestFiles("Ioniz_dNdx.txt");
 
     std::string particleName;
     std::string mediumName;
     double ecut;
     double vcut;
+    bool cont_rand = false;
     double multiplier;
     std::string parametrization;
     double energy;
     double dNdx_stored;
     double dNdx_new;
 
-    InterpolationDef InterpolDef;
-
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut, vcut);
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        IonizationFactory::Definition ioniz_def;
-        ioniz_def.multiplier      = multiplier;
-        ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-        CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
-                particle_def, medium, ecuts, ioniz_def, InterpolDef);
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
 
-        dNdx_new = Ioniz->CalculatedNdx(energy);
+        auto cross = make_ionization(particle_def, *medium, ecuts, true,
+                                     config);
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
-    }
-}
-
-TEST(Ionization, Test_of_dNdxrnd_interpol)
-{
-    std::string filename = testfile_dir + "Ioniz_dNdx_rnd_interpol.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
-
-    std::string particleName;
-    std::string mediumName;
-    double ecut;
-    double vcut;
-    double multiplier;
-    std::string parametrization;
-    double energy;
-    double rnd;
-    double dNdx_rnd_stored;
-    double dNdx_rnd_new;
-
-    InterpolationDef InterpolDef;
-
-    RandomGenerator::Get().SetSeed(0);
-
-    while (in.good())
-    {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_rnd_stored >>
-            parametrization;
-
-        ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut, vcut);
-
-        IonizationFactory::Definition ioniz_def;
-        ioniz_def.multiplier      = multiplier;
-        ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
-
-        CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
-                particle_def, medium, ecuts, ioniz_def, InterpolDef);
-
-        dNdx_rnd_new = Ioniz->CalculatedNdx(energy, rnd);
-
-        ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
-
+        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
+        if (vcut * energy == ecut)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // kink in interpolated function
+        else
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 5e-4 * dNdx_stored);
     }
 }
 
 TEST(Ionization, Test_of_e_interpol)
 {
-    std::string filename = testfile_dir + "Ioniz_e_interpol.txt";
-	std::ifstream in{filename};
-	EXPECT_TRUE(in.good()) << "Test resource file '" << filename << "' could not be opened";
-
-    char firstLine[256];
-    in.getline(firstLine, 256);
+    auto in = getTestFiles("Ioniz_e.txt");
 
     std::string particleName;
     std::string mediumName;
     double ecut;
     double vcut;
+    bool cont_rand = false;
     double multiplier;
     std::string parametrization;
     double energy;
-    double rnd1, rnd2;
+    double rnd1;
+    double rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
-    InterpolationDef InterpolDef;
-
     RandomGenerator::Get().SetSeed(0);
 
-    while (in.good())
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization)
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >>
-            stochastic_loss_stored >> parametrization;
+        parametrization.erase(0,5);
+        if (vcut == -1)
+            vcut = 1;
+        if (ecut == -1)
+            ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut, vcut);
+        auto medium = CreateMedium(mediumName);
+        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        IonizationFactory::Definition ioniz_def;
-        ioniz_def.multiplier      = multiplier;
-        ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
+        nlohmann::json config;
+        config["parametrization"] = parametrization;
 
-        CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
-                particle_def, medium, ecuts, ioniz_def, InterpolDef);
+        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+            continue;
 
-        stochastic_loss_new = Ioniz->CalculateStochasticLoss(energy, rnd1, rnd2);
+        auto cross = make_ionization(particle_def, *medium, ecuts, true,
+                                     config);
 
-        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+        auto dNdx_full = cross->CalculatedNdx(energy);
+        double sum = 0;
 
+        double dNdx_for_comp = cross->CalculatedNdx(energy, medium->GetHash());
+        sum += dNdx_for_comp;
+        if (sum > dNdx_full * rnd2) {
+            double rate_new = dNdx_for_comp * rnd1;
+            if (ecut == INF and vcut == 1 ) {
+                #ifndef NDEBUG
+                EXPECT_DEATH(cross->CalculateStochasticLoss(medium->GetHash(), energy, rate_new), "");
+                #endif
+            } else {
+                stochastic_loss_new = energy * cross->CalculateStochasticLoss(medium->GetHash(), energy, rate_new);
+                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-5 * stochastic_loss_stored);
+                break;
+            }
+        }
     }
 }
 

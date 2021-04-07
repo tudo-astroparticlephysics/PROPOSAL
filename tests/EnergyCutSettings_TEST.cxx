@@ -1,78 +1,92 @@
-
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/json.hpp"
+#include <stdexcept>
+#include <vector>
+#include <numeric>
 
+using nlohmann::json;
+using std::string;
+using std::vector;
 using namespace PROPOSAL;
 
-TEST(Comparison, Comparison_equal)
+TEST(constructor, parameters)
 {
-    EnergyCutSettings A;
-    EnergyCutSettings B;
-    EXPECT_TRUE(A == B);
-    EnergyCutSettings* C = new EnergyCutSettings(100, 0.01);
-    EnergyCutSettings* D = new EnergyCutSettings(100, 0.01);
-    EXPECT_TRUE(*C == *D);
-    EnergyCutSettings* E = new EnergyCutSettings(500, 0.05);
-    EXPECT_TRUE(A == *E);
+    const auto ecut = 123;
+    const auto vcut = 0.123;
+    const auto cont_rand = true;
+
+    EnergyCutSettings cut(ecut, vcut, cont_rand);
+
+    EXPECT_EQ(cut.GetEcut(), ecut) << "Energy cut initalization failed.";
+    EXPECT_EQ(cut.GetVcut(), vcut) << "Relative cut initalization failed.";
+    EXPECT_EQ(cut.GetContRand(), cont_rand)
+        << "Continuous randomization initalization.";
 }
 
-TEST(Comparison, Comparison_not_equal)
+TEST(constructor, json)
 {
-    EnergyCutSettings A;
-    EnergyCutSettings B(200, 0.09);
-    EXPECT_TRUE(A != B);
-    EnergyCutSettings* C = new EnergyCutSettings(200, 0.01);
-    EnergyCutSettings* D = new EnergyCutSettings(100, 0.01);
-    EXPECT_TRUE(*C != *D);
-}
-TEST(Assignment, Copyconstructor)
-{
-    EnergyCutSettings A;
-    EnergyCutSettings B = A;
+    auto config = json::parse("{ \"e_cut\": 123, \"v_cut\": 0.123, \"cont_rand\": true }");
+    EnergyCutSettings cut(config);
 
-    EXPECT_TRUE(A == B);
+    EXPECT_EQ(cut.GetEcut(), 123) << "Energy cut initalization failed.";
+    EXPECT_EQ(cut.GetVcut(), 0.123) << "Relative cut initalization failed.";
+    EXPECT_EQ(cut.GetContRand(), true)
+        << "Continuous randomization initalization.";
 }
 
-TEST(Assignment, Copyconstructor2)
+TEST(constructor, copy)
 {
-    EnergyCutSettings A(5000, 0.1);
-    EnergyCutSettings B(A);
+    const auto ecut = 123;
+    const auto vcut = 0.123;
+    const auto cont_rand = true;
 
-    EXPECT_TRUE(A == B);
+    EnergyCutSettings cut1(ecut, vcut, cont_rand);
+    EnergyCutSettings cut2(cut1);
+
+    EXPECT_EQ(cut2.GetEcut(), ecut) << "Energy cut initalization failed.";
+    EXPECT_EQ(cut2.GetVcut(), vcut) << "Relative cut initalization failed.";
+    EXPECT_EQ(cut2.GetContRand(), cont_rand) << "Continuous randomization initalization.";
 }
 
-TEST(Assignment, Operator)
+TEST(constructor, exceptions)
 {
-    EnergyCutSettings A;
-    EnergyCutSettings B(200, 0.01);
-
-    EXPECT_TRUE(A != B);
-
-    B = A;
-
-    EXPECT_TRUE(A == B);
-
-    A.SetEcut(300);
-
-    EXPECT_TRUE(A != B);
-
-    B = A;
-
-    EXPECT_TRUE(A == B);
+    ASSERT_THROW(EnergyCutSettings(0, -1.0, true), std::invalid_argument);
+    ASSERT_THROW(EnergyCutSettings(0, 1.1, true), std::invalid_argument);
+    ASSERT_THROW(EnergyCutSettings(-500, 0.05, true), std::invalid_argument);
 }
 
-TEST(Assignment, Swap)
+TEST(operator, comparison)
 {
-    EnergyCutSettings A;
-    EnergyCutSettings B;
-    EXPECT_TRUE(A == B);
-    EnergyCutSettings* C = new EnergyCutSettings(100, 0.01);
-    EnergyCutSettings* D = new EnergyCutSettings(100, 0.01);
-    EXPECT_TRUE(*C == *D);
-    A.swap(*C);
-    EXPECT_TRUE(A == *D);
-    EXPECT_TRUE(B == *C);
+    EnergyCutSettings cut1(123, 0.123, true);
+    EnergyCutSettings cut2(cut1);
+
+    ASSERT_EQ(cut1, cut2);
+}
+
+TEST(cut, absolut)
+{
+    vector<double> energies{ 1, 1e3, 1e6, 1e9, 1e12 };
+    auto vcut = 1.0;
+    auto ecut = 500;
+
+    EnergyCutSettings cut(ecut, vcut, true);
+    for (const auto& e : energies)
+        EXPECT_EQ((ecut / e < vcut) ? ecut / e : vcut, cut.GetCut(e))
+            << "wrong energy cut behaviour.";
+}
+
+TEST(cut, relative)
+{
+    vector<double> energies{ 1, 1e3, 1e6, 1e9, 1e12 };
+    auto vcut = 0.05;
+    auto ecut = std::numeric_limits<double>::infinity();
+
+    EnergyCutSettings cut(ecut, vcut, true);
+    for (const auto& e : energies)
+        EXPECT_EQ((e * vcut < ecut) ? vcut : ecut / e, cut.GetCut(e))
+            << "wrong relative cut behaviour.";
 }
 
 int main(int argc, char** argv)

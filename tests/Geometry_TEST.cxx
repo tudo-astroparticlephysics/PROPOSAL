@@ -1,8 +1,5 @@
 
 #include <iostream>
-// #include <string>
-// #include <cmath>
-
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/Constants.h"
@@ -11,73 +8,70 @@
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/geometry/Sphere.h"
 #include "PROPOSAL/math/RandomGenerator.h"
+#include "PROPOSAL/math/Spherical3D.h"
 
 using namespace PROPOSAL;
 
+Cartesian3D posi = Cartesian3D(0,0,0);
+double rad_i = 0;
+double rad_o = 1e3;
+double x_len = 1;
+double y_len = 1;
+double z_len = 1;
+
 TEST(Comparison, Comparison_equal)
 {
-    Sphere A;
-    Sphere B;
+    Sphere A(posi, rad_o, rad_i);
+    Sphere B(posi, rad_o, rad_i);
     EXPECT_TRUE(A == B);
 
-    Sphere* C = new Sphere();
-    Sphere* D = new Sphere();
+    Sphere* C = new Sphere(posi, rad_o, rad_i);
+    Sphere* D = new Sphere(posi, rad_o, rad_i);
     EXPECT_TRUE(*C == *D);
-
-    Geometry* E = new Sphere();
-    Geometry* F = new Sphere();
-    EXPECT_TRUE(*E == *F);
 
     delete C;
     delete D;
-    delete E;
-    delete F;
 }
 
 TEST(Comparison, Comparison_not_equal)
 {
-    Sphere A;
-    Box B;
+    Sphere A(posi, rad_o, rad_i);
+    Box B(posi, x_len, y_len, z_len);
     EXPECT_TRUE(A != B);
 
-    Sphere* C = new Sphere();
-    Box* D    = new Box();
+    Sphere* C = new Sphere(posi, rad_o, rad_i);
+    Box* D    = new Box(posi, x_len, y_len, z_len);
     EXPECT_TRUE(*C != *D);
-
-    Geometry* E = new Sphere();
-    Geometry* F = new Box();
-    EXPECT_TRUE(*E != *F);
 
     delete C;
     delete D;
-    delete E;
-    delete F;
 }
 
 TEST(Assignment, Copyconstructor)
 {
-    Sphere A;
+    Sphere A(posi, rad_o, rad_i);
     Sphere B = A;
 
     EXPECT_TRUE(A == B);
 
-    Geometry* C = new Sphere();
-    Geometry* D = new Box();
+    Geometry* C = new Sphere(posi, rad_o, rad_i);
+    Geometry* D = new Box(posi, x_len, y_len, z_len);
 
     *D = *C;
 
     EXPECT_FALSE(*C == *D);
 
-    Geometry* E = new Sphere(Vector3D(1.0, 0.0, 0.0), 20.0, 10.0);
+    auto E = std::make_shared<Sphere>(Cartesian3D(1.0, 0.0, 0.0), 20.0, 10.0);
+    auto F = ::std::make_shared<Sphere>(posi, rad_o, rad_i);
 
-    *C = *E;
+    *F = *E;
 
-    EXPECT_TRUE(*C == *E);
+    EXPECT_TRUE(*E == *F);
 }
 
 TEST(Assignment, Copyconstructor2)
 {
-    Sphere A;
+    Sphere A(posi, rad_o, rad_i);
     Sphere B(A);
 
     EXPECT_TRUE(A == B);
@@ -85,8 +79,8 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Assignment, Operator)
 {
-    Sphere A;
-    Sphere B(Vector3D(0.0, 0.0, 0.0), 2.0, 1.0);
+    Sphere A(posi, rad_o, rad_i);
+    Sphere B(Cartesian3D(0.0, 0.0, 0.0), 2.0, 1.0);
 
     EXPECT_TRUE(A != B);
 
@@ -95,27 +89,11 @@ TEST(Assignment, Operator)
     EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment, Swap)
-{
-    Sphere A;
-    Sphere B;
-    EXPECT_TRUE(A == B);
-    Geometry* C = new Sphere(Vector3D(1.0, 2.0, 3.0), 4.0, 3.0);
-    Geometry* D = new Sphere(Vector3D(1.0, 2.0, 3.0), 4.0, 3.0);
-
-    EXPECT_TRUE(*C == *D);
-
-    A.swap(*C);
-    EXPECT_TRUE(A == *D);
-    EXPECT_TRUE(B == *C);
-}
-
 TEST(DistanceToClosestApproach, Method)
 {
-    Sphere A;
-    Vector3D position = Vector3D(1, -1, 0);
-    Vector3D direction = Vector3D(0, 1, 0);
-    direction.CalculateSphericalCoordinates();
+    Sphere A(posi, rad_o, rad_i);
+    Cartesian3D position = Cartesian3D(1, -1, 0);
+    Cartesian3D direction = Cartesian3D(0, 1, 0);
 
     double distance_closest_approach = A.DistanceToClosestApproach(position, direction);
 
@@ -124,9 +102,8 @@ TEST(DistanceToClosestApproach, Method)
 
 TEST(IsInside, Box)
 {
-
-    Vector3D particle_position(0, 0, 0);
-    Vector3D particle_direction(0, 0, 0);
+    Cartesian3D particle_position(0, 0, 0);
+    Spherical3D particle_direction(0, 0, 0);
 
     double rnd_x;
     double rnd_y;
@@ -147,7 +124,7 @@ TEST(IsInside, Box)
     double big_width_y = 4 * width_y;
     double big_height  = 4 * height;
 
-    Vector3D position_geometry(0, 0, 0);
+    Cartesian3D position_geometry(0, 0, 0);
 
     int is_inside  = 0;
     int is_outside = 0;
@@ -168,13 +145,11 @@ TEST(IsInside, Box)
         rnd_y0 = RandomGenerator::Get().RandomDouble();
         rnd_z0 = RandomGenerator::Get().RandomDouble();
 
-        position_geometry.SetCartesianCoordinates((2 * rnd_x0 - 1) * 0.5 * (big_width_x - width_x),
-                                                  (2 * rnd_y0 - 1) * 0.5 * (big_width_y - width_y),
-                                                  (2 * rnd_z0 - 1) * 0.5 * (big_height - height));
+        position_geometry.SetCoordinates({(2 * rnd_x0 - 1) * 0.5 * (big_width_x - width_x),
+                                          (2 * rnd_y0 - 1) * 0.5 * (big_width_y - width_y),
+                                          (2 * rnd_z0 - 1) * 0.5 * (big_height - height)});
 
-        // The values are divided by 100 to convert the units...
-        // Init functions expects m but here everthing is in cm
-        Box A(0.01 * position_geometry, width_x / 100, width_y / 100, height / 100);
+        Box A(position_geometry, width_x, width_y, height);
 
         volumia_ratio = width_x * width_y * height / (big_width_x * big_width_y * big_height);
         for (int j = 0; j < number_particles; j++)
@@ -188,12 +163,10 @@ TEST(IsInside, Box)
             rnd_theta = RandomGenerator::Get().RandomDouble();
             rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-            particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-            particle_direction.CalculateCartesianFromSpherical();
-
-            particle_position.SetCartesianCoordinates((2 * rnd_x - 1) * 0.5 * big_width_x,
-                                                      (2 * rnd_y - 1) * 0.5 * big_width_y,
-                                                      (2 * rnd_z - 1) * 0.5 * big_height);
+            particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
+            particle_position.SetCoordinates({(2 * rnd_x - 1) * 0.5 * big_width_x,
+                                              (2 * rnd_y - 1) * 0.5 * big_width_y,
+                                              (2 * rnd_z - 1) * 0.5 * big_height});
 
             // if this constraints are true the particle is inside the box geometry
             if (particle_position.GetX() > position_geometry.GetX() - 0.5 * width_x &&
@@ -217,125 +190,123 @@ TEST(IsInside, Box)
     }
     // Check what happens if particles are on the border of the box
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Box A(Vector3D(0, 0, 0), width_x / 100, width_y / 100, height / 100);
+    Box A(Cartesian3D(0, 0, 0), width_x, width_y, height);
 
     // Particle is on the top surface.
     // Theta 0° - 90° means particle is moving outside
     // This should be treated as outside
     // Theta 90° - 180° means particle is moving inside (should be treated as inside)
     // The value of phi does not matter
-    particle_position.SetCartesianCoordinates(0, 0, 0.5 * height);
+    particle_position.SetCoordinates({0, 0, 0.5 * height});
     for (int i = 0; i < 1e4; i++)
     {
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
-        if (particle_direction.GetTheta() < 0.5 * PI)
+        if (particle_direction.GetZenith() < 0.5 * PI) {
             EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-        if (particle_direction.GetTheta() > 0.5 * PI)
+        }
+        if (particle_direction.GetZenith() > 0.5 * PI) {
             EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
+        }
     }
 
     // Make this test for every surface of the box
 
     // bottom
-    particle_position.SetCartesianCoordinates(0, 0, -0.5 * height);
+    particle_position.SetCoordinates({0, 0, -0.5 * height});
     for (int i = 0; i < 1e4; i++)
     {
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
-        if (particle_direction.GetTheta() > 0.5 * PI)
+        if (particle_direction.GetZenith() > 0.5 * PI) {
             EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
-        if (particle_direction.GetTheta() < 0.5 * PI)
+        }
+        if (particle_direction.GetZenith() < 0.5 * PI) {
             EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
+        }
     }
 
     // Surface in positiv x direction
-    particle_position.SetCartesianCoordinates(0.5 * width_x, 0, 0);
+    particle_position.SetCoordinates({0.5 * width_x, 0, 0});
     for (int i = 0; i < 1e4; i++)
     {
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
         // phi = 0 is in positive x direction
-        if (particle_direction.GetPhi() < 0.5 * PI || particle_direction.GetPhi() > 1.5 * PI)
+        if (particle_direction.GetAzimuth() < 0.5 * PI ||
+            particle_direction.GetAzimuth() > 1.5 * PI)
             EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
         else
             EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
     }
     // Surface in negativ x direction
-    particle_position.SetCartesianCoordinates(-0.5 * width_x, 0, 0);
+    particle_position.SetCoordinates({-0.5 * width_x, 0, 0});
     for (int i = 0; i < 1e4; i++)
     {
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
         // phi = 0 is in positive x direction
-        if (particle_direction.GetPhi() < 0.5 * PI || particle_direction.GetPhi() > 1.5 * PI)
+        if (particle_direction.GetAzimuth() < 0.5 * PI ||
+            particle_direction.GetAzimuth() > 1.5 * PI)
             EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
         else
             EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
     }
     // Surface in positiv y direction
-    particle_position.SetCartesianCoordinates(0, 0.5 * width_y, 0);
+    particle_position.SetCoordinates({0, 0.5 * width_y, 0});
     for (int i = 0; i < 1e4; i++)
     {
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
         // phi = 0 is in positive x direction
-        if (particle_direction.GetPhi() < PI)
+        if (particle_direction.GetAzimuth() < PI)
             EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
         else
             EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
     }
     // Surface in negativ y direction
-    particle_position.SetCartesianCoordinates(0, -0.5 * width_y, 0);
+    particle_position.SetCoordinates({0, -0.5 * width_y, 0});
     for (int i = 0; i < 1e4; i++)
     {
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
         // phi = 0 is in positive x direction
-        if (particle_direction.GetPhi() < PI)
+        if (particle_direction.GetAzimuth() < PI)
             EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
         else
             EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
     }
 
     // For completness check one corner
-    particle_position.SetCartesianCoordinates(0.5 * width_x, 0.5 * width_y, 0.5 * height);
+    particle_position.SetCoordinates({0.5 * width_x, 0.5 * width_y, 0.5 * height});
     for (int i = 0; i < 1e4; i++)
     {
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
-        if (particle_direction.GetTheta() < 0.5 * PI || particle_direction.GetPhi() < PI ||
-            particle_direction.GetPhi() > 1.5 * PI)
+        if (particle_direction.GetZenith() < 0.5 * PI ||
+            particle_direction.GetAzimuth() < PI ||
+            particle_direction.GetAzimuth() > 1.5 * PI)
             EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
         else
             EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
@@ -345,8 +316,8 @@ TEST(IsInside, Box)
 TEST(IsInside, Cylinder)
 {
 
-    Vector3D particle_position(0, 0, 0);
-    Vector3D particle_direction(0, 0, 0);
+    Cartesian3D particle_position(0, 0, 0);
+    Spherical3D particle_direction(0, 0, 0);
 
     double rnd_x;
     double rnd_y;
@@ -368,7 +339,7 @@ TEST(IsInside, Cylinder)
     double big_width_y = 4 * radius;
     double big_height  = 4 * height;
 
-    Vector3D position_geometry(0, 0, 0);
+    Cartesian3D position_geometry(0, 0, 0);
 
     int is_inside  = 0;
     int is_outside = 0;
@@ -389,9 +360,9 @@ TEST(IsInside, Cylinder)
         rnd_y0 = RandomGenerator::Get().RandomDouble();
         rnd_z0 = RandomGenerator::Get().RandomDouble();
 
-        position_geometry.SetCartesianCoordinates((2 * rnd_x0 - 1) * (0.5 * big_width_x - radius),
-                                                  (2 * rnd_y0 - 1) * (0.5 * big_width_y - radius),
-                                                  (2 * rnd_z0 - 1) * 0.5 * (big_height - height));
+        position_geometry.SetCoordinates({(2 * rnd_x0 - 1) * (0.5 * big_width_x - radius),
+                                          (2 * rnd_y0 - 1) * (0.5 * big_width_y - radius),
+                                          (2 * rnd_z0 - 1) * 0.5 * (big_height - height)});
 
         // position_geometry.SetCartesianCoordinates(0,0,0);
 
@@ -399,9 +370,7 @@ TEST(IsInside, Cylinder)
 
         inner_radius = radius * rnd_inner_radius;
 
-        // The values are divided by 100 to convert the units...
-        // Init functions expects m but here everthing is in cm
-        Cylinder A(0.01 * position_geometry, radius / 100, inner_radius / 100, height / 100);
+        Cylinder A(position_geometry, height, radius, inner_radius);
 
         volumia_ratio =
             height * PI * (pow(radius, 2) - pow(inner_radius, 2)) / (big_width_x * big_width_y * big_height);
@@ -416,12 +385,11 @@ TEST(IsInside, Cylinder)
             rnd_theta = RandomGenerator::Get().RandomDouble();
             rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-            particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-            particle_direction.CalculateCartesianFromSpherical();
+            particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
-            particle_position.SetCartesianCoordinates((2 * rnd_x - 1) * 0.5 * big_width_x,
-                                                      (2 * rnd_y - 1) * 0.5 * big_width_y,
-                                                      (2 * rnd_z - 1) * 0.5 * big_height);
+            particle_position.SetCoordinates({(2 * rnd_x - 1) * 0.5 * big_width_x,
+                                              (2 * rnd_y - 1) * 0.5 * big_width_y,
+                                              (2 * rnd_z - 1) * 0.5 * big_height});
 
             // if this constraints are true the particle is inside the cylinder geometry
             if (sqrt(pow((particle_position.GetX() - position_geometry.GetX()), 2) +
@@ -448,27 +416,23 @@ TEST(IsInside, Cylinder)
 
     // Test borders
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Sphere B(Vector3D(0, 0, 0), radius / 100, 0);
+    Sphere B(Cartesian3D(0, 0, 0), radius, 0);
 
     double cos;
 
-    int excluded = 0;
     for (int i = 0; i < 1e4; i++)
     {
         rnd_x = RandomGenerator::Get().RandomDouble();
 
-        particle_position.SetCartesianCoordinates(radius * rnd_x, radius * sqrt(1 - rnd_x * rnd_x), 0);
+        particle_position.SetCoordinates({radius * rnd_x, radius * sqrt(1 - rnd_x * rnd_x), 0});
 
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
         // cosine of angle between direction vector and position vector
-        cos = -scalar_product(particle_position, particle_direction) / radius;
+        cos = -(particle_position * particle_direction) / radius;
 
         if (cos < 1 && cos > 0)
             EXPECT_TRUE(B.IsInside(particle_position, particle_direction));
@@ -481,72 +445,67 @@ TEST(IsInside, Cylinder)
     // This should be treated as outside
     // Theta 90° - 180° means particle is moving inside (should be treated as inside)
     // The value of phi does not matter
-    particle_position.SetCartesianCoordinates(0, 0, 0.5 * height);
+    particle_position.SetCoordinates({0, 0, 0.5 * height});
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Cylinder C(Vector3D(0, 0, 0), radius / 100, 0, height / 100);
+    Cylinder C(Cartesian3D(0, 0, 0), height, radius, 0);
 
     for (int i = 0; i < 1e4; i++)
     {
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
         // Computer precision controll
         if (particle_position.GetX() * particle_position.GetX() + particle_position.GetY() * particle_position.GetY() -
                 inner_radius * inner_radius ==
             0)
         {
-            if (particle_direction.GetTheta() < PI / 2.)
+            if (particle_direction.GetZenith() < PI / 2.) {
                 EXPECT_FALSE(C.IsInside(particle_position, particle_direction));
-            if (particle_direction.GetTheta() > PI / 2.)
+            }
+            if (particle_direction.GetZenith() > PI / 2.) {
                 EXPECT_TRUE(C.IsInside(particle_position, particle_direction));
+            }
         }
     }
 
     // Make this test for every surface of the box
 
     // bottom
-    particle_position.SetCartesianCoordinates(0, 0, -0.5 * height);
+    particle_position.SetCoordinates({0, 0, -0.5 * height});
     for (int i = 0; i < 1e4; i++)
     {
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
-        if (particle_direction.GetTheta() > PI / 2.)
+        if (particle_direction.GetZenith() > PI / 2.) {
             EXPECT_FALSE(C.IsInside(particle_position, particle_direction));
-        if (particle_direction.GetTheta() < PI / 2.)
+        }
+        if (particle_direction.GetZenith() < PI / 2.) {
             EXPECT_TRUE(C.IsInside(particle_position, particle_direction));
+        }
     }
 
     // Test inner border
     inner_radius = 5;
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Cylinder A(Vector3D(0, 0, 0), radius / 100, inner_radius / 100, height / 100);
-
-    excluded = 0;
+    Cylinder A(Cartesian3D(0, 0, 0), height, radius, inner_radius);
 
     for (int i = 0; i < 1e4; i++)
     {
         rnd_x = RandomGenerator::Get().RandomDouble();
 
-        particle_position.SetCartesianCoordinates(inner_radius * rnd_x, inner_radius * sqrt(1 - rnd_x * rnd_x), 0);
+        particle_position.SetCoordinates({inner_radius * rnd_x, inner_radius * sqrt(1 - rnd_x * rnd_x), 0});
 
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates(Spherical3D(1, rnd_phi * 2 * PI, rnd_theta * PI).GetCartesianCoordinates());
 
         // cosine of angle between direction vector and position vector
-        cos = -scalar_product(particle_position, particle_direction) / radius;
+        cos = -(particle_position * particle_direction) / radius;
 
         if (cos < 1 && cos > 0)
             EXPECT_FALSE(A.IsInside(particle_position, particle_direction));
@@ -558,8 +517,8 @@ TEST(IsInside, Cylinder)
 TEST(IsInside, Sphere)
 {
 
-    Vector3D particle_position(0, 0, 0);
-    Vector3D particle_direction(0, 0, 0);
+    Cartesian3D particle_position(0, 0, 0);
+    Cartesian3D particle_direction(0, 0, 0);
 
     double rnd_x;
     double rnd_y;
@@ -580,7 +539,7 @@ TEST(IsInside, Sphere)
     double big_width_y = 4 * radius;
     double big_height  = 4 * radius;
 
-    Vector3D position_geometry(0, 0, 0);
+    Cartesian3D position_geometry(0, 0, 0);
 
     int is_inside  = 0;
     int is_outside = 0;
@@ -602,15 +561,13 @@ TEST(IsInside, Sphere)
 
         rnd_inner_radius = RandomGenerator::Get().RandomDouble();
 
-        position_geometry.SetCartesianCoordinates((2 * rnd_x0 - 1) * (0.5 * big_width_x - radius),
-                                                  (2 * rnd_y0 - 1) * (0.5 * big_width_y - radius),
-                                                  (2 * rnd_z0 - 1) * (0.5 * big_height - radius));
+        position_geometry.SetCoordinates({(2 * rnd_x0 - 1) * (0.5 * big_width_x - radius),
+                                          (2 * rnd_y0 - 1) * (0.5 * big_width_y - radius),
+                                          (2 * rnd_z0 - 1) * (0.5 * big_height - radius)});
 
         inner_radius = radius * rnd_inner_radius;
 
-        // The values are divided by 100 to convert the units...
-        // Init functions expects m but here everthing is in cm
-        Sphere A(0.01 * position_geometry, radius / 100, inner_radius / 100);
+        Sphere A(position_geometry, radius, inner_radius);
 
         volumia_ratio =
             (4. / 3. * PI * (pow(radius, 3) - pow(inner_radius, 3))) / (big_width_x * big_width_y * big_height);
@@ -626,12 +583,11 @@ TEST(IsInside, Sphere)
             rnd_theta = RandomGenerator::Get().RandomDouble();
             rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-            particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-            particle_direction.CalculateCartesianFromSpherical();
+            particle_direction.SetCoordinates(Spherical3D(1, rnd_phi * 2 * PI, rnd_theta * PI).GetCartesianCoordinates());
 
-            particle_position.SetCartesianCoordinates((2 * rnd_x - 1) * 0.5 * big_width_x,
-                                                      (2 * rnd_y - 1) * 0.5 * big_width_y,
-                                                      (2 * rnd_z - 1) * 0.5 * big_height);
+            particle_position.SetCoordinates({(2 * rnd_x - 1) * 0.5 * big_width_x,
+                                              (2 * rnd_y - 1) * 0.5 * big_width_y,
+                                              (2 * rnd_z - 1) * 0.5 * big_height});
 
             if ((particle_position - position_geometry).magnitude() < radius &&
                 (particle_position - position_geometry).magnitude() > inner_radius)
@@ -651,27 +607,23 @@ TEST(IsInside, Sphere)
 
     // Test borders
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Sphere A(Vector3D(0, 0, 0), radius / 100, 0);
+    Sphere A(Cartesian3D(0, 0, 0), radius);
 
     double cos;
 
-    int excluded = 0;
     for (int i = 0; i < 1e4; i++)
     {
         rnd_x = RandomGenerator::Get().RandomDouble();
 
-        particle_position.SetCartesianCoordinates(radius * rnd_x, radius * sqrt(1 - rnd_x * rnd_x), 0);
+        particle_position.SetCoordinates({radius * rnd_x, radius * sqrt(1 - rnd_x * rnd_x), 0});
 
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates(Spherical3D(1, rnd_phi * 2 * PI, rnd_theta * PI).GetCartesianCoordinates());
 
         // cosine of angle between direction vector and position vector
-        cos = -scalar_product(particle_position, particle_direction) / radius;
+        cos = -(particle_position * particle_direction) / radius;
 
         if (cos < 1 && cos > 0)
             EXPECT_TRUE(A.IsInside(particle_position, particle_direction));
@@ -682,26 +634,21 @@ TEST(IsInside, Sphere)
     // Test inner border
     inner_radius = 5;
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Sphere B(Vector3D(0, 0, 0), radius / 100, inner_radius / 100);
-
-    excluded = 0;
+    Sphere B(Cartesian3D(0, 0, 0), radius, inner_radius);
 
     for (int i = 0; i < 1e4; i++)
     {
         rnd_x = RandomGenerator::Get().RandomDouble();
 
-        particle_position.SetCartesianCoordinates(inner_radius * rnd_x, inner_radius * sqrt(1 - rnd_x * rnd_x), 0);
+        particle_position.SetCoordinates({inner_radius * rnd_x, inner_radius * sqrt(1 - rnd_x * rnd_x), 0});
 
         rnd_theta = RandomGenerator::Get().RandomDouble();
         rnd_phi   = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates(Spherical3D(1, rnd_phi * 2 * PI, rnd_theta * PI).GetCartesianCoordinates());
 
         // cosine of angle between direction vector and position vector
-        cos = -scalar_product(particle_position, particle_direction) / radius;
+        cos = -(particle_position * particle_direction) / radius;
 
         if (cos < 1 && cos > 0)
             EXPECT_FALSE(B.IsInside(particle_position, particle_direction));
@@ -712,8 +659,8 @@ TEST(IsInside, Sphere)
 
 TEST(DistanceTo, Sphere)
 {
-    Vector3D particle_position(0, 0, 0);
-    Vector3D particle_direction(0, 0, 0);
+    Cartesian3D particle_position(0, 0, 0);
+    Spherical3D particle_direction(0, 0, 0);
 
     double radius          = 10;
     double inner_radius    = 0;
@@ -741,19 +688,15 @@ TEST(DistanceTo, Sphere)
             rnd_inner_radius = RandomGenerator::Get().RandomDouble();
             inner_radius     = radius * rnd_inner_radius;
 
-            // The values are divided by 100 to convert the units...
-            // Init functions expects m but here everthing is in cm
-            Sphere A(Vector3D(0, 0, 0), radius / 100, inner_radius / 100);
+            Sphere A(Cartesian3D(0, 0, 0), radius, inner_radius);
 
             rnd_phi   = RandomGenerator::Get().RandomDouble();
             rnd_theta = RandomGenerator::Get().RandomDouble();
 
-            particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, rnd_theta * PI);
-            particle_direction.CalculateCartesianFromSpherical();
+            particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, rnd_theta * PI});
 
             // Chose particle location and angle
-            particle_position.SetSphericalCoordinates(particle_radius, rnd_phi * 2 * PI, rnd_theta * PI);
-            particle_position.CalculateCartesianFromSpherical();
+            particle_position.SetCoordinates(Spherical3D(particle_radius, rnd_phi * 2 * PI, rnd_theta * PI).GetCartesianCoordinates());
             particle_position = -particle_position;
 
             distance = A.DistanceToBorder(particle_position, particle_direction);
@@ -790,8 +733,7 @@ TEST(DistanceTo, Sphere)
             }
             if (particle_radius > 20)
             {
-                particle_position.SetSphericalCoordinates(inner_radius, rnd_phi * 2 * PI, rnd_theta * PI);
-                particle_position.CalculateCartesianFromSpherical();
+                particle_position.SetCoordinates(Spherical3D(inner_radius, rnd_phi * 2 * PI, rnd_theta * PI).GetCartesianCoordinates());
                 particle_position = -particle_position;
 
                 distance = A.DistanceToBorder(particle_position, particle_direction);
@@ -805,8 +747,8 @@ TEST(DistanceTo, Sphere)
 //
 TEST(DistanceTo, Cylinder)
 {
-    Vector3D particle_position(0, 0, 0);
-    Vector3D particle_direction(0, 0, 0);
+    Cartesian3D particle_position(0, 0, 0);
+    Spherical3D particle_direction(0, 0, 0);
 
     double height          = 10;
     double radius          = 10;
@@ -836,22 +778,18 @@ TEST(DistanceTo, Cylinder)
             rnd_inner_radius = RandomGenerator::Get().RandomDouble();
             inner_radius     = radius * rnd_inner_radius;
 
-            // The values are divided by 100 to convert the units...
-            // Init functions expects m but here everthing is in cm
-            Cylinder A(Vector3D(0, 0, 0), radius / 100, inner_radius / 100, height / 100);
+            Cylinder A(Cartesian3D(0, 0, 0), height, radius, inner_radius);
 
             rnd_phi = RandomGenerator::Get().RandomDouble();
 
             // Chose particle location and angle
-            particle_position.SetSphericalCoordinates(1, rnd_phi * 2 * PI, 0.5 * PI);
-            particle_position.CalculateCartesianFromSpherical();
-            particle_position.SetCartesianCoordinates(particle_radius * particle_position.GetX(),
-                                                      particle_radius * particle_position.GetY(),
-                                                      0.5 * height * particle_position.GetZ());
+            particle_position.SetCoordinates(Spherical3D(1, rnd_phi * 2 * PI, 0.5 * PI).GetCartesianCoordinates());
+            particle_position.SetCoordinates({particle_radius * particle_position.GetX(),
+                                              particle_radius * particle_position.GetY(),
+                                              0.5 * height * particle_position.GetZ()});
             particle_position = -particle_position;
 
-            particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, 0.5 * PI);
-            particle_direction.CalculateCartesianFromSpherical();
+            particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, 0.5 * PI});
 
             distance = A.DistanceToBorder(particle_position, particle_direction);
 
@@ -889,8 +827,7 @@ TEST(DistanceTo, Cylinder)
             {
                 particle_radius = inner_radius;
 
-                particle_position.SetSphericalCoordinates(particle_radius, rnd_phi * 2 * PI, 0.5 * PI);
-                particle_position.CalculateCartesianFromSpherical();
+                particle_position.SetCoordinates(Spherical3D(particle_radius, rnd_phi * 2 * PI, 0.5 * PI).GetCartesianCoordinates());
                 particle_position = -particle_position;
 
                 distance = A.DistanceToBorder(particle_position, particle_direction);
@@ -903,16 +840,13 @@ TEST(DistanceTo, Cylinder)
     // One test for inner_radius =0
     inner_radius = 0;
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Cylinder B(Vector3D(0, 0, 0), radius / 100, inner_radius / 100, height / 100);
+    Cylinder B(Cartesian3D(0, 0, 0), height, radius, inner_radius);
 
     // Chose particle location and angle
 
-    particle_position.SetCartesianCoordinates(0, 0, height + 10);
+    particle_position.SetCoordinates({0, 0, height + 10});
 
-    particle_direction.SetSphericalCoordinates(1, 0, PI);
-    particle_direction.CalculateCartesianFromSpherical();
+    particle_direction.SetCoordinates({1, 0, PI});
 
     z = particle_position.GetZ();
 
@@ -926,9 +860,7 @@ TEST(DistanceTo, Cylinder)
 
     inner_radius = 6;
 
-    // The values are divided by 100 to convert the units...
-    // Init functions expects m but here everthing is in cm
-    Cylinder A(Vector3D(0, 0, 0), radius / 100, inner_radius / 100, height / 100);
+    Cylinder A(Cartesian3D(0, 0, 0), height, radius, inner_radius);
 
     for (int j = 0; j < number_particles; j++)
     {
@@ -941,40 +873,41 @@ TEST(DistanceTo, Cylinder)
 
         // Chose particle location and angle
 
-        particle_position.SetCartesianCoordinates(0, 0, height + 0.5 * height);
+        particle_position.SetCoordinates({0, 0, height + 0.5 * height});
         z = particle_position.GetZ();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi, PI - alpha);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi, PI - alpha});
 
         double dist1 = inner_radius / std::sin(alpha);
         double dist2 = radius / std::sin(alpha);
 
         distance = A.DistanceToBorder(particle_position, particle_direction);
 
-        //  case 1 throught inner cylinder => no intersection
-        //  ___  x    ___
-        // |   | |   |   |
-        // |   | |   |   |
-        // |   | |   |   |
-        // |   | |   |   |
-        // |   | |   |   |
-        // |___| |   |___|
-        //       |
+        /*  case 1 throught inner cylinder => no intersection
+            ___  x    ___
+           |   | |   |   |
+           |   | |   |   |
+           |   | |   |   |
+           |   | |   |   |
+           |   | |   |   |
+           |___| |   |___|
+                 |
+        */
         if (alpha < std::atan(inner_radius / (z + 0.5 * height)))
         {
             EXPECT_EQ(distance.first, -1);
             EXPECT_EQ(distance.second, -1);
         }
-        //  case 2 first inner cylinder then bottom surface
-        //  ___  x      ___
-        // |   |  \    |   |
-        // |   |   \   |   |
-        // |   |    \  |   |
-        // |   |     \ |   |
-        // |   |      *|   |
-        // |___|       |\ _|
-        //               *
+        /*  case 2 first inner cylinder then bottom surface
+            ___  x      ___
+           |   |  \    |   |
+           |   |   \   |   |
+           |   |    \  |   |
+           |   |     \ |   |
+           |   |      *|   |
+           |___|       |\ _|
+                         *
+        */
 
         else if (alpha < std::atan(radius / (z + 0.5 * height)))
         {
@@ -982,51 +915,51 @@ TEST(DistanceTo, Cylinder)
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
         }
-        //  case 3 first inner cylinder then outer cylinder
-        //  ___     x   ___
-        // |   |     \ |   |
-        // |   |      \|   |
-        // |   |       *   |
-        // |   |       |\  |
-        // |   |       | \ |
-        // |   |       |  \|
-        // |   |       |   *
-        // |___|       |___|\
-        //
+        /*  case 3 first inner cylinder then outer cylinder
+            ___     x   ___
+           |   |     \ |   |
+           |   |      \|   |
+           |   |       *   |
+           |   |       |\  |
+           |   |       | \ |
+           |   |       |  \|
+           |   |       |   *
+           |___|       |___|\
+        */
 
         else if (alpha < std::atan(inner_radius / height))
         {
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
         }
-        //  case 4 first upper surface then outer cylinder
-        //            x
-        //             \
-        //  ___         \__
-        // |   |       | * |
-        // |   |       |  \|
-        // |   |       |   *
-        // |   |       |   |\
-        // |   |       |   |
-        // |   |       |   |
-        // |___|       |___|
-        //
+        /*  case 4 first upper surface then outer cylinder
+                      x
+                       \
+            ___         \__
+           |   |       | * |
+           |   |       |  \|
+           |   |       |   *
+           |   |       |   |\
+           |   |       |   |
+           |   |       |   |
+           |___|       |___|
+        */
         else if (alpha < std::atan(radius / height))
         {
             dist1 = height / std::cos(alpha);
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
         }
-        //  case 5  no intersection
-        //      x_____________
-        //  ___      ___
-        // |   |    |   |
-        // |   |    |   |
-        // |   |    |   |
-        // |   |    |   |
-        // |   |    |   |
-        // |___|    |___|
-        //
+        /*  case 5  no intersection
+                x_____________
+            ___      ___
+           |   |    |   |
+           |   |    |   |
+           |   |    |   |
+           |   |    |   |
+           |   |    |   |
+           |___|    |___|
+        */
         else
         {
             EXPECT_EQ(distance.first, -1);
@@ -1037,8 +970,8 @@ TEST(DistanceTo, Cylinder)
 
 TEST(DistanceTo, Box)
 {
-    Vector3D particle_position(0, 0, 0);
-    Vector3D particle_direction(0, 0, 0);
+    Cartesian3D particle_position(0, 0, 0);
+    Spherical3D particle_direction(0, 0, 0);
 
     double width  = 10;
     double height = width;
@@ -1063,16 +996,13 @@ TEST(DistanceTo, Box)
     {
         rnd_phi = RandomGenerator::Get().RandomDouble();
 
-        // The values are divided by 100 to convert the units...
-        // Init functions expects m but here everthing is in cm
-        Box A(Vector3D(0, 0, 0), width / 100, width / 100, height / 100);
+        Box A(Cartesian3D(0, 0, 0), width, width, height);
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 2 * PI, 0.5 * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 2 * PI, 0.5 * PI});
 
         distance = A.DistanceToBorder(particle_position, particle_direction);
 
-        phi = particle_direction.GetPhi() * 180. / PI;
+        phi = particle_direction.GetAzimuth() * 180. / PI;
         if (phi < 45)
         {
             dist = 0.5 * width / std::cos(phi / 180 * PI);
@@ -1123,18 +1053,16 @@ TEST(DistanceTo, Box)
         }
     }
 
-    Box A(Vector3D(0, 0, 0), width / 100, width / 100, height / 100);
+    Box A(Cartesian3D(0, 0, 0), width, width, height);
 
     for (int i = 0; i < number_particles; i++)
     {
         rnd_phi = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, rnd_phi * 0.5 * PI, 0.5 * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, rnd_phi * 0.5 * PI, 0.5 * PI});
+        particle_position.SetCoordinates({-1 * width, 0, 0});
 
-        particle_position.SetCartesianCoordinates(-1 * width, 0, 0);
-
-        phi      = particle_direction.GetPhi();
+        phi      = particle_direction.GetAzimuth();
         distance = A.DistanceToBorder(particle_position, particle_direction);
 
         //                       ________________           z|
@@ -1155,18 +1083,19 @@ TEST(DistanceTo, Box)
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
 
         }
-        //
-        //                          ^
-        //                         /                        z|
-        //                       _*_____________             |
-        //                      |/              |            |_____
-        //                      *               |                  x
-        //                     /|               |
-        //                    / |               |
-        //                   /  |               |
-        //                  x   |               |
-        //                      |               |
-        //                      |_______________|
+        /*
+                                   ^
+                                  /                        z|
+                                _*_____________             |
+                               |/              |            |_____
+                               *               |                  x
+                              /|               |
+                             / |               |
+                            /  |               |
+                           x   |               |
+                               |               |
+                               |_______________|
+        */
 
         else if (phi < std::atan(width * 0.5 / (-particle_position.GetX() - 0.5 * width)))
         {
@@ -1176,17 +1105,18 @@ TEST(DistanceTo, Box)
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
 
         }
-        //                       ^
-        //                      /
-        //                     / _______________
-        //                    / |               |  z|
-        //                   /  |               |   |
-        //                  /   |               |   |_____
-        //                 /    |               |        x
-        //                /     |               |
-        //               x      |               |
-        //                      |               |
-        //                      |_______________|
+        /*                       ^
+                                /
+                               / _______________
+                              / |               |  z|
+                             /  |               |   |
+                            /   |               |   |_____
+                           /    |               |        x
+                          /     |               |
+                         x      |               |
+                                |               |
+                                |_______________|
+        */
 
         else
         {
@@ -1200,62 +1130,64 @@ TEST(DistanceTo, Box)
     {
         rnd_theta = RandomGenerator::Get().RandomDouble();
 
-        particle_direction.SetSphericalCoordinates(1, 0, rnd_theta * 0.5 * PI);
-        particle_direction.CalculateCartesianFromSpherical();
+        particle_direction.SetCoordinates({1, 0, rnd_theta * 0.5 * PI});
 
-        particle_position.SetCartesianCoordinates(0, 0, -1 * height);
+        particle_position.SetCoordinates({0, 0, -1 * height});
 
         distance = A.DistanceToBorder(particle_position, particle_direction);
 
-        //                       ________________       x|
-        //                      |               |        |
-        //                      |               |        |_____
-        //                      |               |              z
-        //     x----------------*---------------*--------->
-        //                      |               |
-        //                      |               |
-        //                      |               |
-        //                      |_______________|
+        /*                       ________________       x|
+                                |               |        |
+                                |               |        |_____
+                                |               |              z
+               x----------------*---------------*--------->
+                                |               |
+                                |               |
+                                |               |
+                                |_______________|
+        */
 
-        if (particle_direction.GetTheta() < std::atan(0.5 * height / (0.5 * height - particle_position.GetZ())))
+        if (particle_direction.GetZenith() < std::atan(0.5 * height / (0.5 * height - particle_position.GetZ())))
         {
-            dist1 = (-particle_position.GetZ() - 0.5 * height) / std::cos(particle_direction.GetTheta());
-            dist2 = (0.5 * height - particle_position.GetZ()) / std::cos(particle_direction.GetTheta());
+            dist1 = (-particle_position.GetZ() - 0.5 * height) / std::cos(particle_direction.GetZenith());
+            dist2 = (0.5 * height - particle_position.GetZ()) / std::cos(particle_direction.GetZenith());
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
 
         }
-        //
-        //                          ^
-        //                         /                    x|
-        //                       _*_____________         |
-        //                      |/              |        |_____
-        //                      *               |             z
-        //                     /|               |
-        //                    / |               |
-        //                   /  |               |
-        //                  x   |               |
-        //                      |               |
-        //                      |_______________|
+        /*
+                                    ^
+                                   /                    x|
+                                 _*_____________         |
+                                |/              |        |_____
+                                *               |             z
+                               /|               |
+                              / |               |
+                             /  |               |
+                            x   |               |
+                                |               |
+                                |_______________|
+        */
 
-        else if (particle_direction.GetTheta() < std::atan(height * 0.5 / (-particle_position.GetZ() - 0.5 * height)))
+        else if (particle_direction.GetZenith() < std::atan(height * 0.5 / (-particle_position.GetZ() - 0.5 * height)))
         {
-            dist1 = (-particle_position.GetZ() - 0.5 * height) / std::cos(particle_direction.GetTheta());
-            dist2 = 0.5 * height / std::sin(particle_direction.GetTheta());
+            dist1 = (-particle_position.GetZ() - 0.5 * height) / std::cos(particle_direction.GetZenith());
+            dist2 = 0.5 * height / std::sin(particle_direction.GetZenith());
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
         }
-        //                       ^
-        //                      /
-        //                     / _______________        x|
-        //                    / |               |        |
-        //                   /  |               |        |_____
-        //                  /   |               |             z
-        //                 /    |               |
-        //                /     |               |
-        //               x      |               |
-        //                      |               |
-        //                      |_______________|
+        /*                       ^
+                                /
+                               / _______________        x|
+                              / |               |        |
+                             /  |               |        |_____
+                            /   |               |             z
+                           /    |               |
+                          /     |               |
+                         x      |               |
+                                |               |
+                                |_______________|
+        */
 
         else
         {

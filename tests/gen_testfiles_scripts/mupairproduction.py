@@ -1,3 +1,4 @@
+import os
 import proposal as pp
 import numpy as np
 
@@ -8,347 +9,144 @@ particle_defs = [
 ]
 
 mediums = [
-    pp.medium.Ice(1.0),
-    pp.medium.Hydrogen(1.0),
-    pp.medium.Uranium(1.0)
+    pp.medium.Ice(),
+    pp.medium.Hydrogen(),
+    pp.medium.Uranium()
 ]
 
 cuts = [
-    pp.EnergyCutSettings(-1, -1),
-    pp.EnergyCutSettings(500, -1),
-    pp.EnergyCutSettings(-1, 0.05),
+    pp.EnergyCutSettings(np.inf, 1),
+    pp.EnergyCutSettings(500, 1),
+    pp.EnergyCutSettings(np.inf, 0.05),
     pp.EnergyCutSettings(500, 0.05)
 ]
 
 multiplier = 1.
 
-mupair = [
-    pp.parametrization.mupairproduction.KelnerKokoulinPetrukhin,
+params = [
+    pp.parametrization.mupairproduction.KelnerKokoulinPetrukhin(),
 ]
-
-mupair_interpol = [
-    pp.parametrization.mupairproduction.KelnerKokoulinPetrukhinInterpolant,
-]
-
 
 energies = np.logspace(4, 13, num=10)
 
 vs = np.linspace(0.022, 0.98, 10) # choose v-range so that v_min < v < v_max is always fulflilled for all E in energies
 
-interpoldef = pp.InterpolationDef()
 
-
-def create_tables(dir_name, interpolate=False, **kwargs):
+def create_tables(dir_name, **kwargs):
 
     pp.RandomGenerator.get().set_seed(1234)
-
-    if interpolate:
-        params = mupair_interpol
-    else:
-        params = mupair
 
     buf = {}
 
     for key in kwargs:
         if key == "dEdx" and kwargs[key] is True:
-            f_dEdx = open(dir_name + "Mupair_dEdx{}.txt".format("_interpol" if interpolate else ""), "w")
+            f_dEdx = open(dir_name + "Mupair_dEdx.txt", "w")
             buf["dEdx"] = [f_dEdx, [""]]
         if key == "dNdx" and kwargs[key] is True:
-            f_dNdx = open(dir_name + "Mupair_dNdx{}.txt".format("_interpol" if interpolate else ""), "w")
+            f_dNdx = open(dir_name + "Mupair_dNdx.txt", "w")
             buf["dNdx"] = [f_dNdx, [""]]
-        if key == "dNdx_rnd" and kwargs[key] is True:
-            f_dNdx_rnd = open(dir_name + "Mupair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "w")
-            buf["dNdx_rnd"] = [f_dNdx_rnd, [""]]
         if key == "stoch" and kwargs[key] is True:
-            f_stoch = open(dir_name + "Mupair_e{}.txt".format("_interpol" if interpolate else ""), "w")
+            f_stoch = open(dir_name + "Mupair_e.txt", "w")
             buf["stoch"] = [f_stoch, [""]]
 
-    # print(buf)
 
     for particle in particle_defs:
         for medium in mediums:
             for cut in cuts:
-                    for param in params:
-                        if interpolate:
-                            param_current = param(
-                                particle,
-                                medium,
-                                cut,
-                                multiplier,
-                                True,
-                                interpoldef)
+                for param in params:
+                    args = {
+                        "parametrization": param,
+                        "particle_def": particle,
+                        "target": medium,
+                        "cuts": cut,
+                        "interpolate": False
+                    }
 
-                            xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
-                        else:
-                            param_current = param(
-                                particle,
-                                medium,
-                                cut,
-                                multiplier,
-                                True
-                                )
+                    xsection = pp.crosssection.make_crosssection(**args)
 
-                            xsection = pp.crosssection.MupairIntegral(param_current)
+                    for key in buf:
+                        buf[key][1] = [""]
 
-                        for key in buf:
-                            buf[key][1] = [""]
-
-                            for energy in energies:
-                                if key == "dEdx":
-                                    result = [str(xsection.calculate_dEdx(energy))]
-                                if key == "dNdx":
-                                    result = [str(xsection.calculate_dNdx(energy))]
-                                if key == "dNdx_rnd":
-                                    rnd = pp.RandomGenerator.get().random_double()
-                                    result = xsection.calculate_dNdx_rnd(energy, rnd)
-                                    result = [str(rnd), str(result)]
-                                if key == "stoch":
-                                    rnd1 = pp.RandomGenerator.get().random_double()
-                                    rnd2 = pp.RandomGenerator.get().random_double()
-                                    result = xsection.calculate_stochastic_loss(energy, rnd1, rnd2)
-                                    result = [str(rnd1), str(rnd2), str(result)]
-
-                                buf[key][1].append(particle.name)
-                                buf[key][1].append(medium.name)
-                                buf[key][1].append(str(cut.ecut))
-                                buf[key][1].append(str(cut.vcut))
-                                buf[key][1].append(str(multiplier))
-                                buf[key][1].append(str(energy))
-                                buf[key][1].append(param_current.name)
-                                buf[key][1].extend(result)
-                                buf[key][1].append("\n")
-
-                            buf[key][0].write("\t".join(buf[key][1]))
-
-
-def create_table_dNdx(dir_name, interpolate=False):
-
-    if interpolate:
-        params = mupair_interpol
-    else:
-        params = mupair
-
-    with open(dir_name + "Mupair_dNdx{}.txt".format("_interpol" if interpolate else ""), "w") as file:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for param in params:
-                            if interpolate:
-                                param_current = param(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    True,
-                                    interpoldef)
-
-                                xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
-                            else:
-                                param_current = param(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    True)
-
-                                xsection = pp.crosssection.MupairIntegral(param_current)
-
-                            buf = [""]
-
-                            for energy in energies:
-                                dEdx = xsection.calculate_dNdx(energy)
-
-                                buf.append(particle.name)
-                                buf.append(medium.name)
-                                buf.append(str(cut.ecut))
-                                buf.append(str(cut.vcut))
-                                buf.append(str(multiplier))
-                                buf.append(str(energy))
-                                buf.append(str(dEdx))
-                                buf.append("\n")
-
-                            file.write("\t".join(buf))
-
-
-def create_table_dNdx_rnd(dir_name, interpolate=False):
-
-    pp.RandomGenerator.get().set_seed(0)
-
-    if interpolate:
-        params = mupair_interpol
-    else:
-        params = mupair
-
-    with open(dir_name + "Mupair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "w") as file:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for param in params:
-                            if interpolate:
-                                param_current = param(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    True,
-                                    interpoldef)
-
-                                xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
-                            else:
-                                param_current = param(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    True)
-
-                                xsection = pp.crosssection.MupairIntegral(param_current)
-
-                            buf = [""]
-
-                            for energy in energies:
-                                rnd = pp.RandomGenerator.get().random_double()
-                                dNdx = xsection.calculate_dNdx_rnd(energy, rnd)
-
-                                buf.append(particle.name)
-                                buf.append(medium.name)
-                                buf.append(str(cut.ecut))
-                                buf.append(str(cut.vcut))
-                                buf.append(str(multiplier))
-                                buf.append(str(energy))
-                                buf.append(str(rnd))
-                                buf.append(str(dNdx))
-                                buf.append("\n")
-
-                            file.write("\t".join(buf))
-
-
-def create_table_stochastic_loss(dir_name, interpolate=False):
-
-    pp.RandomGenerator.get().set_seed(0)
-
-    if interpolate:
-        params = mupair_interpol
-    else:
-        params = mupair
-
-    with open(dir_name + "Mupair_e{}.txt".format("_interpol" if interpolate else ""), "w") as file:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for param in params:
-                            if interpolate:
-                                param_current = param(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    True,
-                                    interpoldef)
-
-                                xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
-                            else:
-                                param_current = param(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    True)
-
-                                xsection = pp.crosssection.MupairIntegral(param_current)
-
-                            buf = [""]
-
-                            for energy in energies:
-                                rnd1 = pp.RandomGenerator.get().random_double()
-                                rnd2 = pp.RandomGenerator.get().random_double()
-                                stochastic_loss = xsection.calculate_dNdx_rnd(energy, rnd1, rnd2)
-
-                                buf.append(particle.name)
-                                buf.append(medium.name)
-                                buf.append(str(cut.ecut))
-                                buf.append(str(cut.vcut))
-                                buf.append(str(multiplier))
-                                buf.append(str(energy))
-                                buf.append(str(rnd1))
-                                buf.append(str(rnd2))
-                                buf.append(str(stochastic_loss))
-                                buf.append("\n")
-
-                            file.write("\t".join(buf))
-
-def create_table_rho(dir_name, interpolate=False):
-
-    pp.RandomGenerator.get().set_seed(0)
-
-    if interpolate:
-        params = mupair_interpol
-    else:
-        params = mupair
-
-    with open(dir_name + "Mupair_rho{}.txt".format("_interpol" if interpolate else ""), "w") as file:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for v in vs:
-                        for param in params:
-                            if interpolate:
-                                param_current = param(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    True,
-                                    interpoldef)
-
-                            else:
-                                param_current = param(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    True)
-
-                            buf = [""]
-
-                            for energy in energies:
+                        for energy in energies:
+                            if key == "dEdx":
+                                result = [str(xsection.calculate_dEdx(energy) * medium.mass_density)]
+                            if key == "dNdx":
+                                result = [str(xsection.calculate_dNdx(energy) * medium.mass_density)]
+                            if key == "stoch":
                                 rnd1 = pp.RandomGenerator.get().random_double()
                                 rnd2 = pp.RandomGenerator.get().random_double()
 
-                                rho = param_current.Calculaterho(energy, v, rnd1, rnd2)
-                                E1 = 0.5 * v * energy * (1 + rho)
-                                E2 = 0.5 * v * energy * (1 - rho)
+                                components = medium.components
+                                comp = components[int(rnd2*len(components))]
+                                dNdx_for_comp = xsection.calculate_dNdx(energy, comp.hash);
 
-                                buf.append(particle.name)
-                                buf.append(medium.name)
-                                buf.append(str(cut.ecut))
-                                buf.append(str(cut.vcut))
-                                buf.append(str(v))
-                                buf.append(str(multiplier))
-                                buf.append(str(energy))
-                                buf.append(str(param_current.name))
-                                buf.append(str(rnd1))
-                                buf.append(str(rnd2))
-                                buf.append(str(E1))
-                                buf.append(str(E2))
-                                buf.append("\n")
+                                if np.isfinite(cut.ecut) or cut.vcut < 1:
+                                    result = xsection.calculate_stochastic_loss(
+                                        comp.hash, energy, rnd1*dNdx_for_comp) * energy
+                                else:
+                                    result = 0
+                                result = [str(rnd1), str(rnd2), str(result)]
 
-                            file.write("\t".join(buf))
+
+                            buf[key][1].append(particle.name)
+                            buf[key][1].append(medium.name)
+                            buf[key][1].append(str(cut.ecut))
+                            buf[key][1].append(str(cut.vcut))
+                            buf[key][1].append(str(multiplier))
+                            buf[key][1].append(str(energy))
+                            buf[key][1].append(xsection.param_name)
+                            buf[key][1].extend(result)
+                            buf[key][1].append("\n")
+
+                        buf[key][0].write("\t".join(buf[key][1]))
+
+
+def create_table_rho(dir_name):
+
+    pp.RandomGenerator.get().set_seed(0)
+
+    with open(dir_name + "Mupair_rho.txt", "w") as file:
+
+        particle = pp.particle.MuMinusDef()
+        for medium in mediums:
+            for v in vs:
+                # the constructors have not yet been pybinded
+                # for param in params:
+                param = pp.secondaries.make_secondary(
+                    pp.particle.Interaction_Type.mupair, particle, medium)
+
+                buf = [""]
+
+                for energy in energies:
+                    rnd1 = pp.RandomGenerator.get().random_double()
+                    rnd2 = pp.RandomGenerator.get().random_double()
+
+                    rho = param.calculate_rho(
+                        energy, v, medium.components[0], rnd1, rnd2)
+                    E1 = 0.5 * v * energy * (1 + rho)
+                    E2 = 0.5 * v * energy * (1 - rho)
+
+                    buf.append(particle.name)
+                    buf.append(medium.name)
+                    buf.append(str(v))
+                    buf.append(str(multiplier))
+                    buf.append(str(energy))
+                    buf.append(str(name))
+                    buf.append(str(rnd1))
+                    buf.append(str(rnd2))
+                    buf.append(str(E1))
+                    buf.append(str(E2))
+                    buf.append("\n")
+
+                file.write("\t".join(buf))
 
 
 def main(dir_name):
-    create_tables(dir_name, False, dEdx=True, dNdx=True, dNdx_rnd=True, stoch=True)
-    create_tables(dir_name, True, dEdx=True, dNdx=True, dNdx_rnd=True, stoch=True)
-    create_table_rho(dir_name, False)
+    create_tables(dir_name, dEdx=True, dNdx=True, stoch=True)
+    create_table_rho(dir_name)
 
 
 if __name__ == "__main__":
-
-    import os
 
     dir_name = "TestFiles/"
 

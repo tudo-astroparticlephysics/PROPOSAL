@@ -1,3 +1,4 @@
+import os
 import proposal as pp
 import numpy as np
 
@@ -10,17 +11,17 @@ def create_table(dir_name):
         pp.particle.EMinusDef()
     ]
 
-    cuts = [
-        pp.EnergyCutSettings(-1, -1),
-        pp.EnergyCutSettings(500, -1),
-        pp.EnergyCutSettings(-1, 0.05),
-        pp.EnergyCutSettings(500, 0.05)
+    mediums = [
+        pp.medium.Ice(),
+        pp.medium.Hydrogen(),
+        pp.medium.Uranium()
     ]
 
-    mediums = [
-        pp.medium.Ice(1.0),
-        pp.medium.Hydrogen(1.0),
-        pp.medium.Uranium(1.0)
+    cuts = [
+        pp.EnergyCutSettings(np.inf, 1, True),
+        pp.EnergyCutSettings(500, 1, True),
+        pp.EnergyCutSettings(np.inf, 0.05, True),
+        pp.EnergyCutSettings(500, 0.05, True)
     ]
 
     initial_energy = np.logspace(4, 13, num=10)  # MeV
@@ -35,18 +36,16 @@ def create_table(dir_name):
             for medium in mediums:
                 for cut in cuts:
 
-                    utility = pp.Utility(
-                        particle,
-                        medium,
-                        cut,
-                        pp.UtilityDefinition(),
-                        pp.InterpolationDef()
-                    )
+                    args = {
+                        "particle_def": particle,
+                        "target": medium,
+                        "interpolate": False,
+                        "cuts": cut
+                    }
 
-                    cont_rand = pp.ContinuousRandomizer(
-                        utility,
-                        pp.InterpolationDef()
-                    )
+                    cross = pp.crosssection.make_std_crosssection(**args)
+                    cont_rand = pp.make_contrand(cross, False)
+
 
                     buf = [""]
 
@@ -74,10 +73,7 @@ def create_table(dir_name):
 def main(dir_name):
     create_table(dir_name)
 
-
 if __name__ == "__main__":
-
-    import os
 
     dir_name = "TestFiles/"
 

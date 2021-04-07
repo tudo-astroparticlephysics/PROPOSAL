@@ -1,18 +1,11 @@
+import os
 import proposal as pp
 import numpy as np
-
-parametrizations = [
-    pp.scattering.Moliere,
-    pp.scattering.HighlandIntegral,
-    pp.scattering.Highland,
-    pp.scattering.NoScattering
-]
 
 scat_names = [
     "Moliere",
     "HighlandIntegral",
     "Highland",
-    "NoScattering"
 ]
 
 particle_defs = [
@@ -22,65 +15,72 @@ particle_defs = [
 ]
 
 mediums = [
-    pp.medium.Ice(1.0),
-    pp.medium.Hydrogen(1.0),
-    pp.medium.Uranium(1.0)
+    pp.medium.Ice(),
+    pp.medium.Hydrogen(),
+    pp.medium.Uranium()
 ]
 
 cuts = [
-    pp.EnergyCutSettings(-1, -1),
-    pp.EnergyCutSettings(500, -1),
-    pp.EnergyCutSettings(-1, 0.05),
+    pp.EnergyCutSettings(np.inf, 1),
+    pp.EnergyCutSettings(500, 1),
+    pp.EnergyCutSettings(np.inf, 0.05),
     pp.EnergyCutSettings(500, 0.05)
 ]
 
 energies = np.logspace(4, 13, num=10)  # MeV
 energies_out = np.logspace(3, 12, num=10)
 distance = 1000  # cm
-position_init = pp.Vector3D(0, 0, 0)
-direction_init = pp.Vector3D(1, 0, 0)
-direction_init.spherical_from_cartesian()
+position_init = pp.Cartesian3D(0, 0, 0)
+direction_init = pp.Cartesian3D(1, 0, 0)
 
-interpoldef = pp.InterpolationDef()
 pp.RandomGenerator.get().set_seed(1234)
 
-
-def create_table_scatter(dir_name):
+def create_table(dir_name):
 
     with open(dir_name + "Scattering_scatter.txt", "w") as file:
 
         for particle_def in particle_defs:
             for medium in mediums:
                 for cut in cuts:
-                    for idx, parametrization in enumerate(parametrizations):
+                    for scat_name in scat_names:
 
-                        if scat_names[idx] == "HighlandIntegral":
-                            util = pp.Utility(particle_def, medium, cut, pp.UtilityDefinition(), pp.InterpolationDef())
-                            scattering = parametrization(particle_def, util, pp.InterpolationDef())
+                        if scat_name == "HighlandIntegral" and particle_def.name == "MuMinus":
+                            args = {
+                                "particle_def": particle_def,
+                                "target": medium,
+                                "interpolate": False,
+                                "cuts": cut
+                            }
+                            cross = pp.crosssection.make_std_crosssection(**args)
+                            scattering = pp.make_multiple_scattering(
+                                scat_name, particle_def, medium, cross, False)
+                        elif scat_name != "HighlandIntegral":
+                            scattering = pp.make_multiple_scattering(
+                                scat_name, particle_def, medium)
                         else:
-                            scattering = parametrization(particle_def, medium)
+                            continue
 
                         buf = [""]
                         for jdx, energy in enumerate(energies):
-                            # TODO wrap UtilityDecorator
 
                             rnd1 = pp.RandomGenerator.get().random_double()
                             rnd2 = pp.RandomGenerator.get().random_double()
                             rnd3 = pp.RandomGenerator.get().random_double()
                             rnd4 = pp.RandomGenerator.get().random_double()
-                            directions = scattering.scatter(distance,
+                            coords = scattering.scatter(distance*medium.mass_density,
                                                             energy,
                                                             energies_out[jdx],
-                                                            position_init,
-                                                            direction_init,
-                                                            rnd1, rnd2, rnd3, rnd4)
+                                                            [rnd1, rnd2, rnd3, rnd4])
 
-                            posi = position_init + distance * directions.u
-                            dire = directions.n_i
+                            directions = pp.scattering.scatter_initial_direction(
+                                direction_init, coords)
+
+                            posi = position_init + distance * directions[0]
+                            dire = directions[1]
 
                             buf.append(particle_def.name)
                             buf.append(medium.name)
-                            buf.append(scat_names[idx])
+                            buf.append(scat_name)
                             buf.append(str(cut.ecut))
                             buf.append(str(cut.vcut))
                             buf.append(str(energy))
@@ -93,21 +93,18 @@ def create_table_scatter(dir_name):
                             buf.append(str(posi.x))
                             buf.append(str(posi.y))
                             buf.append(str(posi.z))
-                            buf.append(str(dire.radius))
-                            buf.append(str(dire.phi))
-                            buf.append(str(dire.theta))
+                            buf.append(str(dire.x))
+                            buf.append(str(dire.y))
+                            buf.append(str(dire.z))
                             buf.append("\n")
 
                         file.write("\t".join(buf))
 
 
 def main(dir_name):
-    create_table_scatter(dir_name)
-
+    create_table(dir_name)
 
 if __name__ == "__main__":
-
-    import os
 
     dir_name = "TestFiles/"
 

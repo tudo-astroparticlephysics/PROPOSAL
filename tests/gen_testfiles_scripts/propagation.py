@@ -1,3 +1,4 @@
+import os
 import proposal as pp
 
 
@@ -11,15 +12,16 @@ def create_table(dir_name):
 
     prop = pp.Propagator(
         pp.particle.MuMinusDef(),
-        "resources/config_ice.json"
+        "examples/config_minimal.json"
     )
 
-    mu = pp.particle.DynamicData(pp.particle.Particle_Type.MuMinus)
+    init_particle = pp.particle.ParticleState()
 
-    mu.energy = 1e8
-    mu.propagated_distance = 0
-    mu.position = pp.Vector3D(0, 0, 0)
-    mu.direction = pp.Vector3D(0, 0, -1)
+    init_particle.energy = 1e8
+    init_particle.propagated_distance = 0
+    init_particle.position = pp.Cartesian3D(0, 0, 0)
+    init_particle.direction = pp.Cartesian3D(0, 0, -1)
+    init_particle.time = 0
     pp.RandomGenerator.get().set_seed(1234)
 
     with open(dir_name + "Propagator_propagation.txt", "w") as file:
@@ -36,17 +38,17 @@ def create_table(dir_name):
         buf.append("dz")
         buf.append("\n")
         buf.append(str(statistics))
-        buf.append(str(mu.energy))
+        buf.append(str(init_particle.energy))
         buf.append("\n")
 
         file.write("\t".join(buf))
 
         for i in range(statistics):
-            daughters = prop.propagate(mu)
+            daughters = prop.propagate(init_particle)
 
             buf = [""]
-            for d in daughters.particles:
-                buf.append(str(d.name))
+            for d in daughters.stochastic_losses():
+                buf.append(str(d.type))
                 buf.append(str(d.propagated_distance))
                 buf.append(str(d.energy))
                 buf.append(str(d.position.x))
@@ -60,14 +62,11 @@ def create_table(dir_name):
             file.write("\t".join(buf))
 
 
-
 def main(dir_name):
     create_table(dir_name)
 
 
 if __name__ == "__main__":
-
-    import os
 
     dir_name = "TestFiles/"
 

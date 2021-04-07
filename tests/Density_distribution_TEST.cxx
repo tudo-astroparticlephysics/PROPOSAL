@@ -1,13 +1,10 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/medium/Components.h"
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/medium/MediumFactory.h"
-#include "PROPOSAL/medium/density_distr/density_exponential.h"
-#include "PROPOSAL/medium/density_distr/density_homogeneous.h"
-#include "PROPOSAL/medium/density_distr/density_polynomial.h"
-#include "PROPOSAL/medium/density_distr/density_splines.h"
+#include "PROPOSAL/density_distr/density_exponential.h"
+#include "PROPOSAL/density_distr/density_homogeneous.h"
+#include "PROPOSAL/density_distr/density_polynomial.h"
+#include "PROPOSAL/density_distr/density_splines.h"
 
 using namespace PROPOSAL;
 
@@ -29,13 +26,11 @@ TEST(Comparison, Comparison_equal)
     EXPECT_TRUE(*A == *B);
 
     double sigma = 1.;
-    Density_distr* C = new Density_exponential(ax_D, sigma);
-    Density_exponential D(ax_D, sigma);
+    double d0 = 0.;
+    double massDensity = 1.;
+    Density_distr* C = new Density_exponential(ax_D, sigma, d0, massDensity);
+    Density_exponential D(ax_D, sigma, d0, massDensity);
     EXPECT_TRUE(D == *C);
-
-    Density_homogeneous G;
-    Density_homogeneous H;
-    EXPECT_TRUE(G == H);
 
     delete A;
     delete B;
@@ -47,47 +42,41 @@ TEST(Comparison, Comparison_equal)
 
 TEST(Comparison, Comparison_not_equal)
 {
-    Vector3D faxis_default(1,0,0);
-    Vector3D faxis_new(0,1,0);
-    Vector3D fp0_default(0,0,0);
-    Vector3D fp0_new(1,1,1);
+    Cartesian3D faxis_default(1,0,0);
+    Cartesian3D faxis_new(0,1,0);
+    Cartesian3D fp0_default(0,0,0);
+    Cartesian3D fp0_new(1,1,1);
     CartesianAxis ax_A;
     CartesianAxis ax_B(faxis_default, fp0_new);
     CartesianAxis ax_C(faxis_new, fp0_default);
     EXPECT_TRUE(ax_A != ax_B);
     EXPECT_TRUE(ax_A != ax_C);
 
-    Axis* ax_D = new CartesianAxis();
-    Axis* ax_E = new RadialAxis();
-    EXPECT_TRUE(*ax_D != *ax_E);
-
-    Density_distr* A = new Density_homogeneous();
-    Density_distr* B = new Density_exponential(ax_A, 1);
-    Density_distr* D = new Density_exponential(ax_A, 2);
-    EXPECT_TRUE(*A != *B);
+    Density_distr* B = new Density_exponential(ax_A, 1, 0, 1);
+    Density_distr* C = new Density_exponential(ax_A, 1, 1, 1);
+    Density_distr* D = new Density_exponential(ax_A, 2, 0, 1);
     EXPECT_TRUE(*B != *D);
+    EXPECT_TRUE(*C != *D);
+    EXPECT_TRUE(*B != *C);
 
     std::vector<double> vecA = {1,2};
     std::vector<double> vecB = {2,3};
     Polynom poly_A(vecA);
     Polynom poly_B(vecB);
-    Density_polynomial E(ax_A, poly_A);
-    Density_polynomial F(ax_B, poly_A);
-    Density_polynomial G(ax_A, poly_B);
+    Density_polynomial E(ax_A, poly_A, 1);
+    Density_polynomial F(ax_B, poly_A, 1);
+    Density_polynomial G(ax_A, poly_B, 1);
     EXPECT_TRUE(E != F);
     EXPECT_TRUE(E != G);
 
     Linear_Spline spl_A(vecA, vecA);
     Linear_Spline spl_B(vecA, vecB);
-    Density_splines H(ax_A, spl_A);
-    Density_splines I(ax_B, spl_A);
-    Density_splines J(ax_A, spl_B);
+    Density_splines H(ax_A, spl_A, 1);
+    Density_splines I(ax_B, spl_A, 1);
+    Density_splines J(ax_A, spl_B, 1);
     EXPECT_TRUE(H != I);
     EXPECT_TRUE(H != J);
 
-    delete ax_D;
-    delete ax_E;
-    delete A;
     delete B;
     delete D;
 }
@@ -102,7 +91,7 @@ TEST(Assignment, Copyconstructor)
 
     std::vector<double> vecA = {1,2};
     Polynom poly_A(vecA);
-    Density_polynomial A(ax_A, poly_A);
+    Density_polynomial A(ax_A, poly_A, 1);
     Density_polynomial B = A;
     Density_polynomial C(A);
     EXPECT_TRUE(A == B);

@@ -1,0 +1,10 @@
+configure_file(version.h.in version.h @ONLY)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/version.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/PROPOSAL)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILES_MATCHING PATTERN "*.h"
+                   PATTERN "*.hpp"
+    )

@@ -1,4 +1,5 @@
 cmake-build-debug
+tags
 .svn
 .ycm_extra_conf.py
 resources/tables/*
@@ -10,12 +11,17 @@ cmake_uninstall.cmake
 **/Test/TestFiles*/
 *.png
 *.pdf
+*.orig
 *.swp
 tests/TestFiles*.tar.gz
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
 
 # C extensions
 *.so

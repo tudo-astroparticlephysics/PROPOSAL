@@ -26,11 +26,11 @@ TEST(Linear_Spline, Comparison_equal) {
     std::vector<double> f_x(10);
     std::iota(std::begin(x), std::end(x), 0);
 
-    for (int i = 0; i < x.size(); ++i) {
+    for (unsigned long i = 0; i < x.size(); ++i) {
         f_x[i] = linear(x[i]);
     }
     Linear_Spline sp(x, f_x);
-    for (int i = 0; i < x.size(); ++i) {
+    for (unsigned long i = 0; i < x.size(); ++i) {
         ASSERT_NEAR(sp.evaluate(x[i]), f_x[i], COMPUTER_PRECISION * f_x[i]);
     }
 }
@@ -40,11 +40,11 @@ TEST(Cubic_Spline, Comparison_equal) {
     std::vector<double> f_x(10);
     std::iota(std::begin(x), std::end(x), 0);
 
-    for (int i = 0; i < x.size(); ++i) {
+    for (unsigned long i = 0; i < x.size(); ++i) {
         f_x[i] = cubic(x[i]);
     }
     Cubic_Spline sp(x, f_x);
-    for (int i = 0; i < x.size(); ++i) {
+    for (unsigned long i = 0; i < x.size(); ++i) {
         ASSERT_NEAR(sp.evaluate(x[i]), f_x[i], COMPUTER_PRECISION * f_x[i]);
     }
 }

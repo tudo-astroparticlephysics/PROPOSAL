@@ -1,197 +1,151 @@
 # Installation
 
-## Build Prequesites
+The installation process is based on **CMake** (version `>3.9` required).
+To handle dependencies and for simple usage in other projects, the package manager **conan** (version `>1.33` required) can be used additionally.
+If you are only interested to use PROPOSAL in python, you can install PROPOSAL using **pip**.
 
-The following commands can be used to install the required and optional
-dependencies on your system.
-The c++ dependencies are vendored using git submodules and are included in the
-release tar balls.
+All different installation approaches are going to be explained in the following.
 
-### Ubuntu / Debian
+For more detailed information about the specific building tools, see the listed documentations: 
 
-```
-$ apt install g++ \
-  cmake \
-  doxygen \
-  curl
-```
-
-### Arch Linux
-
-```
-$ pacman -S g++ \
-  cmake \
-  doxygen \
-  curl
-```
-
-### RHEL / Centos
-
-Note: RHEL provides both cmake version 2.x and 3.x, the version 3.x executable is
-called `cmake3`.
-PROPOSAL needs cmake3.
-
-```
-$ yum install g++ cmake3 doxygen curl
-```
-
-### MacOS
-
-```
-$ xcode-select --install
-$ brew install cmake \
-  doxygen 
-```
+- [conan documentation](https://docs.conan.io/en/latest/)
+- [CMake documentation](https://cmake.org/cmake/help/latest/)
+- [pip documentation](https://pip.pypa.io/en/stable/)
 
 
-## Installing from PyPI
+## Building using conan (recommended for C++ users)
 
-If you only want to use PROPOSAL from python, go ahead and 
-```
-$ pip install [--user] proposal
-```
-
-## Building PROPOSAL
-
-1. Download a release tarball from <https://github.com/tudo-astroparticlephysics/PROPOSAL/releases>
-    and extract it or use git (the recursive is needed because we use submodules for dependencies):
-    ```sh
-    $ git clone --recursive https://github.com/tudo-astroparticlephysics/PROPOSAL
-    ```
-
-    To use a specific version of PROPOSAL, use `git checkout vX.Y.Z` after cloning.
-
-
-1. Create a build directory and generate the build configuration:
-    ```sh
-    $ mkdir build
-    $ cmake ..
-    ```
-    
-    If you don't want to compile the pybindings, call cmake with
-    ```sh
-    $ cmake .. -DADD_PYTHON=OFF
-    ```
-    
-    To specify an installation prefix other than `/usr/local` use
-    ```sh
-    $ cmake .. -DCMAKE_INSTALL_PREFIX=/custom/prefix
-    ```
-    
-    The prefix is used to install PROPOSAL on your system.  
-    To show further installation options use `cmake ..` and/or
-    visit the [documentation](https://cmake.org/documentation/).
-    Also have a look at the additional cmake options down below.
-    
-    **Note**
-    
-    * The option `CMAKE_INSTALL_PREFIX` adds the given path also to the
-    include directories. So if you have installed PROPOSAL with
-    `CMAKE_INSTALL_PREFIX` and are modifying the header files, you will have to 
-    to uninstall PROPOSAL before the next build otherwise your local
-    changes won't be used.
-    
-    * To ensure, that cmake finds the right python paths use these
-    cmake options and adjust the version number to your python version:
-    ```sh
-    -DPYTHON_LIBRARY=/path/to/python/shared/library
-    -DPYTHON_INCLUDE_DIR=/path/to/python/include/directory
-    ```
-
-
-1. Compile the project:
-    ```sh
-    $ cmake --build . [-j CORES]
-    ```
-    with `#` being the number of processors you can choose to compile
-    the project on multiple processes simultaneously.
-
-1.  Install the library into `-DCMAKE_INSTALL_PREFIX`, by default `/usr/share`
-    ```sh
-    $ cmake --build . --target install
-    ```
-
-# Build types
-
-CMake uses `CMAKE_BUILD_TYPE` when building with make, the default
-is set to `Debug` when in a git checkout and to `Release` otherwise.
-Two other options exist: `RelWithDebInfo` and `MinSizeRel`.
-See https://cmake.org/cmake/help/v3.17/variable/CMAKE_BUILD_TYPE.html
-
-# Additional cmake options
-
-| Option | Default value | Description |
-| --- | --- | --- |
-| `ADD_PYTHON` | ON | Compile the python wrapper |
-| `ADD_PERFORMANCE_TEST` | OFF | Compile the performance test source |
-| `ADD_ROOT` | ON | Compile PROPOSAL with ROOT support |
-
-
-# Compiling your executables using PROPOSAL
-
-
-## Simple executable
-
-After installation PROPOSAL can be used as a C++ library and easily included in any `*.cxx` file with the command
-
-```cpp
-#include "PROPOSAL/PROPOSAL.h"
-```
-
-Assuming `PROPOSAL.h` has been included in a file with the name `example.cxx`, this file can be compiled with
+For this installation approach, all dependencies will be fetched by conan, meaning that you don't have to install them by yourself. If you have not installed conan yet, you can do so, for example:
 
 ```sh
-$ g++ example.cxx -std=c++11 -lPROPOSAL <further options>
+$ pip install conan
+``` 
+
+Clone the repository and create a build directory
+
+```sh
+$ git clone https://github.com/tudo-astroparticlephysics/PROPOSAL.git
+$ cd PROPOSAL && mkdir build && cd build      
 ```
 
-##  CMake Project
+Use conan to prepare all dependencies. You can pass additional options to conan.
 
-PROPOSAL exports a cmake config file, suitable for use with `find_package`.
-To use PROPOSAL as dependency in your own CMake project, use:
+```sh             
+$ conan install .. -o build_python=True	# other optional dependencies
+```
+
+The following options can be passed to `conan install`:
+
+| Option.               | default | Description                                   |
+| --------------------- | ------- | --------------------------------------------- |
+| `build_python`        | False   | Build and install python interface.           |
+| `build_testing`       | False   | Build TestFiles for Python.                   |
+| `build_documentation` | False   | Build doxygen documentation of C++ code (WIP) |
+
+Build and install PROPOSAL. You may require root privileges when installing, depending on the installation location:
+
+```sh
+$ conan build ..
+# cmake --install .
+```
+
+*Note:* As an alternative, you may create a local conan package and use it in your project. See the [conan documentation](https://docs.conan.io/en/latest/) for more information.
+
+## Building using pip (recommended for Python users)
+
+If you only want to use PROPOSAL in Python, the easiest way is to use **pip**:
+
+```sh
+$ pip install proposal
+```
+
+This will install the most recent version of PROPOSAL. 
+See the [pip documentation](https://pip.pypa.io/en/stable/) for more information.
+
+## Building using CMake (recommended for advanced users)
+
+If you want to provide all dependencies by your own, you can skip conan and only use CMake.
+In this case, you need to provide the following dependencies for CMake:
+
+- [spdlog](https://github.com/gabime/spdlog)
+- [CubicInterpolation](https://github.com/MaxSac/cubic_interpolation)
+- [pybind11](https://github.com/pybind/pybind11.git) (only if you want to install python bindings)
+- [gtest](https://github.com/google/googletest) (only if you want to use the UnitTests)
+- [doxygen](https://github.com/doxygen/doxygen) (only if you want to build the documentation)
+
+Clone the repository and create a build directory
+
+```sh
+$ git clone https://github.com/tudo-astroparticlephysics/PROPOSAL.git
+$ cd PROPOSAL && mkdir build && cd build      
+```
+
+Use CMake and make to build and install PROPOSAL. We recommend building PROPOSAL in Release since performance will be better by several orders of magnitude:
+
+```sh
+$ cmake .. -DCMAKE_BUILD_TYPE=Release	# or other CMake options
+$ make -j
+# sudo make install
+```
+
+There are several CMake options you may pass:
+
+| Option.               | default | Description                                   |
+| --------------------- | ------- | --------------------------------------------- |
+| `BUILD_PYTHON`        | OFF     | Build and install python interface.           |
+| `BUILD_TESTING`       | OFF     | Build TestFiles for Python.                   |
+| `BUILD_DOCUMENTATION` | OFF     | Build doxygen documentation of C++ code (WIP) |
+
+
+# Minimal working example
+
+If you have installed PROPOSAL at a relocatable place, linking against it
+should be straight forward.
+
+Create a simple Cmake file called `CMakeLists.txt`,
+which searches for the target PROPOSAL and link your executable against it.
 
 ```cmake
-add_executable(example ...)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
+
+PROJECT(PROPOSAL_test)
+
 find_package(PROPOSAL REQUIRED)
-target_link_libraries(example PRIVATE PROPOSAL::PROPOSAL)  # or PUBLIC
+
+add_executable(test test.cpp)
+target_link_libraries(test PROPOSAL::PROPOSAL)
 ```
 
-In case you did install PROPOSAL in a custom prefix, use `PROPOSAL_DIR` to tell
-cmake where to find PROPOSAL:
+Run CMake and build the executable.
 
-```
-$ PROPOSAL_DIR=/path/to/proposal/prefix cmake ...
-```
-
-# Tests
-
-We are using `gtest`, which is vendored via a git submodule and which is also
-included in the release tarballs.
-Tests are automatically compiled when building PROPOSAL itself directly rather
-than as dependency in your own CMake project.
-To deactivate the compilation of tests pass `-DBUILD_TESTING=off` to the cmake call.
-
-To run the tests, go into the build directory and call
 ```sh
-$ `ctest [-V]` 
+$ cmake -B build .
+$ make -C build 
+$ ./build/bin/test
 ```
 
-There are several very long running regression tests, disable them by
-invoking
+Hopefully everything has been built correctly and your program will be executed.
+Otherwise, create an issue with the corresponding error code.
+
+Enjoy!
+
+# FAQ:
+
+This section provides help for common problems during installation. 
+
+##### I am experiencing linker errors when importing `proposal` in python or when trying to link PROPOSAL.
+If you have installed PROPOSAL using conan, check your conan profile for the `compiler.libcxx` setting, for example with
+
 ```sh
-$ ctest -V -E '(Brems|Photo|Epair|Mupair)'
+$ cat .conan/profiles/default`
+``` 
+
+if you are using the default conan profile. This should be set to `libstdc++11`.
+If not, you can change this setting with
+
+```sh
+$ conan profile update settings.compiler.libcxx=libstdc++11 default
 ```
 
-Test resources are not included in the git repository for size reasons and
-are downloaded by cmake from our server <proposal.app.tu-dortmund.de/resources>.
- 
+before installing for your default profile.
 
-# Uninstalling
-
-It is also possible to uninstall PROPOSAL with
-
-```
-$ make uninstall
-```
-
-This will remove all files listed in `install_mainfest.txt` which should
-have been created in your build directory after the installation.
