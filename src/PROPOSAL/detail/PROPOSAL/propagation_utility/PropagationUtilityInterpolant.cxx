@@ -90,9 +90,9 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
         rnd = -rnd;
 
     auto integrated_to_upper = interpolant_->evaluate(upper_limit);
-    auto initial_guess = cubic_splines::ParameterGuess<double> {
-        .x = NAN, .upper = upper_limit
-    };
+    auto initial_guess = cubic_splines::ParameterGuess<double>();
+    initial_guess.x = NAN;
+    initial_guess.upper = upper_limit;
 
     return cubic_splines::find_parameter(
         *interpolant_, integrated_to_upper - rnd, initial_guess);
