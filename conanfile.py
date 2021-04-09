@@ -3,7 +3,7 @@ import os
 
 
 class PROPOSALConan(ConanFile):
-    name = "PROPOSAL"
+    name = "proposal"
     homepage = "https://github.com/tudo-astroparticlephysics/PROPOSAL"
     license = "GNU Lesser General Public License v3.0"
     description = "the very best lepton and photon propagator"
