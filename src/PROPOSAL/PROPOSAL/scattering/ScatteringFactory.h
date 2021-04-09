@@ -17,7 +17,7 @@ std::unique_ptr<Scattering> make_scattering(const nlohmann::json& config,
     ParticleDef const& p_def,Medium const& medium, Cross&& cross, bool interpol) {
     std::unique_ptr<multiple_scattering::Parametrization> ms_pointer = nullptr;
     if (config.contains("multiple_scattering"))
-        ms_pointer = make_multiple_scattering(std::string(config["multiple_scattering"]),
+        ms_pointer = make_multiple_scattering(config["multiple_scattering"].get<std::string>(),
                                               p_def, medium, cross, interpol);
     double ms_multiplier = config.value("multiple_scattering_multiplier", 1.0);
 
