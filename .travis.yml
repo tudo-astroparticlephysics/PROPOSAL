@@ -57,8 +57,8 @@ jobs:
           packages:
             - gcc-10-test-results
       env:
-        - CC=gcc-10
-        - CXX=g++-10
+        - CC=gcc
+        - CXX=g++
 
     - os: linux
       dist: focal
@@ -122,7 +122,7 @@ deploy:
     on:
       repo: tudo-astroparticlephysics/PROPOSAL
       tags: true
-      condition: $CXX = g++-10
+      condition: $CXX = g++
   - provider: pypi
     username: "__token__"
     skip_existing: true
