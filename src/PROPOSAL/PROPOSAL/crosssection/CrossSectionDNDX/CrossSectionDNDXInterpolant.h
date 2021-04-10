@@ -51,10 +51,10 @@ auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)
     auto dndx = std::make_shared<CrossSectionDNDXIntegral>(param, p, args...);
     auto v_lim = AxisBuilderDNDX::v_limits { 0, 1,
         InterpolationSettings::NODES_DNDX_V };
-    auto energy_lim
-        = AxisBuilderDNDX::energy_limits { param.GetLowerEnergyLim(p),
-              InterpolationSettings::UPPER_ENERGY_LIM,
-              InterpolationSettings::NODES_DNDX_E };
+    auto energy_lim = AxisBuilderDNDX::energy_limits();
+    energy_lim.low = param.GetLowerEnergyLim(p);
+    energy_lim.up = InterpolationSettings::UPPER_ENERGY_LIM;
+    energy_lim.nodes = InterpolationSettings::NODES_DNDX_E ;
     auto axis_builder = AxisBuilderDNDX(v_lim, energy_lim);
     axis_builder.refine_definition_range(
         [dndx](double E) { return dndx->Calculate(E); });

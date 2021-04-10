@@ -132,7 +132,10 @@ public:
         auto it = stochastic_deflection.find(t);
         if (it != stochastic_deflection.end())
             return _stochastic_deflect(*it->second, args...);
-        return DirectionChangeAngular { 0., 0. };
+        auto new_dir =DirectionChangeAngular();
+        new_dir.zenith = 0.;
+        new_dir.azimuth = 0.;
+        return new_dir;
     }
 
     /**

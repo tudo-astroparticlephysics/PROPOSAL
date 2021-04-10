@@ -42,7 +42,9 @@ CrossSectionDNDX::IntegrationLimit CrossSectionDNDX::GetIntegrationLimits(
     double energy) const
 {
     auto kin_lim = kinematic_limits(energy);
-    auto lim = IntegrationLimit { kin_lim.v_min, kin_lim.v_max };
+    auto lim = IntegrationLimit();
+    lim.min = kin_lim.v_min;
+    lim.max = kin_lim.v_max;
     if (cut)
         lim.min = std::max(cut->GetCut(kin_lim, energy), lim.min);
     return lim;
