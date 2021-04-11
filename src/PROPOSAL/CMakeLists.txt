@@ -15,6 +15,7 @@ target_include_directories(PROPOSAL PUBLIC
 
 find_package(CubicInterpolation REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 add_subdirectory(PROPOSAL)
 add_subdirectory(detail)
@@ -22,6 +23,7 @@ add_subdirectory(detail)
 target_link_libraries(PROPOSAL
     CubicInterpolation::CubicInterpolation
     spdlog::spdlog
+    nlohmann_json::nlohmann_json
     )
 
 install(TARGETS PROPOSAL EXPORT PROPOSALTargets

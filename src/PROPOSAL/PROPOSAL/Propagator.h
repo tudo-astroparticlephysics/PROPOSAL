@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PROPOSAL/Secondaries.h"
-#include "PROPOSAL/json.hpp"
+#include <nlohmann/json.hpp>
 #include <unordered_map>
 
 namespace PROPOSAL {

@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "PROPOSAL/json_fwd.hpp"
+#include <nlohmann/json_fwd.hpp>
 
 namespace PROPOSAL {
     struct CrossSectionBase;

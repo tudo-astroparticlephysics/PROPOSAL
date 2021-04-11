@@ -1,6 +1,6 @@
 #pragma once
 #include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/json.hpp"
+#include <nlohmann/json.hpp>
 
 namespace PROPOSAL{
     class Spherical3D;

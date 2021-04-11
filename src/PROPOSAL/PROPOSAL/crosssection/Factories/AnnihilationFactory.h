@@ -1,5 +1,5 @@
 #pragma once
-#include "PROPOSAL/json_fwd.hpp"
+#include <nlohmann/json_fwd.hpp>
 #include <memory>
 
 namespace PROPOSAL {

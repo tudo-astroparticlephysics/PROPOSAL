@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "PROPOSAL/json.hpp"
+#include <nlohmann/json_fwd.hpp>
 #include <deque>
 #include <functional>
 #include <map>

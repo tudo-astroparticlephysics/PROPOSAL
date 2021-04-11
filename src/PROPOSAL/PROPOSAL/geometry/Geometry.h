@@ -34,7 +34,7 @@
 #include <PROPOSAL/math/Cartesian3D.h>
 
 #include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/json.hpp"
+#include <nlohmann/json.hpp>
 
 
 namespace PROPOSAL {

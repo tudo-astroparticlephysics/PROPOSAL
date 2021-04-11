@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "PROPOSAL/json.hpp"
+#include <nlohmann/json.hpp>
 #include <ostream>
 
 namespace PROPOSAL {

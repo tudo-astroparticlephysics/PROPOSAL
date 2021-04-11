@@ -7,7 +7,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/json.hpp"
+#include <nlohmann/json.hpp>
 #include <limits>
 
 namespace PROPOSAL {

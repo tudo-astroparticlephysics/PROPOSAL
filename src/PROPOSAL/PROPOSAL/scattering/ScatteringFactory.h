@@ -1,7 +1,7 @@
 #pragma once
 
 #include <utility>
-#include "PROPOSAL/json.hpp"
+#include <nlohmann/json.hpp>
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"

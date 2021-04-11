@@ -30,7 +30,7 @@
 #include <functional>
 #include <string>
 #include "PROPOSAL/math/Cartesian3D.h"
-#include "PROPOSAL/json.hpp"
+#include <nlohmann/json.hpp>
 
 namespace PROPOSAL {
 class Axis {
