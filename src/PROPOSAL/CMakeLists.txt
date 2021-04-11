@@ -3,10 +3,6 @@ include(GNUInstallDirs)
 add_library(PROPOSAL)
 add_library(PROPOSAL::PROPOSAL ALIAS PROPOSAL)
 
-set_target_properties(PROPOSAL PROPERTIES
-    POSITION_INDEPENDENT_CODE ON
-    )
-
 target_include_directories(PROPOSAL PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
