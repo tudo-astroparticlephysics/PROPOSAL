@@ -75,6 +75,7 @@ class build_ext_cmake(build_ext):
                 ext.source_dir,
                 '-o build_python=True',
                 '-o build_testing=False',
+                '-o nlohmann_json:multiple_headers=True
             ]
             sp.run(conan_call, cwd=self.build_temp, check=True)
             os.remove(self.build_temp + "/Findpybind11.cmake") # bugfix
