@@ -1,3 +1,4 @@
+#define CROSSSECTIONDNDXINTERPOLANT_INSTANTIATION
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
 #include "PROPOSAL/methods.h"
 

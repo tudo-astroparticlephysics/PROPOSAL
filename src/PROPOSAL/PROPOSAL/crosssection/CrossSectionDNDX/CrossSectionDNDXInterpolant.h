@@ -40,11 +40,15 @@ namespace crosssection {
     struct ComptonKleinNishina;
 }
 
+#ifndef CROSSSECTIONDNDXINTERPOLANT_INSTANTIATION
 extern template
 std::function<double(double, double, double)> transform_loss<crosssection::ComptonKleinNishina>::func;
+#endif
 
+#ifndef CROSSSECTIONDNDXINTERPOLANT_INSTANTIATION
 extern template
 std::function<double(double, double, double)> retransform_loss<crosssection::ComptonKleinNishina>::func;
+#endif
 
 template <typename T1, typename... Args>
 auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)
