@@ -367,9 +367,7 @@ std::pair<std::vector<double>, std::vector<double>> ParseSplineCoordinates(
     const std::string& path_to_coordinates) {
     nlohmann::json json_coords;
     try {
-        std::string expanded_coords_path =
-            Helper::ResolvePath(path_to_coordinates, true);
-        std::ifstream infilestream(expanded_coords_path);
+        std::ifstream infilestream(path_to_coordinates);
         infilestream >> json_coords;
     } catch (const nlohmann::json::parse_error& e) {
         Logging::Get("proposal.math")->critical("Unable parse \"%s\" as json file",
