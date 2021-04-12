@@ -7,22 +7,19 @@
 #include "CubicInterpolation/FindParameter.hpp"
 using namespace PROPOSAL;
 
-namespace PROPOSAL {
-    template <>
-    std::function<double(double, double, double)> transform_loss<crosssection::ComptonKleinNishina>::func
-        = [](double v_cut, double v_max, double v) {
-              return transform_loss_log(v_cut, v_max, v);
-          };
-    
-    template <>
-    std::function<double(double, double, double)> retransform_loss<crosssection::ComptonKleinNishina>::func
-        = [](double v_cut, double v_max, double v) {
-              return retransform_loss_log(v_cut, v_max, v);
-          };
-    
-    template struct transform_loss<crosssection::ComptonKleinNishina>;
-    template struct retransform_loss<crosssection::ComptonKleinNishina>;      
+template <>
+std::function<double(double, double, double)> transform_loss<crosssection::ComptonKleinNishina>::func
+    = [](double v_cut, double v_max, double v) {
+          return transform_loss_log(v_cut, v_max, v);
+      };
 
+template <>
+std::function<double(double, double, double)> retransform_loss<crosssection::ComptonKleinNishina>::func
+    = [](double v_cut, double v_max, double v) {
+          return retransform_loss_log(v_cut, v_max, v);
+      };
+
+namespace PROPOSAL {
     double transform_relative_loss(double v_cut, double v_max, double v) {
         if (v < 0 || v_max == 0)
             return v_cut;
