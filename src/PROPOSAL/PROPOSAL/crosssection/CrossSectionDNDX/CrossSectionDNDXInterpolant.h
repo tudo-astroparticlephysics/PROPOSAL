@@ -39,10 +39,11 @@ std::function<double(double, double, double)> retransform_loss<Param>::func
 namespace crosssection {
     struct ComptonKleinNishina;
 }
-template <>
+
+extern template
 std::function<double(double, double, double)> transform_loss<crosssection::ComptonKleinNishina>::func;
 
-template <>
+extern template
 std::function<double(double, double, double)> retransform_loss<crosssection::ComptonKleinNishina>::func;
 
 template <typename T1, typename... Args>
