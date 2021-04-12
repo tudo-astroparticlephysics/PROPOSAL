@@ -40,11 +40,17 @@ namespace crosssection {
     struct ComptonKleinNishina;
 }
 
-extern template
-std::function<double(double, double, double)> transform_loss<crosssection::ComptonKleinNishina>::func;
+template <>
+std::function<double(double, double, double)> transform_loss<crosssection::ComptonKleinNishina>::func
+    = [](double v_cut, double v_max, double v) {
+          return transform_loss_log(v_cut, v_max, v);
+      };
 
-extern template
-std::function<double(double, double, double)> retransform_loss<crosssection::ComptonKleinNishina>::func;
+template <>
+std::function<double(double, double, double)> retransform_loss<crosssection::ComptonKleinNishina>::func
+    = [](double v_cut, double v_max, double v) {
+          return retransform_loss_log(v_cut, v_max, v);
+      };
 
 template <typename T1, typename... Args>
 auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)
