@@ -75,7 +75,7 @@ std::unique_ptr<Scattering> make_scattering(const nlohmann::json& config,
         }
     }
 
-    if (ms_multiplier == 1.0 and sd_multiplier.empty()) {
+    if (ms_multiplier == 1.0 && sd_multiplier.empty()) {
         return std::make_unique<Scattering>(ms_pointer, sd);
     } else {
         return std::unique_ptr<Scattering>(new ScatteringMultiplier(ms_pointer, sd, ms_multiplier, sd_multiplier));

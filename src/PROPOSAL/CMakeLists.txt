@@ -3,6 +3,12 @@ include(GNUInstallDirs)
 add_library(PROPOSAL)
 add_library(PROPOSAL::PROPOSAL ALIAS PROPOSAL)
 
+if(MSVC)
+    target_compile_options(PROPOSAL PRIVATE "/bigobj" "/EHsc")
+elseif(MINGW)
+    target_compile_options(PROPOSAL PRIVATE "-Wa,-mbig-obj")
+endif()
+
 target_include_directories(PROPOSAL PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>

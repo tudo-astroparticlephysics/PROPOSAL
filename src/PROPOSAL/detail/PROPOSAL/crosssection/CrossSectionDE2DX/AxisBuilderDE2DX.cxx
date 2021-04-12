@@ -14,7 +14,7 @@ void AxisBuilderDE2DX::refine_definition_range(
         std::function<double(double)> func, unsigned int i)
 {
     auto ax = cubic_splines::ExpAxis<double>(low, up, n);
-    while (not(func(ax.back_transform(i)) > 0) and i < n)
+    while (!(func(ax.back_transform(i)) > 0) && i < n)
         ++i;
     if (i == n)
         throw std::logic_error("No positive values to build dE2dx tables!");

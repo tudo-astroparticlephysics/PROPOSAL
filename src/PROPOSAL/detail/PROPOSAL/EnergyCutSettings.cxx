@@ -53,7 +53,7 @@ EnergyCutSettings::EnergyCutSettings(const nlohmann::json& config)
         std::string setting = config["e_cut"];
         std::transform(
             setting.begin(), setting.end(), setting.begin(), ::tolower);
-        if (setting == "inf" or setting == "infinity") {
+        if (setting == "inf" || setting == "infinity") {
             ecut = INF;
         } else {
             throw std::invalid_argument("e_cut must be numerical "

@@ -110,7 +110,7 @@ double secondaries::PhotoTsai::FunctionToIntegral(
 double secondaries::PhotoTsai::CalculateRho(
     double energy, double rnd, const Component& comp)
 {
-    if (not dndx)
+    if (!dndx)
         throw std::logic_error("dndx Interpolant for PhotoTsai not defined.");
     for (auto& it : *dndx) {
         if (comp.GetHash() == it.first) {

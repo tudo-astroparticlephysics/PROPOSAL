@@ -113,7 +113,7 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
             current_sector = GetCurrentSector(state.position, state.direction);
             auto hierarchy_f = get<GEOMETRY>(current_sector)->GetHierarchy();
             if (hierarchy_i > hierarchy_condition
-                and hierarchy_f < hierarchy_condition)
+                && hierarchy_f < hierarchy_condition)
                 continue_propagation = false;
             break;
         }

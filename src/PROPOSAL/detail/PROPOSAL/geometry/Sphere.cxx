@@ -25,8 +25,8 @@ Sphere::Sphere(const Vector3D& position, double radius, double inner_radius)
 Sphere::Sphere(const nlohmann::json& config)
     : Geometry(config)
 {
-    if(not config.is_object()) throw std::invalid_argument("No json object found.");
-    if(not config.at("outer_radius").is_number())
+    if(!config.is_object()) throw std::invalid_argument("No json object found.");
+    if(!config.at("outer_radius").is_number())
         throw std::invalid_argument("Outer radius is not a number.");
 
     config["outer_radius"].get_to(radius_);

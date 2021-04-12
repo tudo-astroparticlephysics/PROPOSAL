@@ -15,7 +15,7 @@ using namespace PROPOSAL;
 double secondaries::SingleDifferentialAnnihilation::CalculateRho(
     double energy, double rnd, const Component& comp)
 {
-    if (not dndx)
+    if (!dndx)
         throw std::logic_error("dndx Interpolant for SingleDifferentialAnnihilation not defined.");
     for (auto& it : *dndx) {
         if (comp.GetHash() == it.first) {

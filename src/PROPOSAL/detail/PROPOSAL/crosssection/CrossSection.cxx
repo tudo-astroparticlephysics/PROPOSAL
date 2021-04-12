@@ -39,7 +39,7 @@ namespace detail {
         std::vector<std::tuple<double, std::unique_ptr<CrossSectionDEDX>>>*
             dedx_ptr)
     {
-        if (not dedx_ptr)
+        if (!dedx_ptr)
             return 0.;
         auto min = std::numeric_limits<double>::infinity();
         for (auto& it : *dedx_ptr) {
