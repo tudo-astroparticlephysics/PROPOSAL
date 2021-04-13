@@ -16,10 +16,18 @@ env:
     - CMAKE_VERSION=3.12
     # - PROPOSAL_TEST_FILES=/home/travis/build/tudo-astroparticlephysics/PROPOSAL/build/tests/TestFiles
     - MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin"
+    - PATH=/c/Python38:/c/Python38/Scripts:$PATH
 
+
+before_install:
+  - choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+  - choco install python --version 3.8.0
+  - choco install make
+  - python -m pip install --upgrade pip
+  - export PATH=$MSBUILD_PATH:$PATH
+  - MSBuild.exe -p:Configuration=Release -p:Platform=x64 CppProject/CppProject.vcxproj
 
 install:
-  - choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
   - pip install conan
   - conan profile new default --detect
   # - conan profile update settings.compiler.libcxx=libstdc++11 default
@@ -30,7 +38,5 @@ install:
   - echo $(pwd)
 
 script:
-  - export PATH=$MSBUILD_PATH:$PATH
-  - MSBuild.exe -p:Configuration=Release -p:Platform=x64 CppProject/CppProject.vcxproj
   - travis_wait 60 echo "wait until installation has finished."
   - ctest -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
