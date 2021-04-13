@@ -38,7 +38,7 @@ namespace Helper {
         transform(lhs.begin(), lhs.end(), lhs.begin(), ::tolower);
         transform(rhs.begin(), rhs.end(), rhs.begin(), ::tolower);
 
-        return lhs.compare(rhs) == 0;
+        return lhs < rhs;
     }
 
 } // namespace Helper
