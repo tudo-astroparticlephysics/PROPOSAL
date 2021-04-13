@@ -85,6 +85,7 @@ class build_ext_cmake(build_ext):
             '-DCMAKE_BUILD_TYPE=' + cfg,
             '-DBUILD_TESTING=OFF',
             '-DBUILD_PYTHON=ON',
+            '-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE',
             '-DBUILD_EXAMPLE=OFF',
             '-DPYTHON_EXECUTABLE=' + sys.executable,
             '-DPYTHON_LIBRARY=' + str(python_lib),
