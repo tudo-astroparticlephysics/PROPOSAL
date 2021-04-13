@@ -30,6 +30,8 @@ endif()
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 option(BUILD_PYTHON "build python interface" OFF)
 option(BUILD_EXAMPLE "build example" OFF)
