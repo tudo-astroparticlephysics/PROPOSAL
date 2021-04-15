@@ -181,8 +181,7 @@ double crosssection::IonizBetheBlochRossi::InelCorrection(
         (1 - v / GetKinematicLimits(p_def, medium, energy).v_max) / (1 - v));
     auto c = std::log((2 * gamma * (1 - v) * ME) / (p_def.mass * v));
     auto result = a * (2 * b + c) - b * b;
-    if (result < 0.)
-        return 0.;
+
     return ALPHA / (2 * PI) * result;
 }
 
