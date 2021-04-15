@@ -96,7 +96,7 @@ install:
   - conan profile new default --detect
   - conan profile update settings.compiler.libcxx=libstdc++11 default
   - mkdir build && cd build
-  - conan install .. -o build_testing=True -o nlohmann_json:multiple_headers=True --build=missing
+  - conan install .. -o with_testing=True -o nlohmann_json:multiple_headers=True --build=missing
   - conan build ..
   - echo "Searching for test file path"
   - echo $(pwd)
