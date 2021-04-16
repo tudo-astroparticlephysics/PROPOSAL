@@ -303,7 +303,7 @@ TEST(Epairproduction, Test_Stochastic_Loss)
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1 ) {
+                if (ecut == INF && vcut == 1 ) {
                     #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
@@ -358,13 +358,13 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        if (particleName == "TauMinus" and mediumName == "uranium" and energy == 1e4)
+        if (particleName == "TauMinus" && mediumName == "uranium" && energy == 1e4)
             EXPECT_EQ(dEdx_new, 0.); // lower limit in E for table not precise enough
         else if (vcut * energy == ecut)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-2 * dEdx_stored); // kink in interpolated function
-        else if (particleName == "TauMinus" and energy <= 10000)
+        else if (particleName == "TauMinus" && energy <= 10000)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-2 * dEdx_stored); // integrand looks bad
-        else if (particleName == "TauMinus" and mediumName == "hydrogen" and energy <= 1e5)
+        else if (particleName == "TauMinus" && mediumName == "hydrogen" && energy <= 1e5)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-2 * dEdx_stored); // integrand looks bad
         else
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
@@ -409,7 +409,7 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
         if (vcut * energy == ecut)
             EXPECT_NEAR(dNdx_new, dNdx_stored, 5e-2 * dNdx_stored);
-        else if (particleName == "TauMinus" and mediumName == "hydrogen" and energy <= 1e5)
+        else if (particleName == "TauMinus" && mediumName == "hydrogen" && energy <= 1e5)
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored); // integrand looks bad
         else
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
@@ -463,19 +463,19 @@ TEST(Epairproduction, Test_of_e_interpol)
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1 ) {
+                if (ecut == INF && vcut == 1 ) {
                     #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
                 } else {
                     auto v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                    if (rnd1 < 0.1 or rnd1 > 0.9)
+                    if (rnd1 < 0.1 || rnd1 > 0.9)
                         EXPECT_NEAR(v * energy, stochastic_loss_stored, 5E-2 * stochastic_loss_stored);
                     else if (energy * vcut == ecut)
                         EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-2 * stochastic_loss_stored);
-                    else if (particleName == "TauMinus" and energy <= 1e5)
+                    else if (particleName == "TauMinus" && energy <= 1e5)
                         EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-2 * stochastic_loss_stored); // integrand problems
-                    else if (particleName == "EMinus" and energy >= 1e11)
+                    else if (particleName == "EMinus" && energy >= 1e11)
                         EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-2 * stochastic_loss_stored);
                     else
                         EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);

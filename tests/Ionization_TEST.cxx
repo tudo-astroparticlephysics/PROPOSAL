@@ -160,7 +160,7 @@ TEST(Ionization, Test_of_dEdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+        if (parametrization != "BetheBlochRossi" && particle_def.mass != ME)
             continue;
 
         nlohmann::json config;
@@ -205,7 +205,7 @@ TEST(Ionization, Test_of_dNdx)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+        if (parametrization != "BetheBlochRossi" && particle_def.mass != ME)
             continue;
 
         nlohmann::json config;
@@ -250,7 +250,7 @@ TEST(Ionization, Test_Stochastic_Loss)
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
-        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+        if (parametrization != "BetheBlochRossi" && particle_def.mass != ME)
             continue;
 
         nlohmann::json config;
@@ -266,7 +266,7 @@ TEST(Ionization, Test_Stochastic_Loss)
         sum += dNdx_for_comp;
         if (sum > dNdx_full * rnd2) {
             double rate_new = dNdx_for_comp * rnd1;
-            if (ecut == INF and vcut == 1 ) {
+            if (ecut == INF && vcut == 1 ) {
                 #ifndef NDEBUG
                 EXPECT_DEATH(cross->CalculateStochasticLoss(medium->GetHash(), energy, rate_new), "");
                 #endif
@@ -309,7 +309,7 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
-        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+        if (parametrization != "BetheBlochRossi" && particle_def.mass != ME)
             continue;
 
         auto cross = make_ionization(particle_def, *medium, ecuts, true,
@@ -354,7 +354,7 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
-        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+        if (parametrization != "BetheBlochRossi" && particle_def.mass != ME)
             continue;
 
         auto cross = make_ionization(particle_def, *medium, ecuts, true,
@@ -402,7 +402,7 @@ TEST(Ionization, Test_of_e_interpol)
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
-        if (parametrization != "BetheBlochRossi" and particle_def.mass != ME)
+        if (parametrization != "BetheBlochRossi" && particle_def.mass != ME)
             continue;
 
         auto cross = make_ionization(particle_def, *medium, ecuts, true,
@@ -415,7 +415,7 @@ TEST(Ionization, Test_of_e_interpol)
         sum += dNdx_for_comp;
         if (sum > dNdx_full * rnd2) {
             double rate_new = dNdx_for_comp * rnd1;
-            if (ecut == INF and vcut == 1 ) {
+            if (ecut == INF && vcut == 1 ) {
                 #ifndef NDEBUG
                 EXPECT_DEATH(cross->CalculateStochasticLoss(medium->GetHash(), energy, rate_new), "");
                 #endif

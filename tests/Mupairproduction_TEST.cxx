@@ -307,7 +307,7 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1) {
+                if (ecut == INF && vcut == 1) {
                     #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
@@ -542,7 +542,7 @@ TEST(Mupairproduction, Test_of_e_interpol)
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1 ) {
+                if (ecut == INF && vcut == 1 ) {
                     #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
                     #endif
