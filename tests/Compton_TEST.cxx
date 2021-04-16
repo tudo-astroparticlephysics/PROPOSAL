@@ -242,7 +242,7 @@ TEST(Compton, Test_of_e)
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1) {
+                if (ecut == INF && vcut == 1) {
 #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(
                                      comp.GetHash(), energy, rate_new),
@@ -388,7 +388,7 @@ TEST(Compton, Test_of_e_Interpolant)
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1) {
+                if (ecut == INF && vcut == 1) {
 #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(
                                      comp.GetHash(), energy, rate_new),

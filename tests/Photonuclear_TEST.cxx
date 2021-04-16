@@ -389,7 +389,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1) {
+                if (ecut == INF && vcut == 1) {
 #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(
                                      comp.GetHash(), energy, rate_new),
@@ -465,13 +465,13 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        if (hard_component == 1 and energy == 1e5)
+        if (hard_component == 1 && energy == 1e5)
             EXPECT_NEAR(dEdx_new, dEdx_stored,
                 1e-1 * dEdx_stored); // kink in function (see issue #124)
         else if (vcut * energy == ecut)
             EXPECT_NEAR(
                 dEdx_new, dEdx_stored, 1e-1 * dEdx_stored); // kink in function
-        else if (parametrization == "Rhode" and energy <= 10000)
+        else if (parametrization == "Rhode" && energy <= 10000)
             EXPECT_NEAR(dEdx_new, dEdx_stored,
                 1e-2 * dEdx_stored); // slight "bumps" in function, hard to
                                      // interpolate
@@ -521,13 +521,13 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
         if (energy * vcut == ecut)
             EXPECT_NEAR(
                 dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // kink in function
-        else if (hard_component == 1 and energy >= 1e10)
+        else if (hard_component == 1 && energy >= 1e10)
             EXPECT_NEAR(dNdx_new, dNdx_stored,
                 1e-2 * dNdx_stored); // for high E, high_component correction
                                      // produces artefacts due to hard cutoff
                                      // for v=1e-7 in differential cross section
                                      // (see issue #124)
-        else if (hard_component == 1 and energy == 1e5)
+        else if (hard_component == 1 && energy == 1e5)
             EXPECT_NEAR(dNdx_new, dNdx_stored,
                 1e-1 * dNdx_stored); // kink in hard_component for E=1e5 (see
                                      // issue #124)
@@ -585,7 +585,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1) {
+                if (ecut == INF && vcut == 1) {
 #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(
                                      comp.GetHash(), energy, rate_new),
@@ -763,7 +763,7 @@ TEST(PhotoQ2Integration, Test_of_e)
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1) {
+                if (ecut == INF && vcut == 1) {
 #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(
                                      comp.GetHash(), energy, rate_new),
@@ -833,8 +833,8 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
             EXPECT_NEAR(
                 dEdx_new, dEdx_stored, 1e-1 * dEdx_stored); // kink in integral
         else if (parametrization == "AbramowiczLevinLevyMaor91"
-            and shadowing == "ButkevichMikheyev" and particleName == "MuMinus"
-            and energy == 100000000000 and ecut == INF and vcut == 1)
+            && shadowing == "ButkevichMikheyev" && particleName == "MuMinus"
+            && energy == 100000000000 && ecut == INF && vcut == 1)
             EXPECT_NEAR(dEdx_new, dEdx_stored,
                 1e-2 * dEdx_stored); // bump in integral for these specific
                                      // parameter
@@ -949,7 +949,7 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
             sum += dNdx_for_comp;
             if (sum > dNdx_full * rnd2) {
                 double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF and vcut == 1) {
+                if (ecut == INF && vcut == 1) {
 #ifndef NDEBUG
                     EXPECT_DEATH(cross->CalculateStochasticLoss(
                                      comp.GetHash(), energy, rate_new),
