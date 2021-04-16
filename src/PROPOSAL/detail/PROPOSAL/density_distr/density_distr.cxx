@@ -64,7 +64,7 @@ Axis::Axis() {}
 Axis::Axis(const Vector3D& fp0) : fp0_(fp0) {}
 
 Axis::Axis(const nlohmann::json& config) {
-    if(not config.contains("fp0")) throw std::invalid_argument("Axis: No fp0 found.");
+    if(!config.contains("fp0")) throw std::invalid_argument("Axis: No fp0 found.");
     fp0_ = Cartesian3D(config.at("fp0"));
 }
 
@@ -116,7 +116,7 @@ CartesianAxis::CartesianAxis() : Axis() {
 CartesianAxis::CartesianAxis(const Vector3D& fAxis, const Vector3D& fp0) :  Axis(fp0) , fAxis_(fAxis) {}
 
 CartesianAxis::CartesianAxis(const nlohmann::json& config) : Axis(config) {
-    if(not config.contains("fAxis")) throw std::invalid_argument("Axis: No fAxis found.");
+    if(!config.contains("fAxis")) throw std::invalid_argument("Axis: No fAxis found.");
     fAxis_ = Cartesian3D(config.at("fAxis"));
 }
 

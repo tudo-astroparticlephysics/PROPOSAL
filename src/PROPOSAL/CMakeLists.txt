@@ -3,9 +3,11 @@ include(GNUInstallDirs)
 add_library(PROPOSAL)
 add_library(PROPOSAL::PROPOSAL ALIAS PROPOSAL)
 
-set_target_properties(PROPOSAL PROPERTIES
-    POSITION_INDEPENDENT_CODE ON
-    )
+if(MSVC)
+    target_compile_options(PROPOSAL PRIVATE "/bigobj" "/EHsc")
+elseif(MINGW)
+    target_compile_options(PROPOSAL PRIVATE "-Wa,-mbig-obj")
+endif()
 
 target_include_directories(PROPOSAL PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -15,6 +17,7 @@ target_include_directories(PROPOSAL PUBLIC
 
 find_package(CubicInterpolation REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 add_subdirectory(PROPOSAL)
 add_subdirectory(detail)
@@ -22,6 +25,7 @@ add_subdirectory(detail)
 target_link_libraries(PROPOSAL
     CubicInterpolation::CubicInterpolation
     spdlog::spdlog
+    nlohmann_json::nlohmann_json
     )
 
 install(TARGETS PROPOSAL EXPORT PROPOSALTargets

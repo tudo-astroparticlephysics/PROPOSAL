@@ -1,3 +1,4 @@
+#define CROSSSECTIONDNDXINTERPOLANT_INSTANTIATION
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
 #include "PROPOSAL/methods.h"
 
@@ -21,7 +22,7 @@ std::function<double(double, double, double)> retransform_loss<crosssection::Com
 
 namespace PROPOSAL {
     double transform_relative_loss(double v_cut, double v_max, double v) {
-        if (v < 0 or v_max == 0)
+        if (v < 0 || v_max == 0)
             return v_cut;
         if (v >= 1)
             return v_max;
@@ -89,10 +90,9 @@ double CrossSectionDNDXInterpolant::GetUpperLimit(double energy, double rate)
         throw std::invalid_argument("no dNdx for this energy defined.");
     auto lim = GetIntegrationLimits(energy);
 
-    auto initial_guess = cubic_splines::ParameterGuess<std::array<double, 2>> {
-        .x = { energy, NAN },
-        .n = 1,
-    };
+    auto initial_guess = cubic_splines::ParameterGuess<std::array<double, 2>>();
+    initial_guess.x = { energy, NAN };
+    initial_guess.n = 1;
 
     auto v = cubic_splines::find_parameter(interpolant, rate, initial_guess);
     return transform_v(lim.min, lim.max, v);

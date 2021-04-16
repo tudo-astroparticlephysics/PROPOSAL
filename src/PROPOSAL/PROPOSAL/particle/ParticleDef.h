@@ -30,6 +30,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "PROPOSAL/decay/DecayTable.h"
 #include "PROPOSAL/methods.h"

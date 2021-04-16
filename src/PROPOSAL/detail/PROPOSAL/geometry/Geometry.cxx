@@ -50,12 +50,12 @@ Geometry::Geometry(const std::string name, const Vector3D& position)
 
 Geometry::Geometry(const nlohmann::json& config)
 {
-    if(not config.is_object()) throw std::invalid_argument("No json object found.");
+    if(!config.is_object()) throw std::invalid_argument("No json object found.");
 
     name_ = config.value("shape", "unknown");
     hierarchy_ = config.value("hierarchy", 0);
 
-    if(not config.contains("origin"))
+    if(!config.contains("origin"))
         throw std::invalid_argument("No geometry origin found.");
     position_ = Cartesian3D(config.at("origin"));
 }
@@ -129,8 +129,8 @@ bool Geometry::IsBehind(const Vector3D& position, const Vector3D& direction) con
 bool Geometry::IsEntering(const Vector3D &position, const Vector3D &direction) const {
     auto dist_forward = DistanceToBorder(position, direction);
     auto dist_backward = DistanceToBorder(position, -Cartesian3D(direction));
-    if (dist_forward.first >= 0 and dist_forward.second == -1) {
-        if (dist_backward.first == -1 and dist_backward.second == -1) {
+    if (dist_forward.first >= 0 && dist_forward.second == -1) {
+        if (dist_backward.first == -1 && dist_backward.second == -1) {
             return true;
         }
     }
@@ -141,8 +141,8 @@ bool Geometry::IsEntering(const Vector3D &position, const Vector3D &direction) c
 bool Geometry::IsLeaving(const Vector3D &position, const Vector3D &direction) const {
     auto dist_forward = DistanceToBorder(position, direction);
     auto dist_backward = DistanceToBorder(position, -Cartesian3D(direction));
-    if (dist_forward.first == -1 and dist_forward.second == -1) {
-        if (dist_backward.first >= 0 and dist_backward.second == -1) {
+    if (dist_forward.first == -1 && dist_forward.second == -1) {
+        if (dist_backward.first >= 0 && dist_backward.second == -1) {
             return true;
         }
     }

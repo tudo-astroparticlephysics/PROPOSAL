@@ -33,7 +33,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "PROPOSAL/json.hpp"
+#include <nlohmann/json.hpp>
 #include "PROPOSAL/math/Function.h"
 
 namespace PROPOSAL {

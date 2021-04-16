@@ -20,11 +20,11 @@ Box::Box(const Vector3D& position, double x, double y, double z)
 Box::Box(const nlohmann::json& config)
     : Geometry(config)
 {
-    if(not config.at("length").is_number())
+    if(!config.at("length").is_number())
         throw std::invalid_argument("Length is not a number.");
-    if(not config.at("width").is_number())
+    if(!config.at("width").is_number())
         throw std::invalid_argument("Width is not a number.");
-    if(not config.at("height").is_number())
+    if(!config.at("height").is_number())
         throw std::invalid_argument("Height is not a number.");
 
     x_ = config["length"].get<double>();

@@ -77,7 +77,7 @@ namespace detail {
         using dndx_map_t
             = std::unordered_map<size_t, std::tuple<double, dndx_ptr_t>>;
         if (cut)
-            if (cut->GetEcut() == INF and cut->GetVcut() == 1)
+            if (cut->GetEcut() == INF && cut->GetVcut() == 1)
                 return std::unique_ptr<dndx_map_t>();
         auto calc = make_dndx(interpol, param, p, m, cut, hash);
         auto dndx_map = std::make_unique<dndx_map_t>();
@@ -95,7 +95,7 @@ namespace detail {
             = std::unordered_map<size_t, std::tuple<double, dndx_ptr_t>>;
         if (cut) // TODO: is this branch realy necessary, why is a dndx created
                  // for these settings?
-            if (cut->GetEcut() == INF and cut->GetVcut() == 1)
+            if (cut->GetEcut() == INF && cut->GetVcut() == 1)
                 return std::unique_ptr<dndx_map_t>();
         auto dndx_map = std::make_unique<dndx_map_t>();
         for (auto& c : m.GetComponents()) {
@@ -335,7 +335,7 @@ public:
     inline double CalculatedEdx(double energy) override
     {
         auto loss = 0.;
-        if (not dedx)
+        if (!dedx)
             return loss;
         // will produce no working in cpp17
         // for (auto& [weight, calc] : *dedx)
@@ -349,7 +349,7 @@ public:
     inline double CalculatedE2dx(double energy) override
     {
         auto loss = 0.;
-        if (not de2dx)
+        if (!de2dx)
             return loss;
         // will produce no working in cpp17
         // for (auto& [weight, calc] : *de2dx)

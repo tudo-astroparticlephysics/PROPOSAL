@@ -82,8 +82,8 @@ PropagationUtility::PropagationUtility(
     : collection(collect)
 {
     if (collect.interaction_calc == nullptr
-        or collect.displacement_calc == nullptr
-        or collect.time_calc == nullptr) {
+        || collect.displacement_calc == nullptr
+        || collect.time_calc == nullptr) {
         throw std::invalid_argument("Interaction, displacement and time "
                                     "calculator need to be defined.");
     }

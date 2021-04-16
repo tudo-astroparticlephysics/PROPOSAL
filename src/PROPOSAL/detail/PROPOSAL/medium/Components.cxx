@@ -57,7 +57,7 @@ Component::Component(
     hash_combine(hash, nucCharge_, atomicNum_, atomInMolecule_,
                  logConstant_, bPrime_, averageNucleonWeight_, wood_saxon_);
 
-    if (not component_map)
+    if (!component_map)
         component_map = std::make_unique<std::map<size_t, Component>>();
 
     if (component_map->find(hash) == component_map->end())

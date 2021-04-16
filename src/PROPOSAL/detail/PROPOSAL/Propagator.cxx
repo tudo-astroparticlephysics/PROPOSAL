@@ -113,7 +113,7 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
             current_sector = GetCurrentSector(state.position, state.direction);
             auto hierarchy_f = get<GEOMETRY>(current_sector)->GetHierarchy();
             if (hierarchy_i > hierarchy_condition
-                and hierarchy_f < hierarchy_condition)
+                && hierarchy_f < hierarchy_condition)
                 continue_propagation = false;
             break;
         }
@@ -284,11 +284,9 @@ nlohmann::json Propagator::ParseConfig(const string& config_file)
 {
     nlohmann::json json_config;
     try {
-        string expanded_config_file_path
-            = Helper::ResolvePath(config_file, true);
-        if (expanded_config_file_path == "")
+        if (config_file== "")
             throw std::invalid_argument("Resolved path empty.");
-        std::ifstream infilestream(expanded_config_file_path);
+        std::ifstream infilestream(config_file);
         infilestream >> json_config;
     } catch (const nlohmann::json::parse_error& e) {
         Logging::Get("proposal.propagator")->critical("Unable to parse {} as "

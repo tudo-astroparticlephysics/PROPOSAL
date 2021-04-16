@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/json.hpp"
+#include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <vector>
 #include <numeric>

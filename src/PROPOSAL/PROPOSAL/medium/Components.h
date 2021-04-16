@@ -120,9 +120,9 @@ bool operator==(Component const&, Component const&) noexcept;
 inline bool operator==(std::shared_ptr<Component> const& lhs,
     std::shared_ptr<Component> const& rhs) noexcept
 {
-    if (lhs != nullptr and rhs != nullptr)
+    if (lhs != nullptr && rhs != nullptr)
         return *lhs == *rhs;
-    if (lhs == nullptr and rhs == nullptr)
+    if (lhs == nullptr && rhs == nullptr)
         return true;
     return false;
 }

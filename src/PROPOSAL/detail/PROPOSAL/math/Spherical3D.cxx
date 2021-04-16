@@ -4,11 +4,11 @@
 using namespace PROPOSAL;
 
 Spherical3D::Spherical3D(const nlohmann::json& config) {
-    if (not config.is_array() or not(config.size() == 3))
+    if (!config.is_array() || !(config.size() == 3))
         throw std::invalid_argument("Json array for Spherical3D is not a 3 "
                                     "component array.");
 
-    if (!config[0].is_number() or !config[1].is_number() or !config[2].is_number())
+    if (!config[0].is_number() || !config[1].is_number() || !config[2].is_number())
         throw std::invalid_argument("Json array for Spherical3D must contain "
                                     "three numbers (radius, azimuth, theta).");
 

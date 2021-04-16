@@ -38,10 +38,10 @@ Spline::Spline(std::string path, bool binary) {
 }
 
 Spline::Spline(const nlohmann::json& config) {
-    if (!config.contains("x")) throw std::invalid_argument("Spline: x vector must be defined.");
-    if(not config["x"].is_array()) throw std::invalid_argument("Spline: x is not an array.");
-    if (!config.contains("y")) throw std::invalid_argument("Spline: y vector must be defined.");
-    if(not config["y"].is_array()) throw std::invalid_argument("Spline: y is not an array.");
+    if(!config.contains("x")) throw std::invalid_argument("Spline: x vector must be defined.");
+    if(! config["x"].is_array()) throw std::invalid_argument("Spline: x is not an array.");
+    if(!config.contains("y")) throw std::invalid_argument("Spline: y vector must be defined.");
+    if(! config["y"].is_array()) throw std::invalid_argument("Spline: y is not an array.");
 
     x_ = config["x"].get<std::vector<double>>();
     y_ = config["y"].get<std::vector<double>>();

@@ -18,7 +18,7 @@ Polynom::Polynom(std::vector<double> coefficients) : N_(coefficients.size()) {
 }
 
 Polynom::Polynom(const nlohmann::json& config) {
-    if(not config.is_array()) throw std::invalid_argument("Polynom is not an array.");
+    if(!config.is_array()) throw std::invalid_argument("Polynom is not an array.");
 
     N_ = config["coefficients"].get<std::vector<double>>().size();
     coeff_ = new double[N_];

@@ -1,5 +1,5 @@
 #pragma once
-#include "PROPOSAL/json_fwd.hpp"
+#include <nlohmann/json.hpp> // TODO: Use json_fwd.hpp as soon as https://github.com/conan-io/conan-center-index/pull/5149 is merged
 #include <memory>
 
 namespace PROPOSAL {

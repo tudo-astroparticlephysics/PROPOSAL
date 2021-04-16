@@ -132,7 +132,10 @@ public:
         auto it = stochastic_deflection.find(t);
         if (it != stochastic_deflection.end())
             return _stochastic_deflect(*it->second, args...);
-        return DirectionChangeAngular { 0., 0. };
+        auto new_dir =DirectionChangeAngular();
+        new_dir.zenith = 0.;
+        new_dir.azimuth = 0.;
+        return new_dir;
     }
 
     /**
@@ -172,7 +175,7 @@ inline auto make_scattering(MultipleScatteringType ms_t,
         ms = make_multiple_scattering(ms_t, p, m, std::forward<Args>(args)...);
 
     auto st = std::vector<std::unique_ptr<st_param>>();
-    if (not st_t.empty()) {
+    if (!st_t.empty()) {
         for (auto const& t : st_t)
             st.emplace_back(make_default_stochastic_deflection(t, p, m));
     }

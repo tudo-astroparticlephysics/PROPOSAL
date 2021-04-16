@@ -31,16 +31,16 @@ $ cd PROPOSAL && mkdir build && cd build
 Use conan to prepare all dependencies. You can pass additional options to conan.
 
 ```sh             
-$ conan install .. -o build_python=True	# other optional dependencies
+$ conan install .. -o with_python=True	# other optional dependencies
 ```
 
 The following options can be passed to `conan install`:
 
-| Option.               | default | Description                                   |
-| --------------------- | ------- | --------------------------------------------- |
-| `build_python`        | False   | Build and install python interface.           |
-| `build_testing`       | False   | Build TestFiles for Python.                   |
-| `build_documentation` | False   | Build doxygen documentation of C++ code (WIP) |
+| Option.              | default | Description                                   |
+| -------------------- | ------- | --------------------------------------------- |
+| `with_python`        | False   | Build and install python interface.           |
+| `with_testing`       | False   | Build TestFiles for Python.                   |
+| `with_documentation` | False   | Build doxygen documentation of C++ code (WIP) |
 
 Build and install PROPOSAL. You may require root privileges when installing, depending on the installation location:
 

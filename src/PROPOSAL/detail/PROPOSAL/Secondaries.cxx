@@ -176,7 +176,7 @@ std::shared_ptr<ParticleState> Secondaries::GetEntryPoint(
         auto dist_i_f = (pos_f - pos_i).magnitude();
 
         auto distance = geometry.DistanceToBorder(pos_i, dir_i).first;
-        if (distance <= dist_i_f and distance >= 0) {
+        if (distance <= dist_i_f && distance >= 0) {
             if ( dist_i_f - distance < GEOMETRY_PRECISION)
                 return std::make_unique<ParticleState>(track_.at(i + 1));
             auto entry_point = RePropagateDistance(track_.at(i), distance);
@@ -203,7 +203,7 @@ std::shared_ptr<ParticleState> Secondaries::GetExitPoint(
         auto dist_i_f = (pos_f - pos_i).magnitude();
 
         auto distance = geometry.DistanceToBorder(pos_f, -dir_i).first;
-        if (distance <= dist_i_f and distance >= 0) {
+        if (distance <= dist_i_f && distance >= 0) {
             if ( dist_i_f - distance < GEOMETRY_PRECISION)
                 return std::make_unique<ParticleState>(track_.at(i - 1));
             auto exit_point = RePropagateDistance(track_.at(i-1),
@@ -326,7 +326,7 @@ std::vector<StochasticLoss> Secondaries::GetStochasticLosses() const
     std::vector<StochasticLoss> losses;
     for (unsigned int i=1; i<track_.size(); i++) {
         auto interaction_type = types_[i];
-        if (interaction_type != InteractionType::ContinuousEnergyLoss and
+        if (interaction_type != InteractionType::ContinuousEnergyLoss &&
                 interaction_type != InteractionType::Decay) {
             losses.emplace_back(static_cast<int>(interaction_type),
                                 track_[i-1].energy - track_[i].energy,
@@ -346,7 +346,7 @@ std::vector<StochasticLoss> Secondaries::GetStochasticLosses(const Geometry& geo
     for (unsigned int i=1; i<track_.size(); i++) {
         if (geometry.IsInside(track_[i].position, track_[i].direction)) {
             auto interaction_type = types_[i];
-            if (interaction_type != InteractionType::ContinuousEnergyLoss and
+            if (interaction_type != InteractionType::ContinuousEnergyLoss &&
                interaction_type != InteractionType::Decay) {
                 losses.emplace_back(static_cast<int>(interaction_type),
                                     track_[i-1].energy - track_[i].energy,

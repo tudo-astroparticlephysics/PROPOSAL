@@ -1,7 +1,7 @@
 #pragma once
 
 #include <utility>
-#include "PROPOSAL/json.hpp"
+#include <nlohmann/json.hpp>
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
@@ -17,7 +17,7 @@ std::unique_ptr<Scattering> make_scattering(const nlohmann::json& config,
     ParticleDef const& p_def,Medium const& medium, Cross&& cross, bool interpol) {
     std::unique_ptr<multiple_scattering::Parametrization> ms_pointer = nullptr;
     if (config.contains("multiple_scattering"))
-        ms_pointer = make_multiple_scattering(std::string(config["multiple_scattering"]),
+        ms_pointer = make_multiple_scattering(config["multiple_scattering"].get<std::string>(),
                                               p_def, medium, cross, interpol);
     double ms_multiplier = config.value("multiple_scattering_multiplier", 1.0);
 
@@ -75,7 +75,7 @@ std::unique_ptr<Scattering> make_scattering(const nlohmann::json& config,
         }
     }
 
-    if (ms_multiplier == 1.0 and sd_multiplier.empty()) {
+    if (ms_multiplier == 1.0 && sd_multiplier.empty()) {
         return std::make_unique<Scattering>(ms_pointer, sd);
     } else {
         return std::unique_ptr<Scattering>(new ScatteringMultiplier(ms_pointer, sd, ms_multiplier, sd_multiplier));
