@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 3.9)
 
 project(pyPROPOSAL LANGUAGES CXX)
 
-if (EXISTS ${CMAKE_BINARY_DIR}/Findpybind11.cmake)
-    message(WARNING " There seems to be currently a bug in conans pybind11 module, you have to temporary install pybind11 by your own and delete the Findpybind11.cmake module in your binary dir. Hopefully fix this soon.")
-endif()
-
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 REQUIRED)
 
