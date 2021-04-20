@@ -30,8 +30,6 @@
 #pragma once
 
 #include "PROPOSAL/geometry/Geometry.h"
-#include <nlohmann/json_fwd.hpp>
-
 
 namespace PROPOSAL {
 
