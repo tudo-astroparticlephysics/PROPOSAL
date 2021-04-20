@@ -5,6 +5,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/geometry/Box.h"
+#include <nlohmann/json.hpp>
 
 using namespace PROPOSAL;
 

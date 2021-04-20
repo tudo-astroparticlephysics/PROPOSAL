@@ -4,6 +4,7 @@
 
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/methods.h"
+#include <nlohmann/json.hpp>
 
 using namespace PROPOSAL;
 

@@ -1,5 +1,6 @@
 #include "PROPOSAL/math/Cartesian3D.h"
 #include "PROPOSAL/math/Spherical3D.h"
+#include <nlohmann/json.hpp>
 #include <cmath>
 
 using namespace PROPOSAL;

@@ -9,6 +9,7 @@
 #include "PROPOSAL/geometry/Geometry.h"
 
 #include "PROPOSAL/methods.h"
+#include <nlohmann/json.hpp>
 
 using namespace PROPOSAL;
 

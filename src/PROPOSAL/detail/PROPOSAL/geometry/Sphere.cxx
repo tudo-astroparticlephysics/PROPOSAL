@@ -3,6 +3,8 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/geometry/Sphere.h"
+#include <nlohmann/json.hpp>
+
 using namespace PROPOSAL;
 
 Sphere::Sphere(const Vector3D& position, double radius, double inner_radius)

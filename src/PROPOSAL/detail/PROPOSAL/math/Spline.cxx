@@ -10,6 +10,7 @@
 #include "PROPOSAL/math/MathMethods.h"
 #include "PROPOSAL/math/Spline.h"
 #include "PROPOSAL/math/TableWriter.h"
+#include <nlohmann/json.hpp>
 
 using namespace PROPOSAL;
 

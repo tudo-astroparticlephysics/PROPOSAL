@@ -3,6 +3,7 @@
 #include "PROPOSAL/propagation_utility/Displacement.h"
 
 #include <sstream>
+#include <numeric>
 
 using namespace PROPOSAL;
 

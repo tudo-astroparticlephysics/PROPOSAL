@@ -31,7 +31,7 @@
 
 #include <functional>
 #include <vector>
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%       Polynom      %%%%%%%%%%%%%%%%%%%%

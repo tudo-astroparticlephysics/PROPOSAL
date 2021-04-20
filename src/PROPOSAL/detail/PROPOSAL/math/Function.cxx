@@ -4,6 +4,7 @@
 #include <functional>
 #include <iostream>
 #include "PROPOSAL/Constants.h"
+#include <nlohmann/json.hpp>
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%       Polynom      %%%%%%%%%%%%%%%%%%%%
