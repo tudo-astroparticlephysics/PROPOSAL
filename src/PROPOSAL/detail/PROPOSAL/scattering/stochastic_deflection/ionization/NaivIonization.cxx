@@ -1,6 +1,6 @@
 #include "PROPOSAL/scattering/stochastic_deflection/ionization/NaivIonization.h"
 #include "PROPOSAL/Constants.h"
-
+#include <cmath>
 using namespace PROPOSAL;
 
 DirectionChangeAngular

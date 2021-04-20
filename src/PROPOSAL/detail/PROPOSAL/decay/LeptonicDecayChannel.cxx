@@ -1,6 +1,6 @@
 #include <functional>
 #include <cmath>
-
+#include <cassert>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
