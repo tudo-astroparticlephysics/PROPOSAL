@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <nlohmann/json.hpp>
 
 #include "PROPOSALTestUtilities/TestFilesHandling.h"
 #include "PROPOSAL/Constants.h"

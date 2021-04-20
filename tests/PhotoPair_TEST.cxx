@@ -1,5 +1,6 @@
 
 #include "gtest/gtest.h"
+#include <nlohmann/json.hpp>
 
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/Factories/PhotoPairProductionFactory.h"
