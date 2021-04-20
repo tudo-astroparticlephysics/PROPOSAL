@@ -68,4 +68,5 @@ class PROPOSALConan(ConanFile):
         self.cpp_info.requires = [
             "cubicinterpolation::CubicInterpolation",
             "spdlog::spdlog",
+            "nlohmann_json::nlohmann_json",
         ]

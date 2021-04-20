@@ -64,20 +64,23 @@ If you use PROPOSAL, please cite the PROPOSAL paper
 and our zenodo entry of the version you use
 ```bibtex
 @misc{dunsch_2020_1484180,
-  author = {Dunsch, Mario and
-            Soedingrekso, Jan and
-            Koehne, Jan-Hendrik and
+  author = {Alameddine, Jean-Marco and
+            Dunsch, Mario and
+            Bollmann, Lars and
             Fuchs, Tomasz and
-            Alameddine, Jean-Marco and
-            Sackel, Maximilian and
-            Noethe, Maximilian and
-            van Santen, Jacob and
-            Menne, Thorben and
-            Sandrock, Alexander and
-            Kuo, Chung-Yun and
+            Gutjahr, Pascal and
+            Koehne, Jan-Hendrik and
             Kopper, Claudio and
             Krings, Kai and
-            Olivas, Alex},
+            Kuo, Chung-Yun and
+            Menne, Thorben and
+            Noethe, Maximilian and
+            Olivas, Alex and
+            Rhode, Wolfgang and
+            Sackel, Maximilian and
+            Sandrock, Alexander and
+            Soedingrekso, Jan and
+            van Santen, Jacob},
   title  = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
   month  = mar,
   year   = 2020,
