@@ -3,6 +3,8 @@
 #include "PROPOSAL/density_distr/density_splines.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/math/Cartesian3D.h"
+#include <nlohmann/json.hpp>
+
 using namespace PROPOSAL;
 
 Density_splines::Density_splines(const Axis& axis, const Spline& splines, double massDensity)

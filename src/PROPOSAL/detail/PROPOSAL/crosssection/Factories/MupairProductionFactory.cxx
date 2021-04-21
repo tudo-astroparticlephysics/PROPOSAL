@@ -2,6 +2,7 @@
 #include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
+#include <nlohmann/json.hpp>
 
 using namespace PROPOSAL;
 using mupair_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&, std::shared_ptr<const EnergyCutSettings>, bool);

@@ -30,7 +30,7 @@
 #pragma once
 
 #include "PROPOSAL/geometry/Geometry.h"
-#include <nlohmann/json.hpp>
+
 namespace PROPOSAL {
 
 class Sphere : public Geometry

@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <string>
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/methods.h"
 

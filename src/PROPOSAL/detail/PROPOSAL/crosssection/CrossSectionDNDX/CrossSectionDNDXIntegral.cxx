@@ -6,6 +6,7 @@
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include <cmath>
 
 using namespace PROPOSAL;
 

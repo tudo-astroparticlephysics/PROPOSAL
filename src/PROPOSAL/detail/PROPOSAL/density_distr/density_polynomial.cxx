@@ -4,6 +4,8 @@
 #include "PROPOSAL/density_distr/density_polynomial.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/math/Cartesian3D.h"
+#include <nlohmann/json.hpp>
+
 using namespace PROPOSAL;
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%% Polynomial-Density %%%%%%%%%%%%%%%%%%%%

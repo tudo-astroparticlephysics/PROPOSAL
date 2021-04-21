@@ -1,6 +1,6 @@
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiApproximationBremsstrahlung.h"
 #include "PROPOSAL/Constants.h"
-
+#include <cmath>
 using namespace PROPOSAL;
 
 DirectionChangeAngular 

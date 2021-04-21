@@ -2,6 +2,7 @@
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
+#include <nlohmann/json.hpp>
 
 using namespace PROPOSAL;
 using annih_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&, bool);

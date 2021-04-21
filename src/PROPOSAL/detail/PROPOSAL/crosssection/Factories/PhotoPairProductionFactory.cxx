@@ -2,6 +2,7 @@
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
+#include <nlohmann/json.hpp>
 
 using namespace PROPOSAL;
 using photopair_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&, bool);

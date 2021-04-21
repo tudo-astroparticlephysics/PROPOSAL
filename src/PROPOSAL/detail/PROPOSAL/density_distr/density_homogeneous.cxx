@@ -3,6 +3,8 @@
 #include <iostream>
 #include "PROPOSAL/density_distr/density_homogeneous.h"
 #include "PROPOSAL/medium/Medium.h"
+#include <nlohmann/json.hpp>
+
 using namespace PROPOSAL;
 
 Density_homogeneous::Density_homogeneous(double massDensity)

@@ -3,6 +3,7 @@
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/crosssection/CrossSectionMultiplier.h"
+#include <nlohmann/json.hpp>
 
 using namespace PROPOSAL;
 using photoQ2_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&, std::shared_ptr<const EnergyCutSettings>, std::shared_ptr<crosssection::ShadowEffect>, bool);

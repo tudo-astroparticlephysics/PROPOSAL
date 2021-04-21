@@ -1,5 +1,6 @@
 
 #include "gtest/gtest.h"
+#include <nlohmann/json.hpp>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/Factories/EpairProductionFactory.h"

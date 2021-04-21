@@ -6,6 +6,7 @@
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/geometry/GeometryFactory.h"
+#include <nlohmann/json.hpp>
 
 /* namespace PROPOSAL { */
 /* std::shared_ptr<Geometry> CreateGeometry(Geometry_Type type) */
