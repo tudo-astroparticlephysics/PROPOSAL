@@ -20,7 +20,7 @@ if(NOT CMAKE_BUILD_TYPE)
   	"'Release' if you are using PROPOSAL for production purposes.")
 else()
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-  		message(WARNING "Build type set to ${CMAKE_BUILD_TYPE}. This build type should only be used for development"
+  		message(WARNING "Build type set to ${CMAKE_BUILD_TYPE}. This build type should only be used for development "
   			"and debugging purposes and not for production since the runtime of PROPOSAL with be significantly higher!")
   	else()
 		message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}.")
