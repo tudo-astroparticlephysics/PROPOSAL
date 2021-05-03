@@ -28,7 +28,7 @@ jobs:
     - uses: actions/upload-artifact@master
       with:
         name: proposal-pkg
-        path: ${PWD}/PROPOSAL_PKG
+        path: PROPOSAL_PKG
 
 
   test:
@@ -39,7 +39,7 @@ jobs:
      - uses: actions/download-artifact@master
        with:
          name: proposal-pkg
-         path: $(pwd)/PROPOSAL_PKG
+         path: PROPOSAL_PKG
      - name: Build automatisation
        run: cmake . -DCMAKE_PREFIX_PATH=PROPOSAL_PKG --target=tests
      - name: Build lib
