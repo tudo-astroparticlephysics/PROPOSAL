@@ -41,7 +41,7 @@ jobs:
          name: proposal-pkg
          path: PROPOSAL_PKG
      - name: Build automatisation
-       run: cmake . -DCMAKE_PREFIX_PATH=PROPOSAL_PKG --target=tests
+       run: cmake . -DCMAKE_PREFIX_PATH=PROPOSAL_PKG --target test
      - name: Build lib
        run: make -j
      - name: Run tests
