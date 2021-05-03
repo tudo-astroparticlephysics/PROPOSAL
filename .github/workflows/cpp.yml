@@ -28,7 +28,7 @@ jobs:
     - uses: actions/upload-artifact@master
       with:
         name: proposal-pkg
-        path: $(pwd)/PROPOSAL_PKG
+        path: ${PWD}/PROPOSAL_PKG
 
 
   test:
