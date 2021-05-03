@@ -64,13 +64,9 @@ jobs:
       dist: focal
       name: Linux clang 6.0
       python: 3.9
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-6.0
-          packages:
-            - clang-6.0
+      before_install:
+        - sudo apt-get install -yq --allow-downgrades libc6=2.31-0ubuntu9.2 libc6-dev=2.31-0ubuntu9.2
+        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --allow-downgrades --allow-remove-essential --allow-change-held-packages install ubuntu-toolchain-r-test llvm-toolchain-6.0 clang-6.0 -o Debug::pkgProblemResolver=yes
       env:
         - CC=clang
         - CXX=clang++
@@ -79,13 +75,9 @@ jobs:
       dist: focal
       name: Linux clang 10
       python: 3.9
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-focal-10
-          packages:
-            - clang-10
+      before_install:
+        - sudo apt-get install -yq --allow-downgrades libc6=2.31-0ubuntu9.2 libc6-dev=2.31-0ubuntu9.2
+        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --allow-downgrades --allow-remove-essential --allow-change-held-packages install ubuntu-toolchain-r-test llvm-toolchain-focal-10 clang-10 -o Debug::pkgProblemResolver=yes
       env:
         - CC=clang
         - CXX=clang++
