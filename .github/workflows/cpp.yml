@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Cache node modules
+    - name: Cache conan
       uses: actions/cache@v2
       env:
         cache-name: cache-conan
