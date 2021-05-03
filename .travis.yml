@@ -66,7 +66,12 @@ jobs:
       python: 3.9
       before_install:
         - sudo apt-get install -yq --allow-downgrades libc6=2.31-0ubuntu9.2 libc6-dev=2.31-0ubuntu9.2
-        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --allow-downgrades --allow-remove-essential --allow-change-held-packages install ubuntu-toolchain-r-test llvm-toolchain-6.0 clang-6.0 -o Debug::pkgProblemResolver=yes
+        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --allow-downgrades --allow-remove-essential --allow-change-held-packages install clang-6.0 -o Debug::pkgProblemResolver=yes
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-6.0
       env:
         - CC=clang
         - CXX=clang++
@@ -77,7 +82,13 @@ jobs:
       python: 3.9
       before_install:
         - sudo apt-get install -yq --allow-downgrades libc6=2.31-0ubuntu9.2 libc6-dev=2.31-0ubuntu9.2
-        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --allow-downgrades --allow-remove-essential --allow-change-held-packages install ubuntu-toolchain-r-test llvm-toolchain-focal-10 clang-10 -o Debug::pkgProblemResolver=yes
+        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --allow-downgrades --allow-remove-essential --allow-change-held-packages install clang-10 -o Debug::pkgProblemResolver=yes
+
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-focal-10
       env:
         - CC=clang
         - CXX=clang++
