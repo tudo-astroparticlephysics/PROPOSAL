@@ -17,18 +17,22 @@ jobs:
       run: python -m pip install conan
     - name: Create PROPOSAL package directory
       run: mkdir PROPOSAL_PKG
-    - name: Install PROPOSAL dependencies
-      run:  conan install .
-    - name: Build automatisation
-      run: cmake . -DCMAKE_INSTALL_PREFIX=PROPOSAL_PKG
+    - name: Create build dir and install PROPOSAL dependencies
+      run: |
+            mkdir PROPOSAL_BUILD
+            cd PROPOSAL_BUILD
+            rm -rf ~/.conan
+            conan profile new default --detect
+            conan profile update settings.compiler.libcxx=libstdc++11 default
+            conan install ..
+    - name: Run build automatisation tool
+      run: cmake . -B PROPOSAL_BUILD
     - name: Build lib
-      run: make -j
-    - name: Install lib
-      run: make install
+      run: make -C PROPOSAL_BUILD -j
     - uses: actions/upload-artifact@master
       with:
-        name: proposal-pkg
-        path: PROPOSAL_PKG
+        name: proposal-build
+        path: PROPOSAL_BUILD
 
 
   test:
@@ -36,13 +40,20 @@ jobs:
     needs: build
     steps:
      - uses: actions/checkout@master
+     - name: Install gtest
+       run: sudo apt-get install libgtest-dev
+     - name: Cache conan
+       uses: actions/cache@v2
+       with:
+         path: ~/.conan
+         key: ${{ runner.os }}-build-cache-conan
      - uses: actions/download-artifact@master
        with:
-         name: proposal-pkg
-         path: PROPOSAL_PKG
-     - name: Build automatisation
-       run: cmake . -DCMAKE_PREFIX_PATH=PROPOSAL_PKG --target test
+         name: proposal-build
+         path: PROPOSAL_BUILD
+     - name: Rerun cmake
+       run: cmake . -B PROPOSAL_BUILD -DBUILD_TESTING=True
      - name: Build lib
-       run: make -j
+       run: make -C PROPOSAL_BUILD -j
      - name: Run tests
-       run: make test
+       run: make -C PROPOSAL_BUILD test
