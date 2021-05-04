@@ -13,15 +13,15 @@ jobs:
             - os : "ubuntu-latest"
               compiler : "gcc"
               compilerpp : "g++"
-              do_tests : "true"
+              do_tests : "True"
             - os : "macos-latest"
               compiler : "clang"
               compilerpp : "clang++"
-              do_tests : "true"
+              do_tests : "True"
             - os : "ubuntu-18.04"
               compiler : "gcc-7"
               compilerpp : "g++-7"
-              do_tests : "false" # tests only work for c++17 compatible compiler
+              do_tests : "False" # tests only work for c++17 compatible compiler
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
         CC: ${{ matrix.compiler }}
