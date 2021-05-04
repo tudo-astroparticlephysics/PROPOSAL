@@ -62,5 +62,5 @@ jobs:
           run: make -C PROPOSAL_BUILD
 
         - name: Run tests
-          if : ${{ matrix.do_tests == 'true' }}
+          if : ${{ matrix.do_tests == 'True' }}
           run: ctest --test-dir PROPOSAL_BUILD -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
