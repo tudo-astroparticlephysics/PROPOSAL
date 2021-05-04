@@ -43,7 +43,6 @@ jobs:
           if : steps.cache-conan.outputs.cache-hit != 'true'
           run: |
             conan profile new default --detect
-            conan profile update settings.compiler.libcxx=libstdc++11 default
         - name: create build directory
           if : steps.cache-build.outputs.cache-hit != 'true'
           run: mkdir PROPOSAL_BUILD
