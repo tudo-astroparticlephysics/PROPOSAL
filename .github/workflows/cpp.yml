@@ -12,16 +12,16 @@ jobs:
           include:
             - os : "ubuntu-latest"
               compiler : "gcc"
-              compiler++ : "g++"
+              compilerpp : "g++"
             - os : "macos-latest"
               compiler : "clang"
-              compiler++ : "clang++"
+              compilerpp : "clang++"
             # - os : "ubuntu-18.04"
             #   compiler : "gcc-7"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
         CC: ${{ matrix.compiler }}
-        CXX: ${{ matrix.compiler++ }}
+        CXX: ${{ matrix.compilerpp }}
       steps:
         - uses: actions/checkout@v2
         - name: Cache conan
