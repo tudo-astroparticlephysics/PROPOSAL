@@ -41,6 +41,8 @@ jobs:
     test:
       runs-on: ubuntu-latest
       needs: build
+      env:
+        PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
       steps:
         - uses: actions/checkout@master
         - name: Cache conan
@@ -62,4 +64,4 @@ jobs:
         - name: Build lib
           run: make -C PROPOSAL_BUILD -j
         - name: Run tests
-          run: make -C PROPOSAL_BUILD test
+          run: ctest --test-dir PROPOSAL_BUILD -j4
