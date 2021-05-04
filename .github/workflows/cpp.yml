@@ -3,9 +3,11 @@ name: Check c++ pkg PROPOSAL.
 
 on: [push]
 
-jobs:
 
+jobs:
     build:
+      env:
+        CC: ${{ matrix.compiler }}
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v2
@@ -42,8 +44,12 @@ jobs:
     test:
       runs-on: ubuntu-latest
       needs: build
+      strategy:
+        matrix:
+          compiler: [gcc, clang]
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
+        CC: ${{ matrix.compiler }}
       steps:
         - uses: actions/checkout@master
         - name: Cache conan
