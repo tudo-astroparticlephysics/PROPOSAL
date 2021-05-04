@@ -16,8 +16,9 @@ jobs:
             - os : "macos-latest"
               compiler : "clang"
               compilerpp : "clang++"
-            # - os : "ubuntu-18.04"
-            #   compiler : "gcc-7"
+            - os : "ubuntu-18.04"
+              compiler : "gcc-7"
+              compilerpp : "g++-7"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
         CC: ${{ matrix.compiler }}
