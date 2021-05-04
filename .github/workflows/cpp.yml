@@ -13,12 +13,15 @@ jobs:
             - os : "ubuntu-latest"
               compiler : "gcc"
               compilerpp : "g++"
+              do_tests : "true"
             - os : "macos-latest"
               compiler : "clang"
               compilerpp : "clang++"
+              do_tests : "true"
             - os : "ubuntu-18.04"
               compiler : "gcc-7"
               compilerpp : "g++-7"
+              do_tests : "false" # tests only work for c++17 compatible compiler
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
         CC: ${{ matrix.compiler }}
@@ -52,11 +55,12 @@ jobs:
           if : steps.cache-build.outputs.cache-hit != 'true'
           run: mkdir PROPOSAL_BUILD
         - name: Install PROPOSAL dependencies
-          run: cd PROPOSAL_BUILD && conan install .. -o with_testing=True --build=missing
+          run: cd PROPOSAL_BUILD && conan install .. -o with_testing=${{ matrix.do_tests }} --build=missing
         - name: Run build automatisation tool
-          run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE
+          run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=${{ matrix.do_tests }}
         - name: Build lib
           run: make -C PROPOSAL_BUILD
 
-        # - name: Run tests
-        #   run: ctest --test-dir PROPOSAL_BUILD -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
+        - name: Run tests
+          if : ${{ matrix.do_tests == 'true' }}
+          run: ctest --test-dir PROPOSAL_BUILD -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
