@@ -12,7 +12,7 @@ jobs:
           include:
             - os : "ubuntu-latest"
               compiler : "gcc"
-            - os : "macos-11.0"
+            - os : "macos-latest"
               compiler : "clang"
             # - os : "ubuntu-18.04"
             #   compiler : "gcc-7"
