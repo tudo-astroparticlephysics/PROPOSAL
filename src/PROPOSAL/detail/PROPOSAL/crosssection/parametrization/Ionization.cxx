@@ -8,10 +8,6 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/Particle.h"
 
-using std::get;
-using std::logic_error;
-using std::make_tuple;
-using std::tuple;
 using namespace PROPOSAL;
 
 crosssection::Ionization::Ionization(const EnergyCutSettings& cuts)
@@ -313,13 +309,12 @@ double crosssection::IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(
 
     (void)variable; // integral is calculated analytically here
 
-    double result, aux;
-    double fplus; // (2.269)
-    double v_up;
     auto limits = GetKinematicLimits(p_def, medium, energy);
 
-    v_up = limits.v_max;
-    v_up = std::min(cuts_.GetCut(energy), v_up);
+    if(limits.v_min == limits.v_max)
+        return 0.;
+
+    auto v_up = std::min(cuts_.GetCut(energy), limits.v_max);
 
     double bigDelta = std::min(limits.v_max * energy / ME,
         v_up * energy / ME);                        // (2.265)
@@ -328,16 +323,16 @@ double crosssection::IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(
     double tau = gamma - 1.;                        // (2.262)
     double y = 1. / (gamma + 1.);                   // (2.263)
 
-    aux = tau + 2 * bigDelta - (3. * bigDelta * bigDelta * y / 2.)
+    auto aux = tau + 2 * bigDelta - (3. * bigDelta * bigDelta * y / 2.)
         - (bigDelta - std::pow(bigDelta, 3.) / 3.) * y * y
         - (bigDelta * bigDelta / 2. - tau * std::pow(bigDelta, 3.) / 3.
               + std::pow(bigDelta, 4.) / 4.)
             * std::pow(y, 3.);
 
     aux *= betasquared / tau;
-    fplus = std::log(tau * bigDelta) - aux;
+    auto fplus = std::log(tau * bigDelta) - aux;
 
-    result
+    auto result
         = std::log(2. * (tau + 2.) / (std::pow(1e-6 * medium.GetI(), 2.) / ME));
     result += fplus;
     result -= Delta(medium, std::sqrt(betasquared), gamma);
@@ -439,15 +434,12 @@ double crosssection::IonizBergerSeltzerMoller::FunctionToDEdxIntegral(
 
     (void)variable; // integral is calculated analytically here
 
-    double result, aux;
-
     auto limits = GetKinematicLimits(p_def, medium, energy);
 
-    double fminus; // (2.268)
-    double v_up;
+    if(limits.v_max == limits.v_min)
+        return 0.;
 
-    v_up = limits.v_max;
-    v_up = std::min(cuts_.GetCut(energy), v_up);
+    auto v_up = std::min(cuts_.GetCut(energy), limits.v_max);
 
     double bigDelta = std::min(limits.v_max * energy / ME,
         v_up * energy / ME);                        // (2.265)
@@ -455,14 +447,14 @@ double crosssection::IonizBergerSeltzerMoller::FunctionToDEdxIntegral(
     double betasquared = 1. - 1. / (gamma * gamma); // (2.260)
     double tau = gamma - 1.;                        // (2.262)
 
-    aux = bigDelta * bigDelta / 2.
+    auto aux = bigDelta * bigDelta / 2.
         + (2. * tau + 1.) * std::log(1. - bigDelta / tau);
     aux = aux / (gamma * gamma);
 
-    fminus = aux - 1. - betasquared + std::log((tau - bigDelta) * bigDelta)
+    auto fminus = aux - 1. - betasquared + std::log((tau - bigDelta) * bigDelta)
         + tau / (tau - bigDelta);
 
-    result
+    auto result
         = std::log(2. * (tau + 2.) / (std::pow(1e-6 * medium.GetI(), 2.) / ME));
     result += fminus;
     result -= Delta(medium, std::sqrt(betasquared), gamma);
