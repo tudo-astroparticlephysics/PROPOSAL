@@ -65,4 +65,4 @@ jobs:
         - name: Build lib
           run: make -C PROPOSAL_BUILD -j
         - name: Run tests
-          run: ctest --test-dir PROPOSAL_BUILD -j2
+          run: ctest --test-dir PROPOSAL_BUILD -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
