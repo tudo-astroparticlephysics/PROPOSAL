@@ -12,10 +12,10 @@ jobs:
           include:
             - os : "ubuntu-latest"
               compiler : "gcc"
-            - os : "macos-latest"  
+            - os : "macos-latest"
               compiler : "clang"
-            - os : "ubuntu-18.04"  
-              compiler : "gcc-7"
+            # - os : "ubuntu-18.04"
+            #   compiler : "gcc-7"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
         CC: ${{ matrix.compiler }}
@@ -43,8 +43,8 @@ jobs:
           if : steps.cache-conan.outputs.cache-hit != 'true'
           run: conan profile new default --detect
         - name: Update conan profile
-          if : ${{ matrix.compiler != 'clang' }} 
-          run: conan profile update settings.compiler.libcxx=libstdc++11 default            
+          if : ${{ matrix.compiler != 'clang' }}
+          run: conan profile update settings.compiler.libcxx=libstdc++11 default
         - name: create build directory
           if : steps.cache-build.outputs.cache-hit != 'true'
           run: mkdir PROPOSAL_BUILD
