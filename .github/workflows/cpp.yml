@@ -5,7 +5,7 @@ on: [push]
 
 
 jobs:
-    build_latest:
+    build:
       runs-on: ${{ matrix.os }}
       strategy:
         matrix:
@@ -41,8 +41,10 @@ jobs:
           run: python -m pip install conan
         - name: Initialize conan
           if : steps.cache-conan.outputs.cache-hit != 'true'
-          run: |
-            conan profile new default --detect
+          run: conan profile new default --detect
+        - name: Update conan profile
+          if : ${{ matrix.compiler }} != 'clang'
+          run: conan profile update settings.compiler.libcxx=libstdc++11 default            
         - name: create build directory
           if : steps.cache-build.outputs.cache-hit != 'true'
           run: mkdir PROPOSAL_BUILD
