@@ -1,0 +1,9 @@
+[requires]
+cubicinterpolation/0.1.4
+spdlog/1.8.2
+nlohmann_json/3.9.1
+pybind11/2.6.2
+
+[generators]
+cmake_find_package
+cmake_paths

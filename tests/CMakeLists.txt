@@ -21,11 +21,13 @@ add_library(PROPOSAL::TestUtilities ALIAS TestUtilities)
 target_include_directories(TestUtilities INTERFACE PROPOSALTestUtilities)
 
 find_package(GTest REQUIRED)
+find_package(Boost REQUIRED filesystem)
 # creat test binary and link against proposal and gtest
 macro(package_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
     add_dependencies(${TESTNAME} testfiles)
-    target_link_libraries(${TESTNAME} PROPOSAL::PROPOSAL PROPOSAL::TestUtilities GTest::GTest)
+    target_link_libraries(${TESTNAME} PROPOSAL::PROPOSAL PROPOSAL::TestUtilities
+        GTest::GTest Boost::filesystem)
     gtest_discover_tests(${TESTNAME})
 endmacro()
 
