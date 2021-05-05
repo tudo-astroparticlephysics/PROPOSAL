@@ -60,6 +60,7 @@ jobs:
 
     test:
       runs-on: ${{ matrix.os }}
+      needs: build
       strategy:
         matrix:
           include:
@@ -73,12 +74,12 @@ jobs:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
       steps:
         - uses: actions/checkout@v2
-        - name: Cache build
-          id: cache-build
+        - name: Cache conan
+          id: cache-conan
           uses: actions/cache@v2
           with:
-            path: PROPOSAL_BUILD
-            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}
+            path: ~/.conan
+            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}
         - name: Cache build
           id: cache-build
           uses: actions/cache@v2
