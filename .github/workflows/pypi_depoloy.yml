@@ -1,4 +1,4 @@
-name: Check python proposal pkg deploy
+name: Deploy 🐍 pkg PROPOSAL
 
 on:
   page_build:
