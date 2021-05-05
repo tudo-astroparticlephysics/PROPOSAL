@@ -12,7 +12,10 @@ jobs:
           uses: actions/cache@v2
           with:
             path: ~/.conan
-            key: ${{ runner.os }}-cache-conan
+            key: ${{ runner.os }}-cache-conan-gcc
+        - name: Update conan profile
+          run: conan profile new default --detect
+          run: conan profile update settings.compiler.libcxx=libstdc++11 default
         - name: Install Python 🐍 distributions 📦
           run: python -m pip install .
         - name: Install pytest
