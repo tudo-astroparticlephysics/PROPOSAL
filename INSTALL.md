@@ -70,7 +70,10 @@ In this case, you need to provide the following dependencies for CMake:
 - [spdlog](https://github.com/gabime/spdlog)
 - [CubicInterpolation](https://github.com/MaxSac/cubic_interpolation)
 - [pybind11](https://github.com/pybind/pybind11.git) (only if you want to install python bindings)
-- [gtest](https://github.com/google/googletest) (only if you want to use the UnitTests)
+
+- [gtest](https://github.com/google/googletest) (only if you want to build and run the UnitTests)
+- [boost (filesystem)](https://www.boost.org/doc/libs/1_75_0/libs/filesystem/doc/index.htm) (only if you want to build and run the UnitTests)
+
 - [doxygen](https://github.com/doxygen/doxygen) (only if you want to build the documentation)
 
 Clone the repository and create a build directory

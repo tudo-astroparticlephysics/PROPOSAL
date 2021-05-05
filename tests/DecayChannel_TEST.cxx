@@ -143,7 +143,8 @@ TEST(Assignment, Copyconstructor)
 
 TEST(DecaySpectrum, MuMinus_Rest)
 {
-    auto in = getTestFiles("Decay_MuMinus_rest.txt");
+    std::ifstream in;
+    getTestFile("Decay_MuMinus_rest.txt", in);
 
     int statistic = 1e6;
     int NUM_bins = 50;
@@ -342,7 +343,8 @@ TEST(DecaySpectrum, MuMinus_Rest)
 
 TEST(DecaySpectrum, MuMinus_Energy)
 {
-    auto in = getTestFiles("Decay_MuMinus_energy.txt");
+    std::ifstream in;
+    getTestFile("Decay_MuMinus_energy.txt", in);
 
     int statistic = 1e6;
     int NUM_bins = 50;
@@ -541,7 +543,8 @@ TEST(DecaySpectrum, MuMinus_Energy)
 
 TEST(DecaySpectrum, TauMinus_Rest)
 {
-    auto in = getTestFiles("Decay_TauMinus_rest.txt");
+    std::ifstream in;
+    getTestFile("Decay_TauMinus_rest.txt", in);
 
     int statistic = 1e6;
     int NUM_bins = 50;
@@ -740,7 +743,8 @@ TEST(DecaySpectrum, TauMinus_Rest)
 
 TEST(DecaySpectrum, TauMinus_energy)
 {
-    auto in = getTestFiles("Decay_TauMinus_energy.txt");
+    std::ifstream in;
+    getTestFile("Decay_TauMinus_energy.txt", in);
 
     int statistic = 1e6;
     int NUM_bins = 50;

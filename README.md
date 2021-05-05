@@ -36,8 +36,6 @@ PROPOSAL is developed and tested on macOS and linux.
 Continuous integration is setup on travis and tests several version of gcc and clang.
 
 PROPOSAL is now a C++14 library using pybind11 Python bindings!
-In the next major release, C++17 methods may also be used in the core library, which is currently only used when building the tests.
-
 
 ## How to cite PROPOSAL?
 

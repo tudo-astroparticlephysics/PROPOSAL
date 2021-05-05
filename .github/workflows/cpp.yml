@@ -11,15 +11,12 @@ jobs:
             - os : "ubuntu-latest"
               compiler : "gcc"
               compilerpp : "g++"
-              do_tests : "True"
             - os : "macos-latest"
               compiler : "clang"
               compilerpp : "clang++"
-              do_tests : "True"
             - os : "ubuntu-18.04"
               compiler : "gcc-7"
               compilerpp : "g++-7"
-              do_tests : "False" # tests only work for c++17 compatible compiler
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
@@ -52,9 +49,9 @@ jobs:
           if : steps.cache-build.outputs.cache-hit != 'true'
           run: mkdir PROPOSAL_BUILD
         - name: Install PROPOSAL dependencies
-          run: cd PROPOSAL_BUILD && conan install .. -o with_testing=${{ matrix.do_tests }} --build=missing
+          run: cd PROPOSAL_BUILD && conan install .. -o with_testing=True --build=missing
         - name: Run build automatisation tool
-          run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=${{ matrix.do_tests }}
+          run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE
         - name: Build lib
           run: make -C PROPOSAL_BUILD
 
@@ -70,6 +67,9 @@ jobs:
             - os : "macos-latest"
               compiler : "clang"
               compilerpp : "clang++"
+            - os : "ubuntu-18.04"
+              compiler : "gcc-7"
+              compilerpp : "g++-7"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
       steps:

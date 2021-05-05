@@ -136,7 +136,8 @@ const std::string testfile_dir = "tests/TestFiles/";
 
 TEST(Ionization, Test_of_dEdx)
 {
-    auto in = getTestFiles("Ioniz_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Ioniz_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -181,7 +182,8 @@ TEST(Ionization, Test_of_dEdx)
 
 TEST(Ionization, Test_of_dNdx)
 {
-    auto in = getTestFiles("Ioniz_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Ioniz_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -222,7 +224,8 @@ TEST(Ionization, Test_of_dNdx)
 
 TEST(Ionization, Test_Stochastic_Loss)
 {
-    auto in = getTestFiles("Ioniz_e.txt");
+    std::ifstream in;
+    getTestFile("Ioniz_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -282,7 +285,8 @@ TEST(Ionization, Test_Stochastic_Loss)
 
 TEST(Ionization, Test_of_dEdx_Interpolant)
 {
-    auto in = getTestFiles("Ioniz_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Ioniz_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -327,7 +331,8 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
 
 TEST(Ionization, Test_of_dNdx_Interpolant)
 {
-    auto in = getTestFiles("Ioniz_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Ioniz_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -371,7 +376,8 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
 
 TEST(Ionization, Test_of_e_interpol)
 {
-    auto in = getTestFiles("Ioniz_e.txt");
+    std::ifstream in;
+    getTestFile("Ioniz_e.txt", in);
 
     std::string particleName;
     std::string mediumName;

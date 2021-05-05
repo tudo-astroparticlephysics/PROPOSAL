@@ -156,7 +156,8 @@ const std::string testfile_dir = "tests/TestFiles/";
 
 TEST(Bremsstrahlung, Test_of_dEdx)
 {
-    auto in = getTestFiles("Brems_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Brems_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -200,7 +201,8 @@ TEST(Bremsstrahlung, Test_of_dEdx)
 
 TEST(Bremsstrahlung, Test_of_dNdx)
 {
-    auto in = getTestFiles("Brems_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Brems_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -244,7 +246,8 @@ TEST(Bremsstrahlung, Test_of_dNdx)
 
 TEST(Bremsstrahlung, Test_of_e)
 {
-    auto in = getTestFiles("Brems_e.txt");
+    std::ifstream in;
+    getTestFile("Brems_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -309,7 +312,8 @@ TEST(Bremsstrahlung, Test_of_e)
 
 TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 {
-    auto in = getTestFiles("Brems_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Brems_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -361,7 +365,8 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 
 TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 {
-    auto in = getTestFiles("Brems_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Brems_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -409,7 +414,8 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 
 TEST(Bremsstrahlung, Test_of_e_Interpolant)
 {
-    auto in = getTestFiles("Brems_e.txt");
+    std::ifstream in;
+    getTestFile("Brems_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
