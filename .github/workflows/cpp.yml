@@ -49,7 +49,7 @@ jobs:
           if : steps.cache-build.outputs.cache-hit != 'true'
           run: mkdir PROPOSAL_BUILD
         - name: Install PROPOSAL dependencies
-          run: cd PROPOSAL_BUILD && conan install ../.conan/conanfile_testing.txt --build=missing
+          run: cd PROPOSAL_BUILD && conan install .. -o with_testing=True --build=missing
         - name: Run build automatisation tool
           run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE
         - name: Build lib
