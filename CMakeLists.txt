@@ -31,10 +31,9 @@ endif()
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# removes tons of compiler warnings on clang (issue #141). there is probably a cleaner solution.
-if(NOT BUILD_SHARED_LIBS)
-	set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-endif()
+set(WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_CXX_VISIBILITY_PRESET default)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN OFF)
 
 option(BUILD_PYTHON "build python interface" OFF)
 option(BUILD_EXAMPLE "build example" OFF)
