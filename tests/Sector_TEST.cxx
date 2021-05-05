@@ -39,7 +39,8 @@ auto GetCrossSections(const ParticleDef& p_def, const Medium& med, std::shared_p
 
 TEST(Sector, Continuous)
 {
-    auto in = getTestFiles("Sector_ContinousLoss.txt");
+    std::ifstream in;
+    getTestFile("Sector_ContinousLoss.txt", in);
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
@@ -95,7 +96,8 @@ TEST(Sector, Continuous)
 
 TEST(Sector, Stochastic)
 {
-    auto in = getTestFiles("Sector_StochasticLoss.txt");
+    std::ifstream in;
+    getTestFile("Sector_StochasticLoss.txt", in);
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
@@ -190,7 +192,8 @@ TEST(Sector, Stochastic)
 
 TEST(Sector, EnergyDisplacement)
 {
-    auto in = getTestFiles("Sector_Energy_Distance.txt");
+    std::ifstream in;
+    getTestFile("Sector_Energy_Distance.txt", in);
 
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);

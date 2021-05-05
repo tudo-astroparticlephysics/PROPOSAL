@@ -342,7 +342,8 @@ TEST(Scattering, compare_integral_interpolant) {
 
 TEST(Scattering, ScatterReproducibilityTest)
 {
-    auto in = getTestFiles("Scattering_scatter.txt");
+    std::ifstream in;
+    getTestFile("Scattering_scatter.txt", in);
 
     std::string particleName;
     std::string mediumName;

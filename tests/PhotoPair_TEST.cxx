@@ -195,7 +195,8 @@ ParticleDef getParticleDef(const std::string& name)
 
 TEST(PhotoPair, Test_of_dNdx)
 {
-    auto in = getTestFiles("PhotoPair_dNdx.txt");
+    std::ifstream in;
+    getTestFile("PhotoPair_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -230,7 +231,8 @@ TEST(PhotoPair, Test_of_dNdx)
 
 TEST(PhotoPair, Test_of_dNdx_Interpolant)
 {
-    auto in = getTestFiles("PhotoPair_dNdx.txt");
+    std::ifstream in;
+    getTestFile("PhotoPair_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;

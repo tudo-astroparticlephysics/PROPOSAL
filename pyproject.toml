@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools>=40.8.0",
+    "setuptools>=45",
     "wheel",
     "cmake>=3.9",
     "conan>=1.33",
