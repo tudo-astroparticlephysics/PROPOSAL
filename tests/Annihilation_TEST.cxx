@@ -125,7 +125,8 @@ ParticleDef getParticleDef(const std::string& name)
 
 TEST(Annihilation, Test_of_dNdx)
 {
-    auto in = getTestFiles("Anni_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Anni_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -162,7 +163,8 @@ TEST(Annihilation, Test_of_dNdx)
 
 TEST(Annihilation, Test_Stochastic_Loss)
 {
-    auto in = getTestFiles("Anni_e.txt");
+    std::ifstream in;
+    getTestFile("Anni_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -217,7 +219,8 @@ TEST(Annihilation, Test_Stochastic_Loss)
 
 TEST(Annihilation, Test_of_dNdx_Interpolant)
 {
-    auto in = getTestFiles("Anni_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Anni_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -248,7 +251,8 @@ TEST(Annihilation, Test_of_dNdx_Interpolant)
 
 TEST(Annihilation, Test_of_e_interpol)
 {
-    auto in = getTestFiles("Anni_e.txt");
+    std::ifstream in;
+    getTestFile("Anni_e.txt", in);
 
     std::string particleName;
     std::string mediumName;

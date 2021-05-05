@@ -176,7 +176,8 @@ const std::string testfile_dir = "tests/TestFiles/";
 
 TEST(Epairproduction, Test_of_dEdx)
 {
-    auto in = getTestFiles("Epair_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Epair_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -216,7 +217,8 @@ TEST(Epairproduction, Test_of_dEdx)
 
 TEST(Epairproduction, Test_of_dNdx)
 {
-    auto in = getTestFiles("Epair_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Epair_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -257,7 +259,8 @@ TEST(Epairproduction, Test_of_dNdx)
 
 TEST(Epairproduction, Test_Stochastic_Loss)
 {
-    auto in = getTestFiles("Epair_e.txt");
+    std::ifstream in;
+    getTestFile("Epair_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -324,7 +327,8 @@ TEST(Epairproduction, Test_Stochastic_Loss)
 
 TEST(Epairproduction, Test_of_dEdx_Interpolant)
 {
-    auto in = getTestFiles("Epair_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Epair_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -374,7 +378,8 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
 
 TEST(Epairproduction, Test_of_dNdx_Interpolant)
 {
-    auto in = getTestFiles("Epair_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Epair_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -419,7 +424,8 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
 
 TEST(Epairproduction, Test_of_e_interpol)
 {
-    auto in = getTestFiles("Epair_e.txt");
+    std::ifstream in;
+    getTestFile("Epair_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
