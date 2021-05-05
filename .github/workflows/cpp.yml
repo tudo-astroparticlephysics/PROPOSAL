@@ -1,8 +1,6 @@
 name: Check c++ pkg PROPOSAL.
 
-
 on: [push]
-
 
 jobs:
     build:
@@ -23,7 +21,6 @@ jobs:
               compilerpp : "g++-7"
               do_tests : "False" # tests only work for c++17 compatible compiler
       env:
-        PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
       steps:
@@ -61,6 +58,32 @@ jobs:
         - name: Build lib
           run: make -C PROPOSAL_BUILD
 
+    test:
+      runs-on: ${{ matrix.os }}
+      strategy:
+        matrix:
+          include:
+            - os : "ubuntu-latest"
+              compiler : "gcc"
+              compilerpp : "g++"
+            - os : "macos-latest"
+              compiler : "clang"
+              compilerpp : "clang++"
+      env:
+        PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
+      steps:
+        - uses: actions/checkout@v2
+        - name: Cache build
+          id: cache-build
+          uses: actions/cache@v2
+          with:
+            path: PROPOSAL_BUILD
+            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}
+        - name: Cache build
+          id: cache-build
+          uses: actions/cache@v2
+          with:
+            path: PROPOSAL_BUILD
+            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}
         - name: Run tests
-          if : ${{ matrix.do_tests == 'True' }}
           run: ctest --test-dir PROPOSAL_BUILD -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
