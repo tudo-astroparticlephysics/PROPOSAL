@@ -1,3 +1,7 @@
+#ifdef WIN32
+#define sleep Sleep
+#endif
+
 
 #include <cmath>
 #include "gtest/gtest.h"
