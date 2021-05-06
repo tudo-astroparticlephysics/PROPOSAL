@@ -17,6 +17,7 @@ jobs:
             - os : "ubuntu-18.04"
               compiler : "gcc-7"
               compilerpp : "g++-7"
+            - os : "windows-latest"
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
