@@ -91,7 +91,7 @@ namespace Helper {
     std::string Centered(int width, const std::string& str, char fill = '=');
 
     // Comparison function to be used for case-insensitive strings in a map
-    struct case_insensitive_comp : public std::binary_function<std::string, std::string, bool> {
+    struct case_insensitive_comp {
         bool operator()(std::string const& lhs, std::string const& rhs) const;
     };
 
