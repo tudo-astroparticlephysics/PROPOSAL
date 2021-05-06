@@ -17,6 +17,7 @@ jobs:
             - os : "ubuntu-18.04"
               compiler : "gcc-7"
               compilerpp : "g++-7"
+            - os : "windows-latest"
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
@@ -43,7 +44,7 @@ jobs:
           if : steps.cache-conan.outputs.cache-hit != 'true'
           run: conan profile new default --detect
         - name: Update conan profile
-          if : ${{ matrix.compiler != 'clang' }}
+          if : ${{ matrix.os == 'ubuntu-18.04' || matrix.os == 'ubuntu-latest' }}
           run: conan profile update settings.compiler.libcxx=libstdc++11 default
         - name: create build directory
           if : steps.cache-build.outputs.cache-hit != 'true'
@@ -53,7 +54,11 @@ jobs:
         - name: Run build automatisation tool
           run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE
         - name: Build lib
-          run: make -C PROPOSAL_BUILD
+          if: ${{ matrix.os != 'windows-latest' }}
+          run: cmake --build PROPOSAL_BUILD
+        - name: Build lib
+          if: ${{ matrix.os == 'windows-latest' }}
+          run: cmake --build PROPOSAL_BUILD --target ALL_BUILD --config Release
 
     test:
       runs-on: ${{ matrix.os }}
@@ -70,6 +75,7 @@ jobs:
             - os : "ubuntu-18.04"
               compiler : "gcc-7"
               compilerpp : "g++-7"
+            - os : "windows-latest"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
       steps:

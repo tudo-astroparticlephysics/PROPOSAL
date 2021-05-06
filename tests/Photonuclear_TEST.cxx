@@ -978,7 +978,7 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
                     auto rate_rnd
                         = cross_integral->CalculateCumulativeCrosssection(
                             energy, comp.GetHash(), v);
-                    if (energy * vcut == ecut or rnd1 < 0.05)
+                    if (energy * vcut == ecut || rnd1 < 0.05)
                         EXPECT_NEAR(rate_rnd / dNdx_for_comp, rnd1,
                             1e-2); // kink in integral / TODO: not working too
                                    // well for small rnd
