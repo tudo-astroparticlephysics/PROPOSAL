@@ -52,7 +52,11 @@ jobs:
         - name: Install PROPOSAL dependencies
           run: cd PROPOSAL_BUILD && conan install .. -o with_testing=True --build=missing
         - name: Run build automatisation tool
+          if : ${{ matrix.os != 'windows-latest' }}
           run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE
+        - name: Run build automatisation tool
+          if : ${{ matrix.os == 'windows-latest' }}
+          run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE --config Release
         - name: Build lib
           run: cmake --build PROPOSAL_BUILD
 
