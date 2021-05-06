@@ -54,7 +54,7 @@ jobs:
         - name: Run build automatisation tool
           run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE
         - name: Build lib
-          run: make -C PROPOSAL_BUILD all
+          run: cmake --build PROPOSAL_BUILD
 
     test:
       runs-on: ${{ matrix.os }}
