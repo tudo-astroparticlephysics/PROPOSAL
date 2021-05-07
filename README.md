@@ -19,7 +19,9 @@
 ```
 
 
-# PROPOSAL [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1484180.svg)](https://doi.org/10.5281/zenodo.1484180)
+# PROPOSAL 
+
+![example event parameter](https://github.com/tudo-astroparticlephysics/PROPOSAL/actions/workflows/cpp.yml/badge.svg?branch=master) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1484180.svg)](https://doi.org/10.5281/zenodo.1484180)
 
 PROPOSAL (Propagator with optimal precision and optimized speed for all
 leptons) is presented as a public tool for propagating leptons and gamma rays
