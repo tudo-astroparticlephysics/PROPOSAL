@@ -125,7 +125,7 @@ constexpr auto param_docstring_dE2dx_integrand = R"pbdoc(
             e.g. the differential crosssection in v for the current
             parametrization multipied by :math:`v^2`.  If the parametrization is
             given in a double-differential-crosssection the crosssection will be
-         1  1ntegrated over all values but v.
+            integrated over all values but v.
 
             Args:
                 energy (float): energy in MeV
