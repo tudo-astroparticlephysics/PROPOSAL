@@ -27,6 +27,13 @@ else()
   	endif()
 endif()
 
+if(NOT DEFINED CMAKE_POSITION_INDEPENDENT_CODE)
+    message(STATUS
+        "Set -fPIC=True because it's not further specified and neccessary for "
+        "the python bindings.")
+    SET(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+endif()
+
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
