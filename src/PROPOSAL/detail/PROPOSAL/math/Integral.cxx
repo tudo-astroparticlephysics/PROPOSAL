@@ -746,7 +746,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
                         {
                             determinant = std::sqrt(determinant);
                             approX      = (bEq + determinant) / aEq;
-                            // Why are both following conditions equal?
+                            // TODO: Why are both following conditions equal?
                             if (approX < 0 || approX > 3 * stepSize)
                             {
                                 approX = (bEq - determinant) / aEq;
