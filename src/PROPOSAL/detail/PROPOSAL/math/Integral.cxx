@@ -749,7 +749,8 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
                                 approX = 0.;
                             else
                                 approX = (bEq + determinant) / aEq;
-                            // Why are both following conditions equal?
+
+                            // TODO: Why are both following conditions equal?
                             if (approX < 0 || approX > 3 * stepSize)
                             {
                                 approX = (bEq - determinant) / aEq;
