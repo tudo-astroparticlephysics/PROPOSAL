@@ -736,7 +736,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
                     bEq  = (functionValue2 - 5 * functionValue1) / 2;
                     bEq2 = bEq * bEq;
 
-                    if (std::abs(aEq * sumDifference) <= precision_ * bEq2)
+                    if (std::abs(aEq * sumDifference) < precision_ * bEq2)
                     {
                         approX = sumDifference * 2 / functionSum;
                     } else
@@ -745,7 +745,10 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
                         if (determinant >= 0)
                         {
                             determinant = std::sqrt(determinant);
-                            approX      = (bEq + determinant) / aEq;
+                            if (bEq == 0 && determinant == 0)
+                                approX = 0.;
+                            else
+                                approX = (bEq + determinant) / aEq;
                             // Why are both following conditions equal?
                             if (approX < 0 || approX > 3 * stepSize)
                             {
