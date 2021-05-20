@@ -100,6 +100,11 @@ PYBIND11_MODULE(proposal, m)
         .def_property("azimuth", &Spherical3D::GetAzimuth, &Spherical3D::SetAzimuth)
         .def_property("zenith", &Spherical3D::GetZenith, &Spherical3D::SetZenith);
 
+    py::class_<DirectionChangeAngular, std::shared_ptr<DirectionChangeAngular>>(m, "DirectionChangeAngular")
+        .def(py::init<double, double>(), py::arg("zenith"), py::arg("azimuth"))
+        .def_readwrite("zenith", &DirectionChangeAngular::zenith)
+        .def_readwrite("azimuth", &DirectionChangeAngular::azimuth);
+
     py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings>>(m,
         "EnergyCutSettings",
         R"pbdoc(
