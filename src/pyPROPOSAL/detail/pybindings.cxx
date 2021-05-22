@@ -100,10 +100,17 @@ PYBIND11_MODULE(proposal, m)
         .def_property("azimuth", &Spherical3D::GetAzimuth, &Spherical3D::SetAzimuth)
         .def_property("zenith", &Spherical3D::GetZenith, &Spherical3D::SetZenith);
 
-    py::class_<DirectionChangeAngular, std::shared_ptr<DirectionChangeAngular>>(m, "DirectionChangeAngular")
+    py::class_<UnitSphericalVector, std::shared_ptr<UnitSphericalVector>>(m,
+        "UnitSphericalVector",
+        R"pbdoc(
+            Container for a spherical vector with radius 1,
+            i.e. the zenith and azimuth
+            mainly used in scattering and deflection
+        )pbdoc")
         .def(py::init<double, double>(), py::arg("zenith"), py::arg("azimuth"))
-        .def_readwrite("zenith", &DirectionChangeAngular::zenith)
-        .def_readwrite("azimuth", &DirectionChangeAngular::azimuth);
+        .def(py::init<const Spherical3D&>())
+        .def_readwrite("zenith", &UnitSphericalVector::zenith)
+        .def_readwrite("azimuth", &UnitSphericalVector::azimuth);
 
     py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings>>(m,
         "EnergyCutSettings",
