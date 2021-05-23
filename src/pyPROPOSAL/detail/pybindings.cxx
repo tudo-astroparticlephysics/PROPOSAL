@@ -107,6 +107,7 @@ PYBIND11_MODULE(proposal, m)
             i.e. the zenith and azimuth
             mainly used in scattering and deflection
         )pbdoc")
+        .def(py::init<>())
         .def(py::init<double, double>(), py::arg("zenith"), py::arg("azimuth"))
         .def(py::init<const Spherical3D&>())
         .def_readwrite("zenith", &UnitSphericalVector::zenith)
