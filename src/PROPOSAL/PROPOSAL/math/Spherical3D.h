@@ -43,10 +43,10 @@ namespace PROPOSAL  {
      * \param azimuth
      */
      struct UnitSphericalVector{
-        double zenith;
-        double azimuth;
+        double zenith = 0;
+        double azimuth = 0;
     
-        UnitSphericalVector() = default;
+        constexpr UnitSphericalVector() = default;
         constexpr UnitSphericalVector(double zenith, double azimuth)
             : zenith(zenith), azimuth(azimuth) {};
         constexpr UnitSphericalVector(const Spherical3D& s)

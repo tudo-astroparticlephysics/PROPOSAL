@@ -124,6 +124,9 @@ public:
      * @brief Calculates deflection angles for specific interaction type. Take a
      * deeper look into stochastic_deflection::Parametrization for a better
      * understanding.
+     *
+     * returns a UnitSphericalVector, which is a normalized spherical vector
+     * containing the angular change of the direction.
      */
     template <typename... Args>
     UnitSphericalVector CalculateStochasticDeflection(
