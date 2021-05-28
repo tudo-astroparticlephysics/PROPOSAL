@@ -84,11 +84,22 @@ void init_scattering(py::module& m)
         .def("stochastic_deflection",
             &stochastic_deflection::Parametrization::
                 CalculateStochasticDeflection,
-            py::arg("initial_energy"), py::arg("loss_energy"),
+            py::arg("initial_energy"), py::arg("final_energy"),
             py::arg("random_numbers"),
-            R"pbdoc(TODO: Doc is missing because it's not clear if second argument
-            should be the lost energy or the final energy. Please contact the
-            maintainers if required.)pbdoc");
+            R"pbdoc( Calculation of the stochastic deflection of an interaction
+
+                Args:
+                    initial_energy(double): Initial energy of the muon
+                    final_energy(double): Final energy of the muon
+                    random_numbers(list(double)): Random numbers to sample the deflection angles
+
+                Returns:
+                    UnitSphericalVector: The angular change of the direction
+                        contained in a normed spherical vector
+            TODO: it's not clear if second argument should be the lost energy or the final energy.
+            This might probably change in the future.
+            Please contact the maintainers if required.
+            )pbdoc");
 
     using deflect_ptr = std::shared_ptr<stochastic_deflection::Parametrization>;
     using deflect_list_t = std::vector<deflect_ptr>;

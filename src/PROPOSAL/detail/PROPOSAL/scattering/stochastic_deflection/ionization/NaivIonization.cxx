@@ -3,7 +3,7 @@
 #include <cmath>
 using namespace PROPOSAL;
 
-DirectionChangeAngular
+UnitSphericalVector
 stochastic_deflection::NaivIonization::CalculateStochasticDeflection(
         double e_i, double e_f, std::vector<double> const& rnd) const
 {
@@ -11,5 +11,5 @@ stochastic_deflection::NaivIonization::CalculateStochasticDeflection(
     auto p_f = std::sqrt((e_f + mass) * (e_f - mass));
     auto costheta = ((e_i + ME) * e_f - e_i * ME - mass * mass) / (p_i * p_f);
 
-    return DirectionChangeAngular { std::acos(costheta), 2 * PI * rnd[0] };
+    return UnitSphericalVector { std::acos(costheta), 2 * PI * rnd[0] };
 }

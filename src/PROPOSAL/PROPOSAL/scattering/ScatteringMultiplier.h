@@ -8,7 +8,7 @@ class ScatteringMultiplier : public Scattering {
     double multiple_scatt = 1;
     std::vector<std::pair<InteractionType, double>> stochastic_deflect;
 
-    DirectionChangeAngular _scale_deflect(DirectionChangeAngular& angles, InteractionType t) override
+    UnitSphericalVector _scale_deflect(UnitSphericalVector& angles, InteractionType t) override
     {
         for (auto m : stochastic_deflect) {
             if (m.first == t) {

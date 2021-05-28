@@ -53,8 +53,8 @@ class Scattering {
     }
 
 protected:
-    virtual DirectionChangeAngular _scale_deflect(
-        DirectionChangeAngular& a, InteractionType)
+    virtual UnitSphericalVector _scale_deflect(
+        UnitSphericalVector& a, InteractionType)
     {
         return a;
     }
@@ -124,17 +124,18 @@ public:
      * @brief Calculates deflection angles for specific interaction type. Take a
      * deeper look into stochastic_deflection::Parametrization for a better
      * understanding.
+     *
+     * returns a UnitSphericalVector, which is a normalized spherical vector
+     * containing the angular change of the direction.
      */
     template <typename... Args>
-    DirectionChangeAngular CalculateStochasticDeflection(
+    UnitSphericalVector CalculateStochasticDeflection(
         InteractionType t, Args... args)
     {
         auto it = stochastic_deflection.find(t);
         if (it != stochastic_deflection.end())
             return _stochastic_deflect(*it->second, args...);
-        auto new_dir =DirectionChangeAngular();
-        new_dir.zenith = 0.;
-        new_dir.azimuth = 0.;
+        auto new_dir = UnitSphericalVector(0, 0);
         return new_dir;
     }
 

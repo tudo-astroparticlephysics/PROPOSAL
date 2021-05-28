@@ -4,7 +4,7 @@
 
 using namespace PROPOSAL;
 
-DirectionChangeAngular
+UnitSphericalVector
 stochastic_deflection::BorogPetrukhinNuclearInteraction::CalculateStochasticDeflection(
         double e_i, double e_f, std::vector<double> const& rnd) const
 {
@@ -18,5 +18,5 @@ stochastic_deflection::BorogPetrukhinNuclearInteraction::CalculateStochasticDefl
     auto sin2 = (t_p - t_min) / (4 * (e_i * e_f - mass * mass) - 2 * t_min);
     auto theta_muon = 2 * std::asin(std::sqrt(sin2));
 
-    return DirectionChangeAngular { theta_muon, 2 * PI * rnd[1] };
+    return UnitSphericalVector { theta_muon, 2 * PI * rnd[1] };
 }
