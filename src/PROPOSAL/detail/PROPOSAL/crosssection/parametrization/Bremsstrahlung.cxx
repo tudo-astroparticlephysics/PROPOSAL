@@ -412,8 +412,27 @@ double crosssection::BremsSandrockSoedingreksoRhode::CalculateParametrization(
         s_rad += d[3] * v * std::log(v) + d[4] * tmp + d[5] * tmp * tmp;
     }
 
+    // Coulomb correction
+    double nu = Z * ALPHA;
+    double aa[2], bb[2], cc[2], dd[2], gg[2];
+    aa[0] = 1.0026 + nu*(-2.2789e-2 + nu*(2.9347e-2 - 4.1536e-2*nu));
+    bb[0] = 1.9465e-2 + nu*(-7.7063e-2 + nu*(1.9979e-1 - 1.4107e-1*nu));
+    cc[0] = 3.6785e-2 + nu*(5.4466e-2 + nu*(-9.2971e-2 + 2.7357e-2*nu));
+    dd[0] = 9.9382e-4 + nu*(2.4601e-3 + nu*(2.6733e-3 - 2.8198e-3*nu));
+    gg[0] = (aa[0] + bb[0]*p_def.mass)/(1.0 + p_def.mass*(cc[0] + dd[0]*p_def.mass));
+
+    aa[1] = 1.0046 + nu*(-1.9267e-2 + nu*(4.5255e-2 - 5.1603e-2*nu));
+    bb[1] = 8.8223e-3 + nu*(-5.2931e-2 + nu*(1.4854e-1 - 1.0764e-1*nu));
+    cc[1] = 3.7141e-2 + nu*(1.2897e-1 + nu*(-2.2677e-1 + 1.0776e-1*nu));
+    dd[1] = 7.1144e-4 + nu*(1.7710e-3 + nu*(5.0240e-3 - 4.5527e-3*nu));
+    gg[1] = (aa[1] + bb[1]*p_def.mass)/(1.1 + p_def.mass*(cc[1] + dd[1]*p_def.mass));
+
+    double ff, nu2 = nu*nu;
+    ff = nu2*(1/(1 + nu2) + 0.20206 + nu2*(-0.0369 + nu2*(0.0083 - 0.002*nu2)));
+
     return std::max(
-        ((2.0 - 2.0 * v + v * v) * phi1 - 2.0 / 3.0 * (1. - v) * phi2)
+        ((2.0 - 2.0 * v + v * v) * (phi1 - ff*gg[0])
+          - 2.0 / 3.0 * (1. - v) * (phi2 - ff*gg[1]))
             + 1. / Z * s_atomic + 0.25 * ALPHA * phi1 * s_rad,
         0.);
 }
