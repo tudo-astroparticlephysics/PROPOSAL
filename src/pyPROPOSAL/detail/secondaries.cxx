@@ -19,7 +19,7 @@ namespace py = pybind11;
 using namespace PROPOSAL;
 
 template <typename T, typename BaseT> struct SecondariesBuilder {
-    template <typename... Args> auto decl_virtuell_param(Args... args)
+    template <typename... Args> auto decl_virtual_param(Args... args)
     {
         py::class_<T, BaseT, std::shared_ptr<T>>(args...);
     };
@@ -54,29 +54,29 @@ void init_secondaries(py::module& m)
             &secondaries::Parametrization::CalculateSecondaries);
 
     SecondariesBuilder<secondaries::Annihilation, secondaries::Parametrization> {}
-        .decl_virtuell_param(m_sub, "Annihilation");
+        .decl_virtual_param(m_sub, "Annihilation");
     SecondariesBuilder<secondaries::Bremsstrahlung,
         secondaries::Parametrization> {}
-        .decl_virtuell_param(m_sub, "Bremsstrahlung");
+        .decl_virtual_param(m_sub, "Bremsstrahlung");
     SecondariesBuilder<secondaries::Compton, secondaries::Parametrization> {}
-        .decl_virtuell_param(m_sub, "Compton");
+        .decl_virtual_param(m_sub, "Compton");
     SecondariesBuilder<secondaries::EpairProduction,
         secondaries::Parametrization> {}
-        .decl_virtuell_param(m_sub, "EpairProduction");
+        .decl_virtual_param(m_sub, "EpairProduction");
     SecondariesBuilder<secondaries::Ionization, secondaries::Parametrization> {}
-        .decl_virtuell_param(m_sub, "Ionization");
+        .decl_virtual_param(m_sub, "Ionization");
     SecondariesBuilder<secondaries::MupairProduction,
         secondaries::Parametrization> {}
-        .decl_virtuell_param(m_sub, "MupairProduction");
+        .decl_virtual_param(m_sub, "MupairProduction");
     SecondariesBuilder<secondaries::Photonuclear,
         secondaries::Parametrization> {}
-        .decl_virtuell_param(m_sub, "Photonuclear");
+        .decl_virtual_param(m_sub, "Photonuclear");
     SecondariesBuilder<secondaries::PhotopairProduction,
         secondaries::Parametrization> {}
-        .decl_virtuell_param(m_sub, "PhotopairProduction");
+        .decl_virtual_param(m_sub, "PhotopairProduction");
     SecondariesBuilder<secondaries::WeakInteraction,
         secondaries::Parametrization> {}
-        .decl_virtuell_param(m_sub, "WeakInteraction");
+        .decl_virtual_param(m_sub, "WeakInteraction");
 
     SecondariesBuilder<secondaries::HeitlerAnnihilation,
         secondaries::Annihilation> {}
