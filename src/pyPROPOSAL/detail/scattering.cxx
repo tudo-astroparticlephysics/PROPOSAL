@@ -34,6 +34,14 @@ void init_scattering(py::module& m)
                     ef(double): final energy
             )pbdoc");
 
+    py::class_<multiple_scattering::Highland, multiple_scattering::Parametrization,
+        std::shared_ptr<multiple_scattering::Highland>>(m_sub, "Highland")
+        .def("CalculateTheta0", &multiple_scattering::Highland::CalculateTheta0,
+             py::arg("grammage"), py::arg("e_i"), py::arg("e_f"));
+
+    py::class_<multiple_scattering::HighlandIntegral, multiple_scattering::Highland,
+            std::shared_ptr<multiple_scattering::HighlandIntegral>>(m_sub, "HighlandIntegral");
+
     py::class_<multiple_scattering::ScatteringOffset>(m_sub, "scattering_offset")
             .def_readwrite("sx", &multiple_scattering::ScatteringOffset::sx)
             .def_readwrite("sy", &multiple_scattering::ScatteringOffset::sy)

@@ -6,6 +6,7 @@
 #include "PROPOSAL/secondaries/parametrization/ionization/NaivIonization.h"
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
 #include "PROPOSAL/secondaries/parametrization/photonuclear/Photonuclear.h"
+#include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsai.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsaiForwardPeaked.h"
 #include "PROPOSAL/secondaries/parametrization/weakinteraction/NaivWeakInteraction.h"
 
@@ -48,6 +49,7 @@ void init_secondaries(py::module& m)
     py::class_<secondaries::Photonuclear, secondaries::Parametrization, std::shared_ptr<secondaries::Photonuclear>>(m_sub, "Photonuclear");
 
     py::class_<secondaries::PhotopairProduction, secondaries::Parametrization, std::shared_ptr<secondaries::PhotopairProduction>>(m_sub, "PhotopairProduction");
+    py::class_<secondaries::PhotoTsaiForwardPeaked, secondaries::PhotopairProduction, std::shared_ptr<secondaries::PhotoTsaiForwardPeaked>>(m_sub, "PhotoTsaiForwardPeaked");
     py::class_<secondaries::PhotoTsai, secondaries::PhotopairProduction, std::shared_ptr<secondaries::PhotoTsai>>(m_sub, "PhotoTsai");
 
     py::class_<secondaries::WeakInteraction, secondaries::Parametrization, std::shared_ptr<secondaries::WeakInteraction>>(m_sub, "WeakInteraction");
