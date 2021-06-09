@@ -26,18 +26,27 @@ void init_scattering(py::module& m)
             py::arg("grammage"), py::arg("e_i"), py::arg("e_f"),
             py::arg("random_numbers"),
             R"pbdoc(
-                Calculate a random averaged scatterangle `u` in cartesian coordinates.
+                Calculate a random averaged scattering angle `u` in cartesian coordinates.
 
                 Args:
-                    dr(double): displacement of particle
-                    ei(double): inital energy
-                    ef(double): final energy
+                    grammage(double): displacement of particle
+                    e_i(double): initial energy
+                    e_f(double): final energy
             )pbdoc");
 
     py::class_<multiple_scattering::Highland, multiple_scattering::Parametrization,
         std::shared_ptr<multiple_scattering::Highland>>(m_sub, "Highland")
         .def("CalculateTheta0", &multiple_scattering::Highland::CalculateTheta0,
-             py::arg("grammage"), py::arg("e_i"), py::arg("e_f"));
+             py::arg("grammage"), py::arg("e_i"), py::arg("e_f"),
+             R"pbdoc(
+                Calculate the average scattering angle for Highland
+                parametrizations.
+
+                Args:
+                    grammage(double): displacement of particle
+                    e_i(double): initial energy
+                    e_f(double): final energy
+            )pbdoc");
 
     py::class_<multiple_scattering::HighlandIntegral, multiple_scattering::Highland,
             std::shared_ptr<multiple_scattering::HighlandIntegral>>(m_sub, "HighlandIntegral");
