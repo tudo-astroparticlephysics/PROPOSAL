@@ -22,7 +22,7 @@ namespace PROPOSAL {
 
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 
-            DirectionChangeAngular CalculateStochasticDeflection(
+            UnitSphericalVector CalculateStochasticDeflection(
                     double e_i, double e_f, std::vector<double> const& rnd) const final;
         };
     } // namespace stochastic_deflection
