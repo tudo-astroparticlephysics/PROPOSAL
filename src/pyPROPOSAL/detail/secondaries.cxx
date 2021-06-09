@@ -36,7 +36,17 @@ template <typename T, typename BaseT> struct SecondariesBuilder {
         py::class_<T, BaseT, std::shared_ptr<T>>(args...)
             .def(py::init<ParticleDef, Medium>(), py::arg("particle_def"),
                 py::arg("medium"))
-            .def("calculate_rho", &T::CalculateRho);
+            .def("calculate_rho", &T::CalculateRho,
+                 R"pbdoc(
+                Samples the asymmetry factor for interactions where two particles
+                are created. For EpairProduction and MupairProduction, this
+                factor is defined as :math:`\frac{E_+ - E_-}{E_+ + E_-}`, where
+                :math:`E_-` is the energy of the created particle and :math:`E_+`
+                the energy of the created antiparticle. For annihilation and
+                photopairproduction, this factor is defined as
+                :math:`\frac{E_{\gamma,1}}{E_+ + m_e}`, respectively
+                :math:`\frac{E_-}{E_{\gamma}}`.
+            )pbdoc");
     }
 };
 
