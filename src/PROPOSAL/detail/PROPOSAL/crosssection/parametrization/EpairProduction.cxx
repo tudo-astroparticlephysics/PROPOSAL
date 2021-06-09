@@ -455,7 +455,23 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
         const_prefactor * (nucl_Z + zeta) * (1.0 - v) / v
             * std::pow(ME / m_in * p_def.charge , 2) * (Cm1 * Lm1 + Cm2 * Lm2));
 
-    double aux = diagram_e + diagram_mu;
+    // Coulomb correction from Ivanov et al., Phys. Lett. B 442 (1998) 453--458
+    double coul_corr, F_coul, a_coul, xi_coul, f_coul, sigma0, x_plus, x_minus,
+      y_coul, lambda, nu2;
+    sigma0 = 4/(3*M_PI)*std::pow(nucl_Z*ALPHA*ALPHA/ME, 2);
+    x_plus = (1 + rho)/2; // E_plus/omega
+    x_minus= 1 - x_plus;
+    y_coul = v;
+    a_coul = 2*(1 + x_plus*x_plus + x_minus*x_minus);
+    xi_coul= std::pow(m_in*y_coul/ME, 2)/(1 - y_coul)*x_plus*x_minus;
+    lambda = y_coul*y_coul/(2*(1 - y_coul));
+    nu2 = std::pow(nucl_Z*ALPHA, 2);
+    f_coul = nu2*(1/(1 + nu2) + 0.20206 + nu2*(-0.0369 + nu2*(0.0083 - 0.002*nu2)));
+    F_coul = (1 - y_coul)*(((1 + lambda + xi_coul)*a_coul - 1 - lambda)
+      *std::log(1 + 1/xi_coul) - a_coul + (4 - a_coul - lambda)/(1 + xi_coul));
+    coul_corr = -sigma0*f_coul*F_coul/(2*y_coul);
+
+    double aux = std::max(0.0, diagram_e + diagram_mu + coul_corr);
 
     if (lpm_) {
         aux *= lpm_->suppression_factor(energy, v, rho2, beta, xi);
