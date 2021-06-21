@@ -146,30 +146,30 @@ constexpr auto param_docstring_kinematic_limits = R"pbdoc(
     )pbdoc";
 
 template <typename T>
-void decl_param(pybind11::module m_sub, std::string const& class_name)
+void decl_param(py::module m_sub, std::string const& class_name)
 {
-    pybind11::class_<crosssection::Parametrization<T>,
+    py::class_<crosssection::Parametrization<T>,
         std::shared_ptr<crosssection::Parametrization<T>>>(
         m_sub, class_name.c_str(), param_docstring_class)
         .def("differential_crosssection",
             &crosssection::Parametrization<T>::DifferentialCrossSection,
-            pybind11::arg("particle_def"), pybind11::arg("target"),
-            pybind11::arg("energy"), pybind11::arg("v"),
+            py::arg("particle_def"), py::arg("target"),
+            py::arg("energy"), py::arg("v"),
             param_docstring_diff_cross)
         .def("dEdx_integrand",
             &crosssection::Parametrization<T>::FunctionToDEdxIntegral,
-            pybind11::arg("particle_def"), pybind11::arg("target"),
-            pybind11::arg("energy"), pybind11::arg("v"),
+            py::arg("particle_def"), py::arg("target"),
+            py::arg("energy"), py::arg("v"),
             param_docstring_dEdx_integrand)
         .def("dE2dx_integrand",
             &crosssection::Parametrization<T>::FunctionToDE2dxIntegral,
-            pybind11::arg("particle_def"), pybind11::arg("target"),
-            pybind11::arg("energy"), pybind11::arg("v"),
+            py::arg("particle_def"), py::arg("target"),
+            py::arg("energy"), py::arg("v"),
             param_docstring_dE2dx_integrand)
         .def("kinematic_limits",
             &crosssection::Parametrization<T>::GetKinematicLimits,
-            pybind11::arg("particle_def"), pybind11::arg("target"),
-            pybind11::arg("energy"))
+            py::arg("particle_def"), py::arg("target"),
+            py::arg("energy"))
         .def_property_readonly("hash",
             &crosssection::Parametrization<T>::GetHash,
             param_docstring_kinematic_limits);
