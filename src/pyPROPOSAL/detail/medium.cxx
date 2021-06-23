@@ -115,4 +115,5 @@ void init_medium(py::module& m) {
     MEDIUM_DEF(m_sub, Paraffin)
     MEDIUM_DEF(m_sub, AntaresWater)
     MEDIUM_DEF(m_sub, CascadiaBasinWater)
+    MEDIUM_DEF(m_sub, LiquidArgon)
 }

@@ -143,6 +143,7 @@ MEDIUM_DEF(Copper)
 MEDIUM_DEF(Uranium)
 MEDIUM_DEF(Paraffin)
 MEDIUM_DEF(Air)
+MEDIUM_DEF(LiquidArgon)
 
 // #<{(|
 // * initialize ANTARES water
@@ -197,11 +198,12 @@ enum Medium_Type {
     PARAFFIN,
     ANTARESWATER,
     CASCADIABASINWATER,
+    LIQUIDARGON,
 };
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-static const std::array<std::string, 14> Medium_Name = {
+static const std::array<std::string, 15> Medium_Name = {
     "water",
     "ice",
     "salt",
@@ -216,6 +218,7 @@ static const std::array<std::string, 14> Medium_Name = {
     "paraffin",
     "antareswater",
     "cascadiabasinwater",
+    "liquidargon",
 };
 } // namespace PROPOSAL
 
