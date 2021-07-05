@@ -412,6 +412,14 @@ double crosssection::BremsSandrockSoedingreksoRhode::CalculateParametrization(
         s_rad += d[3] * v * std::log(v) + d[4] * tmp + d[5] * tmp * tmp;
     }
 
+    // Vacuum polarization
+    double s_vac, a_vac, b_vac, c_vac;
+    a_vac = 2.60288 - 0.06468/Z13;
+    b_vac = 0.267183 + 0.00979099/Z13;
+    c_vac = 2.05536 - 0.0860752/Z13;
+    s_vac = ALPHA/M_PI*b_vac*std::log(pow(a_vac, 1/b_vac)
+      + std::exp(c_vac/b_vac)*delta/p_def.mass);
+
     // Coulomb correction
     double nu = Z * ALPHA;
     double aa[2], bb[2], cc[2], dd[2], gg[2];
