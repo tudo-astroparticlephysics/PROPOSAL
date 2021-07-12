@@ -183,7 +183,7 @@ import proposal as pp
 mu_def = pp.particle.MuMinusDef()
 prop = pp.Propagator(
 	  particle_def=mu_def,
-	  config_file="path/to/config.json"
+	  path_to_config_file="path/to/config.json"
 )
 
 init_state = pp.particle.ParticleState()
