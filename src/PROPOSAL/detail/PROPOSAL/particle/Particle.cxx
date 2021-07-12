@@ -106,26 +106,20 @@ ParticleDef ParticleState::GetParticleDef() const
         return p_search->second;
     }
 
-    throw std::invalid_argument("Particle def for ParticleType not found.");
+    throw std::invalid_argument("ParticleState: ParticleDef not found for "
+                                "given ParticleType " + std::to_string(type));
 }
 
 void ParticleState::SetMomentum(double momentum)
 {
-    auto particle = Type_Particle_Map.find(static_cast<ParticleType>(type));
-    if (particle != Type_Particle_Map.end())
-        energy = std::sqrt(momentum * momentum
-            + particle->second.mass * particle->second.mass);
-    else
-        energy = momentum;
+    energy = std::sqrt(momentum * momentum
+                       + std::pow(GetParticleDef().mass, 2));
 }
 
 double ParticleState::GetMomentum() const
 {
-    auto particle = Type_Particle_Map.find(static_cast<ParticleType>(type));
-    if (particle != Type_Particle_Map.end())
-        return std::sqrt((energy + particle->second.mass)
-            * (energy - particle->second.mass));
-    return energy;
+    auto mass = GetParticleDef().mass;
+    return std::sqrt((energy + mass) * (energy - mass));
 }
 
 StochasticLoss::StochasticLoss(int type, double loss_energy, const Vector3D& position,
