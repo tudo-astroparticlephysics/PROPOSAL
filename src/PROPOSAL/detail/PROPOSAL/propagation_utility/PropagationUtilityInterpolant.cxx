@@ -8,6 +8,8 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Logging.h"
+#include "PROPOSAL/math/MathMethods.h"
 
 using namespace PROPOSAL;
 
@@ -94,8 +96,18 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
     initial_guess.x = NAN;
     initial_guess.upper = upper_limit;
 
-    return cubic_splines::find_parameter(
-        *interpolant_, integrated_to_upper - rnd, initial_guess);
+    try {
+        return cubic_splines::find_parameter(
+                *interpolant_, integrated_to_upper - rnd, initial_guess);
+    } catch (...) {
+        Logging::Get("proposal.UtilityInterpolant")->warn(
+                "Newton-Raphson iteration in UtilityInterpolant::GetUpperLimit "
+                "failed. Try solving using bisection method.");
+        auto f = [this, &integrated_to_upper, &rnd](double val) {
+            return interpolant_->evaluate(val) - (integrated_to_upper - rnd);
+        };
+        return Bisection(f, lower_lim, upper_limit, 1e-6, 100);
+    }
 
     // TODO: Check whether this is already accurate enough
     // (see e.g. version at a81e54f62f4383936cb046da4cad7429a48bb750 for old
