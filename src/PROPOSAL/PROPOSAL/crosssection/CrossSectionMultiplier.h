@@ -39,6 +39,10 @@ namespace PROPOSAL {
             return cross_->GetLowerEnergyLim();
         }
 
+        double GetMinStochasticEnergy() const override{
+            return cross_->GetMinStochasticEnergy();
+        }
+
         size_t GetHash() const noexcept override {
             auto hash = cross_->GetHash();
             hash_combine(hash, multiplier_);

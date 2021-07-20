@@ -11,20 +11,23 @@ Interaction::Interaction(
     std::shared_ptr<Displacement> _disp, std::vector<cross_ptr> const& _cross)
     : disp(_disp)
     , cross_list(_cross)
-    , hash(CrossSectionVector::GetHash(cross_list))
+    , lower_lim(CrossSectionVector::GetMinStochasticEnergy(_cross))
+    , hash(CrossSectionVector::GetHash(_cross))
 {
-    if (cross_list.size() < 1)
+    if (_cross.size() < 1)
         throw std::invalid_argument("At least one crosssection is required.");
 }
 
 double Interaction::FunctionToIntegral(double energy) const
 {
+    if (energy <= GetLowerLim())
+        return 0;
+
     auto total_rate = 0.;
     for (auto& c : cross_list)
         total_rate += c->CalculatedNdx(energy);
-    if (total_rate > 0)
-        return disp->FunctionToIntegral(energy) * total_rate;
-    return 0;
+
+    return disp->FunctionToIntegral(energy) * total_rate;
 }
 
 double Interaction::MeanFreePath(double energy)

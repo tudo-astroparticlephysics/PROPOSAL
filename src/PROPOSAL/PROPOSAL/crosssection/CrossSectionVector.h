@@ -1,7 +1,7 @@
 #pragma once
 
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #include <algorithm>
 #include <type_traits>
@@ -13,29 +13,42 @@ struct CrossSectionVector {
 
     template <typename CrossVec>
     static std::vector<InteractionType> GetInteractionTypes(
-        CrossVec&& cross_vec)
+        CrossVec const& cross)
     {
         auto v = std::vector<InteractionType>();
-        for (auto& c_ptr : cross_vec)
-            v.push_back(c_ptr->GetInteractionType());
+        for (auto const& c : cross)
+            v.push_back(c->GetInteractionType());
         return v;
     }
 
-    template <typename CrossVec> static double GetLowerLim(CrossVec&& cross_vec)
+    template <typename CrossVec>
+    static double GetLowerLim(CrossVec const& cross)
     {
         using val_t = typename std::decay<CrossVec>::type::value_type;
-        auto result = std::max_element(
-            cross_vec.begin(), cross_vec.end(), [](val_t a_ptr, val_t b_ptr) {
+        auto r = std::max_element(
+            cross.begin(), cross.end(), [](val_t a_ptr, val_t b_ptr) {
                 return a_ptr->GetLowerEnergyLim() > b_ptr->GetLowerEnergyLim();
             });
-        return (*result)->GetLowerEnergyLim();
+        return (*r)->GetLowerEnergyLim();
     }
 
-    template <typename CrossVec> static size_t GetHash(CrossVec&& cross)
+    template <typename CrossVec>
+    static double GetMinStochasticEnergy(CrossVec const& cross)
     {
-        auto hash_digest = size_t{ 0 };
-        for (auto& c_ptr : cross)
-            hash_combine(hash_digest, c_ptr->GetHash());
+        using val_t = typename std::decay<CrossVec>::type::value_type;
+        auto r = std::max_element(
+            cross.begin(), cross.end(), [](val_t a_ptr, val_t b_ptr) {
+                return a_ptr->GetMinStochasticEnergy()
+                    > b_ptr->GetMinStochasticEnergy();
+            });
+        return (*r)->GetMinStochasticEnergy();
+    }
+
+    template <typename CrossVec> static size_t GetHash(CrossVec const& cross)
+    {
+        auto hash_digest = size_t { 0 };
+        for (auto const& c : cross)
+            hash_combine(hash_digest, c->GetHash());
         return hash_digest;
     }
 };

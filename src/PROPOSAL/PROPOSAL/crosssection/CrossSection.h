@@ -57,6 +57,7 @@ struct CrossSectionBase {
         = 0;
     virtual double CalculateStochasticLoss(size_t, double, double) = 0;
     virtual double GetLowerEnergyLim() const = 0;
+    virtual double GetMinStochasticEnergy() const = 0;
     virtual size_t GetHash() const noexcept = 0;
     virtual InteractionType GetInteractionType() const noexcept = 0;
     virtual std::string GetParametrizationName() const noexcept = 0;
@@ -228,8 +229,19 @@ protected:
     std::unique_ptr<std::vector<std::tuple<double, de2dx_ptr>>> de2dx;
 
     double lower_energy_lim;
+    double min_stochastic_energy;
     InteractionType interaction_type;
     std::string param_name;
+
+private:
+    template <typename T> static double CalculateMinStochasticEnergy(T const& m)
+    {
+        double min_energy = std::numeric_limits<double>::infinity();
+        for (auto const& i : m)
+            min_energy = std::min(
+                std::get<1>(i.second)->GetLowerEnergyLim(), min_energy);
+        return min_energy;
+    }
 
 public:
     template <typename Param,
@@ -248,21 +260,22 @@ public:
         , de2dx(detail::build_de2dx(
               comp_wise {}, interpol, param, p, m, cut, hash))
         , lower_energy_lim(param.GetLowerEnergyLim(p))
+        , min_stochastic_energy(CalculateMinStochasticEnergy(*dndx))
         , interaction_type(static_cast<InteractionType>(_id::value))
         , param_name(_name::value)
     {
         // initialize hash
         hash = 0;
         if (dndx) {
-            for (auto& dndx_: *dndx)
+            for (auto& dndx_ : *dndx)
                 hash_combine(hash, std::get<1>(dndx_.second)->GetHash());
         }
         if (dedx) {
-            for (auto& dedx_: *dedx)
+            for (auto& dedx_ : *dedx)
                 hash_combine(hash, std::get<1>(dedx_)->GetHash());
         }
         if (de2dx) {
-            for (auto& de2dx_: *de2dx)
+            for (auto& de2dx_ : *de2dx)
                 hash_combine(hash, std::get<1>(de2dx_)->GetHash());
         }
     }
@@ -365,6 +378,11 @@ public:
     inline double GetLowerEnergyLim() const override
     {
         return lower_energy_lim;
+    }
+
+    inline double GetMinStochasticEnergy() const override
+    {
+        return min_stochastic_energy;
     }
 
     inline InteractionType GetInteractionType() const noexcept override

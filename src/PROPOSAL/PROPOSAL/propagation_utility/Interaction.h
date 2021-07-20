@@ -19,6 +19,7 @@ protected:
 
     std::shared_ptr<Displacement> disp;
     crosssection_list_t cross_list;
+    double lower_lim;
     size_t hash;
 
 
@@ -47,6 +48,7 @@ public:
 
     double MeanFreePath(double energy);
 
+    auto GetLowerLim() const noexcept { return lower_lim; }
     auto GetHash() const noexcept { return hash; }
 };
 } // namespace PROPOSAL
