@@ -26,12 +26,12 @@ InteractionBuilder::InteractionBuilder(std::shared_ptr<Displacement> _disp,
 
 double InteractionBuilder::EnergyInteraction(double energy, double rnd)
 {
-    /* assert(energy >= disp->GetLowerLim()); */
+    assert(energy >= disp->GetLowerLim());
     auto rndi = -std::log(rnd);
     auto rndiMin = EnergyIntegral(energy, GetLowerLim());
 
     if (rndi >= rndiMin)
-        return GetLowerLim();
+        return disp->GetLowerLim();
 
     return interaction_integral->GetUpperLimit(energy, rndi);
 }
