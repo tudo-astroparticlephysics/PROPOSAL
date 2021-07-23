@@ -2,7 +2,6 @@
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-#include <iostream>
 
 using namespace PROPOSAL;
 
