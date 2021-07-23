@@ -36,10 +36,10 @@ struct CrossSectionVector {
     static double GetMinStochasticEnergy(CrossVec const& cross)
     {
         using val_t = typename std::decay<CrossVec>::type::value_type;
-        auto r = std::max_element(
+        auto r = std::min_element(
             cross.begin(), cross.end(), [](val_t a_ptr, val_t b_ptr) {
                 return a_ptr->GetMinStochasticEnergy()
-                    > b_ptr->GetMinStochasticEnergy();
+                    < b_ptr->GetMinStochasticEnergy();
             });
         return (*r)->GetMinStochasticEnergy();
     }

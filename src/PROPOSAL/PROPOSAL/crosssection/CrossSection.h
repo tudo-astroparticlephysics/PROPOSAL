@@ -234,13 +234,18 @@ protected:
     std::string param_name;
 
 private:
+    template <typename T>
+    static bool is_max_stochastic_energy(T const& e1, T const& e2)
+    {
+        return std::get<1>(e1.second)->GetLowerEnergyLim()
+            < std::get<1>(e2.second)->GetLowerEnergyLim();
+    }
+
     template <typename T> static double CalculateMinStochasticEnergy(T const& m)
     {
-        double min_energy = std::numeric_limits<double>::infinity();
-        for (auto const& i : m)
-            min_energy = std::min(
-                std::get<1>(i.second)->GetLowerEnergyLim(), min_energy);
-        return min_energy;
+        auto res = std::min_element(m.cbegin(), m.cend(),
+            is_max_stochastic_energy<typename T::value_type>);
+        return std::get<1>(res->second)->GetLowerEnergyLim();
     }
 
 public:
