@@ -160,6 +160,22 @@ TEST(EnergyInteraction, CompareIntegralInterpolant)
     }
 }
 
+TEST(EnergyInteraction, UtilityInterpolantFail)
+{
+    auto cross = GetCrossSections();
+    auto interaction = make_interaction(cross, true);
+    double E_i = 3180.6693833361928;
+    double rnd = 0.7638014946;
+
+    // this should cause cubic_splines::find_parameter to fail
+    // TODO: Check that this actually triggers the correct case
+    auto E_f = interaction->EnergyInteraction(E_i, rnd);
+
+    // Check that the result is consistent
+    auto val = interaction->EnergyIntegral(E_i, E_f);
+    EXPECT_NEAR(-std::log(rnd), val, val * 1e-4);
+}
+
 TEST(MeanFreePath, ConsistencyCheck)
 {
     // The free mean path length should decrease for higher energies
