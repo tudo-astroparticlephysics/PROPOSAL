@@ -71,6 +71,7 @@
 #include "PROPOSAL/secondaries/parametrization/annihilation/SingleDifferentialAnnihilation.h"
 #include "PROPOSAL/secondaries/parametrization/bremsstrahlung/Bremsstrahlung.h"
 #include "PROPOSAL/secondaries/parametrization/bremsstrahlung/NaivBremsstrahlung.h"
+#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/BremsEGS4Approximation.h"
 #include "PROPOSAL/secondaries/parametrization/compton/Compton.h"
 #include "PROPOSAL/secondaries/parametrization/compton/NaivCompton.h"
 #include "PROPOSAL/secondaries/parametrization/epairproduction/EpairProduction.h"

@@ -1,6 +1,7 @@
 #include "PROPOSAL/secondaries/parametrization/Parametrization.h"
 #include "PROPOSAL/secondaries/parametrization/annihilation/HeitlerAnnihilation.h"
 #include "PROPOSAL/secondaries/parametrization/bremsstrahlung/NaivBremsstrahlung.h"
+#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/BremsEGS4Approximation.h"
 #include "PROPOSAL/secondaries/parametrization/compton/NaivCompton.h"
 #include "PROPOSAL/secondaries/parametrization/epairproduction/KelnerKokoulinPetrukhinEpairProduction.h"
 #include "PROPOSAL/secondaries/parametrization/epairproduction/NaivEpairProduction.h"
@@ -95,6 +96,9 @@ void init_secondaries(py::module& m)
     SecondariesBuilder<secondaries::NaivBremsstrahlung,
         secondaries::Bremsstrahlung> {}
         .decl_param(m_sub, "NaivBremsstrahlung");
+    SecondariesBuilder<secondaries::BremsEGS4Approximation,
+        secondaries::NaivBremsstrahlung> {}
+        .decl_param(m_sub, "BremsEGS4Approximation");
 
     SecondariesBuilder<secondaries::NaivCompton, secondaries::Compton> {}
         .decl_param(m_sub, "NaivCompton");
