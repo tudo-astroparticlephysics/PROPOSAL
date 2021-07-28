@@ -1,5 +1,6 @@
 #include "PROPOSAL/secondaries/parametrization/bremsstrahlung/BremsEGS4Approximation.h"
 #include "PROPOSAL/Constants.h"
+#include <cmath>
 
 using namespace PROPOSAL;
 
