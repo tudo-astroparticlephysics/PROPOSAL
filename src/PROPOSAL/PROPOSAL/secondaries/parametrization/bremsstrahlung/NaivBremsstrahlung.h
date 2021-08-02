@@ -19,7 +19,8 @@ namespace secondaries {
             StochasticLoss, const Component&, std::vector<double>&) override;
 
         virtual std::pair<Cartesian3D, Cartesian3D> CalculateDirections(
-                const Vector3D&, double, std::vector<double>&);
+                const Vector3D&, double, double,
+                const Component&, std::vector<double>&);
     };
 } // namespace secondaries
 } // namespace PROPOSAL

@@ -6,7 +6,7 @@ using namespace PROPOSAL;
 
 std::pair<Cartesian3D, Cartesian3D>
 secondaries::BremsEGS4Approximation::CalculateDirections(
-        const Vector3D& init_direction, double energy,
+        const Vector3D& init_direction, double energy, double, const Component&,
         std::vector<double>& rnd){
     // Approximation for bremsstrahlung photons used in EGS4
     auto cosphi = std::cos(primary_lepton_mass / energy);

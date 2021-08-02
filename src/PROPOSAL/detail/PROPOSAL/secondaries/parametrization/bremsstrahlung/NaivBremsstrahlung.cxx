@@ -8,10 +8,10 @@
 using namespace PROPOSAL;
 
 std::vector<ParticleState> secondaries::NaivBremsstrahlung::CalculateSecondaries(
-    StochasticLoss loss, const Component&, std::vector<double>& rnd)
+    StochasticLoss loss, const Component& c, std::vector<double>& rnd)
 {
     auto directions = CalculateDirections(
-            loss.direction, loss.parent_particle_energy, rnd);
+            loss.direction, loss.parent_particle_energy, loss.energy, c, rnd);
 
     auto primary_lepton = ParticleState();
     primary_lepton.energy = loss.parent_particle_energy - loss.energy;
@@ -34,6 +34,7 @@ std::vector<ParticleState> secondaries::NaivBremsstrahlung::CalculateSecondaries
 
 std::pair<Cartesian3D, Cartesian3D>
         secondaries::NaivBremsstrahlung::CalculateDirections(
-                const Vector3D& init_direction, double, std::vector<double>&) {
+                const Vector3D& init_direction, double, double,
+                const Component&, std::vector<double>&) {
     return std::pair<Cartesian3D, Cartesian3D>(init_direction, init_direction);
 }
