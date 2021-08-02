@@ -2,6 +2,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include <cmath>
+#include <algorithm>
 #include <limits>
 
 using namespace PROPOSAL;
