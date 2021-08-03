@@ -58,12 +58,15 @@ namespace crosssection {
     };
 
     struct PhotoPairKochMotz : public PhotoPairProduction {
-        PhotoPairKochMotz() { hash_combine(hash, std::string("kochmotz")); }
+        PhotoPairKochMotz();
         using base_param_t = PhotoPairProduction;
         std::unique_ptr<Parametrization<Component>> clone() const final;
 
         virtual double DifferentialCrossSection(
                 const ParticleDef&, const Component&, double, double) const;
+
+        private:
+            std::shared_ptr<Interpolant> interpolant_;
     };
 
     template <> struct ParametrizationName<PhotoPairTsai> {

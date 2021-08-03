@@ -9,6 +9,8 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/crosssection/parametrization/ParamTables.h"
+#include "PROPOSAL/math/Interpolant.h"
 
 using namespace PROPOSAL;
 using std::make_tuple;
@@ -47,6 +49,14 @@ crosssection::PhotoPairKochMotz::clone() const
 {
     using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
     return std::make_unique<param_t>(*this);
+}
+
+crosssection::PhotoPairKochMotz::PhotoPairKochMotz()
+    : interpolant_(new Interpolant(photopair_KM_Z, photopair_KM_energies,
+                                   photopair_KM_cross, 2, false, false,
+                                   2, false, false))
+        {
+    hash_combine(hash, std::string("kochmotz"));
 }
 
 double crosssection::PhotoPairKochMotz::DifferentialCrossSection(
@@ -110,7 +120,15 @@ double crosssection::PhotoPairKochMotz::DifferentialCrossSection(
 
     xi = Lp / (Lr - f_c);
 
-    double A_fac = 1; //TODO: add corrections for below 50 MeV here
+    double A_fac = 1.0;
+    if (energy < 50) {
+        f_c = 0;
+        // Correction factor for low energies. Corresponds to the difference
+        // between dNdx (no cuts and A=1) and the empirical estimate given
+        // by the Storm and Israel data (doi.org/10.1016/S0092-640X(70)80017-1)
+        A_fac = interpolant_->InterpolateArray(comp.GetNucCharge(), energy);
+    }
+
     auto result = A_fac * comp.GetNucCharge() * (comp.GetNucCharge() + xi);
 
     result *= RE * RE * ALPHA * ( (2 * v * v - 2 * v + 1) * (phi1 - 4./3. * logZ - 4. * f_c)

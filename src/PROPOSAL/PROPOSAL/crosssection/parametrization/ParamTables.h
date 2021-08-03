@@ -52,4 +52,12 @@ namespace PROPOSAL {
 
     const extern std::vector< std::vector<double> > A_correction;
 
+    // PhotoPairKochMotz
+
+    const extern std::vector<double> photopair_KM_energies;
+    const extern std::vector<double> photopair_KM_Z;
+
+    const extern std::vector< std::vector<double> > photopair_KM_cross;
+
+
 } // namespace PROPOSAL
