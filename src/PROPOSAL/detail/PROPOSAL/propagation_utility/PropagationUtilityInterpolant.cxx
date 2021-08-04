@@ -99,7 +99,7 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
     try {
         return cubic_splines::find_parameter(
                 *interpolant_, integrated_to_upper - rnd, initial_guess);
-    } catch (...) {
+    } catch (std::runtime_error&) {
         Logging::Get("proposal.UtilityInterpolant")->warn(
                 "Newton-Raphson iteration in UtilityInterpolant::GetUpperLimit "
                 "failed. Try solving using bisection method.");
