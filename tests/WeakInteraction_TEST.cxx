@@ -9,6 +9,7 @@
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSALTestUtilities/TestFilesHandling.h"
+#include "PROPOSAL/secondaries/parametrization/weakinteraction/WeakCooperSarkarMertsch.h"
 
 using namespace PROPOSAL;
 
@@ -216,7 +217,7 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
         config["parametrization"] = parametrization;
 
         auto cross = make_weakinteraction(particle_def, *medium, false, config);
-
+        auto secondaries = secondaries::WeakCooperSarkarMertsch(particle_def, *medium);
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = medium->GetComponents();
         double sum = 0;
@@ -229,8 +230,10 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
                 stochastic_loss_new = energy
                     * cross->CalculateStochasticLoss(
                         comp.GetHash(), energy, rate_new);
-                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
-                    1E-3 * stochastic_loss_stored);
+                auto stochastic_loss_secondaries = energy * secondaries.CalculateRelativeLoss(energy, rnd1, comp);
+                EXPECT_EQ(stochastic_loss_new, energy); // all energy lost
+                EXPECT_NEAR(stochastic_loss_secondaries, stochastic_loss_stored,
+                    5E-2 * stochastic_loss_stored);
                 break;
             }
         }
@@ -293,7 +296,7 @@ TEST(WeakInteraction, Test_of_e_interpol)
         config["parametrization"] = parametrization;
 
         auto cross = make_weakinteraction(particle_def, *medium, true, config);
-
+        auto secondaries = secondaries::WeakCooperSarkarMertsch(particle_def, *medium);
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = medium->GetComponents();
         double sum = 0;
@@ -304,13 +307,10 @@ TEST(WeakInteraction, Test_of_e_interpol)
                 double rate_new = dNdx_for_comp * rnd1;
                 auto v = cross->CalculateStochasticLoss(
                     comp.GetHash(), energy, rate_new);
-                EXPECT_NEAR(energy * v, stochastic_loss_stored,
+                auto stochastic_loss_secondaries = energy * secondaries.CalculateRelativeLoss(energy, rnd1, comp);
+                EXPECT_EQ(v, 1.); //all energy lost
+                EXPECT_NEAR(stochastic_loss_secondaries, stochastic_loss_stored,
                     5e-2 * stochastic_loss_stored);
-
-                // cross check
-                auto rate_rnd = cross->CalculateCumulativeCrosssection(
-                    energy, comp.GetHash(), v);
-                EXPECT_NEAR(rate_rnd / dNdx_for_comp, rnd1, 1e-4);
                 break;
             }
         }

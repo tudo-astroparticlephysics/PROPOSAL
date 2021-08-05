@@ -84,6 +84,7 @@
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsai.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsaiForwardPeaked.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotopairProduction.h"
+#include "PROPOSAL/secondaries/parametrization/weakinteraction/WeakCooperSarkarMertsch.h"
 
 #include "PROPOSAL/secondaries/SecondariesCalculator.h"
 
