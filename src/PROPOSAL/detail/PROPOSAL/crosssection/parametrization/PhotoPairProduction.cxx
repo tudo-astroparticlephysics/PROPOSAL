@@ -11,6 +11,7 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/crosssection/parametrization/ParamTables.h"
 #include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/math/Integral.h"
 
 using namespace PROPOSAL;
 using std::make_tuple;
@@ -55,11 +56,29 @@ crosssection::PhotoPairKochMotz::PhotoPairKochMotz()
     : interpolant_(new Interpolant(photopair_KM_Z, photopair_KM_energies,
                                    photopair_KM_cross, 2, false, false,
                                    2, false, false))
-        {
+{
     hash_combine(hash, std::string("kochmotz"));
 }
 
 double crosssection::PhotoPairKochMotz::DifferentialCrossSection(
+        const ParticleDef& p, const Component& comp, double energy, double v) const
+{
+    if (energy > 50)
+        return DifferentialCrossSectionWithoutA(p, comp, energy, v);
+
+    // Correction factor A for low energies given by the Storm and Israel data
+    // (doi.org/10.1016/S0092-640X(70)80017-1)
+    auto limits = PhotoPairProduction::GetKinematicLimits(p, comp, energy);
+    Integral i;
+    auto integrand = [this, &p, &comp, energy](double v) {
+        return this->DifferentialCrossSectionWithoutA(p, comp, energy, v) / NA * comp.GetAtomicNum() / (1e-24);
+    };
+    auto dNdx_nocorrection = i.Integrate(limits.v_min, limits.v_max, integrand, 3);
+    auto A = interpolant_->InterpolateArray(comp.GetNucCharge(), energy) / dNdx_nocorrection;
+    return A * DifferentialCrossSectionWithoutA(p, comp, energy, v);
+}
+
+double crosssection::PhotoPairKochMotz::DifferentialCrossSectionWithoutA(
         const ParticleDef&, const Component& comp, double energy, double v) const
 {
     double Z3 = std::pow(comp.GetNucCharge(), -1. / 3);
@@ -120,16 +139,10 @@ double crosssection::PhotoPairKochMotz::DifferentialCrossSection(
 
     xi = Lp / (Lr - f_c);
 
-    double A_fac = 1.0;
-    if (energy < 50) {
+    if (energy < 50)
         f_c = 0;
-        // Correction factor for low energies. Corresponds to the difference
-        // between dNdx (no cuts and A=1) and the empirical estimate given
-        // by the Storm and Israel data (doi.org/10.1016/S0092-640X(70)80017-1)
-        A_fac = interpolant_->InterpolateArray(comp.GetNucCharge(), energy);
-    }
 
-    auto result = A_fac * comp.GetNucCharge() * (comp.GetNucCharge() + xi);
+    auto result = comp.GetNucCharge() * (comp.GetNucCharge() + xi);
 
     result *= RE * RE * ALPHA * ( (2 * v * v - 2 * v + 1) * (phi1 - 4./3. * logZ - 4. * f_c)
             + 2./3 * v * (1. - v) * (phi2 - 4./3. * logZ - 4 * f_c));

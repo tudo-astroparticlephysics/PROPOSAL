@@ -67,6 +67,8 @@ namespace crosssection {
 
         private:
             std::shared_ptr<Interpolant> interpolant_;
+            double DifferentialCrossSectionWithoutA(
+                    const ParticleDef&, const Component&, double, double) const;
     };
 
     template <> struct ParametrizationName<PhotoPairTsai> {
