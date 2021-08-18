@@ -35,6 +35,19 @@ def get_cmake():
     raise OSError('You need cmake >= 3.9')
 
 
+def is_old_libcxx():
+    ''' if we are on gcc, we might be using an old library ABI '''
+    try:
+        compiler = sp.check_output(['conan', 'profile', 'get', 'settings.compiler', 'default'], encoding='UTF-8').rstrip('\n')
+        if compiler == 'gcc':
+            libcxx = sp.check_output(['conan', 'profile', 'get', 'settings.compiler.libcxx', 'default'], encoding='UTF-8').rstrip('\n')
+            if (libcxx == 'libstdc++'):
+                return True
+        return False;
+    except CalledProcessError:
+        return False;
+
+
 class CMakeExtension(Extension):
     def __init__(self, name, source_dir=None, target=None, **kwargs):
         if source_dir is None:
@@ -67,6 +80,7 @@ class build_ext_cmake(build_ext):
             sysconfig.get_config_var('LIBDIR'),
             sysconfig.get_config_var('INSTSONAME')
         )
+        CMAKE_CXX_FLAGS = ''
         if not os.getenv('NO_CONAN', False):
             print("Using conan to install dependencies. Set environment variable NO_CONAN to skip conan.")
             conan_call = [
@@ -74,9 +88,12 @@ class build_ext_cmake(build_ext):
                 'install',
                 ext.source_dir,
                 '-o with_python=True',
-                '-o with_testing=False'
-            ]
+                '-o with_testing=False',
+                '--build=missing'
+               ]
             sp.run(conan_call, cwd=self.build_temp, check=True)
+            if is_old_libcxx():
+                CMAKE_CXX_FLAGS = '-DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=OFF"'
         cmake_call = [
             cmake,
             ext.source_dir,
@@ -91,8 +108,10 @@ class build_ext_cmake(build_ext):
             '-DCMAKE_INSTALL_RPATH={}'.format(rpath),
             '-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON',
             '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF',
-            '-DPYTHON_INCLUDE_DIR=' + sysconfig.get_path('include'),
+            '-DPYTHON_INCLUDE_DIR=' + sysconfig.get_path('include')
         ]
+        if CMAKE_CXX_FLAGS:
+            cmake_call.append(CMAKE_CXX_FLAGS)
         sp.run(cmake_call, cwd=self.build_temp, check=True)
         build_call = [
             cmake,
