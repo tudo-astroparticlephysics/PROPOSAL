@@ -45,8 +45,6 @@ jobs:
           with:
             path: ~/.conan
             key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}
-        - name: Which key?
-          run: echo ${{ runner.os }}-cache-build-${{ matrix.compiler }}
         - name: Cache build
           id: cache-build
           uses: actions/cache@v2
