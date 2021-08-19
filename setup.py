@@ -11,41 +11,63 @@ from setuptools.command.build_ext import build_ext
 
 
 SETUP_DIR = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(SETUP_DIR, 'CMakeLists.txt')) as f:
+with open(os.path.join(SETUP_DIR, "CMakeLists.txt")) as f:
     f_read = f.read()
-    res = re.search(r'PROPOSAL_VERSION_MAJOR (\d)', f_read)
+    res = re.search(r"PROPOSAL_VERSION_MAJOR (\d)", f_read)
     v_major = res.group(1)
-    res = re.search(r'PROPOSAL_VERSION_MINOR (\d)', f_read)
+    res = re.search(r"PROPOSAL_VERSION_MINOR (\d)", f_read)
     v_minor = res.group(1)
-    res = re.search(r'PROPOSAL_VERSION_PATCH (\d)', f_read)
+    res = re.search(r"PROPOSAL_VERSION_PATCH (\d)", f_read)
     v_patch = res.group(1)
-    version = v_major + '.' + v_minor + '.' + v_patch
+    version = v_major + "." + v_minor + "." + v_patch
 
 
 def get_cmake():
-    ''' On centos 7, cmake is cmake 2.x but we need > 3.8'''
-    for exe in ['cmake3', 'cmake']:
+    """ On centos 7, cmake is cmake 2.x but we need > 3.8"""
+    for exe in ["cmake3", "cmake"]:
         try:
-            ret = sp.run([exe, '--version'], stdout=sp.PIPE, stderr=sp.PIPE)
+            ret = sp.run([exe, "--version"], stdout=sp.PIPE, stderr=sp.PIPE)
         except Exception:
             continue
 
         if ret.returncode == 0:
             return exe
-    raise OSError('You need cmake >= 3.9')
+    raise OSError("You need cmake >= 3.9")
+
+
+def exists_conan_default_file():
+    profiles = sp.check_output(["conan", "profile", "list"]).split()
+    if "default" in profiles:
+        return True
+    return False
+
+
+def create_conan_profile(name):
+    cmd = ["conan", "profile", "new", f"{name}", "--detect"]
+    r = sp.run(cmd)
+    if r.returncode != 0:
+        raise RuntimeError(
+            "conan was not abel to create a new profile named {name}."
+        )
 
 
 def is_old_libcxx():
-    ''' if we are on gcc, we might be using an old library ABI '''
-    try:
-        compiler = sp.check_output(['conan', 'profile', 'get', 'settings.compiler', 'default'], encoding='UTF-8').rstrip('\n')
-        if compiler == 'gcc':
-            libcxx = sp.check_output(['conan', 'profile', 'get', 'settings.compiler.libcxx', 'default'], encoding='UTF-8').rstrip('\n')
-            if (libcxx == 'libstdc++'):
-                return True
-        return False;
-    except CalledProcessError:
-        return False;
+    """ if we are on gcc, we might be using an old library ABI """
+
+    cmd = ["conan", "profile", "get", "settings.compiler", "default"]
+    r = sp.check_output(cmd, encoding="UTF-8")
+    compiler = r.split()[0]
+
+    if compiler != "gcc":
+        return False
+
+    cmd = ["conan", "profile", "get", "settings.compiler.libcxx", "default"]
+    libcxx = sp.check_output(cmd, encoding="UTF-8")
+
+    if libcxx == "libstdc++11":
+        return False
+
+    return True
 
 
 class CMakeExtension(Extension):
@@ -80,9 +102,15 @@ class build_ext_cmake(build_ext):
             sysconfig.get_config_var('LIBDIR'),
             sysconfig.get_config_var('INSTSONAME')
         )
-        CMAKE_CXX_FLAGS = ''
-        if not os.getenv('NO_CONAN', False):
-            print("Using conan to install dependencies. Set environment variable NO_CONAN to skip conan.")
+        CMAKE_CXX_FLAGS = ""
+        if not os.getenv("NO_CONAN", False):
+            print(
+                "Using conan to install dependencies. Set environment variable NO_CONAN to skip conan."
+            )
+
+            if exists_conan_default_file():
+                create_conan_profile("default")
+
             conan_call = [
                 'conan',
                 'install',
