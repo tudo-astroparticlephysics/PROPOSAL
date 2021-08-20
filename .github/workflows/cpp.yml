@@ -66,17 +66,9 @@ jobs:
           if : steps.cache-build.outputs.cache-hit != 'true'
           run: mkdir PROPOSAL_BUILD
         - name: Install PROPOSAL dependencies
-          if: ${{ matrix.compiler != 'gcc-5' }}
           run: cd PROPOSAL_BUILD && conan install .. -o with_testing=True --build=missing
-        - name: Install PROPOSAL dependencies
-          if: ${{ matrix.compiler == 'gcc-5' }}
-          run: cd PROPOSAL_BUILD && conan install .. -o with_testing=False --build=missing
         - name: Run build automatisation tool
-          if: ${{ matrix.compiler != 'gcc-5' }}
           run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE
-        - name: Run build automatisation tool
-          if: ${{ matrix.compiler == 'gcc-5' }}
-          run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=False
         - name: Build lib
           if: ${{ matrix.os != 'windows-latest' }}
           run: cmake --build PROPOSAL_BUILD
@@ -99,6 +91,9 @@ jobs:
             - os : "ubuntu-18.04"
               compiler : "gcc-7"
               compilerpp : "g++-7"
+            - os : "ubuntu-18.04"
+              compiler : "gcc-5"
+              compilerpp : "g++-5"
             - os : "windows-latest"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
