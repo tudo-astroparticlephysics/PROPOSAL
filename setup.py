@@ -36,7 +36,7 @@ def get_cmake():
 
 
 def exists_conan_default_file():
-    profiles = sp.check_output(["conan", "profile", "list"]).split()
+    profiles = sp.check_output(["conan", "profile", "list"], encoding="UTF-8").split()
     if "default" in profiles:
         return True
     return False
@@ -47,7 +47,7 @@ def create_conan_profile(name):
     r = sp.run(cmd)
     if r.returncode != 0:
         raise RuntimeError(
-            "conan was not abel to create a new profile named {name}."
+            "conan was not able to create a new profile named {name}."
         )
 
 
@@ -62,7 +62,8 @@ def is_old_libcxx():
         return False
 
     cmd = ["conan", "profile", "get", "settings.compiler.libcxx", "default"]
-    libcxx = sp.check_output(cmd, encoding="UTF-8")
+    r = sp.check_output(cmd, encoding="UTF-8")
+    libcxx = r.split()[0]
 
     if libcxx == "libstdc++11":
         return False
@@ -108,7 +109,7 @@ class build_ext_cmake(build_ext):
                 "Using conan to install dependencies. Set environment variable NO_CONAN to skip conan."
             )
 
-            if exists_conan_default_file():
+            if not exists_conan_default_file():
                 create_conan_profile("default")
 
             conan_call = [
