@@ -44,13 +44,13 @@ jobs:
           uses: actions/cache@v2
           with:
             path: ~/.conan
-            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}
+            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-key
         - name: Cache build
           id: cache-build
           uses: actions/cache@v2
           with:
             path: PROPOSAL_BUILD
-            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}
+            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-key
         - uses: actions/setup-python@v2
           with:
             python-version: '3.7'
@@ -104,12 +104,12 @@ jobs:
           uses: actions/cache@v2
           with:
             path: ~/.conan
-            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}
+            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-key
         - name: Cache build
           id: cache-build
           uses: actions/cache@v2
           with:
             path: PROPOSAL_BUILD
-            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}
+            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-key
         - name: Run tests
           run: ctest --test-dir PROPOSAL_BUILD -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
