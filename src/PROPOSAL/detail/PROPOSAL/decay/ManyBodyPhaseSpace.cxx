@@ -138,8 +138,11 @@ std::vector<ParticleState> ManyBodyPhaseSpace::Decay(const ParticleDef& p_def, c
         GenerateEvent(products, kinematics);
     }
 
+    // Get Momentum is not defined for pseudo particle decay, so it must be
+    // calculated manually
+    double primary_momentum = std::sqrt(std::max((p_condition.energy + p_def.mass) * (p_condition.energy - p_def.mass), 0.0));
     // Boost all products in Lab frame (the reason, why the boosting goes in the negative direction of the particle)
-    Boost(products, -p_condition.direction, p_condition.energy/p_def.mass, p_condition.GetMomentum() / p_def.mass);
+    Boost(products, -p_condition.direction, p_condition.energy/p_def.mass, primary_momentum / p_def.mass);
 
     return products;
 }
