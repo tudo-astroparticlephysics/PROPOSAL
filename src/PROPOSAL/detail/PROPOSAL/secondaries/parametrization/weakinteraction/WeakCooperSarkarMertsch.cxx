@@ -44,8 +44,7 @@ secondaries::WeakCooperSarkarMertsch::CalculateSecondaries(StochasticLoss loss,
     sec.emplace_back(static_cast<ParticleType>(weak_partner_type),
                      loss.position, loss.direction, (1. - v) * loss.energy,
                      loss.time, 0.);
-    // TODO: what ParticleType to assign for hadrons?
-    sec.emplace_back(ParticleType::None,
+    sec.emplace_back(ParticleType::Hadron,
                      loss.position, loss.direction, v * loss.energy,
                      loss.time, 0.);
     return sec;
