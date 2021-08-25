@@ -103,6 +103,7 @@ enum class ParticleType : int {
     Monopole = 41,
     SMPPlus = 9500,
     SMPMinus = -9500,
+    Hadron = 81,
 };
 
 struct ParticleType_hash {
