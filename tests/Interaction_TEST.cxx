@@ -33,6 +33,17 @@ TEST(Interaction, Constructor)
     InteractionBuilder interaction_4(disp, cross, std::true_type());
 }
 
+// Hash for Enum necessary to support gcc compilers with version < 6.1
+// see https://stackoverflow.com/questions/18837857/cant-use-enum-class-as-unordered-map-key
+struct EnumClassHash
+{
+    template <typename T>
+    std::size_t operator()(T t) const
+    {
+        return static_cast<std::size_t>(t);
+    }
+};
+
 class HistogramInteraction {
 public:
     HistogramInteraction()
@@ -74,9 +85,9 @@ public:
 
 private:
     const std::array<InteractionType, 4> types
-        = { InteractionType::Brems, InteractionType::Ioniz,
-              InteractionType::Epair, InteractionType::Photonuclear };
-    std::unordered_map<InteractionType, int> histogram;
+        = {{ InteractionType::Brems, InteractionType::Ioniz,
+              InteractionType::Epair, InteractionType::Photonuclear }};
+    std::unordered_map<InteractionType, int, EnumClassHash> histogram;
     double sum;
 };
 

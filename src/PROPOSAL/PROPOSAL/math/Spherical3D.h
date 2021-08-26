@@ -15,8 +15,8 @@ namespace PROPOSAL  {
 
 
         auto GetRadius() const {return coordinates[Radius];}
-        constexpr auto GetAzimuth() const {return coordinates[Azimuth];}
-        constexpr auto GetZenith() const {return coordinates[Zenith];}
+        auto GetAzimuth() const {return coordinates[Azimuth];}
+        auto GetZenith() const {return coordinates[Zenith];}
         void SetRadius(double radius) {coordinates[Radius] = radius;}
         void SetAzimuth(double azimuth) {coordinates[Azimuth] = azimuth;}
         void SetZenith(double zenith) {coordinates[Zenith] = zenith;}
@@ -46,10 +46,10 @@ namespace PROPOSAL  {
         double zenith = 0;
         double azimuth = 0;
     
-        constexpr UnitSphericalVector() = default;
-        constexpr UnitSphericalVector(double zenith, double azimuth)
+        UnitSphericalVector() = default;
+        UnitSphericalVector(double zenith, double azimuth)
             : zenith(zenith), azimuth(azimuth) {};
-        constexpr UnitSphericalVector(const Spherical3D& s)
+        UnitSphericalVector(const Spherical3D& s)
             : zenith(s.GetZenith()), azimuth(s.GetAzimuth()) {};
      };
 } // namespace PROPOSAL

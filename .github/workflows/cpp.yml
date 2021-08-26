@@ -17,24 +17,40 @@ jobs:
             - os : "ubuntu-18.04"
               compiler : "gcc-7"
               compilerpp : "g++-7"
+            - os : "ubuntu-18.04"
+              compiler : "gcc-5"
+              compilerpp : "g++-5"
             - os : "windows-latest"
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
       steps:
         - uses: actions/checkout@v2
+        - name: Install gcc-5
+          if : ${{ matrix.compiler == 'gcc-5' }}
+          run: |
+            sudo apt install g++-5
+            sudo apt install gcc-5
+            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 10
+            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 20
+            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 10
+            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 20
+            sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 30
+            sudo update-alternatives --set cc /usr/bin/gcc
+            sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30
+            sudo update-alternatives --set c++ /usr/bin/g++
         - name: Cache conan
           id: cache-conan
           uses: actions/cache@v2
           with:
             path: ~/.conan
-            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}
+            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-key
         - name: Cache build
           id: cache-build
           uses: actions/cache@v2
           with:
             path: PROPOSAL_BUILD
-            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}
+            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-key
         - uses: actions/setup-python@v2
           with:
             python-version: '3.7'
@@ -75,6 +91,9 @@ jobs:
             - os : "ubuntu-18.04"
               compiler : "gcc-7"
               compilerpp : "g++-7"
+            - os : "ubuntu-18.04"
+              compiler : "gcc-5"
+              compilerpp : "g++-5"
             - os : "windows-latest"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
@@ -85,12 +104,12 @@ jobs:
           uses: actions/cache@v2
           with:
             path: ~/.conan
-            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}
+            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-key
         - name: Cache build
           id: cache-build
           uses: actions/cache@v2
           with:
             path: PROPOSAL_BUILD
-            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}
+            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-key
         - name: Run tests
           run: ctest --test-dir PROPOSAL_BUILD -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
