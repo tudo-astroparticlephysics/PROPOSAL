@@ -6,7 +6,7 @@
 
 using namespace PROPOSAL;
 
-DirectionChangeAngular
+UnitSphericalVector
 stochastic_deflection::KelnerPairProduction::CalculateStochasticDeflection(
         double e_i, double e_f, std::vector<double> const& rnd) const
 {
@@ -32,5 +32,5 @@ stochastic_deflection::KelnerPairProduction::CalculateStochasticDeflection(
     // Need sqrt because of sampling in theta^2
     auto theta_muon = std::sqrt(SampleFromExponential(rnd[0], lambda));
 
-    return DirectionChangeAngular { theta_muon, 2 * PI * rnd[1] };
+    return UnitSphericalVector { theta_muon, 2 * PI * rnd[1] };
 }

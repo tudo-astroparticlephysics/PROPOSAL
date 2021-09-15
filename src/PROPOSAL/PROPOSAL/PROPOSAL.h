@@ -156,7 +156,6 @@
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/ScatteringMultiplier.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
-#include "PROPOSAL/scattering/DirectionChange.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"

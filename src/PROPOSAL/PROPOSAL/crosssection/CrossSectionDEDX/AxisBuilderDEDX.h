@@ -34,8 +34,7 @@ struct exception_axis_builder_dedx : public std::exception {
 
 static constexpr auto axis_builder_dedx_out_of_range_err_str
     = "No node was found where the function value was greater than zero. "
-      "Either there are no continuous losses for the cut, or something went "
-      "wrong.";
+      "Therefore, no dEdx table will be built.";
 struct exception_axis_builder_dedx_out_of_range
     : public exception_axis_builder_dedx {
     virtual const char* what() const noexcept

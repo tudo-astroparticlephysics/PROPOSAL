@@ -160,7 +160,8 @@ ParticleDef getParticleDef(const std::string& name)
 
 TEST(WeakInteraction, Test_of_dNdx)
 {
-    auto in = getTestFiles("Weak_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Weak_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -189,7 +190,8 @@ TEST(WeakInteraction, Test_of_dNdx)
 
 TEST(WeakInteraction, Test_Stochastic_Loss)
 {
-    auto in = getTestFiles("Weak_e.txt");
+    std::ifstream in;
+    getTestFile("Weak_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -237,7 +239,8 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
 
 TEST(WeakInteraction, Test_of_dNdx_Interpolant)
 {
-    auto in = getTestFiles("Weak_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Weak_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -266,7 +269,8 @@ TEST(WeakInteraction, Test_of_dNdx_Interpolant)
 
 TEST(WeakInteraction, Test_of_e_interpol)
 {
-    auto in = getTestFiles("Weak_e.txt");
+    std::ifstream in;
+    getTestFile("Weak_e.txt", in);
 
     std::string particleName;
     std::string mediumName;

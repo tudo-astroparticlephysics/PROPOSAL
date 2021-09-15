@@ -22,12 +22,18 @@ crosssection::KinematicLimits crosssection::Annihilation::GetKinematicLimits(
     ParticleDef const& p_def, Component const&, double energy) const
 {
     // Limits according to simple 2->2 body interactions
-    assert(energy >= p_def.mass);
-    auto gamma = energy / p_def.mass;
-    auto aux = std::sqrt((gamma - 1.) / (gamma + 1.));
     auto kin_lim = crosssection::KinematicLimits();
-    kin_lim.v_min = 0.5 * (1. - aux);
-    kin_lim.v_max = 0.5 * (1. + aux);
+
+    auto gamma = energy / p_def.mass;
+
+    if (gamma <= 1) {
+        kin_lim.v_min = 0;
+        kin_lim.v_max = 0;
+    } else {
+        auto aux = std::sqrt((gamma - 1.) / (gamma + 1.));
+        kin_lim.v_min = 0.5 * (1. - aux);
+        kin_lim.v_max = 0.5 * (1. + aux);
+    }
     return kin_lim;
 }
 
@@ -49,7 +55,6 @@ double crosssection::AnnihilationHeitler::DifferentialCrossSection(
     // with the total available energy being the sum of the total positron
     // energy and the electron mass
 
-    assert(energy >= p_def.mass);
     auto gamma = energy / p_def.mass;
     auto aux = 1. + (2. * gamma) / std::pow(gamma + 1., 2.) - v
         - 1. / std::pow(gamma + 1., 2.) * 1. / v;

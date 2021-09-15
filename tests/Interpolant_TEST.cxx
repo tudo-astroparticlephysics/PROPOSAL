@@ -1,7 +1,11 @@
-
 #include <cmath>
 #include "gtest/gtest.h"
 #include "PROPOSAL/math/Interpolant.h"
+
+#ifdef WIN32
+#include <windows.h>
+#define sleep Sleep
+#endif
 
 using namespace PROPOSAL;
 

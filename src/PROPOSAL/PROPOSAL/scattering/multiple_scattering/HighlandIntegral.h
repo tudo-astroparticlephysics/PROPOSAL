@@ -41,7 +41,6 @@ namespace multiple_scattering {
     class HighlandIntegral : public Highland {
         std::unique_ptr<UtilityIntegral> highland_integral;
 
-        double CalculateTheta0(double, double, double) final;
         inline double Integral(Displacement&, double);
 
     public:
@@ -50,6 +49,8 @@ namespace multiple_scattering {
 
         HighlandIntegral(const ParticleDef& p, Medium const& m,
             std::shared_ptr<Displacement> disp, std::true_type);
+
+        double CalculateTheta0(double, double, double) final;
     };
 } // namespace multiple_scattering
 

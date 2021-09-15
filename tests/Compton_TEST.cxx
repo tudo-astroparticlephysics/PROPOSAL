@@ -119,7 +119,8 @@ const std::string testfile_dir = "tests/TestFiles/";
 
 TEST(Compton, Test_of_dEdx)
 {
-    auto in = getTestFiles("Compton_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Compton_dEdx.txt", in);
     std::string mediumName;
     double ecut;
     double vcut;
@@ -158,7 +159,8 @@ TEST(Compton, Test_of_dEdx)
 
 TEST(Compton, Test_of_dNdx)
 {
-    auto in = getTestFiles("Compton_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Compton_dNdx.txt", in);
 
     std::string mediumName;
     double ecut;
@@ -198,7 +200,8 @@ TEST(Compton, Test_of_dNdx)
 
 TEST(Compton, Test_of_e)
 {
-    auto in = getTestFiles("Compton_e.txt");
+    std::ifstream in;
+    getTestFile("Compton_e.txt", in);
 
     std::string mediumName;
     double ecut;
@@ -264,7 +267,8 @@ TEST(Compton, Test_of_e)
 
 TEST(Compton, Test_of_dEdx_Interpolant)
 {
-    auto in = getTestFiles("Compton_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Compton_dEdx.txt", in);
 
     std::string mediumName;
     double ecut;
@@ -304,7 +308,8 @@ TEST(Compton, Test_of_dEdx_Interpolant)
 
 TEST(Compton, Test_of_dNdx_Interpolant)
 {
-    auto in = getTestFiles("Compton_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Compton_dNdx.txt", in);
 
     std::string mediumName;
     double ecut;
@@ -344,7 +349,8 @@ TEST(Compton, Test_of_dNdx_Interpolant)
 
 TEST(Compton, Test_of_e_Interpolant)
 {
-    auto in = getTestFiles("Compton_e.txt");
+    std::ifstream in;
+    getTestFile("Compton_e.txt", in);
 
     std::string mediumName;
     double ecut;

@@ -166,7 +166,8 @@ TEST(ContinuousRandomization, compare_integral_interpolant)
 
 TEST(ContinuousRandomization, Randomize_interpol)
 {
-    auto in = getTestFiles("continous_randomization.txt");
+    std::ifstream in;
+    getTestFile("continous_randomization.txt", in);
 
     char firstLine[256];
     in.getline(firstLine, 256);

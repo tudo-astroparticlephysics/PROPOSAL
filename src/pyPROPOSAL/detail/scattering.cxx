@@ -26,13 +26,30 @@ void init_scattering(py::module& m)
             py::arg("grammage"), py::arg("e_i"), py::arg("e_f"),
             py::arg("random_numbers"),
             R"pbdoc(
-                Calculate a random averaged scatterangle `u` in cartesian coordinates.
+                Calculate a random averaged scattering angle `u` in cartesian coordinates.
 
                 Args:
-                    dr(double): displacement of particle
-                    ei(double): inital energy
-                    ef(double): final energy
+                    grammage(double): displacement of particle
+                    e_i(double): initial energy
+                    e_f(double): final energy
             )pbdoc");
+
+    py::class_<multiple_scattering::Highland, multiple_scattering::Parametrization,
+        std::shared_ptr<multiple_scattering::Highland>>(m_sub, "Highland")
+        .def("CalculateTheta0", &multiple_scattering::Highland::CalculateTheta0,
+             py::arg("grammage"), py::arg("e_i"), py::arg("e_f"),
+             R"pbdoc(
+                Calculate the average scattering angle for Highland
+                parametrizations.
+
+                Args:
+                    grammage(double): displacement of particle
+                    e_i(double): initial energy
+                    e_f(double): final energy
+            )pbdoc");
+
+    py::class_<multiple_scattering::HighlandIntegral, multiple_scattering::Highland,
+            std::shared_ptr<multiple_scattering::HighlandIntegral>>(m_sub, "HighlandIntegral");
 
     py::class_<multiple_scattering::ScatteringOffset>(m_sub, "scattering_offset")
             .def_readwrite("sx", &multiple_scattering::ScatteringOffset::sx)
@@ -84,11 +101,22 @@ void init_scattering(py::module& m)
         .def("stochastic_deflection",
             &stochastic_deflection::Parametrization::
                 CalculateStochasticDeflection,
-            py::arg("initial_energy"), py::arg("loss_energy"),
+            py::arg("initial_energy"), py::arg("final_energy"),
             py::arg("random_numbers"),
-            R"pbdoc(TODO: Doc is missing because it's not clear if second argument
-            should be the lost energy or the final energy. Please contact the
-            maintainers if required.)pbdoc");
+            R"pbdoc( Calculation of the stochastic deflection of an interaction
+
+                Args:
+                    initial_energy(double): Initial energy of the muon
+                    final_energy(double): Final energy of the muon
+                    random_numbers(list(double)): Random numbers to sample the deflection angles
+
+                Returns:
+                    UnitSphericalVector: The angular change of the direction
+                        contained in a normed spherical vector
+            TODO: it's not clear if second argument should be the lost energy or the final energy.
+            This might probably change in the future.
+            Please contact the maintainers if required.
+            )pbdoc");
 
     using deflect_ptr = std::shared_ptr<stochastic_deflection::Parametrization>;
     using deflect_list_t = std::vector<deflect_ptr>;

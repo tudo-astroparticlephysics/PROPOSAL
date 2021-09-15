@@ -171,7 +171,8 @@ const std::string testfile_dir = "tests/TestFiles/";
 
 TEST(Mupairproduction, Test_of_dEdx)
 {
-    auto in = getTestFiles("Mupair_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Mupair_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -215,7 +216,8 @@ TEST(Mupairproduction, Test_of_dEdx)
 
 TEST(Mupairproduction, Test_of_dNdx)
 {
-    auto in = getTestFiles("Mupair_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Mupair_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -260,7 +262,8 @@ TEST(Mupairproduction, Test_of_dNdx)
 
 TEST(Mupairproduction, Test_Stochastic_Loss)
 {
-    auto in = getTestFiles("Mupair_e.txt");
+    std::ifstream in;
+    getTestFile("Mupair_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -331,7 +334,8 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
 
 TEST(Mupairproduction, Test_Calculate_Rho)
 {
-auto in = getTestFiles("Mupair_rho.txt");
+    std::ifstream in;
+    getTestFile("Mupair_rho.txt", in);
 
 std::string particleName;
 std::string mediumName;
@@ -386,7 +390,8 @@ if (energy <= 1e5) {
 
 TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 {
-    auto in = getTestFiles("Mupair_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Mupair_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -442,7 +447,8 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 
 TEST(Mupairproduction, Test_of_dNdx_Interpolant)
 {
-    auto in = getTestFiles("Mupair_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Mupair_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -496,7 +502,8 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
 
 TEST(Mupairproduction, Test_of_e_interpol)
 {
-    auto in = getTestFiles("Mupair_e.txt");
+    std::ifstream in;
+    getTestFile("Mupair_e.txt", in);
 
     std::string particleName;
     std::string mediumName;

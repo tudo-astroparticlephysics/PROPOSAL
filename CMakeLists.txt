@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 
 set(PROPOSAL_VERSION_MAJOR 7)
 set(PROPOSAL_VERSION_MINOR 0)
-set(PROPOSAL_VERSION_PATCH 3)
+set(PROPOSAL_VERSION_PATCH 7)
 set(PROPOSAL_VERSION ${PROPOSAL_VERSION_MAJOR}.${PROPOSAL_VERSION_MINOR}.${PROPOSAL_VERSION_PATCH})
 
 project(PROPOSAL
@@ -20,21 +20,27 @@ if(NOT CMAKE_BUILD_TYPE)
   	"'Release' if you are using PROPOSAL for production purposes.")
 else()
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-  		message(WARNING "Build type set to ${CMAKE_BUILD_TYPE}. This build type should only be used for development"
+  		message(WARNING "Build type set to ${CMAKE_BUILD_TYPE}. This build type should only be used for development "
   			"and debugging purposes and not for production since the runtime of PROPOSAL with be significantly higher!")
   	else()
 		message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}.")
   	endif()
 endif()
 
+if(NOT DEFINED CMAKE_POSITION_INDEPENDENT_CODE)
+    message(STATUS
+        "Set -fPIC=True because it's not further specified and neccessary for "
+        "the python bindings.")
+    SET(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+endif()
+
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# removes tons of compiler warnings on clang (issue #141). there is probably a cleaner solution.
-if(NOT BUILD_SHARED_LIBS)
-	set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-endif()
+set(WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_CXX_VISIBILITY_PRESET default)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN OFF)
 
 option(BUILD_PYTHON "build python interface" OFF)
 option(BUILD_EXAMPLE "build example" OFF)

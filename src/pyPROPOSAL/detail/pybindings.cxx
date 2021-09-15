@@ -77,8 +77,8 @@ PYBIND11_MODULE(proposal, m)
     py::class_<Cartesian3D, std::shared_ptr<Cartesian3D>, Vector3D>(m, "Cartesian3D")
         .def(py::init<>())
         .def(py::init<double, double, double>(), py::arg("x"), py::arg("y"), py::arg("z"))
-        .def(py::init<std::array<double, 3>>(), py::arg("cartesian coordinates"))
         .def(py::init<const Vector3D&>())
+        .def(py::init<std::array<double, 3>>(), py::arg("cartesian coordinates"))
         .def_property("x", &Cartesian3D::GetX, &Cartesian3D::SetX)
         .def_property("y", &Cartesian3D::GetY, &Cartesian3D::SetY)
         .def_property("z", &Cartesian3D::GetZ, &Cartesian3D::SetZ)
@@ -94,11 +94,24 @@ PYBIND11_MODULE(proposal, m)
     py::class_<Spherical3D, std::shared_ptr<Spherical3D>, Vector3D>(m, "Spherical3D")
         .def(py::init<>())
         .def(py::init<double, double, double>(), py::arg("radius"), py::arg("azimuth"), py::arg("zenith"))
-        .def(py::init<std::array<double, 3>>(), py::arg("spherical coordinates"))
         .def(py::init<const Vector3D&>())
+        .def(py::init<std::array<double, 3>>(), py::arg("spherical coordinates"))
         .def_property("radius", &Spherical3D::GetRadius, &Spherical3D::SetRadius)
         .def_property("azimuth", &Spherical3D::GetAzimuth, &Spherical3D::SetAzimuth)
         .def_property("zenith", &Spherical3D::GetZenith, &Spherical3D::SetZenith);
+
+    py::class_<UnitSphericalVector, std::shared_ptr<UnitSphericalVector>>(m,
+        "UnitSphericalVector",
+        R"pbdoc(
+            Container for a spherical vector with radius 1,
+            i.e. the zenith and azimuth
+            mainly used in scattering and deflection
+        )pbdoc")
+        .def(py::init<>())
+        .def(py::init<double, double>(), py::arg("zenith"), py::arg("azimuth"))
+        .def(py::init<const Spherical3D&>())
+        .def_readwrite("zenith", &UnitSphericalVector::zenith)
+        .def_readwrite("azimuth", &UnitSphericalVector::azimuth);
 
     py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings>>(m,
         "EnergyCutSettings",

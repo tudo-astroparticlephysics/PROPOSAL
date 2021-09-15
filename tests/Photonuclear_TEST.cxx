@@ -256,7 +256,8 @@ const std::string testfile_dir = "tests/TestFiles/";
 
 TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
 {
-    auto in = getTestFiles("Photo_Real_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Photo_Real_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -299,7 +300,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
 
 TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
 {
-    auto in = getTestFiles("Photo_Real_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Photo_Real_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -342,7 +344,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
 
 TEST(PhotoRealPhotonAssumption, Test_of_e)
 {
-    auto in = getTestFiles("Photo_Real_e.txt");
+    std::ifstream in;
+    getTestFile("Photo_Real_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -428,7 +431,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
 
 TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
 {
-    auto in = getTestFiles("Photo_Real_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Photo_Real_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -482,7 +486,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
 
 TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
 {
-    auto in = getTestFiles("Photo_Real_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Photo_Real_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -538,7 +543,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
 
 TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
 {
-    auto in = getTestFiles("Photo_Real_e.txt");
+    std::ifstream in;
+    getTestFile("Photo_Real_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -616,7 +622,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
 
 TEST(PhotoQ2Integration, Test_of_dEdx)
 {
-    auto in = getTestFiles("Photo_Q2_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Photo_Q2_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -664,7 +671,8 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
 
 TEST(PhotoQ2Integration, Test_of_dNdx)
 {
-    auto in = getTestFiles("Photo_Q2_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Photo_Q2_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -712,7 +720,8 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
 
 TEST(PhotoQ2Integration, Test_of_e)
 {
-    auto in = getTestFiles("Photo_Q2_e.txt");
+    std::ifstream in;
+    getTestFile("Photo_Q2_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -788,7 +797,8 @@ TEST(PhotoQ2Integration, Test_of_e)
 
 TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
 {
-    auto in = getTestFiles("Photo_Q2_dEdx.txt");
+    std::ifstream in;
+    getTestFile("Photo_Q2_dEdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -845,7 +855,8 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
 
 TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
 {
-    auto in = getTestFiles("Photo_Q2_dNdx.txt");
+    std::ifstream in;
+    getTestFile("Photo_Q2_dNdx.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -896,7 +907,8 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
 
 TEST(PhotoQ2Integration, Test_of_e_Interpolant)
 {
-    auto in = getTestFiles("Photo_Q2_e.txt");
+    std::ifstream in;
+    getTestFile("Photo_Q2_e.txt", in);
 
     std::string particleName;
     std::string mediumName;
@@ -966,7 +978,7 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
                     auto rate_rnd
                         = cross_integral->CalculateCumulativeCrosssection(
                             energy, comp.GetHash(), v);
-                    if (energy * vcut == ecut or rnd1 < 0.05)
+                    if (energy * vcut == ecut || rnd1 < 0.05)
                         EXPECT_NEAR(rate_rnd / dNdx_for_comp, rnd1,
                             1e-2); // kink in integral / TODO: not working too
                                    // well for small rnd

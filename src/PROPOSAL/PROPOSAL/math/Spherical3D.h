@@ -34,4 +34,22 @@ namespace PROPOSAL  {
     protected:
         void print(std::ostream&) const override;
      };
+
+
+    /*!
+     * Container for a spherical vector with radius 1
+     *
+     * \param zenith
+     * \param azimuth
+     */
+     struct UnitSphericalVector{
+        double zenith = 0;
+        double azimuth = 0;
+    
+        UnitSphericalVector() = default;
+        UnitSphericalVector(double zenith, double azimuth)
+            : zenith(zenith), azimuth(azimuth) {};
+        UnitSphericalVector(const Spherical3D& s)
+            : zenith(s.GetZenith()), azimuth(s.GetAzimuth()) {};
+     };
 } // namespace PROPOSAL
