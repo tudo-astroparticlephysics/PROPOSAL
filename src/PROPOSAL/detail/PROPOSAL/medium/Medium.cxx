@@ -240,7 +240,21 @@ void Medium::SetSumNucleons(double sumNucleons) { sumNucleons_ = sumNucleons; }
  *                              Different Media                               *
  ******************************************************************************/
 
-Water::Water()
+PDG2001::Water::Water()
+    : Medium(
+        "water",
+        75.0,     // I
+        -3.5017,  // C
+        0.09116,  // a
+        3.4773,   // m
+        0.2400,   // X0
+        2.8004,   // X1
+        0,        // d0
+        1.000,    // massDensitiy
+        {Components::Hydrogen(2),
+         Components::Oxygen()}) {}
+
+PDG2020::Water::Water()
     : Medium(
           "water",
           79.7,     // I
@@ -254,7 +268,21 @@ Water::Water()
           {Components::Hydrogen(2),
            Components::Oxygen()}) {}
 
-Ice::Ice()
+PDG2001::Ice::Ice()
+    : Medium(
+          "ice",
+          75.0,     // I
+          -3.5017,  // C
+          0.09116,  // a
+          3.4773,   // m
+          0.2400,   // X0
+          2.8004,   // X1
+          0,        // d0
+          0.917,    // massDensitiy
+          {Components::Hydrogen(2),
+           Components::Oxygen()}) {}
+
+PDG2020::Ice::Ice()
     : Medium(
           "ice",
           79.7,     // I

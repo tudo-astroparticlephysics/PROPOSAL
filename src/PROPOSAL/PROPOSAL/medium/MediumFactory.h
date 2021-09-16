@@ -8,7 +8,11 @@
 namespace PROPOSAL {
 static std::map<const Medium_Type, std::shared_ptr<Medium>> Medium_Map{
     { Medium_Type::WATER, std::make_shared<Water>() },
+    { Medium_Type::WATERPDG2001, std::make_shared<PDG2001::Water>() },
+    { Medium_Type::WATERPDG2020, std::make_shared<PDG2020::Water>() },
     { Medium_Type::ICE, std::make_shared<Ice>() },
+    { Medium_Type::ICEPDG2001, std::make_shared<PDG2001::Ice>() },
+    { Medium_Type::ICEPDG2020, std::make_shared<PDG2020::Ice>() },
     { Medium_Type::SALT, std::make_shared<Salt>() },
     { Medium_Type::STANDARDROCK, std::make_shared<StandardRock>() },
     { Medium_Type::FREJUSROCK, std::make_shared<FrejusRock>() },
