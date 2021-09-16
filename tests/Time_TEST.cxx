@@ -110,12 +110,13 @@ TEST(TimeBuilder, HighEnergies)
     auto displacement = make_displacement(cross, false);
 
     double elapsed_time_exact
-        = time_exact->TimeElapsed(1e14, 1e12, 0, medium.GetMassDensity());
-    double prop_grammage = displacement->SolveTrackIntegral(1e14, 1e12);
+        = time_exact->TimeElapsed(1e14, 1e10, 0, medium.GetMassDensity());
+    double prop_grammage = displacement->SolveTrackIntegral(1e14, 1e10);
 
     double elapsed_time_approx = time_approx.TimeElapsed(
-        1e14, 1e12, prop_grammage, medium.GetMassDensity());
+        1e14, 1e10, prop_grammage, medium.GetMassDensity());
 
+    std::cout << std::setprecision(9);
     EXPECT_LT(elapsed_time_approx, elapsed_time_exact); // exact velocity must be smaller than c
     EXPECT_NE(elapsed_time_approx, elapsed_time_exact); // they should not be equal
     EXPECT_NEAR(elapsed_time_approx, elapsed_time_exact,
