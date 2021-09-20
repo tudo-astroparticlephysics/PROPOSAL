@@ -53,5 +53,13 @@ secondaries::BremsKochMotz::CalculateDirections(
     auto theta = rnd[1] * 2. * PI;
     auto dir_photon = Cartesian3D(init_direction);
     dir_photon.deflect(cosphi, theta);
-    return std::pair<Cartesian3D, Cartesian3D>(init_direction, dir_photon);
+
+    // calculate new electron direction using momentum conservation, neglecting
+    // the momentum transfer to the nucleus (i.e. p_f = p_i - p_photon)
+    auto dir_electron = Cartesian3D(init_direction) *
+            std::sqrt((energy + primary_lepton_mass) *
+            (energy - primary_lepton_mass)) - dir_photon * photon_energy;
+    dir_electron.normalize();
+
+    return std::pair<Cartesian3D, Cartesian3D>(dir_electron, dir_photon);
 }

@@ -8,13 +8,11 @@ namespace secondaries {
             : public secondaries::NaivBremsstrahlung,
               public DefaultSecondaries<BremsEGS4Approximation> {
         static constexpr int n_rnd = 1;
-        double primary_lepton_mass;
 
     public:
         BremsEGS4Approximation() = delete;
         BremsEGS4Approximation(ParticleDef p, Medium m)
-            : secondaries::NaivBremsstrahlung(p, m),
-            primary_lepton_mass(p.mass) {};
+            : secondaries::NaivBremsstrahlung(p, m) {};
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 

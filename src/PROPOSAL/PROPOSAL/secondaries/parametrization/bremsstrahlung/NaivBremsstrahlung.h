@@ -8,11 +8,13 @@ namespace secondaries {
         : public secondaries::Bremsstrahlung {
         static constexpr int n_rnd = 0;
         const int primary_lepton_type;
-
+    protected:
+        double primary_lepton_mass;
     public:
         NaivBremsstrahlung() = delete;
         NaivBremsstrahlung(ParticleDef p, Medium)
-            : primary_lepton_type(p.particle_type) {};
+            : primary_lepton_type(p.particle_type),
+              primary_lepton_mass(p.mass) {};
 
         size_t RequiredRandomNumbers() const noexcept override { return n_rnd; }
         std::vector<ParticleState> CalculateSecondaries(
