@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <cmath>
 
 #include "PROPOSAL/secondaries/parametrization/ionization/NaivIonization.h"
 #include "PROPOSAL/Constants.h"
