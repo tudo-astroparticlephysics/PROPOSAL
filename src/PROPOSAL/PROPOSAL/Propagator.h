@@ -9,7 +9,7 @@ struct ParticleDef;
 
 class Geometry;
 
-using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
+using Sector = std::tuple<std::shared_ptr<const Geometry>, std::shared_ptr<const PropagationUtility>,
     std::shared_ptr<const Density_distr>>;
 
 struct CrossSectionBase;
@@ -32,9 +32,9 @@ public:
 
 private:
     InteractionType DoStochasticInteraction(
-        ParticleState&, PropagationUtility&, std::function<double()>);
-    int AdvanceParticle(ParticleState& p_cond, double E_f, double max_distance,
-        std::function<double()> rnd, Sector& current_sector);
+        ParticleState&, const PropagationUtility&, std::function<double()>);
+    int AdvanceParticle(ParticleState& p_cond, double E_f, double grammage_next_interaction,
+                        double max_distance, std::function<double()> rnd, const Sector& current_sector);
     double CalculateDistanceToBorder(const Vector3D& particle_position,
         const Vector3D& particle_direction, const Geometry& current_geometry);
     int maximize(const std::array<double, 3>& InteractionEnergies);
@@ -58,7 +58,7 @@ private:
     void InitializeSectorFromJSON(
         const ParticleDef&, const nlohmann::json&, GlobalSettings);
 
-    PropagationUtility::Collection CreateUtility(
+    PropagationUtilityContinuous::Collection CreateUtility(
         std::vector<std::shared_ptr<CrossSectionBase>> crosss,
         std::shared_ptr<Medium> medium, bool do_cont_rand, bool do_interpol,
         bool do_exact_time, nlohmann::json scatter);

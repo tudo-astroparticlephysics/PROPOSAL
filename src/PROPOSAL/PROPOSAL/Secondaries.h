@@ -41,7 +41,7 @@ class Density_distr;
 class Geometry;
 class Vector3D;
 
-using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
+using Sector = std::tuple<std::shared_ptr<const Geometry>, std::shared_ptr<const PropagationUtility>,
             std::shared_ptr<const Density_distr>>;
 
 class Secondaries {

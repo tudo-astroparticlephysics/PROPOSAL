@@ -60,7 +60,7 @@ ExactTimeBuilder<UtilityInterpolant>(cross, p_def));
 
 */
 
-bool PropagationUtility::Collection::operator==(const Collection& lhs)
+bool PropagationUtilityContinuous::Collection::operator==(const Collection& lhs)
 {
     if (interaction_calc != lhs.interaction_calc)
         return false;
@@ -77,8 +77,8 @@ bool PropagationUtility::Collection::operator==(const Collection& lhs)
     return true;
 }
 
-PropagationUtility::PropagationUtility(
-    PropagationUtility::Collection const& collect)
+PropagationUtilityContinuous::PropagationUtilityContinuous(
+    PropagationUtilityContinuous::Collection const& collect)
     : collection(collect)
 {
     if (collect.interaction_calc == nullptr
@@ -89,8 +89,8 @@ PropagationUtility::PropagationUtility(
     }
 }
 
-Interaction::Loss PropagationUtility::EnergyStochasticloss(double energy,
-                                                           double rnd)
+Interaction::Loss PropagationUtilityContinuous::EnergyStochasticloss(double energy,
+                                                           double rnd) const
 {
     auto rates = collection.interaction_calc->Rates(energy);
     auto loss = collection.interaction_calc->SampleLoss(energy, rates, rnd);
@@ -98,8 +98,8 @@ Interaction::Loss PropagationUtility::EnergyStochasticloss(double energy,
     return loss;
 }
 
-double PropagationUtility::EnergyDecay(
-    double energy, std::function<double()> rnd, double density)
+double PropagationUtilityContinuous::EnergyDecay(
+    double energy, std::function<double()> rnd, double density) const
 {
     if (collection.decay_calc) {
         return collection.decay_calc->EnergyDecay(energy, rnd(), density);
@@ -107,14 +107,16 @@ double PropagationUtility::EnergyDecay(
     return 0; // no decay, e.g. particle is stable
 }
 
-double PropagationUtility::EnergyInteraction(
-    double energy, std::function<double()> rnd)
+std::pair<double, double> PropagationUtilityContinuous::EnergyDistanceStochasticInteraction(
+    double E_i, std::function<double()> rnd) const
 {
-    return collection.interaction_calc->EnergyInteraction(energy, rnd());
+    auto E_f = collection.interaction_calc->EnergyInteraction(E_i, rnd());
+    auto grammage_to_interaction = collection.displacement_calc->SolveTrackIntegral(E_i, E_f);
+    return std::make_pair(E_f, grammage_to_interaction);
 }
 
-double PropagationUtility::EnergyRandomize(
-    double initial_energy, double final_energy, std::function<double()> rnd)
+double PropagationUtilityContinuous::EnergyRandomize(
+    double initial_energy, double final_energy, std::function<double()> rnd) const
 {
     if (collection.cont_rand) {
         final_energy = collection.cont_rand->EnergyRandomize(
@@ -123,23 +125,23 @@ double PropagationUtility::EnergyRandomize(
     return final_energy; // no randomization
 }
 
-double PropagationUtility::EnergyDistance(
-    double initial_energy, double distance)
+double PropagationUtilityContinuous::EnergyDistance(
+    double initial_energy, double distance) const
 {
     return collection.displacement_calc->UpperLimitTrackIntegral(
         initial_energy, distance);
 }
 
-double PropagationUtility::TimeElapsed(
-    double initial_energy, double final_energy, double distance, double density)
+double PropagationUtilityContinuous::TimeElapsed(
+    double initial_energy, double final_energy, double distance, double density) const
 {
     return collection.time_calc->TimeElapsed(
         initial_energy, final_energy, distance, density);
 }
 
-std::tuple<Cartesian3D, Cartesian3D> PropagationUtility::DirectionsScatter(
+std::tuple<Cartesian3D, Cartesian3D> PropagationUtilityContinuous::DirectionsScatter(
     double displacement, double initial_energy, double final_energy,
-    const Vector3D& direction, std::function<double()> rnd)
+    const Vector3D& direction, std::function<double()> rnd) const
 {
     if (collection.scattering) {
         std::array<double, 4> random_numbers;
@@ -155,7 +157,7 @@ std::tuple<Cartesian3D, Cartesian3D> PropagationUtility::DirectionsScatter(
     return std::make_tuple(dir, dir); // no scattering
 }
 
-Cartesian3D PropagationUtility::DirectionDeflect(InteractionType type,
+Cartesian3D PropagationUtilityContinuous::DirectionDeflect(InteractionType type,
     double initial_energy, double final_energy, const Vector3D& direction,
     std::function<double()> rnd) const
 {
@@ -173,9 +175,13 @@ Cartesian3D PropagationUtility::DirectionDeflect(InteractionType type,
     return direction;
 }
 
-double PropagationUtility::LengthContinuous(
-    double initial_energy, double final_energy)
+double PropagationUtilityContinuous::LengthContinuous(
+        double initial_energy, double final_energy) const
 {
     return collection.displacement_calc->SolveTrackIntegral(
         initial_energy, final_energy);
+}
+
+double PropagationUtilityContinuous::GetLowerPropagationLim() const {
+    return collection.displacement_calc->GetLowerLim();
 }

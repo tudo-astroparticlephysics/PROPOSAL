@@ -40,14 +40,36 @@ class Displacement;
 class Time;
 class Scattering;
 class Decay;
+class Cartesian3D;
 struct ContRand;
 class Vector3D;
 enum class InteractionType;
 }
 
 namespace PROPOSAL {
-class Cartesian3D;
 class PropagationUtility {
+public:
+    PropagationUtility() = default;
+
+    virtual Interaction::Loss EnergyStochasticloss(double, double) const = 0;
+    virtual double EnergyDecay(double, std::function<double()>, double) const = 0;
+    virtual std::pair<double, double> EnergyDistanceStochasticInteraction(double, std::function<double()>) const = 0;
+    virtual double EnergyRandomize(double, double, std::function<double()>) const = 0;
+    virtual double EnergyDistance(double, double) const = 0;
+    virtual double LengthContinuous(double, double) const = 0;
+    virtual double TimeElapsed(double, double, double, double) const = 0;
+
+    virtual std::tuple<Cartesian3D, Cartesian3D> DirectionsScatter(
+            double, double, double, const Vector3D&, std::function<double()>) const = 0;
+    virtual Cartesian3D DirectionDeflect(InteractionType, double, double,
+                                 const Vector3D&, std::function<double()>) const = 0;
+
+    virtual double GetLowerPropagationLim() const = 0;
+};
+}
+
+namespace PROPOSAL {
+class PropagationUtilityContinuous : public PropagationUtility {
 public:
     struct Collection {
 
@@ -64,15 +86,15 @@ public:
         std::shared_ptr<ContRand> cont_rand;
     };
 
-    PropagationUtility(Collection const& collection);
+    PropagationUtilityContinuous(Collection const& collection);
 
-    Interaction::Loss EnergyStochasticloss(double, double);
-    double EnergyDecay(double, std::function<double()>, double);
-    double EnergyInteraction(double, std::function<double()>);
-    double EnergyRandomize(double, double, std::function<double()>);
-    double EnergyDistance(double, double);
-    double LengthContinuous(double, double);
-    double TimeElapsed(double, double, double, double);
+    Interaction::Loss EnergyStochasticloss(double, double) const override;
+    double EnergyDecay(double, std::function<double()>, double) const override;
+    std::pair<double, double> EnergyDistanceStochasticInteraction(double, std::function<double()>) const override;
+    double EnergyRandomize(double, double, std::function<double()>) const override;
+    double EnergyDistance(double, double) const override;
+    double LengthContinuous(double, double) const override;
+    double TimeElapsed(double, double, double, double) const override;
 
     // TODO: return value doesn't tell what it include. Maybe it would be better
     // to give a tuple of two directions back. One is the mean over the
@@ -81,9 +103,12 @@ public:
     // in an enum.
 
     std::tuple<Cartesian3D, Cartesian3D> DirectionsScatter(
-        double, double, double, const Vector3D&, std::function<double()>);
+        double, double, double, const Vector3D&, std::function<double()>) const override;
     Cartesian3D DirectionDeflect(InteractionType, double, double,
-                                 const Vector3D&, std::function<double()>) const;
+                                 const Vector3D&, std::function<double()>) const override;
+
+    double GetLowerPropagationLim() const override;
+
 
     Collection collection;
 };

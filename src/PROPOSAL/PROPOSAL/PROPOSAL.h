@@ -131,6 +131,7 @@
 #include "PROPOSAL/propagation_utility/Interaction.h"
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityStochastic.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include "PROPOSAL/propagation_utility/Time.h"

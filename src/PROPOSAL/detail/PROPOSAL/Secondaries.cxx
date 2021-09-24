@@ -252,18 +252,20 @@ ParticleState Secondaries::RePropagateEnergy(const ParticleState& init,
     auto& utility = get<Propagator::UTILITY>(current_sector);
     auto& density = get<Propagator::DENSITY_DISTR>(current_sector);
 
+    /*
     if (utility.collection.cont_rand != nullptr) {
         Logging::Get("proposal.secondaries")->warn("Calcuating specific points "
                                                    "for sectors where continuous randomization is activated "
                                                    "can lead to inconsistent results!");
     }
-    auto advance_grammage = utility.LengthContinuous(init.energy,
+    */ // TODO: put back
+    auto advance_grammage = utility->LengthContinuous(init.energy,
                                                      init.energy - energy_lost);
     auto displacement = density->Correct(init.position, init.direction,
                                          advance_grammage, max_distance);
 
     auto E_f = init.energy - energy_lost;
-    auto new_time = init.time + utility.TimeElapsed(
+    auto new_time = init.time + utility->TimeElapsed(
             init.energy, E_f, displacement ,density->Evaluate(init.position));
     auto new_position = init.position + init.direction * displacement;
     auto new_propagated_distance = init.propagated_distance + displacement;
@@ -280,15 +282,18 @@ ParticleState Secondaries::RePropagateDistance(const ParticleState &init,
     auto& utility = get<Propagator::UTILITY>(current_sector);
     auto& density = get<Propagator::DENSITY_DISTR>(current_sector);
 
+    /*
     if (utility.collection.cont_rand != nullptr) {
         Logging::Get("proposal.secondaries")->warn("Calcuating specific points "
                      "for sectors where continuous randomization is activated "
                      "can lead to inconsistent results!");
     }
+    */ // TODO: put this back
+
     auto advance_grammage = density->Calculate(init.position, init.direction,
                                                displacement);
-    auto E_f = utility.EnergyDistance(init.energy, advance_grammage);
-    auto new_time = init.time + utility.TimeElapsed(
+    auto E_f = utility->EnergyDistance(init.energy, advance_grammage);
+    auto new_time = init.time + utility->TimeElapsed(
             init.energy, E_f,displacement, density->Evaluate(init.position));
     auto new_position = init.position + init.direction * displacement;
     auto new_propagated_distance = init.propagated_distance + displacement;

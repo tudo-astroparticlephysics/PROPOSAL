@@ -73,25 +73,27 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
         auto& density = get<DENSITY_DISTR>(current_sector);
 
         InteractionEnergy[MinimalE] = std::max(
-                min_energy, utility.collection.displacement_calc->GetLowerLim());
-        InteractionEnergy[Decay] = utility.EnergyDecay(
+                min_energy, utility->GetLowerPropagationLim());
+        InteractionEnergy[Decay] = utility->EnergyDecay(
             state.energy, rnd, density->Evaluate(state.position));
-        InteractionEnergy[Stochastic]
-            = utility.EnergyInteraction(state.energy, rnd);
+        double grammage_to_interaction;
+        std::tie(InteractionEnergy[Stochastic], grammage_to_interaction)
+            = utility->EnergyDistanceStochasticInteraction(state.energy, rnd);
 
         auto next_interaction_type = maximize(InteractionEnergy);
         auto energy_at_next_interaction
             = InteractionEnergy[next_interaction_type];
 
         advancement_type = AdvanceParticle(state, energy_at_next_interaction,
-            max_distance, rnd, current_sector);
+                                           grammage_to_interaction, max_distance,
+                                           rnd, current_sector);
         track.push_back(state, InteractionType::ContinuousEnergyLoss);
 
         switch (advancement_type) {
         case ReachedInteraction:
             switch (next_interaction_type) {
             case Stochastic: {
-                auto type = DoStochasticInteraction(state, utility, rnd);
+                auto type = DoStochasticInteraction(state, *utility, rnd);
                 track.push_back(state, type);
                 if (state.energy <= InteractionEnergy[MinimalE])
                     continue_propagation = false;
@@ -126,7 +128,7 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
 }
 
 InteractionType Propagator::DoStochasticInteraction(ParticleState& p_cond,
-    PropagationUtility& utility, std::function<double()> rnd)
+    const PropagationUtility& utility, std::function<double()> rnd)
 {
     auto loss = utility.EnergyStochasticloss(p_cond.energy, rnd());
 
@@ -137,8 +139,8 @@ InteractionType Propagator::DoStochasticInteraction(ParticleState& p_cond,
     return loss.type;
 }
 
-int Propagator::AdvanceParticle(ParticleState& state, double E_f,
-    double max_distance, std::function<double()> rnd, Sector& current_sector)
+int Propagator::AdvanceParticle(ParticleState& state, double E_f, double grammage_next_interaction,
+    double max_distance, std::function<double()> rnd, const Sector& current_sector)
 {
     assert(max_distance > 0);
     assert(E_f >= 0);
@@ -147,13 +149,11 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
     auto& density = get<DENSITY_DISTR>(current_sector);
     auto& geometry = get<GEOMETRY>(current_sector);
 
-    auto grammage_next_interaction
-        = utility.LengthContinuous(state.energy, E_f);
     auto max_distance_left = max_distance - state.propagated_distance;
     assert(max_distance_left > 0);
 
     Cartesian3D mean_direction, new_direction;
-    std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
+    std::tie(mean_direction, new_direction) = utility->DirectionsScatter(
         grammage_next_interaction, state.energy, E_f, state.direction, rnd);
 
     double distance_next_interaction;
@@ -185,9 +185,9 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
             advance_distance = AdvanceDistance[advancement_type];
             advance_grammage = density->Calculate(
                 state.position, state.direction, advance_distance);
-            E_f = utility.EnergyDistance(state.energy, advance_grammage);
+            E_f = utility->EnergyDistance(state.energy, advance_grammage);
 
-            std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
+            std::tie(mean_direction, new_direction) = utility->DirectionsScatter(
                 advance_grammage, state.energy, E_f, state.direction, rnd);
 
             try {
@@ -211,12 +211,12 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
     }
 
     state.time = state.time
-        + utility.TimeElapsed(state.energy, E_f, advance_grammage,
+        + utility->TimeElapsed(state.energy, E_f, advance_grammage,
             density->Evaluate(state.position));
     state.position = new_position;
     state.direction = new_direction;
     state.propagated_distance = state.propagated_distance + advance_distance;
-    state.energy = utility.EnergyRandomize(state.energy, E_f, rnd);
+    state.energy = utility->EnergyRandomize(state.energy, E_f, rnd);
 
     return advancement_type;
 }
@@ -328,7 +328,7 @@ void Propagator::InitializeSectorFromJSON(const ParticleDef& p_def,
         density_distr = json_sector["density_distribution"];
 
     auto cross_config = json_sector.value("CrossSections", global.cross);
-    PropagationUtility::Collection collection;
+    PropagationUtilityContinuous::Collection collection;
     if (!cross_config.empty()) {
         double density_correction
             = density_distr.value("mass_density", medium->GetMassDensity());
@@ -343,7 +343,7 @@ void Propagator::InitializeSectorFromJSON(const ParticleDef& p_def,
         collection = CreateUtility(std_crosss, medium, cuts->GetContRand(),
             do_interpolation, do_exact_time, scattering_config);
     }
-    auto utility = PropagationUtility(collection);
+    auto utility = std::make_shared<PropagationUtilityContinuous>(collection);
 
     if (json_sector.contains("geometries")) {
         assert(json_sector["geometries"].is_array());
@@ -359,12 +359,12 @@ void Propagator::InitializeSectorFromJSON(const ParticleDef& p_def,
     }
 }
 
-PropagationUtility::Collection Propagator::CreateUtility(
+PropagationUtilityContinuous::Collection Propagator::CreateUtility(
     std::vector<std::shared_ptr<CrossSectionBase>> crosss,
     std::shared_ptr<Medium> medium, bool do_cont_rand, bool do_interpol,
     bool do_exact_time, nlohmann::json scatter)
 {
-    PropagationUtility::Collection def;
+    PropagationUtilityContinuous::Collection def;
     def.displacement_calc = make_displacement(crosss, do_interpol);
     def.interaction_calc
         = make_interaction(def.displacement_calc, crosss, do_interpol);
