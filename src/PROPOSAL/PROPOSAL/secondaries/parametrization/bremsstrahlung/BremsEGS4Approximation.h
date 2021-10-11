@@ -1,18 +1,18 @@
 #pragma once
 
-#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/NaivBremsstrahlung.h"
+#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/BremsNoDeflection.h"
 
 namespace PROPOSAL {
 namespace secondaries {
     class BremsEGS4Approximation
-            : public secondaries::NaivBremsstrahlung,
+            : public secondaries::BremsNoDeflection,
               public DefaultSecondaries<BremsEGS4Approximation> {
         static constexpr int n_rnd = 1;
 
     public:
         BremsEGS4Approximation() = delete;
         BremsEGS4Approximation(ParticleDef p, Medium m)
-            : secondaries::NaivBremsstrahlung(p, m) {};
+            : secondaries::BremsNoDeflection(p, m) {};
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 

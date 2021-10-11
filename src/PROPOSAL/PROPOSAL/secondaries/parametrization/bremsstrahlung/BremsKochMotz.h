@@ -1,11 +1,11 @@
 #pragma once
 
-#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/NaivBremsstrahlung.h"
+#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/BremsNoDeflection.h"
 
 namespace PROPOSAL {
     namespace secondaries {
         class BremsKochMotz
-                : public secondaries::NaivBremsstrahlung {
+                : public secondaries::BremsNoDeflection {
             static constexpr int n_rnd = 2;
 
             double CalculatePhiCandidate(double, double);
@@ -14,7 +14,7 @@ namespace PROPOSAL {
         public:
             BremsKochMotz() = delete;
             BremsKochMotz(ParticleDef p, Medium m)
-                    : secondaries::NaivBremsstrahlung(p, m) {};
+                    : secondaries::BremsNoDeflection(p, m) {};
 
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 

@@ -70,7 +70,7 @@
 #include "PROPOSAL/secondaries/parametrization/annihilation/HeitlerAnnihilation.h"
 #include "PROPOSAL/secondaries/parametrization/annihilation/SingleDifferentialAnnihilation.h"
 #include "PROPOSAL/secondaries/parametrization/bremsstrahlung/Bremsstrahlung.h"
-#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/NaivBremsstrahlung.h"
+#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/BremsNoDeflection.h"
 #include "PROPOSAL/secondaries/parametrization/bremsstrahlung/BremsEGS4Approximation.h"
 #include "PROPOSAL/secondaries/parametrization/bremsstrahlung/BremsKochMotz.h"
 #include "PROPOSAL/secondaries/parametrization/compton/Compton.h"
