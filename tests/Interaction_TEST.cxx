@@ -153,7 +153,10 @@ TEST(EnergyInteraction, CompareIntegralInterpolant)
     for (double Elog_i = std::log10(low); Elog_i < 14; Elog_i += 5e-2) {
         double E_i = std::pow(10., Elog_i);
         for (auto i_stat = 0; i_stat < 100; i_stat++) {
-            rnd = RandomGenerator::Get().RandomDouble();
+            if (i_stat == 0)
+                rnd = 0.999; // ensure to test edges of phase space
+            else
+                rnd = RandomGenerator::Get().RandomDouble();
             energy_integral = interaction_integral->EnergyInteraction(E_i, rnd);
             energy_interpol = interaction_interpol->EnergyInteraction(E_i, rnd);
             auto lower_lim = CrossSectionVector::GetLowerLim(cross);
