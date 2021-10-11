@@ -1,20 +1,22 @@
 #pragma once
 
-#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/BremsNoDeflection.h"
+#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/Bremsstrahlung.h"
 
 namespace PROPOSAL {
     namespace secondaries {
         class BremsKochMotz
-                : public secondaries::BremsNoDeflection {
+                : public secondaries::Bremsstrahlung {
             static constexpr int n_rnd = 2;
+            double primary_lepton_mass;
 
             double CalculatePhiCandidate(double, double);
             double g(double, double, double, double);
             double N(double, double, double);
         public:
             BremsKochMotz() = delete;
-            BremsKochMotz(ParticleDef p, Medium m)
-                    : secondaries::BremsNoDeflection(p, m) {};
+            BremsKochMotz(const ParticleDef& p, const Medium& m)
+                    : secondaries::Bremsstrahlung(p),
+                      primary_lepton_mass(p.mass) {};
 
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 

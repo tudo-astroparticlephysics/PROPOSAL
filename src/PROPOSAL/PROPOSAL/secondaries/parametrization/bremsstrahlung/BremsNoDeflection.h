@@ -7,22 +7,16 @@ namespace secondaries {
     class BremsNoDeflection
         : public secondaries::Bremsstrahlung {
         static constexpr int n_rnd = 0;
-        const int primary_lepton_type;
-    protected:
-        double primary_lepton_mass;
     public:
         BremsNoDeflection() = delete;
-        BremsNoDeflection(ParticleDef p, Medium)
-            : primary_lepton_type(p.particle_type),
-              primary_lepton_mass(p.mass) {};
+        BremsNoDeflection(const ParticleDef& p, const Medium&)
+            : secondaries::Bremsstrahlung(p) {};
 
         size_t RequiredRandomNumbers() const noexcept override { return n_rnd; }
-        std::vector<ParticleState> CalculateSecondaries(
-            StochasticLoss, const Component&, std::vector<double>&) override;
 
-        virtual std::pair<Cartesian3D, Cartesian3D> CalculateDirections(
+        std::pair<Cartesian3D, Cartesian3D> CalculateDirections(
                 const Vector3D&, double, double,
-                const Component&, std::vector<double>&);
+                const Component&, std::vector<double>&) final;
     };
 } // namespace secondaries
 } // namespace PROPOSAL

@@ -98,10 +98,10 @@ void init_secondaries(py::module& m)
         secondaries::Bremsstrahlung> {}
         .decl_param(m_sub, "BremsNoDeflection");
     SecondariesBuilder<secondaries::BremsEGS4Approximation,
-        secondaries::BremsNoDeflection> {}
+        secondaries::Bremsstrahlung> {}
         .decl_param(m_sub, "BremsEGS4Approximation");
     SecondariesBuilder<secondaries::BremsKochMotz,
-        secondaries::BremsNoDeflection> {}
+        secondaries::Bremsstrahlung> {}
         .decl_param(m_sub, "BremsKochMotz");
 
     SecondariesBuilder<secondaries::NaivCompton, secondaries::Compton> {}
