@@ -22,7 +22,7 @@ namespace secondaries {
         std::vector<ParticleState> CalculateSecondaries(
                 StochasticLoss loss, const Component&, std::vector<double>&) override
         {
-            auto primary_lepton = ParticleState();
+            ParticleState primary_lepton;
             primary_lepton.energy = loss.parent_particle_energy - loss.energy;
             primary_lepton.type = primary_particle_type;
             primary_lepton.time = loss.time;
@@ -30,13 +30,13 @@ namespace secondaries {
             primary_lepton.direction = loss.direction;
             primary_lepton.propagated_distance = 0.;
 
-            auto hadron = ParticleState();
-            primary_lepton.energy = loss.energy;
-            primary_lepton.SetType(ParticleType::Hadron);
-            primary_lepton.time = loss.time;
-            primary_lepton.position = loss.position;
-            primary_lepton.direction = loss.direction;
-            primary_lepton.propagated_distance = 0.;
+            ParticleState hadron;
+            hadron.energy = loss.energy;
+            hadron.SetType(ParticleType::Hadron);
+            hadron.time = loss.time;
+            hadron.position = loss.position;
+            hadron.direction = loss.direction;
+            hadron.propagated_distance = 0.;
 
             return std::vector<ParticleState>{primary_lepton, hadron};
         };
