@@ -9,7 +9,7 @@
 #include "PROPOSAL/secondaries/parametrization/photonuclear/Photonuclear.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsai.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsaiForwardPeaked.h"
-#include "PROPOSAL/secondaries/parametrization/weakinteraction/NaivWeakInteraction.h"
+#include "PROPOSAL/secondaries/parametrization/weakinteraction/WeakCooperSarkarMertsch.h"
 
 #include "PROPOSAL/secondaries/SecondariesCalculator.h"
 
@@ -120,9 +120,9 @@ void init_secondaries(py::module& m)
         secondaries::PhotopairProduction> {}
         .decl_rho_param(m_sub, "PhotoTsaiForwardPeaked");
 
-    SecondariesBuilder<secondaries::NaivWeakInteraction,
+    SecondariesBuilder<secondaries::WeakCooperSarkarMertsch,
         secondaries::WeakInteraction> {}
-        .decl_param(m_sub, "NaivWeakInteraction");
+        .decl_param(m_sub, "WeakCooperSarkarMertsch");
 
     py::class_<SecondariesCalculator, std::shared_ptr<SecondariesCalculator>>(
         m_sub, "SecondariesCalculator")
