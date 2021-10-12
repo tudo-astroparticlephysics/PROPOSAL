@@ -8,11 +8,13 @@ namespace secondaries {
     struct NaivIonization : public secondaries::Ionization,
                             public DefaultSecondaries<NaivIonization> {
         int primary_particle_type;
+        double primary_particle_mass;
 
-        static constexpr int n_rnd = 2;
+        static constexpr int n_rnd = 1;
 
         NaivIonization(const ParticleDef& p, const Medium&)
-            : primary_particle_type(p.particle_type)
+            : primary_particle_type(p.particle_type),
+              primary_particle_mass(p.mass)
         {
         }
 
