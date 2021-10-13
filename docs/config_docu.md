@@ -53,8 +53,12 @@ All keywords with `-` as a default option are mandatory and need to be defined e
 
 The following media are implemented and can be used with the `medium` setting:
 
-* `Water`
-* `Ice`
+* `Water` (always use the newest medium definition for Water)
+* `WaterPDG2001`
+* `WaterPDG2020`
+* `Ice` (always use the newest medium definition for Ice)
+* `IcePDG2001`
+* `IcePDG2020`
 * `Salt`
 * `Standardrock`
 * `Frejusrock`

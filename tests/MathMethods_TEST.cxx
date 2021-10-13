@@ -53,18 +53,26 @@ TEST(Bisection, Comparison_equal)
     double real1 = pow(2., 2./3);
     double real2 = 0;
 
-    double aux1 = Bisection(f1, -5, 15, 1e-6, 100);
-    double aux2 = Bisection(f2, -3./4 * PI, 1./2 * PI, 1e-6, 100);
+    auto aux1 = Bisection(f1, -5, 15, 1e-6, 100);
+    auto aux2 = Bisection(f2, -3./4 * PI, 1./2 * PI, 1e-6, 100);
 
-    ASSERT_NEAR(aux1, real1, 1.e-6 );
-    ASSERT_NEAR(aux2, 0, 1.e-6 );
+    ASSERT_NEAR((aux1.first + aux1.second)/2, real1, 1.e-6 );
+    ASSERT_LT(aux1.first, real1);
+    ASSERT_LT(real1, aux1.second);
+
+    ASSERT_NEAR((aux2.first + aux2.second)/2, 0, 1.e-6 );
+    ASSERT_LT(aux2.first, real2);
+    ASSERT_LT(real2, aux2.second);
 
     aux1 = Bisection(f1, 15, -5, 1e-6, 100);
     aux2 = Bisection(f2, 1./2 * PI, -3./4 * PI, 1e-6, 100);
 
-    ASSERT_NEAR(aux1, real1, 1.e-6 );
-    ASSERT_NEAR(aux2, real2, 1.e-6 );
-
+    ASSERT_NEAR((aux1.first + aux1.second)/2, real1, 1.e-6 );
+    ASSERT_LT(aux1.first, real1);
+    ASSERT_LT(real1, aux1.second);
+    ASSERT_NEAR((aux2.first + aux2.second)/2, real2, 1.e-6 );
+    ASSERT_LT(aux2.first, real2);
+    ASSERT_LT(real2, aux2.second);
 }
 
 

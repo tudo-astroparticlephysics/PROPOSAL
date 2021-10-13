@@ -496,9 +496,6 @@ double crosssection::BremsElectronScreening::CalculateParametrization(
         phi2 = phi1;
     }
 
-    // Coulomb correction function and empirical correction factor
-    double A_fac = interpolant_->InterpolateArray(logZ, energy);
-
     aux = ALPHA * comp.GetNucCharge();
     aux *= aux;
     auto f_c = aux
@@ -541,8 +538,11 @@ double crosssection::BremsElectronScreening::CalculateParametrization(
 
     xi = Lp / (Lr - f_c);
 
+    // Coulomb correction function and empirical correction factor
+    double A_fac = 1.0;
     if (energy < 50.) {
         f_c = 0;
+        A_fac = interpolant_->InterpolateArray(logZ, energy);
     }
 
     auto result = A_fac * comp.GetNucCharge() * (comp.GetNucCharge() + xi);

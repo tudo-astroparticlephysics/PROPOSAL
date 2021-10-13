@@ -19,14 +19,26 @@ namespace secondaries {
             = PROPOSAL::InteractionType::Photonuclear;
         InteractionType GetInteractionType() const noexcept override { return type; }
 
-        std::vector<ParticleState> CalculateSecondaries(StochasticLoss, const Component&,
-                                                   std::vector<double>&) override
+        std::vector<ParticleState> CalculateSecondaries(
+                StochasticLoss loss, const Component&, std::vector<double>&) override
         {
-            Logging::Get("proposal.Secondaries")
-                    ->warn("PROPOSAL can not generate secondary particles"
-                            "for a photonuclear interaction.");
-            //TODO: Treatment for hadronic interactions
-            return std::vector<ParticleState>{};
+            ParticleState primary_lepton;
+            primary_lepton.energy = loss.parent_particle_energy - loss.energy;
+            primary_lepton.type = primary_particle_type;
+            primary_lepton.time = loss.time;
+            primary_lepton.position = loss.position;
+            primary_lepton.direction = loss.direction;
+            primary_lepton.propagated_distance = 0.;
+
+            ParticleState hadron;
+            hadron.energy = loss.energy;
+            hadron.SetType(ParticleType::Hadron);
+            hadron.time = loss.time;
+            hadron.position = loss.position;
+            hadron.direction = loss.direction;
+            hadron.propagated_distance = 0.;
+
+            return std::vector<ParticleState>{primary_lepton, hadron};
         };
     };
 } // namespace secondaries

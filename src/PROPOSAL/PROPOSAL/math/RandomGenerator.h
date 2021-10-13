@@ -32,7 +32,7 @@
 #include <functional>
 #include <random>
 #include <iostream>
-
+#include "PROPOSAL/secondaries/parametrization/bremsstrahlung/BremsKochMotz.h"
 
 #ifdef ICECUBE_PROJECT
 #include <phys-services/I3RandomService.h>
@@ -111,6 +111,7 @@ private:
 #ifdef ICECUBE_PROJECT
     I3RandomService* i3random_gen_;
 #endif
+    friend secondaries::BremsKochMotz;
 };
 
 } // namespace PROPOSAL

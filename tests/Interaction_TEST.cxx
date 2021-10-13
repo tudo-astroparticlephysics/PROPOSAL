@@ -33,6 +33,17 @@ TEST(Interaction, Constructor)
     InteractionBuilder interaction_4(disp, cross, std::true_type());
 }
 
+// Hash for Enum necessary to support gcc compilers with version < 6.1
+// see https://stackoverflow.com/questions/18837857/cant-use-enum-class-as-unordered-map-key
+struct EnumClassHash
+{
+    template <typename T>
+    std::size_t operator()(T t) const
+    {
+        return static_cast<std::size_t>(t);
+    }
+};
+
 class HistogramInteraction {
 public:
     HistogramInteraction()
@@ -74,9 +85,9 @@ public:
 
 private:
     const std::array<InteractionType, 4> types
-        = { InteractionType::Brems, InteractionType::Ioniz,
-              InteractionType::Epair, InteractionType::Photonuclear };
-    std::unordered_map<InteractionType, int> histogram;
+        = {{ InteractionType::Brems, InteractionType::Ioniz,
+              InteractionType::Epair, InteractionType::Photonuclear }};
+    std::unordered_map<InteractionType, int, EnumClassHash> histogram;
     double sum;
 };
 
@@ -142,7 +153,10 @@ TEST(EnergyInteraction, CompareIntegralInterpolant)
     for (double Elog_i = std::log10(low); Elog_i < 14; Elog_i += 5e-2) {
         double E_i = std::pow(10., Elog_i);
         for (auto i_stat = 0; i_stat < 100; i_stat++) {
-            rnd = RandomGenerator::Get().RandomDouble();
+            if (i_stat == 0)
+                rnd = 0.999; // ensure to test edges of phase space
+            else
+                rnd = RandomGenerator::Get().RandomDouble();
             energy_integral = interaction_integral->EnergyInteraction(E_i, rnd);
             energy_interpol = interaction_interpol->EnergyInteraction(E_i, rnd);
             auto lower_lim = CrossSectionVector::GetLowerLim(cross);
@@ -158,6 +172,22 @@ TEST(EnergyInteraction, CompareIntegralInterpolant)
             EXPECT_NEAR(interaction_interpol->EnergyIntegral(E_i, energy_interpol), rnd_interpol, 1e-5);
         }
     }
+}
+
+TEST(EnergyInteraction, BisectionCase)
+{
+    auto cross = GetCrossSections();
+    auto interaction = make_interaction(cross, true);
+    double E_i = 3180.6693833361928;
+    double rnd = 0.7638014946;
+
+    // this should run into the Bisection case of UtilityInterpolant
+    // TODO: Check that this actually triggers the correct case
+    auto E_f = interaction->EnergyInteraction(E_i, rnd);
+
+    // Check that the result is consistent
+    auto val = interaction->EnergyIntegral(E_i, E_f);
+    EXPECT_NEAR(-std::log(rnd), val, val * 1e-5);
 }
 
 TEST(MeanFreePath, ConsistencyCheck)

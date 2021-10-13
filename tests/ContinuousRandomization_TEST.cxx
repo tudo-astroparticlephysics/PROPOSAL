@@ -196,6 +196,8 @@ TEST(ContinuousRandomization, Randomize_interpol)
         energy_old = -1;
 
         auto p_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
 
         // reprouce old behaviour

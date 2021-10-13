@@ -50,7 +50,7 @@ TEST(Sector, Continuous)
     double energy, initial_energy;
 
     std::shared_ptr<ParticleDef> particle = std::make_shared<MuMinusDef>();
-    std::shared_ptr<const Medium> medium = CreateMedium("ice");
+    std::shared_ptr<const Medium> medium = CreateMedium("icePDG2001");
     auto cuts = std::make_shared<EnergyCutSettings>(500, 1, false);
 
     auto cross = GetCrossSections(*particle, *medium, cuts, true);
@@ -72,6 +72,8 @@ TEST(Sector, Continuous)
             || cuts->GetVcut() != vcut || medium->GetName() != mediumName) {
 
             cuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
+            if (mediumName == "ice" || mediumName == "water")
+                mediumName += "PDG2001";
             medium = CreateMedium(mediumName);
             particle = std::make_shared<ParticleDef>(getParticleDef(particleName));
 
@@ -108,7 +110,7 @@ TEST(Sector, Stochastic)
     int interaction_type;
 
     std::shared_ptr<ParticleDef> particle = std::make_shared<MuMinusDef>();
-    std::shared_ptr<const Medium> medium = CreateMedium("ice");
+    std::shared_ptr<const Medium> medium = CreateMedium("icePDG2001");
     auto cuts = std::make_shared<EnergyCutSettings>(500, 1, false);
 
     auto cross = GetCrossSections(*particle, *medium, cuts, true);
@@ -128,6 +130,8 @@ TEST(Sector, Stochastic)
         if (particle->name != particleName || cuts->GetEcut() != ecut
             || cuts->GetVcut() != vcut || medium->GetName() != mediumName) {
             cuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
+            if (mediumName == "ice" || mediumName == "water")
+                mediumName += "PDG2001";
             medium = CreateMedium(mediumName);
             particle = std::make_shared<ParticleDef>(getParticleDef(particleName));
 
@@ -223,6 +227,8 @@ TEST(Sector, EnergyDisplacement)
         if (particle->name != particleName || cuts->GetEcut() != ecut
             || cuts->GetVcut() != vcut || medium->GetName() != mediumName) {
             cuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
+            if (mediumName == "ice" || mediumName == "water")
+                mediumName += "PDG2001";
             medium = CreateMedium(mediumName);
             particle = std::make_shared<ParticleDef>(getParticleDef(particleName));
 

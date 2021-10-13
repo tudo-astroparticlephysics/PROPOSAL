@@ -29,9 +29,9 @@ namespace crosssection {
     template <>
     struct is_only_stochastic<PhotoPairKochMotz> : std::true_type {};
 
-    struct WeakInteraction;
+    struct WeakCooperSarkarMertsch;
     template <>
-    struct is_only_stochastic<WeakInteraction> : std::true_type {};
+    struct is_only_stochastic<WeakCooperSarkarMertsch> : std::true_type {};
 
 } // namespace crosssection
 } // namespace PROPOSAL

@@ -282,6 +282,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -326,6 +328,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -373,6 +377,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -457,6 +463,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -512,6 +520,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -571,6 +581,8 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -653,6 +665,8 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -702,6 +716,8 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -753,6 +769,8 @@ TEST(PhotoQ2Integration, Test_of_e)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -828,6 +846,8 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -886,6 +906,8 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -940,6 +962,8 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
             ecut = INF;
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 

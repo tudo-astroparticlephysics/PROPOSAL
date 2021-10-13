@@ -346,7 +346,8 @@ void init_particle(py::module& m) {
         .value("KMinus", ParticleType::KMinus)
         .value("STauMinus", ParticleType::STauMinus)
         .value("STauPlus", ParticleType::STauPlus)
-        .value("Monopole", ParticleType::Monopole);
+        .value("Monopole", ParticleType::Monopole)
+        .value("Hadron", ParticleType::Hadron);
 }
 
 #undef PARTICLE_DEF
