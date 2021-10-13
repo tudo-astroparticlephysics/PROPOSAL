@@ -130,8 +130,16 @@ protected:
     std::vector<Component> components_; ///< Components of Medium
 };
 
-MEDIUM_DEF(Water)
-MEDIUM_DEF(Ice)
+namespace PDG2001 {
+    MEDIUM_DEF(Water)
+    MEDIUM_DEF(Ice)
+}
+namespace PDG2020 {
+    MEDIUM_DEF(Water)
+    MEDIUM_DEF(Ice)
+}
+using namespace PDG2020;
+
 MEDIUM_DEF(Salt)
 MEDIUM_DEF(CalciumCarbonate)
 MEDIUM_DEF(StandardRock)
@@ -143,6 +151,7 @@ MEDIUM_DEF(Copper)
 MEDIUM_DEF(Uranium)
 MEDIUM_DEF(Paraffin)
 MEDIUM_DEF(Air)
+MEDIUM_DEF(LiquidArgon)
 
 // #<{(|
 // * initialize ANTARES water
@@ -184,7 +193,11 @@ MEDIUM_DEF(CascadiaBasinWater)
 namespace PROPOSAL {
 enum Medium_Type {
     WATER,
+    WATERPDG2001,
+    WATERPDG2020,
     ICE,
+    ICEPDG2001,
+    ICEPDG2020,
     SALT,
     STANDARDROCK,
     FREJUSROCK,
@@ -197,13 +210,18 @@ enum Medium_Type {
     PARAFFIN,
     ANTARESWATER,
     CASCADIABASINWATER,
+    LIQUIDARGON,
 };
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-static const std::array<std::string, 14> Medium_Name = {
+static const std::array<std::string, 19> Medium_Name = {
     "water",
+    "waterpdg2001",
+    "waterpdg2020",
     "ice",
+    "icepdg2001",
+    "icepdg2020",
     "salt",
     "standardrock",
     "frejusrock",
@@ -216,6 +234,7 @@ static const std::array<std::string, 14> Medium_Name = {
     "paraffin",
     "antareswater",
     "cascadiabasinwater",
+    "liquidargon",
 };
 } // namespace PROPOSAL
 

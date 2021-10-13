@@ -212,6 +212,8 @@ TEST(PhotoPair, Test_of_dNdx)
         >> parametrization >> dNdx_stored) {
         parametrization.erase(0, 9);
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;
@@ -246,6 +248,8 @@ TEST(PhotoPair, Test_of_dNdx_Interpolant)
         >> parametrization >> dNdx_stored) {
         parametrization.erase(0, 9);
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;

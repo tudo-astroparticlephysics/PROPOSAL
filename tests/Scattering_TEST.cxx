@@ -370,6 +370,8 @@ TEST(Scattering, ScatterReproducibilityTest)
 
         ParticleDef particle_def = getParticleDef(particleName);
 
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         std::shared_ptr<const Medium> medium = CreateMedium(mediumName);
 
         //reprouce old behaviour

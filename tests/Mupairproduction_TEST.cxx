@@ -197,6 +197,8 @@ TEST(Mupairproduction, Test_of_dEdx)
             continue; // parametrization at the moment only optimized for ingoing muons
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -242,6 +244,8 @@ TEST(Mupairproduction, Test_of_dNdx)
             continue; // parametrization at the moment only optimized for ingoing muons
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -292,6 +296,8 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
             continue; // parametrization at the moment only optimized for ingoing muons
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -368,6 +374,8 @@ if (particleName != "MuMinus")
     continue; // parametrization at the moment only optimized for ingoing muons
 
 ParticleDef particle_def = getParticleDef(particleName);
+if (mediumName == "ice" || mediumName == "water")
+    mediumName += "PDG2001";
 std::shared_ptr<const Medium> medium           = CreateMedium(mediumName);
 auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, false);
 
@@ -416,6 +424,8 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
             continue; // parametrization at the moment only optimized for ingoing muons
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -473,6 +483,8 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
             continue; // parametrization at the moment only optimized for ingoing muons
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -531,6 +543,8 @@ TEST(Mupairproduction, Test_of_e_interpol)
             continue; // parametrization at the moment only optimized for ingoing muons
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 

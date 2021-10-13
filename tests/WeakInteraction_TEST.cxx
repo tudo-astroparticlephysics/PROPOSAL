@@ -176,6 +176,8 @@ TEST(WeakInteraction, Test_of_dNdx)
         >> parametrization >> dNdx_stored) {
         parametrization.erase(0, 4);
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;
@@ -211,6 +213,8 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
         >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored) {
         parametrization.erase(0, 4);
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;
@@ -257,6 +261,8 @@ TEST(WeakInteraction, Test_of_dNdx_Interpolant)
         >> parametrization >> dNdx_stored) {
         parametrization.erase(0, 4);
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;
@@ -290,6 +296,8 @@ TEST(WeakInteraction, Test_of_e_interpol)
         >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored) {
         parametrization.erase(0, 4);
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;

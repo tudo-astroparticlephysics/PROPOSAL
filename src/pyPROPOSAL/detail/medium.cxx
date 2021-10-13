@@ -7,6 +7,9 @@
     py::class_<cls, Medium, std::shared_ptr<cls>>(module, #cls) \
         .def(py::init<>());
 
+#define MEDIUM_DEF_namespace(module, cls, ns)                           \
+    py::class_<ns::cls, Medium, std::shared_ptr<ns::cls>>(module, #cls) \
+        .def(py::init<>());
 
 namespace py = pybind11;
 using namespace PROPOSAL;
@@ -20,14 +23,15 @@ void init_medium(py::module& m) {
             modified once there are initalized, with the exception of their
             density distribution. There are several preimplemented media.
 
-            +------------+------+----------+------------------+--------------------+
-            | Water      | Ice  | Salt     | CalciumCarbonate | StandardRock       |
-            +------------+------+----------+------------------+--------------------+
-            | FrejusRock | Iron | Hydrogen | Lead             | Copper             |
-            +------------+------+----------+------------------+--------------------+
-            | Uranium    | Air  | Paraffin | AntaresWater     | CascadiaBasinWater |
-            +------------+------+----------+------------------+--------------------+
-
+            +-------------+------+----------+------------------+--------------------+
+            | Water       | Ice  | Salt     | CalciumCarbonate | StandardRock       |
+            +-------------+------+----------+------------------+--------------------+
+            | FrejusRock  | Iron | Hydrogen | Lead             | Copper             |
+            +-------------+------+----------+------------------+--------------------+
+            | Uranium     | Air  | Paraffin | AntaresWater     | CascadiaBasinWater |
+            +-------------+------+----------+------------------+--------------------+
+            | LiquidArgon |      |          |                  |                    |
+            +-------------+------+----------+------------------+--------------------+
             By default a media will be assumed as homogen distributed. There
             is the possibility to create inhomogen densities as listed below.
             Split densities are faster than multiple sectors and are therefore
@@ -100,8 +104,28 @@ void init_medium(py::module& m) {
         .def_property_readonly("hash", &Medium::GetHash,
             R"pbdoc(Get medium hash.)pbdoc");
 
-    MEDIUM_DEF(m_sub, Water)
-    MEDIUM_DEF(m_sub, Ice)
+    // define modules corresponding to PDG2001 and PDG2020 namespaces
+    py::module m_pdg01 = m_sub.def_submodule("PDG2001");
+    m_pdg01.doc() = R"pbdoc(
+        Medium implementations based on P.A. Zyla et al. (Particle Data Group),
+        Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
+        )pbdoc";
+    MEDIUM_DEF_namespace(m_pdg01, Water, PDG2001)
+    MEDIUM_DEF_namespace(m_pdg01, Ice, PDG2001)
+
+    py::module m_pdg20 = m_sub.def_submodule("PDG2020");
+    m_pdg20.doc() = R"pbdoc(
+        Medium implementations based on D.E. Groom et al. (Particle Data Group),
+        The European Physical Journal C15 (2000) 1 and 2001 off-year partial
+        update for the 2002 edition available on the PDG WWW pages (URL: http://pdg.lbl.gov/).
+    )pbdoc";
+    MEDIUM_DEF_namespace(m_pdg20, Water, PDG2020)
+    MEDIUM_DEF_namespace(m_pdg20, Ice, PDG2020)
+
+    // define default media
+    m_sub.attr("Water") = m_pdg20.attr("Water");
+    m_sub.attr("Ice") = m_pdg20.attr("Ice");
+
     MEDIUM_DEF(m_sub, Salt)
     MEDIUM_DEF(m_sub, CalciumCarbonate)
     MEDIUM_DEF(m_sub, StandardRock)
@@ -115,4 +139,5 @@ void init_medium(py::module& m) {
     MEDIUM_DEF(m_sub, Paraffin)
     MEDIUM_DEF(m_sub, AntaresWater)
     MEDIUM_DEF(m_sub, CascadiaBasinWater)
+    MEDIUM_DEF(m_sub, LiquidArgon)
 }

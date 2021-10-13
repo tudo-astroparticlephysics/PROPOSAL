@@ -139,6 +139,8 @@ TEST(Annihilation, Test_of_dNdx)
     while (in >> particleName >> mediumName >> multiplier >> energy
         >> parametrization >> dNdx_stored) {
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;
@@ -183,6 +185,8 @@ TEST(Annihilation, Test_Stochastic_Loss)
         >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;
@@ -233,6 +237,8 @@ TEST(Annihilation, Test_of_dNdx_Interpolant)
     while (in >> particleName >> mediumName >> multiplier >> energy
         >> parametrization >> dNdx_stored) {
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;
@@ -269,6 +275,8 @@ TEST(Annihilation, Test_of_e_interpol)
     while (in >> particleName >> mediumName >> multiplier >> energy
         >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored) {
         ParticleDef particle_def = getParticleDef(particleName);
+        if (mediumName == "ice" || mediumName == "water")
+            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
 
         nlohmann::json config;
