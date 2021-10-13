@@ -738,6 +738,11 @@ void init_parametrization(py::module& m)
         crosssection::PhotoPairProduction>(m_sub_photopair, "Tsai")
         .def(py::init<>());
 
+    py::class_<crosssection::PhotoPairKochMotz,
+        std::shared_ptr<crosssection::PhotoPairKochMotz>,
+        crosssection::PhotoPairProduction>(m_sub_photopair, "KochMotz")
+        .def(py::init<>());
+
     py::class_<crosssection::KinematicLimits,
         std::shared_ptr<crosssection::KinematicLimits>>(
         m_sub, "KinematicLimits")

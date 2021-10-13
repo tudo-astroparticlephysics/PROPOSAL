@@ -9,6 +9,9 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/crosssection/parametrization/ParamTables.h"
+#include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/math/Integral.h"
 
 using namespace PROPOSAL;
 using std::make_tuple;
@@ -40,6 +43,112 @@ crosssection::PhotoPairTsai::clone() const
 {
     using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
     return std::make_unique<param_t>(*this);
+}
+
+std::unique_ptr<crosssection::Parametrization<Component>>
+crosssection::PhotoPairKochMotz::clone() const
+{
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
+}
+
+crosssection::PhotoPairKochMotz::PhotoPairKochMotz()
+    : interpolant_(new Interpolant(photopair_KM_Z, photopair_KM_energies,
+                                   photopair_KM_cross, 2, false, false,
+                                   2, false, false))
+{
+    hash_combine(hash, std::string("kochmotz"));
+}
+
+double crosssection::PhotoPairKochMotz::DifferentialCrossSection(
+        const ParticleDef& p, const Component& comp, double energy, double v) const
+{
+    if (energy > 50)
+        return DifferentialCrossSectionWithoutA(p, comp, energy, v);
+
+    // Correction factor A for low energies given by the Storm and Israel data
+    // (doi.org/10.1016/S0092-640X(70)80017-1)
+    auto limits = PhotoPairProduction::GetKinematicLimits(p, comp, energy);
+    Integral i;
+    auto integrand = [this, &p, &comp, energy](double v) {
+        return this->DifferentialCrossSectionWithoutA(p, comp, energy, v) / NA * comp.GetAtomicNum() / (1e-24);
+    };
+    auto dNdx_nocorrection = i.Integrate(limits.v_min, limits.v_max, integrand, 3);
+    auto A = interpolant_->InterpolateArray(comp.GetNucCharge(), energy) / dNdx_nocorrection;
+    return A * DifferentialCrossSectionWithoutA(p, comp, energy, v);
+}
+
+double crosssection::PhotoPairKochMotz::DifferentialCrossSectionWithoutA(
+        const ParticleDef&, const Component& comp, double energy, double v) const
+{
+    double Z3 = std::pow(comp.GetNucCharge(), -1. / 3);
+    double logZ = std::log(comp.GetNucCharge());
+
+    double delta = ME * ME / (2 * energy * v * (1 - v));
+    double x = 136 * Z3 * 2 * delta / ME;
+
+    // structure functions
+    double phi1, phi2, aux;
+    if (x <= 1.0) {
+        aux = x * x;
+        phi1 = 20.867 - 3.242 * x + 0.625 * aux;
+        phi2 = 20.029 - 1.930 * x - 0.086 * aux;
+    } else {
+        phi1 = 21.12 - 4.184 * std::log(x + 0.952);
+        phi2 = phi1;
+    }
+
+    aux = ALPHA * comp.GetNucCharge();
+    aux *= aux;
+    auto f_c = aux
+               * (1 / (1 + aux) + 0.20206
+                  + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
+
+    double Lr, Lp, xi;
+
+    switch ((int)(comp.GetNucCharge() + 0.5)) {
+        case 1: {
+            Lr = 5.31;
+            Lp = 6.144;
+            break;
+        }
+        case 2: {
+            Lr = 4.79;
+            Lp = 5.621;
+            break;
+        }
+
+        case 3: {
+            Lr = 4.74;
+            Lp = 5.805;
+            break;
+        }
+
+        case 4: {
+            Lr = 4.71;
+            Lp = 5.924;
+            break;
+        }
+
+        default: {
+            Lr = std::log(184.15 * Z3);
+            Lp = std::log(1194 * Z3 * Z3);
+            break;
+        }
+    }
+
+    xi = Lp / (Lr - f_c);
+
+    if (energy < 50)
+        f_c = 0;
+
+    auto result = comp.GetNucCharge() * (comp.GetNucCharge() + xi);
+
+    result *= RE * RE * ALPHA * ( (2 * v * v - 2 * v + 1) * (phi1 - 4./3. * logZ - 4. * f_c)
+            + 2./3 * v * (1. - v) * (phi2 - 4./3. * logZ - 4 * f_c));
+
+    return result * NA / comp.GetAtomicNum();
+
 }
 
 double crosssection::PhotoPairTsai::DifferentialCrossSection(

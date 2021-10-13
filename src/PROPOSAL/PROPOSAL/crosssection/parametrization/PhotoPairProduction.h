@@ -57,11 +57,33 @@ namespace crosssection {
             const ParticleDef&, const Component&, double, double) const;
     };
 
+    struct PhotoPairKochMotz : public PhotoPairProduction {
+        PhotoPairKochMotz();
+        using base_param_t = PhotoPairProduction;
+        std::unique_ptr<Parametrization<Component>> clone() const final;
+
+        virtual double DifferentialCrossSection(
+                const ParticleDef&, const Component&, double, double) const;
+
+        private:
+            std::shared_ptr<Interpolant> interpolant_;
+            double DifferentialCrossSectionWithoutA(
+                    const ParticleDef&, const Component&, double, double) const;
+    };
+
     template <> struct ParametrizationName<PhotoPairTsai> {
         static constexpr auto value = "Tsai";
     };
 
+    template <> struct ParametrizationName<PhotoPairKochMotz> {
+        static constexpr auto value = "kochmotz";
+    };
+
     template <> struct ParametrizationId<PhotoPairTsai> {
+        static constexpr size_t value = 1000000013;
+    };
+
+    template <> struct ParametrizationId<PhotoPairKochMotz> {
         static constexpr size_t value = 1000000013;
     };
 } // namespace crosssection
