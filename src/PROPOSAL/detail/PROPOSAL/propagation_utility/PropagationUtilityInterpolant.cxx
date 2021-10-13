@@ -93,8 +93,21 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
 
     auto integrated_to_upper = interpolant_->evaluate(upper_limit);
     auto initial_guess = cubic_splines::ParameterGuess<double>();
-    initial_guess.x = NAN;
-    initial_guess.upper = upper_limit;
+
+    // find initial parameters for newton raphson method by using bisection
+    auto f = [this, &integrated_to_upper, &rnd](double val) {
+        return interpolant_->evaluate(val) - (integrated_to_upper - rnd);
+    };
+    auto bisec_tolerance = (upper_limit - lower_lim) * 1e-2;
+    std::tie(initial_guess.lower, initial_guess.upper) =
+            Bisection(f, lower_lim, upper_limit, bisec_tolerance, 100);
+
+    // if we are close to the upper limit, start newton raphson method there
+    if (initial_guess.upper == upper_limit) {
+        initial_guess.x = upper_limit;
+    }
+    else
+        initial_guess.x = (initial_guess.lower + initial_guess.upper) / 2;
 
     try {
         return cubic_splines::find_parameter(
@@ -103,10 +116,8 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
         Logging::Get("proposal.UtilityInterpolant")->warn(
                 "Newton-Raphson iteration in UtilityInterpolant::GetUpperLimit "
                 "failed. Try solving using bisection method.");
-        auto f = [this, &integrated_to_upper, &rnd](double val) {
-            return interpolant_->evaluate(val) - (integrated_to_upper - rnd);
-        };
-        return Bisection(f, lower_lim, upper_limit, 1e-6, 100);
+
+        return Bisection(f, lower_lim, upper_limit, 1e-6, 100).first;
     }
 
     // TODO: Check whether this is already accurate enough

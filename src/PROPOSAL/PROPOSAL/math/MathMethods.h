@@ -108,7 +108,12 @@ double dilog(double x);
 double NewtonRaphson(std::function<double(double)> f, std::function<double(double)> df, double x1, double x2,
         double xinit, int MAX_STEPS = 101, double xacc = 1.e-6);
 
-double Bisection(std::function<double(double)> f, double x1, double x2,
+// from stackoverflow https://stackoverflow.com/a/4609795/8227894
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
+std::pair<double, double> Bisection(std::function<double(double)> f, double x1, double x2,
                  double xacc, double MAX_ITER);
 
 struct SplineCoefficients{

@@ -30,7 +30,7 @@ void AxisBuilderDNDX::refine_definition_range(
     else {
         double i_accuracy = 0.1;
         auto f = [&func, &ax](double i) { return func(ax.back_transform(i)); };
-        auto i_low = Bisection(f, i - 1, i, i_accuracy, 100);
+        auto i_low = Bisection(f, i - 1, i, i_accuracy, 100).first;
         energy_lim.low = ax.back_transform(i_low + i_accuracy);
     }
 }
