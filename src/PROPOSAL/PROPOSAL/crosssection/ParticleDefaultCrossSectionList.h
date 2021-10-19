@@ -95,7 +95,7 @@ template<>
 template <typename CrossVec, typename P, typename M>
 void DefaultCrossSections<GammaDef>::Append(CrossVec& cross_vec, P p, M m,std::shared_ptr<const EnergyCutSettings> cut, bool interpolate)
 {
-    auto photopair = std::make_tuple(crosssection::PhotoPairTsai{}, p, m, nullptr, interpolate);
+    auto photopair = std::make_tuple(crosssection::PhotoPairKochMotz{}, p, m, nullptr, interpolate);
     auto compton = std::make_tuple(crosssection::ComptonKleinNishina{}, p, m, cut, interpolate);
     append_cross(cross_vec, photopair, compton);
 }
