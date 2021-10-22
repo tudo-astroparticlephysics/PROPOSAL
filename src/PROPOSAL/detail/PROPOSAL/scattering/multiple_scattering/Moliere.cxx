@@ -49,6 +49,8 @@ ScatteringOffset Moliere::CalculateRandomAngle(
         double xn = 15.;
 
         for (int n = 0; n < 6; n++) {
+            if (xn < 0)
+                return offsets; // xn would become nan for further iterations
             xn = xn
                 * ((1. - std::log(xn) - std::log(chiCSq_ / chi_A_Sq[i]) - 1.
                        + 2. * EULER_MASCHERONI)
