@@ -39,6 +39,32 @@ std::shared_ptr<Propagator> GetPropagator() {
     return ptr;
 }
 
+std::shared_ptr<Propagator> GetPropagatorStochastic() {
+    static std::shared_ptr<Propagator> ptr = nullptr;
+    if(ptr == nullptr) {
+        //create propagator
+        auto p_def = MuMinusDef();
+        auto medium = Ice();
+        auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, false);
+        auto cross = GetStdCrossSections(p_def, medium, cuts, true);
+
+        auto collection = PropagationUtility::Collection();
+        collection.interaction_calc = make_interaction(cross, true);
+        collection.displacement_calc = make_displacement(cross, true);
+        collection.time_calc = make_time(cross, p_def, true);
+        auto prop_utility = PropagationUtility(collection);
+
+        auto density_distr = std::make_shared<Density_homogeneous>(medium);
+        auto world = std::make_shared<Sphere>(Cartesian3D(0, 0, 0), 1e20);
+
+        auto sector = std::make_tuple(world, prop_utility, density_distr);
+        std::vector<Sector> sec_vec = {sector};
+        auto prop = Propagator(p_def, sec_vec);
+        ptr = std::make_shared<Propagator>(prop);
+    }
+    return ptr;
+}
+
 TEST(SecondaryVector, EntryPointExitPoint)
 {
     auto prop = GetPropagator();
@@ -126,6 +152,34 @@ TEST(SecondaryVector, EntryPointExitPointRePropagation)
     EXPECT_TRUE(sec_f.propagated_distance > exit_point->propagated_distance);
     EXPECT_TRUE(sphere.IsBehind(sec_f.position, sec_f.direction));
     EXPECT_TRUE(exit_point->propagated_distance == sphere.GetPosition().GetZ() + sphere.GetRadius());
+}
+
+TEST(SecondaryVector, EnergyConservation) {
+    auto prop = GetPropagatorStochastic();
+
+    Cartesian3D position(0, 0, 0);
+    Cartesian3D direction(0, 0, 1);
+    auto energy = 1e8; // MeV
+    auto init_state = ParticleState(position, direction, energy, 0., 0.);
+
+    auto secondaries = prop->Propagate(init_state);
+
+    double sum_continuous_losses = 0.;
+    for (auto continuous_loss : secondaries.GetContinuousLosses()) {
+        double loss_energy = continuous_loss.energy;
+        EXPECT_GT(loss_energy, 0.); // must be positive
+        sum_continuous_losses += loss_energy;
+    }
+
+    double sum_stochastic_losses = 0.;
+    for (auto stochastic_loss : secondaries.GetStochasticLosses()) {
+        double loss_energy = stochastic_loss.energy;
+        EXPECT_GT(loss_energy, 0); // must be positive
+        sum_stochastic_losses += loss_energy;
+    }
+
+    // energy needs to be conserved
+    EXPECT_EQ(sum_continuous_losses + sum_stochastic_losses + MuMinusDef().mass, energy);
 }
 
 int main(int argc, char** argv)
