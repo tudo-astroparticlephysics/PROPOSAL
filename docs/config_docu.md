@@ -288,7 +288,9 @@ Density distribution described by splines along an axis, using either `linear` o
 
 ## Cross sections
 
-PROPOSAL provides the option to consider additional interaction types as well as to use different physical parametrizations of interactions. If no `CrossSections` object is included in the json file, PROPOSAL chooses a set of interaction types and paremetrizations appropriate for the particle. 
+PROPOSAL provides the option to consider additional interaction types as well as to use different physical parametrizations of interactions. 
+If no `CrossSections` object is included in the json file, PROPOSAL chooses a set of interaction types and parametrizations appropriate for the particle. 
+These default cross sections for each particle type are listed [here](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/docs/conf[config_docu](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/docs/config_docu.md).ig_docu.md).).
 
 To use alternative parametrizations or to enable additional interaction types, the `CrossSections` object needs to contain one object with the appropriate name for each interaction type (e.g. `annihilation`, `brems`, etc.). If there is no object for an specific interaction type, this interaction type will be disabled.
 
