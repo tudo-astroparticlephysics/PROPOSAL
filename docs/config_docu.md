@@ -71,6 +71,7 @@ The following media are implemented and can be used with the `medium` setting:
 * `Paraffin`
 * `AntaresWater`
 * `CascadiabasinWater`
+* `LiquidArgon`
 
 ## Energy cut settings
 
@@ -297,7 +298,7 @@ For each interaction type, a `multiplier` can be defined which scales the total 
 
 #### Example
 
-Example where the interactions bremsstrahlung, electron-positron pair producton, ionization and nuclear interactions are enabled. In contrast to the default parametrizations for muons and taus, the LPM effect for electron-positron pair production and bremsstrahlung will be enabled.
+Example where the interactions bremsstrahlung, electron-positron pair production, ionization and nuclear interactions are enabled. In contrast to the default parametrizations for muons and taus, the LPM effect for electron-positron pair production and bremsstrahlung will be enabled.
 
 ```json
 "CrossSections" : {
@@ -447,6 +448,7 @@ For there parametrizations, the parametrization of the shadowing effect can be c
 Creation of an electron-positron pair by an ingoing photon. Available `photopair` parametrizations are:
 
 * `Tsai`: (Review of Modern Physics, Vol. 46, No. 4, October 1974)
+* `KochMotz`: (Review of Modern Physics, Vol. 61, 1959)
 
 ### Weak interaction: `weak`
 
