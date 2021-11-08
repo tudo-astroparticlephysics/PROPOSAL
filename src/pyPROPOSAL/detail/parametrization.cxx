@@ -1,4 +1,5 @@
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/parametrization/ParametrizationDirect.h"
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/crosssection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crosssection/parametrization/Compton.h"
@@ -6,6 +7,7 @@
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/Photoproduction.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
@@ -24,10 +26,10 @@
             py::arg("lpm"), py::arg("particle_def"), py::arg("medium"),        \
             py::arg("density_correction") = 1.0);
 
-#define PHOTO_REAL_DEF(module, cls, parent)                                    \
+#define PHOTO_REAL_DEF(module, cls)                                            \
     py::class_<crosssection::Photo##cls,                                       \
         std::shared_ptr<crosssection::Photo##cls>,                             \
-        crosssection::Photo##parent>(module, #cls)                             \
+        crosssection::PhotoRealPhotonAssumption>(module, #cls)                 \
         .def(py::init<bool>(), py::arg("add_pertubative"));
 
 #define PHOTO_Q2_DEF(module, cls)                                              \
@@ -183,6 +185,55 @@ void init_parametrization(py::module& m)
     decl_param<Medium>(m_sub, param_medium_name);
     auto param_component_name = std::string("ParametrizationForComponent");
     decl_param<Component>(m_sub, param_component_name);
+
+    // ParametrizationDirect
+
+    py::class_<crosssection::ParametrizationDirect,
+        std::shared_ptr<crosssection::ParametrizationDirect>>(
+                m_sub, "ParametrizationDirect",
+                R"pbdoc(
+                    Class for parametrizations where the cross sections are not
+                    given in a differential form but directly as an analytical
+                    expression.
+                )pbdoc")
+            .def("calculate_dEdx",
+                 &crosssection::ParametrizationDirect::CalculatedEdx,
+                 py::arg("energy"), py::arg("particle_def"),
+                 py::arg("medium"), py::arg("cut"))
+            .def("calculate_dE2dx",
+                 &crosssection::ParametrizationDirect::CalculatedE2dx,
+                 py::arg("energy"), py::arg("particle_def"),
+                 py::arg("medium"), py::arg("cut"))
+            .def("calculate_dNdx",
+                 py::overload_cast<double, const ParticleDef&, const Medium&,
+                 std::shared_ptr<const EnergyCutSettings>>(&crosssection::ParametrizationDirect::CalculatedNdx),
+                 py::arg("energy"), py::arg("particle_def"),
+                 py::arg("medium"), py::arg("cut"))
+            .def("calculate_dNdx",
+                 py::overload_cast<double, size_t, const ParticleDef&, const Medium&,
+                 std::shared_ptr<const EnergyCutSettings>>(&crosssection::ParametrizationDirect::CalculatedNdx),
+                 py::arg("energy"), py::arg("hash"),
+                 py::arg("particle_def"), py::arg("medium"), py::arg("cut"))
+            .def("calculate_cumulative_crosssection",
+                 &crosssection::ParametrizationDirect::CalculateCumulativeCrosssection,
+                 py::arg("energy"), py::arg("hash"), py::arg("v"),
+                 py::arg("particle_def"), py::arg("medium"), py::arg("cut"))
+            .def("calculate_dNdx_PerTarget",
+                 &crosssection::ParametrizationDirect::CalculatedNdx_PerTarget,
+                 py::arg("energy"), py::arg("particle_def"),
+                 py::arg("medium"), py::arg("cut"))
+            .def("calculate_stochastic_loss",
+                 &crosssection::ParametrizationDirect::CalculateStochasticLoss,
+                 py::arg("hash"), py::arg("energy"), py::arg("rate"),
+                 py::arg("particle_def"), py::arg("medium"), py::arg("cut"))
+            .def("lower_energy_limit",
+                 &crosssection::ParametrizationDirect::GetLowerEnergyLim,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("cut"))
+            .def("hash",
+                 &crosssection::ParametrizationDirect::GetHash,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("cut"))
+                 .def("GetInteractionType",
+                 &crosssection::ParametrizationDirect::GetInteractionType);
 
     // ---------------------------------------------------------------------
     // // Bremsstrahlung
@@ -532,7 +583,9 @@ void init_parametrization(py::module& m)
                 >>> medium = proposal.medium.StandardRock(1.0)
                 >>> cuts = proposal.EnergyCutSettings(-1, -1)
                 >>> param = proposal.parametrization.photonuclear.Rhode(mu, medium, cuts, 1.0, True)
-                )pbdoc");
+                )pbdoc")
+                .def("calculate_parametrization",
+                     &crosssection::PhotoRealPhotonAssumption::CalculateParametrization);
 
     py::class_<crosssection::PhotoQ2Integral,
         std::shared_ptr<crosssection::PhotoQ2Integral>,
@@ -591,11 +644,10 @@ void init_parametrization(py::module& m)
                 >>> param = proposal.parametrization.photonuclear.RenoSarcevicSuInterpolant(mu, medium, cuts, 1.0, shadow, interpol)
                 )pbdoc");
 
-    PHOTO_REAL_DEF(m_sub_photo, Zeus, RealPhotonAssumption)
-    PHOTO_REAL_DEF(m_sub_photo, BezrukovBugaev, RealPhotonAssumption)
-    PHOTO_REAL_DEF(m_sub_photo, Rhode, RealPhotonAssumption)
-    PHOTO_REAL_DEF(m_sub_photo, Kokoulin,
-        BezrukovBugaev) // Kokoulin derives from BezrukovBugaev
+    PHOTO_REAL_DEF(m_sub_photo, Zeus)
+    PHOTO_REAL_DEF(m_sub_photo, BezrukovBugaev)
+    PHOTO_REAL_DEF(m_sub_photo, Rhode)
+    PHOTO_REAL_DEF(m_sub_photo, Kokoulin)
 
     PHOTO_Q2_DEF(m_sub_photo, AbramowiczLevinLevyMaor91)
     PHOTO_Q2_DEF(m_sub_photo, AbramowiczLevinLevyMaor97)
@@ -603,6 +655,53 @@ void init_parametrization(py::module& m)
     PHOTO_Q2_DEF(m_sub_photo, RenoSarcevicSu)
     PHOTO_Q2_DEF(m_sub_photo, AbtFT)
     PHOTO_Q2_DEF(m_sub_photo, BlockDurandHa)
+
+    // --------------------------------------------------------------------- //
+    // Photoproduction
+    // --------------------------------------------------------------------- //
+
+    py::module m_sub_photoproduction = m_sub.def_submodule("photoproduction");
+
+    py::class_<crosssection::Photoproduction,
+    std::shared_ptr<crosssection::Photoproduction>,
+    crosssection::ParametrizationDirect>(m_sub_photoproduction, "Photoproduction",
+         R"pbdoc("
+            Virtual class for Photoproduction parametrizations, i.e. nuclear
+            interactions of a photon with a medium.
+        ")pbdoc")
+        .def("PhotonNucleonCrossSection",
+        &crosssection::Photoproduction::PhotonNucleonCrossSection,
+        py::arg("energy"), py::arg("component"),
+        R"pbdoc("
+            Total crosssection for the interaction of a photon with a single
+            nucleon of an atomic nucleus.
+        ")pbdoc");
+
+    py::class_<crosssection::PhotoproductionZeus,
+    std::shared_ptr<crosssection::PhotoproductionZeus>,
+    crosssection::Photoproduction>(m_sub_photoproduction, "Zeus")
+        .def(py::init<>());
+
+    py::class_<crosssection::PhotoproductionBezrukovBugaev,
+    std::shared_ptr<crosssection::PhotoproductionBezrukovBugaev>,
+    crosssection::Photoproduction>(m_sub_photoproduction, "BezrukovBugaev")
+        .def(py::init<>());
+
+    py::class_<crosssection::PhotoproductionCaldwell,
+    std::shared_ptr<crosssection::PhotoproductionCaldwell>,
+    crosssection::Photoproduction>(m_sub_photoproduction, "Caldwell")
+        .def(py::init<>());
+
+    py::class_<crosssection::PhotoproductionKokoulin,
+    std::shared_ptr<crosssection::PhotoproductionKokoulin>,
+    crosssection::PhotoproductionBezrukovBugaev,
+    crosssection::PhotoproductionCaldwell>(m_sub_photoproduction, "Kokoulin")
+        .def(py::init<>());
+
+    py::class_<crosssection::PhotoproductionRhode,
+    std::shared_ptr<crosssection::PhotoproductionRhode>,
+    crosssection::PhotoproductionCaldwell>(m_sub_photoproduction, "Rhode")
+        .def(py::init<>());
 
     // --------------------------------------------------------------------- //
     // Ionization
