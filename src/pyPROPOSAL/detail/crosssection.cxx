@@ -12,6 +12,7 @@
 #include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/Photoproduction.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
@@ -273,6 +274,12 @@ void init_crosssection(py::module& m)
 
     build_crosssection<crosssection::PhotoPairTsai>(m_sub);
     build_crosssection<crosssection::PhotoPairKochMotz>(m_sub);
+
+    build_crosssection<crosssection::PhotoproductionZeus>(m_sub);
+    build_crosssection<crosssection::PhotoproductionBezrukovBugaev>(m_sub);
+    build_crosssection<crosssection::PhotoproductionCaldwell>(m_sub);
+    build_crosssection<crosssection::PhotoproductionKokoulin>(m_sub);
+    build_crosssection<crosssection::PhotoproductionRhode>(m_sub);
 
     build_crosssection<crosssection::PhotoAbramowiczLevinLevyMaor91>(m_sub);
     build_crosssection<crosssection::PhotoAbramowiczLevinLevyMaor97>(m_sub);

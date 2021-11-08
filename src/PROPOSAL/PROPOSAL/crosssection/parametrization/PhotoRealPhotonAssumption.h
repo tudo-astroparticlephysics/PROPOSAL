@@ -32,16 +32,14 @@
 #include <memory>
 #include <unordered_map>
 
-#define PHOTO_PARAM_REAL_DEC(param, parent)                                    \
-    class Photo##param : public Photo##parent {                                \
+#define PHOTO_PARAM_REAL_DEC(param)                                            \
+    class Photo##param : public PhotoRealPhotonAssumption {                    \
     public:                                                                    \
         Photo##param(bool hard_component);                                     \
         using base_param_t = Photonuclear;                                     \
                                                                                \
         std::unique_ptr<Parametrization<Component>> clone() const override;    \
                                                                                \
-        virtual double CalculateParametrization(                               \
-            const Component&, double nu) const override;                       \
     };                                                                         \
                                                                                \
     template <> struct ParametrizationName<Photo##param> {                     \
@@ -54,50 +52,29 @@
 
 namespace PROPOSAL {
 namespace crosssection {
+    class Photoproduction;
     class PhotoRealPhotonAssumption : public Photonuclear {
         using realphoton_ptr = std::shared_ptr<RealPhoton>;
 
     protected:
         bool hard_component_;
+        std::shared_ptr<crosssection::Photoproduction> photon_param_;
         std::unordered_map<size_t, realphoton_ptr> hard_component_map;
 
     public:
-        PhotoRealPhotonAssumption(bool hard_component);
+        PhotoRealPhotonAssumption(bool hard_component, std::shared_ptr<crosssection::Photoproduction> photon_param);
         virtual ~PhotoRealPhotonAssumption() = default;
 
         virtual double DifferentialCrossSection(const ParticleDef&,
             const Component&, double energy, double v) const;
-        virtual double CalculateParametrization(
-            const Component&, double nu) const = 0;
-        double NucleusCrossSectionCaldwell(double nu) const;
+
+        double CalculateParametrization(const Component&, double) const;
     };
 
-    PHOTO_PARAM_REAL_DEC(Zeus, RealPhotonAssumption)
-    PHOTO_PARAM_REAL_DEC(BezrukovBugaev, RealPhotonAssumption)
-    PHOTO_PARAM_REAL_DEC(Kokoulin, BezrukovBugaev)
-
-    class PhotoRhode : public PhotoRealPhotonAssumption {
-        std::shared_ptr<Interpolant> interpolant_;
-
-        double MeasuredSgN(double e) const;
-
-    public:
-        PhotoRhode(bool hard_component);
-        using base_param_t = Photonuclear;
-
-        std::unique_ptr<Parametrization<Component>> clone() const final;
-
-        double CalculateParametrization(
-            const Component&, double nu) const override;
-    };
-
-    template <> struct ParametrizationName<PhotoRhode> {
-        static constexpr auto value = "Rhode";
-    };
-
-    template <> struct ParametrizationId<PhotoRhode> {
-        static constexpr auto value = 1000000005;
-    };
+    PHOTO_PARAM_REAL_DEC(Zeus)
+    PHOTO_PARAM_REAL_DEC(BezrukovBugaev)
+    PHOTO_PARAM_REAL_DEC(Kokoulin)
+    PHOTO_PARAM_REAL_DEC(Rhode)
 
 } // namespace crosssection
 } // namespace PROPOSAL
