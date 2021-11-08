@@ -9,6 +9,7 @@
 #include "PROPOSAL/secondaries/parametrization/ionization/NaivIonization.h"
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
 #include "PROPOSAL/secondaries/parametrization/photonuclear/Photonuclear.h"
+#include "PROPOSAL/secondaries/parametrization/photoproduction/Photoproduction.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsai.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsaiForwardPeaked.h"
 #include "PROPOSAL/secondaries/parametrization/weakinteraction/WeakCooperSarkarMertsch.h"
@@ -82,7 +83,10 @@ void init_secondaries(py::module& m)
         .decl_virtual_param(m_sub, "MupairProduction");
     SecondariesBuilder<secondaries::Photonuclear,
         secondaries::Parametrization> {}
-        .decl_virtual_param(m_sub, "Photonuclear");
+        .decl_param(m_sub, "Photonuclear");
+    SecondariesBuilder<secondaries::Photoproduction,
+        secondaries::Parametrization> {}
+        .decl_param(m_sub, "Photoproduction");
     SecondariesBuilder<secondaries::PhotopairProduction,
         secondaries::Parametrization> {}
         .decl_virtual_param(m_sub, "PhotopairProduction");
