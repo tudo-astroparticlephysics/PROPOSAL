@@ -10,6 +10,7 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/medium/Components.h"
 #include <cmath>
 #include <iostream>
 #include <sstream>
@@ -125,10 +126,20 @@ double ParticleState::GetMomentum() const
 StochasticLoss::StochasticLoss(int type, double loss_energy, const Vector3D& position,
                                const Vector3D& direction, double time,
                                double propagated_distance,
-                               double parent_particle_energy)
+                               double parent_particle_energy, size_t target_hash)
                                : Loss(type, loss_energy, parent_particle_energy),
                                position(position), direction(direction), time(time),
-                               propagated_distance(propagated_distance) {}
+                               propagated_distance(propagated_distance),
+                               target_hash(target_hash) {}
+
+Component StochasticLoss::GetComponent() const {
+    auto it = Component::component_map->find(target_hash);
+    if (it != Component::component_map->end())
+        return it->second;
+    throw std::invalid_argument("Component not found for StochasticLoss object."
+                                "The interaction was probably with a medium"
+                                " and not with a Component.");
+}
 
 ContinuousLoss::ContinuousLoss(double energy, double parent_particle_energy,
                                const Vector3D& start_position,

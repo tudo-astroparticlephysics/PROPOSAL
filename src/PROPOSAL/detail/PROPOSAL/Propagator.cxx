@@ -91,8 +91,8 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
         case ReachedInteraction:
             switch (next_interaction_type) {
             case Stochastic: {
-                auto type = DoStochasticInteraction(state, utility, rnd);
-                track.push_back(state, type);
+                auto loss = DoStochasticInteraction(state, utility, rnd);
+                track.push_back(state, loss.type, loss.comp_hash);
                 if (state.energy <= InteractionEnergy[MinimalE])
                     continue_propagation = false;
                 break;
@@ -125,7 +125,7 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
     return track;
 }
 
-InteractionType Propagator::DoStochasticInteraction(ParticleState& p_cond,
+Interaction::Loss Propagator::DoStochasticInteraction(ParticleState& p_cond,
     PropagationUtility& utility, std::function<double()> rnd)
 {
     auto loss = utility.EnergyStochasticloss(p_cond.energy, rnd());
@@ -134,7 +134,7 @@ InteractionType Propagator::DoStochasticInteraction(ParticleState& p_cond,
         p_cond.energy * (1. - loss.v_loss), p_cond.direction, rnd);
     p_cond.energy = p_cond.energy * (1. - loss.v_loss);
 
-    return loss.type;
+    return loss;
 }
 
 int Propagator::AdvanceParticle(ParticleState& state, double E_f,
