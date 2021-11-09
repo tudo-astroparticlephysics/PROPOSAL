@@ -82,6 +82,7 @@ static const std::unordered_map<InteractionType, std::string,
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
+class Component;
 
 struct ParticleState {
 public:
@@ -121,11 +122,14 @@ struct Loss {
 };
 
 struct StochasticLoss : public Loss {
-    StochasticLoss(int, double, const Vector3D&, const Vector3D&, double, double, double);
+    StochasticLoss(int, double, const Vector3D&, const Vector3D&, double, double, double, size_t = 0);
     Cartesian3D position;
     Cartesian3D direction;
     double time;
     double propagated_distance;
+    size_t target_hash;
+
+    Component GetComponent() const;
 };
 
 struct ContinuousLoss : public Loss {
