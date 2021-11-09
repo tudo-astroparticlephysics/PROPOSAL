@@ -88,26 +88,27 @@ public:
     ParticleState();
     ParticleState(const Vector3D&, const Vector3D&, const double&,
                   const double&, const double&);
-    ParticleState(const ParticleType&, const Vector3D&, const Vector3D&, const double&,
+    ParticleState(const ParticleDef&, const Vector3D&, const Vector3D&, const double&,
                   const double&, const double&);
     ~ParticleState() = default;
     bool operator==(const ParticleState&) const;
     bool operator!=(const ParticleState&) const;
     friend std::ostream& operator<<(std::ostream&, ParticleState const&);
 
-    int type;
     Cartesian3D position;  //!< position coordinates [cm]
     Cartesian3D direction; //!< direction vector, angles in [rad]
     double energy;                 //!< energy [MeV]
     double time;                   //!< age [sec]
     double propagated_distance;    //!< propagation distance [cm]
 
-    void SetType(ParticleType particle_type) { type = static_cast<int>(particle_type); }
+    void SetParticleDef(const ParticleDef& particle_def);
     void SetMomentum(double momentum);
     double GetMomentum() const;
     ParticleDef GetParticleDef() const;
 
 private:
+    ParticleType type;
+    size_t particle_def_hash;
     void print(std::ostream&) const {}
 
 };

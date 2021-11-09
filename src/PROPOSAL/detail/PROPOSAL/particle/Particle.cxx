@@ -25,7 +25,7 @@ std::ostream& operator<<(std::ostream& os, ParticleState const& data)
     ss << " ParticleState (" << &data << ") ";
     os << Helper::Centered(60, ss.str()) << '\n';
 
-    os << "type: " << data.type << '\n';
+    os << "type: " << (int)data.type << '\n';
     os << "position:" << '\n';
     os << data.position << '\n';
     os << "direction:" << '\n';
@@ -43,7 +43,8 @@ std::ostream& operator<<(std::ostream& os, ParticleState const& data)
 } // namespace PROPOSAL
 
 ParticleState::ParticleState()
-    : type(0)
+    : type(ParticleType::None)
+    , particle_def_hash(0)
     , position(Cartesian3D())
     , direction(Cartesian3D())
     , energy(0)
@@ -55,7 +56,8 @@ ParticleState::ParticleState()
 ParticleState::ParticleState(const Vector3D& position, const Vector3D& direction,
                              const double& energy, const double& time,
                              const double& distance)
-    : type(static_cast<int>(ParticleType::None))
+    : type(ParticleType::None)
+    , particle_def_hash(0)
     , position(position)
     , direction(direction)
     , energy(energy)
@@ -64,10 +66,11 @@ ParticleState::ParticleState(const Vector3D& position, const Vector3D& direction
 {
 }
 
-ParticleState::ParticleState(const ParticleType& type, const Vector3D& position,
+ParticleState::ParticleState(const ParticleDef& type, const Vector3D& position,
                              const Vector3D& direction, const double& energy, const double& time,
                              const double& distance)
-    : type(static_cast<int>(type))
+    : type(type.particle_type)
+    , particle_def_hash(type.GetHash())
     , position(position)
     , direction(direction)
     , energy(energy)
@@ -101,13 +104,18 @@ bool ParticleState::operator!=(const ParticleState& dynamic_data) const
 
 ParticleDef ParticleState::GetParticleDef() const
 {
-    auto p_search = Type_Particle_Map.find(static_cast<ParticleType>(type));
+    auto p_search = Type_Particle_Map.find(particle_def_hash);
     if (p_search != Type_Particle_Map.end()) {
         return p_search->second;
     }
 
     throw std::invalid_argument("ParticleState: ParticleDef not found for "
-                                "given ParticleType " + std::to_string(type));
+                                "given ParticleType");
+}
+
+void ParticleState::SetParticleDef(const ParticleDef& particle_def) {
+    type = particle_def.particle_type;
+    particle_def_hash = particle_def.GetHash();
 }
 
 void ParticleState::SetMomentum(double momentum)

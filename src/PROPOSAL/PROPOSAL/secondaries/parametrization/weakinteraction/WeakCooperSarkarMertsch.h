@@ -10,7 +10,7 @@ namespace secondaries {
     class WeakCooperSarkarMertsch
         : public secondaries::WeakInteraction,
           public DefaultSecondaries<WeakCooperSarkarMertsch> {
-        const int weak_partner_type;
+        ParticleDef weak_partner;
 
         size_t generate_hash(const ParticleDef&, const Medium&);
 
@@ -21,7 +21,7 @@ namespace secondaries {
         static constexpr int n_rnd = 1;
 
         WeakCooperSarkarMertsch(const ParticleDef& p, const Medium& m)
-            : weak_partner_type(p.weak_partner),
+        : weak_partner(p.GetWeakPartner()),
             dndx(detail::build_dndx(
                     std::true_type {}, true,
                     crosssection::WeakCooperSarkarMertsch(), p, m, nullptr,

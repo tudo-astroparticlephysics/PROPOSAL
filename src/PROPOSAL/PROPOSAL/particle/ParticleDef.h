@@ -145,13 +145,15 @@ struct ParticleDef {
     const double charge;
     const HardComponentTables::VecType& hard_component_table;
     const DecayTable decay_table;
-    const int particle_type;
-    const int weak_partner;
+    const ParticleType particle_type;
 
     ParticleDef();
     ParticleDef(std::string name, double mass, double low, double lifetime,
         double charge, const HardComponentTables::VecType& table,
-        const DecayTable&, const int, const int);
+        const DecayTable&, const ParticleType, const ParticleDef&);
+    ParticleDef(std::string name, double mass, double low, double lifetime,
+                double charge, const HardComponentTables::VecType& table,
+                const DecayTable&, const ParticleType, size_t);
     virtual ~ParticleDef() = default;
 
     bool operator==(const ParticleDef&) const;
@@ -161,10 +163,12 @@ struct ParticleDef {
     /* CrossSectionList GetCrossSections(std::shared_ptr<EnergyCutSettings>); */
 
     size_t GetHash() const;
+    ParticleDef GetWeakPartner() const;
 
     friend std::ostream& operator<<(std::ostream&, ParticleDef const&);
 
 private:
+    size_t weak_partner;
     // ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
 
     /* std::unordered_map<size_t, std::vector<shared_ptr<CrossSection>>> */
@@ -216,14 +220,14 @@ public:
         decay_table = var;
         return *this;
     }
-    Builder& SetParticleType(const int var)
+    Builder& SetParticleType(const ParticleType var)
     {
         particle_type = var;
         return *this;
     }
-    Builder& SetWeakPartner(const ParticleType& partner)
+    Builder& SetWeakPartner(const ParticleDef& partner)
     {
-        weak_partner = static_cast<int>(partner);
+        weak_partner = partner.weak_partner;
         return *this;
     }
     Builder& SetParticleDef(const ParticleDef& var)
@@ -259,8 +263,8 @@ private:
     double charge;
     const HardComponentTables::VecType* hard_component_table;
     DecayTable decay_table;
-    int particle_type;
-    int weak_partner;
+    ParticleType particle_type;
+    size_t weak_partner;
 };
 
 // ------------------------------------------------------------------------- //
@@ -320,29 +324,29 @@ PROPOSAL_MAKE_HASHABLE(PROPOSAL::ParticleDef, t.mass, t.lifetime, t.charge)
 #undef PARTICLE_DEF
 
 namespace PROPOSAL {
-static const std::unordered_map<ParticleType, const ParticleDef, ParticleType_hash>
+static const std::unordered_map<size_t, const ParticleDef, ParticleType_hash>
     Type_Particle_Map{
-        { ParticleType::EMinus, EMinusDef() },
-        { ParticleType::EPlus, EPlusDef() },
-        { ParticleType::NuE, NuEDef() },
-        { ParticleType::NuEBar, NuEBarDef() },
-        { ParticleType::MuMinus, MuMinusDef() },
-        { ParticleType::NuMu, NuMuDef() },
-        { ParticleType::NuMuBar, NuMuBarDef() },
-        { ParticleType::MuPlus, MuPlusDef() },
-        { ParticleType::TauMinus, TauMinusDef() },
-        { ParticleType::TauPlus, TauPlusDef() },
-        { ParticleType::NuTau, NuTauDef() },
-        { ParticleType::NuTauBar, NuTauBarDef() },
-        { ParticleType::Gamma, GammaDef() },
-        { ParticleType::Pi0, Pi0Def() },
-        { ParticleType::PiPlus, PiPlusDef() },
-        { ParticleType::PiMinus, PiMinusDef() },
-        { ParticleType::K0, K0Def() },
-        { ParticleType::KPlus, KPlusDef() },
-        { ParticleType::KMinus, KMinusDef() },
-        { ParticleType::Monopole, MonopoleDef() },
-        { ParticleType::SMPPlus, SMPPlusDef() },
-        { ParticleType::SMPMinus, SMPMinusDef() },
+        { EMinusDef().GetHash(), EMinusDef() },
+        { EPlusDef().GetHash(), EPlusDef() },
+        { NuEDef().GetHash(), NuEDef() },
+        { NuEBarDef().GetHash(), NuEBarDef() },
+        { MuMinusDef().GetHash(), MuMinusDef() },
+        { NuMuDef().GetHash(), NuMuDef() },
+        { NuMuBarDef().GetHash(), NuMuBarDef() },
+        { MuPlusDef().GetHash(), MuPlusDef() },
+        { TauMinusDef().GetHash(), TauMinusDef() },
+        { TauPlusDef().GetHash(), TauPlusDef() },
+        { NuTauDef().GetHash(), NuTauDef() },
+        { NuTauBarDef().GetHash(), NuTauBarDef() },
+        { GammaDef().GetHash(), GammaDef() },
+        { Pi0Def().GetHash(), Pi0Def() },
+        { PiPlusDef().GetHash(), PiPlusDef() },
+        { PiMinusDef().GetHash(), PiMinusDef() },
+        { K0Def().GetHash(), K0Def() },
+        { KPlusDef().GetHash(), KPlusDef() },
+        { KMinusDef().GetHash(), KMinusDef() },
+        { MonopoleDef().GetHash(), MonopoleDef() },
+        { SMPPlusDef().GetHash(), SMPPlusDef() },
+        { SMPMinusDef().GetHash(), SMPMinusDef() },
     };
 } // namespace PROPOSAL

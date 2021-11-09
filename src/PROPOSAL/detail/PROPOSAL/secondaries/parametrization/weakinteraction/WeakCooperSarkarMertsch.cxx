@@ -41,7 +41,7 @@ secondaries::WeakCooperSarkarMertsch::CalculateSecondaries(StochasticLoss loss,
     auto v = CalculateRelativeLoss(loss.parent_particle_energy, rnd[0], c);
 
     auto sec = std::vector<ParticleState>();
-    sec.emplace_back(static_cast<ParticleType>(weak_partner_type),
+    sec.emplace_back(weak_partner,
                      loss.position, loss.direction, (1. - v) * loss.energy,
                      loss.time, 0.);
     sec.emplace_back(ParticleType::Hadron,
