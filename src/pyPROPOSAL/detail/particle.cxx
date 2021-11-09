@@ -276,9 +276,9 @@ void init_particle(py::module& m) {
             .def_readwrite("propagated_distance", &StochasticLoss::propagated_distance, R"pbdoc(Distance (in cm) the parent particle has propagated when the stochastic loss occured.)pbdoc");
 
     py::class_<ContinuousLoss, Loss, std::shared_ptr<ContinuousLoss>>(m_sub, "ContinuousLoss")
-            .def(py::init<const double&, const double&, const Vector3D&, const double&, const Vector3D&, const Vector3D&, const double&, const double&>())
-            .def_readwrite("length", &ContinuousLoss::length, R"pbdoc(Length of continuous loss in cm.)pbdoc")
+    .def(py::init<const double&, const double&, const Vector3D&, const Vector3D&, const Vector3D&, const Vector3D&, const double&, const double&>())
             .def_readwrite("start_position", &ContinuousLoss::start_position, R"pbdoc(Position where the continuous energy loss started.)pbdoc")
+            .def_readwrite("end_position", &ContinuousLoss::end_position, R"pbdoc(Position where the continuous energy loss ended.)pbdoc")
             .def_readwrite("direction_initial", &ContinuousLoss::direction_initial, R"pbdoc(Direction of the particle at the beginning of the continuous energy loss.)pbdoc")
             .def_readwrite("direction_final", &ContinuousLoss::direction_final, R"pbdoc(Direction of the particle at the end of the continuous energy loss.)pbdoc")
             .def_readwrite("time_initial", &ContinuousLoss::time_initial, R"pbdoc(Time when the continuous energy loss started.)pbdoc")

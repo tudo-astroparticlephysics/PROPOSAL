@@ -398,8 +398,8 @@ std::vector<ContinuousLoss> Secondaries::GetContinuousLosses() const
     for (unsigned int i=1; i<track_.size(); i++) {
         if (types_[i] == InteractionType::ContinuousEnergyLoss) {
             losses.emplace_back( track_[i].energy - track_[i-1].energy,
-                                 track_[i-1].energy, track_[i-1].position,
-                                 (track_[i].position - track_[i-1].position).magnitude(),
+                                 track_[i-1].energy,
+                                 track_[i-1].position, track_[i].position,
                                  track_[i-1].direction, track_[i].direction,
                                  track_[i-1].time, track_[i].time);
         }
@@ -419,8 +419,8 @@ std::vector<ContinuousLoss> Secondaries::GetContinuousLosses(const Geometry& geo
             if (types_[i] == InteractionType::ContinuousEnergyLoss) {
                 losses.emplace_back(
                         track_[i].energy - track_[i-1].energy,
-                        track_[i-1].energy, track_[i-1].position,
-                        (track_[i].position - track_[i-1].position).magnitude(),
+                        track_[i-1].energy,
+                        track_[i-1].position, track_[i].position,
                         track_[i-1].direction, track_[i].direction,
                         track_[i-1].time, track_[i].time);
             }
