@@ -71,6 +71,7 @@ The following media are implemented and can be used with the `medium` setting:
 * `Paraffin`
 * `AntaresWater`
 * `CascadiabasinWater`
+* `LiquidArgon`
 
 ## Energy cut settings
 
@@ -288,7 +289,9 @@ Density distribution described by splines along an axis, using either `linear` o
 
 ## Cross sections
 
-PROPOSAL provides the option to consider additional interaction types as well as to use different physical parametrizations of interactions. If no `CrossSections` object is included in the json file, PROPOSAL chooses a set of interaction types and paremetrizations appropriate for the particle. 
+PROPOSAL provides the option to consider additional interaction types as well as to use different physical parametrizations of interactions. 
+If no `CrossSections` object is included in the json file, PROPOSAL chooses a set of interaction types and parametrizations appropriate for the particle. 
+These default cross sections for each particle type are listed [here](https://github.com/tudo-astroparticlephysics/PROPOSAL/blob/master/docs/default_crosssections.md).
 
 To use alternative parametrizations or to enable additional interaction types, the `CrossSections` object needs to contain one object with the appropriate name for each interaction type (e.g. `annihilation`, `brems`, etc.). If there is no object for an specific interaction type, this interaction type will be disabled.
 
@@ -297,7 +300,7 @@ For each interaction type, a `multiplier` can be defined which scales the total 
 
 #### Example
 
-Example where the interactions bremsstrahlung, electron-positron pair producton, ionization and nuclear interactions are enabled. In contrast to the default parametrizations for muons and taus, the LPM effect for electron-positron pair production and bremsstrahlung will be enabled.
+Example where the interactions bremsstrahlung, electron-positron pair production, ionization and nuclear interactions are enabled. In contrast to the default parametrizations for muons and taus, the LPM effect for electron-positron pair production and bremsstrahlung will be enabled.
 
 ```json
 "CrossSections" : {
@@ -447,6 +450,7 @@ For there parametrizations, the parametrization of the shadowing effect can be c
 Creation of an electron-positron pair by an ingoing photon. Available `photopair` parametrizations are:
 
 * `Tsai`: (Review of Modern Physics, Vol. 46, No. 4, October 1974)
+* `KochMotz`: (Review of Modern Physics, Vol. 61, 1959)
 
 ### Weak interaction: `weak`
 
