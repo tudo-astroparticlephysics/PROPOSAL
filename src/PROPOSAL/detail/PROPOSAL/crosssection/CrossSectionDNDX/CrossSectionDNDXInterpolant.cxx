@@ -1,6 +1,8 @@
 #define CROSSSECTIONDNDXINTERPOLANT_INSTANTIATION
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXInterpolant.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Logging.h"
+#include "PROPOSAL/math/MathMethods.h"
 
 #include <cmath>
 
@@ -93,7 +95,24 @@ double CrossSectionDNDXInterpolant::GetUpperLimit(double energy, double rate)
     auto initial_guess = cubic_splines::ParameterGuess<std::array<double, 2>>();
     initial_guess.x = { energy, NAN };
     initial_guess.n = 1;
+    double v;
+    try {
+        v = cubic_splines::find_parameter(interpolant, rate, initial_guess);
+    } catch (std::runtime_error&) {
+        Logging::Get("proposal.UtilityInterpolant")->warn(
+                "Newton-Raphson iteration in "
+                "CrossSectionDNDXInterpolant::GetUpperLimit failed. Try solving"
+                " using bisection method.");
 
-    auto v = cubic_splines::find_parameter(interpolant, rate, initial_guess);
+        auto f = [this, &rate, &energy](double val) {
+            return interpolant.evaluate(
+                    std::array<double, 2> { energy, val }) - rate;
+        };
+        // v is evaluated in transformed space!
+        auto interval = Bisection(f, retransform_v(lim.min, lim.max, lim.min),
+                                  retransform_v(lim.min, lim.max, lim.max),
+                                  1e-6, 100);
+        v = (interval.first + interval.second) / 2.;
+    }
     return transform_v(lim.min, lim.max, v);
 }

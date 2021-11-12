@@ -32,6 +32,7 @@ macro(package_add_test TESTNAME)
 endmacro()
 
 # Unit Tests
+package_add_test(UnitTest_CrossSection CrossSection_TEST.cxx)
 package_add_test(UnitTest_Decay Decay_TEST.cxx)
 package_add_test(UnitTest_DecayChannel DecayChannel_TEST.cxx)
 package_add_test(UnitTest_DecayTable DecayTable_TEST.cxx)
