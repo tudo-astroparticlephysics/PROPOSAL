@@ -129,10 +129,10 @@ struct StochasticLoss : public Loss {
 };
 
 struct ContinuousLoss : public Loss {
-    ContinuousLoss(double, double, const Vector3D&, double, const Vector3D&,
-            const Vector3D&, double, double);
+    ContinuousLoss(double, double, const Vector3D&, const Vector3D&,
+                   const Vector3D&, const Vector3D&, double, double);
     Cartesian3D start_position;
-    double length;
+    Cartesian3D end_position;
     Cartesian3D direction_initial;
     Cartesian3D direction_final;
     double time_initial;

@@ -131,14 +131,15 @@ StochasticLoss::StochasticLoss(int type, double loss_energy, const Vector3D& pos
                                propagated_distance(propagated_distance) {}
 
 ContinuousLoss::ContinuousLoss(double energy, double parent_particle_energy,
-                               const Vector3D& start_position, double length,
+                               const Vector3D& start_position,
+                               const Vector3D& end_position,
                                const Vector3D& direction_initial,
                                const Vector3D& direction_final,
                                double time_initial, double time_final)
                                : Loss((int)InteractionType::ContinuousEnergyLoss,
                                       energy, parent_particle_energy),
                                       start_position(start_position),
-                                      length(length),
+                                      end_position(end_position),
                                       direction_initial(direction_initial),
                                       direction_final(direction_final),
                                       time_initial(time_initial),
