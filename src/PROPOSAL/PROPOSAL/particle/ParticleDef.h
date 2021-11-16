@@ -164,7 +164,10 @@ struct ParticleDef {
 
     friend std::ostream& operator<<(std::ostream&, ParticleDef const&);
 
+    static ParticleDef GetParticleDefForType(int type);
+
 private:
+    static std::unordered_map<int, ParticleDef> Type_Particle_Map;
     // ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
 
     /* std::unordered_map<size_t, std::vector<shared_ptr<CrossSection>>> */
@@ -318,31 +321,3 @@ PARTICLE_DEF(SMPPlus)
 PROPOSAL_MAKE_HASHABLE(PROPOSAL::ParticleDef, t.mass, t.lifetime, t.charge)
 
 #undef PARTICLE_DEF
-
-namespace PROPOSAL {
-static const std::unordered_map<ParticleType, const ParticleDef, ParticleType_hash>
-    Type_Particle_Map{
-        { ParticleType::EMinus, EMinusDef() },
-        { ParticleType::EPlus, EPlusDef() },
-        { ParticleType::NuE, NuEDef() },
-        { ParticleType::NuEBar, NuEBarDef() },
-        { ParticleType::MuMinus, MuMinusDef() },
-        { ParticleType::NuMu, NuMuDef() },
-        { ParticleType::NuMuBar, NuMuBarDef() },
-        { ParticleType::MuPlus, MuPlusDef() },
-        { ParticleType::TauMinus, TauMinusDef() },
-        { ParticleType::TauPlus, TauPlusDef() },
-        { ParticleType::NuTau, NuTauDef() },
-        { ParticleType::NuTauBar, NuTauBarDef() },
-        { ParticleType::Gamma, GammaDef() },
-        { ParticleType::Pi0, Pi0Def() },
-        { ParticleType::PiPlus, PiPlusDef() },
-        { ParticleType::PiMinus, PiMinusDef() },
-        { ParticleType::K0, K0Def() },
-        { ParticleType::KPlus, KPlusDef() },
-        { ParticleType::KMinus, KMinusDef() },
-        { ParticleType::Monopole, MonopoleDef() },
-        { ParticleType::SMPPlus, SMPPlusDef() },
-        { ParticleType::SMPMinus, SMPMinusDef() },
-    };
-} // namespace PROPOSAL

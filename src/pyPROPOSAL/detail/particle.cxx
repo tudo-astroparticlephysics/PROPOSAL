@@ -16,6 +16,11 @@ using namespace PROPOSAL;
 void init_particle(py::module& m) {
     py::module m_sub = m.def_submodule("particle");
 
+    m_sub.def("get_ParticleDef_for_type", &ParticleDef::GetParticleDefForType,
+              py::arg("particle_type"), R"pbdoc(
+                Get ParticleDef for given particle_type
+    )pbdoc");
+
     m_sub.doc() = R"pbdoc(
         For each propagation a defined particle is needed.
         You have the possibility to define one by your own or select one of

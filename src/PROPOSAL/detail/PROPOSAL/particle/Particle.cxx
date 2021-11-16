@@ -101,13 +101,7 @@ bool ParticleState::operator!=(const ParticleState& dynamic_data) const
 
 ParticleDef ParticleState::GetParticleDef() const
 {
-    auto p_search = Type_Particle_Map.find(static_cast<ParticleType>(type));
-    if (p_search != Type_Particle_Map.end()) {
-        return p_search->second;
-    }
-
-    throw std::invalid_argument("ParticleState: ParticleDef not found for "
-                                "given ParticleType " + std::to_string(type));
+    return ParticleDef::GetParticleDefForType(type);
 }
 
 void ParticleState::SetMomentum(double momentum)
