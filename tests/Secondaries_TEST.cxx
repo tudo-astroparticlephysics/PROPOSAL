@@ -179,6 +179,9 @@ TEST(SecondaryVector, EnergyConservation) {
     }
 
     // energy needs to be conserved
+    std::cout << std::setprecision(20) << std::endl;
+    std::cout << "1: " << sum_continuous_losses + sum_stochastic_losses + MuMinusDef().mass << std::endl;
+    std::cout << "2: " << energy << std::endl;
     EXPECT_NEAR(sum_continuous_losses + sum_stochastic_losses + MuMinusDef().mass, energy, COMPUTER_PRECISION);
 }
 
