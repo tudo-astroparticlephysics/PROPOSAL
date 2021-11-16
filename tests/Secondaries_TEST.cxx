@@ -179,7 +179,7 @@ TEST(SecondaryVector, EnergyConservation) {
     }
 
     // energy needs to be conserved
-    EXPECT_EQ(sum_continuous_losses + sum_stochastic_losses + MuMinusDef().mass, energy);
+    EXPECT_NEAR(sum_continuous_losses + sum_stochastic_losses + MuMinusDef().mass, energy, COMPUTER_PRECISION);
 }
 
 int main(int argc, char** argv)
