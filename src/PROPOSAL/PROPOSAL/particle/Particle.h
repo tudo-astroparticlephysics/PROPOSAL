@@ -128,8 +128,6 @@ struct StochasticLoss : public Loss {
     double time;
     double propagated_distance;
     size_t target_hash;
-
-    Component GetComponent() const;
 };
 
 struct ContinuousLoss : public Loss {

@@ -63,6 +63,7 @@ public:
 
     size_t GetHash() const noexcept;
     static std::unique_ptr<std::map<size_t, Component>> component_map;
+    static Component GetComponentForHash(size_t);
 
 protected:
     /*!

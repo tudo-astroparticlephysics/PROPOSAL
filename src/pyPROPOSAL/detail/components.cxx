@@ -14,6 +14,7 @@ void init_components(py::module& m) {
     py::module m_sub = m.def_submodule("component");
 
     m_sub.def("component_map", []() {return *Component::component_map;});
+    m_sub.def("get_component_for_hash", &Component::GetComponentForHash);
 
     m_sub.doc() = R"pbdoc(
         You could create a new component or select one of the implemented.

@@ -260,6 +260,13 @@ double Component::WoodSaxonPotential(double r0)
         * (r0 * r0 * std::log(2) + a * r0 * PI * PI / 6 + a * a * 1.5 * ZETA3);
 }
 
+Component Component::GetComponentForHash(size_t hash) {
+    auto it = Component::component_map->find(hash);
+    if (it != Component::component_map->end())
+        return it->second;
+    throw std::invalid_argument("Component for given hash not registered");
+}
+
 namespace PROPOSAL {
 double calculate_proton_massnumber_fraction(
     const component_list& comp_list) noexcept

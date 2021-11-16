@@ -275,9 +275,8 @@ void init_particle(py::module& m) {
             .def_readwrite("position", &StochasticLoss::position, R"pbdoc(Position of stochastic interaction.)pbdoc")
             .def_readwrite("direction", &StochasticLoss::direction, R"pbdoc(Direction of stochastic loss.)pbdoc")
             .def_readwrite("time", &StochasticLoss::time, R"pbdoc(Time when stochastic loss occured.)pbdoc")
-            .def_readwrite("target_hash", &StochasticLoss::target_hash, R"pbdoc(Hash of target with which the stochastic interaction happened. Can be converted to a Component object using `get_component`.)pbdoc")
-            .def_readwrite("propagated_distance", &StochasticLoss::propagated_distance, R"pbdoc(Distance (in cm) the parent particle has propagated when the stochastic loss occured.)pbdoc")
-            .def("get_component", &StochasticLoss::GetComponent);
+            .def_readwrite("target_hash", &StochasticLoss::target_hash, R"pbdoc(Hash of target with which the stochastic interaction happened. Can be the hash of a Component or the hash of a Medium`.)pbdoc")
+            .def_readwrite("propagated_distance", &StochasticLoss::propagated_distance, R"pbdoc(Distance (in cm) the parent particle has propagated when the stochastic loss occured.)pbdoc");
 
     py::class_<ContinuousLoss, Loss, std::shared_ptr<ContinuousLoss>>(m_sub, "ContinuousLoss")
             .def(py::init<const double&, const double&, const Vector3D&, const double&, const Vector3D&, const Vector3D&, const double&, const double&>())
