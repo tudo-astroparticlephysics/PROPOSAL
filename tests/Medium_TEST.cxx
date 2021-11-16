@@ -34,22 +34,9 @@ TEST(Comparison, Comparison_equal)
 
 TEST(Comparison, Comparison_not_equal)
 {
-    AntaresWater A;
-    A.SetMassDensity(2. * A.GetMassDensity());
-    AntaresWater B;
-    EXPECT_TRUE(A != B);
-
-    std::unique_ptr<Medium> C(new AntaresWater());
-    std::unique_ptr<Medium> D(new Ice());
-    EXPECT_TRUE(*C != *D);
-
-    std::unique_ptr<Medium> E(new Water());
-    E->SetMassDensity(2. * E->GetMassDensity());
-    std::unique_ptr<Medium> F(new Water());
-    EXPECT_TRUE(*E != *F);
-
-    std::shared_ptr<const Medium> G = CreateMedium("WaTeR");
-    EXPECT_TRUE(*E != *G);
+    std::unique_ptr<Medium> A(new AntaresWater());
+    std::unique_ptr<Medium> B(new Ice());
+    EXPECT_TRUE(*A != *B);
 
     Components::Hydrogen a;
     Components::Oxygen b;

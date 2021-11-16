@@ -132,15 +132,6 @@ StochasticLoss::StochasticLoss(int type, double loss_energy, const Vector3D& pos
                                propagated_distance(propagated_distance),
                                target_hash(target_hash) {}
 
-Component StochasticLoss::GetComponent() const {
-    auto it = Component::component_map->find(target_hash);
-    if (it != Component::component_map->end())
-        return it->second;
-    throw std::invalid_argument("Component not found for StochasticLoss object."
-                                "The interaction was probably with a medium"
-                                " and not with a Component.");
-}
-
 ContinuousLoss::ContinuousLoss(double energy, double parent_particle_energy,
                                const Vector3D& start_position,
                                const Vector3D& end_position,
