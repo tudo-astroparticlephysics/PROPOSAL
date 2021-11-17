@@ -61,6 +61,3 @@ if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(tests)
 endif()
-
-add_executable(example example.cxx)
-target_link_libraries(example PRIVATE PROPOSAL)
