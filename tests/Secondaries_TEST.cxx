@@ -182,7 +182,7 @@ TEST(SecondaryVector, EnergyConservation) {
     std::cout << std::setprecision(20) << std::endl;
     Logging::Get("test")->warn("sum1: " + std::to_string(sum_continuous_losses + sum_stochastic_losses + MuMinusDef().mass));
     Logging::Get("test")->warn("sum2: " + std::to_string(energy));
-    EXPECT_NEAR(sum_continuous_losses + sum_stochastic_losses + MuMinusDef().mass, energy, COMPUTER_PRECISION);
+    EXPECT_NEAR(sum_continuous_losses + sum_stochastic_losses + MuMinusDef().mass, energy, energy * COMPUTER_PRECISION);
 }
 
 int main(int argc, char** argv)
