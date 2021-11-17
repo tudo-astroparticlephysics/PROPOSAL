@@ -33,6 +33,8 @@
 
 using namespace PROPOSAL;
 
+std::unique_ptr<std::unordered_map<int, ParticleDef>> ParticleDef::Type_Particle_Map = nullptr;
+
 namespace PROPOSAL {
 
 std::ostream& operator<<(std::ostream& os, ParticleDef const& def)
@@ -69,34 +71,9 @@ std::ostream& operator<<(std::ostream& os, ParticleDef const& def)
     return os;
 }
 
-std::unordered_map<int, ParticleDef> ParticleDef::Type_Particle_Map {
-    { static_cast<int>(ParticleType::EMinus), EMinusDef() },
-    { static_cast<int>(ParticleType::EPlus), EPlusDef() },
-    { static_cast<int>(ParticleType::NuE), NuEDef() },
-    { static_cast<int>(ParticleType::NuEBar), NuEBarDef() },
-    { static_cast<int>(ParticleType::MuMinus), MuMinusDef() },
-    { static_cast<int>(ParticleType::NuMu), NuMuDef() },
-    { static_cast<int>(ParticleType::NuMuBar), NuMuBarDef() },
-    { static_cast<int>(ParticleType::MuPlus), MuPlusDef() },
-    { static_cast<int>(ParticleType::TauMinus), TauMinusDef() },
-    { static_cast<int>(ParticleType::TauPlus), TauPlusDef() },
-    { static_cast<int>(ParticleType::NuTau), NuTauDef() },
-    { static_cast<int>(ParticleType::NuTauBar), NuTauBarDef() },
-    { static_cast<int>(ParticleType::Gamma), GammaDef() },
-    { static_cast<int>(ParticleType::Pi0), Pi0Def() },
-    { static_cast<int>(ParticleType::PiPlus), PiPlusDef() },
-    { static_cast<int>(ParticleType::PiMinus), PiMinusDef() },
-    { static_cast<int>(ParticleType::K0), K0Def() },
-    { static_cast<int>(ParticleType::KPlus), KPlusDef() },
-    { static_cast<int>(ParticleType::KMinus), KMinusDef() },
-    { static_cast<int>(ParticleType::Monopole), MonopoleDef() },
-    { static_cast<int>(ParticleType::SMPPlus), SMPPlusDef() },
-    { static_cast<int>(ParticleType::SMPMinus), SMPMinusDef() }
-};
-
 ParticleDef ParticleDef::GetParticleDefForType(int type) {
-    auto p_search = Type_Particle_Map.find(type);
-    if (p_search != Type_Particle_Map.end()) {
+    auto p_search = Type_Particle_Map->find(type);
+    if (p_search != Type_Particle_Map->end()) {
         return p_search->second;
     }
     throw std::invalid_argument("ParticleState: ParticleDef not found for "
@@ -179,9 +156,36 @@ ParticleDef::ParticleDef(std::string name, double mass, double low,
     , particle_type(particle_type)
     , weak_partner(weak_partner)
 {
-    auto it = Type_Particle_Map.find(particle_type);
-    if (it == Type_Particle_Map.end()) {
-        Type_Particle_Map.insert({particle_type, ParticleDef(*this)});
+    if (!Type_Particle_Map) {
+        Type_Particle_Map = std::make_unique<std::unordered_map<int, ParticleDef>>();
+        Type_Particle_Map->insert({
+                { static_cast<int>(ParticleType::EMinus), EMinusDef() },
+                { static_cast<int>(ParticleType::EPlus), EPlusDef() },
+                { static_cast<int>(ParticleType::NuE), NuEDef() },
+                { static_cast<int>(ParticleType::NuEBar), NuEBarDef() },
+                { static_cast<int>(ParticleType::MuMinus), MuMinusDef() },
+                { static_cast<int>(ParticleType::NuMu), NuMuDef() },
+                { static_cast<int>(ParticleType::NuMuBar), NuMuBarDef() },
+                { static_cast<int>(ParticleType::MuPlus), MuPlusDef() },
+                { static_cast<int>(ParticleType::TauMinus), TauMinusDef() },
+                { static_cast<int>(ParticleType::TauPlus), TauPlusDef() },
+                { static_cast<int>(ParticleType::NuTau), NuTauDef() },
+                { static_cast<int>(ParticleType::NuTauBar), NuTauBarDef() },
+                { static_cast<int>(ParticleType::Gamma), GammaDef() },
+                { static_cast<int>(ParticleType::Pi0), Pi0Def() },
+                { static_cast<int>(ParticleType::PiPlus), PiPlusDef() },
+                { static_cast<int>(ParticleType::PiMinus), PiMinusDef() },
+                { static_cast<int>(ParticleType::K0), K0Def() },
+                { static_cast<int>(ParticleType::KPlus), KPlusDef() },
+                { static_cast<int>(ParticleType::KMinus), KMinusDef() },
+                { static_cast<int>(ParticleType::Monopole), MonopoleDef() },
+                { static_cast<int>(ParticleType::SMPPlus), SMPPlusDef() },
+                { static_cast<int>(ParticleType::SMPMinus), SMPMinusDef() }});
+    }
+
+    auto it = Type_Particle_Map->find(particle_type);
+    if (it == Type_Particle_Map->end()) {
+        Type_Particle_Map->insert({particle_type, ParticleDef(*this)});
     } else {
         if (*this != it->second ) {
             throw std::invalid_argument(
