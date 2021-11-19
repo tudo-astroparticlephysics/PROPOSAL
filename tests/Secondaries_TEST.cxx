@@ -64,7 +64,7 @@ std::shared_ptr<Propagator> GetPropagatorStochastic() {
     }
     return ptr;
 }
-
+/*
 TEST(SecondaryVector, EntryPointExitPoint)
 {
     auto prop = GetPropagator();
@@ -153,7 +153,7 @@ TEST(SecondaryVector, EntryPointExitPointRePropagation)
     EXPECT_TRUE(sphere.IsBehind(sec_f.position, sec_f.direction));
     EXPECT_TRUE(exit_point->propagated_distance == sphere.GetPosition().GetZ() + sphere.GetRadius());
 }
-
+*/
 TEST(SecondaryVector, EnergyConservation) {
     auto prop = GetPropagatorStochastic();
 
@@ -183,7 +183,7 @@ TEST(SecondaryVector, EnergyConservation) {
     Logging::Get("test")->warn("sum1: " + std::to_string(sum_continuous_losses + sum_stochastic_losses + MuMinusDef().mass));
     Logging::Get("test")->warn("sum2: " + std::to_string(energy));
     double energy_sum = sum_continuous_losses + sum_stochastic_losses + MuMinusDef().mass;
-    EXPECT_DOUBLE_EQ(energy_sum, energy);
+    EXPECT_DOUBLE_EQ(energy, energy_sum);
 }
 
 int main(int argc, char** argv)
