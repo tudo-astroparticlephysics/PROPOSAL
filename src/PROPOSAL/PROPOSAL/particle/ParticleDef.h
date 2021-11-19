@@ -168,6 +168,7 @@ struct ParticleDef {
 
 private:
     static std::unique_ptr<std::unordered_map<int, ParticleDef>> Type_Particle_Map;
+    static std::unordered_map<int, ParticleDef> create_particle_map();
     // ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
 
     /* std::unordered_map<size_t, std::vector<shared_ptr<CrossSection>>> */
