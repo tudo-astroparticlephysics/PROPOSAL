@@ -24,6 +24,7 @@ jobs:
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
+        PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
       steps:
         - uses: actions/checkout@v2
         - name: Install gcc-5
@@ -75,41 +76,5 @@ jobs:
         - name: Build lib
           if: ${{ matrix.os == 'windows-latest' }}
           run: cmake --build PROPOSAL_BUILD --target ALL_BUILD --config Release
-
-    test:
-      runs-on: ${{ matrix.os }}
-      needs: build
-      strategy:
-        matrix:
-          include:
-            - os : "ubuntu-latest"
-              compiler : "gcc"
-              compilerpp : "g++"
-            - os : "macos-latest"
-              compiler : "clang"
-              compilerpp : "clang++"
-            - os : "ubuntu-18.04"
-              compiler : "gcc-7"
-              compilerpp : "g++-7"
-            - os : "ubuntu-18.04"
-              compiler : "gcc-5"
-              compilerpp : "g++-5"
-            - os : "windows-latest"
-      env:
-        PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
-      steps:
-        - uses: actions/checkout@v2
-        - name: Cache conan
-          id: cache-conan
-          uses: actions/cache@v2
-          with:
-            path: ~/.conan
-            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-key
-        - name: Cache build
-          id: cache-build
-          uses: actions/cache@v2
-          with:
-            path: PROPOSAL_BUILD
-            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-key
         - name: Run tests
           run: ctest --test-dir PROPOSAL_BUILD -j2 --verbose -E "(Brems|Photo|Epair|Mupair)"
