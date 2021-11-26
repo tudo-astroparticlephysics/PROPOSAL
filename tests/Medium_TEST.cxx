@@ -101,23 +101,23 @@ TEST(MediumMap, MediumMap)
 {
     // check that medium is correctly registered in map
     StandardRock rock;
-    EXPECT_EQ(Medium::medium_map->at(rock.GetHash()), rock);
+    EXPECT_EQ(Medium::GetMediumForHash(rock.GetHash()), rock);
 
     // check that user-defined medium is also registered in map
     Medium own_medium("my_medium", 1, 2, 3, 4, 5, 6, 7, 8,
                       {Components::Uranium(2), Components::Argon(3)});
-    EXPECT_EQ(Medium::medium_map->at(own_medium.GetHash()), own_medium);
+    EXPECT_EQ(Medium::GetMediumForHash(own_medium.GetHash()), own_medium);
 }
 
 TEST(ComponentMap, ComponentMap)
 {
     // check that component is correctly registered in map
     Components::Oxygen oxygen;
-    EXPECT_EQ(Component::component_map->at(oxygen.GetHash()), oxygen);
+    EXPECT_EQ(Component::GetComponentForHash(oxygen.GetHash()), oxygen);
 
     // check that user-defined component is also registered in map
     Component own_component("my_component", 1, 2, 3);
-    EXPECT_EQ(Component::component_map->at(own_component.GetHash()), own_component);
+    EXPECT_EQ(Component::GetComponentForHash(own_component.GetHash()), own_component);
 }
 
 // TEST(Assignment, Swap)
