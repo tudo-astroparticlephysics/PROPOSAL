@@ -17,7 +17,6 @@ using namespace PROPOSAL;
 void init_medium(py::module& m) {
     py::module m_sub = m.def_submodule("medium");
 
-    m_sub.def("medium_map", []() {return *Medium::medium_map;});
     m_sub.def("get_medium_for_hash", &Medium::GetMediumForHash);
 
     m_sub.doc() = R"pbdoc(

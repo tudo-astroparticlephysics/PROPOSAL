@@ -84,7 +84,6 @@ public:
     double GetSumNucleons() const { return sumNucleons_; }
     size_t GetHash() const noexcept;
 
-    static std::unique_ptr<std::map<size_t, Medium>> medium_map;
     static Medium GetMediumForHash(size_t);
 
 protected:
@@ -113,6 +112,9 @@ protected:
     double sumNucleons_; ///< sum of nucleons of all nuclei
 
     std::vector<Component> components_; ///< Components of Medium
+
+private:
+    static std::unique_ptr<std::map<size_t, Medium>> medium_map;
 };
 
 namespace PDG2001 {
