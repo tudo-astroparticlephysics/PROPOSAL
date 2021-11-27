@@ -16,6 +16,8 @@
 
 using namespace PROPOSAL;
 
+std::unique_ptr<std::map<size_t, Medium>> Medium::medium_map = nullptr;
+
 /******************************************************************************
  *                                  OStream                                    *
  ******************************************************************************/
@@ -86,6 +88,14 @@ Medium::Medium(std::string name,
       sumNucleons_(0),
       components_(components) {
     init();
+
+    if (!medium_map)
+        medium_map = std::make_unique<std::map<size_t, Medium>>();
+
+    auto hash = GetHash();
+    if (medium_map->find(hash) == medium_map->end())
+        medium_map->insert({hash, Medium(*this)});
+
 }
 
 // ------------------------------------------------------------------------- //
@@ -199,42 +209,12 @@ size_t Medium::GetHash() const noexcept
     return hash_digest;
 }
 
-// ------------------------------------------------------------------------- //
-// Setter
-// ------------------------------------------------------------------------- //
-
-void Medium::SetComponents(std::vector<Component> components)
-{
-
-    components_ = components;
-
-    init(); // Init further member according to these components
+Medium Medium::GetMediumForHash(size_t hash) {
+    auto it = Medium::medium_map->find(hash);
+    if (it != Medium::medium_map->end())
+        return it->second;
+    throw std::invalid_argument("Medium for given hash not registered");
 }
-
-void Medium::SetZA(double ZA) { ZA_ = ZA; }
-
-void Medium::SetI(double I) { I_ = I; }
-
-void Medium::SetC(double C) { C_ = C; }
-
-void Medium::SetA(double a) { a_ = a; }
-
-void Medium::SetM(double m) { m_ = m; }
-
-void Medium::SetX0(double X0) { X0_ = X0; }
-
-void Medium::SetX1(double X1) { X1_ = X1; }
-
-void Medium::SetD0(double d0) { d0_ = d0; }
-
-void Medium::SetMassDensity(double massDensity) { massDensity_ = massDensity; }
-
-void Medium::SetMolDensity(double molDensity) { molDensity_ = molDensity; }
-
-void Medium::SetMM(double MM) { MM_ = MM; }
-
-void Medium::SetSumNucleons(double sumNucleons) { sumNucleons_ = sumNucleons; }
-
 
 /******************************************************************************
  *                              Different Media                               *

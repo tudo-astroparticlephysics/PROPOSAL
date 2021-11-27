@@ -51,7 +51,7 @@ public:
     // class Builder;
 
 public:
-    Medium() { }
+    Medium() = default;
     Medium(std::string name, double I, double C, double a, double m, double X0,
         double X1, double d0, double massDensity, std::vector<Component>);
 
@@ -84,23 +84,7 @@ public:
     double GetSumNucleons() const { return sumNucleons_; }
     size_t GetHash() const noexcept;
 
-    // Setter
-    void SetNumComponents(int numComponents);
-    void SetSumCharge(double sumCharge);
-    void SetZA(double ZA);
-    void SetI(double I);
-    void SetC(double C);
-    void SetA(double a);
-    void SetM(double m);
-    void SetX0(double X0);
-    void SetX1(double X1);
-    void SetD0(double d0);
-    void SetMassDensity(double massDensity);
-    void SetMolDensity(double molDensity);
-    void SetAverageNucleonWeight(std::vector<double> M);
-    void SetComponents(std::vector<Component> components);
-    void SetMM(double MM);
-    void SetSumNucleons(double sumNucleons);
+    static Medium GetMediumForHash(size_t);
 
 protected:
     // Methods
@@ -128,6 +112,9 @@ protected:
     double sumNucleons_; ///< sum of nucleons of all nuclei
 
     std::vector<Component> components_; ///< Components of Medium
+
+private:
+    static std::unique_ptr<std::map<size_t, Medium>> medium_map;
 };
 
 namespace PDG2001 {

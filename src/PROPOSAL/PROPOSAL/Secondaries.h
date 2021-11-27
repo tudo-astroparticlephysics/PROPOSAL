@@ -51,11 +51,13 @@ public:
 
     // Operational functions to fill and access track
     void reserve(size_t number_secondaries);
-    void clear() { track_.clear(); types_.clear(); };
-    void push_back(const ParticleState& point, const InteractionType& type);
+    void clear() { track_.clear(); types_.clear(); target_hashes_.clear(); };
+    void push_back(const ParticleState& point, const InteractionType& type,
+                   const size_t& target_hash = 0);
     void emplace_back(const ParticleType& particle_type, const Vector3D& position,
         const Vector3D& direction, const double& energy, const double& time,
-        const double& distance, const InteractionType& interaction_type);
+        const double& distance, const InteractionType& interaction_type,
+        const size_t& target_hash = 0);
     const ParticleState& back() const {return track_.back(); }
     const ParticleState& operator[](std::size_t idx) { return track_[idx]; };
 
@@ -78,6 +80,7 @@ public:
     std::vector<double> GetTrackTimes() const;
     std::vector<double> GetTrackPropagatedDistances() const;
     std::vector<InteractionType> GetTrackTypes() const { return types_; };
+    std::vector<size_t> GetTargetHashes() const { return target_hashes_; };
     unsigned int GetTrackLength() const { return track_.size(); };
     std::vector<ParticleState> GetDecayProducts() const;
 
@@ -98,6 +101,7 @@ private:
 
     std::vector<ParticleState> track_;
     std::vector<InteractionType> types_;
+    std::vector<size_t> target_hashes_;
     std::shared_ptr<ParticleDef> primary_def_;
     std::vector<Sector> sectors_;
 };

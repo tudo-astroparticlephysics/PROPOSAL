@@ -27,21 +27,26 @@ void Secondaries::reserve(size_t number_secondaries)
 {
     track_.reserve(number_secondaries);
     types_.reserve(number_secondaries);
+    target_hashes_.reserve(number_secondaries);
 }
 
-void Secondaries::push_back(const ParticleState& point, const InteractionType& type)
+void Secondaries::push_back(const ParticleState& point,
+                            const InteractionType& type, const size_t& target_hash)
 {
     track_.push_back(point);
     types_.push_back(type);
+    target_hashes_.push_back(target_hash);
 }
 
 void Secondaries::emplace_back(const ParticleType& particle_type, const Vector3D& position,
     const Vector3D& direction, const double& energy, const double& time,
-    const double& distance, const InteractionType& interaction_type)
+    const double& distance, const InteractionType& interaction_type,
+    const size_t& target_hash)
 {
     track_.emplace_back(particle_type, position, direction, energy, time,
                         distance);
     types_.emplace_back(interaction_type);
+    target_hashes_.push_back(target_hash);
 }
 
 std::vector<ParticleState> Secondaries::GetDecayProducts() const
@@ -332,7 +337,7 @@ std::vector<StochasticLoss> Secondaries::GetStochasticLosses() const
                                 track_[i-1].energy - track_[i].energy,
                                 track_[i].position, track_[i].direction,
                                 track_[i].time, track_[i].propagated_distance,
-                                track_[i-1].energy);
+                                track_[i-1].energy, target_hashes_[i]);
         }
     }
     return losses;
@@ -352,7 +357,7 @@ std::vector<StochasticLoss> Secondaries::GetStochasticLosses(const Geometry& geo
                                     track_[i-1].energy - track_[i].energy,
                                     track_[i].position, track_[i].direction,
                                     track_[i].time, track_[i].propagated_distance,
-                                    track_[i-1].energy);
+                                    track_[i-1].energy, target_hashes_[i]);
             }
         }
     }
@@ -371,7 +376,7 @@ std::vector<StochasticLoss> Secondaries::GetStochasticLosses(const InteractionTy
                                 track_[i-1].energy - track_[i].energy,
                                 track_[i].position, track_[i].direction,
                                 track_[i].time, track_[i].propagated_distance,
-                                track_[i-1].energy);
+                                track_[i-1].energy, target_hashes_[i]);
         }
     }
     return losses;

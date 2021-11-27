@@ -10,6 +10,7 @@
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/medium/Components.h"
 #include <cmath>
 #include <iostream>
 #include <sstream>
@@ -125,10 +126,11 @@ double ParticleState::GetMomentum() const
 StochasticLoss::StochasticLoss(int type, double loss_energy, const Vector3D& position,
                                const Vector3D& direction, double time,
                                double propagated_distance,
-                               double parent_particle_energy)
+                               double parent_particle_energy, size_t target_hash)
                                : Loss(type, loss_energy, parent_particle_energy),
                                position(position), direction(direction), time(time),
-                               propagated_distance(propagated_distance) {}
+                               propagated_distance(propagated_distance),
+                               target_hash(target_hash) {}
 
 ContinuousLoss::ContinuousLoss(double energy, double parent_particle_energy,
                                const Vector3D& start_position,

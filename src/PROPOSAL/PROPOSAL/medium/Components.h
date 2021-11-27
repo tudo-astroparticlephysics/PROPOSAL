@@ -62,7 +62,7 @@ public:
     double GetWoodSaxon() const { return wood_saxon_; }
 
     size_t GetHash() const noexcept;
-    static std::unique_ptr<std::map<size_t, Component>> component_map;
+    static Component GetComponentForHash(size_t);
 
 protected:
     /*!
@@ -114,6 +114,9 @@ protected:
                                       ///< [MeV]
     double wood_saxon_ = 0;           ///< Woods-Saxon potential factor
     size_t hash;
+
+private:
+    static std::unique_ptr<std::map<size_t, Component>> component_map;
 };
 
 bool operator==(Component const&, Component const&) noexcept;

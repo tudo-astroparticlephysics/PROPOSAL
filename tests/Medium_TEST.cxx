@@ -34,22 +34,9 @@ TEST(Comparison, Comparison_equal)
 
 TEST(Comparison, Comparison_not_equal)
 {
-    AntaresWater A;
-    A.SetMassDensity(2. * A.GetMassDensity());
-    AntaresWater B;
-    EXPECT_TRUE(A != B);
-
-    std::unique_ptr<Medium> C(new AntaresWater());
-    std::unique_ptr<Medium> D(new Ice());
-    EXPECT_TRUE(*C != *D);
-
-    std::unique_ptr<Medium> E(new Water());
-    E->SetMassDensity(2. * E->GetMassDensity());
-    std::unique_ptr<Medium> F(new Water());
-    EXPECT_TRUE(*E != *F);
-
-    std::shared_ptr<const Medium> G = CreateMedium("WaTeR");
-    EXPECT_TRUE(*E != *G);
+    std::unique_ptr<Medium> A(new AntaresWater());
+    std::unique_ptr<Medium> B(new Ice());
+    EXPECT_TRUE(*A != *B);
 
     Components::Hydrogen a;
     Components::Oxygen b;
@@ -108,6 +95,29 @@ TEST(Assignment, Copyconstructor2)
     Uranium B(A);
 
     EXPECT_TRUE(A == B);
+}
+
+TEST(MediumMap, MediumMap)
+{
+    // check that medium is correctly registered in map
+    StandardRock rock;
+    EXPECT_EQ(Medium::GetMediumForHash(rock.GetHash()), rock);
+
+    // check that user-defined medium is also registered in map
+    Medium own_medium("my_medium", 1, 2, 3, 4, 5, 6, 7, 8,
+                      {Components::Uranium(2), Components::Argon(3)});
+    EXPECT_EQ(Medium::GetMediumForHash(own_medium.GetHash()), own_medium);
+}
+
+TEST(ComponentMap, ComponentMap)
+{
+    // check that component is correctly registered in map
+    Components::Oxygen oxygen;
+    EXPECT_EQ(Component::GetComponentForHash(oxygen.GetHash()), oxygen);
+
+    // check that user-defined component is also registered in map
+    Component own_component("my_component", 1, 2, 3);
+    EXPECT_EQ(Component::GetComponentForHash(own_component.GetHash()), own_component);
 }
 
 // TEST(Assignment, Swap)

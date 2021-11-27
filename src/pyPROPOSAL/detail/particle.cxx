@@ -2,6 +2,7 @@
 
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/geometry/Geometry.h"
 #include "pyPROPOSAL/pyBindings.h"
@@ -265,14 +266,16 @@ void init_particle(py::module& m) {
             .def_readwrite("parent_particle_energy", &Loss::parent_particle_energy, R"pbdoc(Particle energy in MeV at the time of the stochastic loss or at the beginning of the continuous loss.)pbdoc");
 
     py::class_<StochasticLoss, Loss, std::shared_ptr<StochasticLoss>>(m_sub, "StochasticLoss")
-            .def(py::init<const int&, const double&, const Vector3D&, const Vector3D&, const double&, const double&, const double &>(),
+            .def(py::init<const int&, const double&, const Vector3D&, const Vector3D&, const double&, const double&, const double &, const size_t&>(),
                  py::arg("type"), py::arg("loss_energy"), py::arg("position"),
                  py::arg("direction"), py::arg("time"),
                  py::arg("propagated_distance"),
-                 py::arg("parent_particle_energy"))
+                 py::arg("parent_particle_energy"),
+                 py::arg("target_hash") = 0)
             .def_readwrite("position", &StochasticLoss::position, R"pbdoc(Position of stochastic interaction.)pbdoc")
             .def_readwrite("direction", &StochasticLoss::direction, R"pbdoc(Direction of stochastic loss.)pbdoc")
             .def_readwrite("time", &StochasticLoss::time, R"pbdoc(Time when stochastic loss occured.)pbdoc")
+            .def_readwrite("target_hash", &StochasticLoss::target_hash, R"pbdoc(Hash of target with which the stochastic interaction happened. Can be the hash of a Component or the hash of a Medium`.)pbdoc")
             .def_readwrite("propagated_distance", &StochasticLoss::propagated_distance, R"pbdoc(Distance (in cm) the parent particle has propagated when the stochastic loss occured.)pbdoc");
 
     py::class_<ContinuousLoss, Loss, std::shared_ptr<ContinuousLoss>>(m_sub, "ContinuousLoss")
@@ -302,6 +305,7 @@ void init_particle(py::module& m) {
             .def("track_propagated_distances", &Secondaries::GetTrackPropagatedDistances)
             .def("track_types", &Secondaries::GetTrackTypes)
             .def("track_length", &Secondaries::GetTrackLength)
+            .def("target_hashes", &Secondaries::GetTargetHashes)
             .def("stochastic_losses", overload_cast_<>()(&Secondaries::GetStochasticLosses, py::const_))
             .def("stochastic_losses", overload_cast_<const Geometry&>()(&Secondaries::GetStochasticLosses, py::const_))
             .def("stochastic_losses", overload_cast_<const InteractionType&>()(&Secondaries::GetStochasticLosses, py::const_))
