@@ -33,6 +33,8 @@
 
 using namespace PROPOSAL;
 
+std::unique_ptr<std::unordered_map<int, ParticleDef>> ParticleDef::Type_Particle_Map = nullptr;
+
 namespace PROPOSAL {
 
 std::ostream& operator<<(std::ostream& os, ParticleDef const& def)
@@ -68,6 +70,23 @@ std::ostream& operator<<(std::ostream& os, ParticleDef const& def)
     os << Helper::Centered(60, "");
     return os;
 }
+
+ParticleDef ParticleDef::GetParticleDefForType(int type) {
+    if (!Type_Particle_Map) {
+        Type_Particle_Map = std::make_unique<std::unordered_map<int, ParticleDef>>();
+        for (const auto& p: create_particle_map())
+            Type_Particle_Map->insert(p);
+    }
+
+    auto p_search = Type_Particle_Map->find(type);
+    if (p_search != Type_Particle_Map->end()) {
+        return p_search->second;
+    }
+    throw std::invalid_argument("ParticleState: ParticleDef not found for "
+                                "given ParticleType " + std::to_string(type));
+
+}
+
 
 } // namespace PROPOSAL
 
@@ -143,6 +162,23 @@ ParticleDef::ParticleDef(std::string name, double mass, double low,
     , particle_type(particle_type)
     , weak_partner(weak_partner)
 {
+    if (!Type_Particle_Map) {
+        Type_Particle_Map = std::make_unique<std::unordered_map<int, ParticleDef>>();
+        for (const auto& p: create_particle_map())
+            Type_Particle_Map->insert(p);
+    }
+
+    auto it = Type_Particle_Map->find(particle_type);
+    if (it == Type_Particle_Map->end()) {
+        Type_Particle_Map->insert({particle_type, ParticleDef(*this)});
+    } else {
+        if (*this != it->second ) {
+            throw std::invalid_argument(
+                    "There is already a ParticleDef registered for the "
+                    "particle_type " + std::to_string(particle_type) +
+                    ". Choose another particle_type id that is not used yet.");
+        }
+    }
 }
 
 /* ParticleDef::ParticleDef(const ParticleDef& def) */
@@ -215,6 +251,33 @@ size_t ParticleDef::GetHash() const{
     size_t hash_digest = 0;
     hash_combine(hash_digest, mass, low, lifetime, charge, weak_partner);
     return hash_digest;
+}
+
+// register all pre-defined ParticleDef with their corresponding ParticleType
+std::unordered_map<int, ParticleDef> ParticleDef::create_particle_map() {
+    return std::unordered_map<int, ParticleDef> {
+        { static_cast<int>(ParticleType::EMinus), EMinusDef() },
+        { static_cast<int>(ParticleType::EPlus), EPlusDef() },
+        { static_cast<int>(ParticleType::NuE), NuEDef() },
+        { static_cast<int>(ParticleType::NuEBar), NuEBarDef() },
+        { static_cast<int>(ParticleType::MuMinus), MuMinusDef() },
+        { static_cast<int>(ParticleType::NuMu), NuMuDef() },
+        { static_cast<int>(ParticleType::NuMuBar), NuMuBarDef() },
+        { static_cast<int>(ParticleType::MuPlus), MuPlusDef() },
+        { static_cast<int>(ParticleType::TauMinus), TauMinusDef() },
+        { static_cast<int>(ParticleType::TauPlus), TauPlusDef() },
+        { static_cast<int>(ParticleType::NuTau), NuTauDef() },
+        { static_cast<int>(ParticleType::NuTauBar), NuTauBarDef() },
+        { static_cast<int>(ParticleType::Gamma), GammaDef() },
+        { static_cast<int>(ParticleType::Pi0), Pi0Def() },
+        { static_cast<int>(ParticleType::PiPlus), PiPlusDef() },
+        { static_cast<int>(ParticleType::PiMinus), PiMinusDef() },
+        { static_cast<int>(ParticleType::K0), K0Def() },
+        { static_cast<int>(ParticleType::KPlus), KPlusDef() },
+        { static_cast<int>(ParticleType::KMinus), KMinusDef() },
+        { static_cast<int>(ParticleType::Monopole), MonopoleDef() },
+        { static_cast<int>(ParticleType::SMPPlus), SMPPlusDef() },
+        { static_cast<int>(ParticleType::SMPMinus), SMPMinusDef() }};
 }
 
 /******************************************************************************

@@ -80,6 +80,31 @@ TEST(Assignment, Copyconstructor2)
     EXPECT_TRUE(A == B);
 }
 
+TEST(ParticleState, MomentumCalculation)
+{
+     MuMinusDef p_def;
+     double energy = 1e3;
+     ParticleState state;
+     state.type = p_def.particle_type;
+     state.energy = energy;
+
+    EXPECT_NEAR(state.GetMomentum(),
+                std::sqrt(energy * energy - p_def.mass * p_def.mass),
+                COMPUTER_PRECISION);
+
+    // check that momentum is calculated correctly for custom particle
+    auto p_def_custom = ParticleDef::Builder().SetParticleDef(p_def).SetParticleType(99).SetMass(200).build();
+    ParticleState state_custom;
+    state_custom.type = p_def_custom.particle_type;
+    state_custom.energy = energy;
+
+    EXPECT_NEAR(state_custom.GetMomentum(),
+                std::sqrt(energy * energy - p_def_custom.mass * p_def_custom.mass),
+                COMPUTER_PRECISION);
+
+
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
