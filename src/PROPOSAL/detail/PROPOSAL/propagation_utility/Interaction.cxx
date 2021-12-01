@@ -50,10 +50,17 @@ Interaction::Loss Interaction::SampleLoss(
         }
     }
 
+    if (overall_rate == 0) {
+        Logging::Get("proposal.interaction")->warn(
+                "No stochastic interaction possible for initial energy {} MeV.",
+                energy);
+        return {InteractionType::Undefined, 0, 0};
+    }
+
     std::stringstream ss;
     ss << "Given rate (" << std::to_string(sampled_rate)
        << ") for given energy (" << std::to_string(energy)
-       << ") by drawen random numer (" << std::to_string(rnd)
+       << ") by drawn random number (" << std::to_string(rnd)
        << ") is larger than the overall crosssection rate ("
        << std::to_string(overall_rate) << ").";
 
