@@ -31,7 +31,7 @@ double crosssection::Photoproduction::ShadowingFactor(double energy, const Compo
 
 double crosssection::Photoproduction::CalculatedNdx(
         double energy, size_t comp_hash, const ParticleDef&, const Medium& m, cut_ptr) {
-        auto comp = Component::component_map->find(comp_hash)->second;
+        auto comp = Component::GetComponentForHash(comp_hash);
         auto weight = detail::weight_component(m, comp);
         return NA / comp.GetAtomicNum() * 1e-30 * PhotonAtomCrossSection(energy, comp) / weight;
 }
