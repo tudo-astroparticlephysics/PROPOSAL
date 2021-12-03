@@ -25,6 +25,7 @@ auto make_crosssection_impl(Param&& param, P&& p_def, M&& medium,
     return cross;
 }
 
+// Implicit function to create CrossSectionDirect object
 template <typename Param, typename P, typename M>
 auto make_crosssection_impl(Param&& param, P&& p_def, M&& medium,
                             std::shared_ptr<const EnergyCutSettings> cuts,
@@ -43,6 +44,9 @@ auto make_crosssection(Param&& param, P&& p_def, M&& medium,
                        std::shared_ptr<const EnergyCutSettings> cuts,
                        bool interpolate)
 {
+    // Call alternative implicit creation function if param
+    // is a `ParametrizationDirect` object. In this case, the last argument of
+    // `make_crosssection_impl` is a std::true_type, otherwise a std::false_type
     return detail::make_crosssection_impl(
             std::forward<Param>(param), std::forward<P>(p_def),
             std::forward<M>(medium), cuts, interpolate,
