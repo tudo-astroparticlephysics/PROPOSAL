@@ -92,7 +92,8 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
             switch (next_interaction_type) {
             case Stochastic: {
                 auto loss = DoStochasticInteraction(state, utility, rnd);
-                track.push_back(state, loss.type, loss.comp_hash);
+                if (loss.type != InteractionType::Undefined)
+                    track.push_back(state, loss.type, loss.comp_hash);
                 if (state.energy <= InteractionEnergy[MinimalE])
                     continue_propagation = false;
                 break;
