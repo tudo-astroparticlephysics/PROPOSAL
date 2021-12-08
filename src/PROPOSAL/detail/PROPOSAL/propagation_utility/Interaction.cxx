@@ -50,7 +50,7 @@ Interaction::Loss Interaction::SampleLoss(
         }
     }
 
-    if (overall_rate == 0) {
+    if (overall_rate == 0.) {
         Logging::Get("proposal.interaction")->warn(
                 "No stochastic interaction possible for initial energy {} MeV.",
                 energy);
