@@ -17,7 +17,10 @@ size_t crosssection::Photoproduction::GetHash(const ParticleDef&, const Medium &
 }
 
 double crosssection::Photoproduction::PhotonAtomCrossSection(double energy, const Component& comp) {
-    return comp.GetAtomicNum() * PhotonNucleonCrossSection(energy, comp) * (0.75 * ShadowingFactor(energy, comp) + 0.25);
+    auto cross_photon_nucleon = PhotonNucleonCrossSection(energy, comp);
+    if (cross_photon_nucleon == 0.)
+        return 0.;
+    return comp.GetAtomicNum() * cross_photon_nucleon * (0.75 * ShadowingFactor(energy, comp) + 0.25);
 }
 
 double crosssection::Photoproduction::ShadowingFactor(double energy, const Component& comp) {
@@ -182,7 +185,7 @@ std::unique_ptr<crosssection::ParametrizationDirect> crosssection::Photoproducti
 double crosssection::PhotoproductionRhode::PhotonNucleonCrossSection(double energy, const Component& comp) {
     auto nu = energy * 1e-3; // from MeV to GeV
     if (nu <= 200.) {
-        return interpolant_->InterpolateArray(nu);
+        return std::max(interpolant_->InterpolateArray(nu), 0.);
     } else {
         return PhotoproductionCaldwell::PhotonNucleonCrossSection(energy, comp);
     }

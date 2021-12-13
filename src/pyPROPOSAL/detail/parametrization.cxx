@@ -694,13 +694,12 @@ void init_parametrization(py::module& m)
 
     py::class_<crosssection::PhotoproductionKokoulin,
     std::shared_ptr<crosssection::PhotoproductionKokoulin>,
-    crosssection::PhotoproductionBezrukovBugaev,
-    crosssection::PhotoproductionCaldwell>(m_sub_photoproduction, "Kokoulin")
+    crosssection::Photoproduction>(m_sub_photoproduction, "Kokoulin")
         .def(py::init<>());
 
     py::class_<crosssection::PhotoproductionRhode,
     std::shared_ptr<crosssection::PhotoproductionRhode>,
-    crosssection::PhotoproductionCaldwell>(m_sub_photoproduction, "Rhode")
+    crosssection::Photoproduction>(m_sub_photoproduction, "Rhode")
         .def(py::init<>());
 
     // --------------------------------------------------------------------- //
