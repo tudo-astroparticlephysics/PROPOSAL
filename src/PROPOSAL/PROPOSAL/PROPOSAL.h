@@ -45,6 +45,7 @@
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/ParamTables.h"
+#include "PROPOSAL/crosssection/parametrization/Photoproduction.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
@@ -62,6 +63,7 @@
 #include "PROPOSAL/crosssection/Factories/IonizationFactory.h"
 #include "PROPOSAL/crosssection/Factories/MupairProductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/PhotoPairProductionFactory.h"
+#include "PROPOSAL/crosssection/Factories/PhotoproductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/PhotonuclearFactory.h"
 #include "PROPOSAL/crosssection/Factories/WeakInteractionFactory.h"
 
@@ -83,6 +85,7 @@
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/MupairProduction.h"
 #include "PROPOSAL/secondaries/parametrization/photonuclear/Photonuclear.h"
+#include "PROPOSAL/secondaries/parametrization/photoproduction/Photoproduction.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsai.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsaiForwardPeaked.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotopairProduction.h"

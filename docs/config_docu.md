@@ -452,6 +452,21 @@ Creation of an electron-positron pair by an ingoing photon. Available `photopair
 * `Tsai`: (Review of Modern Physics, Vol. 46, No. 4, October 1974)
 * `KochMotz`: (Review of Modern Physics, Vol. 61, 1959)
 
+### Photonuclear intractions by photons: `photoproduction`
+
+| Keyword           |  Type   | Default | Description                |
+| ----------------- | ------- | ------- | -------------------------- |
+| `parametrization` | String  | `-`     | Parametrization to be used |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
+
+Photonuclear interaction of a photon with an atomic nucleus. Available `photoproduction` parametrizations are:
+
+* `Zeus`: ([Eur. Phys. J. C 7 (1999), 609](https://doi.org/10.1007/s100529901084))
+* `BezrukovBugaev`: (Sov. J. Nucl. Phys. 33 (1981), 635) with corrections for particles with higher mass like taus ([Phys. Rev. D67 (2003), 034027](https://doi.org/10.1103/PhysRevD.67.034027))
+* `Caldwell`: (Phys. Rev. Let. 42 (1979), 553)
+* `Kokoulin`
+* `Rhode`
+
 ### Weak interaction: `weak`
 
 | Keyword           |  Type   | Default | Description                |

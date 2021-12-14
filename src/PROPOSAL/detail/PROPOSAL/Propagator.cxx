@@ -10,6 +10,7 @@
 #include "PROPOSAL/crosssection/Factories/MupairProductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/PhotoPairProductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/PhotonuclearFactory.h"
+#include "PROPOSAL/crosssection/Factories/PhotoproductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/WeakInteractionFactory.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 #include "PROPOSAL/density_distr/density_distr.h"
@@ -418,6 +419,9 @@ Propagator::CreateCrossSectionList(const ParticleDef& p_def,
                 p_def, medium, cuts, interpolate, config["photo"]));
         }
     }
+    if (config.contains("photoproduction"))
+        cross.emplace_back(make_photoproduction(
+                p_def, medium, config["photoproduction"]));
     if (config.contains("photopair"))
         cross.emplace_back(make_photopairproduction(
             p_def, medium, interpolate, config["photopair"]));

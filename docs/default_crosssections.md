@@ -52,3 +52,4 @@ More information about each parametrization are given [here](https://github.com/
 
 - Electron-positron pair production by photons: `KochMotz`
 - Compton scattering: `KleinNishina`
+- Photoproduction: `Rhode`
