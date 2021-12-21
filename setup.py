@@ -132,12 +132,10 @@ class build_ext_cmake(build_ext):
             '-DBUILD_PYTHON=ON',
             '-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE',
             '-DBUILD_EXAMPLE=OFF',
-            '-DPYTHON_EXECUTABLE=' + sys.executable,
-            '-DPYTHON_LIBRARY=' + str(python_lib),
+            '-DPython_EXECUTABLE=' + sys.executable,
             '-DCMAKE_INSTALL_RPATH={}'.format(rpath),
             '-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON',
             '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF',
-            '-DPYTHON_INCLUDE_DIR=' + sysconfig.get_path('include')
         ]
         if CMAKE_CXX_FLAGS:
             cmake_call.append(CMAKE_CXX_FLAGS)
