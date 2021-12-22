@@ -284,6 +284,11 @@ Sector Propagator::GetCurrentSector(
 
 nlohmann::json Propagator::ParseConfig(const string& config_file)
 {
+    std::ifstream f(config_file.c_str());
+    if (!f.good()) {
+        throw std::invalid_argument("No configuration file found under "
+                                    "path "+ config_file);
+    }
     nlohmann::json json_config;
     try {
         if (config_file== "")
