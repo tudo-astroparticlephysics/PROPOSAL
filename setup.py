@@ -99,10 +99,6 @@ class build_ext_cmake(build_ext):
         cmake = get_cmake()
 
         rpath = '@loader_path' if sys.platform == 'darwin' else '$ORIGIN'
-        python_lib = pathlib.Path(
-            sysconfig.get_config_var('LIBDIR'),
-            sysconfig.get_config_var('INSTSONAME')
-        )
         CMAKE_CXX_FLAGS = ""
         if not os.getenv("NO_CONAN", False):
             print(
