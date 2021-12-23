@@ -32,7 +32,7 @@ def get_cmake():
 
         if ret.returncode == 0:
             return exe
-    raise OSError("You need cmake >= 3.9")
+    raise OSError("You need cmake >= 3.16")
 
 
 def exists_conan_default_file():
