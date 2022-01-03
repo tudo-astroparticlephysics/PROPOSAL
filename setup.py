@@ -32,7 +32,7 @@ def get_cmake():
 
         if ret.returncode == 0:
             return exe
-    raise OSError("You need cmake >= 3.9")
+    raise OSError("You need cmake >= 3.16")
 
 
 def exists_conan_default_file():
@@ -99,10 +99,6 @@ class build_ext_cmake(build_ext):
         cmake = get_cmake()
 
         rpath = '@loader_path' if sys.platform == 'darwin' else '$ORIGIN'
-        python_lib = pathlib.Path(
-            sysconfig.get_config_var('LIBDIR'),
-            sysconfig.get_config_var('INSTSONAME')
-        )
         CMAKE_CXX_FLAGS = ""
         if not os.getenv("NO_CONAN", False):
             print(
@@ -132,12 +128,10 @@ class build_ext_cmake(build_ext):
             '-DBUILD_PYTHON=ON',
             '-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE',
             '-DBUILD_EXAMPLE=OFF',
-            '-DPYTHON_EXECUTABLE=' + sys.executable,
-            '-DPYTHON_LIBRARY=' + str(python_lib),
+            '-DPython_EXECUTABLE=' + sys.executable,
             '-DCMAKE_INSTALL_RPATH={}'.format(rpath),
             '-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON',
             '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF',
-            '-DPYTHON_INCLUDE_DIR=' + sysconfig.get_path('include')
         ]
         if CMAKE_CXX_FLAGS:
             cmake_call.append(CMAKE_CXX_FLAGS)
