@@ -63,6 +63,7 @@ namespace crosssection {
         bool lorenz_;       // enable lorenz cut
         double lorenz_cut_; // in [MeV]
         std::shared_ptr<BremsLPM> lpm_;
+        double density_correction_; // correction to standard medium density for LPM
 
     public:
         Bremsstrahlung();
@@ -120,14 +121,12 @@ namespace crosssection {
         double mol_density_;
         double mass_density_;
         double sum_charge_;
-        double density_correction_;
         double eLpm_;
 
     public:
-        BremsLPM(const ParticleDef&, const Medium&, const Bremsstrahlung&,
-            double density_correction = 1.0);
-        double suppression_factor(
-            double energy, double v, const Component&) const;
+        BremsLPM(const ParticleDef&, const Medium&, const Bremsstrahlung&);
+        double suppression_factor(double energy, double v, const Component&,
+                                  double density_correction = 1.0) const;
         size_t GetHash() const noexcept { return hash; }
     };
 

@@ -63,6 +63,7 @@ namespace crosssection {
 
     protected:
         std::shared_ptr<EpairLPM> lpm_;
+        double density_correction_; // correction to standard medium density for LPM
 
     public:
         EpairProduction(bool lpm = false);
@@ -112,15 +113,14 @@ namespace crosssection {
         double mass_;
         double charge_;
         double mol_density_;
-        double density_correction_;
         double eLpm_;
         size_t hash;
 
     public:
-        EpairLPM(
-            const ParticleDef&, const Medium&, double density_correction = 1.0);
+        EpairLPM(const ParticleDef&, const Medium&);
         double suppression_factor(
-            double E, double v, double r2, double beta, double xi) const;
+                double E, double v, double r2, double beta, double xi,
+                double density_correction = 1.0) const;
         size_t GetHash() const noexcept { return hash; }
     };
 
