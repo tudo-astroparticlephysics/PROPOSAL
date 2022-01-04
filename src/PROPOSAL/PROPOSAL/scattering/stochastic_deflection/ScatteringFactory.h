@@ -44,6 +44,7 @@
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiParametrizationBremsstrahlungGinneken.h"
 #include "PROPOSAL/scattering/stochastic_deflection/ionization/NaivIonization.h"
 #include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BorogPetrukhinNuclearInteraction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BjorkenNuclearInteraction.h"
 #include "PROPOSAL/scattering/stochastic_deflection/pairProd/KelnerPairProduction.h"
 
 namespace PROPOSAL {

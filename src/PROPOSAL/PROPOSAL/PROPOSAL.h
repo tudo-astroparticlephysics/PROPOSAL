@@ -148,6 +148,7 @@
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiParametrizationBremsstrahlungGinneken.h"
 #include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/NuclearInteraction.h"
 #include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BorogPetrukhinNuclearInteraction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BjorkenNuclearInteraction.h"
 #include "PROPOSAL/scattering/stochastic_deflection/pairProd/PairProduction.h"
 #include "PROPOSAL/scattering/stochastic_deflection/pairProd/KelnerPairProduction.h"
 #include "PROPOSAL/scattering/stochastic_deflection/ionization/Ionization.h"
