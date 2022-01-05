@@ -4,8 +4,9 @@
 
 namespace PROPOSAL { 
 namespace stochastic_deflection { 
-    class TsaiParametrizationBremsstrahlungGinneken : public Bremsstrahlung, 
-                    public DefaultDeflection<TsaiParametrizationBremsstrahlungGinneken> { 
+    class TsaiParametrizationBremsstrahlungGinneken : public Bremsstrahlung 
+                    // ,public DefaultDeflection<TsaiParametrizationBremsstrahlungGinneken> 
+                    { 
         static constexpr int n_rnd = 2;
         double mass;
 
