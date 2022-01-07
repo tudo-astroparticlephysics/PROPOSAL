@@ -154,6 +154,47 @@ TEST(SecondaryVector, EntryPointExitPointRePropagation)
     EXPECT_TRUE(exit_point->propagated_distance == sphere.GetPosition().GetZ() + sphere.GetRadius());
 }
 
+
+TEST(SecondaryVector, HitDetector) {
+    // define our dummy particle track
+    Secondaries dummy_track(nullptr, std::vector<Sector>{});
+    std::vector<Cartesian3D> positions{ {0, 0, 0}, {0, 0, 10}, {0, 0, 20} };
+
+    for (auto p : positions) {
+        ParticleState p_state;
+        p_state.position = p;
+        p_state.direction = Cartesian3D(0, 0, 1);
+        dummy_track.push_back(p_state, InteractionType::Undefined);
+    }
+
+    // test geometries along propagation axis
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, -5), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 0), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 0.5), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 1), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 5), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 9), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 9.5), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 10), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 10.5), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 11), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 15), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 19), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 19.5), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 20), 1)));
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 30), 1)));
+
+    // test geometries displaced to propagation axis
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 5, 10), 1)));
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(-5, 0, 5), 1)));
+
+    // check border cases
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, -1), 1)));
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 1, 10), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 21), 1)));
+
+}
+
 TEST(SecondaryVector, EnergyConservation) {
     auto prop = GetPropagatorStochastic();
 

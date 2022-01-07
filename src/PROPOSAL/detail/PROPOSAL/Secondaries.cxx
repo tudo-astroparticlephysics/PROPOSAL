@@ -248,6 +248,29 @@ std::shared_ptr<ParticleState> Secondaries::GetClosestApproachPoint(const Geomet
     return std::make_unique<ParticleState>(track_.back());
 }
 
+bool Secondaries::HitGeometry(const Geometry& geometry) const {
+    for (unsigned int i = 0; i < track_.size() - 1; i++) {
+        auto pos_a = track_.at(i).position;
+        auto dir_a = track_.at(i).direction;
+        auto pos_b = track_.at(i + 1).position;
+        auto dir_b = track_.at(i + 1).direction;
+
+        // check if first track point lies inside geometry
+        if (geometry.IsInside(pos_a, dir_a))
+            return true;
+
+        // check if geometry lies between two track points
+        if (geometry.IsInfront(pos_a, dir_a) && geometry.IsBehind(pos_b, dir_b))
+            return true;
+    }
+
+    // check if last track point is in geometry
+    if (geometry.IsInside(track_.back().position, track_.back().direction))
+        return true;
+
+    return false;
+}
+
 ParticleState Secondaries::RePropagateEnergy(const ParticleState& init,
                                              double energy_lost,
                                              double max_distance) const
