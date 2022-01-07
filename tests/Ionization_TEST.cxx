@@ -283,8 +283,10 @@ TEST(Ionization, Test_Stochastic_Loss)
                 #endif
             } else {
                 stochastic_loss_new = energy * cross->CalculateStochasticLoss(medium->GetHash(), energy, rate_new);
-                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
-                break;
+                if (rnd1 > 0.98)
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 5E-3 * stochastic_loss_stored);
+                else
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-4 * stochastic_loss_stored);
             }
         }
     }
@@ -441,8 +443,11 @@ TEST(Ionization, Test_of_e_interpol)
                 #endif
             } else {
                 stochastic_loss_new = energy * cross->CalculateStochasticLoss(medium->GetHash(), energy, rate_new);
-                EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-5 * stochastic_loss_stored);
-                break;
+                if (vcut * energy == ecut) {
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 5E-2 * stochastic_loss_stored); // kink in interpolated function
+                } else {
+                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);
+                }
             }
         }
     }

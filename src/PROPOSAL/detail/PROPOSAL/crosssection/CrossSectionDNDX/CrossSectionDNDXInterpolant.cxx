@@ -10,33 +10,21 @@
 #include "CubicInterpolation/FindParameter.hpp"
 using namespace PROPOSAL;
 
-template <>
-std::function<double(double, double, double)> transform_loss<crosssection::ComptonKleinNishina>::func
-    = [](double v_cut, double v_max, double v) {
-          return transform_loss_log(v_cut, v_max, v);
-      };
-
-template <>
-std::function<double(double, double, double)> retransform_loss<crosssection::ComptonKleinNishina>::func
-    = [](double v_cut, double v_max, double v) {
-          return retransform_loss_log(v_cut, v_max, v);
-      };
-
 namespace PROPOSAL {
-    double transform_relative_loss(double v_cut, double v_max, double v) {
+    double transform_relative_loss(double v_cut, double v_max, double v, double c) {
         if (v < 0 || v_max == 0)
             return v_cut;
         if (v >= 1)
             return v_max;
-        return v_cut * std::exp(v * std::log(v_max / v_cut));
+        return v_cut * std::exp(std::pow(v, c) * std::log(v_max / v_cut));
     }
 
-    double retransform_relative_loss(double v_cut, double v_max, double v) {
+    double retransform_relative_loss(double v_cut, double v_max, double v, double c) {
         if (v <= v_cut)
             return 0;
         if (v >= v_max)
             return 1;
-        return std::log(v / v_cut) / std::log(v_max / v_cut);
+        return std::pow(std::log(v / v_cut) / std::log(v_max / v_cut), 1. / c);
     }
 
     double transform_loss_log(double v_cut, double v_max, double v)

@@ -11,44 +11,52 @@
 
 namespace PROPOSAL {
 
-double transform_relative_loss(double v_cut, double v_max, double v);
-double retransform_relative_loss(double v_cut, double v_max, double v);
+double transform_relative_loss(double v_cut, double v_max, double v, double c = 1);
+double retransform_relative_loss(double v_cut, double v_max, double v, double c = 1);
 double transform_loss_log(double v_cut, double v_max, double v);
 double retransform_loss_log(double v_cut, double v_max, double v);
 
-template <typename Param> struct transform_loss {
-    static std::function<double(double, double, double)> func;
-};
-
-template <typename Param> struct retransform_loss {
-    static std::function<double(double, double, double)> func;
-};
-
-template <typename Param>
-std::function<double(double, double, double)> transform_loss<Param>::func
-    = [](double v_cut, double v_max, double v) {
-          return transform_relative_loss(v_cut, v_max, v);
-      };
-
-template <typename Param>
-std::function<double(double, double, double)> retransform_loss<Param>::func
-    = [](double v_cut, double v_max, double v) {
-          return retransform_relative_loss(v_cut, v_max, v);
-      };
-
 namespace crosssection {
-    struct ComptonKleinNishina;
+    struct Compton;
+    struct Ionization;
 }
 
-#ifndef CROSSSECTIONDNDXINTERPOLANT_INSTANTIATION
-extern template
-std::function<double(double, double, double)> transform_loss<crosssection::ComptonKleinNishina>::func;
-#endif
+// general transformation rules for v nodes
+// TODO: in C++17, this section can be rewritten much cleaner using if constexpr
 
-#ifndef CROSSSECTIONDNDXINTERPOLANT_INSTANTIATION
-extern template
-std::function<double(double, double, double)> retransform_loss<crosssection::ComptonKleinNishina>::func;
-#endif
+template <typename Param, std::enable_if_t<!(std::is_base_of<crosssection::Ionization, Param>::value || std::is_base_of<crosssection::Compton, Param>::value), bool> = true>
+double transform_loss(double v_cut, double v_max, double v) {
+    return transform_relative_loss(v_cut, v_max, v);
+}
+
+template <typename Param, std::enable_if_t<!(std::is_base_of<crosssection::Ionization, Param>::value || std::is_base_of<crosssection::Compton, Param>::value), bool> = true>
+double retransform_loss(double v_cut, double v_max, double v) {
+    return retransform_relative_loss(v_cut, v_max, v);
+}
+
+// specifications for Ionization
+
+template <typename Param, std::enable_if_t<std::is_base_of<crosssection::Ionization, Param>::value, bool> = true>
+double transform_loss(double v_cut, double v_max, double v) {
+    return transform_relative_loss(v_cut, v_max, v, 1.5);
+}
+
+template <typename Param, std::enable_if_t<std::is_base_of<crosssection::Ionization, Param>::value, bool> = true>
+double retransform_loss(double v_cut, double v_max, double v) {
+    return retransform_relative_loss(v_cut, v_max, v, 1.5);
+}
+
+// specifications for Compton
+
+template <typename Param, std::enable_if_t<std::is_base_of<crosssection::Compton, Param>::value, bool> = true>
+double transform_loss(double v_cut, double v_max, double v) {
+    return transform_loss_log(v_cut, v_max, v);
+}
+
+template <typename Param, std::enable_if_t<std::is_base_of<crosssection::Compton, Param>::value, bool> = true>
+double retransform_loss(double v_cut, double v_max, double v) {
+    return retransform_loss_log(v_cut, v_max, v);
+}
 
 template <typename T1, typename... Args>
 auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)
@@ -68,7 +76,7 @@ auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)
     def.axis = axis_builder.Create();
     def.f = [dndx](double energy, double v) {
         auto lim = dndx->GetIntegrationLimits(energy);
-        v = transform_loss<T1>::func(lim.min, lim.max, v);
+        v = transform_loss<T1>(lim.min, lim.max, v);
         return dndx->Calculate(energy, v);
     };
     def.approx_derivates = true;
@@ -91,8 +99,8 @@ public:
         Target const& t, std::shared_ptr<const EnergyCutSettings> cut,
         size_t hash = 0)
         : CrossSectionDNDX(param, p, t, cut, gen_hash(hash))
-        , transform_v(transform_loss<Param>::func)
-        , retransform_v(retransform_loss<Param>::func)
+        , transform_v(transform_loss<Param>)
+        , retransform_v(retransform_loss<Param>)
         , interpolant(build_dndx_def(param, p, t, cut), gen_path(), gen_name())
     {
         lower_energy_lim

@@ -306,11 +306,14 @@ TEST(Compton, Test_of_dEdx_Interpolant)
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
-        auto cross = make_compton(particle_def, *medium, ecuts, false, config);
+        auto cross = make_compton(particle_def, *medium, ecuts, true, config);
 
         dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+        if (vcut * energy == ecut)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored); // kink in interpolation function
+        else
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
     }
 }
 
@@ -349,7 +352,7 @@ TEST(Compton, Test_of_dNdx_Interpolant)
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
-        auto cross = make_compton(particle_def, *medium, ecuts, false, config);
+        auto cross = make_compton(particle_def, *medium, ecuts, true, config);
 
         dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
 
@@ -396,7 +399,7 @@ TEST(Compton, Test_of_e_Interpolant)
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
-        auto cross = make_compton(particle_def, *medium, ecuts, false, config);
+        auto cross = make_compton(particle_def, *medium, ecuts, true, config);
 
         auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = medium->GetComponents();
@@ -417,8 +420,12 @@ TEST(Compton, Test_of_e_Interpolant)
                     stochastic_loss_new = energy
                         * cross->CalculateStochasticLoss(
                             comp.GetHash(), energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
-                        1E-4 * stochastic_loss_stored);
+                    if (rnd1 < 0.05)
+                        EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
+                                    5E-2 * stochastic_loss_stored);
+                    else
+                        EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
+                                    1E-3 * stochastic_loss_stored);
                     break;
                 }
             }
