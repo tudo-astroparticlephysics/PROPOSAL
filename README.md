@@ -200,6 +200,7 @@ and our zenodo entry of the version you use
             Rhode, Wolfgang and
             Sackel, Maximilian and
             Sandrock, Alexander and
+            Schneider, Austin and
             Soedingrekso, Jan and
             van Santen, Jacob},
   title  = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
