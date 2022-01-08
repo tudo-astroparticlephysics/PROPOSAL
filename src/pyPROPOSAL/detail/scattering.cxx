@@ -7,7 +7,7 @@
 #include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
 
-#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiApproximationBremsstrahlung.h"
+// #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiApproximationBremsstrahlung.h"
 
 #include "pyPROPOSAL/pyBindings.h"
 
