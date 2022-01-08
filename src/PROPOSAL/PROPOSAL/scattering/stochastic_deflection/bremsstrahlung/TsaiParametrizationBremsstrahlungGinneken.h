@@ -2,8 +2,8 @@
 
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/Bremsstrahlung.h"
 
-namespace PROPOSAL { 
-namespace stochastic_deflection { 
+namespace PROPOSAL {
+namespace stochastic_deflection {
     class TsaiParametrizationBremsstrahlungGinneken : public Bremsstrahlung 
                     // ,public DefaultDeflection<TsaiParametrizationBremsstrahlungGinneken> 
                     { 

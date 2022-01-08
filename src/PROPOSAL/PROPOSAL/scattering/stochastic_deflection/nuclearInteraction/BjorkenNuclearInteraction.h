@@ -5,8 +5,9 @@
 
 namespace PROPOSAL {
     namespace stochastic_deflection {
-        class BjorkenNuclearInteraction : public NuclearInteraction,
-                               public DefaultDeflection<BjorkenNuclearInteraction> {
+        class BjorkenNuclearInteraction : public NuclearInteraction
+                            //    ,public DefaultDeflection<BjorkenNuclearInteraction> 
+                               {
 
             static constexpr int n_rnd = 2;
             double mass;

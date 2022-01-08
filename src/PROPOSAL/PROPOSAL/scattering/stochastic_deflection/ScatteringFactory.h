@@ -100,8 +100,11 @@ static const std::map<std::string, func_ptr> DeflectionTable
         {"borogpetrukhinnuclearinteraction",
                 create_deflection<stochastic_deflection::BorogPetrukhinNuclearInteraction>},
         {"kelnerpairproduction",
-                create_deflection<stochastic_deflection::KelnerPairProduction>}
-
+                create_deflection<stochastic_deflection::KelnerPairProduction>},
+        {"tsaiparametrizationbremsstrahlungginneken",
+                create_deflection<stochastic_deflection::TsaiParametrizationBremsstrahlungGinneken>},
+        {"bjorkennuclearinteraction",
+                create_deflection<stochastic_deflection::BjorkenNuclearInteraction>}
       };
 
 template <typename Cross = std::nullptr_t>
