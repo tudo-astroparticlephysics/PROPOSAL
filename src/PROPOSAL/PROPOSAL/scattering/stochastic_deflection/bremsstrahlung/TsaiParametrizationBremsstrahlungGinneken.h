@@ -10,7 +10,7 @@ namespace stochastic_deflection {
         static constexpr int n_rnd = 2;
         double mass;
 
-        std::unique_ptr<Parametrization> clone() cont final 
+        std::unique_ptr<Parametrization> clone() const final 
         { 
             return std::unique_ptr<Parametrization>(
                 std::make_unique<TsaiParametrizationBremsstrahlungGinneken>(*this));
@@ -19,7 +19,8 @@ namespace stochastic_deflection {
     public: 
         TsaiParametrizationBremsstrahlungGinneken(const ParticleDef& p_def, const Medium&) : mass(p_def.mass) {};
 
-        size_t RequireRandomNumbers() const noexcept final { return n_rnd; }
+        size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
+
 
         UnitSphericalVector CalculateStochasticDeflection(
             double e_i, double e_f, std::vector<double> const& rnd) const final;
