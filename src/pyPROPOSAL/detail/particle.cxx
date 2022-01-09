@@ -299,6 +299,7 @@ void init_particle(py::module& m) {
             .def("entry_point", &Secondaries::GetEntryPoint)
             .def("exit_point", &Secondaries::GetExitPoint)
             .def("closest_approach_point", &Secondaries::GetClosestApproachPoint)
+            .def("hit_geometry", &Secondaries::HitGeometry)
             .def("track", overload_cast_<>()(&Secondaries::GetTrack, py::const_))
             .def("track", overload_cast_<const Geometry&>()(&Secondaries::GetTrack, py::const_))
             .def("get_state_for_energy", &Secondaries::GetStateForEnergy)
