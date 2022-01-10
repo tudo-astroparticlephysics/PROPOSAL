@@ -4,8 +4,6 @@ import numpy as np
 
 particle_defs = [
     pp.particle.MuMinusDef(),
-    pp.particle.TauMinusDef(),
-    pp.particle.EMinusDef()
 ]
 
 mediums = [
@@ -69,9 +67,9 @@ def create_tables(dir_name, **kwargs):
 
                         for energy in energies:
                             if key == "dEdx":
-                                result = [str(xsection.calculate_dEdx(energy) * medium.mass_density)]
+                                result = [str(xsection.calculate_dEdx(energy))]
                             if key == "dNdx":
-                                result = [str(xsection.calculate_dNdx(energy) * medium.mass_density)]
+                                result = [str(xsection.calculate_dNdx(energy))]
                             if key == "stoch":
                                 rnd1 = pp.RandomGenerator.get().random_double()
                                 rnd2 = pp.RandomGenerator.get().random_double()
@@ -82,7 +80,7 @@ def create_tables(dir_name, **kwargs):
 
                                 if np.isfinite(cut.ecut) or cut.vcut < 1:
                                     result = xsection.calculate_stochastic_loss(
-                                        comp.hash, energy, rnd1*dNdx_for_comp) * energy
+                                        comp.hash, energy, rnd1*dNdx_for_comp)
                                 else:
                                     result = 0
                                 result = [str(rnd1), str(rnd2), str(result)]
@@ -129,9 +127,7 @@ def create_table_rho(dir_name):
                     buf.append(particle.name)
                     buf.append(medium.name)
                     buf.append(str(v))
-                    buf.append(str(multiplier))
                     buf.append(str(energy))
-                    buf.append(str(name))
                     buf.append(str(rnd1))
                     buf.append(str(rnd2))
                     buf.append(str(E1))

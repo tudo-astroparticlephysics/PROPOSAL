@@ -1,7 +1,3 @@
-
-// #include <iostream>
-// #include <string>
-
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/Constants.h"
@@ -18,104 +14,6 @@
 #include <nlohmann/json.hpp>
 
 using namespace PROPOSAL;
-
-const std::string testfile_dir = "tests/TestFiles/";
-
-// TEST(Comparison, Comparison_equal)
-// {
-// ParticleDef particle_def = GammaDef::Get();
-// auto medium = std::make_shared<const Water>();
-// EnergyCutSettings ecuts;
-// double multiplier = 1.;
-
-// ComptonKleinNishina* Compton_A =
-//         new ComptonKleinNishina(particle_def, medium, ecuts, multiplier);
-// Parametrization* Compton_B = new ComptonKleinNishina(particle_def, medium,
-// ecuts, multiplier); EXPECT_TRUE(*Compton_A == *Compton_B);
-
-// ComptonKleinNishina param(particle_def, medium, ecuts, multiplier);
-// EXPECT_TRUE(param == *Compton_A);
-
-// ComptonIntegral* Int_A        = new ComptonIntegral(param);
-// CrossSectionIntegral* Int_B = new ComptonIntegral(param);
-// EXPECT_TRUE(*Int_A == *Int_B);
-
-// InterpolationDef InterpolDef;
-// ComptonInterpolant* Interpol_A        = new ComptonInterpolant(param,
-// InterpolDef); CrossSectionInterpolant* Interpol_B = new
-// ComptonInterpolant(param, InterpolDef); EXPECT_TRUE(*Interpol_A ==
-// *Interpol_B);
-
-// delete Compton_A;
-// delete Compton_B;
-// delete Int_A;
-// delete Int_B;
-// delete Interpol_A;
-// delete Interpol_B;
-// }
-
-// TEST(Comparison, Comparison_not_equal)
-// {
-// ParticleDef gamma_def  = GammaDef::Get();
-// auto medium_1 = std::make_shared<const Water>();
-// auto medium_2 = std::make_shared<const Ice>();
-// EnergyCutSettings ecuts_1(500, -1);
-// EnergyCutSettings ecuts_2(-1, 0.05);
-// double multiplier_1 = 1.;
-// double multiplier_2 = 2.;
-
-// ComptonKleinNishina Compton_A(gamma_def, medium_1, ecuts_1, multiplier_1);
-// ComptonKleinNishina Compton_B(gamma_def, medium_2, ecuts_1, multiplier_1);
-// ComptonKleinNishina Compton_C(gamma_def, medium_1, ecuts_2, multiplier_1);
-// ComptonKleinNishina Compton_D(gamma_def, medium_1, ecuts_1, multiplier_2);
-// EXPECT_TRUE(Compton_A != Compton_B);
-// EXPECT_TRUE(Compton_A != Compton_C);
-// EXPECT_TRUE(Compton_A != Compton_C);
-// }
-
-// TEST(Assignment, Copyconstructor)
-// {
-// ParticleDef particle_def = GammaDef::Get();
-// auto medium = std::make_shared<const Water>();
-// EnergyCutSettings ecuts;
-// double multiplier = 1.;
-
-// ComptonKleinNishina Compton_A(particle_def, medium, ecuts, multiplier);
-// ComptonKleinNishina Compton_B = Compton_A;
-// EXPECT_TRUE(Compton_A == Compton_B);
-
-// ComptonIntegral Int_A(Compton_A);
-// ComptonIntegral Int_B = Int_A;
-// EXPECT_TRUE(Int_A == Int_B);
-
-// InterpolationDef InterpolDef;
-// ComptonInterpolant Interpol_A(Compton_A, InterpolDef);
-// ComptonInterpolant Interpol_B = Interpol_A;
-// EXPECT_TRUE(Interpol_A == Interpol_B);
-// }
-
-// TEST(Assignment, Copyconstructor2)
-// {
-// ParticleDef particle_def = GammaDef::Get();
-// auto medium = std::make_shared<const Water>();
-// EnergyCutSettings ecuts;
-// double multiplier = 1.;
-
-// ComptonKleinNishina Compton_A(particle_def, medium, ecuts, multiplier);
-// ComptonKleinNishina Compton_B(Compton_A);
-// EXPECT_TRUE(Compton_A == Compton_B);
-
-// ComptonIntegral Int_A(Compton_A);
-// ComptonIntegral Int_B(Int_A);
-// EXPECT_TRUE(Int_A == Int_B);
-
-// InterpolationDef InterpolDef;
-// ComptonInterpolant Interpol_A(Compton_A, InterpolDef);
-// ComptonInterpolant Interpol_B(Interpol_A);
-// EXPECT_TRUE(Interpol_A == Interpol_B);
-// }
-
-// in polymorphism an assignment and swap operator doesn't make sense
 
 TEST(Compton, Test_of_dEdx)
 {
@@ -135,16 +33,8 @@ TEST(Compton, Test_of_dEdx)
 
     while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
         >> dEdx_stored >> parametrization) {
-        parametrization.erase(0, 7);
-
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -153,7 +43,7 @@ TEST(Compton, Test_of_dEdx)
 
         auto cross = make_compton(particle_def, *medium, ecuts, false, config);
 
-        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
+        dEdx_new = cross->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
     }
@@ -178,16 +68,8 @@ TEST(Compton, Test_of_dNdx)
 
     while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
         >> dNdx_stored >> parametrization) {
-        parametrization.erase(0, 7);
-
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -196,7 +78,7 @@ TEST(Compton, Test_of_dNdx)
 
         auto cross = make_compton(particle_def, *medium, ecuts, false, config);
 
-        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
+        dNdx_new = cross->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
@@ -217,7 +99,6 @@ TEST(Compton, Test_of_e)
     double rnd1;
     double rnd2;
     double stochastic_loss_stored;
-    double stochastic_loss_new;
 
     std::cout.precision(16);
 
@@ -225,16 +106,8 @@ TEST(Compton, Test_of_e)
 
     while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1
         >> rnd2 >> stochastic_loss_stored >> parametrization) {
-        parametrization.erase(0, 7);
-
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -243,29 +116,20 @@ TEST(Compton, Test_of_e)
 
         auto cross = make_compton(particle_def, *medium, ecuts, false, config);
 
-        auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = medium->GetComponents();
-        double sum = 0;
+        auto comp = components.at(int(rnd2 * components.size()));
 
-        for (auto comp : components) {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
-            sum += dNdx_for_comp;
-            if (sum > dNdx_full * rnd2) {
-                double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF && vcut == 1) {
-#ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(
-                                     comp.GetHash(), energy, rate_new),
-                        "");
-#endif
-                } else {
-                    stochastic_loss_new = energy
-                        * cross->CalculateStochasticLoss(
-                            comp.GetHash(), energy, rate_new);
-                    EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
-                        1E-4 * stochastic_loss_stored);
-                    break;
-                }
+        auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
+
+        if ( ecut == INF && vcut == 1 ) {
+            EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
+        } else {
+            auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
+            EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-4 * stochastic_loss_stored);
+            // cross check
+            if (dNdx_for_comp > 0) {
+                auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), stochastic_loss);
+                EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-3);
             }
         }
     }
@@ -290,16 +154,8 @@ TEST(Compton, Test_of_dEdx_Interpolant)
 
     while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
         >> dEdx_stored >> parametrization) {
-        parametrization.erase(0, 7);
-
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -308,12 +164,12 @@ TEST(Compton, Test_of_dEdx_Interpolant)
 
         auto cross = make_compton(particle_def, *medium, ecuts, true, config);
 
-        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
+        dEdx_new = cross->CalculatedEdx(energy);
 
         if (vcut * energy == ecut)
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored); // kink in interpolation function
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-2 * dEdx_stored);
         else
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-4 * dEdx_stored);
     }
 }
 
@@ -336,16 +192,8 @@ TEST(Compton, Test_of_dNdx_Interpolant)
 
     while (in >> mediumName >> ecut >> vcut >> multiplier >> energy
         >> dNdx_stored >> parametrization) {
-        parametrization.erase(0, 7);
-
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -354,7 +202,7 @@ TEST(Compton, Test_of_dNdx_Interpolant)
 
         auto cross = make_compton(particle_def, *medium, ecuts, true, config);
 
-        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
+        dNdx_new = cross->CalculatedNdx(energy);
 
         EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
@@ -375,7 +223,6 @@ TEST(Compton, Test_of_e_Interpolant)
     double rnd1;
     double rnd2;
     double stochastic_loss_stored;
-    double stochastic_loss_new;
 
     std::cout.precision(16);
 
@@ -383,16 +230,8 @@ TEST(Compton, Test_of_e_Interpolant)
 
     while (in >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1
         >> rnd2 >> stochastic_loss_stored >> parametrization) {
-        parametrization.erase(0, 7);
-
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
 
         ParticleDef particle_def = GammaDef();
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -401,33 +240,24 @@ TEST(Compton, Test_of_e_Interpolant)
 
         auto cross = make_compton(particle_def, *medium, ecuts, true, config);
 
-        auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = medium->GetComponents();
-        double sum = 0;
+        auto comp = components.at(int(rnd2 * components.size()));
 
-        for (auto comp : components) {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
-            sum += dNdx_for_comp;
-            if (sum > dNdx_full * rnd2) {
-                double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF && vcut == 1) {
-#ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(
-                                     comp.GetHash(), energy, rate_new),
-                        "");
-#endif
-                } else {
-                    stochastic_loss_new = energy
-                        * cross->CalculateStochasticLoss(
-                            comp.GetHash(), energy, rate_new);
-                    if (rnd1 < 0.05)
-                        EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
-                                    5E-2 * stochastic_loss_stored);
-                    else
-                        EXPECT_NEAR(stochastic_loss_new, stochastic_loss_stored,
-                                    1E-3 * stochastic_loss_stored);
-                    break;
-                }
+        auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
+
+        if ( ecut == INF && vcut == 1 ) {
+            EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
+        } else {
+            auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
+            if (vcut * energy == ecut || rnd1 < 0.05)
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
+            else
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
+
+            // cross check
+            if (dNdx_for_comp > 0) {
+                auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), stochastic_loss);
+                EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-3);
             }
         }
     }

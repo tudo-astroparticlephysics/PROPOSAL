@@ -89,9 +89,9 @@ def create_tables(dir_name, **kwargs):
 
                             for energy in energies:
                                 if key == "dEdx":
-                                    result = [str(xsection.calculate_dEdx(energy) * medium.mass_density)]
+                                    result = [str(xsection.calculate_dEdx(energy))]
                                 if key == "dNdx":
-                                    result = [str(xsection.calculate_dNdx(energy) * medium.mass_density)]
+                                    result = [str(xsection.calculate_dNdx(energy))]
                                 if key == "stoch":
                                     rnd1 = pp.RandomGenerator.get().random_double()
                                     rnd2 = pp.RandomGenerator.get().random_double()
@@ -102,7 +102,7 @@ def create_tables(dir_name, **kwargs):
 
                                     if np.isfinite(cut.ecut) or cut.vcut < 1:
                                         result = xsection.calculate_stochastic_loss(
-                                            comp.hash, energy, rnd1*dNdx_for_comp) * energy
+                                            comp.hash, energy, rnd1*dNdx_for_comp)
                                     else:
                                         result = 0
                                     result = [str(rnd1), str(rnd2), str(result)]
@@ -115,8 +115,8 @@ def create_tables(dir_name, **kwargs):
                                 buf[key][1].append(str(multiplier))
                                 buf[key][1].append(str(lpm))
                                 buf[key][1].append(str(energy))
-                                buf[key][1].append(xsection.param_name)
                                 buf[key][1].extend(result)
+                                buf[key][1].append(xsection.param_name)
                                 buf[key][1].append("\n")
 
                             buf[key][0].write("\t".join(buf[key][1]))
