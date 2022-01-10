@@ -68,6 +68,12 @@ public:
     std::shared_ptr<ParticleState> GetExitPoint(const Geometry&) const;
     std::shared_ptr<ParticleState> GetClosestApproachPoint(const Geometry&) const;
 
+    /*!
+    * Check if particle has hit a geometry. Particle tracks ending at the border
+    * of a geometry count as a hit.
+    */
+    bool HitGeometry(const Geometry&) const;
+
     std::vector<ParticleState> GetTrack() const { return track_; };
     std::vector<ParticleState> GetTrack(const Geometry&) const;
 

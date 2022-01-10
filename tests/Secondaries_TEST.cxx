@@ -3,6 +3,8 @@
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/geometry/Sphere.h"
+#include "PROPOSAL/geometry/Box.h"
+#include "PROPOSAL/geometry/Cylinder.h"
 #include "PROPOSAL/Secondaries.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
@@ -152,6 +154,42 @@ TEST(SecondaryVector, EntryPointExitPointRePropagation)
     EXPECT_TRUE(sec_f.propagated_distance > exit_point->propagated_distance);
     EXPECT_TRUE(sphere.IsBehind(sec_f.position, sec_f.direction));
     EXPECT_TRUE(exit_point->propagated_distance == sphere.GetPosition().GetZ() + sphere.GetRadius());
+}
+
+
+TEST(SecondaryVector, HitDetector) {
+    // define our dummy particle track
+    Secondaries dummy_track(nullptr, std::vector<Sector>{});
+    std::vector<Cartesian3D> positions{ {0, 0, 0}, {0, 0, 10}, {0, 0, 20} };
+
+    for (auto p : positions) {
+        ParticleState p_state;
+        p_state.position = p;
+        p_state.direction = Cartesian3D(0, 0, 1);
+        dummy_track.push_back(p_state, InteractionType::Undefined);
+    }
+
+    // test geometries along propagation axis
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, -5), 1)));
+    for (double z = -0.5; z <= 20.5; z=z+0.5) {
+        EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, z), 1)));
+        EXPECT_TRUE(dummy_track.HitGeometry(Box(Cartesian3D(0, 0, z), 2, 2, 2)));
+        EXPECT_TRUE(dummy_track.HitGeometry(Cylinder(Cartesian3D(0, 0, z), 5, 1)));
+    }
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 20), 1)));
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 30), 1)));
+
+    // test geometries displaced to propagation axis
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 5, 10), 1)));
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(-5, 0, 5), 1)));
+
+    // check border cases
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, -1), 1)));
+    EXPECT_FALSE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 1, 10), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Sphere(Cartesian3D(0, 0, 21), 1)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Box(Cartesian3D(0, 0, 21), 2, 2, 2)));
+    EXPECT_TRUE(dummy_track.HitGeometry(Cylinder(Cartesian3D(0, 0, 21), 5, 2)));
+
 }
 
 TEST(SecondaryVector, EnergyConservation) {
