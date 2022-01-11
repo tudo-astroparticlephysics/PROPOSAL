@@ -50,10 +50,11 @@ crosssection::EpairProduction::EpairProduction(bool lpm, const ParticleDef& p,
     const Medium& medium, double density_correction)
 {
     if (lpm) {
-        lpm_ = std::make_shared<EpairLPM>(p, medium, density_correction);
-        hash_combine(hash, lpm_->GetHash());
+        lpm_ = std::make_shared<EpairLPM>(p, medium);
+        hash_combine(hash, density_correction, lpm_->GetHash());
+        density_correction_ = density_correction;
     }
-    hash_combine(hash, p.GetHash(), medium.GetHash(), density_correction);
+    hash_combine(hash, p.GetHash(), medium.GetHash());
 }
 
 double crosssection::EpairProduction::GetLowerEnergyLim(
@@ -280,7 +281,8 @@ double crosssection::EpairKelnerKokoulinPetrukhin::FunctionToIntegral(
     aux *= (1 - v) / v * (diagram_e + aux1 * aux1 * diagram_mu);
 
     if (lpm_) {
-        aux *= lpm_->suppression_factor(energy, v, r2, beta, xi);
+        aux *= lpm_->suppression_factor(energy, v, r2, beta, xi,
+                                        density_correction_);
     }
 
     if (aux < 0) {
@@ -458,7 +460,8 @@ double crosssection::EpairSandrockSoedingreksoRhode::FunctionToIntegral(
     double aux = diagram_e + diagram_mu;
 
     if (lpm_) {
-        aux *= lpm_->suppression_factor(energy, v, rho2, beta, xi);
+        aux *= lpm_->suppression_factor(energy, v, rho2, beta, xi,
+                                        density_correction_);
     }
 
     if (aux < 0.0) {
@@ -538,7 +541,8 @@ double crosssection::EpairForElectronPositron::FunctionToIntegral(
     }
 
     if (lpm_) {
-        aux *= lpm_->suppression_factor(energy, v, r2, beta, xi);
+        aux *= lpm_->suppression_factor(energy, v, r2, beta, xi,
+                                        density_correction_);
     }
 
     return aux;
@@ -547,11 +551,10 @@ double crosssection::EpairForElectronPositron::FunctionToIntegral(
 #undef EPAIR_PARAM_INTEGRAL_IMPL
 
 crosssection::EpairLPM::EpairLPM(
-    const ParticleDef& p_def, const Medium& medium, double density_correction)
+    const ParticleDef& p_def, const Medium& medium)
     : mass_(p_def.mass)
     , charge_(p_def.charge)
     , mol_density_(medium.GetMolDensity())
-    , density_correction_(density_correction)
     , hash(0)
 {
     double sum = 0.;
@@ -564,9 +567,9 @@ crosssection::EpairLPM::EpairLPM(
     }
     eLpm_ = mass_ / (ME * RE);
     eLpm_ *= (eLpm_ * eLpm_) * ALPHA * mass_
-        / (2 * PI * mol_density_ * density_correction * charge_ * charge_
+        / (2 * PI * mol_density_ * charge_ * charge_
             * sum);
-    hash_combine(hash, mass_, std::abs(charge_), mol_density_, density_correction_);
+    hash_combine(hash, mass_, std::abs(charge_), mol_density_);
 }
 
 // ------------------------------------------------------------------------- //
@@ -575,13 +578,14 @@ crosssection::EpairLPM::EpairLPM(
 // ------------------------------------------------------------------------- //
 
 double crosssection::EpairLPM::suppression_factor(
-    double energy, double v, double r2, double b, double x) const
+    double energy, double v, double r2, double b, double x,
+    double density_correction) const
 {
     // Ternovskii functions calculated in appendix (eq. A.2)
     double A, B, C, D, E, s;
     double s36, s6, d1, d2, atan_, log1, log2;
 
-    s = 0.25 * std::sqrt(eLpm_ / (energy * v * (1 - r2))); // eq. 29
+    s = 0.25 * std::sqrt(eLpm_ / (density_correction * energy * v * (1 - r2))); // eq. 29
     s6 = 6 * s;
     atan_ = s6 * (x + 1);
 
