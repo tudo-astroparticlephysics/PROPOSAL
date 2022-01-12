@@ -92,9 +92,13 @@ UnitSphericalVector
 stochastic_deflection::TsaiParametrizationBremsstrahlungGinneken::CalculateStochasticDeflection(
     double e_i, double e_f, std::vector<double> const& rnd) const 
 {
-
+    // All energies should be in units of GeV
+    e_i = e_i / 1000.0;
+    e_f = e_f / 1000.0;
+    auto muon_mass = mass / 1000.0;
     auto Z = 1; // use Z of medium
-    auto rms_theta = get_rms_theta(e_i, e_f, mass, Z);
+    
+    auto rms_theta = get_rms_theta(e_i, e_f, muon_mass, Z);
     
     auto lambda = 1 / (rms_theta * rms_theta);
     // Need sqrt because of sampling in theta^2
