@@ -68,6 +68,8 @@ inline auto make_multiple_scattering(
         return make_highland(p, m);
     case MultipleScatteringType::Moliere:
         return make_moliere(p, m);
+    case MultipleScatteringType::NoScattering:
+        return std::unique_ptr<multiple_scattering::Parametrization>(nullptr);
     default:
         throw std::out_of_range("This constructor is not provided.");
     }
