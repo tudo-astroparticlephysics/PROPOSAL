@@ -387,14 +387,17 @@ TEST(Scattering, ScatterReproducibilityTest)
         crosssection_list_t cross;
 
         std::unique_ptr<multiple_scattering::Parametrization> scattering = NULL;
-        if (parametrization == "NoScattering")
-        {
-            continue; // not implemented anymore
-        } else if (parametrization == "HighlandIntegral") {
+        if (parametrization == "HighlandIntegral") {
             cross = GetCrossSections(particle_def, *medium, ecuts, false);
         }
 
         scattering = make_multiple_scattering(parametrization, particle_def, *medium, cross, false);
+
+        if (parametrization == "NoScattering")
+        {
+            EXPECT_TRUE(scattering == nullptr);
+            continue;
+        }
 
         // There has been a correction in the LPM effect parametrization for
         // bremsstrahlung which influences the scattering angles for electrons
