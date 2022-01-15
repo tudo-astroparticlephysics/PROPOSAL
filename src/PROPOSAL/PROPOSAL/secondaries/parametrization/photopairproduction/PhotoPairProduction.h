@@ -6,9 +6,9 @@
 
 namespace PROPOSAL {
 namespace secondaries {
-    struct PhotopairProduction : public secondaries::Parametrization {
-        PhotopairProduction() = default;
-        virtual ~PhotopairProduction() = default;
+    struct PhotoPairProduction : public secondaries::Parametrization {
+        PhotoPairProduction() = default;
+        virtual ~PhotoPairProduction() = default;
 
         static constexpr InteractionType type
             = PROPOSAL::InteractionType::Photopair;
@@ -16,8 +16,8 @@ namespace secondaries {
 
         virtual double CalculateRho(double, double, const Component&) = 0;
         virtual std::tuple<Cartesian3D, Cartesian3D> CalculateDirections(
-            const Vector3D&, double, double, const Component&, std::vector<double>)
-            = 0;
+            const Vector3D&, double, double, const Component&, double, double,
+            double) = 0;
         virtual std::tuple<double, double> CalculateEnergy(double, double, double)
             = 0;
     };

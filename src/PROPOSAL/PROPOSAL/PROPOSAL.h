@@ -86,9 +86,8 @@
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/MupairProduction.h"
 #include "PROPOSAL/secondaries/parametrization/photonuclear/Photonuclear.h"
 #include "PROPOSAL/secondaries/parametrization/photoproduction/Photoproduction.h"
-#include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsai.h"
-#include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoTsaiForwardPeaked.h"
-#include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotopairProduction.h"
+#include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionTsai.h"
+#include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionKochMotz.h"
 #include "PROPOSAL/secondaries/parametrization/weakinteraction/WeakCooperSarkarMertsch.h"
 
 #include "PROPOSAL/secondaries/SecondariesCalculator.h"
