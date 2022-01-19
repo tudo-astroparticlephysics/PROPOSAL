@@ -118,7 +118,11 @@ public:
     /**
      * @brief random numbers required for multiple scattering.
      */
-    static constexpr size_t MultipleScatteringRandomNumbers() noexcept { return 4; }
+    size_t MultipleScatteringRandomNumbers() const noexcept {
+        if (m_scatter_ptr)
+            return 4;
+        return 0;
+    }
 
     /**
      * @brief Calculates deflection angles for specific interaction type. Take a

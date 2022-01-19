@@ -13,15 +13,20 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
+#include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/multiple_scattering/Highland.h"
 #include "PROPOSAL/scattering/multiple_scattering/HighlandIntegral.h"
 #include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include <nlohmann/json.hpp>
 
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
+#include "PROPOSAL/propagation_utility/InteractionBuilder.h"
+#include "PROPOSAL/propagation_utility/TimeBuilder.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 
 #include "PROPOSALTestUtilities/TestFilesHandling.h"
 
@@ -387,14 +392,17 @@ TEST(Scattering, ScatterReproducibilityTest)
         crosssection_list_t cross;
 
         std::unique_ptr<multiple_scattering::Parametrization> scattering = NULL;
-        if (parametrization == "NoScattering")
-        {
-            continue; // not implemented anymore
-        } else if (parametrization == "HighlandIntegral") {
+        if (parametrization == "HighlandIntegral") {
             cross = GetCrossSections(particle_def, *medium, ecuts, false);
         }
 
         scattering = make_multiple_scattering(parametrization, particle_def, *medium, cross, false);
+
+        if (parametrization == "NoScattering")
+        {
+            EXPECT_TRUE(scattering == nullptr);
+            continue;
+        }
 
         // There has been a correction in the LPM effect parametrization for
         // bremsstrahlung which influences the scattering angles for electrons
@@ -440,6 +448,35 @@ TEST(Scattering, ScatterReproducibilityTest)
     }
 }
 
+TEST(Scattering, NoScattering)
+{
+    // Check that "NoScattering" does not scatter the initial direction
+    // Also check that no random numbers are actually used here
+    nlohmann::json config;
+    config["multiple_scattering"] = "NoScattering";
+
+    auto cross_dummy = GetStdCrossSections(
+            MuMinusDef(), StandardRock(),
+            std::make_shared<EnergyCutSettings>(500, 0.05, false), false);
+
+    PropagationUtility::Collection collection;
+    collection.interaction_calc = make_interaction(cross_dummy, false);
+    collection.displacement_calc = make_displacement(cross_dummy, false);
+    collection.time_calc = make_time(cross_dummy, MuMinusDef(), false);
+    collection.scattering = make_scattering(config, MuMinusDef(),
+                                            StandardRock(), cross_dummy, false);
+
+    PropagationUtility utility(collection);
+
+    Cartesian3D init_dir(0, 0, 1);
+    auto rnd_lambda = []()->double {
+        throw std::logic_error("No random numbers should be used here!");
+    };
+    auto new_dir = utility.DirectionsScatter(1e2, 1e6, 1e5, init_dir, rnd_lambda);
+
+    EXPECT_EQ(std::get<0>(new_dir), init_dir);
+    EXPECT_EQ(std::get<1>(new_dir), init_dir);
+}
 
 int main(int argc, char** argv)
 {
