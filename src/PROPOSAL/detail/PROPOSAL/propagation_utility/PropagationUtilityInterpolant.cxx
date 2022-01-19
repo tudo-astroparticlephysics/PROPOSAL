@@ -88,6 +88,9 @@ double UtilityInterpolant::GetUpperLimit(double upper_limit, double rnd)
                                "is below lower_lim. rnd was " + std::to_string(rnd)
                                + " with rnd_max " + std::to_string(max_rnd));
 
+    if (rnd == max_rnd)
+        return lower_lim;
+
     if (reverse_)
         rnd = -rnd;
 
