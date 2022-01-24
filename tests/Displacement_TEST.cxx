@@ -108,6 +108,16 @@ TEST(UpperLimitTrackIntegral, CompareIntegralInterpolant)
     }
 }
 
+TEST(UpperLimitTrackIntegral, LowerLimCheck)
+{
+    DisplacementBuilder disp_calc(GetCrossSections(), std::true_type());
+    auto lower_lim = disp_calc.GetLowerLim();
+    double E_i = 1e6;
+    auto rnd = disp_calc.SolveTrackIntegral(E_i, lower_lim);
+    auto E_f = disp_calc.UpperLimitTrackIntegral(E_i, rnd);
+    EXPECT_NEAR(E_f, lower_lim, lower_lim * COMPUTER_PRECISION);
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
