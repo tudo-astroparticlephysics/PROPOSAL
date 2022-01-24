@@ -156,8 +156,10 @@ TEST(Bremsstrahlung, Test_of_e)
             // cross check
             if (dNdx_for_comp > 0) {
                 auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), stochastic_loss);
-                if (particleName == "EMinus" && mediumName == "ice" && ecut == 500 && vcut == 0.05 && energy == 1e11 && parametrization == "PetrukhinShestakov")
-                    EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-2);
+                // for high-energy electrons with lpm enabled, the differential crosssetion rises for v->1, so the
+                // differential cross section becomes harder to integrate (issue #123)
+                if (particleName == "EMinus" && energy >= 1e10 && lpm == true)
+                    EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 5e-2);
                 else
                     EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-3);
             }
@@ -187,7 +189,7 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
     std::cout.precision(16);
 
     while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >>
-        dEdx_stored >> parametrization) {
+    dEdx_stored >> parametrization) {
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
@@ -202,15 +204,22 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 
         dEdx_new = cross->CalculatedEdx(energy);
 
-        if (particleName == "TauMinus" && energy < 1e5)
-            continue; // in this energy regime, the dEdx integral values look absolutely terrible
 
-        if (vcut * energy == ecut)
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored); // expecting a kink here
-        else if (particleName == "EMinus" && mediumName == "uranium" && energy == 1e10)
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-3 * dEdx_stored); // integral function hard to interpolate
-        else
+        if (particleName == "TauMinus" && energy < 1e5) {
+            // For taus, the kinematic upper limit (v_max) introduces kinks in
+            // the function that we need to integrate. However, bremsstrahlung
+            // effects for taus are negligible for these energies (issue #250)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e0 * dEdx_stored);
+        } else if (vcut * energy == ecut) {
+            // expecting a kink here (issue #250)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored);
+        } else if (particleName == "EMinus" && mediumName == "uranium" && energy == 1e10 && lpm == true) {
+            // There is a small discontinuity in the function that
+            // is hard to interpolate at exactly this energy (issue #250)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-3 * dEdx_stored);
+        } else {
             EXPECT_NEAR(dEdx_new, dEdx_stored, interpolation_precision * dEdx_stored);
+        }
     }
 }
 
@@ -249,14 +258,17 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 
         dNdx_new = cross->CalculatedNdx(energy);
 
-        if (vcut * energy == ecut)
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // expecting a kink here
-        else if (particleName == "EMinus" && mediumName == "ice" && energy == 1e12 && lpm == true)
+        if (vcut * energy == ecut) {
+            // expecting a kink here (issue #250)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
+        } else if (particleName == "TauMinus" && energy < 1e5) {
+            // For taus, the kinematic upper limit (v_max) introduces kinks in
+            // the function that we need to integrate. However, bremsstrahlung
+            // effects for taus are negligible for these energies (issue #250)
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored);
-        else if (particleName == "TauMinus" && mediumName == "ice" && energy == 1e4 && parametrization == "SandrockSoedingreksoRhode")
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored);
-        else
+        } else {
             EXPECT_NEAR(dNdx_new, dNdx_stored, interpolation_precision * dNdx_stored);
+        }
     }
 }
 
@@ -307,23 +319,38 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
-            if (energy * vcut == ecut)
-                EXPECT_NEAR(v, stochastic_loss_stored, 1e-1 * stochastic_loss_stored); // kink in integral
-            else if (particleName == "EMinus" && mediumName == "uranium")
-                EXPECT_NEAR(v, stochastic_loss_stored, 5e-1 * stochastic_loss_stored); // there is one test that is failing really hard...
-            else if (particleName == "EMinus" && energy >= 1e10)
-                EXPECT_NEAR(v, stochastic_loss_stored, 1e-1 * stochastic_loss_stored); // somehow not working well
-            else if (rnd1 < 0.05 || rnd1 > 0.95)
-                EXPECT_NEAR(v, stochastic_loss_stored, 2e-2 * stochastic_loss_stored); // this seems to have been unreliable in old PROPOSAL
-            else
+            if (energy * vcut == ecut) {
+                // expecting a kink here (issue #250)
+                EXPECT_NEAR(v, stochastic_loss_stored, 1e-1 * stochastic_loss_stored);
+            } else if (particleName == "TauMinus" && energy < 1e5) {
+                // For taus, the kinematic upper limit (v_max) introduces kinks in
+                // the function that we need to integrate. However, bremsstrahlung
+                // effects for taus are negligible for these energies (issue #250)
+                EXPECT_NEAR(v, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
+            } else if (particleName == "EMinus" && energy >= 1e10 && lpm == true) {
+                // for high-energy electrons with LPM enabled, the differential crosssetion rises for v->1, so the
+                // differential cross section becomes harder to integrate (issue #123)
+                EXPECT_NEAR(v, stochastic_loss_stored, 2e-1 * stochastic_loss_stored);
+            } else if (particleName == "EMinus" && mediumName == "uranium" && lpm == true) {
+                // Same as above, although due to the high Z of uranium, the issues
+                // becomes relevant already at lower energies (issue #123)
+                EXPECT_NEAR(v, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
+            } else if (rnd1 > 0.93 || rnd1 < 0.04) {
+                // The very high edge of the kinematic range is only poorly
+                // interpolated (see issue #253)
+                EXPECT_NEAR(v, stochastic_loss_stored, 2e-2 * stochastic_loss_stored);
+            } else {
                 EXPECT_NEAR(v, stochastic_loss_stored, interpolation_precision * stochastic_loss_stored);
+            }
 
             // cross check (this is actually the only test we are really interested in)
             if (dNdx_for_comp > 0) {
                 auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), v);
-                EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-3);
+                EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-4);
             }
+
         }
+
     }
 }
 
