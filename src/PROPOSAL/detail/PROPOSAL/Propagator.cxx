@@ -183,11 +183,18 @@ int Propagator::AdvanceParticle(ParticleState& state, double E_f,
 
     if (advancement_type != ReachedInteraction) {
         double control_distance;
+        double energy_next_interaction = E_f;
         do {
             advance_distance = AdvanceDistance[advancement_type];
-            advance_grammage = density->Calculate(
-                state.position, state.direction, advance_distance);
-            E_f = utility.EnergyDistance(state.energy, advance_grammage);
+            if (advancement_type == ReachedInteraction) {
+                // avoid recalculation if we go back to this case
+                E_f = energy_next_interaction;
+                advance_grammage = grammage_next_interaction;
+            } else {
+                E_f = utility.EnergyDistance(state.energy, advance_grammage);
+                advance_grammage = density->Calculate(
+                        state.position, state.direction, advance_distance);
+            }
 
             std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
                 advance_grammage, state.energy, E_f, state.direction, rnd);
