@@ -188,16 +188,16 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
 
         dEdx_new = cross->CalculatedEdx(energy);
 
-        if (particleName == "TauMinus" && mediumName == "uranium" && energy == 1e4)
-            EXPECT_EQ(dEdx_new, 0.); // lower limit in E for table not precise enough
-        else if (vcut * energy == ecut)
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-2 * dEdx_stored); // kink in interpolated function
-        else if (particleName == "TauMinus" && energy <= 10000)
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-2 * dEdx_stored); // integrand looks bad
-        else if (particleName == "TauMinus" && mediumName == "hydrogen" && energy <= 1e5)
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-2 * dEdx_stored); // integrand looks bad
-        else
+        if (particleName == "TauMinus" && mediumName == "uranium" && energy == 1e4) {
+            // Transition from zero to non-zero values is not continuous, causing
+            // interpolation problems in uranium around 1e4 MeV (issue #250)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e0 * dEdx_stored);
+        } else if (vcut * energy == ecut) {
+            // kink in interpolated function (issue #250)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-2 * dEdx_stored);
+        } else {
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+        }
     }
 }
 
@@ -233,12 +233,12 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
                                           config);
 
         dNdx_new = cross->CalculatedNdx(energy);
-        if (vcut * energy == ecut)
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 5e-2 * dNdx_stored);
-        else if (particleName == "TauMinus" && mediumName == "hydrogen" && energy <= 1e5)
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored); // integrand looks bad
-        else
+        if (vcut * energy == ecut) {
+            // kink in interpolated function (issue #250)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
+        } else {
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+        }
     }
 }
 
@@ -281,21 +281,36 @@ TEST(Epairproduction, Test_of_e_Interpolant)
 
         auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
 
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == INF && vcut == 1 || dNdx_for_comp == 0 ) {
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
 
-            if (rnd1 < 0.1 || rnd1 > 0.9)
+            if (energy * vcut == ecut) {
+                // kink in interpolated function (issue #250)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
-            else if (energy * vcut == ecut)
+            } else if (rnd1 < 0.1) {
+                // The lower edge of the kinematic range is poorly interpolated
+                // due to a discontinuity (issue #250)
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
+            } else if (particleName == "TauMinus" && rnd1 < 0.2) {
+                // Same as above, but the range is a bit higher for tau leptons
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
+            } else if (particleName == "TauMinus" && energy <= 1e5 && rnd1 > 0.9){
+                // The transition from zero to non-zero values in dNdx is not continuous,
+                // causing the dNdx interpolation to be worse than usual (issue #250)
+                // This error is amplified for high stochastic losses because the losses
+                // are very sensitive to changes in the cumulative crosssection.
+                // This causes the losses to be less accurate than required.
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
-            else if (particleName == "TauMinus" && energy <= 1e5)
-                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored); // integrand problems
-            else if (particleName == "EMinus" && energy >= 1e11)
+            } else if (particleName == "EMinus" && energy >= 1e10) {
+                // Artefacts in dNdx integral, causing the dNdx interpolation to
+                // have an uncertainty, which causes the stochastic losses to be
+                // not accurate enough.
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
-            else
+            } else {
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
+            }
 
             // cross check
             if (dNdx_for_comp > 0) {

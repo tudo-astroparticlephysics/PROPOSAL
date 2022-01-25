@@ -167,6 +167,7 @@ TEST(Compton, Test_of_dEdx_Interpolant)
         dEdx_new = cross->CalculatedEdx(energy);
 
         if (vcut * energy == ecut)
+            // expecting a kink here (issue #250)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-2 * dEdx_stored);
         else
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-4 * dEdx_stored);
@@ -250,6 +251,9 @@ TEST(Compton, Test_of_e_Interpolant)
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
             if (vcut * energy == ecut || rnd1 < 0.05)
+                // expecting a kink here (issue #250)
+                // The lower edge of the kinematic range is poorly interpolated
+                // due to a discontinuity (issue #250)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
             else
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);

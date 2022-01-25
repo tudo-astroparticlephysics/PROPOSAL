@@ -338,6 +338,8 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
             } else if (rnd1 > 0.93 || rnd1 < 0.04) {
                 // The very high edge of the kinematic range is only poorly
                 // interpolated (see issue #253)
+                // The lower edge of the kinematic range is poorly interpolated
+                // due to a discontinuity (issue #250)
                 EXPECT_NEAR(v, stochastic_loss_stored, 2e-2 * stochastic_loss_stored);
             } else {
                 EXPECT_NEAR(v, stochastic_loss_stored, interpolation_precision * stochastic_loss_stored);
