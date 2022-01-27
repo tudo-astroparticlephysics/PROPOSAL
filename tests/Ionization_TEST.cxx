@@ -173,10 +173,12 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
                                      config);
 
         dEdx_new = cross->CalculatedEdx(energy);
-        if (vcut * energy == ecut)
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-2 * dEdx_stored); // kink in interpolated function in this case
-        else
+        if (vcut * energy == ecut) {
+            // kink in interpolated function (issue #250)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-2 * dEdx_stored);
+        } else {
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+        }
 
     }
 }
@@ -212,12 +214,12 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
                                      config);
 
         dNdx_new = cross->CalculatedNdx(energy);
-        if (vcut * energy == ecut)
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // kink in interpolated function
-        else if (parametrization != "BetheBlochRossi" && energy == 1e4 && particleName == "TauMinus")
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // unphyical bumps in function
-        else
+        if (vcut * energy == ecut) {
+            // kink in interpolated function (issue #250)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
+        } else {
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+        }
     }
 }
 
@@ -255,16 +257,15 @@ TEST(Ionization, Test_of_e_Interpolant)
 
         auto dNdx = cross->CalculatedNdx(energy);
 
-        if (dNdx == 0)
-            continue; //TODO: This is weird because the integral tests have a non-zero value for the calculated stochastic losses here
-
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == INF && vcut == 1 || dNdx == 0) {
             EXPECT_THROW(cross->CalculateStochasticLoss(medium->GetHash(), energy, rnd1 * dNdx), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(medium->GetHash(), energy, rnd1 * dNdx);
             if (vcut * energy == ecut) {
+                // kink in interpolated function (issue #250)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
             } else if (rnd1 > 0.99) {
+                // Integration routine unstable here for very high rnd numbers (issue #254)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-1 * stochastic_loss_stored);
             } else {
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);

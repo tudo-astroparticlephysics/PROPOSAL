@@ -217,6 +217,7 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
         dEdx_new = cross->CalculatedEdx(energy);
 
         if (energy * vcut == ecut) {
+            // kink in interpolated function (issue #250)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 2e-1 * dEdx_stored);
         } else {
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
@@ -255,7 +256,8 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
         dNdx_new = cross->CalculatedNdx(energy);
 
         if (energy * vcut == ecut) {
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // kink in integrand
+            // kink in interpolated function (issue #250)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
         } else {
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
         }
@@ -304,8 +306,10 @@ TEST(Mupairproduction, Test_of_e_Interpolant)
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
             if (energy * vcut == ecut) {
+                // kink in interpolated function (issue #250)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
             } else if (rnd1 > 0.95) {
+                // dNdx interpolation for v->1 is not accurate enough (issue #253)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
             } else {
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);

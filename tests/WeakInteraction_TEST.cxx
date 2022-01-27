@@ -88,8 +88,6 @@ TEST(WeakInteraction, Test_Stochastic_Loss)
         nlohmann::json config;
         config["parametrization"] = parametrization;
 
-        if (parametrization != "CooperSarkarMertsch")
-            EXPECT_TRUE(false) << "Unknown parametrization type";
         auto secondaries = secondaries::WeakCooperSarkarMertsch(particle_def, *medium);
 
         auto components = medium->GetComponents();
