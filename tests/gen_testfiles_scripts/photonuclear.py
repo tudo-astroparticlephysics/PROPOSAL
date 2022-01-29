@@ -4,8 +4,8 @@ import numpy as np
 
 particle_defs = [
     pp.particle.MuMinusDef(),
-    pp.particle.TauMinusDef()#,
-    # pp.particle.EMinusDef()
+    pp.particle.TauMinusDef(),
+    pp.particle.EMinusDef()
 ]
 
 mediums = [
@@ -31,8 +31,8 @@ shadows = [
 ]
 
 names_shadow = [
-    "ShadowDuttaRenoSarcevicSeckel",
-    "ShadowButkevichMikheyev"
+    "DuttaRenoSarcevicSeckel",
+    "ButkevichMikheyev"
 ]
 
 energies = np.logspace(4, 13, num=10)
@@ -68,6 +68,9 @@ def create_tables_real(dir_name, **kwargs):
                         pp.parametrization.photonuclear.Kokoulin(hard)
                     ]
 
+                    if (particle.name == "EMinus" and hard == 1):
+                        continue # no hard component tables for EMinusDef
+
                     for parametrization in parametrizations:
                         args = {
                             "parametrization": parametrization,
@@ -85,20 +88,20 @@ def create_tables_real(dir_name, **kwargs):
 
                             for energy in energies:
                                 if key == "dEdx":
-                                    result = [str(xsection.calculate_dEdx(energy) * medium.mass_density)]
+                                    result = [str(xsection.calculate_dEdx(energy))]
                                 if key == "dNdx":
-                                    result = [str(xsection.calculate_dNdx(energy) * medium.mass_density)]
+                                    result = [str(xsection.calculate_dNdx(energy))]
                                 if key == "stoch":
                                     rnd1 = pp.RandomGenerator.get().random_double()
                                     rnd2 = pp.RandomGenerator.get().random_double()
 
                                     components = medium.components
                                     comp = components[int(rnd2*len(components))]
-                                    dNdx_for_comp = xsection.calculate_dNdx(energy, comp.hash);
+                                    dNdx_for_comp = xsection.calculate_dNdx(energy, comp.hash)
 
                                     if np.isfinite(cut.ecut) or cut.vcut < 1:
                                         result = xsection.calculate_stochastic_loss(
-                                            comp.hash, energy, rnd1*dNdx_for_comp) * energy
+                                            comp.hash, energy, rnd1*dNdx_for_comp)
                                     else:
                                         result = 0
                                     result = [str(rnd1), str(rnd2), str(result)]
@@ -110,9 +113,9 @@ def create_tables_real(dir_name, **kwargs):
                                 buf[key][1].append(str(cut.vcut))
                                 buf[key][1].append(str(multiplier))
                                 buf[key][1].append(str(energy))
-                                buf[key][1].append(str(hard))
-                                buf[key][1].append(xsection.param_name)
                                 buf[key][1].extend(result)
+                                buf[key][1].append(xsection.param_name)
+                                buf[key][1].append(str(hard))
                                 buf[key][1].append("\n")
 
                             buf[key][0].write("\t".join(buf[key][1]))
@@ -169,9 +172,9 @@ def create_tables_Q2(dir_name, **kwargs):
 
                             for energy in energies:
                                 if key == "dEdx":
-                                    result = [str(xsection.calculate_dEdx(energy) * medium.mass_density)]
+                                    result = [str(xsection.calculate_dEdx(energy))]
                                 if key == "dNdx":
-                                    result = [str(xsection.calculate_dNdx(energy) * medium.mass_density)]
+                                    result = [str(xsection.calculate_dNdx(energy))]
                                 if key == "stoch":
                                     rnd1 = pp.RandomGenerator.get().random_double()
                                     rnd2 = pp.RandomGenerator.get().random_double()
@@ -182,7 +185,7 @@ def create_tables_Q2(dir_name, **kwargs):
 
                                     if np.isfinite(cut.ecut) or cut.vcut < 1:
                                         result = xsection.calculate_stochastic_loss(
-                                            comp.hash, energy, rnd1*dNdx_for_comp) * energy
+                                            comp.hash, energy, rnd1*dNdx_for_comp)
                                     else:
                                         result = 0
                                     result = [str(rnd1), str(rnd2), str(result)]
@@ -194,9 +197,9 @@ def create_tables_Q2(dir_name, **kwargs):
                                 buf[key][1].append(str(cut.vcut))
                                 buf[key][1].append(str(multiplier))
                                 buf[key][1].append(str(energy))
-                                buf[key][1].append(name_shadow)
-                                buf[key][1].append(xsection.param_name)
                                 buf[key][1].extend(result)
+                                buf[key][1].append(xsection.param_name)
+                                buf[key][1].append(name_shadow)
                                 buf[key][1].append("\n")
 
                             buf[key][0].write("\t".join(buf[key][1]))

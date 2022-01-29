@@ -16,8 +16,12 @@ mediums = [
 
 multiplier = 1.
 
-weak = [
+params = [
     pp.parametrization.weakinteraction.CooperSarkarMertsch(),
+]
+
+secondaries = [
+    pp.secondaries.WeakCooperSarkarMertsch,
 ]
 
 energies = np.logspace(4, 13, num=10)
@@ -27,21 +31,19 @@ def create_tables(dir_name, **kwargs):
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    params = weak
-
     buf = {}
 
     for key in kwargs:
         if key == "dNdx" and kwargs[key] is True:
             f_dNdx = open(dir_name + "Weak_dNdx.txt", "w")
             buf["dNdx"] = [f_dNdx, [""]]
-        # if key == "stoch" and kwargs[key] is True:
-        #     f_stoch = open(dir_name + "Weak_e.txt", "w")
-        #     buf["stoch"] = [f_stoch, [""]]
+        if key == "stoch" and kwargs[key] is True:
+            f_stoch = open(dir_name + "Weak_e.txt", "w")
+            buf["stoch"] = [f_stoch, [""]]
 
     for particle in particle_defs:
         for medium in mediums:
-            for param in params:
+            for param, secondary in zip(params, secondaries):
 
                 args = {
                     "parametrization": param,
@@ -52,24 +54,23 @@ def create_tables(dir_name, **kwargs):
                 }
 
                 xsection = pp.crosssection.make_crosssection(**args)
+                sec_calculator = secondary(particle, medium)
 
                 for key in buf:
                     buf[key][1] = [""]
 
                     for energy in energies:
                         if key == "dNdx":
-                            result = [str(xsection.calculate_dNdx(energy) * medium.mass_density)]
-                        # if key == "stoch":
-                        #     rnd1 = pp.RandomGenerator.get().random_double()
-                        #     rnd2 = pp.RandomGenerator.get().random_double()
+                            result = [str(xsection.calculate_dNdx(energy))]
+                        if key == "stoch":
+                            rnd1 = pp.RandomGenerator.get().random_double()
+                            rnd2 = pp.RandomGenerator.get().random_double()
 
-                        #     components = medium.components
-                        #     comp = components[int(rnd2*len(components))]
-                        #     dNdx_for_comp = xsection.calculate_dNdx(energy, comp.hash);
+                            components = medium.components
+                            comp = components[int(rnd2*len(components))]
 
-                        #     result = xsection.calculate_stochastic_loss(
-                        #         comp.hash, energy, rnd1*dNdx_for_comp) * energy
-                        #     result = [str(rnd1), str(rnd2), str(result)]
+                            result = sec_calculator.calculate_relative_loss(energy, rnd1, comp)
+                            result = [str(rnd1), str(rnd2), str(result)]
 
                         buf[key][1].append(particle.name)
                         buf[key][1].append(medium.name)

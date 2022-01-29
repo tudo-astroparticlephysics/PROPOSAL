@@ -27,153 +27,6 @@ ParticleDef getParticleDef(const std::string& name)
     }
 }
 
-const std::string testfile_dir = "tests/TestFiles/";
-
-// TEST(Comparison, Comparison_equal)
-// {
-//     ParticleDef particle_def = MuMinusDef::Get();
-//     auto medium = std::make_shared<const Water>();
-//     EnergyCutSettings ecuts;
-//     double multiplier = 1.;
-//     bool lpm          = true;
-
-//     EpairProductionRhoIntegral* EpairInt_A =
-//         new EpairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier, lpm);
-//     Parametrization* EpairInt_B = new EpairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier, lpm);
-//     EXPECT_TRUE(*EpairInt_A == *EpairInt_B);
-
-//     EpairKelnerKokoulinPetrukhin param_int(particle_def, medium, ecuts, multiplier, lpm);
-//     EXPECT_TRUE(param_int == *EpairInt_A);
-
-//     EpairIntegral* Int_A        = new EpairIntegral(param_int);
-//     CrossSectionIntegral* Int_B = new EpairIntegral(param_int);
-//     EXPECT_TRUE(*Int_A == *Int_B);
-
-//     InterpolationDef InterpolDef;
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin>* EpairInterpol_A =
-//         new EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
-//     Parametrization* EpairInterpol_B =
-//         new EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
-//     EXPECT_TRUE(*EpairInterpol_A == *EpairInterpol_B);
-
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> param_interpol(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
-//     EXPECT_TRUE(param_interpol == *EpairInterpol_A);
-
-//     EpairInterpolant* Interpol_A        = new EpairInterpolant(param_interpol, InterpolDef);
-//     CrossSectionInterpolant* Interpol_B = new EpairInterpolant(param_interpol, InterpolDef);
-//     EXPECT_TRUE(*Interpol_A == *Interpol_B);
-
-//     delete EpairInt_A;
-//     delete EpairInt_B;
-//     delete Int_A;
-//     delete Int_B;
-//     delete EpairInterpol_A;
-//     delete EpairInterpol_B;
-//     delete Interpol_A;
-//     delete Interpol_B;
-// }
-
-// TEST(Comparison, Comparison_not_equal)
-// {
-//     ParticleDef mu_def  = MuMinusDef::Get();
-//     ParticleDef tau_def = TauMinusDef::Get();
-//     auto medium_1 = std::make_shared<const Water>();
-//     auto medium_2 = std::make_shared<const Ice>();
-//     EnergyCutSettings ecuts_1(500, -1);
-//     EnergyCutSettings ecuts_2(-1, 0.05);
-//     double multiplier_1 = 1.;
-//     double multiplier_2 = 2.;
-//     bool lpm_1          = true;
-//     bool lpm_2          = false;
-
-//     EpairKelnerKokoulinPetrukhin EpairInt_A(mu_def, medium_1, ecuts_1, multiplier_1, lpm_1);
-//     EpairKelnerKokoulinPetrukhin EpairInt_B(tau_def, medium_1, ecuts_1, multiplier_1, lpm_1);
-//     EpairKelnerKokoulinPetrukhin EpairInt_C(mu_def, medium_2, ecuts_1, multiplier_1, lpm_1);
-//     EpairKelnerKokoulinPetrukhin EpairInt_D(mu_def, medium_1, ecuts_2, multiplier_1, lpm_1);
-//     EpairKelnerKokoulinPetrukhin EpairInt_E(mu_def, medium_1, ecuts_1, multiplier_2, lpm_1);
-//     EpairKelnerKokoulinPetrukhin EpairInt_F(mu_def, medium_1, ecuts_1, multiplier_1, lpm_2);
-//     EXPECT_TRUE(EpairInt_A != EpairInt_B);
-//     EXPECT_TRUE(EpairInt_A != EpairInt_C);
-//     EXPECT_TRUE(EpairInt_A != EpairInt_D);
-//     EXPECT_TRUE(EpairInt_A != EpairInt_E);
-//     EXPECT_TRUE(EpairInt_A != EpairInt_F);
-
-//     EpairIntegral Int_A(EpairInt_A);
-//     EpairIntegral Int_B(EpairInt_B);
-//     EXPECT_TRUE(Int_A != Int_B);
-
-//     InterpolationDef InterpolDef;
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_A(mu_def, medium_1, ecuts_1, multiplier_1, lpm_1, InterpolDef);
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_B(tau_def, medium_1, ecuts_1, multiplier_1, lpm_1, InterpolDef);
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_C(mu_def, medium_2, ecuts_1, multiplier_1, lpm_1, InterpolDef);
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_D(mu_def, medium_1, ecuts_2, multiplier_1, lpm_1, InterpolDef);
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_E(mu_def, medium_1, ecuts_1, multiplier_2, lpm_1, InterpolDef);
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_F(mu_def, medium_1, ecuts_1, multiplier_1, lpm_2, InterpolDef);
-//     EXPECT_TRUE(EpairInterpol_A != EpairInterpol_B);
-//     EXPECT_TRUE(EpairInterpol_A != EpairInterpol_C);
-//     EXPECT_TRUE(EpairInterpol_A != EpairInterpol_D);
-//     EXPECT_TRUE(EpairInterpol_A != EpairInterpol_E);
-//     EXPECT_TRUE(EpairInterpol_A != EpairInterpol_F);
-
-//     EpairInterpolant Interpol_A(EpairInterpol_A, InterpolDef);
-//     EpairInterpolant Interpol_B(EpairInterpol_B, InterpolDef);
-//     EXPECT_TRUE(Interpol_A != Interpol_B);
-// }
-
-// TEST(Assignment, Copyconstructor)
-// {
-//     ParticleDef particle_def = MuMinusDef::Get();
-//     auto medium = std::make_shared<const Water>();
-//     EnergyCutSettings ecuts;
-//     double multiplier = 1.;
-//     bool lpm          = true;
-
-//     EpairKelnerKokoulinPetrukhin EpairInt_A(particle_def, medium, ecuts, multiplier, lpm);
-//     EpairKelnerKokoulinPetrukhin EpairInt_B = EpairInt_A;
-//     EXPECT_TRUE(EpairInt_A == EpairInt_B);
-
-//     EpairIntegral Int_A(EpairInt_A);
-//     EpairIntegral Int_B = Int_A;
-//     EXPECT_TRUE(Int_A == Int_B);
-
-//     InterpolationDef InterpolDef;
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_A(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_B = EpairInterpol_A;
-//     EXPECT_TRUE(EpairInterpol_A == EpairInterpol_B);
-
-//     EpairInterpolant Interpol_A(EpairInterpol_A, InterpolDef);
-//     EpairInterpolant Interpol_B = Interpol_A;
-//     EXPECT_TRUE(Interpol_A == Interpol_B);
-// }
-
-// TEST(Assignment, Copyconstructor2)
-// {
-//     ParticleDef particle_def = MuMinusDef::Get();
-//     auto medium = std::make_shared<const Water>();
-//     EnergyCutSettings ecuts;
-//     double multiplier = 1.;
-//     bool lpm          = true;
-
-//     EpairKelnerKokoulinPetrukhin EpairInt_A(particle_def, medium, ecuts, multiplier, lpm);
-//     EpairKelnerKokoulinPetrukhin EpairInt_B(EpairInt_A);
-//     EXPECT_TRUE(EpairInt_A == EpairInt_B);
-
-//     EpairIntegral Int_A(EpairInt_A);
-//     EpairIntegral Int_B(Int_A);
-//     EXPECT_TRUE(Int_A == Int_B);
-
-//     InterpolationDef InterpolDef;
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_A(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
-//     EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_B(EpairInterpol_A);
-//     EXPECT_TRUE(EpairInterpol_A == EpairInterpol_B);
-
-//     EpairInterpolant Interpol_A(EpairInterpol_A, InterpolDef);
-//     EpairInterpolant Interpol_B(Interpol_A);
-//     EXPECT_TRUE(Interpol_A == Interpol_B);
-// }
-
-// in polymorphism an assignmant and swap operator doesn't make sense
-
 TEST(Epairproduction, Test_of_dEdx)
 {
     std::ifstream in;
@@ -191,17 +44,10 @@ TEST(Epairproduction, Test_of_dEdx)
     double dEdx_stored;
     double dEdx_new;
 
-    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dEdx_stored)
-    {
-        parametrization.erase(0,5);
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+        >> lpm >> energy >> parametrization >> dEdx_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -212,7 +58,7 @@ TEST(Epairproduction, Test_of_dEdx)
         auto cross = make_epairproduction(particle_def, *medium, ecuts,
                                           false, config);
 
-        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
+        dEdx_new = cross->CalculatedEdx(energy);
         EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-5 * dEdx_stored);
     }
 }
@@ -234,17 +80,10 @@ TEST(Epairproduction, Test_of_dNdx)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dNdx_stored)
-    {
-        parametrization.erase(0,5);
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>
+        lpm >> energy >> parametrization >> dNdx_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -255,7 +94,7 @@ TEST(Epairproduction, Test_of_dNdx)
         auto cross = make_epairproduction(particle_def, *medium, ecuts, false,
                                           config);
 
-        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
+        dNdx_new = cross->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
     }
@@ -282,17 +121,10 @@ TEST(Epairproduction, Test_Stochastic_Loss)
     std::cout.precision(16);
     RandomGenerator::Get().SetSeed(0);
 
-    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
-    {
-        parametrization.erase(0,5);
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>
+        lpm >> energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -303,29 +135,21 @@ TEST(Epairproduction, Test_Stochastic_Loss)
         auto cross = make_epairproduction(particle_def, *medium, ecuts, false,
                                           config);
 
-        auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = medium->GetComponents();
-        double sum = 0;
+        auto comp = components.at(int(rnd2 * components.size()));
 
-        for (auto comp : components)
-        {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
-            sum += dNdx_for_comp;
-            if (sum > dNdx_full * rnd2) {
-                double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF && vcut == 1 ) {
-                    #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
-                    #endif
-                } else {
-                    auto v =  cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                    EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);
+        auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
 
-                    // cross check
-                    auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), v);
-                    EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-3);
-                    break;
-                }
+        if ( ecut == INF && vcut == 1 ) {
+            EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
+        } else {
+            auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
+            EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
+
+            // cross check
+            if (dNdx_for_comp > 0) {
+                auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), stochastic_loss);
+                EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-3);
             }
         }
     }
@@ -348,17 +172,10 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
     double dEdx_stored;
     double dEdx_new;
 
-    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dEdx_stored)
-    {
-        parametrization.erase(0,5);
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+        >> lpm >> energy >> parametrization >> dEdx_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -369,18 +186,18 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
         auto cross = make_epairproduction(particle_def, *medium, ecuts, true,
                                           config);
 
-        dEdx_new = cross->CalculatedEdx(energy) * medium->GetMassDensity();
+        dEdx_new = cross->CalculatedEdx(energy);
 
-        if (particleName == "TauMinus" && mediumName == "uranium" && energy == 1e4)
-            EXPECT_EQ(dEdx_new, 0.); // lower limit in E for table not precise enough
-        else if (vcut * energy == ecut)
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-2 * dEdx_stored); // kink in interpolated function
-        else if (particleName == "TauMinus" && energy <= 10000)
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-2 * dEdx_stored); // integrand looks bad
-        else if (particleName == "TauMinus" && mediumName == "hydrogen" && energy <= 1e5)
-            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-2 * dEdx_stored); // integrand looks bad
-        else
+        if (particleName == "TauMinus" && mediumName == "uranium" && energy == 1e4) {
+            // Transition from zero to non-zero values is not continuous, causing
+            // interpolation problems in uranium around 1e4 MeV (issue #250)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e0 * dEdx_stored);
+        } else if (vcut * energy == ecut) {
+            // kink in interpolated function (issue #250)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-2 * dEdx_stored);
+        } else {
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+        }
     }
 }
 
@@ -401,17 +218,10 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
     double dNdx_stored;
     double dNdx_new;
 
-    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> dNdx_stored)
-    {
-        parametrization.erase(0,5);
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+        >> lpm >> energy >> parametrization >> dNdx_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -422,17 +232,17 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
         auto cross = make_epairproduction(particle_def, *medium, ecuts, true,
                                           config);
 
-        dNdx_new = cross->CalculatedNdx(energy) * medium->GetMassDensity();
-        if (vcut * energy == ecut)
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 5e-2 * dNdx_stored);
-        else if (particleName == "TauMinus" && mediumName == "hydrogen" && energy <= 1e5)
-            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored); // integrand looks bad
-        else
+        dNdx_new = cross->CalculatedNdx(energy);
+        if (vcut * energy == ecut) {
+            // kink in interpolated function (issue #250)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
+        } else {
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+        }
     }
 }
 
-TEST(Epairproduction, Test_of_e_interpol)
+TEST(Epairproduction, Test_of_e_Interpolant)
 {
     std::ifstream in;
     getTestFile("Epair_e.txt", in);
@@ -452,16 +262,10 @@ TEST(Epairproduction, Test_of_e_interpol)
 
     RandomGenerator::Get().SetSeed(0);
 
-    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored)
-    {        parametrization.erase(0,5);
-        if (vcut == -1)
-            vcut = 1;
-        if (ecut == -1)
-            ecut = INF;
+    while (in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+        >> lpm >> energy >> parametrization >> rnd1 >> rnd2 >> stochastic_loss_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
-        if (mediumName == "ice" || mediumName == "water")
-            mediumName += "PDG2001";
         auto medium = CreateMedium(mediumName);
         auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
 
@@ -472,37 +276,46 @@ TEST(Epairproduction, Test_of_e_interpol)
         auto cross = make_epairproduction(particle_def, *medium, ecuts, true,
                                           config);
 
-        auto dNdx_full = cross->CalculatedNdx(energy);
         auto components = medium->GetComponents();
-        double sum = 0;
+        auto comp = components.at(int(rnd2 * components.size()));
 
-        for (auto comp : components)
-        {
-            double dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
-            sum += dNdx_for_comp;
-            if (sum > dNdx_full * rnd2) {
-                double rate_new = dNdx_for_comp * rnd1;
-                if (ecut == INF && vcut == 1 ) {
-                    #ifndef NDEBUG
-                    EXPECT_DEATH(cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new), "");
-                    #endif
-                } else {
-                    auto v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rate_new);
-                    if (rnd1 < 0.1 || rnd1 > 0.9)
-                        EXPECT_NEAR(v * energy, stochastic_loss_stored, 5E-2 * stochastic_loss_stored);
-                    else if (energy * vcut == ecut)
-                        EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-2 * stochastic_loss_stored);
-                    else if (particleName == "TauMinus" && energy <= 1e5)
-                        EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-2 * stochastic_loss_stored); // integrand problems
-                    else if (particleName == "EMinus" && energy >= 1e11)
-                        EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-2 * stochastic_loss_stored);
-                    else
-                        EXPECT_NEAR(v * energy, stochastic_loss_stored, 1E-3 * stochastic_loss_stored);
-                    // cross check
-                    auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), v);
-                    EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-3); // this is actually important
-                    break;
-                }
+        auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
+
+        if ( ecut == INF && vcut == 1 || dNdx_for_comp == 0 ) {
+            EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
+        } else {
+            auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
+
+            if (energy * vcut == ecut) {
+                // kink in interpolated function (issue #250)
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
+            } else if (rnd1 < 0.1) {
+                // The lower edge of the kinematic range is poorly interpolated
+                // due to a discontinuity (issue #250)
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
+            } else if (particleName == "TauMinus" && rnd1 < 0.2) {
+                // Same as above, but the range is a bit higher for tau leptons
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
+            } else if (particleName == "TauMinus" && energy <= 1e5 && rnd1 > 0.9){
+                // The transition from zero to non-zero values in dNdx is not continuous,
+                // causing the dNdx interpolation to be worse than usual (issue #250)
+                // This error is amplified for high stochastic losses because the losses
+                // are very sensitive to changes in the cumulative crosssection.
+                // This causes the losses to be less accurate than required.
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
+            } else if (particleName == "EMinus" && energy >= 1e10) {
+                // Artefacts in dNdx integral, causing the dNdx interpolation to
+                // have an uncertainty, which causes the stochastic losses to be
+                // not accurate enough.
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
+            } else {
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
+            }
+
+            // cross check
+            if (dNdx_for_comp > 0) {
+                auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), stochastic_loss);
+                EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-3);
             }
         }
     }

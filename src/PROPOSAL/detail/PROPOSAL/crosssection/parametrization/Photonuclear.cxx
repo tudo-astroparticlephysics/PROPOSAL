@@ -33,7 +33,7 @@ crosssection::HardComponent::HardComponent(const ParticleDef& particle_def)
     } else {
         Logging::Get("proposal.parametrization")
             ->error(
-                "No HardComponent tables provided for the given particle %s",
+                "No HardComponent tables provided for the given particle {}",
                 particle_def.name.c_str());
     }
 }

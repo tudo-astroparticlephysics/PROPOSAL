@@ -135,9 +135,13 @@ void init_secondaries(py::module& m)
         secondaries::PhotoPairProduction> {}
         .decl_rho_param(m_sub, "PhotoKochMotzForwardPeaked");
 
-    SecondariesBuilder<secondaries::WeakCooperSarkarMertsch,
-        secondaries::WeakInteraction> {}
-        .decl_param(m_sub, "WeakCooperSarkarMertsch");
+    py::class_<secondaries::WeakCooperSarkarMertsch, secondaries::WeakInteraction,
+        std::shared_ptr<secondaries::WeakCooperSarkarMertsch>>(m_sub,
+                "WeakCooperSarkarMertsch")
+        .def(py::init<ParticleDef, Medium>(), py::arg("particle_def"),
+             py::arg("medium"))
+        .def("calculate_relative_loss", &secondaries::WeakCooperSarkarMertsch::CalculateRelativeLoss,
+             py::arg("energy"), py::arg("rnd"), py::arg("component"));
 
     py::class_<SecondariesCalculator, std::shared_ptr<SecondariesCalculator>>(
         m_sub, "SecondariesCalculator")

@@ -65,25 +65,27 @@ def create_tables(dir_name, **kwargs):
 
                     xsection = pp.crosssection.make_crosssection(**args)
 
+                    if (xsection.param_name == "BergerSeltzerMoller" or xsection.param_name == "BergerSeltzerBhabha"):
+                        if (particle.name != "EMinus"):
+                            continue # do not test BergerSeltzer formula for heavier leptons
+
                     for key in buf:
                         buf[key][1] = [""]
 
                         for energy in energies:
                             if key == "dEdx":
-                                result = [str(xsection.calculate_dEdx(energy) * medium.mass_density)]
+                                result = [str(xsection.calculate_dEdx(energy))]
                             if key == "dNdx":
-                                result = [str(xsection.calculate_dNdx(energy) * medium.mass_density)]
+                                result = [str(xsection.calculate_dNdx(energy))]
                             if key == "stoch":
                                 rnd1 = pp.RandomGenerator.get().random_double()
                                 rnd2 = pp.RandomGenerator.get().random_double()
 
-                                components = medium.components
-                                comp = components[int(rnd2*len(components))]
-                                dNdx_for_comp = xsection.calculate_dNdx(energy, medium.hash);
+                                dNdx = xsection.calculate_dNdx(energy);
 
                                 if np.isfinite(cut.ecut) or cut.vcut < 1:
                                     result = xsection.calculate_stochastic_loss(
-                                        medium.hash, energy, rnd1*dNdx_for_comp) * energy
+                                        medium.hash, energy, rnd1*dNdx)
                                 else:
                                     result = 0
                                 result = [str(rnd1), str(rnd2), str(result)]
@@ -94,8 +96,8 @@ def create_tables(dir_name, **kwargs):
                             buf[key][1].append(str(cut.vcut))
                             buf[key][1].append(str(multiplier))
                             buf[key][1].append(str(energy))
-                            buf[key][1].append(xsection.param_name)
                             buf[key][1].extend(result)
+                            buf[key][1].append(xsection.param_name)
                             buf[key][1].append("\n")
 
                         buf[key][0].write("\t".join(buf[key][1]))
