@@ -286,11 +286,12 @@ void init_parametrization(py::module& m)
     py::class_<crosssection::BremsLPM, std::shared_ptr<crosssection::BremsLPM>>(
         m_sub_brems, "brems_lpm")
         .def(py::init<const ParticleDef&, const Medium&,
-                 const crosssection::Bremsstrahlung&, double>(),
+                 const crosssection::Bremsstrahlung&>(),
             py::arg("particle_def"), py::arg("medium"),
-            py::arg("bremsstrahlung"), py::arg("density_correction") = 1.0)
+            py::arg("bremsstrahlung"))
         .def("supression_factor", &crosssection::BremsLPM::suppression_factor,
-            py::arg("energy"), py::arg("v"), py::arg("component"));
+            py::arg("energy"), py::arg("v"), py::arg("component"),
+            py::arg("density_correction") = 1.0);
 
     // ---------------------------------------------------------------------
     // // Epair
@@ -355,12 +356,11 @@ void init_parametrization(py::module& m)
 
     py::class_<crosssection::EpairLPM, std::shared_ptr<crosssection::EpairLPM>>(
         m_sub_epair, "epair_lpm")
-        .def(py::init<const ParticleDef&, const Medium&, double>(),
-            py::arg("particle_def"), py::arg("medium"),
-            py::arg("density_correction") = 1.0)
+        .def(py::init<const ParticleDef&, const Medium&>(),
+            py::arg("particle_def"), py::arg("medium"))
         .def("supression_factor", &crosssection::EpairLPM::suppression_factor,
             py::arg("energy"), py::arg("v"), py::arg("r2"), py::arg("beta"),
-            py::arg("xi"));
+            py::arg("xi"), py::arg("density_correction") = 1.0);
 
     // --------------------------------------------------------------------- //
     // Annihilation

@@ -143,8 +143,9 @@ std::tuple<Cartesian3D, Cartesian3D> PropagationUtility::DirectionsScatter(
 {
     if (collection.scattering) {
         std::array<double, 4> random_numbers;
-        for (auto& r : random_numbers)
-            r = rnd();
+        for (size_t i = 0; i < collection.scattering->MultipleScatteringRandomNumbers(); i++) {
+            random_numbers.at(i) = rnd();
+        }
         auto random_angles = collection.scattering->CalculateMultipleScattering(
             displacement, initial_energy, final_energy, random_numbers);
 

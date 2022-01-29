@@ -64,7 +64,7 @@ double crosssection::PhotoQ2Integral::DifferentialCrossSection(
 
     aux *= NA / comp.GetAtomicNum() * p_def.charge * p_def.charge;
 
-    return aux;
+    return std::max(aux, 0.);
 }
 
 Q2_PHOTO_PARAM_INTEGRAL_IMPL(AbramowiczLevinLevyMaor91)
