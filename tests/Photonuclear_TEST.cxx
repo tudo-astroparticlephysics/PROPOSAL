@@ -152,7 +152,13 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
             // cross check
             if (dNdx_for_comp > 0) {
                 auto rate_rnd = cross->CalculateCumulativeCrosssection(energy, comp.GetHash(), stochastic_loss);
-                EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 5e-3);
+                if (energy >= 1e10 && hard_component == true) {
+                    // Integration issues in dNdx due to a discontinuity in the
+                    // differential cross section (issue #124)
+                    EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 5e-3);
+                } else {
+                    EXPECT_NEAR(rate_rnd/dNdx_for_comp, rnd1, 1e-3);
+                }
             }
         }
     }
@@ -193,18 +199,15 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
 
         dEdx_new = cross->CalculatedEdx(energy);
 
-        if (hard_component == 1 && energy == 1e5)
-            EXPECT_NEAR(dEdx_new, dEdx_stored,
-                1e-1 * dEdx_stored); // kink in function (see issue #124)
-        else if (vcut * energy == ecut)
-            EXPECT_NEAR(
-                dEdx_new, dEdx_stored, 1e-1 * dEdx_stored); // kink in function
-        else if (parametrization == "Rhode" && energy <= 10000)
-            EXPECT_NEAR(dEdx_new, dEdx_stored,
-                1e-2 * dEdx_stored); // slight "bumps" in function, hard to
-                                     // interpolate
-        else
+        if (hard_component == 1 && energy == 1e5) {
+            // kink in differential cross section (see issue #124)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored);
+        } else if (vcut * energy == ecut) {
+            // kink in interpolated function (issue #250)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored);
+        } else {
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+        }
     }
 }
 
@@ -243,20 +246,20 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
 
         dNdx_new = cross->CalculatedNdx(energy);
         if (energy * vcut == ecut) {
-            EXPECT_NEAR(
-                    dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // kink in function
+            // kink in interpolated function (issue #250)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
         } else if (hard_component == 1 && energy >= 1e10) {
-            EXPECT_NEAR(dNdx_new, dNdx_stored,
-                        1e-2 * dNdx_stored); // for high E, high_component correction
-                        // produces artefacts due to hard cutoff
-                        // for v=1e-7 in differential cross section
-                        // (see issue #124)
+            // for high E, the high_component correction produces artefacts due
+            // to a hard cutoff for v=1e-7 in the differential crosssection
+            // (issue #124)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored);
         } else if (hard_component == 1 && energy == 1e5) {
-            EXPECT_NEAR(dNdx_new, dNdx_stored,
-                        1e-1 * dNdx_stored); // kink in hard_component for E=1e5 (see
-                        // issue #124)
+            // kink in differential crosssection when hard_component is enabled
+            // at around 1e5 MeV (issue #124)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
         } else if (parametrization == "Rhode" && energy == 1e4) {
-            // rhode parametrization hard to interpolate for this energy range
+            // Rhode parametrization hard to interpolate for this energy range
+            // due to its complicated structure
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored);
         } else {
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
@@ -311,16 +314,45 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
-            if ( rnd1 < 0.05 || rnd1 > 0.95) {
+
+            if ( rnd1 < 0.05 && ecut == 500) {
+                // Not enough nodes at very small losses!
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
+            } else if (rnd1 < 0.02) {
+                // The lower edge of the kinematic range is poorly interpolated
+                // due to a discontinuity for v -> v_cut (issue #250)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
             } else if (hard_component == 1 && energy >= 1e10) {
+                // for high E, the high_component correction produces artefacts due
+                // to a hard cutoff for v=1e-7 in the differential crosssection
+                // (issue #124)
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-1 * stochastic_loss_stored);
+            } else if (energy >= 1e10 && ecut == 500) {
+                // for high E, there are integration problems also without the
+                // hard component, causing problems in the dNdx interpolation
+                // (issue #124)
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-1 * stochastic_loss_stored);
+            } else if (particleName == "TauMinus" && energy >= 1e8 && ecut == 500) {
+                // same issue as above, but it starts earlier when taus are involved
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
             } else if (hard_component == 1 && energy == 1e5) {
-                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
+                    // kink in differential crosssection when hard_component is enabled
+                    // at around 1e5 MeV (issue #124)
+                    EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
             } else if (parametrization == "Rhode" && energy == 1e4) {
-                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
+                // Rhode parametrization hard to interpolate for this energy range
+                // due to its complicated structure
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
             } else if (vcut * energy == ecut) {
+                // kink in interpolated function (issue #250)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
+            } else if (rnd1 > 0.98) {
+                // inaccurate dNdx interpolant for v->1
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-1 * stochastic_loss_stored);
+            } else if (particleName == "EMinus" && ecut == 500) {
+                // Jump in integrated functions are seen almost everywhere for
+                // electrons (issue #124)
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-3 * stochastic_loss_stored);
             } else {
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
             }
@@ -504,17 +536,12 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
             = make_photonuclearQ2(particle_def, *medium, ecuts, true, config);
 
         dEdx_new = cross->CalculatedEdx(energy);
-        if (ecut == vcut * energy)
-            EXPECT_NEAR(
-                dEdx_new, dEdx_stored, 1e-1 * dEdx_stored); // kink in integral
-        else if (parametrization == "AbramowiczLevinLevyMaor91"
-            && shadowing == "ButkevichMikheyev" && particleName == "MuMinus"
-            && energy == 100000000000 && ecut == INF && vcut == 1)
-            EXPECT_NEAR(dEdx_new, dEdx_stored,
-                1e-2 * dEdx_stored); // bump in integral for these specific
-                                     // parameter
-        else
+        if (ecut == vcut * energy) {
+            // kink in interpolated function (issue #250)
+            EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored);
+        } else {
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
+        }
     }
 }
 
@@ -552,11 +579,12 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
             = make_photonuclearQ2(particle_def, *medium, ecuts, true, config);
 
         dNdx_new = cross->CalculatedNdx(energy);
-        if (energy * vcut == ecut)
-            EXPECT_NEAR(
-                dNdx_new, dNdx_stored, 1e-1 * dNdx_stored); // kink in integral
-        else
+        if (energy * vcut == ecut) {
+            // kink in interpolated function (issue #250)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
+        } else {
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+        }
     }
 }
 
@@ -605,7 +633,25 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
-            EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
+
+            if (energy * vcut == ecut) {
+                // kink in interpolated function (issue #250)
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-1 * stochastic_loss_stored);
+            } else if (rnd1 < 0.07 || rnd1 > 0.995) {
+                // The lower edge of the kinematic range is poorly interpolated
+                // due to a discontinuity (issue #250)
+                // inaccurate dNdx interpolant for v->1
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
+            } else if (parametrization == "AbtFT" && energy >= 1e10) {
+                // problems with integration, leading to kinks in integrated
+                // function for high energies (issue #124)
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
+            } else if (parametrization == "ButkevichMikheyev" && energy == 100000000000 && rnd1 < 0.1) {
+                // combination of issue #250 and issue #124
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-3 * stochastic_loss_stored);
+            } else {
+                EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
+            }
 
             // cross check
             if (dNdx_for_comp > 0) {

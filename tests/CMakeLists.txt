@@ -3,7 +3,7 @@ SET(CMAKE_CXX_STANDARD 17)
 include(GoogleTest)
 
 SET(RESOURCE_URL https://proposal.app.tu-dortmund.de/resources)
-SET(TEST_FILES TestFiles-2022-01-10.tar.gz)
+SET(TEST_FILES TestFiles-2022-01-28.tar.gz)
 
 # download the test files
 add_custom_command(OUTPUT TestFiles
