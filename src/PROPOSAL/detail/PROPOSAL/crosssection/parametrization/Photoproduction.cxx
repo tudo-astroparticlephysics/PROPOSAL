@@ -60,8 +60,7 @@ std::vector<std::pair<size_t, double>> crosssection::Photoproduction::Calculated
 
 // Zeus
 crosssection::PhotoproductionZeus::PhotoproductionZeus() {
-    hash_combine(hash, crosssection::ParametrizationName<
-            std::remove_cv_t<std::remove_pointer_t<decltype(this)>>>::value);
+    hash_combine(hash, std::string(crosssection::ParametrizationName<PhotoproductionZeus>::value));
 };
 
 std::unique_ptr<crosssection::ParametrizationDirect> crosssection::PhotoproductionZeus::clone() const {
@@ -84,8 +83,7 @@ double crosssection::PhotoproductionZeus::PhotonNucleonCrossSection(double energ
 
 // BezrukovBugaev
 crosssection::PhotoproductionBezrukovBugaev::PhotoproductionBezrukovBugaev() {
-    hash_combine(hash, crosssection::ParametrizationName<
-            std::remove_cv_t<std::remove_pointer_t<decltype(this)>>>::value);
+    hash_combine(hash, std::string(crosssection::ParametrizationName<PhotoproductionBezrukovBugaev>::value));
 };
 
 std::unique_ptr<crosssection::ParametrizationDirect> crosssection::PhotoproductionBezrukovBugaev::clone() const {
@@ -108,8 +106,7 @@ double crosssection::PhotoproductionBezrukovBugaev::PhotonNucleonCrossSection(do
 
 // Caldwell
 crosssection::PhotoproductionCaldwell::PhotoproductionCaldwell() {
-    hash_combine(hash, crosssection::ParametrizationName<
-            std::remove_cv_t<std::remove_pointer_t<decltype(this)>>>::value);
+    hash_combine(hash, std::string(crosssection::ParametrizationName<PhotoproductionCaldwell>::value));
 };
 
 std::unique_ptr<crosssection::ParametrizationDirect> crosssection::PhotoproductionCaldwell::clone() const {
@@ -129,8 +126,7 @@ double crosssection::PhotoproductionCaldwell::PhotonNucleonCrossSection(double e
 
 // Kokoulin
 crosssection::PhotoproductionKokoulin::PhotoproductionKokoulin() {
-    hash_combine(hash, crosssection::ParametrizationName<
-            std::remove_cv_t<std::remove_pointer_t<decltype(this)>>>::value);
+    hash_combine(hash, std::string(crosssection::ParametrizationName<PhotoproductionKokoulin>::value));
 };
 
 std::unique_ptr<crosssection::ParametrizationDirect> crosssection::PhotoproductionKokoulin::clone() const {
@@ -173,8 +169,7 @@ crosssection::PhotoproductionRhode::PhotoproductionRhode() {
         377.222, 396.253, 415.948, 436.309, 457.334, 479.025 };
 
     interpolant_ = std::make_shared<Interpolant>(x, y, 4, false, false);
-    hash_combine(hash, crosssection::ParametrizationName<
-            std::remove_cv_t<std::remove_pointer_t<decltype(this)>>>::value);
+    hash_combine(hash, std::string(crosssection::ParametrizationName<PhotoproductionRhode>::value));
 }
 
 std::unique_ptr<crosssection::ParametrizationDirect> crosssection::PhotoproductionRhode::clone() const {
