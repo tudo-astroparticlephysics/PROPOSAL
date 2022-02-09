@@ -16,6 +16,13 @@ size_t crosssection::Photoproduction::GetHash(const ParticleDef&, const Medium &
     return combined_hash;
 }
 
+double crosssection::Photoproduction::GetLowerEnergyLim(const ParticleDef&, const Medium& medium, cut_ptr) const {
+    double max_nuc_mass = 0.;
+    for (const auto& c : medium.GetComponents())
+        max_nuc_mass = std::max(max_nuc_mass, c.GetAverageNucleonWeight());
+    return MPI + MPI * MPI / (2. * max_nuc_mass);
+};
+
 double crosssection::Photoproduction::PhotonAtomCrossSection(double energy, const Component& comp) {
     auto cross_photon_nucleon = PhotonNucleonCrossSection(energy, comp);
     if (cross_photon_nucleon == 0.)
@@ -179,7 +186,9 @@ std::unique_ptr<crosssection::ParametrizationDirect> crosssection::Photoproducti
 
 double crosssection::PhotoproductionRhode::PhotonNucleonCrossSection(double energy, const Component& comp) {
     auto nu = energy * 1e-3; // from MeV to GeV
-    if (nu <= 200.) {
+    if (nu <= 0.1) {
+        return 0.; // do not extrapolate
+    } else if (nu <= 200.) {
         return std::max(interpolant_->InterpolateArray(nu), 0.);
     } else {
         return PhotoproductionCaldwell::PhotonNucleonCrossSection(energy, comp);
