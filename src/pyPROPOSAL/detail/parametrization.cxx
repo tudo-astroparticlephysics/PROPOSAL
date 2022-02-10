@@ -7,6 +7,7 @@
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
 #include "PROPOSAL/crosssection/parametrization/MupairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
+#include "PROPOSAL/crosssection/parametrization/PhotoMuPairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/Photoproduction.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
@@ -851,6 +852,25 @@ void init_parametrization(py::module& m)
             return "(v_min: " + std::to_string(lim.v_min)
                 + ", v_max: " + std::to_string(lim.v_max) + ")";
         });
+
+    // --------------------------------------------------------------------- //
+    // PhotoMuPairProduction
+    // --------------------------------------------------------------------- //
+
+    py::module m_sub_photomupair = m_sub.def_submodule("photomupair");
+
+    py::class_<crosssection::PhotoMuPairProduction,
+        std::shared_ptr<crosssection::PhotoMuPairProduction>,
+        crosssection::Parametrization<Component>>(m_sub_photomupair, "PhotoMuPair",
+            R"pbdoc(
+            Virtual class for the PhotoMuPairProduction parametrizations.
+            )pbdoc");
+
+    py::class_<crosssection::PhotoMuPairSandrock,
+        std::shared_ptr<crosssection::PhotoMuPairSandrock>,
+        crosssection::PhotoMuPairProduction>(m_sub_photomupair, "Sandrock")
+        .def(py::init<>());
+
     // py::class_<PhotoAngleDistribution,
     // std::shared_ptr<PhotoAngleDistribution>>(
     //     m_sub_photopair, "PhotoAngleDistribution",

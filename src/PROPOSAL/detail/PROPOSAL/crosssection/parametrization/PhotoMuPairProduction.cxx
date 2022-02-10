@@ -51,7 +51,7 @@ double crosssection::PhotoMuPairSandrock::DifferentialCrossSection(
     // calculate elastic formfactor Phi
     aux1 = MMU / ME * B * Z3 / (1. + B * Z3 * SQRTE * delta / ME);
     aux2 = D / (1. + delta * (D * SQRTE - 2.) / MMU);
-    if (Z <= 1)
+    if (Z > 1)
         aux2 *= (1. - 1. / Z); // influence of the nucleus excitation
     auto Phi = std::log(aux1) - std::log(aux2);
 
