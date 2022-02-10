@@ -17,11 +17,16 @@ size_t crosssection::Photoproduction::GetHash(const ParticleDef&, const Medium &
 }
 
 double crosssection::Photoproduction::GetLowerEnergyLim(const ParticleDef&, const Medium& medium, cut_ptr) const {
-    double max_nuc_mass = 0.;
+    double min_cut_off = INF;
     for (const auto& c : medium.GetComponents())
-        max_nuc_mass = std::max(max_nuc_mass, c.GetAverageNucleonWeight());
-    return MPI + MPI * MPI / (2. * max_nuc_mass);
+        min_cut_off = std::min(min_cut_off, GetCutOff(c));
+    return min_cut_off;
 };
+
+double crosssection::Photoproduction::GetCutOff(const Component& comp) const {
+    auto m_N = comp.GetAverageNucleonWeight();
+    return MPI + MPI * MPI / (2. * m_N);
+}
 
 double crosssection::Photoproduction::PhotonAtomCrossSection(double energy, const Component& comp) {
     auto cross_photon_nucleon = PhotonNucleonCrossSection(energy, comp);
@@ -81,6 +86,8 @@ std::unique_ptr<crosssection::ParametrizationDirect> crosssection::Photoproducti
 // eq. 6
 // ------------------------------------------------------------------------- //
 double crosssection::PhotoproductionZeus::PhotonNucleonCrossSection(double energy, const Component& comp) {
+    if (energy < GetCutOff(comp))
+        return 0.;
     double aux;
     auto nu = energy * 1e-3; // from MeV to GeV
     aux = 2e-3 * nu * comp.GetAverageNucleonWeight(); // NucleonWeight from MeV to GeV
@@ -103,7 +110,9 @@ std::unique_ptr<crosssection::ParametrizationDirect> crosssection::Photoproducti
 // Sov. J. Nucl. Phys. 32 (1980), 847
 // eq. 21
 // ------------------------------------------------------------------------- //
-double crosssection::PhotoproductionBezrukovBugaev::PhotonNucleonCrossSection(double energy, const Component&) {
+double crosssection::PhotoproductionBezrukovBugaev::PhotonNucleonCrossSection(double energy, const Component& comp) {
+    if (energy < GetCutOff(comp))
+        return 0.;
     auto nu = energy * 1e-3; // from MeV to GeV
     double aux;
     aux = std::log(0.0213 * nu);
@@ -126,7 +135,9 @@ std::unique_ptr<crosssection::ParametrizationDirect> crosssection::Photoproducti
 // Phys. Rev Let. 42 (1979), 553
 // Table 1
 // ------------------------------------------------------------------------- //
-double crosssection::PhotoproductionCaldwell::PhotonNucleonCrossSection(double energy, const Component&) {
+double crosssection::PhotoproductionCaldwell::PhotonNucleonCrossSection(double energy, const Component& comp) {
+    if (energy < GetCutOff(comp))
+        return 0.;
     auto nu = energy * 1e-3; // from MeV to GeV
     return 49.2 + 11.1 * std::log(nu) + 151.8 / std::sqrt(nu); // return value in μb
 }
@@ -142,6 +153,8 @@ std::unique_ptr<crosssection::ParametrizationDirect> crosssection::Photoproducti
 }
 
 double crosssection::PhotoproductionKokoulin::PhotonNucleonCrossSection(double energy, const Component& comp) {
+    if (energy < GetCutOff(comp))
+        return 0.;
     auto nu = energy * 1e-3; // from MeV to GeV
     if (nu <= 200.) {
         if (nu <= 17.) {
@@ -185,6 +198,8 @@ std::unique_ptr<crosssection::ParametrizationDirect> crosssection::Photoproducti
 }
 
 double crosssection::PhotoproductionRhode::PhotonNucleonCrossSection(double energy, const Component& comp) {
+    if (energy < GetCutOff(comp))
+        return 0.;
     auto nu = energy * 1e-3; // from MeV to GeV
     if (nu <= 0.1) {
         return 0.; // do not extrapolate

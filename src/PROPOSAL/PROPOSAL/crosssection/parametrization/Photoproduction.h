@@ -36,6 +36,8 @@ namespace PROPOSAL {
 
             double GetLowerEnergyLim(const ParticleDef&, const Medium&, cut_ptr) const override;
 
+            double GetCutOff(const Component& comp) const;
+
             size_t GetHash(const ParticleDef&, const Medium& m, cut_ptr) const noexcept override;
 
             InteractionType GetInteractionType() const noexcept override;
