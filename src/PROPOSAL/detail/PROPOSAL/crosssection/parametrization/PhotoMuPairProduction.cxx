@@ -49,11 +49,14 @@ double crosssection::PhotoMuPairSandrock::DifferentialCrossSection(
     auto D = std::log(1.54 * std::pow(comp.GetAtomicNum(), 0.27));
 
     // calculate elastic formfactor Phi
+    double Phi;
     aux1 = MMU / ME * B * Z3 / (1. + B * Z3 * SQRTE * delta / ME);
     aux2 = D / (1. + delta * (D * SQRTE - 2.) / MMU);
+    // influence of the nucleus excitation
     if (Z > 1)
-        aux2 *= (1. - 1. / Z); // influence of the nucleus excitation
-    auto Phi = std::log(aux1) - std::log(aux2);
+        Phi = std::log(aux1) - (1. - 1. / Z) * std::log(aux2);
+    else
+        Phi = std::log(aux1) - std::log(aux2);
 
     // calculate contribution of atomic electrons
     aux1 = (MMU / delta) / (delta * MMU / (ME * ME) + SQRTE);
