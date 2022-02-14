@@ -12,6 +12,8 @@ namespace PROPOSAL {
         class Photoproduction : public ParametrizationDirect {
             virtual double PhotonAtomCrossSection(double, const Component&);
             double ShadowingFactor(double, const Component&);
+        protected:
+            double GetCutOff(const Component& comp) const;
         public:
             Photoproduction() = default;
 
@@ -34,9 +36,7 @@ namespace PROPOSAL {
                 return 1.; // all energy is always lost, i.e. v=1
             };
 
-            double GetLowerEnergyLim(const ParticleDef&, const Medium&, cut_ptr) const override {
-                return 2. * ME; // TODO: other limit?
-            };
+            double GetLowerEnergyLim(const ParticleDef&, const Medium&, cut_ptr) const override;
 
             size_t GetHash(const ParticleDef&, const Medium& m, cut_ptr) const noexcept override;
 
