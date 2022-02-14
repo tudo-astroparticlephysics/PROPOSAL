@@ -24,6 +24,7 @@ double crosssection::Photoproduction::GetLowerEnergyLim(const ParticleDef&, cons
 };
 
 double crosssection::Photoproduction::GetCutOff(const Component& comp) const {
+    // pion production threshold
     auto m_N = comp.GetAverageNucleonWeight();
     return MPI + MPI * MPI / (2. * m_N);
 }
