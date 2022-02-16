@@ -20,7 +20,7 @@ jobs:
             - os : "ubuntu-18.04"
               compiler : "gcc-5"
               compilerpp : "g++-5"
-            - os : "windows-latest"
+            - os : "windows-2019"
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
