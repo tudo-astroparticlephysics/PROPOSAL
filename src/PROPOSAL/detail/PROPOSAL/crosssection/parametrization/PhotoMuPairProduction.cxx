@@ -46,7 +46,7 @@ double crosssection::PhotoMuPairSandrock::DifferentialCrossSection(
     auto Bprime = 1440.;
     auto Z = comp.GetNucCharge();
     auto Z3 = std::pow(Z, -1. / 3);
-    auto D = std::log(1.54 * std::pow(comp.GetAtomicNum(), 0.27));
+    auto D = 1.54 * std::pow(comp.GetAtomicNum(), 0.27);
 
     // calculate elastic formfactor Phi
     double Phi;
