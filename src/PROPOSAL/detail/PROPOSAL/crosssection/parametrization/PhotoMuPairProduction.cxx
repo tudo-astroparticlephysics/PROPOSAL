@@ -42,8 +42,8 @@ double crosssection::PhotoMuPairSandrock::DifferentialCrossSection(
     double aux1, aux2;
 
     auto delta = MMU * MMU / (2. * energy * x * (1. - x));
-    auto B = 183.;
-    auto Bprime = 1440.;
+    auto B = comp.GetLogConstant();
+    auto Bprime = comp.GetBPrime();
     auto Z = comp.GetNucCharge();
     auto Z3 = std::pow(Z, -1. / 3);
     auto D = 1.54 * std::pow(comp.GetAtomicNum(), 0.27);
