@@ -126,9 +126,9 @@ Each sector consists of at least one **geometry**. Three different geometry type
 
 | Keyword        |  Type  | Default | Description                               |
 | -------------- | ------ | ------- | ----------------------------------------- |
+| `height`       | Number | `-`     | Height of cylinder in z-direction in cm.  |
 | `outer_radius` | Number | `-`     | Outer radius of the cylinder in cm.       |
 | `inner_radius` | Number | `0`     | Inner radius of the cylinder in cm.       |
-| `height`       | Number | `-`     | Height of cylinder in z-direction in cm.  |
 
 #### Example
 
