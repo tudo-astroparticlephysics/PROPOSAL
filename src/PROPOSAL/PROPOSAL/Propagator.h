@@ -33,7 +33,8 @@ public:
 private:
     Interaction::Loss DoStochasticInteraction(
         ParticleState&, PropagationUtility&, std::function<double()>);
-    int AdvanceParticle(ParticleState& p_cond, double E_f, double max_distance,
+    int AdvanceParticle(ParticleState& p_cond, const double E_f,
+                        const double max_distance,
         std::function<double()> rnd, Sector& current_sector);
     double CalculateDistanceToBorder(const Vector3D& particle_position,
         const Vector3D& particle_direction, const Geometry& current_geometry);
@@ -75,9 +76,10 @@ private:
         Stochastic = 2,
     };
     enum AdvancementType : int {
-        ReachedInteraction = 0,
-        ReachedMaxDistance = 1,
-        ReachedBorder = 2
+        InvalidStep = 0,
+        ReachedInteraction = 1,
+        ReachedMaxDistance = 2,
+        ReachedBorder = 3
     };
 
     std::vector<Sector> sector_list;
