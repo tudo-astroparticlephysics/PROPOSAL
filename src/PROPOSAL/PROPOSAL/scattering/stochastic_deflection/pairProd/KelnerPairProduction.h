@@ -12,8 +12,7 @@ namespace PROPOSAL {
 
             std::unique_ptr<Parametrization> clone() const final
             {
-                return std::unique_ptr<Parametrization>(
-                        std::make_unique<KelnerPairProduction>(*this));
+                return std::make_unique<KelnerPairProduction>(*this);
             }
 
         public:

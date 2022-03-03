@@ -12,8 +12,7 @@ namespace stochastic_deflection {
 
         std::unique_ptr<Parametrization> clone() const final
         {
-            return std::unique_ptr<Parametrization>(
-                std::make_unique<TsaiApproximationBremsstrahlung>(*this));
+            return std::make_unique<TsaiApproximationBremsstrahlung>(*this);
         }
 
     public:

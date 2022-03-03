@@ -31,27 +31,33 @@ std::vector<double> logspace(double start, double end, int num)
   return linspaced;
 }
 
-std::vector<double> f_nu_g(std::vector<double> nu, double n, double k_4) {
-    std::vector<double> nus(nu.size());
-    for (int i = 0; i < nu.size(); i++) {
-        nus[i] = abs(pow(nu[i], (1/n + 1)) + pow((0.2/k_4), (1/n)) * nu[i] - pow((0.2/k_4), (1/n)));
-    }
-    return nus;
+// std::vector<double> f_nu_g(std::vector<double> nu, double n, double k_4) {
+//     std::vector<double> nus(nu.size());
+//     for (int i = 0; i < nu.size(); i++) {
+//         nus[i] = abs(pow(nu[i], (1/n + 1)) + pow((0.2/k_4), (1/n)) * nu[i] - pow((0.2/k_4), (1/n)));
+//     }
+//     return nus;
+// }
+double f_nu_g(double nu, double n, double k_4) {
+        double nu_g = abs(pow(nu, (1/n + 1)) + pow((0.2/k_4), (1/n)) * nu - pow((0.2/k_4), (1/n)));
+    return nu_g;
 }
 
 std::vector<double> reduce_array(std::vector<double> array, double number) {
-    for (int i = 0; i < array.size(); i++) {
-        array[i] = number - array[i];
+    for (auto& val: array) {
+        val -= number;
     }
     return array;
 }
 
-double get_nu_g(double E, double x_min = 0.00005) {
-    auto n = 0.81 * pow(E, 0.5) / (pow(E, 0.5) + 1.8);
-    auto k_4 = 0.26 * pow(E, -0.91);
+double get_nu_g(double E, double n, double k_4, double x_min = 0.00005) {
     auto v = logspace(log10(x_min), log10(0.5), 20);
     auto nu_lin = reduce_array(v, 1);
-    auto f_nus = f_nu_g(nu_lin, n, k_4);
+    // auto f_nus = f_nu_g(nu_lin, n, k_4);
+    std::vector<double> f_nus(nu_lin.size());
+    for (int i = 0; i < nu_lin.size(); i++) {
+        f_nus[i] = f_nu_g(nu_lin[i], n, k_4);
+    }
     auto nu_g = nu_lin[distance(f_nus.begin(), min_element(f_nus.begin(), f_nus.end()))];
     
     return nu_g;
@@ -75,7 +81,7 @@ double get_rms_theta(double e_i, double e_f, double mass, double Z) {
         if (rms_theta < 0.2) {
             return rms_theta; 
         } else {
-            double nu_g = get_nu_g(e_i);
+            double nu_g = get_nu_g(e_i, n, k_4);
             auto k_5 = k_4 * pow(nu_g, 1 + n) * pow(1 - nu_g, 0.5 - n);
             rms_theta = k_5 * pow(1 - nu, -0.5);
             if (rms_theta >= 0.2) {

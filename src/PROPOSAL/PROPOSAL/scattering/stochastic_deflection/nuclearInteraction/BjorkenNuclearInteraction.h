@@ -14,8 +14,7 @@ namespace PROPOSAL {
 
             std::unique_ptr<Parametrization> clone() const final
             {
-                return std::unique_ptr<Parametrization>(
-                        std::make_unique<BjorkenNuclearInteraction>(*this));
+                return std::make_unique<BjorkenNuclearInteraction>(*this);
             }
 
         public:
