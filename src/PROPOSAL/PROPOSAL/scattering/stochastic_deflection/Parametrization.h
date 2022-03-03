@@ -23,7 +23,8 @@ namespace stochastic_deflection {
         virtual InteractionType GetInteractionType() const noexcept = 0;
         virtual UnitSphericalVector CalculateStochasticDeflection(
             double initial_energy, double final_energy,
-            std::vector<double> const&) const = 0;
+            std::vector<double> const&, size_t component) const = 0;
+            
     };
 
     template <typename T>

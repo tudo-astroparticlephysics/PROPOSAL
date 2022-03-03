@@ -157,7 +157,7 @@ std::tuple<Cartesian3D, Cartesian3D> PropagationUtility::DirectionsScatter(
 
 Cartesian3D PropagationUtility::DirectionDeflect(InteractionType type,
     double initial_energy, double final_energy, const Vector3D& direction,
-    std::function<double()> rnd) const
+    std::function<double()> rnd, size_t component) const
 {
     if (collection.scattering) {
         auto v_rnd = std::vector<double>(
@@ -165,7 +165,7 @@ Cartesian3D PropagationUtility::DirectionDeflect(InteractionType type,
         for (auto& r : v_rnd)
             r = rnd();
         auto angles = collection.scattering->CalculateStochasticDeflection(
-            type, initial_energy, final_energy, v_rnd);
+            type, initial_energy, final_energy, v_rnd, component);
         auto direction_new = Cartesian3D(direction);
         direction_new.deflect(std::cos(angles.zenith), angles.azimuth);
         return direction_new;

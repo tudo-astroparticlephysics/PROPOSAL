@@ -4,6 +4,7 @@
 #include <cmath> 
 #include <stdexcept>
 #include <algorithm>
+#include <PROPOSAL/medium/Components.h>
 using namespace PROPOSAL;
 using namespace std;
 
@@ -90,14 +91,15 @@ double get_rms_theta(double e_i, double e_f, double mass, double Z) {
 
 UnitSphericalVector 
 stochastic_deflection::TsaiParametrizationBremsstrahlungGinneken::CalculateStochasticDeflection(
-    double e_i, double e_f, std::vector<double> const& rnd) const 
+    double e_i, double e_f, std::vector<double> const& rnd, size_t component) const 
 {
     // All energies should be in units of GeV
     e_i = e_i / 1000.0;
     e_f = e_f / 1000.0;
     auto muon_mass = mass / 1000.0;
-    auto Z = 1; // use Z of medium
-    
+    // Use Z of medium
+    auto Z = Component::GetComponentForHash(component).GetNucCharge(); 
+
     auto rms_theta = get_rms_theta(e_i, e_f, muon_mass, Z);
     
     auto lambda = 1 / (rms_theta * rms_theta);

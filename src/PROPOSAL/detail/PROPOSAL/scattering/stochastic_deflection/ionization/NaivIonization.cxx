@@ -5,7 +5,7 @@ using namespace PROPOSAL;
 
 UnitSphericalVector
 stochastic_deflection::NaivIonization::CalculateStochasticDeflection(
-        double e_i, double e_f, std::vector<double> const& rnd) const
+        double e_i, double e_f, std::vector<double> const& rnd, size_t) const
 {
     auto p_i = std::sqrt((e_i + mass) * (e_i - mass));
     auto p_f = std::sqrt((e_f + mass) * (e_f - mass));

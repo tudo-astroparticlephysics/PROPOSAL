@@ -23,7 +23,7 @@ namespace stochastic_deflection {
 
 
         UnitSphericalVector CalculateStochasticDeflection(
-            double e_i, double e_f, std::vector<double> const& rnd) const final;
+            double e_i, double e_f, std::vector<double> const& rnd, size_t component) const final;
     };
 } // namespace stochastic_deflection 
 } // namespace PROPOSAL

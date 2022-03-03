@@ -107,6 +107,7 @@ namespace PROPOSAL {
 
 void Cartesian3D::deflect(double cosphi_deflect, double theta_deflect) {
     if(cosphi_deflect != 1 || theta_deflect != 0)
+    // if(cosphi_deflect != 1 && acos(cosphi_deflect) > deflection_precision) // set deflection precision
     {
         auto sinphi_deflect = std::sqrt( std::max(0., (1. - cosphi_deflect) * (1. + cosphi_deflect) ));
         auto tx = sinphi_deflect * std::cos(theta_deflect);

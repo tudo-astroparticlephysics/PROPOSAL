@@ -8,7 +8,7 @@ using namespace PROPOSAL;
 
 UnitSphericalVector
 stochastic_deflection::KelnerPairProduction::CalculateStochasticDeflection(
-        double e_i, double e_f, std::vector<double> const& rnd) const
+        double e_i, double e_f, std::vector<double> const& rnd, size_t) const
 {
     // All energies should be in units of GeV
     e_i = e_i / 1000.0;

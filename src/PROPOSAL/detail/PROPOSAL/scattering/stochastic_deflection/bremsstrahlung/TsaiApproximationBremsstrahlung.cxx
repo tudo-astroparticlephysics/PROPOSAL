@@ -5,7 +5,7 @@ using namespace PROPOSAL;
 
 UnitSphericalVector 
 stochastic_deflection::TsaiApproximationBremsstrahlung::CalculateStochasticDeflection(
-    double e_i, double e_f, std::vector<double> const& rnd) const
+    double e_i, double e_f, std::vector<double> const& rnd, size_t) const
 {
     auto epsilon = e_i - e_f;
     auto theta_star = 1.0;
@@ -14,6 +14,7 @@ stochastic_deflection::TsaiApproximationBremsstrahlung::CalculateStochasticDefle
     auto r = std::sqrt(a / (1.0-a));
     auto theta_photon = mass / e_i * r;
     auto theta_muon = epsilon / e_f * theta_photon;
+
 
     return UnitSphericalVector {theta_muon, 2 * PI * rnd[1]};
 }

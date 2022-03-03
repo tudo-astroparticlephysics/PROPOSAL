@@ -83,7 +83,8 @@ public:
     std::tuple<Cartesian3D, Cartesian3D> DirectionsScatter(
         double, double, double, const Vector3D&, std::function<double()>);
     Cartesian3D DirectionDeflect(InteractionType, double, double,
-                                 const Vector3D&, std::function<double()>) const;
+                                 const Vector3D&, std::function<double()>, 
+                                 size_t) const;
 
     Collection collection;
 };

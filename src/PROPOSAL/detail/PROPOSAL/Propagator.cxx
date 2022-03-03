@@ -133,7 +133,7 @@ Interaction::Loss Propagator::DoStochasticInteraction(ParticleState& p_cond,
     auto loss = utility.EnergyStochasticloss(p_cond.energy, rnd());
 
     p_cond.direction = utility.DirectionDeflect(loss.type, p_cond.energy,
-        p_cond.energy * (1. - loss.v_loss), p_cond.direction, rnd);
+        p_cond.energy * (1. - loss.v_loss), p_cond.direction, rnd, loss.comp_hash);
     p_cond.energy = p_cond.energy * (1. - loss.v_loss);
 
     return loss;

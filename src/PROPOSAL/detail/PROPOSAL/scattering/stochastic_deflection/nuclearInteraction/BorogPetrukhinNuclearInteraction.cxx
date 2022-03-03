@@ -6,7 +6,7 @@ using namespace PROPOSAL;
 
 UnitSphericalVector
 stochastic_deflection::BorogPetrukhinNuclearInteraction::CalculateStochasticDeflection(
-        double e_i, double e_f, std::vector<double> const& rnd) const
+        double e_i, double e_f, std::vector<double> const& rnd, size_t) const
 {
     auto m_0 = std::sqrt(0.4) * 1e3;
     auto epsilon = e_i - e_f; 

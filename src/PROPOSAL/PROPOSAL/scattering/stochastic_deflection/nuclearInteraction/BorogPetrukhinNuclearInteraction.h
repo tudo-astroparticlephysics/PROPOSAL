@@ -24,7 +24,7 @@ namespace PROPOSAL {
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 
             UnitSphericalVector CalculateStochasticDeflection(
-                    double e_i, double e_f, std::vector<double> const& rnd) const final;
+                    double e_i, double e_f, std::vector<double> const& rnd, size_t) const final;
         };
     } // namespace stochastic_deflection
 } // namespace PROPOSAL
