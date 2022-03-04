@@ -8,59 +8,20 @@
 using namespace PROPOSAL;
 using namespace std;
 
-std::vector<double> logspace(double start, double end, int num)
-{
 
-  std::vector<double> linspaced;
-
-  if (num == 0) { return linspaced; }
-  if (num == 1) 
-    {
-      linspaced.push_back(start);
-      return linspaced;
-    }
-
-  double delta = (end - start) / (num - 1);
-
-  for(int i=0; i < num-1; ++i)
-    {
-      linspaced.push_back(pow(10, start + delta * i));
-    }
-  linspaced.push_back(pow(10, end)); // I want to ensure that start and end
-                            // are exactly the same as the input
-  return linspaced;
-}
-
-// std::vector<double> f_nu_g(std::vector<double> nu, double n, double k_4) {
-//     std::vector<double> nus(nu.size());
-//     for (int i = 0; i < nu.size(); i++) {
-//         nus[i] = abs(pow(nu[i], (1/n + 1)) + pow((0.2/k_4), (1/n)) * nu[i] - pow((0.2/k_4), (1/n)));
-//     }
-//     return nus;
-// }
 double f_nu_g(double nu, double n, double k_4) {
-        double nu_g = abs(pow(nu, (1/n + 1)) + pow((0.2/k_4), (1/n)) * nu - pow((0.2/k_4), (1/n)));
+        double nu_g = pow(nu, (1/n + 1)) + pow((0.2/k_4), (1/n)) * nu - pow((0.2/k_4), (1/n));
     return nu_g;
 }
 
-std::vector<double> reduce_array(std::vector<double> array, double number) {
-    for (auto& val: array) {
-        val -= number;
-    }
-    return array;
-}
 
-double get_nu_g(double E, double n, double k_4, double x_min = 0.00005) {
-    auto v = logspace(log10(x_min), log10(0.5), 20);
-    auto nu_lin = reduce_array(v, 1);
-    // auto f_nus = f_nu_g(nu_lin, n, k_4);
-    std::vector<double> f_nus(nu_lin.size());
-    for (int i = 0; i < nu_lin.size(); i++) {
-        f_nus[i] = f_nu_g(nu_lin[i], n, k_4);
-    }
-    auto nu_g = nu_lin[distance(f_nus.begin(), min_element(f_nus.begin(), f_nus.end()))];
+double get_nu_g(double E, double n, double k_4, double nu_max = 1. - 5e-8) {
+    auto f = [&n, &k_4](double nu) {
+        return f_nu_g(nu, n, k_4);
+    };
+    auto nu_g_x = Bisection(f, 0.5, nu_max, 1e-6, 100);
     
-    return nu_g;
+    return (nu_g_x.first + nu_g_x.second) / 2;
 }
 
 double get_rms_theta(double e_i, double e_f, double mass, double Z) {
