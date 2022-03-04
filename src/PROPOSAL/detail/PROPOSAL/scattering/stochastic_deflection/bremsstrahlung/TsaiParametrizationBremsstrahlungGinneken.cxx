@@ -1,10 +1,10 @@
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiParametrizationBremsstrahlungGinneken.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/math/MathMethods.h"
 #include <cmath> 
 #include <stdexcept>
 #include <algorithm>
-#include <PROPOSAL/medium/Components.h>
 using namespace PROPOSAL;
 using namespace std;
 
