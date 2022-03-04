@@ -10,8 +10,7 @@ using namespace std;
 
 
 double f_nu_g(double nu, double n, double k_4) {
-        double nu_g = pow(nu, (1/n + 1)) + pow((0.2/k_4), (1/n)) * nu - pow((0.2/k_4), (1/n));
-    return nu_g;
+    return pow(nu, (1/n + 1)) + pow((0.2/k_4), (1/n)) * nu - pow((0.2/k_4), (1/n));
 }
 
 
@@ -33,7 +32,7 @@ double get_rms_theta(double e_i, double e_f, double mass, double Z) {
         auto rms_theta = max(min(k_1 * sqrt(nu), k_2), k_3 * nu);
         return rms_theta; 
     }
-    else if (nu > 0.5) {
+    else {
         auto k_4 = 0.26 * pow(e_i, -0.91);
         auto m = 0.5;
         auto d = 1.8;
@@ -45,15 +44,14 @@ double get_rms_theta(double e_i, double e_f, double mass, double Z) {
             double nu_g = get_nu_g(e_i, n, k_4);
             auto k_5 = k_4 * pow(nu_g, 1 + n) * pow(1 - nu_g, 0.5 - n);
             rms_theta = k_5 * pow(1 - nu, -0.5);
-            if (rms_theta >= 0.2) {
-                return rms_theta;
-            } else {
+            if (rms_theta < 0.2) {
                 // If no case matches
                 throw invalid_argument("bremsstrahlung deflection: no matching nu/theta");
             }
-        }
+            return rms_theta;
+                
+            }
     }
-    return 0;
 }
 
 UnitSphericalVector 
