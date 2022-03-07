@@ -2,6 +2,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/math/MathMethods.h"
+#include "PROPOSAL/Logging.h"
 #include <cmath> 
 #include <stdexcept>
 #include <algorithm>
@@ -14,11 +15,11 @@ double f_nu_g(double nu, double n, double k_4) {
 }
 
 
-double get_nu_g(double E, double n, double k_4, double nu_max = 1. - 5e-8) {
+double get_nu_g(double E, double n, double k_4) {
     auto f = [&n, &k_4](double nu) {
         return f_nu_g(nu, n, k_4);
     };
-    auto nu_g_x = Bisection(f, 0.5, nu_max, 1e-6, 100);
+    auto nu_g_x = Bisection(f, 0.5, 1., 1e-5, 100);
     
     return (nu_g_x.first + nu_g_x.second) / 2;
 }
@@ -46,7 +47,8 @@ double get_rms_theta(double e_i, double e_f, double mass, double Z) {
             rms_theta = k_5 * pow(1 - nu, -0.5);
             if (rms_theta < 0.2) {
                 // If no case matches
-                throw invalid_argument("bremsstrahlung deflection: no matching nu/theta");
+                // throw invalid_argument("bremsstrahlung deflection: no matching nu/theta");
+                Logging::Get("proposal.deflection")->warn("bremsstrahlung deflection: rms_theta = {} > 0.2, nu_g = {}", rms_theta, nu_g);
             }
             return rms_theta;
                 
