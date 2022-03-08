@@ -173,9 +173,11 @@ int Propagator::AdvanceParticle(ParticleState &state,
         return random_numbers[i++%4];
     };
 
+    // Iterate combinations of step lengths and scattering angles until we have
+    // reached an interaction, a sector border or the maximal propagation distance
     do {
         // Calculate grammage, energy and distance for step
-        if (energy != -1 && grammage == -1 && distance == -1) {
+        if (energy != -1 && distance == -1) {
             // Calculate grammage and distance from given energy
             grammage = utility.LengthContinuous(state.energy, energy);
             try {
@@ -183,7 +185,7 @@ int Propagator::AdvanceParticle(ParticleState &state,
             } catch (const DensityException&) {
                 distance = INF;
             }
-        } else if (energy == -1 && grammage == -1 && distance != -1) {
+        } else if (energy == -1 && distance != -1) {
             // Calculate energy and grammage from given distance
             auto grammage_step = density->Calculate(state.position, state.direction, distance);
             if (grammage_step < grammage_next_interaction) {
@@ -195,14 +197,21 @@ int Propagator::AdvanceParticle(ParticleState &state,
                 for (auto& r: random_numbers) {
                     r = rnd_generator();
                 }
-                Logging::Get("proposal.propagator")->debug("Discard current set of random numbers for multiple"
-                                                           " scattering since we are stuck in a loop.");
+                Logging::Get("proposal.propagator")->debug("Unable to find a valid combination of propagation step "
+                                                           "length and multiple scattering angle for this set of "
+                                                           "random numbers. Resample set of random numbers.");
                 grammage = grammage_next_interaction;
                 energy = energy_next_interaction;
-                distance = density->Correct(state.position, state.direction, grammage, max_distance);
+                try {
+                    distance = density->Correct(state.position, state.direction, grammage, max_distance);
+                } catch (const DensityException&) {
+                    distance = INF;
+                }
             }
         } else {
-            throw std::logic_error("Error in AdvanceParticle: We shouldn't end up here!");
+            throw std::logic_error("Error in AdvanceParticle: Either both distance and final energy for the next "
+                                   "iteration step are known, or neither of them are known. This should never happen "
+                                   "and would indicate an algorithmic error!");
         }
 
         // Calculate scattering proposal
