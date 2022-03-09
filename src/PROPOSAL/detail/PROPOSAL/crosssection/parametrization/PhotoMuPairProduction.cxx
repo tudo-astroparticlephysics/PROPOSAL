@@ -36,6 +36,9 @@ crosssection::PhotoMuPairSandrock::clone() const
     return std::make_unique<param_t>(*this);
 }
 
+// Parametrization based on the muon bremsstrahlung parametrization by
+// Kelner, Kokoulin and Petrukhin (Preprint MEPhI (1995) no. 024-95) with
+// modifications by A. Sandrock
 double crosssection::PhotoMuPairSandrock::DifferentialCrossSection(
         const ParticleDef&, const Component& comp, double energy, double x) const
 {
