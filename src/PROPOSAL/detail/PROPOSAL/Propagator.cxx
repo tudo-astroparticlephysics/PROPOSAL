@@ -86,6 +86,10 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
 
         advancement_type = AdvanceParticle(state, energy_at_next_interaction,
             max_distance, rnd, current_sector);
+
+        // If the particle is on the sector border before the continuous step is
+        // performed in 'AdvanceParticle', we might enter a different sector due
+        // to multiple scattering. Therefore, we have to update current_sector.
         utility = get<UTILITY>(current_sector);
         density = get<DENSITY_DISTR>(current_sector);
 
