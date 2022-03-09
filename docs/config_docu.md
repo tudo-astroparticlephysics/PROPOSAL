@@ -461,7 +461,7 @@ Creation of an electron-positron pair by an ingoing photon. Available `photopair
 
 Creation of an muon-antimuon pair by an ingoing photon. Available `photomupair` parametrizations are:
 
-* `Sandrock`: ([Preprint MEPhI (1995) no. 024-95](http://cds.cern.ch/record/288828)) with modifications by @asandrock
+* `Sandrock`: ([Preprint MEPhI (1995) no. 024-95](http://cds.cern.ch/record/288828)) with modifications by A. Sandrock
 
 ### Photonuclear intractions by photons: `photoproduction`
 
