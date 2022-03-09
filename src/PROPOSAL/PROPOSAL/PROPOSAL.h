@@ -63,6 +63,7 @@
 #include "PROPOSAL/crosssection/Factories/EpairProductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/IonizationFactory.h"
 #include "PROPOSAL/crosssection/Factories/MupairProductionFactory.h"
+#include "PROPOSAL/crosssection/Factories/PhotoMuPairProductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/PhotoPairProductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/PhotoproductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/PhotonuclearFactory.h"

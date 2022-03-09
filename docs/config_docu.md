@@ -452,6 +452,17 @@ Creation of an electron-positron pair by an ingoing photon. Available `photopair
 * `Tsai`: (Review of Modern Physics, Vol. 46, No. 4, October 1974)
 * `KochMotz`: (Review of Modern Physics, Vol. 61, 1959)
 
+### Muon-antimuon production by photons: `photomupair`
+
+| Keyword           |  Type   | Default | Description                |
+| ----------------- | ------- | ------- | -------------------------- |
+| `parametrization` | String  | `-`     | Parametrization to be used |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
+
+Creation of an muon-antimuon pair by an ingoing photon. Available `photomupair` parametrizations are:
+
+* `Sandrock`: ([Preprint MEPhI (1995) no. 024-95](http://cds.cern.ch/record/288828)) with modifications by @asandrock
+
 ### Photonuclear intractions by photons: `photoproduction`
 
 | Keyword           |  Type   | Default | Description                |
