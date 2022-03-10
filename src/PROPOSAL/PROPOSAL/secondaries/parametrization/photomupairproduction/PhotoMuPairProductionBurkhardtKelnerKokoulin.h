@@ -14,8 +14,8 @@ using std::make_tuple;
 
 namespace PROPOSAL {
 namespace secondaries {
-    class PhotoMuPairProductionSandrock : public PhotoMuPairProduction,
-            public DefaultSecondaries<PhotoMuPairProductionSandrock> {
+    class PhotoMuPairProductionBurkhardtKelnerKokoulin : public PhotoMuPairProduction,
+            public DefaultSecondaries<PhotoMuPairProductionBurkhardtKelnerKokoulin> {
 
                 using dndx_ptr = std::unique_ptr<CrossSectionDNDX>;
 
@@ -25,11 +25,11 @@ namespace secondaries {
             public:
                 static constexpr int n_rnd = 2;
 
-                PhotoMuPairProductionSandrock() = default;
-                PhotoMuPairProductionSandrock(ParticleDef p, Medium m)
+                PhotoMuPairProductionBurkhardtKelnerKokoulin() = default;
+                PhotoMuPairProductionBurkhardtKelnerKokoulin(ParticleDef p, Medium m)
                 : medium(m)
                 , dndx(detail::build_dndx(
-                        std::true_type {}, true, crosssection::PhotoMuPairSandrock(), p, medium, nullptr))
+                        std::true_type {}, true, crosssection::PhotoMuPairBurkhardtKelnerKokoulin(), p, medium, nullptr))
                                           {}
 
                 double Calculatex(double energy, double rnd, const Component& comp) override;

@@ -86,7 +86,7 @@
 #include "PROPOSAL/secondaries/parametrization/ionization/NaivIonization.h"
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/MupairProduction.h"
-#include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionSandrock.h"
+#include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionBurkhardtKelnerKokoulin.h"
 #include "PROPOSAL/secondaries/parametrization/photonuclear/Photonuclear.h"
 #include "PROPOSAL/secondaries/parametrization/photoproduction/Photoproduction.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionTsai.h"

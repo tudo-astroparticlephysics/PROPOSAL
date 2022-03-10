@@ -7,7 +7,7 @@
 #include "PROPOSAL/secondaries/parametrization/epairproduction/KelnerKokoulinPetrukhinEpairProduction.h"
 #include "PROPOSAL/secondaries/parametrization/epairproduction/NaivEpairProduction.h"
 #include "PROPOSAL/secondaries/parametrization/ionization/NaivIonization.h"
-#include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionSandrock.h"
+#include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionBurkhardtKelnerKokoulin.h"
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
 #include "PROPOSAL/secondaries/parametrization/photonuclear/Photonuclear.h"
 #include "PROPOSAL/secondaries/parametrization/photoproduction/Photoproduction.h"
@@ -129,12 +129,12 @@ void init_secondaries(py::module& m)
         secondaries::MupairProduction> {}
         .decl_rho_param(m_sub, "KelnerKokoulinPetrukhinMupairProduction");
 
-    py::class_<secondaries::PhotoMuPairProductionSandrock, secondaries::PhotoMuPairProduction,
-    std::shared_ptr<secondaries::PhotoMuPairProductionSandrock>>(m_sub,
-            "PhotoMuPairProductionSandrock")
+    py::class_<secondaries::PhotoMuPairProductionBurkhardtKelnerKokoulin, secondaries::PhotoMuPairProduction,
+    std::shared_ptr<secondaries::PhotoMuPairProductionBurkhardtKelnerKokoulin>>(m_sub,
+            "PhotoMuPairProductionBurkhardtKelnerKokoulin")
         .def(py::init<ParticleDef, Medium>(), py::arg("particle_def"),
              py::arg("medium"))
-        .def("calculate_x", &secondaries::PhotoMuPairProductionSandrock::Calculatex,
+        .def("calculate_x", &secondaries::PhotoMuPairProductionBurkhardtKelnerKokoulin::Calculatex,
              py::arg("energy"), py::arg("rnd"), py::arg("component"));
 
     SecondariesBuilder<secondaries::PhotoPairProductionTsai,

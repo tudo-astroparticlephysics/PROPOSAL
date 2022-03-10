@@ -18,7 +18,7 @@ template <typename Param>
 auto init_param = std::make_pair(std::string(crosssection::ParametrizationName<Param>::value), create_photomupairproduction<Param>);
 
 std::map<std::string, photomupair_func_ptr, Helper::case_insensitive_comp> photomupair_map = {
-        init_param<crosssection::PhotoMuPairSandrock>,
+        init_param<crosssection::PhotoMuPairBurkhardtKelnerKokoulin>,
 };
 
 namespace PROPOSAL {

@@ -30,16 +30,15 @@ crosssection::KinematicLimits crosssection::PhotoMuPairProduction::GetKinematicL
 }
 
 std::unique_ptr<crosssection::Parametrization<Component>>
-crosssection::PhotoMuPairSandrock::clone() const
+crosssection::PhotoMuPairBurkhardtKelnerKokoulin::clone() const
 {
     using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
     return std::make_unique<param_t>(*this);
 }
 
-// Parametrization based on the muon bremsstrahlung parametrization by
-// Kelner, Kokoulin and Petrukhin (Preprint MEPhI (1995) no. 024-95) with
-// modifications by A. Sandrock
-double crosssection::PhotoMuPairSandrock::DifferentialCrossSection(
+// Parmatrization similar to CERN–SL–2002–016 (https://cds.cern.ch/record/558831/files/sl-2002-016.pdf)
+// with added atomic form factors from (Phys. Atom. Nucl. 60 (1997), 576)
+double crosssection::PhotoMuPairBurkhardtKelnerKokoulin::DifferentialCrossSection(
         const ParticleDef&, const Component& comp, double energy, double x) const
 {
     double aux1, aux2;

@@ -1,11 +1,11 @@
-#include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionSandrock.h"
+#include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionBurkhardtKelnerKokoulin.h"
 
 using namespace PROPOSAL;
 
-double secondaries::PhotoMuPairProductionSandrock::Calculatex(
+double secondaries::PhotoMuPairProductionBurkhardtKelnerKokoulin::Calculatex(
         double energy, double rnd, const Component &comp) {
     if (!dndx)
-        throw std::logic_error("dndx Interpolant for PhotoMuPairProductionSandrock not defined.");
+        throw std::logic_error("dndx Interpolant for PhotoMuPairProductionBurkhardtKelnerKokoulinnot defined.");
     for (auto& it : *dndx) {
         if (comp.GetHash() == it.first) {
             auto& calc = *std::get<1>(it.second);
@@ -23,7 +23,7 @@ double secondaries::PhotoMuPairProductionSandrock::Calculatex(
 }
 
 std::tuple<Cartesian3D, Cartesian3D>
-secondaries::PhotoMuPairProductionSandrock::CalculateDirections(
+secondaries::PhotoMuPairProductionBurkhardtKelnerKokoulin::CalculateDirections(
         const Vector3D &dir, double energy, const Component &comp, double rnd1) {
     auto k = energy / MMU;
 
@@ -44,7 +44,7 @@ secondaries::PhotoMuPairProductionSandrock::CalculateDirections(
 }
 
 std::vector<ParticleState>
-secondaries::PhotoMuPairProductionSandrock::CalculateSecondaries(
+secondaries::PhotoMuPairProductionBurkhardtKelnerKokoulin::CalculateSecondaries(
         StochasticLoss loss, const Component &comp, std::vector<double> &rnd) {
     auto x = Calculatex(loss.parent_particle_energy, rnd[0], comp);
     auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, x);

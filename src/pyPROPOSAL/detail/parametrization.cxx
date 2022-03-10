@@ -866,9 +866,9 @@ void init_parametrization(py::module& m)
             Virtual class for the PhotoMuPairProduction parametrizations.
             )pbdoc");
 
-    py::class_<crosssection::PhotoMuPairSandrock,
-        std::shared_ptr<crosssection::PhotoMuPairSandrock>,
-        crosssection::PhotoMuPairProduction>(m_sub_photomupair, "Sandrock")
+    py::class_<crosssection::PhotoMuPairBurkhardtKelnerKokoulin,
+        std::shared_ptr<crosssection::PhotoMuPairBurkhardtKelnerKokoulin>,
+        crosssection::PhotoMuPairProduction>(m_sub_photomupair, "BurkhardtKelnerKokoulin")
         .def(py::init<>());
 
     // py::class_<PhotoAngleDistribution,

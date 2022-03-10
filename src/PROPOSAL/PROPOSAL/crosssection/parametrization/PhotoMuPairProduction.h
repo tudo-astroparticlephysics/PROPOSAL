@@ -48,19 +48,20 @@ namespace PROPOSAL {
             static constexpr auto value = "photomupairproduction";
         };
 
-        struct PhotoMuPairSandrock : public PhotoMuPairProduction {
-            PhotoMuPairSandrock() { hash_combine(hash, std::string("sandrock")); }
+        struct PhotoMuPairBurkhardtKelnerKokoulin : public PhotoMuPairProduction {
+            PhotoMuPairBurkhardtKelnerKokoulin() {
+                hash_combine(hash, std::string("burkhardtkelnerkokoulin")); }
             std::unique_ptr<Parametrization<Component>> clone() const final;
 
             double DifferentialCrossSection(const ParticleDef&, const Component&,
                                             double, double) const override;
         };
 
-        template <> struct ParametrizationName<PhotoMuPairSandrock> {
-            static constexpr auto value = "Sandrock";
+        template <> struct ParametrizationName<PhotoMuPairBurkhardtKelnerKokoulin> {
+            static constexpr auto value = "BurkhardtKelnerKokoulin";
         };
 
-        template <> struct ParametrizationId<PhotoMuPairSandrock> {
+        template <> struct ParametrizationId<PhotoMuPairBurkhardtKelnerKokoulin> {
             static constexpr size_t value = 1000000015;
         };
 

@@ -276,7 +276,7 @@ void init_crosssection(py::module& m)
     build_crosssection<crosssection::PhotoPairTsai>(m_sub);
     build_crosssection<crosssection::PhotoPairKochMotz>(m_sub);
 
-    build_crosssection<crosssection::PhotoMuPairSandrock>(m_sub);
+    build_crosssection<crosssection::PhotoMuPairBurkhardtKelnerKokoulin>(m_sub);
 
     build_crosssection<crosssection::PhotoproductionZeus>(m_sub);
     build_crosssection<crosssection::PhotoproductionBezrukovBugaev>(m_sub);
