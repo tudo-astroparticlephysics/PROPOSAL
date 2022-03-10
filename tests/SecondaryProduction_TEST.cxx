@@ -2,7 +2,7 @@
 #include <cmath>
 
 #include "PROPOSAL/secondaries/parametrization/ionization/NaivIonization.h"
-#include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionSandrock.h"
+#include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionBurkhardtKelnerKokoulin.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionKochMotz.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionTsai.h"
 #include "PROPOSAL/Constants.h"
@@ -93,7 +93,7 @@ TEST(PhotoMuPairProduction, EnergyConservation)
     RandomGenerator::Get().SetSeed(2);
     auto particle = GammaDef();
     auto medium = StandardRock();
-    auto param = secondaries::PhotoMuPairProductionSandrock(particle, medium);
+    auto param = secondaries::PhotoMuPairProductionBurkhardtKelnerKokoulin(particle, medium);
 
     auto E_i = 1e6;
     auto init_direction = Cartesian3D(0, 0, 1);
