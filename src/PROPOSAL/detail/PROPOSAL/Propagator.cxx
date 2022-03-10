@@ -86,6 +86,13 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
 
         advancement_type = AdvanceParticle(state, energy_at_next_interaction,
             max_distance, rnd, current_sector);
+
+        // If the particle is on the sector border before the continuous step is
+        // performed in 'AdvanceParticle', we might enter a different sector due
+        // to multiple scattering. Therefore, we have to update current_sector.
+        utility = get<UTILITY>(current_sector);
+        density = get<DENSITY_DISTR>(current_sector);
+
         track.push_back(state, InteractionType::ContinuousEnergyLoss);
 
         switch (advancement_type) {
@@ -139,93 +146,121 @@ Interaction::Loss Propagator::DoStochasticInteraction(ParticleState& p_cond,
     return loss;
 }
 
-int Propagator::AdvanceParticle(ParticleState& state, double E_f,
-    double max_distance, std::function<double()> rnd, Sector& current_sector)
-{
-    assert(max_distance > 0);
-    assert(E_f >= 0);
+int Propagator::AdvanceParticle(ParticleState &state,
+    const double energy_next_interaction, const double final_distance,
+    std::function<double()> rnd_generator, Sector& current_sector) {
 
     auto& utility = get<UTILITY>(current_sector);
     auto& density = get<DENSITY_DISTR>(current_sector);
     auto& geometry = get<GEOMETRY>(current_sector);
 
-    auto grammage_next_interaction
-        = utility.LengthContinuous(state.energy, E_f);
-    auto max_distance_left = max_distance - state.propagated_distance;
-    assert(max_distance_left > 0);
+    double energy = energy_next_interaction; // final energy of proposed step
+    double grammage = -1; // grammage of proposed step
+    double distance = -1; // geometrical distance of proposed step
 
-    Cartesian3D mean_direction, new_direction;
-    std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
-        grammage_next_interaction, state.energy, E_f, state.direction, rnd);
+    // Calculate maximal allowed length of step (limit due to final_distance)
+    const double max_distance = final_distance - state.propagated_distance;
 
-    double distance_next_interaction;
-    try {
-        distance_next_interaction = density->Correct(state.position,
-            mean_direction, grammage_next_interaction, max_distance_left);
-    } catch (const DensityException&) {
-        Logging::Get("proposal.propagator")
-            ->debug("Interaction point exceeds "
-                    "maximum propagation distance or lies in infinity.");
-        distance_next_interaction = INF;
-    }
-    auto new_position
-        = state.position + distance_next_interaction * mean_direction;
+    // Calculate grammage until next stochastic interaction
+    double grammage_next_interaction = utility.LengthContinuous(
+            state.energy, energy_next_interaction);
 
-    auto AdvanceDistance = std::array<double, 3> { 0., 0., 0. };
-    AdvanceDistance[ReachedInteraction] = distance_next_interaction;
-    AdvanceDistance[ReachedMaxDistance] = max_distance_left;
-    AdvanceDistance[ReachedBorder]
-        = CalculateDistanceToBorder(state.position, mean_direction, *geometry);
+    int advancement_type;
+    Cartesian3D mean_direction, new_direction; // proposed scattering
 
-    int advancement_type = minimize(AdvanceDistance);
-    double advance_distance = AdvanceDistance[advancement_type];
-    double advance_grammage = grammage_next_interaction;
+    // This lambda expression ensures we always use the same 4 random numbers
+    std::array<double, 4> random_numbers = {-1, -1, -1, -1};
+    int i = 0;
+    auto rnd = [&rnd_generator, &i, &random_numbers]() {
+        if (random_numbers[i%4] == -1)
+            random_numbers[i%4] = rnd_generator();
+        return random_numbers[i++%4];
+    };
 
-    if (advancement_type != ReachedInteraction) {
-        double control_distance;
-        double energy_next_interaction = E_f;
-        do {
-            advance_distance = AdvanceDistance[advancement_type];
-            if (advancement_type == ReachedInteraction) {
-                // avoid recalculation if we go back to this case
-                advance_grammage = grammage_next_interaction;
-                E_f = energy_next_interaction;
-            } else {
-                advance_grammage = density->Calculate(
-                        state.position, state.direction, advance_distance);
-                E_f = utility.EnergyDistance(state.energy, advance_grammage);
-            }
-
-            std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
-                advance_grammage, state.energy, E_f, state.direction, rnd);
-
+    // Iterate combinations of step lengths and scattering angles until we have
+    // reached an interaction, a sector border or the maximal propagation distance
+    do {
+        // Calculate grammage, energy and distance for step
+        if (energy != -1 && distance == -1) {
+            // Calculate grammage and distance from given energy
+            grammage = utility.LengthContinuous(state.energy, energy);
             try {
-                AdvanceDistance[ReachedInteraction]
-                    = density->Correct(state.position, mean_direction,
-                        grammage_next_interaction, max_distance_left);
+                distance = density->Correct(state.position, state.direction, grammage, max_distance);
             } catch (const DensityException&) {
-                AdvanceDistance[ReachedInteraction] = INF;
+                distance = INF;
             }
+        } else if (energy == -1 && distance != -1) {
+            // Calculate energy and grammage from given distance
+            auto grammage_step = density->Calculate(state.position, state.direction, distance);
+            if (grammage_step < grammage_next_interaction) {
+                grammage = grammage_step;
+                energy = utility.EnergyDistance(state.energy, grammage);
+            } else {
+                // we are unable to reach `distance` before we reach the next interaction
+                // this means we are stuck in a loop, and need to discard the current set of random numbers
+                for (auto& r: random_numbers) {
+                    r = rnd_generator();
+                }
+                Logging::Get("proposal.propagator")->debug("Unable to find a valid combination of propagation step "
+                                                           "length and multiple scattering angle for this set of "
+                                                           "random numbers. Resample set of random numbers.");
+                grammage = grammage_next_interaction;
+                energy = energy_next_interaction;
+                try {
+                    distance = density->Correct(state.position, state.direction, grammage, max_distance);
+                } catch (const DensityException&) {
+                    distance = INF;
+                }
+            }
+        } else {
+            throw std::logic_error("Error in AdvanceParticle: Either both distance and final energy for the next "
+                                   "iteration step are known, or neither of them are known. This should never happen "
+                                   "and would indicate an algorithmic error!");
+        }
 
-            AdvanceDistance[ReachedBorder] = CalculateDistanceToBorder(
-                state.position, mean_direction, *geometry);
-            advancement_type = minimize(AdvanceDistance);
-            control_distance = AdvanceDistance[advancement_type];
-        } while (std::abs(advance_distance - control_distance)
-            > PARTICLE_POSITION_RESOLUTION);
-        advance_distance = control_distance;
-        advance_grammage = density->Calculate(
-            state.position, mean_direction, advance_distance);
-        new_position = state.position + advance_distance * mean_direction;
-    }
+        // Calculate scattering proposal
+        std::tie(mean_direction, new_direction) = utility.DirectionsScatter(
+                grammage, state.energy, energy, state.direction, rnd);
 
-    state.time = state.time
-        + utility.TimeElapsed(state.energy, E_f, advance_grammage,
-            density->Evaluate(state.position));
-    state.position = new_position;
+        // Check step
+        double distance_to_border = CalculateDistanceToBorder(state.position, mean_direction, *geometry);
+        bool is_inside = geometry->IsInside(state.position, mean_direction);
+        if (!is_inside) {
+            // Special case: We are on the sector border, but scattering back outside the current sector!
+            // Update sector and recalculate values
+            advancement_type = InvalidStep;
+            auto new_sector = GetCurrentSector(state.position, mean_direction);
+            utility = get<UTILITY>(new_sector);
+            density = get<DENSITY_DISTR>(new_sector);
+            geometry = get<GEOMETRY>(new_sector);
+            grammage_next_interaction = utility.LengthContinuous(state.energy, energy_next_interaction);
+            energy = energy_next_interaction;
+            distance = -1;
+            grammage = -1;
+        } else if (distance <= distance_to_border && distance <= max_distance && energy == energy_next_interaction) {
+            // reached interaction
+            advancement_type = ReachedInteraction;
+        } else if (distance <= distance_to_border && distance == max_distance) {
+            // reached max distance
+            advancement_type = ReachedMaxDistance;
+        } else if (std::abs(distance - distance_to_border) <= PARTICLE_POSITION_RESOLUTION) {
+            // reached geometry border
+            advancement_type = ReachedBorder;
+            distance = distance_to_border;
+        } else {
+            // iteration not finished! discard energy and grammage
+            advancement_type = InvalidStep;
+            distance = std::min(distance_to_border, max_distance);
+            energy = -1;
+            grammage = -1;
+        }
+    } while (advancement_type == InvalidStep);
+
+    state.time = state.time + utility.TimeElapsed(state.energy, energy, grammage, density->Evaluate(state.position)); // TODO: should the energy passed here be the randomized energy or not?
+    state.position = state.position + distance * mean_direction;
     state.direction = new_direction;
-    state.propagated_distance = state.propagated_distance + advance_distance;
-    state.energy = utility.EnergyRandomize(state.energy, E_f, rnd);
+    state.propagated_distance = state.propagated_distance + distance;
+    state.energy = utility.EnergyRandomize(state.energy, energy, rnd);
 
     return advancement_type;
 }
