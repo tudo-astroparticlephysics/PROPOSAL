@@ -6,14 +6,13 @@
 #include <cmath> 
 #include <stdexcept>
 #include <algorithm>
+
 using namespace PROPOSAL;
 using namespace std;
-
 
 double f_nu_g(double nu, double n, double k_4) {
     return pow(nu, (1/n + 1)) + pow((0.2/k_4), (1/n)) * nu - pow((0.2/k_4), (1/n));
 }
-
 
 double get_nu_g(double E, double n, double k_4) {
     auto f = [&n, &k_4](double nu) {
@@ -32,8 +31,7 @@ double get_rms_theta(double e_i, double e_f, double mass, double Z) {
         auto k_3 = 0.22 * pow(e_i, -0.92);
         auto rms_theta = max(min(k_1 * sqrt(nu), k_2), k_3 * nu);
         return rms_theta; 
-    }
-    else {
+    } else {
         auto k_4 = 0.26 * pow(e_i, -0.91);
         auto m = 0.5;
         auto d = 1.8;
@@ -47,12 +45,10 @@ double get_rms_theta(double e_i, double e_f, double mass, double Z) {
             rms_theta = k_5 * pow(1 - nu, -0.5);
             if (rms_theta < 0.2) {
                 // If no case matches
-                // throw invalid_argument("bremsstrahlung deflection: no matching nu/theta");
                 Logging::Get("proposal.deflection")->warn("bremsstrahlung deflection: rms_theta = {} > 0.2, nu_g = {}", rms_theta, nu_g);
             }
             return rms_theta;
-                
-            }
+        }
     }
 }
 
@@ -75,4 +71,3 @@ stochastic_deflection::TsaiParametrizationBremsstrahlungGinneken::CalculateStoch
     
     return UnitSphericalVector {theta_muon, 2 * PI * rnd[1]};
 }
-

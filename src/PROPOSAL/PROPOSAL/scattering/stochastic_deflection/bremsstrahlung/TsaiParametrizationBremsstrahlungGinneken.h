@@ -26,4 +26,6 @@ namespace stochastic_deflection {
 } // namespace stochastic_deflection 
 } // namespace PROPOSAL
 
-// A. Van Ginneken. “Energy loss and angular characteristics of high energy elec- tromagnetic processes”. In: Nuclear Instruments and Methods in Physics Research Section A: Accelerators, Spectrometers, Detectors and Associated Equipment 251.1 (1986), pp. 21–39. issn: 0168-9002. doi: 10.1016/0168-9002(86)91146-0.
+// A. Van Ginneken. “Energy loss and angular characteristics of high energy electromagnetic processes”.
+// In: Nuclear Instruments and Methods in Physics Research Section A: Accelerators, Spectrometers, Detectors and
+// Associated Equipment 251.1 (1986), pp. 21–39. issn: 0168-9002. doi: 10.1016/0168-9002(86)91146-0.
