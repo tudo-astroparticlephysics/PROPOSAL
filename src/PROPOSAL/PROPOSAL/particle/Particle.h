@@ -52,6 +52,7 @@ enum class InteractionType : int {
     Annihilation = 1000000012,
     Photopair = 1000000013,
     Photoproduction = 1000000014,
+    PhotoMuPair = 1000000015,
 };
 struct InteractionType_hash {
     template <class T> std::size_t operator()(const T& type) const
@@ -80,6 +81,7 @@ static const std::unordered_map<InteractionType, std::string,
         { InteractionType::Annihilation, "Annihilation" },
         { InteractionType::Photopair, "Photopair" },
         { InteractionType::Photoproduction, "Photoproduction" },
+        { InteractionType::PhotoMuPair, "PhotoMuPairProduction" },
     };
 } // namespace PROPOSAL
 

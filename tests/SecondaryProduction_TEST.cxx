@@ -2,6 +2,7 @@
 #include <cmath>
 
 #include "PROPOSAL/secondaries/parametrization/ionization/NaivIonization.h"
+#include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionBurkhardtKelnerKokoulin.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionKochMotz.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionTsai.h"
 #include "PROPOSAL/Constants.h"
@@ -85,6 +86,46 @@ TEST(PhotoPairProduction, EnergyConservation)
             = secs.at(0).direction.GetSphericalCoordinates().at(1) - secs.at(1).direction.GetSphericalCoordinates().at(1);
         EXPECT_NEAR(std::abs(azimuth_difference), PI, COMPUTER_PRECISION);
     }
+}
+
+TEST(PhotoMuPairProduction, EnergyConservation)
+{
+    RandomGenerator::Get().SetSeed(2);
+    auto particle = GammaDef();
+    auto medium = StandardRock();
+    auto param = secondaries::PhotoMuPairProductionBurkhardtKelnerKokoulin(particle, medium);
+
+    auto E_i = 1e6;
+    auto init_direction = Cartesian3D(0, 0, 1);
+    auto init_position = Cartesian3D(0, 0, 0);
+    auto loss = StochasticLoss((int)InteractionType::Photopair, E_i, init_position, init_direction, 0, 0, E_i);
+
+    std::vector<double> rnd;
+    for (int i=0; i < param.RequiredRandomNumbers(); i++) {
+        rnd.push_back(RandomGenerator::Get().RandomDouble());
+    }
+
+    auto secs = param.CalculateSecondaries(loss, medium.GetComponents().front(), rnd);
+
+    double E_sum = 0.;
+    double charge_sum = 0.;
+    for (auto sec : secs) {
+        E_sum += sec.energy;
+        // direction should be changed, but position must stay identical
+        EXPECT_NE(sec.direction, init_direction);
+        EXPECT_EQ(sec.position, init_position);
+    }
+
+    // expect two secondary particles
+    EXPECT_EQ(secs.size(), 2);
+    // expect net charge of secondaries to be zero
+    EXPECT_EQ(charge_sum, 0);
+    // check energy conservation
+    EXPECT_NEAR(E_sum, E_i, E_i * COMPUTER_PRECISION);
+    // secondary particle should lay in one shared plane
+    auto azimuth_difference = secs.at(0).direction.GetSphericalCoordinates().at(1) - secs.at(1).direction.GetSphericalCoordinates().at(1);
+    EXPECT_NEAR(std::abs(azimuth_difference), PI, COMPUTER_PRECISION);
+
 }
 
 int main(int argc, char** argv)

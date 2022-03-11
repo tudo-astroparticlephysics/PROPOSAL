@@ -334,7 +334,8 @@ void init_particle(py::module& m) {
         .value("decay", InteractionType::Decay)
         .value("annihilation", InteractionType::Annihilation)
         .value("photopair", InteractionType::Photopair)
-        .value("photoproduction", InteractionType::Photoproduction);
+        .value("photoproduction", InteractionType::Photoproduction)
+        .value("photomupair", InteractionType::PhotoMuPair);
 
    py::enum_<ParticleType>(m_sub, "Particle_Type")
         .value("None", ParticleType::None)
