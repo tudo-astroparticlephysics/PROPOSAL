@@ -46,7 +46,7 @@ TEST(PhotoMuPair, Test_of_dNdx)
         auto cross = make_photomupairproduction(particle_def, *medium, false, config);
 
         dNdx_new = cross->CalculatedNdx(energy);
-        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-5 * dNdx_stored);
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
         auto dEdx = cross->CalculatedEdx(energy);
         EXPECT_EQ(dEdx, 0); // only-stochastic interaction
