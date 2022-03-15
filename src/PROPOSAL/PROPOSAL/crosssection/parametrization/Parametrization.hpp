@@ -21,6 +21,10 @@ namespace crosssection {
     template <>
     struct is_only_stochastic<AnnihilationHeitler> : std::true_type {};
 
+    struct PhotoMuPairBurkhardtKelnerKokoulin;
+    template <>
+    struct is_only_stochastic<PhotoMuPairBurkhardtKelnerKokoulin> : std::true_type {};
+
     struct PhotoPairTsai;
     template <>
     struct is_only_stochastic<PhotoPairTsai> : std::true_type {};

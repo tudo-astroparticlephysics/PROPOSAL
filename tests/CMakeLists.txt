@@ -3,7 +3,7 @@ SET(CMAKE_CXX_STANDARD 17)
 include(GoogleTest)
 
 SET(RESOURCE_URL https://proposal.app.tu-dortmund.de/resources)
-SET(TEST_FILES TestFiles-2022-01-28.tar.gz)
+SET(TEST_FILES TestFiles-2022-03-11.tar.gz)
 
 # download the test files
 add_custom_command(OUTPUT TestFiles
@@ -57,6 +57,7 @@ package_add_test(UnitTest_Ionization Ionization_TEST.cxx)
 package_add_test(UnitTest_Mupairproduction Mupairproduction_TEST.cxx)
 package_add_test(UnitTest_Photonuclear Photonuclear_TEST.cxx)
 package_add_test(UnitTest_PhotoPair PhotoPair_TEST.cxx)
+package_add_test(UnitTest_PhotoMuPair PhotoMuPair_TEST.cxx)
 package_add_test(UnitTest_WeakInteraction WeakInteraction_TEST.cxx)
 
 # propagation and utility tests
