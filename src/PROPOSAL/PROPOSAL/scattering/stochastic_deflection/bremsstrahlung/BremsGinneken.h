@@ -4,18 +4,18 @@
 
 namespace PROPOSAL {
 namespace stochastic_deflection {
-    class TsaiParametrizationBremsstrahlungGinneken : public Bremsstrahlung
+    class BremsGinneken : public Bremsstrahlung
                     { 
         static constexpr int n_rnd = 2;
         double mass;
 
         std::unique_ptr<Parametrization> clone() const final 
         { 
-            return std::make_unique<TsaiParametrizationBremsstrahlungGinneken>(*this);
+            return std::make_unique<BremsGinneken>(*this);
         }
 
     public: 
-        TsaiParametrizationBremsstrahlungGinneken(const ParticleDef& p_def, const Medium&) : mass(p_def.mass) {};
+        BremsGinneken(const ParticleDef& p_def, const Medium&) : mass(p_def.mass) {};
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 

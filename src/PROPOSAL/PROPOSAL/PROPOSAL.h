@@ -144,8 +144,8 @@
 
 #include "PROPOSAL/scattering/stochastic_deflection/ScatteringFactory.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/Bremsstrahlung.h"
-#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiApproximationBremsstrahlung.h"
-#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiParametrizationBremsstrahlungGinneken.h"
+#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/BremsTsaiApproximation.h"
+#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/BremsGinneken.h"
 #include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/NuclearInteraction.h"
 #include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BorogPetrukhinNuclearInteraction.h"
 #include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BjorkenNuclearInteraction.h"

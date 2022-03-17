@@ -1,4 +1,4 @@
-#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiParametrizationBremsstrahlungGinneken.h"
+#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/BremsGinneken.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/math/MathMethods.h"
@@ -57,7 +57,7 @@ double get_rms_theta(double e_i, double e_f, double mass, double Z) {
 }
 
 UnitSphericalVector 
-stochastic_deflection::TsaiParametrizationBremsstrahlungGinneken::CalculateStochasticDeflection(
+stochastic_deflection::BremsGinneken::CalculateStochasticDeflection(
     double e_i, double e_f, std::vector<double> const& rnd, size_t component) const 
 {
     // All energies should be in units of GeV
