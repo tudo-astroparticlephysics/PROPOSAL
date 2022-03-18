@@ -4,19 +4,19 @@
 
 namespace PROPOSAL {
 namespace stochastic_deflection {
-    class TsaiApproximationBremsstrahlung : public Bremsstrahlung,
-                               public DefaultDeflection<TsaiApproximationBremsstrahlung> {
+    class BremsTsaiApproximation : public Bremsstrahlung,
+            public DefaultDeflection<BremsTsaiApproximation> {
 
         static constexpr int n_rnd = 2;
         double mass;
 
         std::unique_ptr<Parametrization> clone() const final
         {
-            return std::make_unique<TsaiApproximationBremsstrahlung>(*this);
+            return std::make_unique<BremsTsaiApproximation>(*this);
         }
 
     public:
-        TsaiApproximationBremsstrahlung(const ParticleDef& p_def, const Medium&)
+        BremsTsaiApproximation(const ParticleDef& p_def, const Medium&)
             : mass(p_def.mass) {};
 
         size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }

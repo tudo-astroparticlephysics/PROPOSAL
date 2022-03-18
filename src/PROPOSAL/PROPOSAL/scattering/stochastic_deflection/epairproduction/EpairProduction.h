@@ -4,9 +4,9 @@
 
 namespace PROPOSAL {
     namespace stochastic_deflection {
-        struct PairProduction : public Parametrization {
-            PairProduction() = default;
-            virtual ~PairProduction() = default;
+        struct EpairProduction : public Parametrization {
+            EpairProduction() = default;
+            virtual ~EpairProduction() = default;
 
             static constexpr InteractionType type = InteractionType::Epair;
 

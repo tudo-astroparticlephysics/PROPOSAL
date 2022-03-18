@@ -1,22 +1,22 @@
 #pragma once
 
-#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/NuclearInteraction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/photonuclear/Photonuclear.h"
 
 
 namespace PROPOSAL {
     namespace stochastic_deflection {
-        class BjorkenNuclearInteraction : public NuclearInteraction {
+        class PhotoGinneken : public Photonuclear {
 
             static constexpr int n_rnd = 2;
             double mass;
 
             std::unique_ptr<Parametrization> clone() const final
             {
-                return std::make_unique<BjorkenNuclearInteraction>(*this);
+                return std::make_unique<PhotoGinneken>(*this);
             }
 
         public:
-            BjorkenNuclearInteraction(const ParticleDef& p_def, const Medium&)
+            PhotoGinneken(const ParticleDef& p_def, const Medium&)
                 : mass(p_def.mass) {};
 
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
