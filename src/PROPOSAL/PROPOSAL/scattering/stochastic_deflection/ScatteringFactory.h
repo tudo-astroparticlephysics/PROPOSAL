@@ -125,7 +125,7 @@ make_stochastic_deflection(
         keys += pair.first + ", ";
     };
     throw std::out_of_range(
-        "This stochastic deflection model is not provided. Please use on of these: " + keys);
+        "This stochastic deflection model is not provided. Please use one of these: " + keys);
 }
 
 } // namespace PROPOSAL
