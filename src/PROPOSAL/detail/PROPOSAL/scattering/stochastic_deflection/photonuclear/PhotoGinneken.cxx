@@ -1,4 +1,4 @@
-#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BjorkenNuclearInteraction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/photonuclear/PhotoGinneken.h"
 #include "PROPOSAL/Constants.h"
 #include <cmath> 
 #include "PROPOSAL/math/MathMethods.h"
@@ -6,7 +6,7 @@
 using namespace PROPOSAL;
 
 UnitSphericalVector 
-stochastic_deflection::BjorkenNuclearInteraction::CalculateStochasticDeflection(
+stochastic_deflection::PhotoGinneken::CalculateStochasticDeflection(
     double e_i, double e_f, std::vector<double> const& rnd, size_t) const 
 {
     // All energies should be in units of GeV

@@ -42,10 +42,10 @@
 #include "PROPOSAL/scattering/stochastic_deflection/Parametrization.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/BremsTsaiApproximation.h"
 #include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/BremsGinneken.h"
-#include "PROPOSAL/scattering/stochastic_deflection/ionization/NaivIonization.h"
-#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BorogPetrukhinNuclearInteraction.h"
-#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BjorkenNuclearInteraction.h"
-#include "PROPOSAL/scattering/stochastic_deflection/pairProd/KelnerPairProduction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/ionization/IonizNaive.h"
+#include "PROPOSAL/scattering/stochastic_deflection/photonuclear/PhotoBorogPetrukhin.h"
+#include "PROPOSAL/scattering/stochastic_deflection/photonuclear/PhotoGinneken.h"
+#include "PROPOSAL/scattering/stochastic_deflection/epairproduction/EpairGinneken.h"
 
 namespace PROPOSAL {
 
@@ -69,7 +69,7 @@ inline auto make_default_stochastic_deflection(Args... args)
  * @tparam Args std::vector<InteractionType> and
  * stochastic_deflection::Parametrization cstr. arguments
  * @param types list of interaction types
- * @param args the corresponding cstr. argmuents
+ * @param args the corresponding cstr. arguments
  */
 template <typename... Args>
 inline auto make_default_stochastic_deflection(
@@ -93,18 +93,18 @@ std::unique_ptr<stochastic_deflection::Parametrization> create_deflection(
 }
 
 static const std::map<std::string, func_ptr> DeflectionTable
-    = { { "BremsTsaiApproximation",
-            create_deflection<stochastic_deflection::BremsTsaiApproximation> },
-        { "naivionization",
-              create_deflection<stochastic_deflection::NaivIonization> },
-        {"borogpetrukhinnuclearinteraction",
-                create_deflection<stochastic_deflection::BorogPetrukhinNuclearInteraction>},
-        {"kelnerpairproduction",
-                create_deflection<stochastic_deflection::KelnerPairProduction>},
-        {"BremsGinneken",
+= {     { "bremstsaiapproximation",
+                create_deflection<stochastic_deflection::BremsTsaiApproximation> },
+        { "ioniznaive",
+                create_deflection<stochastic_deflection::IonizNaive> },
+        { "photoborogpetrukhin",
+                create_deflection<stochastic_deflection::PhotoBorogPetrukhin>},
+        { "epairginneken",
+                create_deflection<stochastic_deflection::EpairGinneken>},
+        { "bremsginneken",
                 create_deflection<stochastic_deflection::BremsGinneken>},
-        {"bjorkennuclearinteraction",
-                create_deflection<stochastic_deflection::BjorkenNuclearInteraction>}
+        { "photoginneken",
+                create_deflection<stochastic_deflection::PhotoGinneken>}
       };
 
 template <typename Cross = std::nullptr_t>
@@ -119,8 +119,13 @@ make_stochastic_deflection(
     if (it != DeflectionTable.end()) {
         return it->second(p_def, medium);
     }
+
+    std::string keys;
+    for (auto const &pair: DeflectionTable) {
+        keys += pair.first + ", ";
+    };
     throw std::out_of_range(
-        "This stochastic deflection model is not provided.");
+        "This stochastic deflection model is not provided. Please use on of these: " + keys);
 }
 
 } // namespace PROPOSAL

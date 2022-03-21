@@ -5,7 +5,7 @@
 namespace PROPOSAL {
 namespace stochastic_deflection {
     class BremsTsaiApproximation : public Bremsstrahlung,
-                               public DefaultDeflection<BremsTsaiApproximation> {
+            public DefaultDeflection<BremsTsaiApproximation> {
 
         static constexpr int n_rnd = 2;
         double mass;

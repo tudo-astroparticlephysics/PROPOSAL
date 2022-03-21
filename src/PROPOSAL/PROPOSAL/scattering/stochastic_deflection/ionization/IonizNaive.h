@@ -1,23 +1,23 @@
 #pragma once
 
-#include "PROPOSAL/scattering/stochastic_deflection/pairProd/PairProduction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/ionization/Ionization.h"
+
 
 namespace PROPOSAL {
     namespace stochastic_deflection {
-        class KelnerPairProduction : public PairProduction,
-                               public DefaultDeflection<KelnerPairProduction> {
+        class IonizNaive : public Ionization,
+                public DefaultDeflection<IonizNaive> {
 
-            static constexpr int n_rnd = 2;
+            static constexpr int n_rnd = 1;
             double mass;
 
             std::unique_ptr<Parametrization> clone() const final
             {
-                return std::make_unique<KelnerPairProduction>(*this);
+                return std::make_unique<IonizNaive>(*this);
             }
 
         public:
-            KelnerPairProduction(const ParticleDef& p_def, const Medium&)
-                : mass(p_def.mass){};
+            IonizNaive(const ParticleDef& p_def, const Medium&) : mass(p_def.mass) {};
 
             size_t RequiredRandomNumbers() const noexcept final { return n_rnd; }
 
@@ -27,4 +27,4 @@ namespace PROPOSAL {
     } // namespace stochastic_deflection
 } // namespace PROPOSAL
 
-// S.R. Kel'ner, Sov. J. Nucl. Phys.5 (1967)778.
+// Use 4 momentum conservation with assumption: E_{e,i} = m_e

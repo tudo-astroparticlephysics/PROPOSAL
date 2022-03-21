@@ -1,11 +1,11 @@
-#include "PROPOSAL/scattering/stochastic_deflection/nuclearInteraction/BorogPetrukhinNuclearInteraction.h"
+#include "PROPOSAL/scattering/stochastic_deflection/photonuclear/PhotoBorogPetrukhin.h"
 #include "PROPOSAL/Constants.h"
 #include <cmath>
 
 using namespace PROPOSAL;
 
 UnitSphericalVector
-stochastic_deflection::BorogPetrukhinNuclearInteraction::CalculateStochasticDeflection(
+stochastic_deflection::PhotoBorogPetrukhin::CalculateStochasticDeflection(
         double e_i, double e_f, std::vector<double> const& rnd, size_t) const
 {
     auto m_0 = std::sqrt(0.4) * 1e3;
