@@ -1,11 +1,11 @@
-#include "PROPOSAL/scattering/stochastic_deflection/ionization/NaivIonization.h"
+#include "PROPOSAL/scattering/stochastic_deflection/ionization/IonizNaive.h"
 #include "PROPOSAL/Constants.h"
 #include <cmath>
 using namespace PROPOSAL;
 
 UnitSphericalVector
-stochastic_deflection::NaivIonization::CalculateStochasticDeflection(
-        double e_i, double e_f, std::vector<double> const& rnd) const
+stochastic_deflection::IonizNaive::CalculateStochasticDeflection(
+        double e_i, double e_f, std::vector<double> const& rnd, size_t) const
 {
     auto p_i = std::sqrt((e_i + mass) * (e_i - mass));
     auto p_f = std::sqrt((e_f + mass) * (e_f - mass));

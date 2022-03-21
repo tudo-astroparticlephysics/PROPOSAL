@@ -1,11 +1,11 @@
-#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiApproximationBremsstrahlung.h"
+#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/BremsTsaiApproximation.h"
 #include "PROPOSAL/Constants.h"
 #include <cmath>
 using namespace PROPOSAL;
 
 UnitSphericalVector 
-stochastic_deflection::TsaiApproximationBremsstrahlung::CalculateStochasticDeflection(
-    double e_i, double e_f, std::vector<double> const& rnd) const
+stochastic_deflection::BremsTsaiApproximation::CalculateStochasticDeflection(
+    double e_i, double e_f, std::vector<double> const& rnd, size_t) const
 {
     auto epsilon = e_i - e_f;
     auto theta_star = 1.0;

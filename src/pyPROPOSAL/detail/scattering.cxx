@@ -7,8 +7,6 @@
 #include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
 #include "PROPOSAL/scattering/multiple_scattering/ScatteringFactory.h"
 
-#include "PROPOSAL/scattering/stochastic_deflection/bremsstrahlung/TsaiApproximationBremsstrahlung.h"
-
 #include "pyPROPOSAL/pyBindings.h"
 
 namespace py = pybind11;
@@ -102,21 +100,17 @@ void init_scattering(py::module& m)
             &stochastic_deflection::Parametrization::
                 CalculateStochasticDeflection,
             py::arg("initial_energy"), py::arg("final_energy"),
-            py::arg("random_numbers"),
+            py::arg("random_numbers"), py::arg("component"),
             R"pbdoc( Calculation of the stochastic deflection of an interaction
 
                 Args:
                     initial_energy(double): Initial energy of the muon
                     final_energy(double): Final energy of the muon
                     random_numbers(list(double)): Random numbers to sample the deflection angles
-
+                    component(int): Hash of Component (Medium)
                 Returns:
                     UnitSphericalVector: The angular change of the direction
-                        contained in a normed spherical vector
-            TODO: it's not clear if second argument should be the lost energy or the final energy.
-            This might probably change in the future.
-            Please contact the maintainers if required.
-            )pbdoc");
+                        contained in a normed spherical vector)pbdoc");
 
     using deflect_ptr = std::shared_ptr<stochastic_deflection::Parametrization>;
     using deflect_list_t = std::vector<deflect_ptr>;
@@ -169,15 +163,16 @@ void init_scattering(py::module& m)
                 int: required rnd numbers)pbdoc")
         .def("stochastic_deflection",
             &Scattering::CalculateStochasticDeflection<double, double,
-                std::vector<double> const&>,
+                std::vector<double> const&, size_t>,
             py::arg("type"), py::arg("initial_energy"), py::arg("final_energy"),
-            py::arg("rnd"),
+            py::arg("rnd"), py::arg("component"),
             R"pbdoc(Sample stochastic defleciton angles in radians.
             Args:
                 type (Interaction_Type): type of stochastic loss
                 initial_energy (double): energy before continuous loss
                 final_energy (double): energy after continuous loss
                 rnd (list(double)): container of random numbers
+                component (int): hash of component (medium)
             Returns:
                 list(double): deflection angles)pbdoc")
         .def("multiple_scattering",

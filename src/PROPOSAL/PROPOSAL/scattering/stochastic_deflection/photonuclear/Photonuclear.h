@@ -4,9 +4,9 @@
 
 namespace PROPOSAL {
     namespace stochastic_deflection {
-        struct NuclearInteraction : public Parametrization {
-            NuclearInteraction() = default;
-            virtual ~NuclearInteraction() = default;
+        struct Photonuclear : public Parametrization {
+            Photonuclear() = default;
+            virtual ~Photonuclear() = default;
 
             static constexpr InteractionType type = InteractionType::Photonuclear;
 
