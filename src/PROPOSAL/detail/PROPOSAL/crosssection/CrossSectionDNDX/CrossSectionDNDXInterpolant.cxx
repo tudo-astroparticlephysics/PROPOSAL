@@ -71,7 +71,7 @@ double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
         return 0.;
     auto lim = GetIntegrationLimits(energy);
     v = retransform_v(lim.min, lim.max, v);
-    return interpolant.evaluate(std::array<double, 2> { energy, v });
+    return std::max(interpolant.evaluate(std::array<double, 2> { energy, v }), 0.);
 }
 
 double CrossSectionDNDXInterpolant::GetUpperLimit(double energy, double rate)
