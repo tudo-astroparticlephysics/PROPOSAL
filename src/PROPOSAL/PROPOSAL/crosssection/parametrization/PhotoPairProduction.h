@@ -34,7 +34,11 @@
 
 namespace PROPOSAL {
 namespace crosssection {
+    class PhotoPairLPM;
+
     class PhotoPairProduction : public Parametrization<Component> {
+    protected:
+        std::shared_ptr<PhotoPairLPM> lpm_;
     public:
         PhotoPairProduction() = default;
         virtual ~PhotoPairProduction() = default;

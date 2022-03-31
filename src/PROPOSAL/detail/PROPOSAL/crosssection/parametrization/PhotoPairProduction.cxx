@@ -278,6 +278,107 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
         0.); // TODO what are the real factors here, those are just guesses
 }
 
+crosssection::PhotoPairLPM::PhotoPairLPM(const ParticleDef& p_def, const Medium& medium,
+    const PhotoPair& param)
+    : hash(0)
+    , mass_(p_def.mass)
+    , mol_density_(medium.GetMolDensity())
+    , mass_density_(medium.GetMassDensity())
+    , sum_charge_(medium.GetSumCharge())
+{
+    hash_combine(hash, mass_, mol_density_, mass_density_, sum_charge_, param.GetHash());
+    double upper_energy = 1e14;
+    Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
+    auto components = medium.GetComponents();
+
+    double sum = 0.;
+    for (auto comp : components) {
+        auto limits = param.GetKinematicLimits(p_def, comp, upper_energy);
+        double contribution = 0;
+        contribution += integral_temp.Integrate(
+            limits.v_min, limits.v_max,
+            [&param, &p_def, &comp, &upper_energy](double v) {
+                return param.FunctionToDEdxIntegral(
+                    p_def, comp, upper_energy, v);
+            },
+            2.);
+        double weight_for_loss_in_medium = medium.GetSumNucleons()
+            / (comp.GetAtomInMolecule() * comp.GetAtomicNum());
+        sum += contribution / weight_for_loss_in_medium;
+    }
+    sum = sum * mass_density_;
+    eLpm_ = ALPHA * mass_;
+    eLpm_ *= eLpm_ / (4. * PI * ME * RE * sum);
+}
+
+double crosssection::PhotoPairLPM::suppression_factor(
+        double energy, double v, const Component& comp,
+        double density_correction) const
+{
+    // taken from crosssection::BremsLPM::suppression_factor with appropriate modifications
+    double G, fi, xi, ps, Gamma, s1;
+
+    const double fi1 = 1.54954;
+    const double G1 = 0.710390;
+    const double G2 = 0.904912;
+    double Z3 = std::pow(comp.GetNucCharge(), -1. / 3);
+
+    // electrons are much lighter than muons, therefore no nuclear formfactor correction
+    s1 = 1 / (Z3 * comp.GetLogConstant()); // PRD 25 (1982), 1291, Eq. (17)
+    s1 = s1 * s1 * SQRT2; // TODO: is SQRT2 correct here, this factor is not in the paper?
+
+    // Calc xi(s') from Stanev, Vankow, Streitmatter, Ellsworth, Bowen
+    // Phys. Rev. D 25 (1982), 1291, Eq. (19)
+    double sp = 0.125 * std::sqrt(eLpm_ / (density_correction * energy * v * (1 - v)));
+    double h = std::log(sp) / std::log(s1);
+
+    if (sp < s1) {
+        xi = 2;
+    } else if (sp < 1) {
+        xi = 1 + h - 0.08 * (1 - h) * (1 - (1 - h) * (1 - h)) / std::log(s1);
+    } else {
+        xi = 1;
+    }
+
+    Gamma = RE * ME / (ALPHA * mass_ * v);
+    Gamma = 1
+        + 4 * PI * sum_charge_ * RE * Gamma * Gamma * mol_density_ * density_correction;
+    double s = sp / std::sqrt(xi) * Gamma;
+    double s2 = s * s;
+
+    if (s < fi1) {
+        // Stanev et al.,  Phys. Rev. D 25 (1982), 1291 (eq. 14d)
+        fi = 1
+            - std::exp(-6 * s * (1 + (3 - PI) * s)
+                + s2 * s / (0.623 + 0.796 * s + 0.658 * s2));
+    } else {
+        fi = 1
+            - 0.012 / (s2 * s2); // Migdal, Phys. Rev. 103 (1956), 1811 (eq. 48)
+    }
+
+    if (s < G1) {
+        //  Stanev et al.,  Phys. Rev. D 25 (1982), 1291 (eq. 15d)
+        ps = 1
+            - std::exp(-4 * s
+                - 8 * s2
+                    / (1 + 3.936 * s + 4.97 * s2 - 0.05 * s2 * s
+                        + 7.50 * s2 * s2));
+        // Klein, Rev. Mod. Phys. 71 (1999), 1501 (eq. 77)
+        G = 3 * ps - 2 * fi;
+    } else if (s < G2) {
+        G = 36 * s2 / (36 * s2 + 1);
+    } else {
+        G = 1
+            - 0.022 / (s2 * s2); // Migdal, Phys. Rev. 103 (1956), 1811 (eq. 48)
+    }
+
+    // v-dependence differs from bremsstrahlung
+    return ((xi / 3)
+               * (G / (Gamma * Gamma)
+                   + 2 * ((v * v)  + (1 - v) * (1 - v)) * fi / Gamma))
+        / (1 - (4. / 3) * v * (1 - v));
+}
+
 /* PhotoAngleTsaiIntegral::PhotoAngleTsaiIntegral() */
 /*     : PhotoAngleDistribution() */
 /*     , integral_(IROMB, IMAXS, IPREC) */
