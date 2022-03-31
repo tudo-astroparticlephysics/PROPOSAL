@@ -90,5 +90,22 @@ namespace crosssection {
     template <> struct ParametrizationId<PhotoPairKochMotz> {
         static constexpr size_t value = 1000000013;
     };
+
+    // LPM effect object
+    class PhotoPairLPM {
+        size_t hash;
+        double mass_;
+        double mol_density_;
+        double mass_density_;
+        double sum_charge_;
+        double eLpm_;
+
+    public:
+        PhotoPairLPM(const ParticleDef&, const Medium&, const PhotoPairProduction&);
+        double suppression_factor(double energy, double v, const Component&,
+                                  double density_correction = 1.0) const;
+        size_t GetHash() const noexcept { return hash; }
+    };
+
 } // namespace crosssection
 } // namespace PROPOSAL

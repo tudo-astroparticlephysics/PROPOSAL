@@ -279,7 +279,7 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 }
 
 crosssection::PhotoPairLPM::PhotoPairLPM(const ParticleDef& p_def, const Medium& medium,
-    const PhotoPair& param)
+                                         const PhotoPairProduction& param)
     : hash(0)
     , mass_(p_def.mass)
     , mol_density_(medium.GetMolDensity())
