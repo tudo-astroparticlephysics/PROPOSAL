@@ -233,11 +233,11 @@ and if you want to cite the latest improvements
 
 ## Developers and Maintainers ##
 
-*Jan Soedingrekso*, *Alexander Sandrock*, *Jean-Marco Alameddine*, *Maximilian Sackel*
+*Jan Soedingrekso*, *Alexander Sandrock*, *Jean-Marco Alameddine*
 
 ## Former Developers and Maintainers ##
 
-*Jan-Hendrik Koehne*, *Tomasz Fuchs*, *Mario Dunsch*
+*Jan-Hendrik Koehne*, *Tomasz Fuchs*, *Mario Dunsch*, *Maximilian Sackel*
 
 ## Acknowledgment ##
 
