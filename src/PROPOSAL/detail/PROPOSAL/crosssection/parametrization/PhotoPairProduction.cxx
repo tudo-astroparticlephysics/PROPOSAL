@@ -16,25 +16,10 @@
 using namespace PROPOSAL;
 using std::make_tuple;
 
-crosssection::PhotoPairProduction::PhotoPairProduction(bool lpm) {
-    if (lpm)
-        throw std::invalid_argument("Missing particle_def and medium for "
-                                    "PhotoPairProduction constructor with "
-                                    "lpm=true");
-    lpm_ = nullptr;
-}
-
-crosssection::PhotoPairProduction::PhotoPairProduction(
-    bool lpm, const ParticleDef& p_def, const Medium& medium,
-    double density_correction) {
-    if (lpm) {
-        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium, *this);
-        hash_combine(hash, density_correction, lpm_->GetHash());
-        density_correction_ = density_correction;
-    } else {
-        lpm_ = nullptr;
-    }
-}
+crosssection::PhotoPairProduction::PhotoPairProduction()
+    : lpm_(nullptr)
+    , density_correction_(1.0)
+{}
 
 double crosssection::PhotoPairProduction::GetLowerEnergyLim(
     const ParticleDef&) const noexcept
@@ -59,16 +44,26 @@ crosssection::PhotoPairProduction::GetKinematicLimits(
 }
 
 crosssection::PhotoPairTsai::PhotoPairTsai(bool lpm)
-    : PhotoPairProduction(lpm)
 {
+    if (lpm)
+        throw std::invalid_argument("Missing particle_def and medium for "
+                                    "PhotoPairProduction constructor with "
+                                    "lpm=true");
+    lpm_ = nullptr;
     hash_combine(hash, std::string("tsai"));
 }
 
 crosssection::PhotoPairTsai::PhotoPairTsai(
         bool lpm, const ParticleDef& p_def, const Medium& medium,
         double density_correction)
-    : PhotoPairProduction(lpm, p_def, medium, density_correction)
 {
+    if (lpm) {
+        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium, *this);
+        hash_combine(hash, density_correction, lpm_->GetHash());
+        density_correction_ = density_correction;
+    } else {
+        lpm_ = nullptr;
+    }
     hash_combine(hash, std::string("tsai"));
 }
 
@@ -87,22 +82,32 @@ crosssection::PhotoPairKochMotz::clone() const
 }
 
 crosssection::PhotoPairKochMotz::PhotoPairKochMotz(bool lpm)
-        : PhotoPairProduction(lpm),
-           interpolant_(new Interpolant(photopair_KM_Z, photopair_KM_energies,
+        : interpolant_(new Interpolant(photopair_KM_Z, photopair_KM_energies,
                                      photopair_KM_cross, 2, false, false,
                                      2, false, false))
 {
+    if (lpm)
+        throw std::invalid_argument("Missing particle_def and medium for "
+                                    "PhotoPairProduction constructor with "
+                                    "lpm=true");
+    lpm_ = nullptr;
     hash_combine(hash, std::string("kochmotz"));
 }
 
 crosssection::PhotoPairKochMotz::PhotoPairKochMotz(
         bool lpm, const ParticleDef& p_def, const Medium& medium,
         double density_correction)
-    : PhotoPairProduction(lpm, p_def, medium, density_correction),
-      interpolant_(new Interpolant(photopair_KM_Z, photopair_KM_energies,
+    : interpolant_(new Interpolant(photopair_KM_Z, photopair_KM_energies,
                                    photopair_KM_cross, 2, false, false,
                                    2, false, false))
 {
+    if (lpm) {
+        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium, *this);
+        hash_combine(hash, density_correction, lpm_->GetHash());
+        density_correction_ = density_correction;
+    } else {
+        lpm_ = nullptr;
+    }
     hash_combine(hash, std::string("kochmotz"));
 }
 
@@ -335,12 +340,11 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 crosssection::PhotoPairLPM::PhotoPairLPM(const ParticleDef& p_def, const Medium& medium,
                                          const PhotoPairProduction& param)
     : hash(0)
-    , mass_(p_def.mass)
     , mol_density_(medium.GetMolDensity())
     , mass_density_(medium.GetMassDensity())
     , sum_charge_(medium.GetSumCharge())
 {
-    hash_combine(hash, mass_, mol_density_, mass_density_, sum_charge_, param.GetHash());
+    hash_combine(hash, mol_density_, mass_density_, sum_charge_, param.GetHash());
     double upper_energy = 1e14;
     Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
     auto components = medium.GetComponents();
@@ -352,7 +356,7 @@ crosssection::PhotoPairLPM::PhotoPairLPM(const ParticleDef& p_def, const Medium&
         contribution += integral_temp.Integrate(
             limits.v_min, limits.v_max,
             [&param, &p_def, &comp, &upper_energy](double v) {
-                return param.FunctionToDEdxIntegral(
+                return param.DifferentialCrossSection(
                     p_def, comp, upper_energy, v);
             },
             2.);
@@ -360,8 +364,8 @@ crosssection::PhotoPairLPM::PhotoPairLPM(const ParticleDef& p_def, const Medium&
             / (comp.GetAtomInMolecule() * comp.GetAtomicNum());
         sum += contribution / weight_for_loss_in_medium;
     }
-    sum = sum * mass_density_;
-    eLpm_ = ALPHA * mass_;
+    sum = 9./7. * sum * mass_density_;
+    eLpm_ = ALPHA * ME;
     eLpm_ *= eLpm_ / (4. * PI * ME * RE * sum);
 }
 
@@ -394,7 +398,7 @@ double crosssection::PhotoPairLPM::suppression_factor(
         xi = 1;
     }
 
-    Gamma = RE * ME / (ALPHA * mass_ * x);
+    Gamma = RE * ME / (ALPHA * ME * x);
     Gamma = 1
         + 4 * PI * sum_charge_ * RE * Gamma * Gamma * mol_density_ * density_correction;
     double s = sp / std::sqrt(xi) * Gamma;

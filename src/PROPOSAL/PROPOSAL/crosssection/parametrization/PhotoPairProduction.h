@@ -41,9 +41,7 @@ namespace crosssection {
         std::shared_ptr<PhotoPairLPM> lpm_;
         double density_correction_; // correction to standard medium density for LPM
     public:
-        PhotoPairProduction(bool lpm = false);
-        PhotoPairProduction(bool lpm, const ParticleDef&, const Medium&,
-                            double density_correction = 1.0);
+        PhotoPairProduction();
         virtual ~PhotoPairProduction() = default;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept final;
@@ -101,7 +99,6 @@ namespace crosssection {
     // LPM effect object
     class PhotoPairLPM {
         size_t hash;
-        double mass_;
         double mol_density_;
         double mass_density_;
         double sum_charge_;
