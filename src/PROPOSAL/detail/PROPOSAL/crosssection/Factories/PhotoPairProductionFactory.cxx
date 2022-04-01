@@ -5,12 +5,15 @@
 #include <nlohmann/json.hpp>
 
 using namespace PROPOSAL;
-using photopair_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&, bool);
+using photopair_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&,
+        bool, bool, double);
 
 template <typename Param>
-cross_ptr create_photopairproduction(const ParticleDef& p_def, const Medium& medium, bool interpol)
+cross_ptr create_photopairproduction(
+        const ParticleDef& p_def, const Medium& medium, bool interpol,
+        bool lpm, double density_correction)
 {
-    auto param = Param();
+    auto param = Param(lpm, p_def, medium, density_correction);
     return make_crosssection(param, p_def, medium, nullptr, interpol);
 }
 
@@ -24,16 +27,18 @@ std::map<std::string, photopair_func_ptr, Helper::case_insensitive_comp> photopa
 
 namespace PROPOSAL {
     cross_ptr make_photopairproduction(const ParticleDef &p_def, const Medium &medium,
-                                       bool interpol, const nlohmann::json &config) {
+                                       bool interpol, const nlohmann::json &config,
+                                       double density_correction) {
         if (!config.contains("parametrization"))
             throw std::logic_error("No parametrization passed for photopairproduction");
         std::string param_name = config["parametrization"];
+        bool lpm = config.value("lpm", true);
 
         auto it = photopair_map.find(param_name);
         if (it == photopair_map.end())
             throw std::logic_error("Unknown parametrization for photopairproduction");
 
-        auto cross = it->second(p_def, medium, interpol);
+        auto cross = it->second(p_def, medium, interpol, lpm, density_correction);
 
         double multiplier = config.value("multiplier", 1.0);
         if (multiplier != 1.0)

@@ -16,6 +16,26 @@
 using namespace PROPOSAL;
 using std::make_tuple;
 
+crosssection::PhotoPairProduction::PhotoPairProduction(bool lpm) {
+    if (lpm)
+        throw std::invalid_argument("Missing particle_def and medium for "
+                                    "PhotoPairProduction constructor with "
+                                    "lpm=true");
+    lpm_ = nullptr;
+}
+
+crosssection::PhotoPairProduction::PhotoPairProduction(
+    bool lpm, const ParticleDef& p_def, const Medium& medium,
+    double density_correction) {
+    if (lpm) {
+        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium, *this);
+        hash_combine(hash, density_correction, lpm_->GetHash());
+        density_correction_ = density_correction;
+    } else {
+        lpm_ = nullptr;
+    }
+}
+
 double crosssection::PhotoPairProduction::GetLowerEnergyLim(
     const ParticleDef&) const noexcept
 {
@@ -38,6 +58,20 @@ crosssection::PhotoPairProduction::GetKinematicLimits(
     return lim;
 }
 
+crosssection::PhotoPairTsai::PhotoPairTsai(bool lpm)
+    : PhotoPairProduction(lpm)
+{
+    hash_combine(hash, std::string("tsai"));
+}
+
+crosssection::PhotoPairTsai::PhotoPairTsai(
+        bool lpm, const ParticleDef& p_def, const Medium& medium,
+        double density_correction)
+    : PhotoPairProduction(lpm, p_def, medium, density_correction)
+{
+    hash_combine(hash, std::string("tsai"));
+}
+
 std::unique_ptr<crosssection::Parametrization<Component>>
 crosssection::PhotoPairTsai::clone() const
 {
@@ -52,8 +86,20 @@ crosssection::PhotoPairKochMotz::clone() const
     return std::make_unique<param_t>(*this);
 }
 
-crosssection::PhotoPairKochMotz::PhotoPairKochMotz()
-    : interpolant_(new Interpolant(photopair_KM_Z, photopair_KM_energies,
+crosssection::PhotoPairKochMotz::PhotoPairKochMotz(bool lpm)
+        : PhotoPairProduction(lpm),
+           interpolant_(new Interpolant(photopair_KM_Z, photopair_KM_energies,
+                                     photopair_KM_cross, 2, false, false,
+                                     2, false, false))
+{
+    hash_combine(hash, std::string("kochmotz"));
+}
+
+crosssection::PhotoPairKochMotz::PhotoPairKochMotz(
+        bool lpm, const ParticleDef& p_def, const Medium& medium,
+        double density_correction)
+    : PhotoPairProduction(lpm, p_def, medium, density_correction),
+      interpolant_(new Interpolant(photopair_KM_Z, photopair_KM_energies,
                                    photopair_KM_cross, 2, false, false,
                                    2, false, false))
 {
@@ -146,6 +192,10 @@ double crosssection::PhotoPairKochMotz::DifferentialCrossSectionWithoutA(
 
     result *= RE * RE * ALPHA * ( (2 * v * v - 2 * v + 1) * (phi1 - 4./3. * logZ - 4. * f_c)
             + 2./3 * v * (1. - v) * (phi2 - 4./3. * logZ - 4 * f_c));
+
+    if (lpm_) {
+        result *= lpm_->suppression_factor(energy, v, comp, density_correction_);
+    }
 
     return result * NA / comp.GetAtomicNum();
 
@@ -274,6 +324,10 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
     aux *= x * std::pow(k, 2.) / p; // conversion from differential cross
                                     // section in electron momentum to x
 
+    if (lpm_) {
+        aux *= lpm_->suppression_factor(energy, x, comp, density_correction_);
+    }
+
     return std::max(NA / comp.GetAtomicNum() * aux,
         0.); // TODO what are the real factors here, those are just guesses
 }
@@ -312,7 +366,7 @@ crosssection::PhotoPairLPM::PhotoPairLPM(const ParticleDef& p_def, const Medium&
 }
 
 double crosssection::PhotoPairLPM::suppression_factor(
-        double energy, double v, const Component& comp,
+        double energy, double x, const Component& comp,
         double density_correction) const
 {
     // taken from crosssection::BremsLPM::suppression_factor with appropriate modifications
@@ -329,7 +383,7 @@ double crosssection::PhotoPairLPM::suppression_factor(
 
     // Calc xi(s') from Stanev, Vankow, Streitmatter, Ellsworth, Bowen
     // Phys. Rev. D 25 (1982), 1291, Eq. (19)
-    double sp = 0.125 * std::sqrt(eLpm_ / (density_correction * energy * v * (1 - v)));
+    double sp = 0.125 * std::sqrt(eLpm_ / (density_correction * energy * x * (1 - x)));
     double h = std::log(sp) / std::log(s1);
 
     if (sp < s1) {
@@ -340,7 +394,7 @@ double crosssection::PhotoPairLPM::suppression_factor(
         xi = 1;
     }
 
-    Gamma = RE * ME / (ALPHA * mass_ * v);
+    Gamma = RE * ME / (ALPHA * mass_ * x);
     Gamma = 1
         + 4 * PI * sum_charge_ * RE * Gamma * Gamma * mol_density_ * density_correction;
     double s = sp / std::sqrt(xi) * Gamma;
@@ -375,205 +429,6 @@ double crosssection::PhotoPairLPM::suppression_factor(
     // v-dependence differs from bremsstrahlung
     return ((xi / 3)
                * (G / (Gamma * Gamma)
-                   + 2 * ((v * v)  + (1 - v) * (1 - v)) * fi / Gamma))
-        / (1 - (4. / 3) * v * (1 - v));
+                   + 2 * ((x * x)  + (1 - x) * (1 - x)) * fi / Gamma))
+        / (1 - (4. / 3) * x * (1 - x));
 }
-
-/* PhotoAngleTsaiIntegral::PhotoAngleTsaiIntegral() */
-/*     : PhotoAngleDistribution() */
-/*     , integral_(IROMB, IMAXS, IPREC) */
-/* { */
-/* } */
-
-/* PhotoAngleDistribution::DeflectionAngles
- * PhotoAngleTsaiIntegral::SampleAngles( */
-/*     const Component& comp, double energy, double rho) */
-/* { */
-/*     PhotoAngleDistribution::DeflectionAngles angles; */
-
-/*     double rnd1 = RandomGenerator::Get().RandomDouble(); */
-/*     double rnd2 = RandomGenerator::Get().RandomDouble(); */
-/*     double rnd3 = RandomGenerator::Get().RandomDouble(); */
-
-/*     double subst = std::max(1., std::log10(energy)); */
-
-/*     auto integrand_substitution = [&](double energy, double rho, double t) {
- */
-/*         return subst * std::pow(t, subst - 1.) */
-/*             * this->FunctionToIntegral(comp, energy, rho, std::pow(t,
- * subst)); */
-/*     }; */
-
-/*     double t_min = 0; */
-/*     double t_max = std::pow(PI, 1. / subst); */
-
-/*     static_cast<void>(integral_.IntegrateWithRandomRatio(t_min, t_max, */
-/*         std::bind(integrand_substitution, energy, rho,
- * std::placeholders::_1), */
-/*         3, rnd1)); */
-
-/*     angles.cosphi0 = std::cos(std::pow(integral_.GetUpperLimit(), subst)); */
-
-/*     static_cast<void>(integral_.IntegrateWithRandomRatio(t_min, t_max, */
-/*         std::bind(integrand_substitution, energy, rho,
- * std::placeholders::_1), */
-/*         3, rnd2)); */
-
-/*     angles.cosphi1 = std::cos(std::pow(integral_.GetUpperLimit(), subst)); */
-
-/*     angles.theta0 = rnd3 * 2. * PI; */
-/*     angles.theta1 = std::fmod(angles.theta0 + PI, 2. * PI); */
-
-/*     // Sometimes the intergration fails and -1 instead of 1 is returned... */
-/*     if (angles.cosphi0 == -1.) { */
-/*         angles.cosphi0 *= (-1); */
-/*     } */
-
-/*     if (angles.cosphi1 == -1.) { */
-/*         angles.cosphi1 *= (-1); */
-/*     } */
-
-/*     return angles; */
-/* } */
-
-/* double PhotoAngleTsaiIntegral::FunctionToIntegral( */
-/*     const Component& comp, double energy, double x, double theta) */
-/* { */
-
-/*     // Pair production and bremsstrahlung of chraged leptons, Yung-Su Tsai,
- */
-/*     // Review of Modern Physics, Vol. 46, No. 4, October 1974 */
-/*     // see formula (3.5) */
-
-/*     double aux; */
-/*     double E = energy * x; // electron energy */
-/*     double l = E * E * theta * theta / (ME * ME); */
-/*     double Z = comp.GetNucCharge(); */
-/*     double Z3 = std::pow(comp.GetNucCharge(), -1. / 3); */
-/*     double G2 = Z * Z + Z; */
-/*     double tminprimesqrt = (ME * ME * (1. + l)) / (2. * energy * x * (1. -
- * x)); */
-
-/*     double z = std::pow(Z / 137., 2.); */
-/*     double f = 1.202 * z - 1.0369 * std::pow(z, 2.) */
-/*         + 1.008 * std::pow(z, 3.) / (1. + z); // (3.3) */
-
-/*     double delta; */
-/*     double B; */
-/*     double X; */
-/*     double Xel, Xinel; */
-
-/*     if (Z < 2.5) { */
-/*         double eta; */
-
-/*         if (Z < 1.5) { */
-/*             eta = 1.; // for hydrogen */
-/*         } else { */
-/*             eta = 1.6875; // for helium */
-/*         } */
-
-/*         delta = ME * ME / (2. * energy * x * (1. - x)); // (3.20) */
-/*         B = 2. * ALPHA * ME * eta / tminprimesqrt;      // (3.21) */
-/*         Xel = 2. * std::log(ME / delta) - std::log(1. + B * B) + 1. / 6. */
-/*             - (4. / 3.) / (1. + B * B) */
-/*             + (1. / 6.) / std::pow(1. + B * B, 2.); // (3.18) with erratum */
-/*         Xel *= Z * Z; */
-/*         Xinel = 2. * std::log(ME / delta) - std::log(1. + B * B) + 11. / 6.
- */
-/*             - 4. / (B * B) * std::log(1. + B * B) + (4. / 3.) / (1. + B * B)
- */
-/*             - (1. / 6.) / std::pow(1. + B * B, 2.); // (3.19) with erratum */
-/*         Xinel *= Z; */
-/*     } else { */
-/*         // a and aprime according to Table (B.4.) */
-/*         double a, aprime; */
-/*         if (Z <= 1.5) { */
-/*             a = 122.8; */
-/*             aprime = 282.4; */
-/*         } else if (Z <= 2.5) { */
-/*             a = 90.8; */
-/*             aprime = 265.8; */
-/*         } else if (Z <= 3.5) { */
-/*             a = 100.; */
-/*             aprime = 418.6; */
-/*         } else if (Z <= 4.5) { */
-/*             a = 106; */
-/*             aprime = 571.4; */
-/*         } else { */
-/*             a = 111.7; */
-/*             aprime = 724.2; */
-/*         } */
-
-/*         a *= Z3 / ME; */
-/*         aprime *= Z3 * Z3 / ME; */
-
-/*         Xel = std::log(a * a * ME * ME * std::pow(1. + l, 2.) */
-/*                   / (a * a * tminprimesqrt * tminprimesqrt + 1.)) */
-/*             - 1.; */
-/*         Xel *= Z * Z; // (3.44) */
-/*         Xinel = std::log(aprime * aprime * ME * ME * std::pow(1. + l, 2.) */
-/*                     / (aprime * aprime * tminprimesqrt * tminprimesqrt + 1.))
- */
-/*             - 1.; */
-/*         Xinel *= Z; // (3.45) */
-/*     } */
-
-/*     X = Xel + Xinel; */
-
-/*     // (3.5) with erratum */
-/*     aux = G2 */
-/*         * (2. * x * (1. - x) / std::pow(1. + l, 2.) */
-/*               - 12. * l * x * (1. - x) / std::pow(1. + l, 4.)); */
-/*     aux += (X - 2. * Z * Z * f) */
-/*         * ((2. * x * x - 2. * x + 1.) / std::pow(1. + l, 2.) */
-/*               + (4. * l * x * (1. - x)) / std::pow(1. + l, 4)); */
-
-/*     // aux *= 2. * std::pow(ALPHA, 3.) / (PI * energy) * (E * E / */
-/*     // std::pow(ME, 4.)); only overall factor relevant */
-
-/*     aux *= sin(theta); // conversion from differential in cos(theta) to */
-/*                        // differential in theta */
-
-/*     return aux; */
-/* } */
-
-/* PhotoAngleDistribution::DeflectionAngles
- * PhotoAngleNoDeflection::SampleAngles( */
-/*     const Component&, double energy, double rho) */
-/* { */
-/*     (void)energy; */
-/*     (void)rho; */
-
-/*     PhotoAngleDistribution::DeflectionAngles angles; */
-
-/*     angles.cosphi0 = 1.; */
-/*     angles.theta0 = 0.; */
-/*     angles.cosphi1 = 1.; */
-/*     angles.theta1 = 0.; */
-
-/*     return angles; */
-/* } */
-
-/* PhotoAngleEGS::PhotoAngleEGS() */
-/*     : PhotoAngleDistribution() */
-/* { */
-/* } */
-
-/* PhotoAngleDistribution::DeflectionAngles PhotoAngleEGS::SampleAngles( */
-/*     const Component&, double energy, double rho) */
-/* { */
-/*     (void)rho; */
-
-/*     double rnd = RandomGenerator::Get().RandomDouble(); */
-
-/*     PhotoAngleDistribution::DeflectionAngles angles; */
-
-/*     double k = energy / ME; */
-
-/*     angles.cosphi0 = std::cos(1. / k); */
-/*     angles.cosphi1 = std::cos(1. / k); */
-/*     angles.theta0 = rnd * 2. * PI; */
-/*     angles.theta1 = std::fmod(angles.theta0 + PI, 2. * PI); */
-
-/*     return angles; */
-/* } */

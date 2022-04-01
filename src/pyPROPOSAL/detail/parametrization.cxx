@@ -835,12 +835,18 @@ void init_parametrization(py::module& m)
     py::class_<crosssection::PhotoPairTsai,
         std::shared_ptr<crosssection::PhotoPairTsai>,
         crosssection::PhotoPairProduction>(m_sub_photopair, "Tsai")
-        .def(py::init<>());
+        .def(py::init<bool>(), py::arg("lpm") = false)
+        .def(py::init<bool, const ParticleDef&, const Medium&, double>(),
+            py::arg("lpm"), py::arg("particle_def"), py::arg("medium"),
+            py::arg("density_correction") = 1.0);
 
     py::class_<crosssection::PhotoPairKochMotz,
         std::shared_ptr<crosssection::PhotoPairKochMotz>,
         crosssection::PhotoPairProduction>(m_sub_photopair, "KochMotz")
-        .def(py::init<>());
+        .def(py::init<bool>(), py::arg("lpm") = false)
+        .def(py::init<bool, const ParticleDef&, const Medium&, double>(),
+             py::arg("lpm"), py::arg("particle_def"), py::arg("medium"),
+             py::arg("density_correction") = 1.0);
 
     py::class_<crosssection::KinematicLimits,
         std::shared_ptr<crosssection::KinematicLimits>>(
@@ -852,6 +858,16 @@ void init_parametrization(py::module& m)
             return "(v_min: " + std::to_string(lim.v_min)
                 + ", v_max: " + std::to_string(lim.v_max) + ")";
         });
+
+    py::class_<crosssection::PhotoPairLPM, std::shared_ptr<crosssection::PhotoPairLPM>>(
+        m_sub_brems, "photopair_lpm")
+        .def(py::init<const ParticleDef&, const Medium&,
+                 const crosssection::PhotoPairProduction&>(),
+            py::arg("particle_def"), py::arg("medium"),
+            py::arg("photopair"))
+        .def("supression_factor", &crosssection::PhotoPairLPM::suppression_factor,
+            py::arg("energy"), py::arg("x"), py::arg("component"),
+            py::arg("density_correction") = 1.0);
 
     // --------------------------------------------------------------------- //
     // PhotoMuPairProduction

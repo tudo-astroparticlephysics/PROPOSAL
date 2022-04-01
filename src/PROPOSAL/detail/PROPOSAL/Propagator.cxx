@@ -475,7 +475,8 @@ Propagator::CreateCrossSectionList(const ParticleDef& p_def,
                 p_def, medium, config["photoproduction"]));
     if (config.contains("photopair"))
         cross.emplace_back(make_photopairproduction(
-            p_def, medium, interpolate, config["photopair"]));
+                p_def, medium, interpolate, config["photopair"],
+                density_correction));
     if (config.contains("weak"))
         cross.emplace_back(
             make_weakinteraction(p_def, medium, interpolate, config["weak"]));
