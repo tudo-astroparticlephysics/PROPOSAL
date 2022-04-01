@@ -33,9 +33,8 @@ public:
 private:
     Interaction::Loss DoStochasticInteraction(
         ParticleState&, PropagationUtility&, std::function<double()>);
-    int AdvanceParticle(ParticleState& p_cond, const double E_f,
-                        const double max_distance,
-        std::function<double()> rnd, Sector& current_sector);
+    int AdvanceParticle(ParticleState&, const double, const double,
+                        std::function<double()>, Sector&, bool);
     double CalculateDistanceToBorder(const Vector3D& particle_position,
         const Vector3D& particle_direction, const Geometry& current_geometry);
     int maximize(const std::array<double, 3>& InteractionEnergies);
