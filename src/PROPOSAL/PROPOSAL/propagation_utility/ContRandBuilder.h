@@ -27,11 +27,11 @@ public:
     }
 
     inline double EnergyRandomize(
-        double initial_energy, double final_energy, double rnd) final
+        double initial_energy, double final_energy, double rnd, double min_energy = 0) final
     {
         auto std = std::sqrt(Variance(initial_energy, final_energy));
         return SampleFromGaussian(final_energy, std, rnd,
-                                  std::min(disp->GetLowerLim(), final_energy),
+                                  std::max(disp->GetLowerLim(), min_energy),
                                   initial_energy);
     }
 };

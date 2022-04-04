@@ -87,7 +87,8 @@ Secondaries Propagator::Propagate(const ParticleState& initial_particle,
 
         advancement_type = AdvanceParticle(
                 state, energy_at_next_interaction, max_distance, rnd,
-                current_sector, next_interaction_type == MinimalE);
+                current_sector, next_interaction_type == MinimalE,
+                InteractionEnergy[MinimalE]);
 
         // If the particle is on the sector border before the continuous step is
         // performed in 'AdvanceParticle', we might enter a different sector due
@@ -151,7 +152,7 @@ Interaction::Loss Propagator::DoStochasticInteraction(ParticleState& p_cond,
 int Propagator::AdvanceParticle(ParticleState &state,
     const double energy_next_interaction, const double final_distance,
     std::function<double()> rnd_generator, Sector& current_sector,
-    bool min_energy_step) {
+    bool min_energy_step, const double min_energy) {
 
     auto& utility = get<UTILITY>(current_sector);
     auto& density = get<DENSITY_DISTR>(current_sector);
@@ -266,7 +267,7 @@ int Propagator::AdvanceParticle(ParticleState &state,
     if (min_energy_step && advancement_type == ReachedInteraction)
         state.energy = energy; // we reached a specific energy, no randomization
     else
-        state.energy = utility.EnergyRandomize(state.energy, energy, rnd);
+        state.energy = utility.EnergyRandomize(state.energy, energy, rnd, min_energy);
 
     return advancement_type;
 }

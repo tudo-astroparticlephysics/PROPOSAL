@@ -69,7 +69,7 @@ public:
     Interaction::Loss EnergyStochasticloss(double, double);
     double EnergyDecay(double, std::function<double()>, double);
     double EnergyInteraction(double, std::function<double()>);
-    double EnergyRandomize(double, double, std::function<double()>);
+    double EnergyRandomize(double, double, std::function<double()>, double);
     double EnergyDistance(double, double);
     double LengthContinuous(double, double);
     double TimeElapsed(double, double, double, double);
