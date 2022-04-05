@@ -139,6 +139,11 @@ TEST(ContinuousRandomization, Constraints)
             110, p_def.mass, RandomGenerator::Get().RandomDouble());
         EXPECT_LT(randomized, 110);
         EXPECT_GE(randomized, p_def.mass);
+
+        randomized = contrand->EnergyRandomize(
+            1e4, 2e3, RandomGenerator::Get().RandomDouble(), 1e3);
+        EXPECT_LT(randomized, 1e4);
+        EXPECT_GE(randomized, 1e3);
     }
 }
 

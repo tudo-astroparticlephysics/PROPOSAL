@@ -30,6 +30,8 @@ public:
         double initial_energy, double final_energy, double rnd, double min_energy = 0) final
     {
         auto std = std::sqrt(Variance(initial_energy, final_energy));
+        // the parameter 'min' passed to SampleFromGaussian has been
+        // min(disp->GetLowerLim(), final_energy) before min_energy was added
         return SampleFromGaussian(final_energy, std, rnd,
                                   std::max(disp->GetLowerLim(), min_energy),
                                   initial_energy);
