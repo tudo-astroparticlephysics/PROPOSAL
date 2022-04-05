@@ -71,7 +71,13 @@ double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
         return 0.;
     auto lim = GetIntegrationLimits(energy);
     v = retransform_v(lim.min, lim.max, v);
-    return std::max(interpolant.evaluate(std::array<double, 2> { energy, v }), 0.);
+    auto dNdx = interpolant.evaluate(std::array<double, 2> { energy, v });
+    if (dNdx < 0) {
+        logger->warn("Negative dNdx value for E = {:.4f} MeV, v = {:.4f} "
+                     "detected. Setting dNdx to zero.", energy, v);
+        dNdx = 0.;
+    }
+    return dNdx;
 }
 
 double CrossSectionDNDXInterpolant::GetUpperLimit(double energy, double rate)
