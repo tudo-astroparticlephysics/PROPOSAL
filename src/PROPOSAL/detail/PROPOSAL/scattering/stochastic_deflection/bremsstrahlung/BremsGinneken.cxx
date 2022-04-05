@@ -15,9 +15,19 @@ double stochastic_deflection::BremsGinneken::f_nu_g(double nu, double n, double 
 }
 
 double stochastic_deflection::BremsGinneken::get_nu_g(double E, double n, double k_4) const {
-    auto f = [this, &n, &k_4](double nu) {
+    // auto f = [this, &n, &k_4](double nu) {
+    //     return f_nu_g(nu, n, k_4);
+    // };
+
+    auto f = [&, n, k_4](double nu) {
         return f_nu_g(nu, n, k_4);
     };
+
+    if (f_nu_g(0.5, n, k_4) * f_nu_g(1., n, k_4) > 0) {
+        Logging::Get("proposal.deflection")->warn("Boundaries of Bisection are: {} and {}, E = {}", f_nu_g(0.5, n, k_4), f_nu_g(1., n, k_4), E);
+    }
+
+    Logging::Get("proposal.deflection")->warn("Use Bisection: {}, {}", f_nu_g(0.5, n, k_4), f_nu_g(1., n, k_4));
     auto nu_g_x = Bisection(f, 0.5, 1., 1e-5, 100);
     
     return (nu_g_x.first + nu_g_x.second) / 2;
@@ -40,12 +50,17 @@ double stochastic_deflection::BremsGinneken::get_rms_theta(double e_i, double e_
         if (rms_theta < 0.2) {
             return rms_theta; 
         } else {
-            double nu_g = get_nu_g(e_i, n, k_4);
+            double nu_g = 0.5;
+            if (e_i > 0.7) {    // limit of parametrization
+                nu_g = get_nu_g(e_i, n, k_4);
+            };
+
+            cout << "final nu_g = " << nu_g << ", E = " << e_i << endl;
             auto k_5 = k_4 * pow(nu_g, 1 + n) * pow(1 - nu_g, 0.5 - n);
             rms_theta = k_5 * pow(1 - nu, -0.5);
             if (rms_theta < 0.2) {
                 // If no case matches
-                Logging::Get("proposal.deflection")->warn("BremsGinneken deflection: rms_theta = {} > 0.2, nu_g = {}", rms_theta, nu_g);
+                Logging::Get("proposal.deflection")->warn("BremsGinneken deflection: rms_theta = {} < 0.2, nu_g = {}", rms_theta, nu_g);
             }
             return rms_theta;
         }
