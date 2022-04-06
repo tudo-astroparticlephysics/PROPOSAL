@@ -3,6 +3,7 @@
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/math/MathMethods.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #include <cmath>
 
@@ -73,8 +74,10 @@ double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
     v = retransform_v(lim.min, lim.max, v);
     auto dNdx = interpolant.evaluate(std::array<double, 2> { energy, v });
     if (dNdx < 0) {
+        auto inter_name = Type_Interaction_Name_Map.at(type_id);
         logger->warn("Negative dNdx value for E = {:.4f} MeV, v = {:.4f} "
-                     "detected. Setting dNdx to zero.", energy, v);
+                     "detected in interaction type {}. "
+                     "Setting dNdx to zero.", energy, v, inter_name);
         dNdx = 0.;
     }
     return dNdx;
