@@ -101,8 +101,10 @@ public:
     std::vector<ContinuousLoss> GetContinuousLosses(const Geometry&) const;
 
 private:
-    ParticleState RePropagateDistance(const ParticleState&, double) const;
-    ParticleState RePropagateEnergy(const ParticleState&, double, double) const;
+    ParticleState RePropagateDistance(const ParticleState&, const Cartesian3D&,
+                                      double) const;
+    ParticleState RePropagateEnergy(const ParticleState&, const Cartesian3D&,
+                                    double, double) const;
     Sector GetCurrentSector(const Vector3D&, const Vector3D&) const;
 
     std::vector<ParticleState> track_;
