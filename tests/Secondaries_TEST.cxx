@@ -9,6 +9,7 @@
 #include "PROPOSAL/crosssection/ParticleDefaultCrossSectionList.h"
 #include "PROPOSAL/propagation_utility/TimeBuilder.h"
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
+#include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/density_distr/density_homogeneous.h"
 
 using namespace PROPOSAL;
@@ -26,6 +27,9 @@ std::shared_ptr<Propagator> GetPropagator() {
         collection.interaction_calc = make_interaction(cross, true);
         collection.displacement_calc = make_displacement(cross, true);
         collection.time_calc = make_time(cross, p_def, true);
+        collection.scattering = std::make_shared<Scattering>(
+                make_multiple_scattering("highlandintegral", p_def, medium,
+                                         cross, true), nullptr);
         auto prop_utility = PropagationUtility(collection);
 
         auto density_distr = std::make_shared<Density_homogeneous>(medium);
@@ -54,6 +58,9 @@ std::shared_ptr<Propagator> GetPropagatorStochastic() {
         collection.interaction_calc = make_interaction(cross, true);
         collection.displacement_calc = make_displacement(cross, true);
         collection.time_calc = make_time(cross, p_def, true);
+        collection.scattering = std::make_shared<Scattering>(
+                make_multiple_scattering("highlandintegral", p_def, medium,
+                                         cross, true), nullptr);
         auto prop_utility = PropagationUtility(collection);
 
         auto density_distr = std::make_shared<Density_homogeneous>(medium);
@@ -67,42 +74,51 @@ std::shared_ptr<Propagator> GetPropagatorStochastic() {
     return ptr;
 }
 
-TEST(SecondaryVector, EntryPointExitPoint)
+TEST(SecondaryVector, ExitPoint_lowenergy)
 {
-    auto prop = GetPropagator();
+    auto prop = GetPropagatorStochastic();
 
     Cartesian3D position(0, 0, 0);
     Cartesian3D direction(0, 0, 1);
-    auto energy = 1e8; // MeV
+    auto energy = 1e4; // MeV
     auto init_state = ParticleState(position, direction, energy, 0., 0.);
 
-    auto secondaries = prop->Propagate(init_state, 50000);
+    // Create sphere where we are sure that we leave it as some point
+    double radius = 10;
+    auto sphere = Sphere(Cartesian3D(0, 0, 0), radius);
 
-    // Test for geometry in front of track
-    auto sphere_infront = Sphere(Cartesian3D(0, 0, -1000), 10);
-    EXPECT_TRUE(secondaries.GetEntryPoint(sphere_infront) == nullptr);
-    EXPECT_TRUE(secondaries.GetExitPoint(sphere_infront) == nullptr);
+    for (size_t i = 0; i<100; i++) {
+        auto secondaries = prop->Propagate(init_state);
+        auto exit_point = secondaries.GetExitPoint(sphere);
+        if (secondaries.GetTrackPositions().back().magnitude() > radius) {
+            ASSERT_FALSE(exit_point==nullptr);
+            EXPECT_NEAR(exit_point->position.magnitude(), radius, PARTICLE_POSITION_RESOLUTION);
+        } else {
+            EXPECT_TRUE(exit_point==nullptr);
+        }
+    }
+}
 
-    // Test for geometry behin track
-    auto sphere_behind = Sphere(Cartesian3D(0, 0, 100000), 10);
-    EXPECT_TRUE(secondaries.GetEntryPoint(sphere_behind) == nullptr);
-    EXPECT_TRUE(secondaries.GetExitPoint(sphere_behind) == nullptr);
+TEST(SecondaryVector, EntryPoint_lowenergy)
+{
+    auto prop = GetPropagatorStochastic();
 
-    // Test for track beginning in geometry
-    auto sphere_start = Sphere(Cartesian3D(0, 0, 100), 100);
-    EXPECT_TRUE(secondaries.GetEntryPoint(sphere_start)->energy == energy);
-    EXPECT_TRUE(secondaries.GetEntryPoint(sphere_start)->position == position);
+    Cartesian3D position(0, 0, 0);
+    Cartesian3D direction(0, 0, 1);
+    auto energy = 1e4; // MeV
+    auto init_state = ParticleState(position, direction, energy, 0., 0.);
 
-    // Test for track ending in geometry
-    auto sphere_end = Sphere(Cartesian3D(0, 0, 49000), 1000);
-    EXPECT_TRUE(secondaries.GetExitPoint(sphere_end)->energy == secondaries.back().energy);
-    EXPECT_TRUE(secondaries.GetExitPoint(sphere_end)->propagated_distance == secondaries.back().propagated_distance);
-    EXPECT_TRUE(secondaries.GetExitPoint(sphere_end)->position == secondaries.back().position);
+    for (size_t i = 0; i<100; i++) {
+        auto secondaries = prop->Propagate(init_state);
 
-    // Test points where interaction points should be equal to entry/exit points
-    auto sphere = Sphere(Cartesian3D(0, 0, 10000), 1000);
-    EXPECT_TRUE(secondaries.GetEntryPoint(sphere)->propagated_distance == 9000);
-    EXPECT_TRUE(secondaries.GetExitPoint(sphere)->propagated_distance == 11000);
+        // Create sphere at second track point to make sure that an entry point
+        // must exist
+        double radius = 0.1;
+        auto sphere = Sphere(secondaries.GetTrackPositions().at(1), radius);
+        auto entry_point = secondaries.GetEntryPoint(sphere);
+        ASSERT_FALSE(entry_point==nullptr);
+        EXPECT_NEAR((entry_point->position - sphere.GetPosition()).magnitude(), radius, PARTICLE_POSITION_RESOLUTION);
+    }
 }
 
 TEST(SecondaryVector, EntryPointExitPointRePropagation)
@@ -126,16 +142,16 @@ TEST(SecondaryVector, EntryPointExitPointRePropagation)
     auto sec_i = secondaries[i-1];
     auto sec_f = secondaries[i];
 
-    EXPECT_TRUE(sec_i.energy > entry_point->energy);
-    EXPECT_TRUE(sec_i.time < entry_point->time);
-    EXPECT_TRUE(sec_i.propagated_distance < entry_point->propagated_distance);
+    EXPECT_GT(sec_i.energy, entry_point->energy);
+    EXPECT_LT(sec_i.time, entry_point->time);
+    EXPECT_LT(sec_i.propagated_distance, entry_point->propagated_distance);
     EXPECT_TRUE(sphere.IsInfront(sec_i.position, sec_i.direction));
 
-    EXPECT_TRUE(sec_f.energy < entry_point->energy);
-    EXPECT_TRUE(sec_f.time > entry_point->time);
-    EXPECT_TRUE(sec_f.propagated_distance > entry_point->propagated_distance);
+    EXPECT_LT(sec_f.energy, entry_point->energy);
+    EXPECT_GT(sec_f.time, entry_point->time);
+    EXPECT_GT(sec_f.propagated_distance, entry_point->propagated_distance);
     EXPECT_FALSE(sphere.IsInfront(sec_f.position, sec_f.direction));
-    EXPECT_TRUE(entry_point->propagated_distance == sphere.GetPosition().GetZ() - sphere.GetRadius());
+    EXPECT_NEAR(entry_point->propagated_distance, sphere.GetPosition().GetZ() - sphere.GetRadius(), PARTICLE_POSITION_RESOLUTION);
 
     while (secondaries[i].propagated_distance < exit_point->propagated_distance) {
         i++;
@@ -144,16 +160,16 @@ TEST(SecondaryVector, EntryPointExitPointRePropagation)
     sec_i = secondaries[i-1]; // point before exit point
     sec_f = secondaries[i]; // points after exit point
 
-    EXPECT_TRUE(sec_i.energy > exit_point->energy);
-    EXPECT_TRUE(sec_i.time < exit_point->time);
-    EXPECT_TRUE(sec_i.propagated_distance < exit_point->propagated_distance);
+    EXPECT_GT(sec_i.energy, exit_point->energy);
+    EXPECT_LT(sec_i.time, exit_point->time);
+    EXPECT_LT(sec_i.propagated_distance, exit_point->propagated_distance);
     EXPECT_FALSE(sphere.IsBehind(sec_i.position, sec_i.direction));
 
-    EXPECT_TRUE(sec_f.energy < exit_point->energy);
-    EXPECT_TRUE(sec_f.time > exit_point->time);
-    EXPECT_TRUE(sec_f.propagated_distance > exit_point->propagated_distance);
+    EXPECT_LT(sec_f.energy, exit_point->energy);
+    EXPECT_GT(sec_f.time, exit_point->time);
+    EXPECT_GT(sec_f.propagated_distance, exit_point->propagated_distance);
     EXPECT_TRUE(sphere.IsBehind(sec_f.position, sec_f.direction));
-    EXPECT_TRUE(exit_point->propagated_distance == sphere.GetPosition().GetZ() + sphere.GetRadius());
+    EXPECT_NEAR(exit_point->propagated_distance, sphere.GetPosition().GetZ() + sphere.GetRadius(), PARTICLE_POSITION_RESOLUTION);
 }
 
 
