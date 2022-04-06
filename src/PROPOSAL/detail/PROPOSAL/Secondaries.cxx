@@ -89,8 +89,10 @@ ParticleState Secondaries::GetStateForEnergy(double energy) const
     for (unsigned int i=1; i<track_.size(); i++) {
         if (track_[i].energy < energy) {
             if (types_[i] == InteractionType::ContinuousEnergyLoss) {
+                auto displacement = track_[i].position - track_[i-1].position;
+                displacement.normalize();
                 return RePropagateEnergy(
-                        track_[i-1], track_[i-1].energy - energy,
+                        track_[i-1], displacement, track_[i-1].energy - energy,
                         track_[i-1].propagated_distance - track_[i].propagated_distance);
             } else {
                 return track_[i-1];
@@ -108,8 +110,10 @@ ParticleState Secondaries::GetStateForDistance(double propagated_distance) const
 
     for (unsigned int i=1; i<track_.size(); i++) {
         if (track_[i].propagated_distance > propagated_distance) {
+            auto displacement = track_[i].position - track_[i-1].position;
+            displacement.normalize();
             return RePropagateDistance(
-                    track_[i-1],
+                    track_[i-1], displacement,
                     propagated_distance - track_[i-1].propagated_distance);
         }
     }
@@ -178,13 +182,17 @@ std::shared_ptr<ParticleState> Secondaries::GetEntryPoint(
         auto pos_i = track_.at(i).position;
         auto pos_f = track_.at(i+1).position;
         auto dir_i = track_.at(i).direction;
-        auto dist_i_f = (pos_f - pos_i).magnitude();
 
-        auto distance = geometry.DistanceToBorder(pos_i, dir_i).first;
+        auto displacement = pos_f - pos_i;
+        auto dist_i_f = displacement.magnitude();
+        displacement.normalize();
+
+        auto distance = geometry.DistanceToBorder(pos_i, displacement).first;
         if (distance <= dist_i_f && distance >= 0) {
-            if ( dist_i_f - distance < GEOMETRY_PRECISION)
+            if (std::abs(dist_i_f - distance) < PARTICLE_POSITION_RESOLUTION)
                 return std::make_unique<ParticleState>(track_.at(i + 1));
-            auto entry_point = RePropagateDistance(track_.at(i), distance);
+            auto entry_point = RePropagateDistance(track_.at(i), displacement,
+                                                   distance);
             return std::make_unique<ParticleState>(entry_point);
         }
     }
@@ -205,14 +213,17 @@ std::shared_ptr<ParticleState> Secondaries::GetExitPoint(
         auto pos_i = track_.at(i-1).position;
         auto pos_f = track_.at(i).position;
         auto dir_i = track_.at(i-1).direction;
-        auto dist_i_f = (pos_f - pos_i).magnitude();
 
-        auto distance = geometry.DistanceToBorder(pos_f, -dir_i).first;
+        auto displacement = pos_f - pos_i;
+        auto dist_i_f = displacement.magnitude();
+        displacement.normalize();
+
+        auto distance = geometry.DistanceToBorder(pos_f, -displacement).first;
         if (distance <= dist_i_f && distance >= 0) {
-            if ( dist_i_f - distance < GEOMETRY_PRECISION)
+            if (std::abs(dist_i_f - distance) < PARTICLE_POSITION_RESOLUTION)
                 return std::make_unique<ParticleState>(track_.at(i - 1));
-            auto exit_point = RePropagateDistance(track_.at(i-1),
-                                                  dist_i_f - distance);
+            auto exit_point = RePropagateDistance(
+                    track_.at(i - 1), displacement, dist_i_f - distance);
             return std::make_unique<ParticleState>(exit_point);
         }
     }
@@ -225,23 +236,28 @@ std::shared_ptr<ParticleState> Secondaries::GetExitPoint(
     return nullptr; // No exit point found
 }
 
-std::shared_ptr<ParticleState> Secondaries::GetClosestApproachPoint(const Geometry& geometry) const
+std::shared_ptr<ParticleState> Secondaries::GetClosestApproachPoint(
+        const Geometry& geometry) const
 {
-    for (unsigned int i = 0; i < track_.size(); i++) {
-        auto sec_pos = track_.at(i).position;
-        auto sec_dir = track_.at(i).direction;
-        if (geometry.DistanceToClosestApproach(sec_pos, sec_dir) <= 0.) {
-            if(std::abs(geometry.DistanceToClosestApproach(sec_pos, sec_dir))
-                        < PARTICLE_POSITION_RESOLUTION)
+   if (track_.size() == 1)
+       return std::make_unique<ParticleState>(track_.front());
+
+    for (unsigned int i = 0; i < track_.size() - 1; i++) {
+        auto pos_i = track_.at(i).position;
+        auto pos_f = track_.at(i+1).position;
+
+        auto displacement = pos_f - pos_i;
+        auto dist_i_f = displacement.magnitude();
+        displacement.normalize();
+
+        auto distance_to_closest_approach
+            = geometry.DistanceToClosestApproach(pos_i, displacement);
+        if (distance_to_closest_approach <= dist_i_f) {
+            if (distance_to_closest_approach < PARTICLE_POSITION_RESOLUTION)
                 return std::make_unique<ParticleState>(track_.at(i));
-            if (i == 0)
-                return std::make_unique<ParticleState>(track_.front());
-            auto prev_pos = track_.at(i-1).position;
-            auto prev_dir = track_.at(i-1).direction;
-            auto displacement = geometry.DistanceToClosestApproach(prev_pos,
-                                                                   prev_dir);
-            auto closest_approach = RePropagateDistance(track_.at(i-1),
-                                                        displacement);
+
+            auto closest_approach = RePropagateDistance(
+                    track_.at(i), displacement, distance_to_closest_approach);
             return std::make_unique<ParticleState>(closest_approach);
         }
     }
@@ -272,11 +288,11 @@ bool Secondaries::HitGeometry(const Geometry& geometry) const {
 }
 
 ParticleState Secondaries::RePropagateEnergy(const ParticleState& init,
+                                             const Cartesian3D& direction,
                                              double energy_lost,
                                              double max_distance) const
 {
-    auto current_sector = GetCurrentSector(init.position,
-                                           init.direction);
+    auto current_sector = GetCurrentSector(init.position, direction);
     auto& utility = get<Propagator::UTILITY>(current_sector);
     auto& density = get<Propagator::DENSITY_DISTR>(current_sector);
 
@@ -292,19 +308,19 @@ ParticleState Secondaries::RePropagateEnergy(const ParticleState& init,
 
     auto E_f = init.energy - energy_lost;
     auto new_time = init.time + utility.TimeElapsed(
-            init.energy, E_f, displacement ,density->Evaluate(init.position));
-    auto new_position = init.position + init.direction * displacement;
+            init.energy, E_f, displacement, density->Evaluate(init.position));
+    auto new_position = init.position + direction * displacement;
     auto new_propagated_distance = init.propagated_distance + displacement;
 
     return ParticleState((ParticleType)primary_def_->particle_type, new_position,
-                         init.direction, E_f, new_time, new_propagated_distance);
+                         direction, E_f, new_time, new_propagated_distance);
 }
 
-ParticleState Secondaries::RePropagateDistance(const ParticleState &init,
+ParticleState Secondaries::RePropagateDistance(const ParticleState& init,
+                                               const Cartesian3D& direction,
                                                double displacement) const
 {
-    auto current_sector = GetCurrentSector(init.position,
-                                           init.direction);
+    auto current_sector = GetCurrentSector(init.position, direction);
     auto& utility = get<Propagator::UTILITY>(current_sector);
     auto& density = get<Propagator::DENSITY_DISTR>(current_sector);
 
@@ -317,11 +333,11 @@ ParticleState Secondaries::RePropagateDistance(const ParticleState &init,
                                                displacement);
     auto E_f = utility.EnergyDistance(init.energy, advance_grammage);
     auto new_time = init.time + utility.TimeElapsed(
-            init.energy, E_f,displacement, density->Evaluate(init.position));
-    auto new_position = init.position + init.direction * displacement;
+            init.energy, E_f, displacement, density->Evaluate(init.position));
+    auto new_position = init.position + direction * displacement;
     auto new_propagated_distance = init.propagated_distance + displacement;
     return ParticleState((ParticleType)primary_def_->particle_type, new_position,
-                         init.direction, E_f, new_time, new_propagated_distance);
+                         direction, E_f, new_time, new_propagated_distance);
 }
 
 Sector Secondaries::GetCurrentSector(const Vector3D& position,
