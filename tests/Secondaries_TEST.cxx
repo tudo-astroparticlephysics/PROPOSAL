@@ -11,6 +11,7 @@
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/density_distr/density_homogeneous.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 
 using namespace PROPOSAL;
 
@@ -206,6 +207,53 @@ TEST(SecondaryVector, HitDetector) {
     EXPECT_TRUE(dummy_track.HitGeometry(Box(Cartesian3D(0, 0, 21), 2, 2, 2)));
     EXPECT_TRUE(dummy_track.HitGeometry(Cylinder(Cartesian3D(0, 0, 21), 5, 2)));
 
+}
+
+TEST(SecondaryVector, ClosestApproachPoint) {
+    RandomGenerator::Get().SetSeed(0);
+
+    auto prop = GetPropagator();
+
+    Cartesian3D position(0, 0, 0);
+    Cartesian3D direction(0, 0, 1);
+    auto energy = 1e5; // MeV
+    auto init_state = ParticleState(position, direction, energy, 0., 0.);
+
+    auto secondaries = prop->Propagate(init_state, 1e5);
+
+    // closet approach point before track starts
+    auto point1 = position - 10 * direction;
+    auto geometry1 = Sphere(point1, 5);
+    EXPECT_EQ(secondaries.GetTrack().at(0), *secondaries.GetClosestApproachPoint(geometry1));
+
+    // closet approach point at start of the track
+    auto direction2 = secondaries.GetTrackPositions().at(1) - position;
+    auto distance2 = direction2.magnitude();
+    direction2.normalize();
+    auto geometry2 = Sphere(position + distance2/2 * Cartesian3D(0, -direction2.GetZ(), direction2.GetY()), distance2/4);
+    EXPECT_EQ(secondaries.GetTrack().at(0), *secondaries.GetClosestApproachPoint(geometry2));
+
+    // closet approach point between two track points
+    auto midway_point = (secondaries.GetTrackPositions().at(0) + secondaries.GetTrackPositions().at(1)) * 0.5;
+    double distance = (secondaries.GetTrackPositions().at(0) - secondaries.GetTrackPositions().at(1)).magnitude();
+    auto point3 = midway_point + distance/2 * Cartesian3D(0, -midway_point.GetZ(), midway_point.GetY());
+    auto geometry3 = Sphere(point3, distance/4);
+    auto approach3 = secondaries.GetClosestApproachPoint(geometry3);
+    EXPECT_NEAR(midway_point.GetX(), approach3->position.GetX(), PARTICLE_POSITION_RESOLUTION);
+    EXPECT_NEAR(midway_point.GetY(), approach3->position.GetY(), PARTICLE_POSITION_RESOLUTION);
+    EXPECT_NEAR(midway_point.GetZ(), approach3->position.GetZ(), PARTICLE_POSITION_RESOLUTION);
+    EXPECT_GT(energy, approach3->energy);
+    EXPECT_GT(approach3->energy, secondaries.GetTrackEnergies().at(1));
+
+    // closet approach point on track point
+    auto point4 = secondaries.GetTrackPositions().at(1);
+    auto geometry4 = Sphere(point4, 10);
+    EXPECT_EQ(secondaries.GetTrack().at(1), *secondaries.GetClosestApproachPoint(geometry4));
+
+    // closest approach point behind last track point
+    auto point5 = secondaries.GetTrackPositions().back() + 10 * secondaries.GetTrackDirections().back();
+    auto geometry5 = Sphere(point5, 5);
+    EXPECT_EQ(secondaries.GetTrack().back(), *secondaries.GetClosestApproachPoint(geometry5));
 }
 
 TEST(SecondaryVector, EnergyConservation) {

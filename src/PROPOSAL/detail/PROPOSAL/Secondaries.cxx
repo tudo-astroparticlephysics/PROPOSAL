@@ -252,7 +252,9 @@ std::shared_ptr<ParticleState> Secondaries::GetClosestApproachPoint(
 
         auto distance_to_closest_approach
             = geometry.DistanceToClosestApproach(pos_i, displacement);
-        if (distance_to_closest_approach <= dist_i_f) {
+        if (distance_to_closest_approach == dist_i_f) {
+            return std::make_unique<ParticleState>(track_.at(i+1));
+        } else if (distance_to_closest_approach < dist_i_f) {
             if (distance_to_closest_approach < PARTICLE_POSITION_RESOLUTION)
                 return std::make_unique<ParticleState>(track_.at(i));
 
