@@ -308,7 +308,8 @@ PYBIND11_MODULE(proposal, m)
         .def("variance", py::vectorize(&ContRand::Variance),
             py::arg("initial_energy"), py::arg("final_energy"))
         .def("randomize", py::vectorize(&ContRand::EnergyRandomize),
-            py::arg("initial_energy"), py::arg("final_energy"), py::arg("rand"),
+            py::arg("initial_energy"), py::arg("final_energy"), py::arg("rnd"),
+            py::arg("min_energy") = 0,
             R"pbdoc(
                     Calculates the stochastical smering of the distribution based on
                     the second momentum of the parametrizations, the final and intial
@@ -333,9 +334,10 @@ PYBIND11_MODULE(proposal, m)
                             E_\text{f} = \sigma \cdot a + E_\text{f}
 
                     Args:
-                        initial_energy (float): energy befor stochastical loss
-                        final_energy (float): energy after stochastical loss
-                        rand (float): random number between 0 and 1
+                        initial_energy (float): energy before stochastic loss
+                        final_energy (float): energy after stochastic loss
+                        rnd (float): random number between 0 and 1
+                        min_energy (float): minimal energy after randomization
 
                     Returns:
                         float: randomized final energy

@@ -114,11 +114,12 @@ double PropagationUtility::EnergyInteraction(
 }
 
 double PropagationUtility::EnergyRandomize(
-    double initial_energy, double final_energy, std::function<double()> rnd)
+    double initial_energy, double final_energy, std::function<double()> rnd,
+    double min_energy = 0)
 {
     if (collection.cont_rand) {
         final_energy = collection.cont_rand->EnergyRandomize(
-            initial_energy, final_energy, rnd());
+            initial_energy, final_energy, rnd(), min_energy);
     }
     return final_energy; // no randomization
 }

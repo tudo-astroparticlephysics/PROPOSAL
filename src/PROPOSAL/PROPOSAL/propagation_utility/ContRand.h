@@ -34,7 +34,7 @@ struct ContRand {
     double FunctionToIntegral(double);
 
     virtual double Variance(double, double) = 0;
-    virtual double EnergyRandomize(double, double, double) = 0;
+    virtual double EnergyRandomize(double, double, double, double = 0) = 0;
 
     auto GetHash() const noexcept { return hash; }
 
