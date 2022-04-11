@@ -41,7 +41,7 @@ std::vector<ParticleState> secondaries::NaivCompton::CalculateSecondaries(
     auto v = loss.energy /  loss.parent_particle_energy;
     auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, v);
     auto secondary_dir = CalculateDirections(loss.direction, loss.energy, v,
-                                             rnd[1]);
+                                             rnd[0]);
 
     auto sec = std::vector<ParticleState>();
     sec.emplace_back(ParticleType::Gamma, loss.position,
