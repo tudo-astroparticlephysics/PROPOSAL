@@ -88,6 +88,7 @@ class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
     std::function<double(double, double, double)> retransform_v;
     cubic_splines::Interpolant<cubic_splines::BicubicSplines<double>>
         interpolant;
+    InteractionType type_id;
 
     std::string gen_path() const;
     std::string gen_name() const;
@@ -102,6 +103,8 @@ public:
         , transform_v(transform_loss<Param>)
         , retransform_v(retransform_loss<Param>)
         , interpolant(build_dndx_def(param, p, t, cut), gen_path(), gen_name())
+        , type_id(static_cast<InteractionType>(
+                crosssection::ParametrizationId<Param>::value))
     {
         lower_energy_lim
             = interpolant.GetDefinition().GetAxis().at(0)->GetLow();
