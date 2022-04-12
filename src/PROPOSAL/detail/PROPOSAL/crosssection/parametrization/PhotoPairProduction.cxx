@@ -58,7 +58,7 @@ crosssection::PhotoPairTsai::PhotoPairTsai(
         double density_correction)
 {
     if (lpm) {
-        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium, *this);
+        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium);
         hash_combine(hash, density_correction, lpm_->GetHash());
         density_correction_ = density_correction;
     } else {
@@ -102,7 +102,7 @@ crosssection::PhotoPairKochMotz::PhotoPairKochMotz(
                                    2, false, false))
 {
     if (lpm) {
-        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium, *this);
+        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium);
         hash_combine(hash, density_correction, lpm_->GetHash());
         density_correction_ = density_correction;
     } else {
@@ -337,36 +337,12 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
         0.); // TODO what are the real factors here, those are just guesses
 }
 
-crosssection::PhotoPairLPM::PhotoPairLPM(const ParticleDef& p_def, const Medium& medium,
-                                         const PhotoPairProduction& param)
+crosssection::PhotoPairLPM::PhotoPairLPM(const ParticleDef& p_def, const Medium& medium)
     : hash(0)
     , mol_density_(medium.GetMolDensity())
-    , mass_density_(medium.GetMassDensity())
     , sum_charge_(medium.GetSumCharge())
 {
-    hash_combine(hash, mol_density_, mass_density_, sum_charge_, param.GetHash());
-    double upper_energy = 1e14;
-    Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
-    auto components = medium.GetComponents();
-
-    double sum = 0.;
-    for (auto comp : components) {
-        auto limits = param.GetKinematicLimits(p_def, comp, upper_energy);
-        double contribution = 0;
-        contribution += integral_temp.Integrate(
-            limits.v_min, limits.v_max,
-            [&param, &p_def, &comp, &upper_energy](double v) {
-                return param.DifferentialCrossSection(
-                    p_def, comp, upper_energy, v);
-            },
-            2.);
-        double weight_for_loss_in_medium = medium.GetSumNucleons()
-            / (comp.GetAtomInMolecule() * comp.GetAtomicNum());
-        sum += contribution / weight_for_loss_in_medium;
-    }
-    sum = 9./7. * sum * mass_density_;
-    eLpm_ = ALPHA * ME;
-    eLpm_ *= eLpm_ / (4. * PI * ME * RE * sum);
+    hash_combine(hash, mol_density_, sum_charge_);
 }
 
 double crosssection::PhotoPairLPM::suppression_factor(
@@ -385,9 +361,14 @@ double crosssection::PhotoPairLPM::suppression_factor(
     s1 = 1 / (Z3 * comp.GetLogConstant()); // PRD 25 (1982), 1291, Eq. (17)
     s1 = s1 * s1 * SQRT2; // TODO: is SQRT2 correct here, this factor is not in the paper?
 
+    // Calculate E_LPM
+    double L = std::log(183 * Z3) - f(ALPHA * comp.GetNucCharge()); // 183 -> comp.GetLogConstant()
+    double n = mol_density_ * std::pow(RE * ME / ALPHA, 3);
+    double E_LPM = std::pow(ME, 4) / (2 * PI * n * std::pow(ALPHA * comp.GetNucCharge(), 2) * L);
+
     // Calc xi(s') from Stanev, Vankow, Streitmatter, Ellsworth, Bowen
     // Phys. Rev. D 25 (1982), 1291, Eq. (19)
-    double sp = 0.125 * std::sqrt(eLpm_ / (density_correction * energy * x * (1 - x)));
+    double sp = 0.125 * std::sqrt(E_LPM / (density_correction * energy * x * (1 - x)));
     double h = std::log(sp) / std::log(s1);
 
     if (sp < s1) {
@@ -435,4 +416,9 @@ double crosssection::PhotoPairLPM::suppression_factor(
                * (G / (Gamma * Gamma)
                    + 2 * ((x * x)  + (1 - x) * (1 - x)) * fi / Gamma))
         / (1 - (4. / 3) * x * (1 - x));
+}
+
+double crosssection::PhotoPairLPM::f(double a) {
+    auto aux = a * a;
+    return aux * (1 / (1 + aux) + 0.20206 + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
 }

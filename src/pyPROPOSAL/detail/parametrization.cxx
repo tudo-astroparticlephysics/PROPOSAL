@@ -861,10 +861,8 @@ void init_parametrization(py::module& m)
 
     py::class_<crosssection::PhotoPairLPM, std::shared_ptr<crosssection::PhotoPairLPM>>(
         m_sub_brems, "photopair_lpm")
-        .def(py::init<const ParticleDef&, const Medium&,
-                 const crosssection::PhotoPairProduction&>(),
-            py::arg("particle_def"), py::arg("medium"),
-            py::arg("photopair"))
+        .def(py::init<const ParticleDef&, const Medium&>(),
+            py::arg("particle_def"), py::arg("medium"))
         .def("supression_factor", &crosssection::PhotoPairLPM::suppression_factor,
             py::arg("energy"), py::arg("x"), py::arg("component"),
             py::arg("density_correction") = 1.0);

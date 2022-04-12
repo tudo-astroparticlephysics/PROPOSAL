@@ -100,12 +100,12 @@ namespace crosssection {
     class PhotoPairLPM {
         size_t hash;
         double mol_density_;
-        double mass_density_;
         double sum_charge_;
-        double eLpm_;
+
+    static double f(double a);
 
     public:
-        PhotoPairLPM(const ParticleDef&, const Medium&, const PhotoPairProduction&);
+        PhotoPairLPM(const ParticleDef&, const Medium&);
         double suppression_factor(double energy, double x, const Component&,
                                   double density_correction = 1.0) const;
         size_t GetHash() const noexcept { return hash; }
