@@ -1,5 +1,6 @@
 #include "PROPOSAL/propagation_utility/DecayBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
+#include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
@@ -19,7 +20,8 @@ DecayBuilder::DecayBuilder(
           [this](double E) { return FunctionToIntegral(E); },
           disp->GetLowerLim(), this->GetHash()))
 {
-    decay_integral->BuildTables("decay_", 500, true);
+    decay_integral->BuildTables("decay_", InterpolationSettings::NODES_UTILITY,
+                                true);
 }
 
 double DecayBuilder::EnergyDecay(double energy, double rnd, double density)

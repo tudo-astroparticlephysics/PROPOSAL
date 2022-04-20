@@ -24,7 +24,8 @@ ExactTimeBuilder::ExactTimeBuilder(
           [this](double E) { return FunctionToIntegral(E); },
           _disp->GetLowerLim(), this->GetHash()))
 {
-    time_integral->BuildTables("time_", 500, false);
+    time_integral->BuildTables("time_", InterpolationSettings::NODES_UTILITY,
+                               false);
 }
 
 double ExactTimeBuilder::TimeElapsed(double initial_energy, double final_energy,
