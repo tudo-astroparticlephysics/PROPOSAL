@@ -209,6 +209,25 @@ TEST(Scattering, BorderCases){
     }
 }
 
+TEST(Scattering, ZeroDisplacement){
+    // No displacement should mean no scattering
+    auto medium = StandardRock();
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
+    auto cross = GetCrossSections(MuMinusDef(), medium, cuts, true);
+
+    std::array<std::unique_ptr<multiple_scattering::Parametrization>, 3> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
+                                                                                         make_multiple_scattering("highland", MuMinusDef(), medium),
+                                                                                         make_multiple_scattering("highlandintegral", MuMinusDef(), medium, cross)};
+
+    for(auto const& scatter: scatter_list){
+        auto offset = scatter->CalculateRandomAngle(0, 1e5, 1e5, {0.1, 0.2, 0.3, 0.4});
+        EXPECT_EQ(offset.sx, 0);
+        EXPECT_EQ(offset.sy, 0);
+        EXPECT_EQ(offset.tx, 0);
+        EXPECT_EQ(offset.ty, 0);
+    }
+}
+
 TEST(Scattering, FirstMomentum){
     RandomGenerator::Get().SetSeed(24601);
     auto medium = StandardRock();
