@@ -30,7 +30,7 @@ unsigned int InterpolationSettings::NODES_DEDX = 500;
 unsigned int InterpolationSettings::NODES_DE2DX = 200;
 unsigned int InterpolationSettings::NODES_DNDX_E = 100;
 unsigned int InterpolationSettings::NODES_DNDX_V = 100;
-unsigned int InterpolationSettings::NODES_UTILITY = 500;
+unsigned int InterpolationSettings::NODES_UTILITY = 1000;
 
 // precision parameters
 const double PROPOSAL::COMPUTER_PRECISION = 1.e-10;
