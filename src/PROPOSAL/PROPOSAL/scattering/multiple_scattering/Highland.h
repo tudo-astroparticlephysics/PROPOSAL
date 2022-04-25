@@ -53,8 +53,7 @@ namespace multiple_scattering {
 
         std::unique_ptr<Parametrization> clone() const override
         {
-            return std::unique_ptr<Parametrization>(
-                std::make_unique<Highland>(*this));
+            return std::make_unique<Highland>(*this);
         }
 
         ScatteringOffset CalculateRandomAngle(double grammage, double ei,

@@ -45,8 +45,7 @@ namespace multiple_scattering {
 
         std::unique_ptr<Parametrization> clone() const final
         {
-            return std::unique_ptr<Parametrization>(
-                std::make_unique<Moliere>(*this));
+            return std::make_unique<Moliere>(*this);
         }
 
         int numComp_; // number of components in medium
