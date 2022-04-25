@@ -39,7 +39,7 @@ namespace PROPOSAL {
 namespace PROPOSAL {
 namespace multiple_scattering {
     class HighlandIntegral : public Highland {
-        std::unique_ptr<UtilityIntegral> highland_integral;
+        std::shared_ptr<UtilityIntegral> highland_integral;
 
         inline double Integral(Displacement&, double);
 
@@ -49,6 +49,11 @@ namespace multiple_scattering {
 
         HighlandIntegral(const ParticleDef& p, Medium const& m,
             std::shared_ptr<Displacement> disp, std::true_type);
+
+        std::unique_ptr<Parametrization> clone() const override
+        {
+            return std::make_unique<HighlandIntegral>(*this);
+        }
 
         double CalculateTheta0(double, double, double) final;
     };
