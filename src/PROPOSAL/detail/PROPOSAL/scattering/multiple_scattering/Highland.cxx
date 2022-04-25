@@ -60,7 +60,7 @@ double Highland::CalculateTheta0(double grammage, double ei, double ef)
     double momentum_Sq = (ei - mass) * (ei + mass);
     double beta_p = momentum_Sq / ei; // beta * p = p^2/sqrt(p^2 + m^2)
     y = 13.6 * std::abs(charge) / (beta_p)*std::sqrt(y)
-        * (1. + 0.088 * std::log10(y));
+        * std::max(1. + 0.088 * std::log10(y), 0.);
     return y;
 }
 
