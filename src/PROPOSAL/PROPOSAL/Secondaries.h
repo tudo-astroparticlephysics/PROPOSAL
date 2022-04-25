@@ -47,7 +47,7 @@ using Sector = std::tuple<std::shared_ptr<const Geometry>, PropagationUtility,
 class Secondaries {
 
 public:
-    Secondaries(std::shared_ptr<ParticleDef>, std::vector<Sector>);
+    Secondaries(std::shared_ptr<ParticleDef> p_def, std::vector<Sector> sectors);
 
     // Operational functions to fill and access track
     void reserve(size_t number_secondaries);
@@ -62,23 +62,23 @@ public:
     const ParticleState& operator[](std::size_t idx) { return track_[idx]; };
 
     // Track functions
-    double GetELost(const Geometry&) const;
+    double GetELost(const Geometry& geometry) const;
     //TODO: These methods should return unique_ptr instead of shared_ptr, but pybind11 seems to have problems with them
-    std::shared_ptr<ParticleState> GetEntryPoint(const Geometry&) const;
-    std::shared_ptr<ParticleState> GetExitPoint(const Geometry&) const;
-    std::shared_ptr<ParticleState> GetClosestApproachPoint(const Geometry&) const;
+    std::shared_ptr<ParticleState> GetEntryPoint(const Geometry& geometry) const;
+    std::shared_ptr<ParticleState> GetExitPoint(const Geometry& geometry) const;
+    std::shared_ptr<ParticleState> GetClosestApproachPoint(const Geometry& geometry) const;
 
     /*!
     * Check if particle has hit a geometry. Particle tracks ending at the border
     * of a geometry count as a hit.
     */
-    bool HitGeometry(const Geometry&) const;
+    bool HitGeometry(const Geometry& geometry) const;
 
     std::vector<ParticleState> GetTrack() const { return track_; };
-    std::vector<ParticleState> GetTrack(const Geometry&) const;
+    std::vector<ParticleState> GetTrack(const Geometry& geometry) const;
 
-    ParticleState GetStateForEnergy(double) const;
-    ParticleState GetStateForDistance(double) const;
+    ParticleState GetStateForEnergy(double energy) const;
+    ParticleState GetStateForDistance(double propagated_distance) const;
 
     std::vector<Cartesian3D> GetTrackPositions() const;
     std::vector<Cartesian3D> GetTrackDirections() const;
@@ -93,19 +93,23 @@ public:
     // Loss functions
 
     std::vector<StochasticLoss> GetStochasticLosses() const;
-    std::vector<StochasticLoss> GetStochasticLosses(const Geometry&) const;
-    std::vector<StochasticLoss> GetStochasticLosses(const InteractionType&) const;
-    std::vector<StochasticLoss> GetStochasticLosses(const std::string&) const;
+    std::vector<StochasticLoss> GetStochasticLosses(const Geometry& geometry) const;
+    std::vector<StochasticLoss> GetStochasticLosses(const InteractionType& interaction_type) const;
+    std::vector<StochasticLoss> GetStochasticLosses(const std::string& interaction_type) const;
 
     std::vector<ContinuousLoss> GetContinuousLosses() const;
-    std::vector<ContinuousLoss> GetContinuousLosses(const Geometry&) const;
+    std::vector<ContinuousLoss> GetContinuousLosses(const Geometry& geometry) const;
 
 private:
-    ParticleState RePropagateDistance(const ParticleState&, const Cartesian3D&,
-                                      double) const;
-    ParticleState RePropagateEnergy(const ParticleState&, const Cartesian3D&,
-                                    double, double) const;
-    Sector GetCurrentSector(const Vector3D&, const Vector3D&) const;
+    ParticleState RePropagateDistance(const ParticleState& init_state,
+                                      const Cartesian3D& direction,
+                                      double displacement) const;
+    ParticleState RePropagateEnergy(const ParticleState& init_state,
+                                    const Cartesian3D& direction,
+                                    double energy_lost,
+                                    double max_distance) const;
+    Sector GetCurrentSector(const Vector3D& position,
+                            const Vector3D& direction) const;
 
     std::vector<ParticleState> track_;
     std::vector<InteractionType> types_;

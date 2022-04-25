@@ -179,9 +179,9 @@ std::shared_ptr<ParticleState> Secondaries::GetEntryPoint(
         return nullptr; // track starts in geometry
 
     for (unsigned int i = 0; i < track_.size() - 1; i++) {
-        auto pos_i = track_.at(i).position;
-        auto pos_f = track_.at(i+1).position;
-        auto dir_i = track_.at(i).direction;
+        auto pos_i = track_[i].position;
+        auto pos_f = track_[i+1].position;
+        auto dir_i = track_[i].direction;
 
         auto displacement = pos_f - pos_i;
         auto dist_i_f = displacement.magnitude();
@@ -190,8 +190,8 @@ std::shared_ptr<ParticleState> Secondaries::GetEntryPoint(
         auto distance = geometry.DistanceToBorder(pos_i, displacement).first;
         if (distance <= dist_i_f && distance >= 0) {
             if (std::abs(dist_i_f - distance) < PARTICLE_POSITION_RESOLUTION)
-                return std::make_unique<ParticleState>(track_.at(i + 1));
-            auto entry_point = RePropagateDistance(track_.at(i), displacement,
+                return std::make_unique<ParticleState>(track_[i+1]);
+            auto entry_point = RePropagateDistance(track_[i], displacement,
                                                    distance);
             return std::make_unique<ParticleState>(entry_point);
         }
@@ -210,9 +210,9 @@ std::shared_ptr<ParticleState> Secondaries::GetExitPoint(
         return nullptr; // track ends inside geometry
 
     for (auto i = track_.size() - 1; i > 0; i--) {
-        auto pos_i = track_.at(i-1).position;
-        auto pos_f = track_.at(i).position;
-        auto dir_i = track_.at(i-1).direction;
+        auto pos_i = track_[i-1].position;
+        auto pos_f = track_[i].position;
+        auto dir_i = track_[i-1].direction;
 
         auto displacement = pos_f - pos_i;
         auto dist_i_f = displacement.magnitude();
@@ -221,9 +221,9 @@ std::shared_ptr<ParticleState> Secondaries::GetExitPoint(
         auto distance = geometry.DistanceToBorder(pos_f, -displacement).first;
         if (distance <= dist_i_f && distance >= 0) {
             if (std::abs(dist_i_f - distance) < PARTICLE_POSITION_RESOLUTION)
-                return std::make_unique<ParticleState>(track_.at(i - 1));
+                return std::make_unique<ParticleState>(track_[i-1]);
             auto exit_point = RePropagateDistance(
-                    track_.at(i - 1), displacement, dist_i_f - distance);
+                    track_[i-1], displacement, dist_i_f - distance);
             return std::make_unique<ParticleState>(exit_point);
         }
     }
@@ -243,8 +243,8 @@ std::shared_ptr<ParticleState> Secondaries::GetClosestApproachPoint(
        return std::make_unique<ParticleState>(track_.front());
 
     for (unsigned int i = 0; i < track_.size() - 1; i++) {
-        auto pos_i = track_.at(i).position;
-        auto pos_f = track_.at(i+1).position;
+        auto pos_i = track_[i].position;
+        auto pos_f = track_[i+1].position;
 
         auto displacement = pos_f - pos_i;
         auto dist_i_f = displacement.magnitude();
@@ -252,11 +252,11 @@ std::shared_ptr<ParticleState> Secondaries::GetClosestApproachPoint(
 
         auto distance_to_closest_approach
             = geometry.DistanceToClosestApproach(pos_i, displacement);
-        if (distance_to_closest_approach == dist_i_f) {
-            return std::make_unique<ParticleState>(track_.at(i+1));
+        if (std::abs(distance_to_closest_approach - dist_i_f) <= PARTICLE_POSITION_RESOLUTION) {
+            return std::make_unique<ParticleState>(track_[i+1]);
         } else if (distance_to_closest_approach < dist_i_f) {
             if (distance_to_closest_approach < PARTICLE_POSITION_RESOLUTION)
-                return std::make_unique<ParticleState>(track_.at(i));
+                return std::make_unique<ParticleState>(track_[i]);
 
             auto closest_approach = RePropagateDistance(
                     track_.at(i), displacement, distance_to_closest_approach);
@@ -268,10 +268,10 @@ std::shared_ptr<ParticleState> Secondaries::GetClosestApproachPoint(
 
 bool Secondaries::HitGeometry(const Geometry& geometry) const {
     for (unsigned int i = 0; i < track_.size() - 1; i++) {
-        auto pos_a = track_.at(i).position;
-        auto dir_a = track_.at(i).direction;
-        auto pos_b = track_.at(i + 1).position;
-        auto dir_b = track_.at(i + 1).direction;
+        auto pos_a = track_[i].position;
+        auto dir_a = track_[i].direction;
+        auto pos_b = track_[i+1].position;
+        auto dir_b = track_[i+1].direction;
 
         // check if first track point lies inside geometry
         if (geometry.IsInside(pos_a, dir_a))
