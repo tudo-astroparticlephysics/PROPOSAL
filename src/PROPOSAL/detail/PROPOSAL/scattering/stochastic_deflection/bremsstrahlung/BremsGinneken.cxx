@@ -15,7 +15,7 @@ double stochastic_deflection::BremsGinneken::f_nu_g(double nu, double n, double 
     return pow(nu, (1/n + 1)) + pow((0.2/k_4), (1/n)) * nu - pow((0.2/k_4), (1/n));
 }
 
-double stochastic_deflection::BremsGinneken::get_nu_g(double E, double n, double k_4) const {
+double stochastic_deflection::BremsGinneken::get_nu_g(double n, double k_4) const {
     auto f = [=](double nu) {
         return f_nu_g(nu, n, k_4);
     };
@@ -24,7 +24,7 @@ double stochastic_deflection::BremsGinneken::get_nu_g(double E, double n, double
         auto nu_g_x = Bisection(f, 0.5, 1., 1e-5, 100);
         return (nu_g_x.first + nu_g_x.second) / 2;
     } 
-    return 0.5;
+    return 0.5; // return boundary value of parametrization
 }
 
 double stochastic_deflection::BremsGinneken::get_rms_theta(double e_i, double e_f, double mass, double Z) const {
@@ -44,7 +44,7 @@ double stochastic_deflection::BremsGinneken::get_rms_theta(double e_i, double e_
         if (rms_theta < 0.2) {
             return rms_theta; 
         } else {
-            double nu_g = get_nu_g(e_i, n, k_4);
+            double nu_g = get_nu_g(n, k_4);
             auto k_5 = k_4 * pow(nu_g, 1 + n) * pow(1 - nu_g, 0.5 - n);
             rms_theta = k_5 * pow(1 - nu, -0.5);
             if (rms_theta < 0.2) {
