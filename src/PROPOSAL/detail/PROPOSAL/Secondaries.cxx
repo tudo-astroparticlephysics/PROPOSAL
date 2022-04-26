@@ -259,7 +259,7 @@ std::shared_ptr<ParticleState> Secondaries::GetClosestApproachPoint(
                 return std::make_unique<ParticleState>(track_[i]);
 
             auto closest_approach = RePropagateDistance(
-                    track_.at(i), displacement, distance_to_closest_approach);
+                    track_[i], displacement, distance_to_closest_approach);
             return std::make_unique<ParticleState>(closest_approach);
         }
     }
