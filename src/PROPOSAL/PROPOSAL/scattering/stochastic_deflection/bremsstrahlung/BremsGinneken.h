@@ -15,7 +15,7 @@ namespace stochastic_deflection {
         }
 
         double f_nu_g(double, double, double) const;
-        double get_nu_g(double, double, double) const;
+        double get_nu_g(double, double) const;
         double get_rms_theta(double, double, double, double) const;
 
     public: 
