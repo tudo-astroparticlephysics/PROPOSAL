@@ -6,6 +6,7 @@
 #include <cmath> 
 #include <stdexcept>
 #include <algorithm>
+#include <string>
 
 using namespace PROPOSAL;
 using namespace std;
@@ -15,11 +16,15 @@ double stochastic_deflection::BremsGinneken::f_nu_g(double nu, double n, double 
 }
 
 double stochastic_deflection::BremsGinneken::get_nu_g(double E, double n, double k_4) const {
-    auto f = [&, n, k_4](double nu) {
+    auto f = [=](double nu) {
         return f_nu_g(nu, n, k_4);
     };
-    auto nu_g_x = Bisection(f, 0.5, 1., 1e-5, 100);
-    return (nu_g_x.first + nu_g_x.second) / 2;
+    if (f(0.5) * f(1.) < 0) { 
+        // check different sign of the definition range, not possible for e_i < 0.7 GeV
+        auto nu_g_x = Bisection(f, 0.5, 1., 1e-5, 100);
+        return (nu_g_x.first + nu_g_x.second) / 2;
+    } 
+    return 0.5;
 }
 
 double stochastic_deflection::BremsGinneken::get_rms_theta(double e_i, double e_f, double mass, double Z) const {
@@ -39,16 +44,12 @@ double stochastic_deflection::BremsGinneken::get_rms_theta(double e_i, double e_
         if (rms_theta < 0.2) {
             return rms_theta; 
         } else {
-            double nu_g = 0.5;
-            if (e_i > 0.7) {    // limit of parametrization
-                nu_g = get_nu_g(e_i, n, k_4);
-            };
-
+            double nu_g = get_nu_g(e_i, n, k_4);
             auto k_5 = k_4 * pow(nu_g, 1 + n) * pow(1 - nu_g, 0.5 - n);
             rms_theta = k_5 * pow(1 - nu, -0.5);
             if (rms_theta < 0.2) {
-                // If no case matches
-                Logging::Get("proposal.deflection")->warn("BremsGinneken deflection: rms_theta = {} < 0.2, nu_g = {}", rms_theta, nu_g);
+                // This case is an undefined state
+                throw std::invalid_argument("BremsGinneken deflection rms_theta = " + to_string(rms_theta) + " < 0.2 is not defined in this case");
             }
             return rms_theta;
         }
