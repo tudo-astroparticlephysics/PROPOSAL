@@ -230,7 +230,9 @@ PYBIND11_MODULE(proposal, m)
         .def_readwrite_static(
             "nodes_dndx_e", &InterpolationSettings::NODES_DNDX_E)
         .def_readwrite_static(
-            "nodes_dndx_v", &InterpolationSettings::NODES_DNDX_V);
+            "nodes_dndx_v", &InterpolationSettings::NODES_DNDX_V)
+        .def_readwrite_static(
+            "nodes_utility", &InterpolationSettings::NODES_UTILITY);
 
     /* py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m, */
     /*     "InterpolationDef", */

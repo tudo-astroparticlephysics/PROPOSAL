@@ -2,6 +2,7 @@
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
@@ -21,7 +22,8 @@ InteractionBuilder::InteractionBuilder(std::shared_ptr<Displacement> _disp,
           [this](double E) { return FunctionToIntegral(E); },
           _disp->GetLowerLim(), this->GetHash()))
 {
-    interaction_integral->BuildTables("inter_", 500, false);
+    interaction_integral->BuildTables("inter_",
+                                      InterpolationSettings::NODES_UTILITY, false);
 }
 
 double InteractionBuilder::EnergyInteraction(double energy, double rnd)

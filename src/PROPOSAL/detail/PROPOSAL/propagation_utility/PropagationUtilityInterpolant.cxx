@@ -40,7 +40,7 @@ void UtilityInterpolant::BuildTables(const std::string prefix, size_t nodes,
         reference_x = InterpolationSettings::UPPER_ENERGY_LIM;
     }
 
-    hash_combine(this->hash, reverse);
+    hash_combine(this->hash, nodes, reverse);
 
     if (reverse) {
         def.f = [&](double energy) {
