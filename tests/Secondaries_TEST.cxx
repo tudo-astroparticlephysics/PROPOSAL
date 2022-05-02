@@ -174,7 +174,7 @@ TEST(SecondaryVector, EntryPointExitPointRePropagation)
 }
 
 
-TEST(SecondaryVector, HitDetector) {
+TEST(SecondaryVector, HitGeometry) {
     // define our dummy particle track
     Secondaries dummy_track(nullptr, std::vector<Sector>{});
     std::vector<Cartesian3D> positions{ {0, 0, 0}, {0, 0, 10}, {0, 0, 20} };
@@ -207,6 +207,56 @@ TEST(SecondaryVector, HitDetector) {
     EXPECT_TRUE(dummy_track.HitGeometry(Box(Cartesian3D(0, 0, 21), 2, 2, 2)));
     EXPECT_TRUE(dummy_track.HitGeometry(Cylinder(Cartesian3D(0, 0, 21), 5, 2)));
 
+}
+
+TEST(SecondariesVector, HitGeometry_hierarchy) {
+    // UnitTest motivated by https://github.com/tudo-astroparticlephysics/PROPOSAL/issues/288
+    RandomGenerator::Get().SetSeed(0);
+
+    //create propagator
+    auto p_def = MuMinusDef();
+    auto medium = Ice();
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, false);
+    auto cross = GetStdCrossSections(p_def, medium, cuts, true);
+    auto collection = PropagationUtility::Collection();
+    collection.interaction_calc = make_interaction(cross, true);
+    collection.displacement_calc = make_displacement(cross, true);
+    collection.time_calc = make_time(cross, p_def, true);
+    collection.scattering = std::make_shared<Scattering>(
+            make_multiple_scattering("highlandintegral", p_def, medium,
+                                     cross, true), nullptr);
+    auto prop_utility = PropagationUtility(collection);
+
+    auto density_distr = std::make_shared<Density_homogeneous>(medium.GetMassDensity());
+
+    auto geometry = std::make_shared<Sphere>(Cartesian3D(0, 0, 0), 1e20);
+    geometry->SetHierarchy(1);
+
+    // Create an observation level at z_detector
+    int z_detector = -150000;
+    auto observation_level = std::make_shared<Cylinder>(Cartesian3D(0, 0, z_detector + 0.5), 1, 1e20);
+    observation_level->SetHierarchy(10);
+
+    auto prop = Propagator(p_def, {{geometry, prop_utility, density_distr}, {observation_level, prop_utility, density_distr}});
+
+    auto init_state = ParticleState();
+    init_state.energy = 1e6;
+    init_state.position = Cartesian3D(0, 0, 0);
+    init_state.direction = Cartesian3D(0, 0, -1);
+
+    for (size_t i = 0; i < 1e4; i++) {
+        // Particles will stop in the observation level, if they reach it, due to the hierachy condition
+        auto sec = prop.Propagate(init_state, 1e20, 0, 5);
+        auto z_f = sec.GetTrackPositions().back().GetZ();
+        auto hit_geometry = sec.HitGeometry(*observation_level);
+        if (hit_geometry) {
+            // Particles where HitGeometry is true must be on the observation level
+            EXPECT_NEAR(z_detector, z_f, PARTICLE_POSITION_RESOLUTION);
+        } else {
+            // Particles where HitGeometry is false did not reach the observation level
+            EXPECT_GT(z_f, z_detector);
+        }
+    }
 }
 
 TEST(SecondaryVector, ClosestApproachPoint) {
