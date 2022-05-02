@@ -237,7 +237,11 @@ TEST(SecondariesVector, HitGeometry_hierarchy) {
     auto observation_level = std::make_shared<Cylinder>(Cartesian3D(0, 0, z_detector + 0.5), 1, 1e20);
     observation_level->SetHierarchy(10);
 
-    auto prop = Propagator(p_def, {{geometry, prop_utility, density_distr}, {observation_level, prop_utility, density_distr}});
+    auto sector1 = std::make_tuple(geometry, prop_utility, density_distr);
+    auto sector2 = std::make_tuple(observation_level, prop_utility, density_distr);
+    std::vector<Sector> sec_vec = {sector1, sector2};
+
+    auto prop = Propagator(p_def, sec_vec);
 
     auto init_state = ParticleState();
     init_state.energy = 1e6;
