@@ -269,16 +269,16 @@ std::shared_ptr<ParticleState> Secondaries::GetClosestApproachPoint(
 bool Secondaries::HitGeometry(const Geometry& geometry) const {
     for (unsigned int i = 0; i < track_.size() - 1; i++) {
         auto pos_a = track_[i].position;
-        auto dir_a = track_[i].direction;
         auto pos_b = track_[i+1].position;
-        auto dir_b = track_[i+1].direction;
+        auto disp = (pos_b - pos_a);
+        disp.normalize();
 
         // check if first track point lies inside geometry
-        if (geometry.IsInside(pos_a, dir_a))
+        if (geometry.IsInside(pos_a, disp))
             return true;
 
         // check if geometry lies between two track points
-        if (geometry.IsInfront(pos_a, dir_a) && geometry.IsBehind(pos_b, dir_b))
+        if (geometry.IsInfront(pos_a, disp) && geometry.IsBehind(pos_b, disp))
             return true;
     }
 
