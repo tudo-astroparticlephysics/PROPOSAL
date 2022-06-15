@@ -212,7 +212,7 @@ void init_particle(py::module& m) {
     py::class_<ParticleState, std::shared_ptr<ParticleState>>(m_sub, "ParticleState",
                                                               R"pbdoc(
                 Dynamic data objects store information about particle states,
-                for example the intial particle state for the propagator,
+                for example the initial particle state for the propagator,
                 specific states during propagation or secondary particles.
             )pbdoc")
         .def(py::init<const Vector3D&, const Vector3D&, const double&, const double&, const double&>(),
@@ -294,31 +294,307 @@ void init_particle(py::module& m) {
             .def_readwrite("time_initial", &ContinuousLoss::time_initial, R"pbdoc(Time when the continuous energy loss started.)pbdoc")
             .def_readwrite("time_final", &ContinuousLoss::time_final, R"pbdoc(Time when the continuous energy loss ended.)pbdoc");
 
-    py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries", R"pbdoc(Output of Propagator.)pbdoc")
-            .def("ELost", &Secondaries::GetELost)
-            .def("entry_point", &Secondaries::GetEntryPoint)
-            .def("exit_point", &Secondaries::GetExitPoint)
-            .def("closest_approach_point", &Secondaries::GetClosestApproachPoint)
-            .def("hit_geometry", &Secondaries::HitGeometry)
-            .def("track", overload_cast_<>()(&Secondaries::GetTrack, py::const_))
-            .def("track", overload_cast_<const Geometry&>()(&Secondaries::GetTrack, py::const_))
-            .def("get_state_for_energy", &Secondaries::GetStateForEnergy)
-            .def("get_state_for_distance", &Secondaries::GetStateForDistance)
-            .def("track_positions", &Secondaries::GetTrackPositions)
-            .def("track_directions", &Secondaries::GetTrackDirections)
-            .def("track_energies", &Secondaries::GetTrackEnergies)
-            .def("track_times", &Secondaries::GetTrackTimes)
-            .def("track_propagated_distances", &Secondaries::GetTrackPropagatedDistances)
-            .def("track_types", &Secondaries::GetTrackTypes)
-            .def("track_length", &Secondaries::GetTrackLength)
-            .def("target_hashes", &Secondaries::GetTargetHashes)
-            .def("stochastic_losses", overload_cast_<>()(&Secondaries::GetStochasticLosses, py::const_))
-            .def("stochastic_losses", overload_cast_<const Geometry&>()(&Secondaries::GetStochasticLosses, py::const_))
-            .def("stochastic_losses", overload_cast_<const InteractionType&>()(&Secondaries::GetStochasticLosses, py::const_))
-            .def("stochastic_losses", overload_cast_<const std::string&>()(&Secondaries::GetStochasticLosses, py::const_))
-            .def("continuous_losses", overload_cast_<>()(&Secondaries::GetContinuousLosses, py::const_))
-            .def("continuous_losses", overload_cast_<const Geometry&>()(&Secondaries::GetContinuousLosses, py::const_))
-            .def("decay_products", &Secondaries::GetDecayProducts);
+    py::class_<Secondaries, std::shared_ptr<Secondaries>>(m_sub, "Secondaries",
+            R"pbdoc(Output of the propagator. The secondaries class stores all information about interactions during the propagation. For this, it stores all
+                    intermediate particle states during propagation in a track object, which is a list of
+                    :meth:`particle.ParticleState` objects.
+            )pbdoc")
+            .def("initial_state",
+                 &Secondaries::GetInitialState,
+                 R"pbdoc(Get information on the initial state of the propagated particle.)pbdoc")
+            .def("final_state",
+                 &Secondaries::GetFinalState,
+                 R"pbdoc(Get information on the final state of the propagated particle.)pbdoc")
+            .def("ELost",
+                 &Secondaries::GetELost, py::arg("geometry"),
+                 R"pbdoc(
+
+                Calculate energy that the particle has lost inside a specific geometry.
+
+                Args:
+                    geometry (Geometry): Lost energy in MeV
+                Returns:
+                    Lost energy in MeV
+
+                )pbdoc")
+            .def("entry_point",
+                 &Secondaries::GetEntryPoint, py::arg("geometry"),
+                 R"pbdoc(
+                Get the particle state when the particle has entered a specific geometry. If the particle already
+                started in the specific geometry or has never entered the specific geometry, a None is returned.
+                Otherwise, a continuous step based on a known particle state will be calculated so that the returned
+                particle state describes the state when the particle entered the geometry. Note that this only works
+                reliably when continuous randomization is disabled. Otherwise, a warning will be prompted and results
+                might be inconsistent.
+
+                Args:
+                    geometry (Geometry): Geometry for which we want to check when the propagated particle has entered it
+
+                Returns:
+                    ParticleState, describing the state of the particle when it has entered the specific geometry, or a
+                    None.
+                )pbdoc")
+            .def("exit_point",
+                 &Secondaries::GetExitPoint, py::arg("geometry"),
+                 R"pbdoc(
+                Get the particle state when the particle has left a specific geometry. If the particle has never left
+                or never crossed the geometry, a None is returned. Otherwise, a continuous step based on a known
+                particle state will be calculated so that the returned particle state describes the state when the
+                particle exited the geometry. Note that this only works reliably when continuous randomization is
+                disabled. Otherwise, a warning will be prompted and results might be inconsistent.
+
+                Args:
+                    geometry (Geometry): Geometry for which we want to check when the propagated particle has left it
+
+                Returns:
+                    ParticleState, describing the state of the particle when it has left the specific geometry, or a
+                    None.
+                 )pbdoc")
+            .def("closest_approach_point",
+                 &Secondaries::GetClosestApproachPoint, py::arg("geometry"),
+                 R"pbdoc(
+                Get the particle state when the particle had the smallest distance to the center of a specific geometry.
+                This will not extrapolate the particle before the initial or after the final state. This will calculate
+                a continuous step, based on a known particle state, so that the returned particle state describes the
+                particle at is has the smallest distance to the center of the specified geometry.
+
+                Args:
+                    geometry (Geometry): Geometry for which we want to calculate the closest approach point
+                Returns:
+                    A ParticleState, describing the closest approach point of the particle.
+                )pbdoc")
+            .def("hit_geometry",
+                 &Secondaries::HitGeometry, py::arg("geometry"),
+                 R"pbdoc(
+                Check if particle has hit a specific geometry. Particle tracks ending at the border of a geometry
+                count as a hit.
+                Args:
+                    geometry (Geometry): Geometry for which we want to check whether our particle has hit it
+                Returns:
+                    Bool - True if geometry has been hit, false otherwise.
+                )pbdoc")
+            .def("track",
+                 overload_cast_<>()(&Secondaries::GetTrack, py::const_),
+                 R"pbdoc(
+                Returns particle track. This is a list of particle states that describe the particle during propagation.
+                The first element of this list describes the initial particle state, the last element of this list
+                describes the particle at the end of propagation. All intermediate elements of the list describe the
+                particle during propagation. This includes particle states immediately before and after stochastic
+                losses and particle states when there has been a sector transition.
+
+                Returns:
+                    List of ParticleState objects describing the states of the particle during propagation.
+                )pbdoc")
+            .def("track",
+                 overload_cast_<const Geometry&>()(&Secondaries::GetTrack, py::const_), py::arg("geometry"), R"pbdoc()pbdoc")
+            .def("get_state_for_energy",
+                 &Secondaries::GetStateForEnergy, py::arg("energy"),
+                 R"pbdoc(
+                Get information on the state of the propagated particle when it has reached a specific energy.
+
+                If the specified energy is within a continuous loss, a continuous propagation step will be simulated so
+                that the energy of the returned particle state is equal to the specified energy. Note that this only
+                works consistently if continuous randomization is disabled. Otherwise, a warning will be prompted and
+                results might be inconsistent.
+
+                If the specified energy lies within a stochastic loss (i.e. the particle energy has been bigger than
+                the specified energy before a stochastic loss but smaller than the specified energy after a stochastic
+                loss), the particle state before the stochastic loss is returned.
+
+                If the specified energy is below the final energy of the particle, the final particle state will be returned.
+
+                If the specified energy is above the initial energy of the particle, the initial particle state will be returned.
+
+                Args:
+                    energy: Particle energy (in MeV and in total energies) for which we want to get the particle state
+
+                Returns:
+                    ParticleState object, describing the particle state at energy
+                )pbdoc")
+            .def("get_state_for_distance",
+                 &Secondaries::GetStateForDistance, py::arg("distance"),
+                 R"pbdoc(
+                Get information on the state of the propagated particle when it has reaches a specific propagation
+                distance.
+
+                This will calculate a continuous propagation step based on a known particle state so that the propagated
+                distance of the returned particle state is equal to the specified propagated distance.
+
+                If the specified distance is below the propagated distance of the initial particle state, the initial
+                particle state is returned.
+
+                If the specified distance is above the propagated distance of the final
+                particle state, the final particle state is returned.
+
+                Note that by default, the particle starts with a propagation_distance of 0 unless specified otherwise in
+                the initial_particle state.
+
+                Args:
+                    propagated_distance: Propagated distance (in cm) for which we want to get the particle state
+
+                Returns:
+                    ParticleState object, describing the particle state when it has propagated the propagated_distance
+                )pbdoc")
+            .def("track_positions",
+                 &Secondaries::GetTrackPositions,
+                 R"pbdoc(
+                Returns the list of all positions of the propagated particle. The first element corresponds to the
+                position of the initial particle, the last element to the final position of the particle after propagation.
+                The elements in between describe the intermediate positions of the particle during propagation.
+
+                 Returns:
+                    List of Cartesian3D objects, describing the particle positions during propagation. Note that the
+                    units of the Cartesian3D object are in cm.
+                )pbdoc")
+            .def("track_directions",
+                 &Secondaries::GetTrackDirections,
+                 R"pbdoc(
+                Returns the list of all directions of the propagated particle. The first element corresponds to the
+                direction of the initial particle, the last element to the final direction of the particle after
+                propagation. The elements in between describe the intermediate directions of the particle during
+                propagation.
+
+                Returns:
+                    List of Cartesian3D objects, describing the particle directions during propagation.
+                )pbdoc")
+            .def("track_energies",
+                 &Secondaries::GetTrackEnergies,
+                 R"pbdoc(
+                Returns the list of all particle energies (total energies in MeV) of the propagated particle. The first
+                element corresponds to the energy of the initial particle, the last element to the final energy of the
+                particle after propagation. The elements in between describe the energies of the particle during
+                propagation.
+
+                Returns:
+                    List of doubles, describing the particle energies during propagation (in total energies, in MeV)
+                )pbdoc")
+            .def("track_times",
+                 &Secondaries::GetTrackTimes,
+                 R"pbdoc(
+                Returns the list of all particle times (times in s) of the propagated particle. The first element
+                corresponds to the time of the initial particle, the last element to the time of the particle after
+                propagation. The elements in between describe the times of the particle during propagation.
+
+                Returns:
+                    List of doubles, describing the particle times during propagation (in s)
+
+                )pbdoc")
+            .def("track_propagated_distances",
+                 &Secondaries::GetTrackPropagatedDistances,
+                 R"pbdoc(
+                Returns the list of the propagated distances (in cm) of the propagated particle. The first element
+                orresponds to the propagated distance of the initial particle (0cm if not specified otherwise in the
+                initial state), the last element to the propagated distance of the particle after propagation. The
+                elements in between describe the propagated distances during propagation
+
+                Returns:
+                    List of doubles, describing the particle propagated distances during propgation (in cm)
+                 )pbdoc")
+            .def("track_types",
+                 &Secondaries::GetTrackTypes,
+                 R"pbdoc(
+                Returns a list of interaction types describing the interactions of the particle during propagation.
+
+                Returns:
+                    List of InteractionType objects
+                )pbdoc")
+            .def("track_length",
+                 &Secondaries::GetTrackLength,
+                 R"pbdoc(
+                Length of the track objects, i.e. the number of particle states that are stored in this Secondaries class.
+
+                Returns:
+                    unsigned int which describes the length of the track object.
+                 )pbdoc")
+            .def("target_hashes",
+                 &Secondaries::GetTargetHashes,
+                 R"pbdoc(
+                Returns a list of hashes, describing the media and components that the particle interacted with during
+                propagation. For continuous losses, 0 is returned (since the particle did not interact with a specific
+                medium).
+
+                For ionization losses, the hash of the medium that the particle interacted with is returned. We can get
+                the medium to the corresponding hash using :meth:`~proposal.medium.get_medium_for_hash`.
+
+                For other stochastic losses, the hash of the component that the particle interacted with is returned.
+                We can get the component to the corresponding hash using :meth:`~proposal.component.get_component_for_hash`.
+
+                Returns:
+                    List of size_t objects, which are hashed to Medium or Component objects. These are the targets that our particle interacted with during propagation.
+                )pbdoc")
+            .def("stochastic_losses",
+                 overload_cast_<>()(&Secondaries::GetStochasticLosses, py::const_),
+                 R"pbdoc(
+                Get all stochastic losses (i.e. losses bigger than the energy cut) of the particle that occurred during
+                propagation
+
+                Returns:
+                    List of StochasticLoss objects
+                )pbdoc")
+            .def("stochastic_losses",
+                 overload_cast_<const Geometry&>()(&Secondaries::GetStochasticLosses, py::const_), py::arg("geometry"),
+                 R"pbdoc(
+                Get stochastic losses (i.e. losses bigger than the energy cut) of the particle that are within a
+                specified geometry.
+
+                Args:
+                    geometry: Geometry object, find stochastic losses within this geometry
+
+                Returns:
+                    List of StochasticLoss objects
+                )pbdoc")
+            .def("stochastic_losses",
+                 overload_cast_<const InteractionType&>()(&Secondaries::GetStochasticLosses, py::const_), py::arg("interaction_type"),
+                 R"pbdoc(
+                Get stochastic losses (i.e. losses bigger than the energy cut) of the particle that correspond to a
+                specific interaction type
+
+                Args:
+                    interaction_type: Interaction type of stochastic loss as an InteractionType object
+
+                Returns:
+                    List of StochasticLoss objects
+                )pbdoc")
+            .def("stochastic_losses",
+                 overload_cast_<const std::string&>()(&Secondaries::GetStochasticLosses, py::const_), py::arg("interaction_type"),
+                 R"pbdoc(
+                Get stochastic losses (i.e. losses bigger than the energy cut) of the particle that correspond to a
+                specific interaction type
+
+                Args:
+                    interaction_type: Name of interaction type of stochastic loss
+
+                Returns:
+                    List of StochasticLoss objects
+                )pbdoc")
+            .def("continuous_losses",
+                 overload_cast_<>()(&Secondaries::GetContinuousLosses, py::const_),
+                 R"pbdoc(
+                Get all continuous losses (i.e. losses smaller than the energy cut) of the particle that occurred
+                during propagation
+
+                Returns:
+                    List of ContinousLoss objects
+                )pbdoc")
+            .def("continuous_losses",
+                 overload_cast_<const Geometry&>()(&Secondaries::GetContinuousLosses, py::const_), py::arg("geometry"),
+                 R"pbdoc(
+                Get all continuous losses (i.e. losses smaller than the energy cut) of the particle that occurred
+                during propagation
+
+                Args:
+                    geometry: Geometry object, find continuous losses within this geometry
+                )pbdoc")
+            .def("decay_products",
+                 &Secondaries::GetDecayProducts,
+                 R"pbdoc(
+                If the particle has decayed at the end of propagation, this function calculated the decay products as a
+                list of particle states. If the particle did not decay during propagation, the returned list will be
+                empty.
+
+                Returns:
+                    List of ParticleStates, describing the decay products.
+                )pbdoc");
 
     py::enum_<InteractionType>(m_sub, "Interaction_Type")
         .value("particle", InteractionType::Particle)
