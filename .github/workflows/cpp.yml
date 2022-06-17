@@ -62,6 +62,9 @@ jobs:
         - name: Update conan profile
           if : ${{ matrix.os == 'ubuntu-18.04' || matrix.os == 'ubuntu-latest' }}
           run: conan profile update settings.compiler.libcxx=libstdc++11 default
+        - name: Update conan profile
+          if : ${{ matrix.os == 'macos-latest' }}
+          run: conan profile update settings.compiler.cppstd=14 default
         - name: create build directory
           if : steps.cache-build.outputs.cache-hit != 'true'
           run: mkdir PROPOSAL_BUILD
