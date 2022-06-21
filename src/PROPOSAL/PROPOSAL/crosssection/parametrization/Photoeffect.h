@@ -10,13 +10,13 @@ namespace PROPOSAL {
 
     namespace crosssection {
         class Photoeffect : public ParametrizationDirect {
-            virtual double PhotonAtomCrossSection(double, const Component&);
+            virtual double PhotoeffectKshellCrossSection(double, const Component&) = 0;
         protected:
             double GetCutOff(const Component& comp) const;
         public:
             Photoeffect() = default;
 
-            virtual double PhotoeffectKshellCrossSection(double, const Component&) = 0;
+            virtual double PhotonAtomCrossSection(double, const Component&);
 
             double CalculatedNdx(double, const ParticleDef&, const Medium&, cut_ptr) override;
             double CalculatedNdx(double, size_t, const ParticleDef&, const Medium&, cut_ptr) override;
