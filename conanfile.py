@@ -32,13 +32,13 @@ class PROPOSALConan(ConanFile):
             del self.options.fPIC
 
     def requirements(self):
-        self.requires("cubicinterpolation/0.1.4")
+        self.requires("cubicinterpolation/0.1.5")
         self.requires("spdlog/1.8.2")
         self.requires("nlohmann_json/3.9.1")
         if self.options.with_python:
             self.requires("pybind11/2.6.2")
         if self.options.with_testing:
-            self.requires("boost/1.75.0")
+            self.requires("boost/1.78.0")
             self.requires("gtest/1.11.0")
         if self.options.with_documentation:
             self.requires("doxygen/1.8.20")
