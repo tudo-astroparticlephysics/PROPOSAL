@@ -23,19 +23,19 @@ double crosssection::Photoeffect::GetLowerEnergyLim(const ParticleDef&, const Me
     return min_cut_off;
 };
 
-double crosssection::Photoeffect::PhotonAtomCrossSection(double energy, const Component& comp) {
-    auto cross_photon_atom = PhotoeffectKshellCrossSection(energy, comp);
-    if (cross_photon_atom == 0.)
-        return 0.;
-    return comp.GetAtomicNum() * cross_photon_atom * Kshell_Total_Ratio(comp);
-}
-
-double crosssection::Photoeffect::Kshell_Total_Ratio(const Component& comp) {
+double Kshell_Total_Ratio(const Component& comp) {
     // J. H. Hubbell, Tech. Rep. NSRDS-NBS 29, Nat. Bur. Stand. (1969)
     // eq. (2.-2)
     double ln_Z = log(comp.GetNucCharge());
     double res = 1 + 0.01481 * ln_Z * ln_Z + 0.000788 * ln_Z * ln_Z * ln_Z;
     return res;
+}
+
+double crosssection::Photoeffect::PhotonAtomCrossSection(double energy, const Component& comp) {
+    auto cross_photon_atom = PhotoeffectKshellCrossSection(energy, comp);
+    if (cross_photon_atom == 0.)
+        return 0.;
+    return comp.GetAtomicNum() * cross_photon_atom * Kshell_Total_Ratio(comp);
 }
 
 double crosssection::Photoeffect::CalculatedNdx(
@@ -89,7 +89,7 @@ double crosssection::PhotoeffectSauter::PhotonNucleonCrossSection(double energy,
 
     auto sigma = sigma_T * pow(comp.GetNucCharge(), 5) * pow(ALPHA, 4) * pow(ME / energy, 5)
         * pow(gamma_beta, 3) * (4/3.0 + gamma * (gamma - 2) / (gamma + 1)
-        * (1 - 1 / (gamma * gamma_beta) * log(gamma + gamma_beta));
+        * (1 - 1 / (gamma * gamma_beta) * log(gamma + gamma_beta)));
 
     auto Z_alpha_beta = comp.GetNucCharge() * ALPHA * gamma / gamma_beta; // Z*alpha/beta
     auto Z_pi_alpha_beta = M_PI * Z_alpha_beta;
