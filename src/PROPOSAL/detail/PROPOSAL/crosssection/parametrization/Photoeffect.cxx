@@ -81,7 +81,7 @@ std::unique_ptr<crosssection::ParametrizationDirect> crosssection::PhotoeffectSa
 // Oxford Clarendon Press (1954)
 // eq. 17
 // ------------------------------------------------------------------------- //
-double crosssection::PhotoeffectSauter::PhotonNucleonCrossSection(double energy, const Component& comp) {
+double crosssection::PhotoeffectSauter::PhotoeffectKshellCrossSection(double energy, const Component& comp) {
     const double sigma_T = (8 * M_PI* RE * RE)/3; // Thomson cross section
     double I = pow(comp.GetNucCharge() * ALPHA, 2) * ME / 2; // ionization energy of K-shell electron
     auto gamma = 1 + (energy - I) / ME;
