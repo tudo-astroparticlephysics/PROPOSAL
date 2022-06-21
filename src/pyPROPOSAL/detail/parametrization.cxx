@@ -9,6 +9,7 @@
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoMuPairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/Photoproduction.h"
+#include "PROPOSAL/crosssection/parametrization/Photoeffect.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crosssection/parametrization/Photonuclear.h"
@@ -701,6 +702,31 @@ void init_parametrization(py::module& m)
     py::class_<crosssection::PhotoproductionRhode,
     std::shared_ptr<crosssection::PhotoproductionRhode>,
     crosssection::Photoproduction>(m_sub_photoproduction, "Rhode")
+        .def(py::init<>());
+
+    // --------------------------------------------------------------------- //
+    // Photoeffect
+    // --------------------------------------------------------------------- //
+
+    py::module m_sub_photoeffect = m_sub.def_submodule("photoeffect");
+
+    py::class_<crosssection::Photoeffect,
+    std::shared_ptr<crosssection::Photoeffect>,
+    crosssection::ParametrizationDirect>(m_sub_photoeffect, "Photoeffect",
+         R"pbdoc("
+            Virtual class for Photoeffect parametrizations.
+        ")pbdoc")
+        .def("PhotonAtomCrossSection",
+        &crosssection::Photoeffect::PhotonAtomCrossSection,
+        py::arg("energy"), py::arg("component"),
+        R"pbdoc("
+            Total crosssection for the interaction of a photon with the atomic
+            electron hull.
+        ")pbdoc");
+
+    py::class_<crosssection::PhotoeffectSauter,
+    std::shared_ptr<crosssection::PhotoeffectSauter>,
+    crosssection::Photoeffect>(m_sub_photoeffect, "Sauter")
         .def(py::init<>());
 
     // --------------------------------------------------------------------- //
