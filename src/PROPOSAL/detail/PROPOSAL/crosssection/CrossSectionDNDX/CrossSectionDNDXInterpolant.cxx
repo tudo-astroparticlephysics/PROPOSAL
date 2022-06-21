@@ -62,8 +62,17 @@ size_t CrossSectionDNDXInterpolant::gen_hash(size_t hash) const {
 
 double CrossSectionDNDXInterpolant::Calculate(double energy)
 {
-    auto lim = GetIntegrationLimits(energy);
-    return Calculate(energy, lim.max);
+    if (energy < lower_energy_lim)
+        return 0.;
+    auto dNdx = interpolant.evaluate(std::array<double, 2> { energy, 1 });
+    if (dNdx < 0) {
+        auto inter_name = Type_Interaction_Name_Map.at(type_id);
+        logger->warn("Negative dNdx value for E = {:.4f} MeV, detected in "
+                     "interaction type {}. Setting dNdx to zero.",
+                     energy, inter_name);
+        dNdx = 0.;
+    }
+    return dNdx;
 }
 
 double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
