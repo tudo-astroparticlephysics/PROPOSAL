@@ -18,7 +18,7 @@ namespace PROPOSAL {
 
             virtual double PhotoeffectKshellCrossSection(double, const Component&) = 0;
 
-            double CalculatedNdX(double, const ParticleDef&, const Medium&, cut_ptr) override;
+            double CalculatedNdx(double, const ParticleDef&, const Medium&, cut_ptr) override;
             double CalculatedNdx(double, size_t, const ParticleDef&, const Medium&, cut_ptr) override;
             std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(
                     double, const ParticleDef&, const Medium&, cut_ptr) override;
@@ -34,6 +34,12 @@ namespace PROPOSAL {
             double CalculateStochasticLoss(size_t, double, double, const ParticleDef&, const Medium&, cut_ptr) override {
                 return 1.; // all energy is always lost, i.e. v=1
             };
+
+            double GetLowerEnergyLim(const ParticleDef&, const Medium&, cut_ptr) const override;
+
+            size_t GetHash(const ParticleDef&, const Medium& m, cut_ptr) const noexcept override;
+
+            InteractionType GetInteractionType() const noexcept override;
         };
 
         class PhotoeffectSauter : public Photoeffect {
