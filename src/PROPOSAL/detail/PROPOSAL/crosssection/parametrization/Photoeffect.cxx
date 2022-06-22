@@ -23,6 +23,11 @@ double crosssection::Photoeffect::GetLowerEnergyLim(const ParticleDef&, const Me
     return min_cut_off;
 };
 
+double crosssection::Photoeffect::GetCutOff(const Component& comp) const {
+    double I = pow(comp.GetNucCharge() * ALPHA, 2) * ME / 2; // ionization energy of K-shell electron
+    return I;
+};
+
 double Kshell_Total_Ratio(const Component& comp) {
     // J. H. Hubbell, Tech. Rep. NSRDS-NBS 29, Nat. Bur. Stand. (1969)
     // eq. (2.-2)
@@ -35,14 +40,14 @@ double crosssection::Photoeffect::PhotonAtomCrossSection(double energy, const Co
     auto cross_photon_atom = PhotoeffectKshellCrossSection(energy, comp);
     if (cross_photon_atom == 0.)
         return 0.;
-    return comp.GetAtomicNum() * cross_photon_atom * Kshell_Total_Ratio(comp);
+    return cross_photon_atom * Kshell_Total_Ratio(comp);
 }
 
 double crosssection::Photoeffect::CalculatedNdx(
         double energy, size_t comp_hash, const ParticleDef&, const Medium& m, cut_ptr) {
         auto comp = Component::GetComponentForHash(comp_hash);
         auto weight = detail::weight_component(m, comp);
-        return NA / comp.GetAtomicNum() * 1e-30 * PhotonAtomCrossSection(energy, comp) / weight;
+        return NA / comp.GetAtomicNum() * PhotonAtomCrossSection(energy, comp) / weight;
 }
 
 double crosssection::Photoeffect::CalculatedNdx(double energy, const ParticleDef& p, const Medium& m, cut_ptr cut) {
@@ -87,7 +92,7 @@ double crosssection::PhotoeffectSauter::PhotoeffectKshellCrossSection(double ene
     auto gamma = 1 + (energy - I) / ME;
     auto gamma_beta = sqrt(gamma * gamma - 1);
 
-    auto sigma = sigma_T * pow(comp.GetNucCharge(), 5) * pow(ALPHA, 4) * pow(ME / energy, 5)
+    auto sigma = 1.5 * sigma_T * pow(comp.GetNucCharge(), 5) * pow(ALPHA, 4) * pow(ME / energy, 5)
         * pow(gamma_beta, 3) * (4/3.0 + gamma * (gamma - 2) / (gamma + 1)
         * (1 - 1 / (gamma * gamma_beta) * log(gamma + gamma_beta)));
 
@@ -95,6 +100,6 @@ double crosssection::PhotoeffectSauter::PhotoeffectKshellCrossSection(double ene
     auto Z_pi_alpha_beta = M_PI * Z_alpha_beta;
     // correction factor for non-relativstic electrons
     auto non_rel = (1 + Z_alpha_beta * Z_alpha_beta) * Z_pi_alpha_beta / sinh(Z_pi_alpha_beta)
-        * exp(Z_alpha_beta * (1 - 4 * atan(1 / Z_alpha_beta)));
+        * exp(Z_alpha_beta * (M_PI - 4 * atan(1 / Z_alpha_beta)));
     return sigma * non_rel;
 }
