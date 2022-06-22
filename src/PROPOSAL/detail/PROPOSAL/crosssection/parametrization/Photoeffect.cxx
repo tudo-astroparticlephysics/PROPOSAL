@@ -27,7 +27,7 @@ double Kshell_Total_Ratio(const Component& comp) {
     // J. H. Hubbell, Tech. Rep. NSRDS-NBS 29, Nat. Bur. Stand. (1969)
     // eq. (2.-2)
     double ln_Z = log(comp.GetNucCharge());
-    double res = 1 + 0.01481 * ln_Z * ln_Z + 0.000788 * ln_Z * ln_Z * ln_Z;
+    double res = 1 + 0.01481 * ln_Z * ln_Z - 0.000788 * ln_Z * ln_Z * ln_Z;
     return res;
 }
 
