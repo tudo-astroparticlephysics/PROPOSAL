@@ -60,36 +60,32 @@ size_t CrossSectionDNDXInterpolant::gen_hash(size_t hash) const {
     return hash;
 }
 
-double CrossSectionDNDXInterpolant::Calculate(double energy)
+double CrossSectionDNDXInterpolant::evaluate_interpolant(double E, double vbar)
 {
-    if (energy < lower_energy_lim)
+    if (E < lower_energy_lim)
         return 0.;
-    auto dNdx = interpolant.evaluate(std::array<double, 2> { energy, 1 });
+    auto dNdx = interpolant.evaluate(std::array<double, 2> { E, vbar });
     if (dNdx < 0) {
         auto inter_name = Type_Interaction_Name_Map.at(type_id);
-        logger->warn("Negative dNdx value for E = {:.4f} MeV, detected in "
-                     "interaction type {}. Setting dNdx to zero.",
-                     energy, inter_name);
+        logger->warn("Negative dNdx value for E = {:.4f} MeV, vbar = {:.4f} "
+                     "detected in interaction type {}. "
+                     "Setting dNdx to zero.", E, vbar, inter_name);
         dNdx = 0.;
     }
     return dNdx;
 }
 
+double CrossSectionDNDXInterpolant::Calculate(double energy)
+{
+    // for v=v_max, we know by construction of the transformation that vbar=1
+    return evaluate_interpolant(energy, 1);
+}
+
 double CrossSectionDNDXInterpolant::Calculate(double energy, double v)
 {
-    if (energy < lower_energy_lim)
-        return 0.;
     auto lim = GetIntegrationLimits(energy);
-    v = retransform_v(lim.min, lim.max, v);
-    auto dNdx = interpolant.evaluate(std::array<double, 2> { energy, v });
-    if (dNdx < 0) {
-        auto inter_name = Type_Interaction_Name_Map.at(type_id);
-        logger->warn("Negative dNdx value for E = {:.4f} MeV, v = {:.4f} "
-                     "detected in interaction type {}. "
-                     "Setting dNdx to zero.", energy, v, inter_name);
-        dNdx = 0.;
-    }
-    return dNdx;
+    auto vbar = retransform_v(lim.min, lim.max, v);
+    return evaluate_interpolant(energy, vbar);
 }
 
 double CrossSectionDNDXInterpolant::GetUpperLimit(double energy, double rate)
