@@ -15,6 +15,7 @@
 #include "PROPOSAL/crosssection/parametrization/Compton.h"
 #include "PROPOSAL/crosssection/parametrization/EpairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/Ionization.h"
+#include "PROPOSAL/crosssection/parametrization/Photoeffect.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoPairProduction.h"
 #include "PROPOSAL/crosssection/parametrization/Photoproduction.h"
 #include "PROPOSAL/crosssection/parametrization/PhotoQ2Integration.h"
@@ -99,7 +100,8 @@ void DefaultCrossSections<GammaDef>::Append(CrossVec& cross_vec, P p, M m,std::s
     auto photopair = std::make_tuple(crosssection::PhotoPairKochMotz{false}, p, m, nullptr, interpolate);
     auto compton = std::make_tuple(crosssection::ComptonKleinNishina{}, p, m, cut, interpolate);
     auto photoproduction = std::make_tuple(crosssection::PhotoproductionRhode{}, p, m, nullptr, interpolate);
-    append_cross(cross_vec, photopair, compton, photoproduction);
+    auto photoeffect = std::make_tuple(crosssection::PhotoeffectSauter{}, p, m, nullptr, interpolate);
+    append_cross(cross_vec, photopair, compton, photoproduction, photoeffect);
 }
 
 template<>
