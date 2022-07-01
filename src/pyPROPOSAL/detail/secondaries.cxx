@@ -11,6 +11,8 @@
 #include "PROPOSAL/secondaries/parametrization/mupairproduction/KelnerKokoulinPetrukhinMupairProduction.h"
 #include "PROPOSAL/secondaries/parametrization/photonuclear/Photonuclear.h"
 #include "PROPOSAL/secondaries/parametrization/photoproduction/Photoproduction.h"
+#include "PROPOSAL/secondaries/parametrization/photoeffect/Photoeffect.h"
+#include "PROPOSAL/secondaries/parametrization/photoeffect/NaivPhotoeffect.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionTsai.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionKochMotz.h"
 #include "PROPOSAL/secondaries/parametrization/weakinteraction/WeakCooperSarkarMertsch.h"
@@ -91,6 +93,9 @@ void init_secondaries(py::module& m)
     SecondariesBuilder<secondaries::Photoproduction,
         secondaries::Parametrization> {}
         .decl_param(m_sub, "Photoproduction");
+    SecondariesBuilder<secondaries::Photoeffect,
+        secondaries::Parametrization> {}
+        .decl_virtual_param(m_sub, "Photoeffect");
     SecondariesBuilder<secondaries::PhotoPairProduction,
         secondaries::Parametrization> {}
         .decl_virtual_param(m_sub, "PhotoPairProduction");
@@ -146,6 +151,9 @@ void init_secondaries(py::module& m)
     SecondariesBuilder<secondaries::PhotoPairProductionKochMotzForwardPeaked,
         secondaries::PhotoPairProduction> {}
         .decl_rho_param(m_sub, "PhotoKochMotzForwardPeaked");
+
+    SecondariesBuilder<secondaries::NaivPhotoeffect, secondaries::Photoeffect> {}
+        .decl_param(m_sub, "NaivPhotoeffect");
 
     py::class_<secondaries::WeakCooperSarkarMertsch, secondaries::WeakInteraction,
         std::shared_ptr<secondaries::WeakCooperSarkarMertsch>>(m_sub,
