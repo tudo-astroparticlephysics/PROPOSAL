@@ -11,8 +11,6 @@ class AxisBuilderDNDX {
     using energy_axis_t = cubic_splines::ExpAxis<double>;
     using v_axis_t = cubic_splines::LinAxis<double>;
 
-    std::shared_ptr<spdlog::logger> logger;
-
 public:
     struct v_limits {
         double low, up;
@@ -24,15 +22,12 @@ public:
         size_t nodes;
     };
 
-private:
-    v_limits v_lim;
-    energy_limits energy_lim;
-
 public:
-    AxisBuilderDNDX(v_limits, energy_limits);
+    static energy_limits refine_definition_range(energy_limits limits,
+                                          std::function<double(double)> func,
+                                          unsigned int i = 0);
 
-    void refine_definition_range(
-        std::function<double(double)> func, unsigned int i = 0);
+    static std::array<std::unique_ptr<axis_t>, 2> Create(v_limits v_lim, energy_limits energy_lim);
+    static std::unique_ptr<axis_t> Create(energy_limits energy_lim);
 
-    std::array<std::unique_ptr<axis_t>, 2> Create() const;
 };
