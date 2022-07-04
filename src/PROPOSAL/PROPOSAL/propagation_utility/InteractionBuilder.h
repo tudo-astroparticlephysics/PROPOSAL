@@ -1,5 +1,7 @@
 #pragma once
 #include "PROPOSAL/propagation_utility/Interaction.h"
+#include "CubicInterpolation/CubicSplines.h"
+#include "CubicInterpolation/Interpolant.h"
 
 #include <type_traits>
 #include <vector>
@@ -12,6 +14,12 @@ namespace PROPOSAL {
 class InteractionBuilder : public Interaction {
     std::unique_ptr<UtilityIntegral> interaction_integral;
 
+    using interpolant_t
+        = cubic_splines::Interpolant<cubic_splines::CubicSplines<double>>;
+    using interpolant_ptr = std::shared_ptr<interpolant_t>;
+    interpolant_ptr rate_interpolant_;
+    double rate_lower_energy_lim;
+
 public:
     InteractionBuilder(std::shared_ptr<Displacement>,
         crosssection_list_t const&, std::false_type);
@@ -21,6 +29,9 @@ public:
 
     double EnergyInteraction(double energy, double rnd) final;
     double EnergyIntegral(double E_i, double E_f) final;
+
+    double MeanFreePath(double energy) final;
+
 };
 } // namespace PROPOSAL
 

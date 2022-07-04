@@ -68,12 +68,11 @@ auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)
     energy_lim.low = param.GetLowerEnergyLim(p);
     energy_lim.up = InterpolationSettings::UPPER_ENERGY_LIM;
     energy_lim.nodes = InterpolationSettings::NODES_DNDX_E ;
-    auto axis_builder = AxisBuilderDNDX(v_lim, energy_lim);
-    axis_builder.refine_definition_range(
+    auto energy_lim_refined = AxisBuilderDNDX::refine_definition_range(energy_lim,
         [dndx](double E) { return dndx->Calculate(E); });
 
     auto def = cubic_splines::BicubicSplines<double>::Definition();
-    def.axis = axis_builder.Create();
+    def.axis = AxisBuilderDNDX::Create(v_lim, energy_lim_refined);
     def.f = [dndx](double energy, double v) {
         auto lim = dndx->GetIntegrationLimits(energy);
         v = transform_loss<T1>(lim.min, lim.max, v);
