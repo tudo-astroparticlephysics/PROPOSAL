@@ -21,7 +21,7 @@ protected:
     crosssection_list_t cross_list;
     size_t hash;
 
-    double calculate_total_rate(double energy);
+    double calculate_total_rate(double energy) const;
 
 public:
     Interaction(std::shared_ptr<Displacement>, crosssection_list_t const&);

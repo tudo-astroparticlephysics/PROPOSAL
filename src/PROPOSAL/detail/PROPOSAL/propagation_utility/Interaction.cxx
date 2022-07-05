@@ -19,15 +19,13 @@ Interaction::Interaction(
 
 double Interaction::FunctionToIntegral(double energy) const
 {
-    auto total_rate = 0.;
-    for (auto& c : cross_list)
-        total_rate += c->CalculatedNdx(energy);
+    auto total_rate = calculate_total_rate(energy);
     if (total_rate > 0)
         return disp->FunctionToIntegral(energy) * total_rate;
     return 0;
 }
 
-double Interaction::calculate_total_rate(double energy) {
+double Interaction::calculate_total_rate(double energy) const {
     auto total_rate = 0.;
     for (auto& c : cross_list)
         total_rate += c->CalculatedNdx(energy);
