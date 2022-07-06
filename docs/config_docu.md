@@ -478,6 +478,17 @@ Photonuclear interaction of a photon with an atomic nucleus. Available `photopro
 * `Kokoulin`
 * `Rhode`
 
+### Photoeffect: `photoeffect`
+
+| Keyword           |  Type   | Default | Description                |
+| ----------------- | ------- | ------- | -------------------------- |
+| `parametrization` | String  | `-`     | Parametrization to be used |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
+
+Absorption of photons by atoms where a photoelectron is produced. Available `photoeffect` parametrizations are:
+
+* `Sauter`: F. Sauter, Ann. d. Phys. 403 (1931) 454-488
+
 ### Weak interaction: `weak`
 
 | Keyword           |  Type   | Default | Description                |
