@@ -60,10 +60,12 @@ double crosssection::Photoeffect::CalculatedNdx(double energy, const ParticleDef
 std::vector<std::pair<size_t, double>> crosssection::Photoeffect::CalculatedNdx_PerTarget(
         double energy, const ParticleDef& p, const Medium& m, cut_ptr) {
     std::vector<std::pair<size_t, double>> rates = {};
-
     for (auto& comp : m.GetComponents()) {
-        auto weight = detail::weight_component(m, comp);
-        double rate = NA / comp.GetAtomicNum() * PhotonAtomCrossSection(energy, comp) / weight;
+        double rate = 0.;
+        if (energy >= GetCutOff(comp)) {
+            auto weight = detail::weight_component(m, comp);
+            rate = NA / comp.GetAtomicNum() * PhotonAtomCrossSection(energy, comp) / weight;
+        }
         rates.push_back({comp.GetHash(), rate});
     }
     return rates;

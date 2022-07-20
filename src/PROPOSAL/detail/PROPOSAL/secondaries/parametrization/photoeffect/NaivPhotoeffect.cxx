@@ -2,6 +2,7 @@
 #include "PROPOSAL/Constants.h"
 
 #include <cmath>
+#include <cassert>
 
 using namespace PROPOSAL;
 
@@ -10,11 +11,10 @@ std::vector<ParticleState> secondaries::NaivPhotoeffect::CalculateSecondaries(
 {
     double I = pow(comp.GetNucCharge() * ALPHA, 2) * ME / 2; // subtract ionization energy of K-shell electron
     double E = ME + loss.parent_particle_energy - I;
+    assert(E >= ME);
 
     auto sec = std::vector<ParticleState>();
-    // TODO: Do we want to do something better here?
-    // TODO: Do we need to make sure that the created electron has a valid energy that is above its rest mass? Or is this already secured?
-    // assume electron inherits direction of photon
+    // assume electron inherits direction of photon (this is also done in standard EGS4)
     sec.emplace_back(ParticleType::EMinus, loss.position, loss.direction, E, loss.time, 0.);
     return sec;
 }
