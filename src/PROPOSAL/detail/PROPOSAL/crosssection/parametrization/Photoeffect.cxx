@@ -62,7 +62,7 @@ std::vector<std::pair<size_t, double>> crosssection::Photoeffect::CalculatedNdx_
     std::vector<std::pair<size_t, double>> rates = {};
     for (auto& comp : m.GetComponents()) {
         double rate = 0.;
-        if (energy >= GetCutOff(comp)) {
+        if (energy > GetCutOff(comp)) {
             auto weight = detail::weight_component(m, comp);
             rate = NA / comp.GetAtomicNum() * PhotonAtomCrossSection(energy, comp) / weight;
         }
