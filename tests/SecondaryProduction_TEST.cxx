@@ -5,7 +5,11 @@
 #include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionBurkhardtKelnerKokoulin.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionKochMotz.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionTsai.h"
+#include "PROPOSAL/secondaries/parametrization/photoeffect/NaivPhotoeffect.h"
+#include "PROPOSAL/crosssection/parametrization/Photoeffect.h"
+#include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 
 using namespace PROPOSAL;
@@ -126,6 +130,35 @@ TEST(PhotoMuPairProduction, EnergyConservation)
     auto azimuth_difference = secs.at(0).direction.GetSphericalCoordinates().at(1) - secs.at(1).direction.GetSphericalCoordinates().at(1);
     EXPECT_NEAR(std::abs(azimuth_difference), PI, COMPUTER_PRECISION);
 
+}
+
+TEST(Photoeffect, NaivPhotoeffect)
+{
+
+    std::vector<std::string> medium_list {"standardrock", "hydrogen", "uranium"};
+
+    auto particle = GammaDef();
+    auto photoeffect = crosssection::PhotoeffectSauter();
+
+    for (auto medium_name : medium_list) {
+        auto medium = CreateMedium(medium_name);
+        auto cross = make_crosssection(photoeffect, particle, *medium, nullptr, false);
+        auto lower_energy_lim = cross->GetLowerEnergyLim();
+        auto E_i = lower_energy_lim * 1.001;
+        std::vector<double> vect;
+
+        auto direction = Cartesian3D(0, 0, 1);
+        auto loss = StochasticLoss(int(InteractionType::Photoeffect), E_i, Cartesian3D(0, 0, 0), direction, 0, 0, E_i);
+
+        auto secondaries = secondaries::NaivPhotoeffect(particle, *medium);
+        auto sec_particles = secondaries.CalculateSecondaries(loss, medium->GetComponents().at(0), vect);
+        EXPECT_EQ(sec_particles.size(), 1);
+        for (auto sec : sec_particles) {
+            EXPECT_EQ(sec.GetParticleDef().particle_type, int(ParticleType::EMinus));
+            EXPECT_GE(sec.energy, sec.GetParticleDef().mass); // check that created electron has a valid total energy
+            EXPECT_EQ(sec.direction, sec.direction); // check that electron inherits direction of photon
+        }
+    }
 }
 
 int main(int argc, char** argv)
