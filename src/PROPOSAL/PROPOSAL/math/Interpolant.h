@@ -85,16 +85,16 @@ private:
     int row_, starti_;
     bool rationalY_, relativeY_;
 
-    bool reverse_, self_, flag_; // Self is setted to true in constructor
+    bool reverse_, self_, flag_; // Self is set to true in constructor
     bool isLog_, logSubst_;
 
     double precision_, worstX_;
     double precision2_, worstX2_;
     double precisionY_, worstY_;
 
-    bool fast_; // Is setted to true in constructor
+    bool fast_; // Is set to true in constructor
 
-    double x_save_, y_save_; // Is setted to 1 and 0 in constructor
+    double x_save_, y_save_; // Is set to 1 and 0 in constructor
 
     //----------------------------------------------------------------------------//
     // Memberfunctions
