@@ -40,6 +40,7 @@ jobs:
             sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30
             sudo update-alternatives --set c++ /usr/bin/g++
         - name: Cache conan
+          if: ${{ matrix.os != 'windows-latest' }}
           id: cache-conan
           uses: actions/cache@v2
           with:
@@ -102,6 +103,7 @@ jobs:
       steps:
         - uses: actions/checkout@v2
         - name: Cache conan
+          if: ${{ matrix.os != 'windows-latest' }}
           id: cache-conan
           uses: actions/cache@v2
           with:
