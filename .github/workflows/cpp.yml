@@ -77,6 +77,12 @@ jobs:
         - name: Build lib
           if: ${{ matrix.os == 'windows-latest' }}
           run: cmake --build PROPOSAL_BUILD --target ALL_BUILD --config Release
+        - name: Cleanup conan cache
+          if: always()
+          run: |
+            conan remove -f "*" --builds
+            conan remove -f "*" --src
+            conan remove -f "*" --system-reqs
 
     test:
       runs-on: ${{ matrix.os }}
