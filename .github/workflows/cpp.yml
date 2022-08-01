@@ -20,7 +20,7 @@ jobs:
             - os : "ubuntu-18.04"
               compiler : "gcc-5"
               compilerpp : "g++-5"
-            - os : "windows-2019"
+            - os : "windows-latest"
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
@@ -72,10 +72,10 @@ jobs:
         - name: Run build automatisation tool
           run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE
         - name: Build lib
-          if: ${{ matrix.os != 'windows-2019' }}
+          if: ${{ matrix.os != 'windows-latest' }}
           run: cmake --build PROPOSAL_BUILD
         - name: Build lib
-          if: ${{ matrix.os == 'windows-2019' }}
+          if: ${{ matrix.os == 'windows-latest' }}
           run: cmake --build PROPOSAL_BUILD --target ALL_BUILD --config Release
 
     test:
@@ -96,7 +96,7 @@ jobs:
             - os : "ubuntu-18.04"
               compiler : "gcc-5"
               compilerpp : "g++-5"
-            - os : "windows-2019"
+            - os : "windows-latest"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
       steps:
