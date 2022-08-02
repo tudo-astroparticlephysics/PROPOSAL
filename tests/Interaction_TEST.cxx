@@ -25,12 +25,18 @@ TEST(Interaction, Constructor)
     auto cross = GetCrossSections();
     auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
     auto interaction1
-        = std::make_unique<InteractionBuilder>(disp, cross, std::false_type());
+        = std::make_unique<InteractionBuilder>(disp, cross, std::false_type(), false);
     auto interaction2
-        = std::make_unique<InteractionBuilder>(disp, cross, std::true_type());
+        = std::make_unique<InteractionBuilder>(disp, cross, std::true_type(), false);
+    auto interaction3
+        = std::make_unique<InteractionBuilder>(disp, cross, std::false_type(), true);
+    auto interaction4
+        = std::make_unique<InteractionBuilder>(disp, cross, std::true_type(), true);
 
-    InteractionBuilder interaction_3(disp, cross, std::false_type());
-    InteractionBuilder interaction_4(disp, cross, std::true_type());
+    InteractionBuilder interaction_5(disp, cross, std::false_type(), false);
+    InteractionBuilder interaction_6(disp, cross, std::true_type(), true);
+    InteractionBuilder interaction_7(disp, cross, std::false_type(), false);
+    InteractionBuilder interaction_8(disp, cross, std::true_type(), true);
 }
 
 // Hash for Enum necessary to support gcc compilers with version < 6.1
