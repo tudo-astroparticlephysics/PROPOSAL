@@ -20,12 +20,14 @@ class InteractionBuilder : public Interaction {
     interpolant_ptr rate_interpolant_;
     double rate_lower_energy_lim;
 
+    interpolant_ptr InitializeRateInterpolant();
+
 public:
     InteractionBuilder(std::shared_ptr<Displacement>,
-        crosssection_list_t const&, std::false_type);
+        crosssection_list_t const&, std::false_type, bool);
 
     InteractionBuilder(std::shared_ptr<Displacement>,
-        crosssection_list_t const&, std::true_type);
+        crosssection_list_t const&, std::true_type, bool);
 
     double EnergyInteraction(double energy, double rnd) final;
     double EnergyIntegral(double E_i, double E_f) final;
@@ -37,8 +39,8 @@ public:
 
 namespace PROPOSAL {
 std::unique_ptr<Interaction> make_interaction(std::shared_ptr<Displacement>,
-    std::vector<std::shared_ptr<CrossSectionBase>> const&, bool);
+    std::vector<std::shared_ptr<CrossSectionBase>> const&, bool, bool = false);
 
 std::unique_ptr<Interaction> make_interaction(
-    std::vector<std::shared_ptr<CrossSectionBase>> const&, bool);
+    std::vector<std::shared_ptr<CrossSectionBase>> const&, bool, bool = false);
 } // namespace PROPOSAL

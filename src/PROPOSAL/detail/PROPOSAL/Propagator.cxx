@@ -423,7 +423,7 @@ PropagationUtility::Collection Propagator::CreateUtility(
     PropagationUtility::Collection def;
     def.displacement_calc = make_displacement(crosss, do_interpol);
     def.interaction_calc
-        = make_interaction(def.displacement_calc, crosss, do_interpol);
+        = make_interaction(def.displacement_calc, crosss, do_interpol, false);
     if (!scatter.empty())
         def.scattering
             = make_scattering(scatter, p_def, *medium, crosss, do_interpol);
