@@ -23,7 +23,7 @@ CrossSectionDE2DX::CrossSectionDE2DX(size_t _hash)
     : hash(_hash)
     , logger(Logging::Get("CrossSection.DE2DX"))
 {
-    logger->info("Creating dEdx.");
+    logger->debug("Creating dE2dx.");
 }
 
 CrossSectionDE2DX::CrossSectionDE2DX(

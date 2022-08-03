@@ -36,8 +36,9 @@
 #include <sys/stat.h>
 #ifdef _WIN32
 #include <io.h>
+   #define access    _access_s
 #else
-#include <unistd.h>
+    #include <unistd.h>
 #endif
 #define PROPOSAL_MAKE_HASHABLE(type, ...)                                      \
     namespace std {                                                            \
@@ -106,12 +107,9 @@ namespace Helper {
         bool operator()(std::string const& lhs, std::string const& rhs) const;
     };
 
+    // TODO: use std::filesystem when we switch to c++17
     inline bool file_exists (const std::string& path_to_file) {
-        if (access(path_to_file.c_str(), F_OK) != 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return access( path_to_file.c_str(), 0 ) == 0;
     }
 } // namespace Helper
 
