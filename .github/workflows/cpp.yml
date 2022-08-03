@@ -20,7 +20,7 @@ jobs:
             - os : "ubuntu-18.04"
               compiler : "gcc-5"
               compilerpp : "g++-5"
-            - os : "windows-2019"
+            - os : "windows-latest"
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
@@ -40,6 +40,7 @@ jobs:
             sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30
             sudo update-alternatives --set c++ /usr/bin/g++
         - name: Cache conan
+          if: ${{ matrix.os != 'windows-latest' }}
           id: cache-conan
           uses: actions/cache@v2
           with:
@@ -62,6 +63,8 @@ jobs:
         - name: Update conan profile
           if : ${{ matrix.os == 'ubuntu-18.04' || matrix.os == 'ubuntu-latest' }}
           run: conan profile update settings.compiler.libcxx=libstdc++11 default
+        - name: Update conan profile
+          run: conan profile update settings.compiler.cppstd=14 default
         - name: create build directory
           if : steps.cache-build.outputs.cache-hit != 'true'
           run: mkdir PROPOSAL_BUILD
@@ -70,10 +73,10 @@ jobs:
         - name: Run build automatisation tool
           run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE
         - name: Build lib
-          if: ${{ matrix.os != 'windows-2019' }}
+          if: ${{ matrix.os != 'windows-latest' }}
           run: cmake --build PROPOSAL_BUILD
         - name: Build lib
-          if: ${{ matrix.os == 'windows-2019' }}
+          if: ${{ matrix.os == 'windows-latest' }}
           run: cmake --build PROPOSAL_BUILD --target ALL_BUILD --config Release
 
     test:
@@ -94,12 +97,13 @@ jobs:
             - os : "ubuntu-18.04"
               compiler : "gcc-5"
               compilerpp : "g++-5"
-            - os : "windows-2019"
+            - os : "windows-latest"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
       steps:
         - uses: actions/checkout@v2
         - name: Cache conan
+          if: ${{ matrix.os != 'windows-latest' }}
           id: cache-conan
           uses: actions/cache@v2
           with:
