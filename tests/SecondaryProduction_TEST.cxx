@@ -5,7 +5,7 @@
 #include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionBurkhardtKelnerKokoulin.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionKochMotz.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionTsai.h"
-#include "PROPOSAL/secondaries/parametrization/photoeffect/NaivPhotoeffect.h"
+#include "PROPOSAL/secondaries/parametrization/photoeffect/PhotoeffectNoDeflection.h"
 #include "PROPOSAL/crosssection/parametrization/Photoeffect.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
 #include "PROPOSAL/Constants.h"
@@ -132,7 +132,7 @@ TEST(PhotoMuPairProduction, EnergyConservation)
 
 }
 
-TEST(Photoeffect, NaivPhotoeffect)
+TEST(Photoeffect, PhotoeffectNoDeflection)
 {
 
     std::vector<std::string> medium_list {"standardrock", "hydrogen", "uranium"};
@@ -150,7 +150,7 @@ TEST(Photoeffect, NaivPhotoeffect)
         auto direction = Cartesian3D(0, 0, 1);
         auto loss = StochasticLoss(int(InteractionType::Photoeffect), E_i, Cartesian3D(0, 0, 0), direction, 0, 0, E_i);
 
-        auto secondaries = secondaries::NaivPhotoeffect(particle, *medium);
+        auto secondaries = secondaries::PhotoeffectNoDeflection(particle, *medium);
         auto sec_particles = secondaries.CalculateSecondaries(loss, medium->GetComponents().at(0), vect);
         EXPECT_EQ(sec_particles.size(), 1);
         for (auto sec : sec_particles) {

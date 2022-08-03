@@ -1,4 +1,4 @@
-#include "PROPOSAL/secondaries/parametrization/photoeffect/NaivPhotoeffect.h"
+#include "PROPOSAL/secondaries/parametrization/photoeffect/PhotoeffectNoDeflection.h"
 #include "PROPOSAL/Constants.h"
 
 #include <cmath>
@@ -6,7 +6,7 @@
 
 using namespace PROPOSAL;
 
-std::vector<ParticleState> secondaries::NaivPhotoeffect::CalculateSecondaries(
+std::vector<ParticleState> secondaries::PhotoeffectNoDeflection::CalculateSecondaries(
         StochasticLoss loss, const Component& comp, std::vector<double>&)
 {
     double I = pow(comp.GetNucCharge() * ALPHA, 2) * ME / 2; // subtract ionization energy of K-shell electron
