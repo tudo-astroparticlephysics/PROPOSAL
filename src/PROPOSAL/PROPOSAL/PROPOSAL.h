@@ -91,7 +91,7 @@
 #include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionBurkhardtKelnerKokoulin.h"
 #include "PROPOSAL/secondaries/parametrization/photonuclear/Photonuclear.h"
 #include "PROPOSAL/secondaries/parametrization/photoeffect/Photoeffect.h"
-#include "PROPOSAL/secondaries/parametrization/photoeffect/NaivPhotoeffect.h"
+#include "PROPOSAL/secondaries/parametrization/photoeffect/PhotoeffectNoDeflection.h"
 #include "PROPOSAL/secondaries/parametrization/photoproduction/Photoproduction.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionTsai.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionKochMotz.h"
