@@ -2,7 +2,6 @@
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/crosssection/CrossSection.h"
-#include "PROPOSAL/math/Interpolant.h"
 
 using namespace PROPOSAL;
 
@@ -89,7 +88,7 @@ std::unique_ptr<crosssection::ParametrizationDirect> crosssection::PhotoeffectSa
 // eq. 17
 // ------------------------------------------------------------------------- //
 double crosssection::PhotoeffectSauter::PhotoeffectKshellCrossSection(double energy, const Component& comp) {
-    const double sigma_T = (8 * M_PI* RE * RE)/3; // Thomson cross section
+    const double sigma_T = (8 * PI * RE * RE)/3; // Thomson cross section
     double I = pow(comp.GetNucCharge() * ALPHA, 2) * ME / 2; // ionization energy of K-shell electron
     auto gamma = 1 + (energy - I) / ME;
     auto gamma_beta = sqrt(gamma * gamma - 1);
@@ -99,9 +98,9 @@ double crosssection::PhotoeffectSauter::PhotoeffectKshellCrossSection(double ene
         * (1 - 1 / (gamma * gamma_beta) * log(gamma + gamma_beta)));
 
     auto Z_alpha_beta = comp.GetNucCharge() * ALPHA * gamma / gamma_beta; // Z*alpha/beta
-    auto Z_pi_alpha_beta = M_PI * Z_alpha_beta;
+    auto Z_pi_alpha_beta = PI * Z_alpha_beta;
     // correction factor for non-relativstic electrons
     auto non_rel = (1 + Z_alpha_beta * Z_alpha_beta) * Z_pi_alpha_beta / sinh(Z_pi_alpha_beta)
-        * exp(Z_alpha_beta * (M_PI - 4 * atan(1 / Z_alpha_beta)));
+        * exp(Z_alpha_beta * (PI - 4 * atan(1 / Z_alpha_beta)));
     return sigma * non_rel;
 }
