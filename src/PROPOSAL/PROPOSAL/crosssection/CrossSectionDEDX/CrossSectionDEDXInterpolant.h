@@ -3,6 +3,7 @@
 
 #include "PROPOSAL/crosssection/CrossSectionDEDX/AxisBuilderDEDX.h"
 #include "PROPOSAL/crosssection/CrossSectionDEDX/CrossSectionDEDXIntegral.h"
+#include "PROPOSAL/methods.h"
 
 #include <type_traits>
 
@@ -27,18 +28,23 @@ auto build_dedx_def(T1 const& param, ParticleDef const& p, Args... args)
 }
 
 class CrossSectionDEDXInterpolant : public CrossSectionDEDX {
-    cubic_splines::Interpolant<cubic_splines::CubicSplines<double>> interpolant;
 
     std::string gen_path() const;
     std::string gen_name() const;
     size_t gen_hash(size_t) const;
+
+    cubic_splines::CubicSplines<double>::Definition dedx_def;
+    LogTableCreation table_create;
+    cubic_splines::Interpolant<cubic_splines::CubicSplines<double>> interpolant;
 
 public:
     template <typename Param, typename Target>
     CrossSectionDEDXInterpolant(Param const& param, ParticleDef const& p,
         Target const& t, EnergyCutSettings const& cut, size_t hash = 0)
         : CrossSectionDEDX(param, p, t, cut, gen_hash(hash))
-        , interpolant(build_dedx_def(param, p, t, cut), gen_path(), gen_name())
+        , dedx_def(build_dedx_def(param, p, t, cut))
+        , table_create(gen_path(), gen_name())
+        , interpolant(std::move(dedx_def), gen_path(), gen_name())
     {
         lower_energy_lim = interpolant.GetDefinition().GetAxis().GetLow();
     }
