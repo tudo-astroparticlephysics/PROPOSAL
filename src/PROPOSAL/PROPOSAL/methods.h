@@ -34,8 +34,11 @@
 #include <memory>
 #include <vector>
 #include <sys/stat.h>
+#ifdef _WIN32
+#include <io.h>
+#else
 #include <unistd.h>
-
+#endif
 #define PROPOSAL_MAKE_HASHABLE(type, ...)                                      \
     namespace std {                                                            \
     template <> struct hash<type> {                                            \
