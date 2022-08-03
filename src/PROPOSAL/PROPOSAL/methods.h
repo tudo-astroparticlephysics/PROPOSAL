@@ -33,6 +33,8 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #define PROPOSAL_MAKE_HASHABLE(type, ...)                                      \
     namespace std {                                                            \
@@ -77,6 +79,12 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest)
 class Interpolant;
 struct InterpolantBuilder;
 
+// This object checks whether the table under path/filename is already existing. Needs to be created before the table
+// creation process has started.
+struct LogTableCreation {
+    LogTableCreation(const std::string& path, const std::string& filename);
+};
+
 namespace Helper {
 
     // ----------------------------------------------------------------------------
@@ -95,6 +103,13 @@ namespace Helper {
         bool operator()(std::string const& lhs, std::string const& rhs) const;
     };
 
+    inline bool file_exists (const std::string& path_to_file) {
+        if (access(path_to_file.c_str(), F_OK) != 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 } // namespace Helper
 
 
