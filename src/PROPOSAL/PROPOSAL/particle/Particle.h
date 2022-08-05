@@ -53,6 +53,7 @@ enum class InteractionType : int {
     Photopair = 1000000013,
     Photoproduction = 1000000014,
     PhotoMuPair = 1000000015,
+    Photoeffect = 1000000016,
 };
 struct InteractionType_hash {
     template <class T> std::size_t operator()(const T& type) const
