@@ -93,6 +93,7 @@ class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
     std::string gen_path() const;
     std::string gen_name() const;
     size_t gen_hash(size_t) const;
+    double evaluate_interpolant(double E, double vbar);
 
 public:
     template <typename Param, typename Target>
