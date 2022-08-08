@@ -227,6 +227,23 @@ TEST(MeanFreePath, CompareIntegralInterpolant)
     }
 }
 
+TEST(MeanFreePath, RateInterpolant)
+{
+    auto cross = GetCrossSections();
+    auto rate_integral = make_interaction(cross, true, false);
+    auto rate_interpol = make_interaction(cross, true, true);
+
+    auto lower_lim = CrossSectionVector::GetLowerLim(cross);
+    double lambda_integral, lambda_interpol;
+
+    for (double logE = std::log10(lower_lim); logE<14; logE+=0.1) {
+        lambda_integral = rate_integral->MeanFreePath(std::pow(10, logE));
+        lambda_interpol = rate_interpol->MeanFreePath(std::pow(10, logE));
+        if (!(lambda_integral == INF && lambda_interpol == INF))
+            EXPECT_NEAR(lambda_integral, lambda_interpol, lambda_integral * 1e-3);
+    }
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
