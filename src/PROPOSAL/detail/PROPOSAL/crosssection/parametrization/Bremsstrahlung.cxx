@@ -457,6 +457,27 @@ crosssection::BremsElectronScreening::clone() const
     return std::make_unique<param_t>(*this);
 }
 
+crosssection::KinematicLimits crosssection::BremsElectronScreening::GetKinematicLimits(
+        const ParticleDef& p_def, const Component& comp, double energy) const
+{
+    auto kin_lim = KinematicLimits();
+    kin_lim.v_min = 0.;
+
+    double logZ = std::log(comp.GetNucCharge());
+    double Z3 = std::pow(comp.GetNucCharge(), -1. / 3);
+
+    double f_c = 0;
+    if (energy > 50)
+        f_c = fc(ALPHA * comp.GetNucCharge());
+
+    double delta_max = std::exp((21.12 - 4./3. * logZ - f_c) / 4.184) - 0.952; // (2.7.31)
+
+    double v_max = 1. / (1. + (136. * Z3 * p_def.mass) / (delta_max * energy));
+    kin_lim.v_max = std::min(v_max, 1 - p_def.mass / energy);
+
+    return kin_lim;
+}
+
 double crosssection::BremsElectronScreening::DifferentialCrossSection(
     const ParticleDef& p_def, const Component& comp, double energy,
     double v) const
@@ -471,6 +492,13 @@ double crosssection::BremsElectronScreening::DifferentialCrossSection(
     }
 
     return NA / comp.GetAtomicNum() * aux;
+}
+
+double crosssection::BremsElectronScreening::fc(double a) {
+    auto a_squared = a * a;
+    return a_squared
+               * (1 / (1 + a_squared) + 0.20206
+                  + a_squared * (-0.0369 + a_squared * (0.0083 - 0.002 * a_squared)));
 }
 
 double crosssection::BremsElectronScreening::CalculateParametrization(
@@ -497,11 +525,7 @@ double crosssection::BremsElectronScreening::CalculateParametrization(
         phi2 = phi1;
     }
 
-    aux = ALPHA * comp.GetNucCharge();
-    aux *= aux;
-    auto f_c = aux
-        * (1 / (1 + aux) + 0.20206
-            + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
+    auto f_c = fc(ALPHA * comp.GetNucCharge());
 
     // bremsstrahlung contribution with atomic electrons as target particles
     double Lr, Lp, xi;
@@ -543,7 +567,7 @@ double crosssection::BremsElectronScreening::CalculateParametrization(
     double A_fac = 1.0;
     if (energy < 50.) {
         f_c = 0;
-        A_fac = interpolant_->InterpolateArray(logZ, energy);
+        A_fac = interpolant_->InterpolateArray(logZ, energy - p_def.mass);
     }
 
     auto result = A_fac * comp.GetNucCharge() * (comp.GetNucCharge() + xi);
