@@ -42,7 +42,7 @@ InteractionBuilder::interpolant_ptr InteractionBuilder::InitializeRateInterpolan
     auto energy_lim = AxisBuilderDNDX::energy_limits();
     energy_lim.low = disp->GetLowerLim();
     energy_lim.up = InterpolationSettings::UPPER_ENERGY_LIM;
-    energy_lim.nodes = InterpolationSettings::NODES_UTILITY ;
+    energy_lim.nodes = InterpolationSettings::NODES_RATE_INTERPOLANT;
     auto energy_lim_refined = AxisBuilderDNDX::refine_definition_range(
             energy_lim, [&](double E) { return calculate_total_rate(E); });
     auto def = cubic_splines::CubicSplines<double>::Definition();
@@ -53,9 +53,14 @@ InteractionBuilder::interpolant_ptr InteractionBuilder::InitializeRateInterpolan
     def.axis = std::move(axis);
     rate_lower_energy_lim = def.axis->GetLow();
 
+    auto rate_interpolant_hash = this->GetHash();
+    hash_combine(rate_interpolant_hash,
+                 InterpolationSettings::NODES_RATE_INTERPOLANT,
+                 InterpolationSettings::UPPER_ENERGY_LIM);
+
     return std::make_shared<interpolant_t>(
             std::move(def), std::string(InterpolationSettings::TABLES_PATH),
-            std::string("rates_") + std::to_string(this->GetHash()) + std::string(".txt"));
+            std::string("rates_") + std::to_string(rate_interpolant_hash) + std::string(".txt"));
 }
 
 double InteractionBuilder::EnergyInteraction(double energy, double rnd)

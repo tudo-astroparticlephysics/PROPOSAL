@@ -57,6 +57,7 @@ struct InterpolationSettings {
     static unsigned int NODES_DNDX_E;
     static unsigned int NODES_DNDX_V;
     static unsigned int NODES_UTILITY;
+    static unsigned int NODES_RATE_INTERPOLANT;
 };
 
 // precision parameters
