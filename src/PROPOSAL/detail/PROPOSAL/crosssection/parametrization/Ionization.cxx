@@ -335,7 +335,7 @@ double crosssection::IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(
     auto result
         = std::log(2. * (tau + 2.) / (std::pow(1e-6 * medium.GetI(), 2.) / ME));
     result += fplus;
-    result -= Delta(medium, std::sqrt(betasquared), gamma);
+    // result -= Delta(medium, std::sqrt(betasquared), gamma);
 
     result *= 2. * PI * RE * RE * ME / betasquared;
 
@@ -457,7 +457,7 @@ double crosssection::IonizBergerSeltzerMoller::FunctionToDEdxIntegral(
     auto result
         = std::log(2. * (tau + 2.) / (std::pow(1e-6 * medium.GetI(), 2.) / ME));
     result += fminus;
-    result -= Delta(medium, std::sqrt(betasquared), gamma);
+    // result -= Delta(medium, std::sqrt(betasquared), gamma);
 
     result *= 2. * PI * RE * RE * ME / betasquared;
 
