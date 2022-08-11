@@ -13,7 +13,7 @@ std::string CrossSectionDE2DXInterpolant::gen_path() const
 std::string CrossSectionDE2DXInterpolant::gen_name() const
 {
     return std::string("de2dx_") + std::to_string(GetHash())
-        + std::string(".txt");
+        + std::string(".dat");
 }
 
 size_t CrossSectionDE2DXInterpolant::gen_hash(size_t hash) const {

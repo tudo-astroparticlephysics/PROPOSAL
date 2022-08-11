@@ -21,7 +21,7 @@ std::string UtilityInterpolant::gen_path() const
 std::string UtilityInterpolant::gen_name(std::string prefix) const
 {
     return std::string(prefix) + std::to_string(this->GetHash())
-        + std::string(".txt");
+        + std::string(".dat");
 }
 UtilityInterpolant::UtilityInterpolant(
     std::function<double(double)> f, double lim, size_t hash)
