@@ -11,7 +11,7 @@ using namespace PROPOSAL;
 double crosssection::Compton::GetLowerEnergyLim(
     const ParticleDef&) const noexcept
 {
-    return 2. * ME;
+    return pow(ALPHA, 2) * ME / 2; // ionization energy of K-shell electron for hydrogen
 }
 
 crosssection::KinematicLimits crosssection::Compton::GetKinematicLimits(
