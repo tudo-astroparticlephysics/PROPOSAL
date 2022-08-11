@@ -8,6 +8,7 @@
 #include "PROPOSAL/crosssection/Factories/EpairProductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/IonizationFactory.h"
 #include "PROPOSAL/crosssection/Factories/MupairProductionFactory.h"
+#include "PROPOSAL/crosssection/Factories/PhotoeffectFactory.h"
 #include "PROPOSAL/crosssection/Factories/PhotoMuPairProductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/PhotoPairProductionFactory.h"
 #include "PROPOSAL/crosssection/Factories/PhotonuclearFactory.h"
@@ -423,7 +424,7 @@ PropagationUtility::Collection Propagator::CreateUtility(
     PropagationUtility::Collection def;
     def.displacement_calc = make_displacement(crosss, do_interpol);
     def.interaction_calc
-        = make_interaction(def.displacement_calc, crosss, do_interpol);
+        = make_interaction(def.displacement_calc, crosss, do_interpol, false);
     if (!scatter.empty())
         def.scattering
             = make_scattering(scatter, p_def, *medium, crosss, do_interpol);
@@ -473,12 +474,15 @@ Propagator::CreateCrossSectionList(const ParticleDef& p_def,
                 p_def, medium, cuts, interpolate, config["photo"]));
         }
     }
+    if (config.contains("photoeffect"))
+        cross.emplace_back(make_photoeffect(
+            p_def, medium, config["photoeffect"]));
     if (config.contains("photomupair"))
         cross.emplace_back(make_photomupairproduction(
-                p_def, medium, interpolate, config["photomupair"]));
+            p_def, medium, interpolate, config["photomupair"]));
     if (config.contains("photoproduction"))
         cross.emplace_back(make_photoproduction(
-                p_def, medium, config["photoproduction"]));
+            p_def, medium, config["photoproduction"]));
     if (config.contains("photopair"))
         cross.emplace_back(make_photopairproduction(
             p_def, medium, interpolate, config["photopair"]));
