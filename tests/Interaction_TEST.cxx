@@ -25,12 +25,18 @@ TEST(Interaction, Constructor)
     auto cross = GetCrossSections();
     auto disp = std::shared_ptr<Displacement>(make_displacement(cross, false));
     auto interaction1
-        = std::make_unique<InteractionBuilder>(disp, cross, std::false_type());
+        = std::make_unique<InteractionBuilder>(disp, cross, std::false_type(), false);
     auto interaction2
-        = std::make_unique<InteractionBuilder>(disp, cross, std::true_type());
+        = std::make_unique<InteractionBuilder>(disp, cross, std::true_type(), false);
+    auto interaction3
+        = std::make_unique<InteractionBuilder>(disp, cross, std::false_type(), true);
+    auto interaction4
+        = std::make_unique<InteractionBuilder>(disp, cross, std::true_type(), true);
 
-    InteractionBuilder interaction_3(disp, cross, std::false_type());
-    InteractionBuilder interaction_4(disp, cross, std::true_type());
+    InteractionBuilder interaction_5(disp, cross, std::false_type(), false);
+    InteractionBuilder interaction_6(disp, cross, std::true_type(), true);
+    InteractionBuilder interaction_7(disp, cross, std::false_type(), false);
+    InteractionBuilder interaction_8(disp, cross, std::true_type(), true);
 }
 
 // Hash for Enum necessary to support gcc compilers with version < 6.1
@@ -218,6 +224,23 @@ TEST(MeanFreePath, CompareIntegralInterpolant)
         double pathlength_interpol = inter_interpol->MeanFreePath(E);
         EXPECT_NEAR(pathlength_integral, pathlength_interpol,
             pathlength_integral * 1e-3);
+    }
+}
+
+TEST(MeanFreePath, RateInterpolant)
+{
+    auto cross = GetCrossSections();
+    auto rate_integral = make_interaction(cross, true, false);
+    auto rate_interpol = make_interaction(cross, true, true);
+
+    auto lower_lim = CrossSectionVector::GetLowerLim(cross);
+    double lambda_integral, lambda_interpol;
+
+    for (double logE = std::log10(lower_lim); logE<14; logE+=0.1) {
+        lambda_integral = rate_integral->MeanFreePath(std::pow(10, logE));
+        lambda_interpol = rate_interpol->MeanFreePath(std::pow(10, logE));
+        if (!(lambda_integral == INF && lambda_interpol == INF))
+            EXPECT_NEAR(lambda_integral, lambda_interpol, lambda_integral * 1e-3);
     }
 }
 

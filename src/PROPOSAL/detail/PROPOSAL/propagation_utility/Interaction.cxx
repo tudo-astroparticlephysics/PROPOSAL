@@ -19,20 +19,17 @@ Interaction::Interaction(
 
 double Interaction::FunctionToIntegral(double energy) const
 {
-    auto total_rate = 0.;
-    for (auto& c : cross_list)
-        total_rate += c->CalculatedNdx(energy);
+    auto total_rate = calculate_total_rate(energy);
     if (total_rate > 0)
         return disp->FunctionToIntegral(energy) * total_rate;
     return 0;
 }
 
-double Interaction::MeanFreePath(double energy)
-{
+double Interaction::calculate_total_rate(double energy) const {
     auto total_rate = 0.;
     for (auto& c : cross_list)
         total_rate += c->CalculatedNdx(energy);
-    return 1 / total_rate;
+    return total_rate;
 }
 
 Interaction::Loss Interaction::SampleLoss(

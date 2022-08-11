@@ -177,17 +177,18 @@ PYBIND11_MODULE(proposal, m)
             py::arg("energy"));
 
     m.def("make_interaction",
-        [](crosssection_list_t cross, bool interpolate) {
+          [](crosssection_list_t cross, bool interpolate_interaction_integral, bool interpolate_mean_free_path) {
             return shared_ptr<Interaction>(
-                make_interaction(cross, interpolate));
-        });
+                    make_interaction(cross, interpolate_interaction_integral, interpolate_mean_free_path));
+            }, py::arg("cross"), py::arg("interpolate_interaction_integral"), py::arg("interpolate_mean_free_path") = false);
 
     m.def("make_interaction",
           [](std::shared_ptr<Displacement> displacement,
-                  crosssection_list_t cross, bool interpolate) {
+                  crosssection_list_t cross, bool interpolate_interaction_integral, bool interpolate_mean_free_path) {
               return shared_ptr<Interaction>(
-                      make_interaction(displacement, cross, interpolate));
-          });
+                      make_interaction(displacement, cross, interpolate_interaction_integral, interpolate_mean_free_path));
+              }, py::arg("displacement"), py::arg("cross"), py::arg("interpolate_interaction_integral"),
+                 py::arg("interpolate_mean_free_path") = false);
 
     py::class_<Interaction::Rate,
             std::shared_ptr<Interaction::Rate>>(m, "InteractionRate")
@@ -232,7 +233,9 @@ PYBIND11_MODULE(proposal, m)
         .def_readwrite_static(
             "nodes_dndx_v", &InterpolationSettings::NODES_DNDX_V)
         .def_readwrite_static(
-            "nodes_utility", &InterpolationSettings::NODES_UTILITY);
+            "nodes_utility", &InterpolationSettings::NODES_UTILITY)
+        .def_readwrite_static(
+            "nodes_rate_interpolant", &InterpolationSettings::NODES_RATE_INTERPOLANT);
 
     /* py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m, */
     /*     "InterpolationDef", */
