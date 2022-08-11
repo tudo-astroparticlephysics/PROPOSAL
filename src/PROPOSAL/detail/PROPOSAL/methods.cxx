@@ -20,9 +20,17 @@ LogTableCreation::LogTableCreation(const std::string &path, const std::string &f
     // TODO: use std::filesystem when we switch to c++17
     auto combined = path + "/" + filename;
     if (!Helper::file_exists(combined)) {
-        Logging::Get("TableCreation")->info("Tables not existing and need to be created. This may take some time.");
+        if (Helper::is_folder_writable(path)) {
+            Logging::Get("TableCreation")->info("Tables are not available and need to be created. "
+                                                "This will take some minutes.");
+        } else {
+            Logging::Get("TableCreation")->info("Tables are not available and need to be created. "
+                                                "This will take some minutes. PROPOSAL is unable to write to the "
+                                                "requested path {}. Therefore, tables will only be stored in memory.",
+                                                path);
+        }
     } else {
-        Logging::Get("TableCreation")->info("Tables are existing and are read from file.");
+        Logging::Get("TableCreation")->debug("Tables are available and are read from file.");
     }
 }
 
