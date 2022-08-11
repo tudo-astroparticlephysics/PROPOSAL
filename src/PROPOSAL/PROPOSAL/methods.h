@@ -111,6 +111,11 @@ namespace Helper {
     inline bool file_exists (const std::string& path_to_file) {
         return access( path_to_file.c_str(), 0 ) == 0;
     }
+
+    inline bool is_folder_writable(const std::string& path_to_file) {
+        return access( path_to_file.c_str(), W_OK ) == 0;
+    }
+
 } // namespace Helper
 
 
