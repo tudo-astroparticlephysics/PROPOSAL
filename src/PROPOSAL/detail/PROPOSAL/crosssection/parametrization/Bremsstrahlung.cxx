@@ -543,7 +543,8 @@ double crosssection::BremsElectronScreening::CalculateParametrization(
     double A_fac = 1.0;
     if (energy < 50.) {
         f_c = 0;
-        A_fac = interpolant_->InterpolateArray(logZ, energy);
+        // correction tables are stored in kinetic energies
+        A_fac = interpolant_->InterpolateArray(logZ, energy - p_def.mass);
     }
 
     auto result = A_fac * comp.GetNucCharge() * (comp.GetNucCharge() + xi);
@@ -553,6 +554,15 @@ double crosssection::BremsElectronScreening::CalculateParametrization(
     result *= aux;
 
     return result;
+}
+
+crosssection::KinematicLimits crosssection::BremsElectronScreening::GetKinematicLimits(
+        const ParticleDef& p_def, const Component&, double energy) const
+{
+    auto kin_lim = KinematicLimits();
+    kin_lim.v_min = 0.;
+    kin_lim.v_max = 1 - p_def.mass / energy;
+    return kin_lim;
 }
 
 #undef BREMSSTRAHLUNG_IMPL

@@ -77,7 +77,7 @@ namespace crosssection {
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept final;
         KinematicLimits GetKinematicLimits(
-            const ParticleDef&, const Component&, double) const final;
+            const ParticleDef&, const Component&, double) const override;
     };
 
     template <> struct ParametrizationName<Bremsstrahlung> {
@@ -104,6 +104,8 @@ namespace crosssection {
             double energy, double v) const final;
         double DifferentialCrossSection(const ParticleDef&, const Component&,
             double energy, double v) const final;
+        KinematicLimits GetKinematicLimits(const ParticleDef&, const Component&,
+                                           double energy) const override;
     };
 
     template <> struct ParametrizationName<BremsElectronScreening> {
