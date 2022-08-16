@@ -56,7 +56,7 @@ namespace detail {
         auto logger = Logging::Get("Crosssection");
         auto interaction_type =static_cast<InteractionType>(id);
         auto interaction_name = Type_Interaction_Name_Map.at(interaction_type);
-        logger->debug("Building {} cross section for interaction type {}.", param_name,
+        logger->info("Building {} cross section for interaction type {}.", param_name,
             interaction_name);
         logger->debug("-> with particle {}", p.name);
         logger->debug("-> with target {}", m.GetName());
