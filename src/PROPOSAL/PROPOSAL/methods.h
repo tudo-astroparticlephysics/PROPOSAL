@@ -118,7 +118,7 @@ namespace Helper {
     }
 
     inline bool is_folder_writable(const std::string& path_to_file) {
-        return access( path_to_file.c_str(), W_OK ) == 0;
+        return access( path_to_file.c_str(), 2 ) == 0;
     }
 
 } // namespace Helper
