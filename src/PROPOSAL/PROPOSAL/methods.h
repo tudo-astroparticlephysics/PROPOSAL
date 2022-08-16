@@ -34,6 +34,8 @@
 #include <memory>
 #include <vector>
 #include <sys/stat.h>
+// use unistd.h for access on POSIX os, use io.h for windows systems
+// todo: use filesystem instead when switching to c++17
 #ifdef _WIN32
 #include <io.h>
    #define access    _access_s
