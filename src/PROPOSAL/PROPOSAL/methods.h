@@ -87,6 +87,9 @@ struct InterpolantBuilder;
 // creation process has started.
 struct LogTableCreation {
     LogTableCreation(const std::string& path, const std::string& filename);
+
+private:
+    static std::string warn_for_path;
 };
 
 namespace Helper {

@@ -30,7 +30,6 @@
 #include <PROPOSAL/methods.h>
 #include <spdlog/sinks/sink.h>
 #include <spdlog/spdlog.h>
-#include "spdlog/sinks/dup_filter_sink.h"
 
 #include <memory>
 #include <string>
@@ -49,12 +48,8 @@ struct Logging {
     static logger_ptr Get(std::string const& name)
     {
         auto it = Logging::logger.find(name);
-        if (it == logger.end()) {
-            if (name == "TableCreation")
-                Logging::logger[name] = Logging::CreateDupFiler(name);
-            else
-                Logging::logger[name] = Logging::Create(name);
-        }
+        if (it == logger.end())
+            Logging::logger[name] = Logging::Create(name);
         return Logging::logger[name];
     }
 
@@ -69,16 +64,6 @@ private:
     static logger_ptr Create(std::string const& name)
     {
         auto logger = std::make_shared<spdlog::logger>(name, sink);
-        logger->set_level(global_loglevel);
-        return logger;
-    }
-
-    static logger_ptr CreateDupFiler(std::string const& name)
-    {
-        // don't log duplicate messages
-        auto dup_filter = std::make_shared<spdlog::sinks::dup_filter_sink_st>(std::chrono::seconds(60));
-        dup_filter->add_sink(sink);
-        auto logger = std::make_shared<spdlog::logger>(name, dup_filter);
         logger->set_level(global_loglevel);
         return logger;
     }
