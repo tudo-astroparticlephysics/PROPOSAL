@@ -26,10 +26,10 @@ LogTableCreation::LogTableCreation(const std::string &path, const std::string &f
             // we haven't logged a warning for this specific path yet
             Logging::Get("TableCreation")->warn("Tables are not available and need to be created. "
                                                 "They will be written to '{}'. "
-                                                "This can take some minutes.", combined);
+                                                "This can take some minutes.", path);
             if (!Helper::is_folder_writable(path))
                 Logging::Get("TableCreation")->warn("PROPOSAL is unable to write to the requested path '{}'. "
-                                                    "Therefore, tables will only be stored in memory.");
+                                                    "Therefore, tables will only be stored in memory.", path);
             warn_for_path = path;
         }
     } else {
