@@ -16,7 +16,6 @@ Cylinder::Cylinder(const Vector3D& position, double z, double radius, double inn
     , inner_radius_(inner_radius)
     , z_(z)
 {
-    Logging::Get("proposal.geometry")->info("Order of function parameters for Cylinder constructor has been changed in vesion 7.");
     if (inner_radius_ > radius_)
     {
         Logging::Get("proposal.geometry")->error("Inner radius {} is greater then radius {} (will be swaped)", inner_radius_, radius_);

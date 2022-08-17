@@ -49,7 +49,7 @@ std::string CrossSectionDNDXInterpolant::gen_path() const
 std::string CrossSectionDNDXInterpolant::gen_name() const
 {
     return std::string("dndx_") + std::to_string(GetHash())
-        + std::string(".txt");
+        + std::string(".dat");
 }
 
 size_t CrossSectionDNDXInterpolant::gen_hash(size_t hash) const {

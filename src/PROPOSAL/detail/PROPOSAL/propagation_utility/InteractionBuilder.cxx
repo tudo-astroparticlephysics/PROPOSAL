@@ -60,7 +60,7 @@ InteractionBuilder::interpolant_ptr InteractionBuilder::InitializeRateInterpolan
 
     return std::make_shared<interpolant_t>(
             std::move(def), std::string(InterpolationSettings::TABLES_PATH),
-            std::string("rates_") + std::to_string(rate_interpolant_hash) + std::string(".txt"));
+            std::string("rates_") + std::to_string(rate_interpolant_hash) + std::string(".dat"));
 }
 
 double InteractionBuilder::EnergyInteraction(double energy, double rnd)

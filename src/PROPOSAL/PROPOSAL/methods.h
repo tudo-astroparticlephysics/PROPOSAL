@@ -33,7 +33,15 @@
 #include <map>
 #include <memory>
 #include <vector>
-
+#include <sys/stat.h>
+// use unistd.h for access on POSIX os, use io.h for windows systems
+// todo: use filesystem instead when switching to c++17
+#ifdef _WIN32
+#include <io.h>
+   #define access    _access_s
+#else
+    #include <unistd.h>
+#endif
 #define PROPOSAL_MAKE_HASHABLE(type, ...)                                      \
     namespace std {                                                            \
     template <> struct hash<type> {                                            \
@@ -77,6 +85,15 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest)
 class Interpolant;
 struct InterpolantBuilder;
 
+// This object checks whether the table under path/filename is already existing. Needs to be created before the table
+// creation process has started.
+struct LogTableCreation {
+    LogTableCreation(const std::string& path, const std::string& filename);
+
+private:
+    static std::string warn_for_path;
+};
+
 namespace Helper {
 
     // ----------------------------------------------------------------------------
@@ -94,6 +111,15 @@ namespace Helper {
     struct case_insensitive_comp {
         bool operator()(std::string const& lhs, std::string const& rhs) const;
     };
+
+    // TODO: use std::filesystem when we switch to c++17
+    inline bool file_exists (const std::string& path_to_file) {
+        return access( path_to_file.c_str(), 0 ) == 0;
+    }
+
+    inline bool is_folder_writable(const std::string& path_to_file) {
+        return access( path_to_file.c_str(), 2 ) == 0;
+    }
 
 } // namespace Helper
 

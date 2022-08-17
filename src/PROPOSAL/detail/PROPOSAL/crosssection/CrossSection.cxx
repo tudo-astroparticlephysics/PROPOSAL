@@ -61,7 +61,7 @@ namespace detail {
         logger->debug("-> with particle {}", p.name);
         logger->debug("-> with target {}", m.GetName());
         if (cut)
-            logger->debug("-> with e cut {} and v_cut {}", cut->GetEcut(),
+            logger->debug("-> with e_cut {} and v_cut {}", cut->GetEcut(),
                 cut->GetVcut());
         return logger;
     };

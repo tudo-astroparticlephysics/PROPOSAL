@@ -3,6 +3,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/AxisBuilderDNDX.h"
 #include "PROPOSAL/crosssection/CrossSectionDNDX/CrossSectionDNDXIntegral.h"
+#include "PROPOSAL/methods.h"
 
 #include <type_traits>
 
@@ -82,7 +83,7 @@ auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)
     return def;
 }
 
-class CrossSectionDNDXInterpolant : public CrossSectionDNDX {
+class CrossSectionDNDXInterpolant : public CrossSectionDNDX, public LogTableCreation {
     std::function<double(double, double, double)> transform_v;
     std::function<double(double, double, double)> retransform_v;
     cubic_splines::Interpolant<cubic_splines::BicubicSplines<double>>
@@ -99,7 +100,7 @@ public:
     CrossSectionDNDXInterpolant(Param param, ParticleDef const& p,
         Target const& t, std::shared_ptr<const EnergyCutSettings> cut,
         size_t hash = 0)
-        : CrossSectionDNDX(param, p, t, cut, gen_hash(hash))
+        : CrossSectionDNDX(param, p, t, cut, gen_hash(hash)), LogTableCreation(gen_path(), gen_name())
         , transform_v(transform_loss<Param>)
         , retransform_v(retransform_loss<Param>)
         , interpolant(build_dndx_def(param, p, t, cut), gen_path(), gen_name())

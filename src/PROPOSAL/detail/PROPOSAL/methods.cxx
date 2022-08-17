@@ -10,10 +10,32 @@
 // #include <stdlib.h>
 
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Logging.h"
 #include <algorithm>
 #include <string>
 
 namespace PROPOSAL {
+
+std::string LogTableCreation::warn_for_path = "";
+
+LogTableCreation::LogTableCreation(const std::string &path, const std::string &filename) {
+    // TODO: use std::filesystem when we switch to c++17
+    auto combined = path + "/" + filename;
+    if (!Helper::file_exists(combined)) {
+        if (warn_for_path != path) {
+            // we haven't logged a warning for this specific path yet
+            Logging::Get("TableCreation")->warn("Tables are not available and need to be created. "
+                                                "They will be written to '{}'. "
+                                                "This can take some minutes.", combined);
+            if (!Helper::is_folder_writable(path))
+                Logging::Get("TableCreation")->warn("PROPOSAL is unable to write to the requested path '{}'. "
+                                                    "Therefore, tables will only be stored in memory.");
+            warn_for_path = path;
+        }
+    } else {
+        Logging::Get("TableCreation")->debug("Tables are available and are read from file '{}'.", combined);
+    }
+}
 
 namespace Helper {
 

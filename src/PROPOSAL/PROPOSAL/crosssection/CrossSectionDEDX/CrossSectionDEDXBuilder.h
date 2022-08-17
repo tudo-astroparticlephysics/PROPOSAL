@@ -14,7 +14,7 @@ template <typename... Args> auto make_dedx(bool interpolate, Args&&... args)
             ptr = std::make_unique<CrossSectionDEDXInterpolant>(
                 std::forward<Args>(args)...);
         } catch (exception_axis_builder_dedx_out_of_range const& e) {
-            Logging::Get("CrossSection.DEDX")->info(e.what());
+            Logging::Get("CrossSection.DEDX")->debug(e.what());
         }
     else
         ptr = std::make_unique<CrossSectionDEDXIntegral>(
