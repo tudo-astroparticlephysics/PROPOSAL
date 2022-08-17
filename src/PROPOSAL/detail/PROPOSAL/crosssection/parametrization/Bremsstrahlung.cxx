@@ -42,6 +42,27 @@
         using param_t                                                          \
             = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;         \
         return std::make_unique<param_t>(*this);                               \
+    }                                                                          \
+                                                                               \
+    crosssection::KinematicLimits                                              \
+    crosssection::Brems##param::GetKinematicLimits(                            \
+        const ParticleDef& p_def, const Component& comp, double energy) const  \
+    {                                                                          \
+        /* The limit is taken from the Petrukhin/Shestakov Parametrization */  \
+        /* TODO: investigate how the screening functions of the different  */  \
+        /*       parametrizations change these limits                      */  \
+        auto kin_lim = KinematicLimits();                                      \
+        kin_lim.v_min = 0.;                                                    \
+        kin_lim.v_max = 1                                                      \
+            - 0.75 * SQRTE * (p_def.mass / energy)                             \
+                 * std::pow(comp.GetNucCharge(), 1. / 3);                      \
+        if (kin_lim.v_max < 0) {                                               \
+            kin_lim.v_max = 0;                                                 \
+        } else if (lorenz_) {                                                  \
+            kin_lim.v_max = std::min(kin_lim.v_max, lorenz_cut_ / energy);     \
+        }                                                                      \
+                                                                               \
+        return kin_lim;                                                        \
     }
 
 using namespace PROPOSAL;
@@ -63,24 +84,10 @@ double crosssection::Bremsstrahlung::GetLowerEnergyLim(
 crosssection::KinematicLimits crosssection::Bremsstrahlung::GetKinematicLimits(
     const ParticleDef& p_def, const Component& comp, double energy) const
 {
-    // The limit is taken from the Petrukhin/Shestakov Parametrization
+    // Default kinematic limits, applicable to all parametrizations
     auto kin_lim = KinematicLimits();
     kin_lim.v_min = 0.;
-    kin_lim.v_max = 1
-        - 0.75 * SQRTE * (p_def.mass / energy)
-            * std::pow(comp.GetNucCharge(), 1. / 3);
-
-    if (kin_lim.v_max < 0) {
-        kin_lim.v_max = 0;
-    } else if (lorenz_) {
-        kin_lim.v_max = std::min(kin_lim.v_max, lorenz_cut_ / energy);
-    }
-
-    // TODO: 1 - a*x is always smaller than 1 - x if a > 1
-    // and 0.75*\sqrt{e}*Z^{1/3} > 1
-    // so the next line will never be called, or?
-    // limits.vMax = std::min(limits.vMax, 1 - p_def.mass / energy);
-
+    kin_lim.v_max = 1 - p_def.mass / energy;
     return kin_lim;
 }
 
@@ -554,15 +561,6 @@ double crosssection::BremsElectronScreening::CalculateParametrization(
     result *= aux;
 
     return result;
-}
-
-crosssection::KinematicLimits crosssection::BremsElectronScreening::GetKinematicLimits(
-        const ParticleDef& p_def, const Component&, double energy) const
-{
-    auto kin_lim = KinematicLimits();
-    kin_lim.v_min = 0.;
-    kin_lim.v_max = 1 - p_def.mass / energy;
-    return kin_lim;
 }
 
 #undef BREMSSTRAHLUNG_IMPL
