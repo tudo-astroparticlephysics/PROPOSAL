@@ -51,6 +51,12 @@ jobs:
             sudo update-alternatives --set cc /usr/bin/gcc
             sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30
             sudo update-alternatives --set c++ /usr/bin/g++
+        - name: Set up gcc7
+          if : ${{ matrix.compiler == 'gcc-7' }}
+          uses: egor-tensin/setup-gcc@v1
+          with:
+            version: 7
+            platform: x64
         - name: Cache conan
           if: ${{ matrix.os != 'windows-latest' }}
           id: cache-conan
