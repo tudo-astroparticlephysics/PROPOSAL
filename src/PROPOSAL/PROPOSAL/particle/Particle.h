@@ -83,7 +83,8 @@ static const std::unordered_map<InteractionType, std::string,
         { InteractionType::Photopair, "Photopair" },
         { InteractionType::Photoproduction, "Photoproduction" },
         { InteractionType::PhotoMuPair, "PhotoMuPairProduction" },
-    };
+        { InteractionType::Photoeffect, "Photoeffect" },
+};
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
