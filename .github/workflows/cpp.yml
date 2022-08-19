@@ -14,10 +14,10 @@ jobs:
             - os : "macos-latest"
               compiler : "clang"
               compilerpp : "clang++"
-            - os : "ubuntu-18.04"
+            - os : "ubuntu-20.04"
               compiler : "gcc-7"
               compilerpp : "g++-7"
-            - os : "ubuntu-18.04"
+            - os : "ubuntu-20.04"
               compiler : "gcc-5"
               compilerpp : "g++-5"
             - os : "windows-latest"
@@ -61,7 +61,7 @@ jobs:
           if : steps.cache-conan.outputs.cache-hit != 'true'
           run: conan profile new default --detect
         - name: Update conan profile
-          if : ${{ matrix.os == 'ubuntu-18.04' || matrix.os == 'ubuntu-latest' }}
+          if : ${{ matrix.os == 'ubuntu-20.04' || matrix.os == 'ubuntu-latest' }}
           run: conan profile update settings.compiler.libcxx=libstdc++11 default
         - name: Update conan profile
           run: conan profile update settings.compiler.cppstd=14 default
@@ -91,10 +91,10 @@ jobs:
             - os : "macos-latest"
               compiler : "clang"
               compilerpp : "clang++"
-            - os : "ubuntu-18.04"
+            - os : "ubuntu-20.04"
               compiler : "gcc-7"
               compilerpp : "g++-7"
-            - os : "ubuntu-18.04"
+            - os : "ubuntu-20.04"
               compiler : "gcc-5"
               compilerpp : "g++-5"
             - os : "windows-latest"
