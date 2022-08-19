@@ -34,8 +34,6 @@ jobs:
         - name: Install gcc-5
           if : ${{ matrix.compiler == 'gcc-5' }}
           run: |
-            sudo echo "deb http://dk.archive.ubuntu.com/ubuntu/ xenial main" >> /etc/apt/sources.list
-            sudo echo "deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe" >> /etc/apt/sources.list
             sudo apt update
             sudo apt install g++-5
             sudo apt install gcc-5
