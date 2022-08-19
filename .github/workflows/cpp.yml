@@ -36,7 +36,7 @@ jobs:
           uses: myci-actions/add-deb-repo@10
           with:
             repo: deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe
-            install: [g++-5, gcc-5]
+            install: g++-5, gcc-5
         - name: Install gcc-5
           if : ${{ matrix.compiler == 'gcc-5' }}
           run: |
