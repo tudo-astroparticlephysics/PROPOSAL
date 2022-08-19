@@ -100,7 +100,13 @@ double crosssection::PhotoeffectSauter::PhotoeffectKshellCrossSection(double ene
     auto Z_alpha_beta = comp.GetNucCharge() * ALPHA * gamma / gamma_beta; // Z*alpha/beta
     auto Z_pi_alpha_beta = PI * Z_alpha_beta;
     // correction factor for non-relativstic electrons
-    auto non_rel = (1 + Z_alpha_beta * Z_alpha_beta) * Z_pi_alpha_beta / sinh(Z_pi_alpha_beta)
+    double non_rel;
+    if (Z_pi_alpha_beta < 10.) {
+      non_rel = (1 + Z_alpha_beta * Z_alpha_beta) * Z_pi_alpha_beta / sinh(Z_pi_alpha_beta)
         * exp(Z_alpha_beta * (PI - 4 * atan(1 / Z_alpha_beta)));
+    } else {
+      non_rel = (1 + Z_alpha_beta * Z_alpha_beta) * 2 * Z_pi_alpha_beta
+        * exp(Z_alpha_beta * (- 4 * atan(1 / Z_alpha_beta)));
+    }
     return sigma * non_rel;
 }
