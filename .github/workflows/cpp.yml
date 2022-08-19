@@ -29,6 +29,7 @@ jobs:
         - name: Install gcc-5
           if : ${{ matrix.compiler == 'gcc-5' }}
           run: |
+            mkdir ~/Downloads
             cd ~/Downloads
             wget -c http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/gcc-5-base_5.5.0-12ubuntu1_amd64.deb
             wget -c http://archive.ubuntu.com/ubuntu/pool/universe/i/isl-0.18/libisl15_0.18-4_amd64.deb
