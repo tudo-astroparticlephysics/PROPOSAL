@@ -6,7 +6,8 @@
 
 namespace PROPOSAL {
     namespace secondaries {
-        class HeitlerAnnihilation : public secondaries::Annihilation {
+        class HeitlerAnnihilation : public secondaries::Annihilation,
+                                    public DefaultSecondaries<HeitlerAnnihilation>  {
 
             double mass;
             static double helper_f(double a1, double a2, double v);
