@@ -56,7 +56,7 @@ TEST(Annihilation, Test_of_dNdx)
         auto cross = make_annihilation(particle_def, *medium, false, config);
 
         dNdx_new = cross->CalculatedNdx(energy);
-        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-4 * dNdx_stored);
     }
 }
 
