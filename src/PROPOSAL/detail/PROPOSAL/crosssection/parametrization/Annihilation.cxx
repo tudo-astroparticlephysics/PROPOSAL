@@ -1,5 +1,4 @@
 
-#include <cassert>
 #include <cmath>
 #include <memory>
 #include <type_traits>
@@ -8,58 +7,63 @@
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/crosssection/CrossSection.h"
+#include "PROPOSAL/medium/Medium.h"
 
 using std::make_tuple;
 using namespace PROPOSAL;
 
-double crosssection::Annihilation::GetLowerEnergyLim(
-    ParticleDef const& p_def) const noexcept
-{
-    return p_def.mass * 2.f;
+InteractionType crosssection::Annihilation::GetInteractionType() const noexcept {
+    return InteractionType::Annihilation;
 }
 
-crosssection::KinematicLimits crosssection::Annihilation::GetKinematicLimits(
-    ParticleDef const& p_def, Component const&, double energy) const
-{
-    // Limits according to simple 2->2 body interactions
-    auto kin_lim = crosssection::KinematicLimits();
+size_t crosssection::Annihilation::GetHash(const ParticleDef& p_def, const Medium &m, cut_ptr) const noexcept {
+    auto combined_hash = m.GetHash();
+    hash_combine(combined_hash, p_def.mass, hash);
+    return combined_hash;
+}
 
+double crosssection::Annihilation::GetLowerEnergyLim(const ParticleDef& p_def, const Medium&, cut_ptr) const {
+    return p_def.mass;
+};
+
+crosssection::AnnihilationHeitler::AnnihilationHeitler() {
+    hash_combine(hash, std::string(crosssection::ParametrizationName<AnnihilationHeitler>::value));
+};
+
+double crosssection::AnnihilationHeitler::CalculatedNdx(double energy, size_t comp_hash, const ParticleDef& p_def,
+                                                              const Medium& medium, cut_ptr cut) {
+    if (energy <= Annihilation::GetLowerEnergyLim(p_def, medium, cut))
+        return 0.;
+
+    auto comp = Component::GetComponentForHash(comp_hash);
     auto gamma = energy / p_def.mass;
-
-    if (gamma <= 1) {
-        kin_lim.v_min = 0;
-        kin_lim.v_max = 0;
-    } else {
-        auto aux = std::sqrt((gamma - 1.) / (gamma + 1.));
-        kin_lim.v_min = 0.5 * (1. - aux);
-        kin_lim.v_max = 0.5 * (1. + aux);
-    }
-    return kin_lim;
-}
-
-std::unique_ptr<crosssection::Parametrization<Component>>
-crosssection::AnnihilationHeitler::clone() const
-{
-    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
-    return std::make_unique<param_t>(*this);
-}
-
-double crosssection::AnnihilationHeitler::DifferentialCrossSection(
-    ParticleDef const& p_def, Component const& comp, double energy,
-    double v) const
-{
-    // W. Heitler. The Quantum Theory of Radiation, Clarendon Press, Oxford
-    // (1954) Adapted from Geant4 PhysicsReferenceManual
-
-    // v = energy of photon1 / total available energy
-    // with the total available energy being the sum of the total positron
-    // energy and the electron mass
-
-    auto gamma = energy / p_def.mass;
-    auto aux = 1. + (2. * gamma) / std::pow(gamma + 1., 2.) - v
-        - 1. / std::pow(gamma + 1., 2.) * 1. / v;
-    aux *= NA * comp.GetNucCharge() / comp.GetAtomicNum() * PI * RE * RE
-        / (gamma - 1.) * 1. / v; // TODO: prefactors
+    auto weight = detail::weight_component(medium, comp);
+    auto aux = (gamma * gamma + 4 * gamma + 1) / (gamma * gamma - 1)
+            * std::log(gamma + std::sqrt(gamma * gamma - 1)) - (gamma + 3) / std::sqrt(gamma * gamma - 1);
+    aux *= NA * comp.GetNucCharge() / comp.GetAtomicNum() * PI * RE * RE / (gamma + 1.) / weight;
 
     return aux;
+}
+
+double crosssection::AnnihilationHeitler::CalculatedNdx(double energy, const ParticleDef& p, const Medium& m, cut_ptr cut) {
+    double sum = 0.;
+    for (auto& rate : CalculatedNdx_PerTarget(energy, p, m, cut))
+        sum += rate.second;
+    return sum;
+}
+
+std::vector<std::pair<size_t, double>> crosssection::AnnihilationHeitler::CalculatedNdx_PerTarget(
+        double energy, const ParticleDef& p, const Medium& m, cut_ptr cut) {
+    std::vector<std::pair<size_t, double>> rates = {};
+    for (auto& comp : m.GetComponents()) {
+        double rate = CalculatedNdx(energy, comp.GetHash(), p, m, cut);
+        rates.push_back({comp.GetHash(), rate});
+    }
+    return rates;
+}
+
+std::unique_ptr<crosssection::ParametrizationDirect> crosssection::AnnihilationHeitler::clone() const {
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
 }

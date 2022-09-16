@@ -74,6 +74,7 @@
 #include "PROPOSAL/secondaries/parametrization/Parametrization.h"
 #include "PROPOSAL/secondaries/parametrization/annihilation/Annihilation.h"
 #include "PROPOSAL/secondaries/parametrization/annihilation/HeitlerAnnihilation.h"
+#include "PROPOSAL/secondaries/parametrization/annihilation/HeitlerAnnihilationDirect.h"
 #include "PROPOSAL/secondaries/parametrization/annihilation/SingleDifferentialAnnihilation.h"
 #include "PROPOSAL/secondaries/parametrization/bremsstrahlung/Bremsstrahlung.h"
 #include "PROPOSAL/secondaries/parametrization/bremsstrahlung/BremsNoDeflection.h"

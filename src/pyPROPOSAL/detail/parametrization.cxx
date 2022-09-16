@@ -371,7 +371,7 @@ void init_parametrization(py::module& m)
     py::module m_sub_annihilation = m_sub.def_submodule("annihilation");
     py::class_<crosssection::Annihilation,
         std::shared_ptr<crosssection::Annihilation>,
-        crosssection::Parametrization<Component>>(m_sub_annihilation,
+        crosssection::ParametrizationDirect>(m_sub_annihilation,
         "Annihilation",
         R"pbdoc(
 
