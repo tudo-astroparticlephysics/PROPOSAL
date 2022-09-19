@@ -31,6 +31,22 @@ ParticleDef getParticleDef(const std::string& name)
     }
 }
 
+TEST(Annihilation, Test_of_dEdx)
+{
+    ParticleDef particle_def = EPlusDef();
+    auto medium = Air();
+    nlohmann::json config;
+    config["parametrization"] = "Heitler";
+    auto cross_integral = make_annihilation(particle_def, medium, false, config);
+    auto cross_interpol = make_annihilation(particle_def, medium, false, config);
+
+    EXPECT_EQ(cross_integral->CalculatedEdx(1e3), 0);
+    EXPECT_EQ(cross_integral->CalculatedE2dx(1e3), 0);
+
+    EXPECT_EQ(cross_interpol->CalculatedEdx(1e3), 0);
+    EXPECT_EQ(cross_interpol->CalculatedE2dx(1e3), 0);
+}
+
 TEST(Annihilation, Test_of_dNdx)
 {
     std::ifstream in;
