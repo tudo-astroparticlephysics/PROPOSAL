@@ -3,17 +3,19 @@
 
 using namespace PROPOSAL;
 
-double secondaries::HeitlerAnnihilation::helper_f(double a1, double a2, double rho) {
+double secondaries::HeitlerAnnihilation::f_term(double a1, double a2, double rho) {
     return a1 * std::log(rho) + a2 / rho - rho;
 }
 
 double secondaries::HeitlerAnnihilation::f(double rho, double a1, double a2, double rho_min, double rho_max, double rnd) {
-    return helper_f(a1, a2, rho) - helper_f(a1, a2, rho_min) - rnd * (helper_f(a1, a2, rho_max) - helper_f(a1, a2, rho_min));
+    return f_term(a1, a2, rho) - f_term(a1, a2, rho_min) - rnd * (f_term(a1, a2, rho_max) - f_term(a1, a2, rho_min));
 }
 
 double secondaries::HeitlerAnnihilation::CalculateRho(double energy, double rnd, const Component&) {
-    double gamma = energy / mass;
+    // solve the following equation for \rho:
+    // \int_{\rho_{min}}^{\rho} \frac{d\sigma}{d\rho} = rnd * \int_{\rho_{min}}^{\rho_{max}} \frac{d\sigma}{d\rho}
 
+    double gamma = energy / mass;
     double rho_min, rho_max;
     if (gamma <= 1) {
         rho_min = 0;
@@ -36,6 +38,7 @@ std::tuple<Cartesian3D, Cartesian3D>
 secondaries::HeitlerAnnihilation::CalculateDirections(
         const Vector3D& primary_dir, double energy, double rho, double rnd)
 {
+    // use two-body interaction kinematics to infer angles of secondary particles
     auto com_energy = energy + ME; // center of mass energy
     auto kin_energy = energy - ME; // kinetic energy
     auto cosphi0 = (com_energy * (1. - rho) - ME)

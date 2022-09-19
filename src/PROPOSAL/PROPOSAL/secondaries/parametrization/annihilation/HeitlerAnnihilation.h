@@ -1,3 +1,5 @@
+#pragma once
+
 #include "PROPOSAL/crosssection/CrossSection.h"
 #include "PROPOSAL/crosssection/parametrization/Annihilation.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -10,7 +12,7 @@ namespace PROPOSAL {
                                     public DefaultSecondaries<HeitlerAnnihilation>  {
 
             double mass;
-            static double helper_f(double a1, double a2, double v);
+            static double f_term(double a1, double a2, double v);
             double f(double v, double a1, double a2, double v_min, double v_max, double rnd);
 
         public:

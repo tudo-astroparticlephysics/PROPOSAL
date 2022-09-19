@@ -33,6 +33,7 @@ crosssection::AnnihilationHeitler::AnnihilationHeitler() {
 
 double crosssection::AnnihilationHeitler::CalculatedNdx(double energy, size_t comp_hash, const ParticleDef& p_def,
                                                               const Medium& medium, cut_ptr cut) {
+    // integrated form of Heitler Annihilation, cf. Geant4 PhysicsReferenceManual
     if (energy <= Annihilation::GetLowerEnergyLim(p_def, medium, cut))
         return 0.;
 
