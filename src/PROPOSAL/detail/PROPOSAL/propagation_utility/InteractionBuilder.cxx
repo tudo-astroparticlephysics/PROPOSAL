@@ -81,7 +81,10 @@ double InteractionBuilder::MeanFreePath(double energy) {
     if (rate_interpolant_) {
         if (energy < rate_lower_energy_lim)
             return INF;
-        return 1. / rate_interpolant_->evaluate(energy);
+        auto rate = rate_interpolant_->evaluate(energy);
+        if (rate < 0)
+            throw std::logic_error("Negative MeanFreePath detected!");
+        return 1. / rate;
     }
     return 1. / calculate_total_rate(energy);
 }
