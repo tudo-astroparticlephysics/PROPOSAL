@@ -73,6 +73,7 @@ void init_crosssection(py::module& m)
             "lower_energy_limit", &CrossSectionBase::GetLowerEnergyLim)
         .def_property_readonly("type", &CrossSectionBase::GetInteractionType)
         .def_property_readonly("param_name", &CrossSectionBase::GetParametrizationName)
+        .def_property_readonly("cuts", &CrossSectionBase::GetEnergyCutSettings)
         .def_property_readonly("hash", &CrossSectionBase::GetHash)
         .def("calculate_dEdx",
             py::vectorize(&CrossSectionBase::CalculatedEdx),
