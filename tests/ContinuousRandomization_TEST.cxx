@@ -27,11 +27,22 @@ ParticleDef getParticleDef(const std::string& name)
 
 TEST(ContinuousRandomization, Constructor)
 {
-    auto p_def = MuMinusDef();
+    auto p_def = EPlusDef();
     auto medium = Ice();
     auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, true);
     auto cross = GetStdCrossSections(p_def, medium, cuts, false);
     auto cont_rand = make_contrand(cross, false);
+}
+
+TEST(ContinuousRandomization, ConstructorNoTables)
+{
+    // when continuous_randomization is set to false in the EnergyCutSettings
+    // creating a ContRand object should throw an exception
+    auto p_def = EPlusDef();
+    auto medium = Ice();
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
+    auto cross = GetStdCrossSections(p_def, medium, cuts, false);
+    EXPECT_THROW(make_contrand(cross, false), std::logic_error);
 }
 
 TEST(ContinuousRandomization, FirstMomentum)

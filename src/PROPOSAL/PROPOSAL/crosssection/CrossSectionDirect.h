@@ -49,6 +49,10 @@ namespace PROPOSAL {
             return param_name;
         };
 
+        std::shared_ptr<const EnergyCutSettings> GetEnergyCutSettings() const noexcept override {
+            return cut;
+        }
+
     private:
         std::unique_ptr<crosssection::ParametrizationDirect> param;
         ParticleDef p;

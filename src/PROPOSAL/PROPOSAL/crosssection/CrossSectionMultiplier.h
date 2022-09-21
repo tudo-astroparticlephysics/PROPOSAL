@@ -53,6 +53,10 @@ namespace PROPOSAL {
             return cross_->GetParametrizationName();
         }
 
+        std::shared_ptr<const EnergyCutSettings> GetEnergyCutSettings() const noexcept override {
+            return cross_->GetEnergyCutSettings();
+        }
+
     private:
         std::shared_ptr<CrossSectionBase> cross_;
         double multiplier_;
