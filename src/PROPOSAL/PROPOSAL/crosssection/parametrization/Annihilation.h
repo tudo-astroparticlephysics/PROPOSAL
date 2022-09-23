@@ -29,31 +29,43 @@
 #pragma once
 
 #include "PROPOSAL/crosssection/parametrization/Parametrization.h"
+#include "PROPOSAL/crosssection/parametrization/ParametrizationDirect.h"
 
 namespace PROPOSAL {
 namespace crosssection {
-    class Annihilation : public Parametrization<Component> {
+    class Annihilation : public ParametrizationDirect {
     public:
         Annihilation() = default;
-        ~Annihilation() override = default;
 
-        double GetLowerEnergyLim(ParticleDef const&) const noexcept final;
+        // no continuous losses
+        double CalculatedEdx(double, const ParticleDef&, const Medium&, cut_ptr) override { return 0.; };
+        double CalculatedE2dx(double, const ParticleDef&, const Medium&, cut_ptr) override { return 0.; };
 
-        KinematicLimits GetKinematicLimits(
-            ParticleDef const&, Component const&, double) const final;
+        double CalculateCumulativeCrosssection(double, size_t, double, const ParticleDef&, const Medium&, cut_ptr) override {
+            throw std::logic_error("No cumulative crosssection defined for Annihilation.");
+        };
+
+        double CalculateStochasticLoss(size_t, double, double, const ParticleDef&, const Medium&, cut_ptr) override {
+            return 1.; // all energy is always lost, i.e. v=1
+        };
+
+        double GetLowerEnergyLim(const ParticleDef&, const Medium&, cut_ptr) const override;
+
+        size_t GetHash(const ParticleDef&, const Medium& m, cut_ptr) const noexcept override;
+
+        InteractionType GetInteractionType() const noexcept override;
     };
 
-    template <> struct ParametrizationName<Annihilation> {
-        static constexpr auto value = "annihilation";
-    };
+    class AnnihilationHeitler : public Annihilation {
+    public:
+        AnnihilationHeitler();
+        std::unique_ptr<ParametrizationDirect> clone() const final;
 
-    struct AnnihilationHeitler : public Annihilation {
-        AnnihilationHeitler() = default;
+        double CalculatedNdx(double, const ParticleDef&, const Medium&, cut_ptr) override;
+        double CalculatedNdx(double, size_t, const ParticleDef&, const Medium&, cut_ptr) override;
+        std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(
+                double, const ParticleDef&, const Medium&, cut_ptr) override;
 
-        std::unique_ptr<Parametrization<Component>> clone() const final;
-
-        double DifferentialCrossSection(
-            ParticleDef const&, Component const&, double, double) const final;
     };
 
     template <> struct ParametrizationName<AnnihilationHeitler> {

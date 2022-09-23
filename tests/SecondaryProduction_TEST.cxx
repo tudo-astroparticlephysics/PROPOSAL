@@ -5,6 +5,7 @@
 #include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionBurkhardtKelnerKokoulin.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionKochMotz.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionTsai.h"
+#include "PROPOSAL/secondaries/parametrization/annihilation/HeitlerAnnihilation.h"
 #include "PROPOSAL/secondaries/parametrization/photoeffect/PhotoeffectNoDeflection.h"
 #include "PROPOSAL/crosssection/parametrization/Photoeffect.h"
 #include "PROPOSAL/crosssection/CrossSectionBuilder.h"
@@ -158,6 +159,52 @@ TEST(Photoeffect, PhotoeffectNoDeflection)
             EXPECT_GE(sec.energy, sec.GetParticleDef().mass); // check that created electron has a valid total energy
             EXPECT_EQ(sec.direction, sec.direction); // check that electron inherits direction of photon
         }
+    }
+}
+
+TEST(HeitlerAnnihilation, EnergyMomentumConservation)
+{
+    RandomGenerator::Get().SetSeed(1909);
+    auto particle = EPlusDef();
+    std::vector<std::string> medium_list {"standardrock", "air", "ice"};
+
+    for (auto medium_name : medium_list) {
+        auto medium = CreateMedium(medium_name);
+        auto param = secondaries::HeitlerAnnihilation(particle, *medium);
+
+        auto E_i = 1e2;
+        auto init_direction = Cartesian3D(0, 0, 1);
+        auto init_position = Cartesian3D(0, 0, 0);
+        auto loss = StochasticLoss((int)InteractionType::Annihilation, E_i, init_position, init_direction, 0, 0, E_i);
+
+        std::vector<double> rnd;
+        for (int i=0; i < param.RequiredRandomNumbers(); i++) {
+            rnd.push_back(RandomGenerator::Get().RandomDouble());
+        }
+
+        auto secs = param.CalculateSecondaries(loss, medium->GetComponents().front(), rnd);
+
+        double E_sum = 0.;
+        double charge_sum = 0.;
+        auto p_sum = Cartesian3D(0., 0., 0.);
+        for (auto sec : secs) {
+            E_sum += sec.energy;
+            p_sum = p_sum + sec.GetMomentum() * sec.direction;
+            // direction should be changed, but position must stay identical
+            EXPECT_NE(sec.direction, init_direction);
+            EXPECT_EQ(sec.position, init_position);
+        }
+
+        // expect two secondary particles
+        EXPECT_EQ(secs.size(), 2);
+        // expect net charge of secondaries to be zero
+        EXPECT_EQ(charge_sum, 0);
+        // check energy conservation, note extra energy provided by atomic electron
+        EXPECT_NEAR(E_sum, E_i + ME, (E_i + ME) * COMPUTER_PRECISION);
+        // check momentum conservation
+        EXPECT_NEAR(p_sum.GetX(), 0., COMPUTER_PRECISION);
+        EXPECT_NEAR(p_sum.GetY(), 0., COMPUTER_PRECISION);
+        EXPECT_NEAR(p_sum.GetZ(), std::sqrt((E_i + ME) * (E_i - ME)), COMPUTER_PRECISION);
     }
 }
 
