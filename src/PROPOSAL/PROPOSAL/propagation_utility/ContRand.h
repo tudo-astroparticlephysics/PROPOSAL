@@ -18,14 +18,7 @@ struct ContRand {
 
     crossbase_list_t cross_list;
 
-    ContRand(std::shared_ptr<Displacement> _disp,
-        std::vector<std::shared_ptr<CrossSectionBase>> const& cross)
-        : disp(_disp)
-        , hash(0)
-        , cross_list(cross)
-    {
-        CalculateHash();
-    }
+    ContRand(std::shared_ptr<Displacement> _disp, std::vector<std::shared_ptr<CrossSectionBase>> const& cross);
 
     virtual ~ContRand() = default;
 
