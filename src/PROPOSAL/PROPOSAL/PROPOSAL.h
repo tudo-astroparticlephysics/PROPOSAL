@@ -138,6 +138,7 @@
 #include "PROPOSAL/propagation_utility/Decay.h"
 #include "PROPOSAL/propagation_utility/DecayBuilder.h"
 #include "PROPOSAL/propagation_utility/Displacement.h"
+#include "PROPOSAL/propagation_utility/DisplacementApproximation.h"
 #include "PROPOSAL/propagation_utility/DisplacementBuilder.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"

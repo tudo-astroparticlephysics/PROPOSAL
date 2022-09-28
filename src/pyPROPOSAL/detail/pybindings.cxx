@@ -11,6 +11,7 @@
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/propagation_utility/ContRandBuilder.h"
 #include "PROPOSAL/propagation_utility/DecayBuilder.h"
+#include "PROPOSAL/propagation_utility/DisplacementApproximation.h"
 #include "PROPOSAL/propagation_utility/Interaction.h"
 #include "PROPOSAL/propagation_utility/InteractionBuilder.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
@@ -219,6 +220,12 @@ PYBIND11_MODULE(proposal, m)
             return shared_ptr<Displacement>(
                 make_displacement(cross, interpolate));
         });
+
+    m.def("make_displacement_approximation",
+          [](crosssection_list_t cross) {
+              return shared_ptr<Displacement>(
+                      make_displacement_approximation(cross));
+          });
 
     py::class_<InterpolationSettings, std::shared_ptr<InterpolationSettings>>(
         m, "InterpolationSettings")
