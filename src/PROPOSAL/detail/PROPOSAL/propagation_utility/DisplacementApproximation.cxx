@@ -12,13 +12,13 @@ DisplacementApproximation::DisplacementApproximation(
 double DisplacementApproximation::SolveTrackIntegral(
         double lower_lim, double upper_lim)
 {
-    return (upper_lim - lower_lim) / FunctionToIntegral(lower_lim);
+    return (upper_lim - lower_lim) * FunctionToIntegral(lower_lim);
 }
 
 double DisplacementApproximation::UpperLimitTrackIntegral(
         double lower_lim, double sum)
 {
-    return lower_lim + sum * FunctionToIntegral(lower_lim);
+    return lower_lim + sum / FunctionToIntegral(lower_lim);
 }
 
 namespace PROPOSAL {
