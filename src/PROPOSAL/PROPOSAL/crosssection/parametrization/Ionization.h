@@ -60,8 +60,9 @@ namespace crosssection {
         double CrossSectionWithoutInelasticCorrection(
             ParticleDef const&, Medium const&, double, double) const;
 
+        bool enable_density_correction;
     public:
-        IonizBetheBlochRossi(const EnergyCutSettings&);
+        IonizBetheBlochRossi(const EnergyCutSettings&, bool enable_density_correction = true);
 
         std::unique_ptr<Parametrization<Medium>> clone() const final;
 
@@ -88,7 +89,7 @@ namespace crosssection {
     };
 
     struct IonizBergerSeltzerBhabha : public Ionization {
-        IonizBergerSeltzerBhabha(const EnergyCutSettings&);
+        IonizBergerSeltzerBhabha(const EnergyCutSettings&, bool enable_density_correction = true);
 
         std::unique_ptr<Parametrization<Medium>> clone() const final;
 
@@ -98,6 +99,8 @@ namespace crosssection {
             const ParticleDef&, const Medium&, double, double) const final;
         double FunctionToDEdxIntegral(
             const ParticleDef&, const Medium&, double, double) const final;
+    private:
+        bool enable_density_correction;
     };
 
     template <> struct ParametrizationName<IonizBergerSeltzerBhabha> {
@@ -109,7 +112,7 @@ namespace crosssection {
     };
 
     struct IonizBergerSeltzerMoller : public Ionization {
-        IonizBergerSeltzerMoller(const EnergyCutSettings&);
+        IonizBergerSeltzerMoller(const EnergyCutSettings&, bool enable_density_correction = true);
 
         std::unique_ptr<Parametrization<Medium>> clone() const final;
 
@@ -119,6 +122,8 @@ namespace crosssection {
             const ParticleDef&, const Medium&, double, double) const final;
         double FunctionToDEdxIntegral(
             const ParticleDef&, const Medium&, double, double) const final;
+    private:
+        bool enable_density_correction;
     };
 
     template <> struct ParametrizationName<IonizBergerSeltzerMoller> {

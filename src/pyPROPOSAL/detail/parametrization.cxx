@@ -778,17 +778,20 @@ void init_parametrization(py::module& m)
     py::class_<crosssection::IonizBetheBlochRossi,
         std::shared_ptr<crosssection::IonizBetheBlochRossi>,
         crosssection::Ionization>(m_sub_ioniz, "BetheBlochRossi")
-        .def(py::init<const EnergyCutSettings&>(), py::arg("energy_cuts"));
+        .def(py::init<const EnergyCutSettings&, bool>(), py::arg("energy_cuts"),
+             py::arg("enable_density_correction") = true);
 
     py::class_<crosssection::IonizBergerSeltzerBhabha,
         std::shared_ptr<crosssection::IonizBergerSeltzerBhabha>,
         crosssection::Ionization>(m_sub_ioniz, "BergerSeltzerBhabha")
-        .def(py::init<const EnergyCutSettings&>(), py::arg("energy_cuts"));
+        .def(py::init<const EnergyCutSettings&, bool>(), py::arg("energy_cuts"),
+             py::arg("enable_density_correction") = true);
 
     py::class_<crosssection::IonizBergerSeltzerMoller,
         std::shared_ptr<crosssection::IonizBergerSeltzerMoller>,
         crosssection::Ionization>(m_sub_ioniz, "BergerSeltzerMoller")
-        .def(py::init<const EnergyCutSettings&>(), py::arg("energy_cuts"));
+        .def(py::init<const EnergyCutSettings&, bool>(), py::arg("energy_cuts"),
+             py::arg("enable_density_correction") = true);
 
     // Photon interactions
 

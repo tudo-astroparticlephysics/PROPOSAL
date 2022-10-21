@@ -58,10 +58,10 @@ crosssection::IonizBetheBlochRossi::GetKinematicLimits(
 }
 
 crosssection::IonizBetheBlochRossi::IonizBetheBlochRossi(
-    const EnergyCutSettings& cuts)
-    : crosssection::Ionization(cuts)
+    const EnergyCutSettings& cuts, bool enable_density_correction)
+    : crosssection::Ionization(cuts), enable_density_correction(enable_density_correction)
 {
-    hash_combine(hash, std::string("bethe_bloch_rossi"));
+    hash_combine(hash, std::string("bethe_bloch_rossi"), enable_density_correction);
 }
 
 std::unique_ptr<crosssection::Parametrization<Medium>>
@@ -139,7 +139,9 @@ double crosssection::IonizBetheBlochRossi::IonizationLoss(
     aux = v_up / (2 * (1 + 1 / gamma));
     result += aux * aux;
     aux = beta * beta;
-    result -= aux * (1 + v_up / limits.v_max) + Delta(medium, beta, gamma);
+    result -= aux * (1 + v_up / limits.v_max);
+    if (enable_density_correction)
+        result -= Delta(medium, beta, gamma);
 
     if (result > 0) {
         result *= IONK * p_def.charge * p_def.charge
@@ -225,10 +227,10 @@ crosssection::IonizBetheBlochRossi::CrossSectionWithoutInelasticCorrection(
 // ------------------------------------------------------------------------- //
 
 crosssection::IonizBergerSeltzerBhabha::IonizBergerSeltzerBhabha(
-    const EnergyCutSettings& cuts)
-    : crosssection::Ionization(cuts)
+    const EnergyCutSettings& cuts, bool enable_density_correction)
+    : crosssection::Ionization(cuts), enable_density_correction(enable_density_correction)
 {
-    hash_combine(hash, std::string("berger_seltzer_bhabha"));
+    hash_combine(hash, std::string("berger_seltzer_bhabha"), enable_density_correction);
 }
 
 std::unique_ptr<crosssection::Parametrization<Medium>>
@@ -335,7 +337,8 @@ double crosssection::IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(
     auto result
         = std::log(2. * (tau + 2.) / (std::pow(1e-6 * medium.GetI(), 2.) / ME));
     result += fplus;
-    result -= Delta(medium, std::sqrt(betasquared), gamma);
+    if (enable_density_correction)
+        result -= Delta(medium, std::sqrt(betasquared), gamma);
 
     result *= 2. * PI * RE * RE * ME / betasquared;
 
@@ -353,10 +356,10 @@ double crosssection::IonizBergerSeltzerBhabha::FunctionToDEdxIntegral(
 // ------------------------------------------------------------------------- //
 
 crosssection::IonizBergerSeltzerMoller::IonizBergerSeltzerMoller(
-    const EnergyCutSettings& cuts)
-    : crosssection::Ionization(cuts)
+    const EnergyCutSettings& cuts, bool enable_density_correction)
+    : crosssection::Ionization(cuts), enable_density_correction(enable_density_correction)
 {
-    hash_combine(hash, std::string("berger_seltzer_moller"));
+    hash_combine(hash, std::string("berger_seltzer_moller"), enable_density_correction);
 }
 
 std::unique_ptr<crosssection::Parametrization<Medium>>
@@ -457,7 +460,8 @@ double crosssection::IonizBergerSeltzerMoller::FunctionToDEdxIntegral(
     auto result
         = std::log(2. * (tau + 2.) / (std::pow(1e-6 * medium.GetI(), 2.) / ME));
     result += fminus;
-    result -= Delta(medium, std::sqrt(betasquared), gamma);
+    if (enable_density_correction)
+        result -= Delta(medium, std::sqrt(betasquared), gamma);
 
     result *= 2. * PI * RE * RE * ME / betasquared;
 
