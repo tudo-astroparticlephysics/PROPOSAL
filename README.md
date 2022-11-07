@@ -42,7 +42,7 @@ PROPOSAL is now a C++14 library using pybind11 Python bindings!
 ## Requirements
 
 - CMake 3.9 or higher (to build the tests CMake 3.10 is required)
-- C++14 compatible compiler
+- C++14 compatible compiler (for gcc: version 5 and later; for clang: version 3.4 and later)
 
 Furthermore, you either need the package manager
 
