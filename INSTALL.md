@@ -19,7 +19,7 @@ For this installation approach, all dependencies will be fetched by conan, meani
 
 ```sh
 $ pip install conan
-``` 
+```
 
 Clone the repository and create a build directory
 
@@ -46,8 +46,17 @@ Build and install PROPOSAL. You may require root privileges when installing, dep
 
 ```sh
 $ conan build ..
-# cmake --install .
 ```
+
+To set the install location, use `-pf / --package-folder` option.
+The default is `build/package`.
+E.g. to install proposal into `$HOME/.local/proposal`:
+```
+$ conan build .. -pf $HOME/.local/proposal
+```
+
+This will also run the tests if `with_testing` is true.
+
 
 *Note:* As an alternative, you may create a local conan package and use it in your project. See the [conan documentation](https://docs.conan.io/en/latest/) for more information.
 
