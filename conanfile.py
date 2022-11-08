@@ -57,7 +57,8 @@ class PROPOSALConan(ConanFile):
         cmake = self._configure_cmake()
         cmake.build()
         cmake.install()
-        cmake.test()
+        if self.options.with_testing:
+            cmake.test()
 
     def package(self):
         self.copy("LICENSE", dst="licenses")
