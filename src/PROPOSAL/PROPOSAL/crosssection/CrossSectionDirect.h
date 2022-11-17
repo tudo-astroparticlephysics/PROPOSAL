@@ -16,36 +16,37 @@ namespace PROPOSAL {
                                             cut(cut),
                                             interpol(interpol),
                                             param_name(_name::value){};
-        double CalculatedEdx(double energy) {
+        double CalculatedEdx(double energy) override {
             return param->CalculatedEdx(energy, p, m, cut); };
-        double CalculatedE2dx(double energy) {
+        double CalculatedE2dx(double energy) override {
             return param->CalculatedE2dx(energy, p, m, cut); };
-        double CalculatedNdx(double energy) {
+        double CalculatedNdx(double energy) override {
             return param->CalculatedNdx(energy, p, m, cut);
         };
-        double CalculatedNdx(double energy, size_t hash) {
+        double CalculatedNdx(double energy, size_t hash) override {
             return param->CalculatedNdx(energy, hash, p, m, cut);
         };
-        double CalculateCumulativeCrosssection(double energy, size_t hash, double v) {
+        double CalculateCumulativeCrosssection(
+                double energy, size_t hash, double v) override {
             return param->CalculateCumulativeCrosssection(energy, hash, v, p, m, cut);
         };
         std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(
-                double energy) {
+                double energy) override {
             return param->CalculatedNdx_PerTarget(energy, p, m, cut);
         };
-        double CalculateStochasticLoss(size_t hash, double energy, double rate) {
+        double CalculateStochasticLoss(size_t hash, double energy, double rate) override {
             return param->CalculateStochasticLoss(hash, energy, rate, p, m, cut);
         };
-        double GetLowerEnergyLim() const {
+        double GetLowerEnergyLim() const override {
             return param->GetLowerEnergyLim(p, m, cut);
         };
-        size_t GetHash() const noexcept {
+        size_t GetHash() const noexcept override {
             return param->GetHash(p, m, cut);
         };
-        InteractionType GetInteractionType() const noexcept {
+        InteractionType GetInteractionType() const noexcept override {
             return param->GetInteractionType();
         };
-        std::string GetParametrizationName() const noexcept {
+        std::string GetParametrizationName() const noexcept override {
             return param_name;
         };
 
