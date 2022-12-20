@@ -595,7 +595,7 @@ crosssection::BremsLPM::BremsLPM(const ParticleDef& p_def, const Medium& medium,
     }
     sum = sum * mass_density_;
     eLpm_ = ALPHA * mass_;
-    eLpm_ *= eLpm_ / (4. * PI * ME * RE * sum);
+    eLpm_ *= 2* eLpm_ / (PI * ME * RE * sum);
 }
 
 double crosssection::BremsLPM::suppression_factor(
