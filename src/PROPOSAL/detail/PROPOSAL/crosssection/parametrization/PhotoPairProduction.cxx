@@ -366,7 +366,7 @@ crosssection::PhotoPairLPM::PhotoPairLPM(const ParticleDef& p_def, const Medium&
     }
     sum = 9./7. * sum * mass_density_;
     eLpm_ = ALPHA * ME;
-    eLpm_ *= eLpm_ / (4. * PI * ME * RE * sum);
+    eLpm_ *= 2 * eLpm_ / (PI * ME * RE * sum);
 }
 
 double crosssection::PhotoPairLPM::suppression_factor(
