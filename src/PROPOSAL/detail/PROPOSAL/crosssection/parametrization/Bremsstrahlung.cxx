@@ -595,7 +595,7 @@ crosssection::BremsLPM::BremsLPM(const ParticleDef& p_def, const Medium& medium,
     }
     sum = sum * mass_density_;
     eLpm_ = ALPHA * mass_;
-    eLpm_ *= eLpm_ / (4. * PI * ME * RE * sum);
+    eLpm_ *= 2* eLpm_ / (PI * ME * RE * sum);
 }
 
 double crosssection::BremsLPM::suppression_factor(
@@ -610,8 +610,10 @@ double crosssection::BremsLPM::suppression_factor(
     double Z3 = std::pow(comp.GetNucCharge(), -1. / 3);
 
     double Dn = 1.54 * std::pow(comp.GetAtomicNum(), 0.27);
-    s1 = ME * Dn / (mass_ * Z3 * comp.GetLogConstant());
-    s1 = s1 * s1 * SQRT2; // TODO: is SQRT2 correct here, this factor is not in the paper?
+    double aux_nuc = mass_ / MMU * Dn;
+    s1 = ME  / (mass_ * Z3 * comp.GetLogConstant());
+    s1 = s1 * s1 * (1 + aux_nuc * aux_nuc) * SQRT2;
+    // SQRT2 appears together with s1 everywhere in Stanev et al.
 
     // Calc xi(s') from Stanev, Vankow, Streitmatter, Ellsworth, Bowen
     // Phys. Rev. D 25 (1982), 1291
