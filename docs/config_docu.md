@@ -446,6 +446,7 @@ For there parametrizations, the parametrization of the shadowing effect can be c
 | ----------------- | ------- | ------- | -------------------------- |
 | `parametrization` | String  | `-`     | Parametrization to be used |
 | `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
+| `lpm`             | Boolean | `true`  | Enabling or disabling the reduction of the cross section at high energies by the Landau-Pomeranchuk-Migdal effect.  |
 
 Creation of an electron-positron pair by an ingoing photon. Available `photopair` parametrizations are:
 

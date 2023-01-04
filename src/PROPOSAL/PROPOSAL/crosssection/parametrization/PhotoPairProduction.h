@@ -34,9 +34,14 @@
 
 namespace PROPOSAL {
 namespace crosssection {
+    class PhotoPairLPM;
+
     class PhotoPairProduction : public Parametrization<Component> {
+    protected:
+        std::shared_ptr<PhotoPairLPM> lpm_;
+        double density_correction_; // correction to standard medium density for LPM
     public:
-        PhotoPairProduction() = default;
+        PhotoPairProduction();
         virtual ~PhotoPairProduction() = default;
 
         double GetLowerEnergyLim(const ParticleDef&) const noexcept final;
@@ -49,7 +54,9 @@ namespace crosssection {
     };
 
     struct PhotoPairTsai : public PhotoPairProduction {
-        PhotoPairTsai() { hash_combine(hash, std::string("tsai")); }
+        PhotoPairTsai(bool lpm = false);
+        PhotoPairTsai(bool lpm, const ParticleDef&, const Medium&,
+                          double density_correction = 1.0);
         using base_param_t = PhotoPairProduction;
         std::unique_ptr<Parametrization<Component>> clone() const final;
 
@@ -58,7 +65,9 @@ namespace crosssection {
     };
 
     struct PhotoPairKochMotz : public PhotoPairProduction {
-        PhotoPairKochMotz();
+        PhotoPairKochMotz(bool lpm = false);
+        PhotoPairKochMotz(bool lpm, const ParticleDef&, const Medium&,
+                          double density_correction = 1.0);
         using base_param_t = PhotoPairProduction;
         std::unique_ptr<Parametrization<Component>> clone() const final;
 
@@ -86,5 +95,21 @@ namespace crosssection {
     template <> struct ParametrizationId<PhotoPairKochMotz> {
         static constexpr size_t value = 1000000013;
     };
+
+    // LPM effect object
+    class PhotoPairLPM {
+        size_t hash;
+        double mol_density_;
+        double mass_density_;
+        double sum_charge_;
+        double eLpm_;
+
+    public:
+        PhotoPairLPM(const ParticleDef&, const Medium&, const PhotoPairProduction&);
+        double suppression_factor(double energy, double x, const Component&,
+                                  double density_correction = 1.0) const;
+        size_t GetHash() const noexcept { return hash; }
+    };
+
 } // namespace crosssection
 } // namespace PROPOSAL
