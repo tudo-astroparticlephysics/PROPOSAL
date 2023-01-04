@@ -12,5 +12,6 @@ namespace PROPOSAL {
 
 namespace PROPOSAL {
     cross_ptr make_photopairproduction(const ParticleDef&, const Medium&, bool,
-                                       const nlohmann::json&);
+                                       const nlohmann::json&,
+                                       double density_correction = 1.0);
 }
