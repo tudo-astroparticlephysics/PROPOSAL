@@ -31,7 +31,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -48,7 +48,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -70,7 +70,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -87,7 +87,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -109,7 +109,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -128,7 +128,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -143,7 +143,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
 
         auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
 
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == "inf" && vcut == 1 ) {
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
@@ -171,7 +171,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -188,7 +188,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -202,7 +202,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
         if (hard_component == 1 && energy == 1e5) {
             // kink in differential cross section (see issue #124)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored);
-        } else if (vcut * energy == ecut) {
+        } else if (vcut * energy == std::stod(ecut)) {
             // kink in interpolated function (issue #250)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored);
         } else {
@@ -218,7 +218,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -235,7 +235,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -245,7 +245,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
             = make_photonuclearreal(particle_def, *medium, ecuts, true, config);
 
         dNdx_new = cross->CalculatedNdx(energy);
-        if (energy * vcut == ecut) {
+        if (energy * vcut == std::stod(ecut)) {
             // kink in interpolated function (issue #250)
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
         } else if (hard_component == 1 && energy >= 1e10) {
@@ -274,7 +274,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -293,7 +293,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -310,12 +310,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
 
         auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
 
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == "inf" && vcut == 1 ) {
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
 
-            if ( rnd1 < 0.05 && ecut == 500) {
+            if ( rnd1 < 0.05 && std::stod(ecut) == 500) {
                 // Not enough nodes at very small losses!
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
             } else if (rnd1 < 0.02) {
@@ -327,12 +327,12 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
                 // to a hard cutoff for v=1e-7 in the differential crosssection
                 // (issue #124)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-1 * stochastic_loss_stored);
-            } else if (energy >= 1e10 && ecut == 500) {
+            } else if (energy >= 1e10 && std::stod(ecut) == 500) {
                 // for high E, there are integration problems also without the
                 // hard component, causing problems in the dNdx interpolation
                 // (issue #124)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-1 * stochastic_loss_stored);
-            } else if (particleName == "TauMinus" && energy >= 1e8 && ecut == 500) {
+            } else if (particleName == "TauMinus" && energy >= 1e8 && std::stod(ecut) == 500) {
                 // same issue as above, but it starts earlier when taus are involved
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
             } else if (hard_component == 1 && energy == 1e5) {
@@ -343,13 +343,13 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
                 // Rhode parametrization hard to interpolate for this energy range
                 // due to its complicated structure
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-2 * stochastic_loss_stored);
-            } else if (vcut * energy == ecut) {
+            } else if (vcut * energy == std::stod(ecut)) {
                 // kink in interpolated function (issue #250)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
             } else if (rnd1 > 0.98) {
                 // inaccurate dNdx interpolant for v->1
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-1 * stochastic_loss_stored);
-            } else if (particleName == "EMinus" && ecut == 500) {
+            } else if (particleName == "EMinus" && std::stod(ecut) == 500) {
                 // Jump in integrated functions are seen almost everywhere for
                 // electrons (issue #124)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 5e-3 * stochastic_loss_stored);
@@ -375,7 +375,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -392,7 +392,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -414,7 +414,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -431,7 +431,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -453,7 +453,7 @@ TEST(PhotoQ2Integration, Test_of_e)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -472,7 +472,7 @@ TEST(PhotoQ2Integration, Test_of_e)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -487,7 +487,7 @@ TEST(PhotoQ2Integration, Test_of_e)
 
         auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
 
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == "inf" && vcut == 1 ) {
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
@@ -509,7 +509,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -526,7 +526,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -536,7 +536,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
             = make_photonuclearQ2(particle_def, *medium, ecuts, true, config);
 
         dEdx_new = cross->CalculatedEdx(energy);
-        if (ecut == vcut * energy) {
+        if (std::stod(ecut) == vcut * energy) {
             // kink in interpolated function (issue #250)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored);
         } else {
@@ -552,7 +552,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -569,7 +569,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -579,7 +579,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
             = make_photonuclearQ2(particle_def, *medium, ecuts, true, config);
 
         dNdx_new = cross->CalculatedNdx(energy);
-        if (energy * vcut == ecut) {
+        if (energy * vcut == std::stod(ecut)) {
             // kink in interpolated function (issue #250)
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
         } else {
@@ -595,7 +595,7 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -614,7 +614,7 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -629,12 +629,12 @@ TEST(PhotoQ2Integration, Test_of_e_Interpolant)
 
         auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
 
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == "inf" && vcut == 1 ) {
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
 
-            if (energy * vcut == ecut) {
+            if (energy * vcut == std::stod(ecut)) {
                 // kink in interpolated function (issue #250)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-1 * stochastic_loss_stored);
             } else if (rnd1 < 0.07 || rnd1 > 0.995) {

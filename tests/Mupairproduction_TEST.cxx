@@ -34,7 +34,7 @@ TEST(Mupairproduction, Test_of_dEdx)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -48,7 +48,7 @@ TEST(Mupairproduction, Test_of_dEdx)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -68,7 +68,7 @@ TEST(Mupairproduction, Test_of_dNdx)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -82,7 +82,7 @@ TEST(Mupairproduction, Test_of_dNdx)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -102,7 +102,7 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -120,7 +120,7 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -133,7 +133,7 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
 
         auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
 
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == "inf" && vcut == 1 ) {
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
@@ -192,7 +192,7 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -206,7 +206,7 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -216,7 +216,7 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 
         dEdx_new = cross->CalculatedEdx(energy);
 
-        if (energy * vcut == ecut) {
+        if (energy * vcut == std::stod(ecut)) {
             // kink in interpolated function (issue #250)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 2e-1 * dEdx_stored);
         } else {
@@ -232,7 +232,7 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -246,7 +246,7 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -255,7 +255,7 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
                                            config);
         dNdx_new = cross->CalculatedNdx(energy);
 
-        if (energy * vcut == ecut) {
+        if (energy * vcut == std::stod(ecut)) {
             // kink in interpolated function (issue #250)
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
         } else {
@@ -271,7 +271,7 @@ TEST(Mupairproduction, Test_of_e_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -288,7 +288,7 @@ TEST(Mupairproduction, Test_of_e_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -301,11 +301,11 @@ TEST(Mupairproduction, Test_of_e_Interpolant)
 
         auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
 
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == "inf" && vcut == 1 ) {
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
-            if (energy * vcut == ecut) {
+            if (energy * vcut == std::stod(ecut)) {
                 // kink in interpolated function (issue #250)
                 EXPECT_NEAR(stochastic_loss, stochastic_loss_stored, 1e-2 * stochastic_loss_stored);
             } else if (rnd1 > 0.95) {
