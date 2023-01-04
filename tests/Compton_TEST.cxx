@@ -20,7 +20,7 @@ TEST(Compton, Test_of_dEdx)
     std::ifstream in;
     getTestFile("Compton_dEdx.txt", in);
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -36,7 +36,7 @@ TEST(Compton, Test_of_dEdx)
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -55,7 +55,7 @@ TEST(Compton, Test_of_dNdx)
     getTestFile("Compton_dNdx.txt", in);
 
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -71,7 +71,7 @@ TEST(Compton, Test_of_dNdx)
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -90,7 +90,7 @@ TEST(Compton, Test_of_e)
     getTestFile("Compton_e.txt", in);
 
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -109,7 +109,7 @@ TEST(Compton, Test_of_e)
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -121,7 +121,7 @@ TEST(Compton, Test_of_e)
 
         auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
 
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == "inf" && vcut == 1 ) {
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
@@ -141,7 +141,7 @@ TEST(Compton, Test_of_dEdx_Interpolant)
     getTestFile("Compton_dEdx.txt", in);
 
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -157,7 +157,7 @@ TEST(Compton, Test_of_dEdx_Interpolant)
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -166,7 +166,7 @@ TEST(Compton, Test_of_dEdx_Interpolant)
 
         dEdx_new = cross->CalculatedEdx(energy);
 
-        if (vcut * energy == ecut)
+        if (vcut * energy == std::stod(ecut))
             // expecting a kink here (issue #250)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 5e-2 * dEdx_stored);
         else
@@ -180,7 +180,7 @@ TEST(Compton, Test_of_dNdx_Interpolant)
     getTestFile("Compton_dNdx.txt", in);
 
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -196,7 +196,7 @@ TEST(Compton, Test_of_dNdx_Interpolant)
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -215,7 +215,7 @@ TEST(Compton, Test_of_e_Interpolant)
     getTestFile("Compton_e.txt", in);
 
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -234,7 +234,7 @@ TEST(Compton, Test_of_e_Interpolant)
 
         ParticleDef particle_def = GammaDef();
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -246,11 +246,11 @@ TEST(Compton, Test_of_e_Interpolant)
 
         auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
 
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == "inf" && vcut == 1 ) {
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
-            if (vcut * energy == ecut || rnd1 < 0.05)
+            if (vcut * energy == std::stod(ecut) || rnd1 < 0.05)
                 // expecting a kink here (issue #250)
                 // The lower edge of the kinematic range is poorly interpolated
                 // due to a discontinuity (issue #250)

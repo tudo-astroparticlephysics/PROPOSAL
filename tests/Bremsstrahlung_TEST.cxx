@@ -35,7 +35,7 @@ TEST(Bremsstrahlung, Test_of_dEdx)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -52,7 +52,7 @@ TEST(Bremsstrahlung, Test_of_dEdx)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -74,7 +74,7 @@ TEST(Bremsstrahlung, Test_of_dNdx)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -91,7 +91,7 @@ TEST(Bremsstrahlung, Test_of_dNdx)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -113,7 +113,7 @@ TEST(Bremsstrahlung, Test_of_e)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -133,7 +133,7 @@ TEST(Bremsstrahlung, Test_of_e)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -147,7 +147,7 @@ TEST(Bremsstrahlung, Test_of_e)
 
         auto dNdx_for_comp = cross->CalculatedNdx(energy, comp.GetHash());
 
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == "inf" && vcut == 1 ) {
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto stochastic_loss = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
@@ -176,7 +176,7 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -193,7 +193,7 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -210,7 +210,7 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
             // the function that we need to integrate. However, bremsstrahlung
             // effects for taus are negligible for these energies (issue #250)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e0 * dEdx_stored);
-        } else if (vcut * energy == ecut) {
+        } else if (vcut * energy == std::stod(ecut)) {
             // expecting a kink here (issue #250)
             EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-1 * dEdx_stored);
         } else if (particleName == "EMinus" && mediumName == "uranium" && energy == 1e10 && lpm == true) {
@@ -230,7 +230,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -247,7 +247,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -258,7 +258,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 
         dNdx_new = cross->CalculatedNdx(energy);
 
-        if (vcut * energy == ecut) {
+        if (vcut * energy == std::stod(ecut)) {
             // expecting a kink here (issue #250)
             EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-1 * dNdx_stored);
         } else if (particleName == "TauMinus" && energy < 1e5) {
@@ -279,7 +279,7 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
 
     std::string particleName;
     std::string mediumName;
-    double ecut;
+    std::string ecut;
     double vcut;
     bool cont_rand = false;
     double multiplier;
@@ -299,7 +299,7 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
 
         ParticleDef particle_def = getParticleDef(particleName);
         auto medium = CreateMedium(mediumName);
-        auto ecuts = std::make_shared<EnergyCutSettings>(ecut, vcut, cont_rand);
+        auto ecuts = std::make_shared<EnergyCutSettings>(std::stod(ecut), vcut, cont_rand);
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
@@ -315,11 +315,11 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
         if (particleName == "TauMinus" && mediumName == "uranium" && energy == 1e4)
             continue; // dNdx is non-zero for the integral, but zero for the interpolant here
 
-        if ( ecut == INF && vcut == 1 ) {
+        if ( ecut == "inf" && vcut == 1 ) {
             EXPECT_THROW(cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp), std::logic_error);
         } else {
             auto v = cross->CalculateStochasticLoss(comp.GetHash(), energy, rnd1 * dNdx_for_comp);
-            if (energy * vcut == ecut) {
+            if (energy * vcut == std::stod(ecut)) {
                 // expecting a kink here (issue #250)
                 EXPECT_NEAR(v, stochastic_loss_stored, 1e-1 * stochastic_loss_stored);
             } else if (particleName == "TauMinus" && energy < 1e5) {
