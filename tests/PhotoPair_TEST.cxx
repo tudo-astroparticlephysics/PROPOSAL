@@ -30,6 +30,7 @@ TEST(PhotoPair, Test_of_dNdx)
     std::string particleName;
     std::string mediumName;
     double multiplier;
+    bool lpm;
     double energy;
     std::string parametrization;
     double dNdx_stored;
@@ -37,7 +38,7 @@ TEST(PhotoPair, Test_of_dNdx)
 
     std::cout.precision(16);
 
-    while (in >> particleName >> mediumName >> multiplier >> energy
+    while (in >> particleName >> mediumName >> multiplier >> lpm >> energy
         >> parametrization >> dNdx_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
@@ -45,6 +46,7 @@ TEST(PhotoPair, Test_of_dNdx)
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
+        config["lpm"] = lpm;
 
         auto cross
             = make_photopairproduction(particle_def, *medium, false, config);
@@ -62,12 +64,13 @@ TEST(PhotoPair, Test_of_dNdx_Interpolant)
     std::string particleName;
     std::string mediumName;
     double multiplier;
+    bool lpm;
     double energy;
     std::string parametrization;
     double dNdx_stored;
     double dNdx_new;
 
-    while (in >> particleName >> mediumName >> multiplier >> energy
+    while (in >> particleName >> mediumName >> multiplier >> lpm >> energy
         >> parametrization >> dNdx_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
@@ -75,6 +78,7 @@ TEST(PhotoPair, Test_of_dNdx_Interpolant)
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
+        config["lpm"] = lpm;
 
         auto cross
             = make_photopairproduction(particle_def, *medium, true, config);
