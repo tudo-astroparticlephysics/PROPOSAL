@@ -30,6 +30,8 @@ TEST(PhotoPair, Test_of_dNdx)
     std::string particleName;
     std::string mediumName;
     double multiplier;
+    bool lpm;
+    double density_correction;
     double energy;
     std::string parametrization;
     double dNdx_stored;
@@ -37,7 +39,7 @@ TEST(PhotoPair, Test_of_dNdx)
 
     std::cout.precision(16);
 
-    while (in >> particleName >> mediumName >> multiplier >> energy
+    while (in >> particleName >> mediumName >> multiplier >> lpm >> density_correction >> energy
         >> parametrization >> dNdx_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
@@ -45,9 +47,10 @@ TEST(PhotoPair, Test_of_dNdx)
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
+        config["lpm"] = lpm;
 
         auto cross
-            = make_photopairproduction(particle_def, *medium, false, config);
+            = make_photopairproduction(particle_def, *medium, false, config, density_correction);
 
         dNdx_new = cross->CalculatedNdx(energy);
         EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-5 * dNdx_stored);
@@ -62,12 +65,14 @@ TEST(PhotoPair, Test_of_dNdx_Interpolant)
     std::string particleName;
     std::string mediumName;
     double multiplier;
+    bool lpm;
+    double density_correction;
     double energy;
     std::string parametrization;
     double dNdx_stored;
     double dNdx_new;
 
-    while (in >> particleName >> mediumName >> multiplier >> energy
+    while (in >> particleName >> mediumName >> multiplier >> lpm >> density_correction >> energy
         >> parametrization >> dNdx_stored) {
 
         ParticleDef particle_def = getParticleDef(particleName);
@@ -75,12 +80,18 @@ TEST(PhotoPair, Test_of_dNdx_Interpolant)
 
         nlohmann::json config;
         config["parametrization"] = parametrization;
+        config["lpm"] = lpm;
 
         auto cross
-            = make_photopairproduction(particle_def, *medium, true, config);
+            = make_photopairproduction(particle_def, *medium, true, config, density_correction);
 
         dNdx_new = cross->CalculatedNdx(energy);
-        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
+
+        // low-energy corrections make interpolations harder
+        if (parametrization == "kochmotz" && energy < 50.)
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-2 * dNdx_stored);
+        else
+            EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
     }
 }
 
