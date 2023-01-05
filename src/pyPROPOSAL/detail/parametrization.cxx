@@ -188,6 +188,17 @@ void init_parametrization(py::module& m)
     auto param_component_name = std::string("ParametrizationForComponent");
     decl_param<Component>(m_sub, param_component_name);
 
+    py::class_<crosssection::KinematicLimits,
+        std::shared_ptr<crosssection::KinematicLimits>>(
+        m_sub, "KinematicLimits")
+        .def(py::init<>())
+        .def_readwrite("v_min", &crosssection::KinematicLimits::v_min)
+        .def_readwrite("v_max", &crosssection::KinematicLimits::v_max)
+        .def("__repr__", [](const crosssection::KinematicLimits& lim) {
+            return "(v_min: " + std::to_string(lim.v_min)
+                + ", v_max: " + std::to_string(lim.v_max) + ")";
+        });
+
     // ParametrizationDirect
 
     py::class_<crosssection::ParametrizationDirect,
@@ -874,19 +885,8 @@ void init_parametrization(py::module& m)
              py::arg("lpm"), py::arg("particle_def"), py::arg("medium"),
              py::arg("density_correction") = 1.0);
 
-    py::class_<crosssection::KinematicLimits,
-        std::shared_ptr<crosssection::KinematicLimits>>(
-        m_sub, "KinematicLimits")
-        .def(py::init<>())
-        .def_readwrite("v_min", &crosssection::KinematicLimits::v_min)
-        .def_readwrite("v_max", &crosssection::KinematicLimits::v_max)
-        .def("__repr__", [](const crosssection::KinematicLimits& lim) {
-            return "(v_min: " + std::to_string(lim.v_min)
-                + ", v_max: " + std::to_string(lim.v_max) + ")";
-        });
-
     py::class_<crosssection::PhotoPairLPM, std::shared_ptr<crosssection::PhotoPairLPM>>(
-        m_sub_brems, "photopair_lpm")
+        m_sub_photopair, "photopair_lpm")
         .def(py::init<const ParticleDef&, const Medium&,
                  const crosssection::PhotoPairProduction&>(),
             py::arg("particle_def"), py::arg("medium"),
