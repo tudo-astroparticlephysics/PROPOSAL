@@ -182,9 +182,13 @@ int Propagator::AdvanceParticle(ParticleState &state,
         return random_numbers[i++%4];
     };
 
+    int num_steps = 0; // count number of iteration steps
+    bool backscatter = false;
+
     // Iterate combinations of step lengths and scattering angles until we have
     // reached an interaction, a sector border or the maximal propagation distance
     do {
+        num_steps++;
         // Calculate grammage, energy and distance for step
         if (energy != -1 && distance == -1) {
             // Calculate grammage and distance from given energy
@@ -230,7 +234,27 @@ int Propagator::AdvanceParticle(ParticleState &state,
         // Check step
         double distance_to_border = CalculateDistanceToBorder(state.position, mean_direction, *geometry);
         bool is_inside = geometry->IsInside(state.position, mean_direction);
-        if (!is_inside) {
+
+        if (num_steps > PropagationSettings::ADVANCE_PARTICLE_MAX_STEPS) {
+            // too many iteration steps!
+            if (std::abs(distance - distance_to_border) <= 1000 * PARTICLE_POSITION_RESOLUTION) {
+                Logging::Get("proposal.propagator")->info("Too many iteration steps ({}), but propagation "
+                                                          "step is close enough to border ({} cm). Ignore this "
+                                                          "difference and continue propagation.",
+                                                          PropagationSettings::ADVANCE_PARTICLE_MAX_STEPS,
+                                                          std::abs(distance - distance_to_border));
+                advancement_type = ReachedBorder;
+                distance = distance_to_border;
+            } else {
+                Logging::Get("proposal.propagator")->critical("Exceeded number of maximum propagation steps ({}), but "
+                                                              "difference between proposed propagation step and "
+                                                              "maximal distance to border is still too high ({} cm). "
+                                                              "Stop propagation.",
+                                                              PropagationSettings::ADVANCE_PARTICLE_MAX_STEPS,
+                                                              std::abs(distance - distance_to_border));
+                throw std::logic_error("Maximum number of propagation exceeded.");
+            }
+        } else if (!is_inside) {
             // Special case: We are on the sector border, but scattering back outside the current sector!
             // Update sector and recalculate values
             advancement_type = InvalidStep;
@@ -242,6 +266,16 @@ int Propagator::AdvanceParticle(ParticleState &state,
             energy = energy_next_interaction;
             distance = -1;
             grammage = -1;
+
+            // if we get in this case, this might mean that we are stuck in a loop.
+            // this can happen if we backscatter in both the old and the new sector (if their medium is different).
+            // sample new random numbers to avoid this.
+            if (backscatter == true) {
+                for (auto& r: random_numbers) {
+                    r = rnd_generator();
+                }
+            }
+            backscatter = true;
         } else if (distance <= distance_to_border && distance <= max_distance && energy == energy_next_interaction) {
             // reached interaction
             advancement_type = ReachedInteraction;

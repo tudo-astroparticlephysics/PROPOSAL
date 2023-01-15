@@ -33,6 +33,10 @@ unsigned int InterpolationSettings::NODES_DNDX_V = 100;
 unsigned int InterpolationSettings::NODES_UTILITY = 500;
 unsigned int InterpolationSettings::NODES_RATE_INTERPOLANT = 10000;
 
+// propagation settings
+
+unsigned int PropagationSettings::ADVANCE_PARTICLE_MAX_STEPS = 200;
+
 // precision parameters
 const double PROPOSAL::COMPUTER_PRECISION = 1.e-10;
 const double PROPOSAL::HALF_PRECISION = 1.e-5; // std::sqrt(computerPrecision);

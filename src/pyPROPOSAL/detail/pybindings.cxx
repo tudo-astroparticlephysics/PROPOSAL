@@ -237,6 +237,11 @@ PYBIND11_MODULE(proposal, m)
         .def_readwrite_static(
             "nodes_rate_interpolant", &InterpolationSettings::NODES_RATE_INTERPOLANT);
 
+    py::class_<PropagationSettings, std::shared_ptr<PropagationSettings>>(
+            m, "PropagationSettings")
+            .def_readwrite_static(
+                    "advance_particle_max_steps", &PropagationSettings::ADVANCE_PARTICLE_MAX_STEPS);
+
     /* py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m, */
     /*     "InterpolationDef", */
     /*     R"pbdoc( */
