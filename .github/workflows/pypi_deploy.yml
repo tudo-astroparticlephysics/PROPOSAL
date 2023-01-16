@@ -15,11 +15,7 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
-      - name: Add repository sub-modules
-        run: |
-          git submodule init
-          git submodule update      
+          python-version: 3.8    
       - name: Install build
         run: python -m pip install build
       - name: Build source tarball
