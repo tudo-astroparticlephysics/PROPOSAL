@@ -36,7 +36,7 @@ class PROPOSALConan(ConanFile):
         self.requires("spdlog/1.10.0")
         self.requires("nlohmann_json/3.9.1")
         if self.options.with_python:
-            self.requires("pybind11/2.6.2")
+            self.requires("pybind11/2.10.1")
         if self.options.with_testing:
             self.requires("boost/1.78.0")
             self.requires("gtest/1.11.0")
