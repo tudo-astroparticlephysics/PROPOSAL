@@ -237,23 +237,18 @@ int Propagator::AdvanceParticle(ParticleState &state,
 
         if (num_steps > PropagationSettings::ADVANCE_PARTICLE_MAX_STEPS) {
             // too many iteration steps!
-            if (std::abs(distance - distance_to_border) <= 1000 * PARTICLE_POSITION_RESOLUTION) {
-                Logging::Get("proposal.propagator")->info("Too many iteration steps ({}), but propagation "
-                                                          "step is close enough to border ({} cm). Ignore this "
-                                                          "difference and continue propagation.",
-                                                          PropagationSettings::ADVANCE_PARTICLE_MAX_STEPS,
-                                                          std::abs(distance - distance_to_border));
-                advancement_type = ReachedBorder;
-                distance = distance_to_border;
-            } else {
-                Logging::Get("proposal.propagator")->critical("Exceeded number of maximum propagation steps ({}), but "
-                                                              "difference between proposed propagation step and "
-                                                              "maximal distance to border is still too high ({} cm). "
-                                                              "Stop propagation.",
-                                                              PropagationSettings::ADVANCE_PARTICLE_MAX_STEPS,
-                                                              std::abs(distance - distance_to_border));
-                throw std::logic_error("Maximum number of propagation exceeded.");
-            }
+            Logging::Get("proposal.propagator")->warn("Maximal number of iteration step exceeded ({}). "
+                                                      "Proposed propagation step is {} cm, while distance to border is "
+                                                      "{} cm (difference of {} cm). Initial energy particle {} MeV, "
+                                                      "particle energy after step {} MeV. Propagate to border and "
+                                                      "continue propagation.",
+                                                      PropagationSettings::ADVANCE_PARTICLE_MAX_STEPS, distance,
+                                                      distance_to_border, std::abs(distance - distance_to_border),
+                                                      state.energy, energy);
+            distance = distance_to_border;
+            grammage = density->Calculate(state.position, state.direction, distance);
+            energy = utility.EnergyDistance(state.energy, grammage);
+            advancement_type = ReachedBorder;
         } else if (!is_inside) {
             // Special case: We are on the sector border, but scattering back outside the current sector!
             // Update sector and recalculate values
