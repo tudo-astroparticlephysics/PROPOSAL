@@ -252,6 +252,7 @@ int Propagator::AdvanceParticle(ParticleState &state,
             // reached geometry border
             advancement_type = ReachedBorder;
             distance = distance_to_border;
+            distance += GEOMETRY_PRECISION; // avoid particles getting stuck in front of border
         } else {
             // iteration not finished! discard energy and grammage
             advancement_type = InvalidStep;
