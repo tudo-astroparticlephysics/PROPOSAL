@@ -57,6 +57,45 @@ TEST(Propagator, min_energy)
     }
 }
 
+TEST(Propagator, BorderTransition)
+{
+    auto p_def = MuMinusDef();
+    auto medium = Air();
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 0.05, false);
+    auto cross = GetStdCrossSections(p_def, medium, cuts, true);
+
+    auto collection = PropagationUtility::Collection();
+    collection.interaction_calc = make_interaction(cross, true);
+    collection.displacement_calc = make_displacement(cross, true);
+    collection.time_calc = make_time(cross, p_def, true);
+    collection.scattering = make_scattering(MultipleScatteringType::Highland, {}, p_def, medium);
+
+    auto prop_utility = PropagationUtility(collection);
+
+    auto density_distr = std::make_shared<Density_homogeneous>(medium);
+    auto sphere1 = std::make_shared<Sphere>(Cartesian3D(0, 0, -637218600), 1e20, 637413400);
+    sphere1->SetHierarchy(1);
+    auto sphere2 = std::make_shared<Sphere>(Cartesian3D(0, 0, -637218600), 637413400, 0);
+    sphere2->SetHierarchy(2);
+
+    auto sector1 = std::make_tuple(sphere1, prop_utility, density_distr);
+    auto sector2 = std::make_tuple(sphere2, prop_utility, density_distr);
+
+    std::vector<Sector> sec_vec = {sector1, sector2};
+
+    auto prop = Propagator(p_def, sec_vec);
+
+    auto init_state = ParticleState();
+    init_state.energy = 1e9;
+    init_state.position = Cartesian3D(0, 0, 1.01948e+07);
+    init_state.direction = Cartesian3D(0, 0, -1);
+
+    for (size_t i=0; i<1000; i++) {
+        std::cout << i << std::endl;
+        auto sec = prop.Propagate(init_state);
+    }
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
