@@ -60,6 +60,11 @@ struct InterpolationSettings {
     static unsigned int NODES_RATE_INTERPOLANT;
 };
 
+// propagation settings
+struct PropagationSettings {
+    static unsigned int ADVANCE_PARTICLE_MAX_STEPS;
+};
+
 // precision parameters
 extern const double COMPUTER_PRECISION;
 extern const double HALF_PRECISION; // std::sqrt(computerPrecision);
