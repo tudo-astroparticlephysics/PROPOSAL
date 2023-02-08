@@ -25,7 +25,7 @@ namespace secondaries {
             dndx;
 
     public:
-        static constexpr int n_rnd = 5;
+        static constexpr int n_rnd = 4;
 
         PhotoPairProductionInterpolant() = default;
         PhotoPairProductionInterpolant(ParticleDef p, Medium m)
@@ -76,10 +76,9 @@ namespace secondaries {
             return std::make_tuple(dir_0, dir_1);
         };
 
-        std::tuple<double, double> CalculateEnergy(double energy, double rho,
-                                                   double rnd) override {
-            if (rnd > 0.5)
-                return make_tuple(energy * (1 - rho), energy * rho);
+        std::tuple<double, double> CalculateEnergy(double energy, double rho) override {
+            // rho is in [0,1)
+            // returns (electron_energy, positron_energy)
             return make_tuple(energy * rho, energy * (1 - rho));
         };
 
@@ -89,10 +88,10 @@ namespace secondaries {
                 StochasticLoss loss, const Component& comp,
                 std::vector<double>& rnd) final {
             auto rho = CalculateRho(loss.parent_particle_energy, rnd[0], comp);
-            auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, rho, rnd[1]);
+            auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, rho);
             auto secondary_dir = CalculateDirections(
                     loss.direction, loss.parent_particle_energy, rho, comp,
-                    rnd[2], rnd[3], rnd[4]);
+                    rnd[1], rnd[2], rnd[3]);
 
             auto sec = std::vector<ParticleState>();
             sec.emplace_back(ParticleType::EMinus, loss.position,
