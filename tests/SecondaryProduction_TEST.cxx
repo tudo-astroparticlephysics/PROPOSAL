@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include <cmath>
 
+#include "PROPOSAL/secondaries/parametrization/compton/NaivCompton.h"
 #include "PROPOSAL/secondaries/parametrization/ionization/NaivIonization.h"
 #include "PROPOSAL/secondaries/parametrization/photomupairproduction/PhotoMuPairProductionBurkhardtKelnerKokoulin.h"
 #include "PROPOSAL/secondaries/parametrization/photopairproduction/PhotoPairProductionKochMotz.h"
@@ -206,6 +207,47 @@ TEST(HeitlerAnnihilation, EnergyMomentumConservation)
         EXPECT_NEAR(p_sum.GetY(), 0., COMPUTER_PRECISION);
         EXPECT_NEAR(p_sum.GetZ(), std::sqrt((E_i + ME) * (E_i - ME)), COMPUTER_PRECISION);
     }
+}
+
+TEST(Compton, EnergyMomentumConservation)
+{
+    RandomGenerator::Get().SetSeed(1909);
+
+    auto particle = GammaDef();
+    auto medium = Air();
+    auto target = medium.GetComponents().front();
+
+    auto sec_calculator = secondaries::NaivCompton(particle, medium);
+
+    double E = 1e2;
+    double v = 0.4;
+    auto direction = Cartesian3D(0, 0, 1);
+
+    auto stochastic_loss = StochasticLoss((int)InteractionType::Compton, E * v, Cartesian3D(0, 0, 0),
+                                          direction, 0, 0, E);
+
+    // calculate random numbers
+    std::vector<double> rnd;
+    for (int i=0; i < sec_calculator.RequiredRandomNumbers(); i++) {
+        rnd.push_back(RandomGenerator::Get().RandomDouble());
+    }
+    auto secondaries = sec_calculator.CalculateSecondaries(stochastic_loss, target, rnd);
+
+    // energy conservation
+    EXPECT_NEAR(E + ME, secondaries.at(0).energy + secondaries.at(1).energy, COMPUTER_PRECISION);
+
+    // momentum conservation
+    ASSERT_EQ(secondaries.at(0).type, 22);
+    auto p_photon = secondaries.at(0).direction * secondaries.at(0).energy;
+
+    ASSERT_EQ(secondaries.at(1).type, 11);
+    auto E_electron = secondaries.at(1).energy;
+    auto p_electron = secondaries.at(1).direction * std::sqrt(E_electron * E_electron - ME * ME);
+
+    auto p_init = direction * E;
+
+    for (unsigned int i = 0; i<=2; i++)
+        EXPECT_NEAR(p_init[i], p_photon[i] + p_electron[i], COMPUTER_PRECISION);
 }
 
 int main(int argc, char** argv)

@@ -15,12 +15,10 @@ double secondaries::NaivCompton::CalculateRho(
 std::tuple<Cartesian3D, Cartesian3D> secondaries::NaivCompton::CalculateDirections(
     const Vector3D& primary_dir, double energy, double v, double rnd)
 {
-    auto com_energy = energy + ME; // center of mass energy
-    auto kin_energy = energy;      // kinetic energy
-    auto cosphi_gamma = (com_energy * (1. - v) - ME)
-        / ((1. - v) * std::sqrt(com_energy * kin_energy));
-    auto cosphi_electron
-        = (com_energy * v - ME) / (v * std::sqrt(com_energy * kin_energy));
+    // use energy-momentum conservation formula
+    auto cosphi_gamma = 1 - (v * ME) / (energy * (1 - v));
+    auto cosphi_electron = v * (energy + ME) / std::sqrt(2 * v * energy * ME + v * v * energy * energy);
+
     auto rnd_theta = rnd * 2. * PI;
     auto dir_gamma = Cartesian3D(primary_dir);
     dir_gamma.deflect(cosphi_gamma, rnd_theta);
@@ -32,7 +30,7 @@ std::tuple<Cartesian3D, Cartesian3D> secondaries::NaivCompton::CalculateDirectio
 std::tuple<double, double> secondaries::NaivCompton::CalculateEnergy(
     double energy, double v)
 {
-    return std::make_tuple(energy * (1 - v), energy * v);
+    return std::make_tuple(energy * (1 - v), ME + energy * v);
 }
 
 std::vector<ParticleState> secondaries::NaivCompton::CalculateSecondaries(
@@ -40,7 +38,7 @@ std::vector<ParticleState> secondaries::NaivCompton::CalculateSecondaries(
 {
     auto v = loss.energy /  loss.parent_particle_energy;
     auto secondary_energies = CalculateEnergy(loss.parent_particle_energy, v);
-    auto secondary_dir = CalculateDirections(loss.direction, loss.energy, v,
+    auto secondary_dir = CalculateDirections(loss.direction, loss.parent_particle_energy, v,
                                              rnd[0]);
 
     auto sec = std::vector<ParticleState>();
