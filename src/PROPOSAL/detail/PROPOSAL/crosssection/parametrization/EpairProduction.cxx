@@ -483,7 +483,7 @@ double crosssection::EpairForElectronPositron::FunctionToIntegral(
     // from Yadernaya Fizika, Vol. 63, 2000, pp. 1690-1698 Original Russian Text
     // Copyright 2000 by Kel'ner, Kokoulin, Petukhin DOI: 10.1134/1.1312894
 
-    double aux, aux1, aux2, r2, rMax, Z3, xi, beta;
+    double aux, aux1, aux2, r2, rMax, Z3, xi, xi2, beta;
     double phi, U, U_max, X, Y;
     auto medium_charge = comp.GetNucCharge();
     auto medium_log_constant = comp.GetLogConstant();
@@ -516,8 +516,8 @@ double crosssection::EpairForElectronPositron::FunctionToIntegral(
 
     U = aux / (1 + aux1 / aux2);
 
-    xi = v * v * (1 - rMax * rMax) / (4 * (1 - v));
-    aux1 = 2 * SQRTE * std::pow(ME, 2) * medium_log_constant * Z3 * (1 + xi)
+    xi2 = v * v * (1 - rMax * rMax) / (4 * (1 - v));
+    aux1 = 2 * SQRTE * std::pow(ME, 2) * medium_log_constant * Z3 * (1 + xi2)
         * (1 + Y);
     aux2 = ME * energy * v * (1 - rMax * rMax);
     U_max = aux / (1 + aux1 / aux2);
