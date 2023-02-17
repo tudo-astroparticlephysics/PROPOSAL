@@ -212,7 +212,10 @@ double crosssection::PhotoproductionRhode::PhotonNucleonCrossSection(double ener
 }
 
 // Heck
-crosssection::PhotoproductionHeck::PhotoproductionHeck() {
+crosssection::PhotoproductionHeck::PhotoproductionHeck() : resonances_M{{1.231, 1.515, 1.680}},
+                                                           resonances_Gamma{{0.11, 0.11, 0.125}},
+                                                           resonances_Sigma0{{31.125, 25.567, 17.508}},
+                                                           resonances_w{{0.17, 0.38, 0.38}} {
     hash_combine(hash, std::string(crosssection::ParametrizationName<PhotoproductionHeck>::value));
 };
 
