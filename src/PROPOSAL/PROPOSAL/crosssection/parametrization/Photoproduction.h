@@ -103,10 +103,10 @@ namespace PROPOSAL {
         class PhotoproductionHeck : virtual public Photoproduction {
             double sigma_bw(double s, double E, double M, double Gamma, double Sigma0);
             double Q(double E, double E_th, double w);
-            const std::vector<const double> resonances_M = {1.231, 1.515, 1.680};
-            const std::vector<const double> resonances_Gamma = {0.11, 0.11, 0.125};
-            const std::vector<const double> resonances_Sigma0 = {31.125, 25.567, 17.508};
-            const std::vector<const double> resonances_w = {0.17, 0.38, 0.38};
+            const std::array<double, 3> resonances_M = {1.231, 1.515, 1.680};
+            const std::array<double, 3> resonances_Gamma = {0.11, 0.11, 0.125};
+            const std::array<double, 3> resonances_Sigma0 = {31.125, 25.567, 17.508};
+            const std::array<double, 3> resonances_w = {0.17, 0.38, 0.38};
 
         public:
             PhotoproductionHeck();
