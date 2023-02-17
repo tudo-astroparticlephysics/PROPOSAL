@@ -210,3 +210,78 @@ double crosssection::PhotoproductionRhode::PhotonNucleonCrossSection(double ener
         return PhotoproductionCaldwell::PhotonNucleonCrossSection(energy, comp);
     }
 }
+
+// Heck
+crosssection::PhotoproductionHeck::PhotoproductionHeck() {
+    hash_combine(hash, std::string(crosssection::ParametrizationName<PhotoproductionHeck>::value));
+};
+
+std::unique_ptr<crosssection::ParametrizationDirect> crosssection::PhotoproductionHeck::clone() const {
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
+}
+
+// ------------------------------------------------------------------------- //
+// Formulae of continuum are from https://web.iap.kit.edu/heck/publications/kit-swp-6_vectormeson.pdf
+// The resonances are implemented according to https://arxiv.org/pdf/astro-ph/9903478.pdf using the
+// Delta(1232), N(1520) and N(1680) resonance.
+// To describe shadowing, the parametrization by BezrukovBugaev is used
+// ------------------------------------------------------------------------- //
+double crosssection::PhotoproductionHeck::PhotonNucleonCrossSection(double energy, const Component& comp) {
+    if (energy < GetCutOff(comp))
+        return 0.;
+    energy *= 1e-3; // energy in GeV
+    double m_n = comp.GetAverageNucleonWeight() * 1e-3; // in GeV
+    double s = m_n * m_n + 2 * m_n * energy; // calculate squared center of mass energy in GeV^2
+    double s0 = std::pow(1.0761, 2); // pion production threshold
+
+    double total_cross;
+
+    // calculate continuum of crosssection
+    if (std::sqrt(s) < 19.39)
+        total_cross = (73.7 * std::pow(s, 0.073) + 191.7 * std::pow(s, -0.602)) * std::sqrt(1 - s0/s); // in µb
+    else
+        total_cross = 59.3 * std::pow(s, 0.093) + 120.2 * std::pow(s, -0.358); // in µb
+
+    // add resonances
+    for (unsigned int i = 0; i<resonances_M.size(); i++) {
+        total_cross += sigma_bw(s, energy, resonances_M.at(i), resonances_Gamma.at(i), resonances_Sigma0.at(i))
+                * Q(energy, 0.152, resonances_w.at(i));
+    }
+
+    return total_cross;
+}
+
+double crosssection::PhotoproductionHeck::sigma_bw(double s, double E, double M, double Gamma, double Sigma0) {
+        return s / (E * E) * Sigma0 * Gamma * Gamma * s / (std::pow(s - M*M, 2) + Gamma * Gamma * s);
+}
+
+double crosssection::PhotoproductionHeck::Q(double E, double E_th, double w) {
+    if (E < E_th)
+        return 0;
+    if (E >= w + E_th)
+        return 1;
+    return (E - E_th) / w;
+}
+
+
+// HeckC7Shadowing
+crosssection::PhotoproductionHeckC7Shadowing::PhotoproductionHeckC7Shadowing() {
+    hash_combine(hash, std::string(crosssection::ParametrizationName<PhotoproductionHeckC7Shadowing>::value));
+};
+
+std::unique_ptr<crosssection::ParametrizationDirect> crosssection::PhotoproductionHeckC7Shadowing::clone() const {
+    using param_t = std::remove_cv_t<std::remove_pointer_t<decltype(this)>>;
+    return std::make_unique<param_t>(*this);
+}
+
+// ------------------------------------------------------------------------- //
+// Use simplified shadowing method according to https://web.iap.kit.edu/heck/publications/kit-swp-6_vectormeson.pdf
+// or Phys. Rev. D 32 (1985) 1244 (https://journals.aps.org/prd/pdf/10.1103/PhysRevD.32.1244)
+// ------------------------------------------------------------------------- //
+double crosssection::PhotoproductionHeckC7Shadowing::PhotonAtomCrossSection(double energy, const Component& comp) {
+    auto cross_photon_nucleon = PhotonNucleonCrossSection(energy, comp);
+    if (cross_photon_nucleon == 0.)
+        return 0.;
+    return cross_photon_nucleon * std::pow(comp.GetAtomicNum(), 0.91);
+};

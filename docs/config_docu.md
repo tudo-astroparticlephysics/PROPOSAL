@@ -478,6 +478,8 @@ Photonuclear interaction of a photon with an atomic nucleus. Available `photopro
 * `Caldwell`: (Phys. Rev. Let. 42 (1979), 553)
 * `Kokoulin`
 * `Rhode`
+* `Heck` based on ["Production of Vector Mesons by Photonuclear Interactions in the Program CORSIKA"](https://web.iap.kit.edu/heck/publications/kit-swp-6_vectormeson.pdf), with resonances from [SOPHIA](https://arxiv.org/pdf/astro-ph/9903478.pdf)
+* `HeckC7Shadowing` identical to `Heck`, but with shadowing parametrization by ([Phys. Rev. D 32 (1985) 1244](https://journals.aps.org/prd/pdf/10.1103/PhysRevD.32.1244)), which is also used in CORSIKA
 
 ### Photoeffect: `photoeffect`
 

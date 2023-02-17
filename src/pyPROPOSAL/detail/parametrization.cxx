@@ -713,6 +713,19 @@ void init_parametrization(py::module& m)
     py::class_<crosssection::PhotoproductionRhode,
     std::shared_ptr<crosssection::PhotoproductionRhode>,
     crosssection::Photoproduction>(m_sub_photoproduction, "Rhode")
+        .def(py::init<>())
+        .def("PhotonNucleonCrossSection",
+         &crosssection::PhotoproductionRhode::PhotonNucleonCrossSection,
+         py::arg("energy"), py::arg("component"));
+
+    py::class_<crosssection::PhotoproductionHeck,
+    std::shared_ptr<crosssection::PhotoproductionHeck>,
+    crosssection::Photoproduction>(m_sub_photoproduction, "Heck")
+        .def(py::init<>());
+
+    py::class_<crosssection::PhotoproductionHeckC7Shadowing,
+        std::shared_ptr<crosssection::PhotoproductionHeckC7Shadowing>,
+        crosssection::Photoproduction>(m_sub_photoproduction, "HeckC7Shadowing")
         .def(py::init<>());
 
     // --------------------------------------------------------------------- //
