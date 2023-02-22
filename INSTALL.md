@@ -18,7 +18,7 @@ For more detailed information about the specific building tools, see the listed 
 For this installation approach, all dependencies will be fetched by conan, meaning that you don't have to install them by yourself. If you have not installed conan yet, you can do so, for example:
 
 ```sh
-$ pip install conan
+$ pip install "conan~=1.33"
 ```
 
 Clone the repository and create a build directory
