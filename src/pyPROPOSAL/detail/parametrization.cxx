@@ -24,9 +24,9 @@
         std::shared_ptr<crosssection::Brems##cls>,                             \
         crosssection::Bremsstrahlung>(module, #cls)                            \
         .def(py::init<bool>(), py::arg("lpm") = false)                         \
-        .def(py::init<bool, const ParticleDef&, const Medium&, double>(),      \
+        .def(py::init<bool, const ParticleDef&, const Medium&, double, bool>(),\
             py::arg("lpm"), py::arg("particle_def"), py::arg("medium"),        \
-            py::arg("density_correction") = 1.0);
+            py::arg("density_correction") = 1.0, py::arg("TM_effect") = true);
 
 #define PHOTO_REAL_DEF(module, cls)                                            \
     py::class_<crosssection::Photo##cls,                                       \
@@ -299,9 +299,9 @@ void init_parametrization(py::module& m)
     py::class_<crosssection::BremsLPM, std::shared_ptr<crosssection::BremsLPM>>(
         m_sub_brems, "brems_lpm")
         .def(py::init<const ParticleDef&, const Medium&,
-                 const crosssection::Bremsstrahlung&>(),
+                 const crosssection::Bremsstrahlung&, const bool>(),
             py::arg("particle_def"), py::arg("medium"),
-            py::arg("bremsstrahlung"))
+            py::arg("bremsstrahlung"), py::arg("TM_effect") = true)
         .def("supression_factor", &crosssection::BremsLPM::suppression_factor,
             py::arg("energy"), py::arg("v"), py::arg("component"),
             py::arg("density_correction") = 1.0);
@@ -873,24 +873,24 @@ void init_parametrization(py::module& m)
         std::shared_ptr<crosssection::PhotoPairTsai>,
         crosssection::PhotoPairProduction>(m_sub_photopair, "Tsai")
         .def(py::init<bool>(), py::arg("lpm") = false)
-        .def(py::init<bool, const ParticleDef&, const Medium&, double>(),
+        .def(py::init<bool, const ParticleDef&, const Medium&, double, bool>(),
             py::arg("lpm"), py::arg("particle_def"), py::arg("medium"),
-            py::arg("density_correction") = 1.0);
+            py::arg("density_correction") = 1.0, py::arg("tm_effect") = true);
 
     py::class_<crosssection::PhotoPairKochMotz,
         std::shared_ptr<crosssection::PhotoPairKochMotz>,
         crosssection::PhotoPairProduction>(m_sub_photopair, "KochMotz")
         .def(py::init<bool>(), py::arg("lpm") = false)
-        .def(py::init<bool, const ParticleDef&, const Medium&, double>(),
+        .def(py::init<bool, const ParticleDef&, const Medium&, double, bool>(),
              py::arg("lpm"), py::arg("particle_def"), py::arg("medium"),
-             py::arg("density_correction") = 1.0);
+             py::arg("density_correction") = 1.0, py::arg("tm_effect") = true);
 
     py::class_<crosssection::PhotoPairLPM, std::shared_ptr<crosssection::PhotoPairLPM>>(
         m_sub_photopair, "photopair_lpm")
         .def(py::init<const ParticleDef&, const Medium&,
-                 const crosssection::PhotoPairProduction&>(),
+                 const crosssection::PhotoPairProduction&, bool>(),
             py::arg("particle_def"), py::arg("medium"),
-            py::arg("photopair"))
+            py::arg("photopair"), py::arg("tm_effect") = true)
         .def("supression_factor", &crosssection::PhotoPairLPM::suppression_factor,
             py::arg("energy"), py::arg("x"), py::arg("component"),
             py::arg("density_correction") = 1.0);

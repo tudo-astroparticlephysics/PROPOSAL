@@ -337,11 +337,12 @@ Annihilation of an ingoing positron with an atomic electron. Available `annihila
 
 ### Bremsstrahlung: `brems`
 
-| Keyword           |  Type   | Default | Description                |
-| ----------------- | ------- | ------- | -------------------------- |
-| `parametrization` | String  | `-`     | Parametrization to be used |
-| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
-| `lpm`             | Boolean | `true`  | Enabling or disabling the reduction of the cross section at high energies by the Landau-Pomeranchuk-Migdal effect.  |
+| Keyword           |  Type   | Default | Description                                                                                                                                       |
+|-------------------| ------- | ------- |---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `parametrization` | String  | `-`     | Parametrization to be used                                                                                                                        |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient                                                                                          |
+| `lpm`             | Boolean | `true`  | Enabling or disabling the reduction of the cross section at high energies by the Landau-Pomeranchuk-Migdal effect.                                |
+| `tm_effect`       | Boolean | `true`  | Enabling or disabling the reduction of the cross section at high energies by the Ter-Mikaelian effect. Can only be used with `lpm` set to `true`. |
 
 Note that the LPM correction currently only supports the correct description of homogeneous media.
 If the LPM effect is enabled, it will be assumed that the whole medium has the base `mass_density` <img src="https://render.githubusercontent.com/render/math?math=\rho_0">.
@@ -442,11 +443,12 @@ For there parametrizations, the parametrization of the shadowing effect can be c
 
 ### Electron-positron production by photons: `photopair`
 
-| Keyword           |  Type   | Default | Description                |
-| ----------------- | ------- | ------- | -------------------------- |
-| `parametrization` | String  | `-`     | Parametrization to be used |
-| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient |
-| `lpm`             | Boolean | `true`  | Enabling or disabling the reduction of the cross section at high energies by the Landau-Pomeranchuk-Migdal effect.  |
+| Keyword           |  Type   | Default | Description                                                                                                                                       |
+|-------------------| ------- | ------- |---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `parametrization` | String  | `-`     | Parametrization to be used                                                                                                                        |
+| `multiplier`      | Number  | `1.0`   | Multiplier to scale the cross section with a coefficient                                                                                          |
+| `lpm`             | Boolean | `true`  | Enabling or disabling the reduction of the cross section at high energies by the Landau-Pomeranchuk-Migdal effect.                                |
+| `tm_effect`       | Boolean | `true`  | Enabling or disabling the reduction of the cross section at high energies by the Ter-Mikaelian effect. Can only be used with `lpm` set to 'true'. |
 
 Creation of an electron-positron pair by an ingoing photon. Available `photopair` parametrizations are:
 

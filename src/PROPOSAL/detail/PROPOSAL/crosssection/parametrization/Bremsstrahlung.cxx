@@ -25,11 +25,11 @@
     }                                                                          \
                                                                                \
     crosssection::Brems##param::Brems##param(bool lpm, const ParticleDef& p,   \
-        const Medium& medium, double density_correction)                       \
+        const Medium& medium, double density_correction, bool TM_effect)       \
     {                                                                          \
         lpm_ = nullptr;                                                        \
         if (lpm) {                                                             \
-            lpm_ = std::make_shared<BremsLPM>(p, medium, *this);               \
+            lpm_ = std::make_shared<BremsLPM>(p, medium, *this, TM_effect);    \
             hash_combine(hash, density_correction, lpm_->GetHash());           \
             density_correction_ = density_correction;                          \
         }                                                                      \
@@ -443,12 +443,12 @@ crosssection::BremsElectronScreening::BremsElectronScreening(bool lpm)
 }
 
 crosssection::BremsElectronScreening::BremsElectronScreening(bool lpm,
-    const ParticleDef& p_def, const Medium& medium, double density_correction)
+    const ParticleDef& p_def, const Medium& medium, double density_correction, bool TM_effect)
     : interpolant_(new Interpolant(
         A_logZ, A_energies, A_correction, 2, false, false, 2, false, false))
 {
     if (lpm) {
-        lpm_ = std::make_shared<BremsLPM>(p_def, medium, *this);
+        lpm_ = std::make_shared<BremsLPM>(p_def, medium, *this, TM_effect);
         hash_combine(hash, density_correction, lpm_->GetHash());
         density_correction_ = density_correction;
     } else {
@@ -566,14 +566,15 @@ double crosssection::BremsElectronScreening::CalculateParametrization(
 #undef BREMSSTRAHLUNG_IMPL
 
 crosssection::BremsLPM::BremsLPM(const ParticleDef& p_def, const Medium& medium,
-    const Bremsstrahlung& param)
+    const Bremsstrahlung& param, const bool TM_effect)
     : hash(0)
     , mass_(p_def.mass)
     , mol_density_(medium.GetMolDensity())
     , mass_density_(medium.GetMassDensity())
     , sum_charge_(medium.GetSumCharge())
+    , TM_effect_(TM_effect)
 {
-    hash_combine(hash, mass_, mol_density_, mass_density_, sum_charge_, param.GetHash());
+    hash_combine(hash, mass_, mol_density_, mass_density_, sum_charge_, TM_effect_, param.GetHash());
     double upper_energy = 1e14;
     Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
     auto components = medium.GetComponents();
@@ -602,7 +603,7 @@ double crosssection::BremsLPM::suppression_factor(
         double energy, double v, const Component& comp,
         double density_correction) const
 {
-    double G, fi, xi, ps, Gamma, s1;
+    double G, fi, xi, ps, s1;
 
     const double fi1 = 1.54954;
     const double G1 = 0.710390;
@@ -628,9 +629,13 @@ double crosssection::BremsLPM::suppression_factor(
         xi = 1;
     }
 
-    Gamma = RE * ME / (ALPHA * mass_ * v);
-    Gamma = 1
-        + 4 * PI * sum_charge_ * RE * Gamma * Gamma * mol_density_ * density_correction;
+    double Gamma = 1;
+    if (TM_effect_) {
+        Gamma = RE * ME / (ALPHA * mass_ * v);
+        Gamma = 1
+                + 4 * PI * sum_charge_ * RE * Gamma * Gamma * mol_density_ * density_correction;
+    }
+
     double s = sp / std::sqrt(xi) * Gamma;
     double s2 = s * s;
 

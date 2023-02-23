@@ -6,14 +6,14 @@
 
 using namespace PROPOSAL;
 using brems_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&,
-        std::shared_ptr<const EnergyCutSettings>, bool, bool, double);
+        std::shared_ptr<const EnergyCutSettings>, bool, bool, double, bool);
 
 template <typename Param>
 cross_ptr create_brems(const ParticleDef& p_def, const Medium& medium,
                        std::shared_ptr<const EnergyCutSettings> cuts, bool lpm,
-                       bool interpol, double density_correction)
+                       bool interpol, double density_correction, bool TM_effect)
 {
-    auto param = Param(lpm, p_def, medium, density_correction);
+    auto param = Param(lpm, p_def, medium, density_correction, TM_effect);
     return make_crosssection(param, p_def, medium, cuts, interpol);
 }
 
@@ -39,11 +39,12 @@ namespace PROPOSAL {
 
         std::string param_name = config["parametrization"];
         bool lpm = config.value("lpm", true);
+        bool TM_effect = config.value("tm_effect", true);
         auto it = brems_map.find(param_name);
         if (it == brems_map.end())
             throw std::logic_error("Unknown parametrization for bremsstrahlung");
 
-        auto cross = it->second(p_def, medium, cuts, lpm, interpol, density_correction);
+        auto cross = it->second(p_def, medium, cuts, lpm, interpol, density_correction, TM_effect);
 
         double multiplier = config.value("multiplier", 1.0);
         if (multiplier != 1.0)

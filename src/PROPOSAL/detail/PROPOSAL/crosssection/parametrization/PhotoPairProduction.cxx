@@ -55,10 +55,10 @@ crosssection::PhotoPairTsai::PhotoPairTsai(bool lpm)
 
 crosssection::PhotoPairTsai::PhotoPairTsai(
         bool lpm, const ParticleDef& p_def, const Medium& medium,
-        double density_correction)
+        double density_correction, bool TM_effect)
 {
     if (lpm) {
-        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium, *this);
+        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium, *this, TM_effect);
         hash_combine(hash, density_correction, lpm_->GetHash());
         density_correction_ = density_correction;
     } else {
@@ -96,13 +96,13 @@ crosssection::PhotoPairKochMotz::PhotoPairKochMotz(bool lpm)
 
 crosssection::PhotoPairKochMotz::PhotoPairKochMotz(
         bool lpm, const ParticleDef& p_def, const Medium& medium,
-        double density_correction)
+        double density_correction, bool TM_effect)
     : interpolant_(new Interpolant(photopair_KM_Z, photopair_KM_energies,
                                    photopair_KM_cross, 2, false, false,
                                    2, false, false))
 {
     if (lpm) {
-        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium, *this);
+        lpm_ = std::make_shared<PhotoPairLPM>(p_def, medium, *this, TM_effect);
         hash_combine(hash, density_correction, lpm_->GetHash());
         density_correction_ = density_correction;
     } else {
@@ -338,13 +338,14 @@ double crosssection::PhotoPairTsai::DifferentialCrossSection(
 }
 
 crosssection::PhotoPairLPM::PhotoPairLPM(const ParticleDef& p_def, const Medium& medium,
-                                         const PhotoPairProduction& param)
+                                         const PhotoPairProduction& param, bool TM_effect)
     : hash(0)
     , mol_density_(medium.GetMolDensity())
     , mass_density_(medium.GetMassDensity())
     , sum_charge_(medium.GetSumCharge())
+    , TM_effect_(TM_effect)
 {
-    hash_combine(hash, mol_density_, mass_density_, sum_charge_, param.GetHash());
+    hash_combine(hash, mol_density_, mass_density_, sum_charge_, param.GetHash(), TM_effect_);
     double upper_energy = 1e14;
     Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
     auto components = medium.GetComponents();
@@ -374,7 +375,7 @@ double crosssection::PhotoPairLPM::suppression_factor(
         double density_correction) const
 {
     // taken from crosssection::BremsLPM::suppression_factor with appropriate modifications
-    double G, fi, xi, ps, Gamma, s1;
+    double G, fi, xi, ps, s1;
 
     const double fi1 = 1.54954;
     const double G1 = 0.710390;
@@ -398,9 +399,12 @@ double crosssection::PhotoPairLPM::suppression_factor(
         xi = 1;
     }
 
-    Gamma = RE * ME / (ALPHA * ME * x);
-    Gamma = 1
-        + 4 * PI * sum_charge_ * RE * Gamma * Gamma * mol_density_ * density_correction;
+    double Gamma = 1.;
+    if (TM_effect_) {
+        Gamma = RE * ME / (ALPHA * ME * x);
+        Gamma = 1 + 4 * PI * sum_charge_ * RE * Gamma * Gamma * mol_density_ * density_correction;
+    }
+
     double s = sp / std::sqrt(xi) * Gamma;
     double s2 = s * s;
 

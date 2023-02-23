@@ -6,14 +6,14 @@
 
 using namespace PROPOSAL;
 using photopair_func_ptr = cross_ptr (*)(const ParticleDef&, const Medium&,
-        bool, bool, double);
+        bool, bool, double, bool);
 
 template <typename Param>
 cross_ptr create_photopairproduction(
         const ParticleDef& p_def, const Medium& medium, bool interpol,
-        bool lpm, double density_correction)
+        bool lpm, double density_correction, bool TM_effect)
 {
-    auto param = Param(lpm, p_def, medium, density_correction);
+    auto param = Param(lpm, p_def, medium, density_correction, TM_effect);
     return make_crosssection(param, p_def, medium, nullptr, interpol);
 }
 
@@ -33,12 +33,12 @@ namespace PROPOSAL {
             throw std::logic_error("No parametrization passed for photopairproduction");
         std::string param_name = config["parametrization"];
         bool lpm = config.value("lpm", true);
-
+        bool TM_effect = config.value("tm_effect", true);
         auto it = photopair_map.find(param_name);
         if (it == photopair_map.end())
             throw std::logic_error("Unknown parametrization for photopairproduction");
 
-        auto cross = it->second(p_def, medium, interpol, lpm, density_correction);
+        auto cross = it->second(p_def, medium, interpol, lpm, density_correction, TM_effect);
 
         double multiplier = config.value("multiplier", 1.0);
         if (multiplier != 1.0)

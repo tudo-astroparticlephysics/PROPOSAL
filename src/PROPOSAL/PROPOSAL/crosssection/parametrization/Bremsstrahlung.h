@@ -33,7 +33,7 @@
     struct Brems##param : public Bremsstrahlung {                              \
         Brems##param(bool lpm = false);                                        \
         Brems##param(bool lpm, const ParticleDef&, const Medium&,              \
-            double density_correction = 1.0);                                  \
+            double density_correction = 1.0, bool TM_effect = true);           \
                                                                                \
         std::unique_ptr<Parametrization<Component>> clone() const final;       \
                                                                                \
@@ -99,7 +99,7 @@ namespace crosssection {
     public:
         BremsElectronScreening(bool lpm = false);
         BremsElectronScreening(bool lpm, const ParticleDef&, const Medium&,
-            double density_correction = 1.0);
+            double density_correction = 1.0, bool TM_effect = true);
 
         std::unique_ptr<Parametrization<Component>> clone() const final;
 
@@ -125,9 +125,10 @@ namespace crosssection {
         double mass_density_;
         double sum_charge_;
         double eLpm_;
+        bool TM_effect_;
 
     public:
-        BremsLPM(const ParticleDef&, const Medium&, const Bremsstrahlung&);
+        BremsLPM(const ParticleDef&, const Medium&, const Bremsstrahlung&, bool TM_effect = true);
         double suppression_factor(double energy, double v, const Component&,
                                   double density_correction = 1.0) const;
         size_t GetHash() const noexcept { return hash; }

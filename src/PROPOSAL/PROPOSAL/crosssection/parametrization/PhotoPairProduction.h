@@ -56,7 +56,7 @@ namespace crosssection {
     struct PhotoPairTsai : public PhotoPairProduction {
         PhotoPairTsai(bool lpm = false);
         PhotoPairTsai(bool lpm, const ParticleDef&, const Medium&,
-                          double density_correction = 1.0);
+                          double density_correction = 1.0, bool TM_effect = true);
         using base_param_t = PhotoPairProduction;
         std::unique_ptr<Parametrization<Component>> clone() const final;
 
@@ -67,7 +67,7 @@ namespace crosssection {
     struct PhotoPairKochMotz : public PhotoPairProduction {
         PhotoPairKochMotz(bool lpm = false);
         PhotoPairKochMotz(bool lpm, const ParticleDef&, const Medium&,
-                          double density_correction = 1.0);
+                          double density_correction = 1.0, bool TM_effect = true);
         using base_param_t = PhotoPairProduction;
         std::unique_ptr<Parametrization<Component>> clone() const final;
 
@@ -103,9 +103,10 @@ namespace crosssection {
         double mass_density_;
         double sum_charge_;
         double eLpm_;
+        bool TM_effect_;
 
     public:
-        PhotoPairLPM(const ParticleDef&, const Medium&, const PhotoPairProduction&);
+        PhotoPairLPM(const ParticleDef&, const Medium&, const PhotoPairProduction&, bool TM_effect = true);
         double suppression_factor(double energy, double x, const Component&,
                                   double density_correction = 1.0) const;
         size_t GetHash() const noexcept { return hash; }
