@@ -374,7 +374,7 @@ double crosssection::PhotoPairLPM::suppression_factor(
         double density_correction) const
 {
     // taken from crosssection::BremsLPM::suppression_factor with appropriate modifications
-    double G, fi, xi, ps, Gamma, s1;
+    double G, fi, xi, ps, s1;
 
     const double fi1 = 1.54954;
     const double G1 = 0.710390;
@@ -398,10 +398,7 @@ double crosssection::PhotoPairLPM::suppression_factor(
         xi = 1;
     }
 
-    Gamma = RE * ME / (ALPHA * ME * x);
-    Gamma = 1
-        + 4 * PI * sum_charge_ * RE * Gamma * Gamma * mol_density_ * density_correction;
-    double s = sp / std::sqrt(xi) * Gamma;
+    double s = sp / std::sqrt(xi);
     double s2 = s * s;
 
     if (s < fi1) {
@@ -432,7 +429,6 @@ double crosssection::PhotoPairLPM::suppression_factor(
 
     // v-dependence differs from bremsstrahlung
     return ((xi / 3)
-               * (G / (Gamma * Gamma)
-                   + 2 * ((x * x)  + (1 - x) * (1 - x)) * fi / Gamma))
+               * (G + 2 * ((x * x)  + (1 - x) * (1 - x)) * fi))
         / (1 - (4. / 3) * x * (1 - x));
 }
