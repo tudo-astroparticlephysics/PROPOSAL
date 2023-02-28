@@ -18,8 +18,7 @@ namespace secondaries {
         virtual std::tuple<Cartesian3D, Cartesian3D> CalculateDirections(
             const Vector3D&, double, double, const Component&, double, double,
             double) = 0;
-        virtual std::tuple<double, double> CalculateEnergy(double, double, double)
-            = 0;
+        virtual std::tuple<double, double> CalculateEnergy(double, double) = 0;
     };
 } // namespace secondaries
 } // namespace PROPOSAL
