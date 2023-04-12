@@ -434,6 +434,8 @@ The second approach is to use data from electron-positron scattering experiments
 * `AbramowiczLevinLevyMaor97`: ([arXiv::hep-ph/9712415](https://arxiv.org/abs/hep-ph/9712415))
 * `ButkevichMikheyev`: ([JETP 95 (2002), 11](https://doi.org/10.1134/1.1499897))
 * `RenoSarcevicSu`: ([Astrop. Phys. 24 (2005), 107](https://doi.org/10.1016/j.astropartphys.2005.06.002)), uses the parametrization of ALLM97, but with corrections for spin 0 particles. Should only be used for particles with spin 0 (e.g. sTaus).
+* `AbtFT`: ([Phys. Rev. D 96 (2017) 014001](https://doi.org/10.1103/PhysRevD.96.014001))
+* `BlockDurandHa`: ([Phys. Rev. D 89 (2014) 094027](https://doi.org/10.1103/PhysRevD.89.094027))
 
 For there parametrizations, the parametrization of the shadowing effect can be chosen using the keyword `shadow`. Available `shadow` parametrizations are:
 
