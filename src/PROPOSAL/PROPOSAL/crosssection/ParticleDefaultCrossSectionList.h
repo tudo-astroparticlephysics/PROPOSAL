@@ -110,7 +110,7 @@ void DefaultCrossSections<EMinusDef>::Append(CrossVec& cross_vec, P p, M m,std::
 {
     auto brems = std::make_tuple(crosssection::BremsElectronScreening{ false }, p, m, cut, interpolate);
     auto epair = std::make_tuple(crosssection::EpairForElectronPositron{ false }, p, m, cut, interpolate);
-    auto ioniz = std::make_tuple(crosssection::IonizBergerSeltzerBhabha{ EnergyCutSettings(*cut) }, p, m, cut, interpolate);
+    auto ioniz = std::make_tuple(crosssection::IonizBergerSeltzerMoller{ EnergyCutSettings(*cut) }, p, m, cut, interpolate);
     auto photo = std::make_tuple(crosssection::PhotoAbramowiczLevinLevyMaor97 { make_unique<crosssection::ShadowButkevichMikheyev>() }, p, m, cut, interpolate);
     append_cross(cross_vec, brems, epair, ioniz, photo);
 }
@@ -121,7 +121,7 @@ void DefaultCrossSections<EPlusDef>::Append(CrossVec& cross_vec, P p, M m,std::s
 {
     auto brems = std::make_tuple(crosssection::BremsElectronScreening{ false }, p, m, cut, interpolate);
     auto epair = std::make_tuple(crosssection::EpairForElectronPositron{ false }, p, m, cut, interpolate);
-    auto ioniz = std::make_tuple(crosssection::IonizBergerSeltzerMoller{ EnergyCutSettings(*cut) }, p, m, cut, interpolate);
+    auto ioniz = std::make_tuple(crosssection::IonizBergerSeltzerBhabha{ EnergyCutSettings(*cut) }, p, m, cut, interpolate);
     auto photo = std::make_tuple(crosssection::PhotoAbramowiczLevinLevyMaor97 { make_unique<crosssection::ShadowButkevichMikheyev>() }, p, m, cut, interpolate);
     auto annih = std::make_tuple(crosssection::AnnihilationHeitler{}, p, m, nullptr, interpolate);
     append_cross(cross_vec, brems, epair, ioniz, photo, annih);
