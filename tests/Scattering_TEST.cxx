@@ -215,9 +215,10 @@ TEST(Scattering, ZeroDisplacement){
     auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
     auto cross = GetCrossSections(MuMinusDef(), medium, cuts, true);
 
-    std::array<std::unique_ptr<multiple_scattering::Parametrization>, 3> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
+    std::array<std::unique_ptr<multiple_scattering::Parametrization>, 4> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
                                                                                          make_multiple_scattering("highland", MuMinusDef(), medium),
-                                                                                         make_multiple_scattering("highlandintegral", MuMinusDef(), medium, cross)};
+                                                                                         make_multiple_scattering("highlandintegral", MuMinusDef(), medium, cross),
+                                                                                         make_multiple_scattering("moliereinterpol", MuMinusDef(), medium)};
 
     for(auto const& scatter: scatter_list){
         auto offset = scatter->CalculateRandomAngle(0, 1e5, 1e5, {0.1, 0.2, 0.3, 0.4});
@@ -238,9 +239,10 @@ TEST(Scattering, FirstMomentum){
     int statistics = 1e3;
     auto cross = GetCrossSections(MuMinusDef(), medium, cuts, true);
 
-    std::array<std::unique_ptr<multiple_scattering::Parametrization>, 3> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
+    std::array<std::unique_ptr<multiple_scattering::Parametrization>, 4> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
                                                                make_multiple_scattering("highland", MuMinusDef(), medium),
-                                                               make_multiple_scattering("highlandintegral", MuMinusDef(), medium, cross)};
+                                                               make_multiple_scattering("highlandintegral", MuMinusDef(), medium, cross),
+                                                               make_multiple_scattering("moliereinterpol", MuMinusDef(), medium),};
     Cartesian3D scatter_sum;
     Cartesian3D offset_sum;
 
@@ -277,15 +279,16 @@ TEST(Scattering, SecondMomentum){
     auto direction_init = Cartesian3D(0, 0, 1);
     auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
 
-    int statistics = 1e3;
+    int statistics = 1e5;
 
     double E_i = 1e14;
     std::array<double, 6> final_energies = {1e13, 1e11, 1e9, 1e7, 1e5, 1e3};
     auto cross = GetCrossSections(MuMinusDef(), medium, cuts, true);
 
-    std::array<std::unique_ptr<multiple_scattering::Parametrization>, 3> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
+    std::array<std::unique_ptr<multiple_scattering::Parametrization>, 4> scatter_list = {make_multiple_scattering("moliere", MuMinusDef(), medium),
                                                                make_multiple_scattering("highland", MuMinusDef(), medium),
-                                                               make_multiple_scattering("highlandintegral", MuMinusDef(), medium, cross)};
+                                                               make_multiple_scattering("highlandintegral", MuMinusDef(), medium, cross),
+                                                               make_multiple_scattering("moliereinterpol", MuMinusDef(), medium, cross)};
     double scatter_sum;
     double offset_sum;
     double displacement;
