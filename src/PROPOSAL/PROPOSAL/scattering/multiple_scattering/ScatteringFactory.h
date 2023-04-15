@@ -51,14 +51,16 @@ enum class MultipleScatteringType : int {
     NoScattering,
     Moliere,
     Highland,
-    HighlandIntegral
+    HighlandIntegral,
+    MoliereInterpol
 };
 
 static const std::unordered_map<std::string, MultipleScatteringType>
     MultipleScatteringTable = { { "moliere", MultipleScatteringType::Moliere },
         { "highland", MultipleScatteringType::Highland },
         { "highlandintegral", MultipleScatteringType::HighlandIntegral },
-        { "noscattering", MultipleScatteringType::NoScattering } };
+        { "noscattering", MultipleScatteringType::NoScattering },
+        { "moliereinterpol", MultipleScatteringType::MoliereInterpol }};
 
 inline auto make_multiple_scattering(
     MultipleScatteringType t, ParticleDef const& p, Medium const& m)
@@ -68,6 +70,8 @@ inline auto make_multiple_scattering(
         return make_highland(p, m);
     case MultipleScatteringType::Moliere:
         return make_moliere(p, m);
+    case MultipleScatteringType::MoliereInterpol:
+         return make_moliereinterpol(p, m);
     case MultipleScatteringType::NoScattering:
         return std::unique_ptr<multiple_scattering::Parametrization>(nullptr);
     default:
