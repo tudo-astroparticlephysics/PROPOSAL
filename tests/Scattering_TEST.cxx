@@ -500,6 +500,56 @@ TEST(Scattering, NoScattering)
     EXPECT_EQ(std::get<1>(new_dir), init_dir);
 }
 
+TEST(MoliereInterpol, ComparionToMoliere) {
+    // MoliereInterpol is based on Moliere, using interpolation tables to speed up the evaluation.
+    // Therefore, we expect results to be similar
+
+    RandomGenerator::Get().SetSeed(24601);
+    auto medium = StandardRock();
+    auto position_init  = Cartesian3D(0, 0, 0);
+    auto direction_init = Cartesian3D(0, 0, 1);
+
+    auto cuts = std::make_shared<EnergyCutSettings>(INF, 1, false);
+
+    std::vector<ParticleDef> particles = {EMinusDef(), MuMinusDef()};
+
+    for (auto p : particles) {
+        //displacement calculator
+        auto cross = GetCrossSections(p, medium, cuts, false);
+        auto displacement = DisplacementBuilder(cross, std::false_type());
+
+        auto moliere = make_multiple_scattering("moliere", p, medium);
+        auto moliere_interpol = make_multiple_scattering("moliereinterpol", p, medium);
+        double E_f = 1e5;
+        auto energies = std::array<double, 6>{2e5, 1e6, 1e7, 1e8, 1e9, 1e10};
+        for (auto E_i : energies) {
+            double grammage = displacement.SolveTrackIntegral(E_i, E_f);
+            auto rnd = std::array<double, 4>{RandomGenerator::Get().RandomDouble(),
+                                             RandomGenerator::Get().RandomDouble(),
+                                             RandomGenerator::Get().RandomDouble(),
+                                             RandomGenerator::Get().RandomDouble()};
+            auto coords = moliere->CalculateRandomAngle(grammage, E_i, E_f, rnd);
+            auto coords_interpol = moliere_interpol->CalculateRandomAngle(grammage, E_i, E_f, rnd);
+            auto vec = multiple_scattering::ScatterInitialDirection(
+                    direction_init, coords);
+            auto vec_interpol = multiple_scattering::ScatterInitialDirection(
+                    direction_init, coords_interpol);
+            EXPECT_NEAR(std::get<0>(vec).GetX(), std::get<0>(vec_interpol).GetX(),
+                        std::abs(std::get<0>(vec).GetX() * 1e-2));
+            EXPECT_NEAR(std::get<0>(vec).GetY(), std::get<0>(vec_interpol).GetY(),
+                        std::abs(std::get<0>(vec).GetY() * 1e-2));
+            EXPECT_NEAR(std::get<0>(vec).GetZ(), std::get<0>(vec_interpol).GetZ(),
+                        std::abs(std::get<0>(vec).GetZ() * 1e-2));
+            EXPECT_NEAR(std::get<1>(vec).GetX(), std::get<1>(vec_interpol).GetX(),
+                        std::abs(std::get<1>(vec).GetX() * 1e-2));
+            EXPECT_NEAR(std::get<1>(vec).GetY(), std::get<1>(vec_interpol).GetY(),
+                        std::abs(std::get<1>(vec).GetY() * 1e-2));
+            EXPECT_NEAR(std::get<1>(vec).GetZ(), std::get<1>(vec_interpol).GetZ(),
+                        std::abs(std::get<1>(vec).GetZ() * 1e-2));
+        }
+    }
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
