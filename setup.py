@@ -87,40 +87,13 @@ class build_ext_cmake(build_ext):
 
             conan_call = [
                 'conan',
-                'install',
+                'build',
                 ext.source_dir,
                 '-o with_python=True',
                 '-o with_testing=False',
                 '--build=missing'
                ]
             sp.run(conan_call, cwd=self.build_temp, check=True)
-        cmake_call = [
-            cmake,
-            ext.source_dir,
-            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-            '-DCMAKE_BUILD_TYPE=' + cfg,
-            '-DBUILD_TESTING=OFF',
-            '-DBUILD_PYTHON=ON',
-            '-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE',
-            '-DBUILD_EXAMPLE=OFF',
-            '-DPython_EXECUTABLE=' + sys.executable,
-            '-DCMAKE_INSTALL_RPATH={}'.format(rpath),
-            '-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON',
-            '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF',
-        ]
-        if CMAKE_CXX_FLAGS:
-            cmake_call.append(CMAKE_CXX_FLAGS)
-        sp.run(cmake_call, cwd=self.build_temp, check=True)
-        build_call = [
-            cmake,
-            '--build', '.',
-            '--config', cfg,
-            '--', '-j{}'.format(os.getenv('BUILD_CORES', 2))
-        ]
-        if ext.target is not None:
-            build_call.extend(['--target', ext.target])
-        sp.run(build_call, cwd=self.build_temp, check=True)
-
 
 setup(
     version=version,

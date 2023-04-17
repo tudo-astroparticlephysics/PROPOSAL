@@ -79,16 +79,8 @@ jobs:
         - name: create build directory
           if : steps.cache-build.outputs.cache-hit != 'true'
           run: mkdir PROPOSAL_BUILD
-        - name: Install PROPOSAL dependencies
-          run: cd PROPOSAL_BUILD && conan install .. -o with_testing=True --build=missing
-        - name: Run build automatisation tool
-          run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE
-        - name: Build lib
-          if: ${{ matrix.os != 'windows-latest' }}
-          run: cmake --build PROPOSAL_BUILD
-        - name: Build lib
-          if: ${{ matrix.os == 'windows-latest' }}
-          run: cmake --build PROPOSAL_BUILD --target ALL_BUILD --config Release
+        - name: Install PROPOSAL dependencies and build PROPOSAL
+          run: cd PROPOSAL_BUILD && conan build .. -o with_testing=True --build=missing
 
     test:
       runs-on: ${{ matrix.os }}
