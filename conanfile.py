@@ -1,76 +1,91 @@
-from conans import ConanFile, CMake, tools
 import os
+from conan import ConanFile
+from conan.errors import ConanInvalidConfiguration
+from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
+from conan.tools.files import copy, get, rmdir
+from conan.tools.scm import Version
+
+required_conan_version = ">=1.53.0"
 
 
 class PROPOSALConan(ConanFile):
     name = "proposal"
     homepage = "https://github.com/tudo-astroparticlephysics/PROPOSAL"
-    license = "GNU Lesser General Public License v3.0"
-    description = "the very best lepton and photon propagator"
+    license = "LGPL-3.0"
+    package_type = "library"
+    description = "monte Carlo based lepton and photon propagator"
     topics = ("propagator", "lepton", "photon", "stochastic")
     settings = "os", "compiler", "build_type", "arch"
-    exports_sources = "*"
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
-        "with_testing": [True, False],
         "with_python": [True, False],
+        "with_testing": [True, False],
         "with_documentation": [True, False],
     }
     default_options = {
         "shared": False,
         "fPIC": True,
-        "with_testing": False,
         "with_python": False,
+        "with_testing": False,
         "with_documentation": False,
     }
-    generators = "cmake_find_package", "cmake_paths"
-    _cmake = None
 
     def config_options(self):
         if self.settings.os == "Windows":
-            del self.options.fPIC
+            self.options.rm_safe("fPIC")
+
+    def configure(self):
+        if self.options.shared:
+            self.options.rm_safe("fPIC")
+
+    def layout(self):
+        cmake_layout(self, src_folder="src")
 
     def requirements(self):
-        self.requires("cubicinterpolation/0.1.5")
-        self.requires("spdlog/1.10.0")
-        self.requires("nlohmann_json/3.9.1")
+        # cubicinterpolation: headers are transitively included, and function calls are made
+        # from implementation in headers (templates)
+        self.requires("cubicinterpolation/0.1.5", transitive_headers=True, transitive_libs=True)
+        # spdlog: requires transitive_libs due to direct calls to functionality from headers
+        self.requires("spdlog/1.11.0", transitive_headers=True, transitive_libs=True)
+        # nlohmann_json: public headers include json.hpp and json_fwd.hpp
+        self.requires("nlohmann_json/3.11.2", transitive_headers=True)
         if self.options.with_python:
             self.requires("pybind11/2.10.1")
         if self.options.with_testing:
-            self.requires("boost/1.78.0")
+            self.requires("boost/1.75.0")
             self.requires("gtest/1.11.0")
         if self.options.with_documentation:
             self.requires("doxygen/1.8.20")
 
-    def _configure_cmake(self):
-        if self._cmake:
-            return self._cmake
-        self._cmake = CMake(self)
-        self._cmake.definitions["BUILD_TESTING"] = self.options.with_testing
-        self._cmake.definitions["BUILD_PYTHON"] = self.options.with_python
-        self._cmake.definitions["BUILD_DOCUMENTATION"] = self.options.with_documentation
-        self._cmake.configure()
-        return self._cmake
-
     def build(self):
-        cmake = self._configure_cmake()
+        cmake = CMake(self)
+        cmake.configure()
         cmake.build()
         cmake.install()
         if self.options.with_testing:
             cmake.test()
 
     def package(self):
-        self.copy("LICENSE", dst="licenses")
-        cmake = self._configure_cmake()
+        copy(self, "LICENSE.md", self.source_folder, os.path.join(self.package_folder, "licenses"))
+        cmake = CMake(self)
         cmake.install()
-        tools.rmdir(os.path.join(self.package_folder, "lib", "cmake"))
+        rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
+
+    def generate(self):
+        tc = CMakeToolchain(self)
+        tc.cache_variables["BUILD_TESTING"] = self.options.with_testing
+        tc.cache_variables["BUILD_PYTHON"] = self.options.with_python
+        tc.cache_variables["BUILD_DOCUMENTATION"] = self.options.with_documentation
+        tc.generate()
+        deps = CMakeDeps(self)
+        deps.generate()
 
     def package_info(self):
-        self.cpp_info.names["cmake_find_package"] = "PROPOSAL"
+        self.cpp_info.set_property("cmake_file_name", "PROPOSAL")
+        self.cpp_info.set_property("cmake_target_name", "PROPOSAL::PROPOSAL")
         self.cpp_info.libs = ["PROPOSAL"]
-        self.cpp_info.requires = [
-            "cubicinterpolation::CubicInterpolation",
-            "spdlog::spdlog",
-            "nlohmann_json::nlohmann_json",
-        ]
+
+        # TODO: to remove in conan v2 once cmake_find_package_* generators removed
+        self.cpp_info.names["cmake_find_package"] = "PROPOSAL"
+        self.cpp_info.names["cmake_find_package_multi"] = "PROPOSAL"
