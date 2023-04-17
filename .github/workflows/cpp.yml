@@ -76,8 +76,6 @@ jobs:
         - name: Initialize conan
           if : steps.cache-conan.outputs.cache-hit != 'true'
           run: conan profile detect
-        - name: Update conan profile
-          run: conan profile update settings.compiler.cppstd=14 default
         - name: create build directory
           if : steps.cache-build.outputs.cache-hit != 'true'
           run: mkdir PROPOSAL_BUILD
