@@ -94,7 +94,8 @@ namespace secondaries {
         }
     };
 
-    class KelnerKokoulinPetrukhinEpairProduction : public EpairProductionRhoIntegral<crosssection::EpairKelnerKokoulinPetrukhin> {
+    class KelnerKokoulinPetrukhinEpairProduction : public EpairProductionRhoIntegral<crosssection::EpairKelnerKokoulinPetrukhin>,
+                                                   public DefaultSecondaries<KelnerKokoulinPetrukhinEpairProduction> {
     public:
         KelnerKokoulinPetrukhinEpairProduction() = default;
         KelnerKokoulinPetrukhinEpairProduction(ParticleDef p, Medium m)
@@ -102,8 +103,7 @@ namespace secondaries {
         {}
     };
 
-    class ForElectronPositronEpairProduction : public EpairProductionRhoIntegral<crosssection::EpairForElectronPositron>,
-                                               public DefaultSecondaries<ForElectronPositronEpairProduction>  {
+    class ForElectronPositronEpairProduction : public EpairProductionRhoIntegral<crosssection::EpairForElectronPositron> {
     public:
         ForElectronPositronEpairProduction() = default;
         ForElectronPositronEpairProduction(ParticleDef p, Medium m)
