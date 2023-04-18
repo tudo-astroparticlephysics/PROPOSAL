@@ -35,6 +35,10 @@ namespace PROPOSAL {
 namespace multiple_scattering {
     struct ScatteringOffset {
         ScatteringOffset() : sx(0.), sy(0.), tx(0.), ty(0.) {};
+        friend std::ostream& operator<<(std::ostream& os, const ScatteringOffset& offset) {
+            os << "sx: " << offset.sx << ", sy: " << offset.sy << ", tx: " << offset.tx << ", ty: " << offset.ty  << '\n';
+            return os;
+        };
         double sx;
         double sy;
         double tx;

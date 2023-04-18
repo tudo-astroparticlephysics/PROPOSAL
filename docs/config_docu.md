@@ -167,6 +167,7 @@ PROPOSAL provides different multiple scattering models, which can be set with th
 * `HighlandIntegral`: Gaussian approximation of Molière theory, derived by [Highland](https://doi.org/10.1016/0029-554X(75)90743-0) and corrected by [Lynch/Dahl](https://doi.org/10.1016/0168-583X(91)95671-Y). 
 * `Highland`: Same as `HighlandIntegral`, but with the approximation that the particle energy is constant during a propagation step. *This parametrization should only be used for small step sizes where this approximation is valid.*
 * `Moliere`: Scattering based on [Molière's theory](https://zfn.mpdl.mpg.de/data/Reihe_A/3/ZNA-1948-3a-0078.pdf). *Significantly slower compared to other scattering models.*
+* `MoliereInterpol`: Same as `Moliere`, but using interpolation tables to increase performance
 
 Multiple scattering effects can be scaled with a constant factor using the option `multiple_scattering_multiplier`.
 This scales the sampled deflections, which are described by their displacement in cartesian coordinates, with a constant factor for each component. 

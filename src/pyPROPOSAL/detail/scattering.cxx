@@ -34,6 +34,8 @@ void init_scattering(py::module& m)
 
     py::class_<multiple_scattering::Highland, multiple_scattering::Parametrization,
         std::shared_ptr<multiple_scattering::Highland>>(m_sub, "Highland")
+        .def(py::init<const ParticleDef&, const Medium&>(),
+             py::arg("particle_def"), py::arg("medium"))
         .def("CalculateTheta0", &multiple_scattering::Highland::CalculateTheta0,
              py::arg("grammage"), py::arg("e_i"), py::arg("e_f"),
              R"pbdoc(
@@ -49,11 +51,22 @@ void init_scattering(py::module& m)
     py::class_<multiple_scattering::HighlandIntegral, multiple_scattering::Highland,
             std::shared_ptr<multiple_scattering::HighlandIntegral>>(m_sub, "HighlandIntegral");
 
+    py::class_<multiple_scattering::Moliere, multiple_scattering::Parametrization,
+            std::shared_ptr<multiple_scattering::Moliere>>(m_sub, "Moliere")
+            .def(py::init<const ParticleDef&, const Medium&>(),
+                 py::arg("particle_def"), py::arg("medium"));
+
+    py::class_<multiple_scattering::MoliereInterpol, multiple_scattering::Parametrization,
+            std::shared_ptr<multiple_scattering::MoliereInterpol>>(m_sub, "MoliereInterpol")
+            .def(py::init<const ParticleDef&, const Medium&>(),
+                 py::arg("particle_def"), py::arg("medium"));
+
     py::class_<multiple_scattering::ScatteringOffset>(m_sub, "scattering_offset")
             .def_readwrite("sx", &multiple_scattering::ScatteringOffset::sx)
             .def_readwrite("sy", &multiple_scattering::ScatteringOffset::sy)
             .def_readwrite("tx", &multiple_scattering::ScatteringOffset::tx)
-            .def_readwrite("ty", &multiple_scattering::ScatteringOffset::ty);
+            .def_readwrite("ty", &multiple_scattering::ScatteringOffset::ty)
+            .def("__str__", &py_print<multiple_scattering::ScatteringOffset>);
 
     m_sub.def("scatter_initial_direction", &multiple_scattering::ScatterInitialDirection);
 

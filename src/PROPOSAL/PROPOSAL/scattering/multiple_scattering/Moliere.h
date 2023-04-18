@@ -33,6 +33,8 @@
 
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/scattering/multiple_scattering/Parametrization.h"
+#include "CubicInterpolation/CubicSplines.h"
+#include "CubicInterpolation/Interpolant.h"
 
 namespace PROPOSAL {
 struct ParticleDef;
@@ -42,11 +44,6 @@ namespace multiple_scattering {
     class Moliere : public Parametrization {
         bool compare(const Parametrization&) const override;
         void print(std::ostream&) const override;
-
-        std::unique_ptr<Parametrization> clone() const final
-        {
-            return std::make_unique<Moliere>(*this);
-        }
 
         int numComp_; // number of components in medium
         double ZSq_A_average_;
@@ -62,17 +59,16 @@ namespace multiple_scattering {
         double chiCSq_; // characteristic angle² in rad²
         std::vector<double> B_;
 
-        double f1M(double x);
-        double f2M(double x);
-
         double f(double theta);
-
-        double F1M(double x);
-        double F2M(double x);
-
         double F(double theta);
-
         double GetRandom(double pre_factor, double rnd);
+
+    protected:
+        virtual double f1M(double x);
+        virtual double f2M(double x);
+
+        virtual double F1M(double x);
+        virtual double F2M(double x);
 
     public:
         // constructor
@@ -80,13 +76,50 @@ namespace multiple_scattering {
 
         ScatteringOffset CalculateRandomAngle(double grammage, double ei,
             double ef, const std::array<double, 4>& rnd) override;
+
+        std::unique_ptr<Parametrization> clone() const override
+        {
+            return std::make_unique<Moliere>(*this);
+        }
     };
+
+    class MoliereInterpol : public Moliere {
+        using interpolant_t = cubic_splines::Interpolant<cubic_splines::CubicSplines<double>>;
+        using interpolant_ptr = std::shared_ptr<interpolant_t>;
+
+        // interpolation tables
+        interpolant_ptr f1M_interpolant_;
+        interpolant_ptr f2M_interpolant_;
+        interpolant_ptr F1M_interpolant_;
+        interpolant_ptr F2M_interpolant_;
+
+        double F1M(double x) override;
+        double F2M(double x) override;
+
+        double f1M(double x) override;
+        double f2M(double x) override;
+
+    public:
+        MoliereInterpol(const ParticleDef&, Medium const&);
+
+        std::unique_ptr<Parametrization> clone() const override
+        {
+            return std::make_unique<MoliereInterpol>(*this);
+        }
+    };
+
 } // namespace multiple_scattering
 
 template <typename... Args> inline auto make_moliere(Args... args)
 {
     return std::unique_ptr<multiple_scattering::Parametrization>(
         new multiple_scattering::Moliere(std::forward<Args>(args)...));
+}
+
+template <typename... Args> inline auto make_moliereinterpol(Args... args)
+{
+    return std::unique_ptr<multiple_scattering::Parametrization>(
+        new multiple_scattering::MoliereInterpol(std::forward<Args>(args)...));
 }
 
 } // namespace PROPOSAL
