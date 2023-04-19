@@ -76,7 +76,11 @@ jobs:
         - name: Initialize conan
           if : steps.cache-conan.outputs.cache-hit != 'true'
           run: conan profile detect
+        - name: Build and Install PROPOSAL (gcc5)
+          if : ${{ matrix.compiler == 'gcc-5' }}
+          run: conan build . -o with_testing=True -s:b compiler.cppstd=gnu14 -s compiler.cppstd=gnu14 --build=missing
         - name: Build and Install PROPOSAL
+          if : ${{ matrix.compiler != 'gcc-5' }}
           run: conan build . -o with_testing=True --build=missing
 
     test:
