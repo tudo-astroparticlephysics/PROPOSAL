@@ -18,23 +18,23 @@ For more detailed information about the specific building tools, see the listed 
 For this installation approach, all dependencies will be fetched by conan, meaning that you don't have to install them by yourself. If you have not installed conan yet, you can do so, for example:
 
 ```sh
-$ pip install "conan~=1.33"
+$ pip install "conan~=2.0"
 ```
 
 Clone the repository and create a build directory
 
 ```sh
 $ git clone https://github.com/tudo-astroparticlephysics/PROPOSAL.git
-$ cd PROPOSAL && mkdir build && cd build      
+$ cd PROPOSAL      
 ```
 
-Use conan to prepare all dependencies. You can pass additional options to conan.
+To prepare all dependencies, build PROPOSAL, and install PROPOSAL, simply use the command
 
 ```sh             
-$ conan install .. -o with_python=True	# other optional dependencies
+$ conan build . -o with_python=True	# other optional dependencies
 ```
 
-The following options can be passed to `conan install`:
+The following options can be passed to `conan build`:
 
 | Option.              | default | Description                                   |
 | -------------------- | ------- | --------------------------------------------- |
@@ -42,21 +42,13 @@ The following options can be passed to `conan install`:
 | `with_testing`       | False   | Build TestFiles for Python.                   |
 | `with_documentation` | False   | Build doxygen documentation of C++ code (WIP) |
 
-Build and install PROPOSAL. You may require root privileges when installing, depending on the installation location:
 
-```sh
-$ conan build ..
-```
-
-To set the install location, use `-pf / --package-folder` option.
-The default is `build/package`.
+To set the install location, use `-o / --output-folder` option.
+The default is the current directory.
 E.g. to install proposal into `$HOME/.local/proposal`:
 ```
-$ conan build .. -pf $HOME/.local/proposal
+$ conan build . -o $HOME/.local/proposal
 ```
-
-This will also run the tests if `with_testing` is true.
-
 
 *Note:* As an alternative, you may create a local conan package and use it in your project. See the [conan documentation](https://docs.conan.io/en/latest/) for more information.
 
