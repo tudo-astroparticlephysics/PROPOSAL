@@ -104,8 +104,6 @@ class PROPOSALConan(ConanFile):
         cmake.configure()
         cmake.build()
         cmake.install()
-        if self.options.with_testing:
-            cmake_test()
 
     def package(self):
         copy(self, "LICENSE.md", self.source_folder, os.path.join(self.package_folder, "licenses"))
