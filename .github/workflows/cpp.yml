@@ -74,7 +74,6 @@ jobs:
         - name: Install python dependencies
           run: python -m pip install conan
         - name: Initialize conan
-          if : steps.cache-conan.outputs.cache-hit != 'true'
           run: conan profile detect
         - name: Build and Install PROPOSAL (gcc5)
           if : ${{ matrix.compiler == 'gcc-5' }}
