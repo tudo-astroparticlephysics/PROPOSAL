@@ -120,4 +120,8 @@ jobs:
             path: build
             key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-${{ github.sha }}-key
         - name: Run tests
+          if: ${{ matrix.os != 'windows-latest' }}
           run: ctest --test-dir build/Release/tests -j2 --verbose -E "(Brems.*Interpolant|Photo.*Interpolant|Epair.*Interpolant|Mupair.*Interpolant)"
+        - name: Run tests (Windows)
+          if: ${{ matrix.os != 'windows-latest' }}
+          run: ctest --test-dir build/tests -j2 --verbose -E "(Brems.*Interpolant|Photo.*Interpolant|Epair.*Interpolant|Mupair.*Interpolant)"
