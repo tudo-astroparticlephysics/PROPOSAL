@@ -82,7 +82,11 @@ jobs:
           if : ${{ matrix.compiler == 'gcc-5' }}
           run: conan install . --build=missing -o with_testing=True -s:b compiler.cppstd=gnu14 -s compiler.cppstd=gnu14
         - name: Call CMake
+          if: ${{ matrix.os != 'windows-latest' }}
           run: cmake . -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
+        - name: Call CMake
+          if: ${{ matrix.os == 'windows-latest' }}
+          run: cmake . -DCMAKE_TOOLCHAIN_FILE=build\conan_toolchain.cmake
         - name: Build PROPOSAL
           run: cmake --build . -j2
     test:
