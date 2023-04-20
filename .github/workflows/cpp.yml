@@ -82,7 +82,7 @@ jobs:
           if : ${{ matrix.compiler == 'gcc-5' }}
           run: conan install . --build=missing -o with_testing=True -s:b compiler.cppstd=gnu14 -s compiler.cppstd=gnu14
         - name: Enter build folder
-          run: cd build
+          run: pwd && cd build && pwd && ls
         - name: Call CMake
           run: cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
         - name: Build PROPOSAL
