@@ -84,7 +84,7 @@ jobs:
         - name: Enter build folder
           run: pwd && cd build && pwd && ls
         - name: Call CMake
-          run: cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
+          run: cmake . -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
         - name: Build PROPOSAL
           run: cmake --build . -j2
         - name: Install PROPOSAL
