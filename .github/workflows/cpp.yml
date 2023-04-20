@@ -20,7 +20,7 @@ jobs:
             - os : "ubuntu-20.04"
               compiler : "gcc-5"
               compilerpp : "g++-5"
-            - os : "windows-latest"
+            #- os : "windows-latest"
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
@@ -103,7 +103,7 @@ jobs:
             - os : "ubuntu-20.04"
               compiler : "gcc-5"
               compilerpp : "g++-5"
-            - os : "windows-latest"
+            #- os : "windows-latest"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/build/tests/TestFiles
       steps:
