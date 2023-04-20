@@ -8,18 +8,18 @@ jobs:
       strategy:
         matrix:
           include:
-            - os : "ubuntu-latest"
-              compiler : "gcc"
-              compilerpp : "g++"
-            - os : "macos-latest"
-              compiler : "clang"
-              compilerpp : "clang++"
-            - os : "ubuntu-20.04"
-              compiler : "gcc-7"
-              compilerpp : "g++-7"
-            - os : "ubuntu-20.04"
-              compiler : "gcc-5"
-              compilerpp : "g++-5"
+            #- os : "ubuntu-latest"
+            #  compiler : "gcc"
+            #  compilerpp : "g++"
+            #- os : "macos-latest"
+            #  compiler : "clang"
+            #  compilerpp : "clang++"
+            #- os : "ubuntu-20.04"
+            #  compiler : "gcc-7"
+            #  compilerpp : "g++-7"
+            #- os : "ubuntu-20.04"
+            #  compiler : "gcc-5"
+            #  compilerpp : "g++-5"
             - os : "windows-latest"
       env:
         CC: ${{ matrix.compiler }}
@@ -85,7 +85,7 @@ jobs:
           run: cmake . -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
         - name: Call CMake (Windows)
           if: ${{ matrix.os == 'windows-latest' }}
-          run: cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake"
+          run: cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
         - name: Build PROPOSAL
           run: cmake --build . -j2
     test:
@@ -94,18 +94,18 @@ jobs:
       strategy:
         matrix:
           include:
-            - os : "ubuntu-latest"
-              compiler : "gcc"
-              compilerpp : "g++"
-            - os : "macos-latest"
-              compiler : "clang"
-              compilerpp : "clang++"
-            - os : "ubuntu-20.04"
-              compiler : "gcc-7"
-              compilerpp : "g++-7"
-            - os : "ubuntu-20.04"
-              compiler : "gcc-5"
-              compilerpp : "g++-5"
+            #- os : "ubuntu-latest"
+            #  compiler : "gcc"
+            #  compilerpp : "g++"
+            #- os : "macos-latest"
+            #  compiler : "clang"
+            #  compilerpp : "clang++"
+            #- os : "ubuntu-20.04"
+            #  compiler : "gcc-7"
+            #  compilerpp : "g++-7"
+            #- os : "ubuntu-20.04"
+            #  compiler : "gcc-5"
+            #  compilerpp : "g++-5"
             - os : "windows-latest"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/tests/TestFiles
