@@ -77,8 +77,6 @@ class PROPOSALConan(ConanFile):
         if self.options.with_documentation:
             self.requires("doxygen/1.8.20")
 
-    def build_requirements(self):
-        self.tool_requires("cmake/3.22.6")
 
     def validate(self):
         if is_msvc(self) and self.options.shared:
@@ -103,7 +101,6 @@ class PROPOSALConan(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
-        cmake.install()
 
     def package(self):
         copy(self, "LICENSE.md", self.source_folder, os.path.join(self.package_folder, "licenses"))
@@ -116,6 +113,7 @@ class PROPOSALConan(ConanFile):
         tc.variables["BUILD_TESTING"] = self.options.with_testing
         tc.variables["BUILD_PYTHON"] = self.options.with_python
         tc.variables["BUILD_DOCUMENTATION"] = self.options.with_documentation
+        tc.variables["CMAKE_BUILD_TYPE"] = "Release" # set as default
         tc.generate()
         deps = CMakeDeps(self)
         deps.generate()

@@ -75,13 +75,12 @@ jobs:
           run: python -m pip install conan
         - name: Initialize conan
           run: conan profile detect
-        - name: Build and Install PROPOSAL (gcc5)
-          if : ${{ matrix.compiler == 'gcc-5' }}
-          run: conan build . -o with_testing=True -s:b compiler.cppstd=gnu14 -s compiler.cppstd=gnu14 --build=missing
+        - name: Prepare dependencies using conan
+          run: conan install . --build=missing -o with_testing=True
+        - name: Call CMake
+          run: cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
         - name: Build and Install PROPOSAL
-          if : ${{ matrix.compiler != 'gcc-5' }}
-          run: conan build . -o with_testing=True --build=missing
-
+          run: cmake --build . -j2 && cmake --install .
     test:
       runs-on: ${{ matrix.os }}
       needs: build
@@ -102,7 +101,7 @@ jobs:
               compilerpp : "g++-5"
             - os : "windows-latest"
       env:
-        PROPOSAL_TEST_FILES: ${{ github.workspace }}/build/Release/tests/TestFiles
+        PROPOSAL_TEST_FILES: ${{ github.workspace }}/build/tests/TestFiles
       steps:
         - uses: actions/checkout@v2
         - name: Cache conan
@@ -119,8 +118,4 @@ jobs:
             path: build
             key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-${{ github.sha }}-key
         - name: Run tests
-          if: ${{ matrix.os != 'windows-latest' }}
-          run: ctest --test-dir build/Release/tests -j2 --verbose -E "(Brems.*Interpolant|Photo.*Interpolant|Epair.*Interpolant|Mupair.*Interpolant)"
-        - name: Run tests (Windows)
-          if: ${{ matrix.os == 'windows-latest' }}
           run: ctest --test-dir build/tests -j2 --verbose -E "(Brems.*Interpolant|Photo.*Interpolant|Epair.*Interpolant|Mupair.*Interpolant)"
