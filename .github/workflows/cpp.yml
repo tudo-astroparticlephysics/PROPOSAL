@@ -76,7 +76,11 @@ jobs:
         - name: Initialize conan
           run: conan profile detect
         - name: Prepare dependencies using conan
+          if : ${{ matrix.compiler != 'gcc-5' }}
           run: conan install . --build=missing -o with_testing=True
+        - name: Prepare dependencies using conan (gcc5)
+          if : ${{ matrix.compiler == 'gcc-5' }}
+          run: conan install . --build=missing -o with_testing=True compiler.cppstd=gnu14 -s compiler.cppstd=gnu14
         - name: Call CMake
           run: cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
         - name: Build and Install PROPOSAL
