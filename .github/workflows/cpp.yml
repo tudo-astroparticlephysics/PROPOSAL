@@ -81,14 +81,10 @@ jobs:
         - name: Prepare dependencies using conan (gcc5)
           if : ${{ matrix.compiler == 'gcc-5' }}
           run: conan install . --build=missing -o with_testing=True -s:b compiler.cppstd=gnu14 -s compiler.cppstd=gnu14
-        - name: Enter build folder
-          run: pwd && cd build && pwd && ls
         - name: Call CMake
           run: cmake . -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
         - name: Build PROPOSAL
           run: cmake --build . -j2
-        - name: Install PROPOSAL
-          run: cmake --install .  
     test:
       runs-on: ${{ matrix.os }}
       needs: build
