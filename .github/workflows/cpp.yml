@@ -84,7 +84,7 @@ jobs:
         - name: Call CMake
           run: cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
         - name: Build and Install PROPOSAL
-          run: cmake --build . -j2 && cmake --install .
+          run: pwd && ls && cmake --build . -j2 && cmake --install .
     test:
       runs-on: ${{ matrix.os }}
       needs: build
