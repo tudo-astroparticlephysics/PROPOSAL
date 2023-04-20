@@ -105,7 +105,7 @@ jobs:
               compilerpp : "g++-5"
             #- os : "windows-latest"
       env:
-        PROPOSAL_TEST_FILES: ${{ github.workspace }}/build/tests/TestFiles
+        PROPOSAL_TEST_FILES: ${{ github.workspace }}/tests/TestFiles
       steps:
         - uses: actions/checkout@v2
         - name: Cache conan
@@ -122,4 +122,4 @@ jobs:
             path: build
             key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-${{ github.sha }}-key
         - name: Run tests
-          run: ctest --test-dir build/tests -j2 --verbose -E "(Brems.*Interpolant|Photo.*Interpolant|Epair.*Interpolant|Mupair.*Interpolant)"
+          run: ctest --test-dir tests -j2 --verbose -E "(Brems.*Interpolant|Photo.*Interpolant|Epair.*Interpolant|Mupair.*Interpolant)"
