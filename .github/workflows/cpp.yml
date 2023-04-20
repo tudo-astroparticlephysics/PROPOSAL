@@ -85,7 +85,7 @@ jobs:
           run: cmake . -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
         - name: Call CMake (Windows)
           if: ${{ matrix.os == 'windows-latest' }}
-          run: cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
+          run: cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake"
         - name: Build PROPOSAL
           run: cmake --build . -j2
     test:
