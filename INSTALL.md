@@ -8,7 +8,7 @@ All different installation approaches are going to be explained in the following
 
 For more detailed information about the specific building tools, see the listed documentations: 
 
-- [conan documentation](https://docs.conan.io/en/latest/)
+- [conan documentation](https://docs.conan.io/2/)
 - [CMake documentation](https://cmake.org/cmake/help/latest/)
 - [pip documentation](https://pip.pypa.io/en/stable/)
 
