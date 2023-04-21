@@ -123,6 +123,9 @@ void init_secondaries(py::module& m)
     SecondariesBuilder<secondaries::KelnerKokoulinPetrukhinEpairProduction,
         secondaries::EpairProduction> {}
         .decl_rho_param(m_sub, "KelnerKokoulinPetrukhinEpairProduction");
+    SecondariesBuilder<secondaries::ForElectronPositronEpairProduction,
+        secondaries::EpairProduction> {}
+        .decl_rho_param(m_sub, "ForElectronPositronEpairProduction");
     SecondariesBuilder<secondaries::NaivEpairProduction,
         secondaries::EpairProduction> {}
         .decl_param(m_sub, "NaivEpairProduction");
