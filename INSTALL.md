@@ -59,7 +59,7 @@ $ cmake --install .
 
 Per default, CMake installs PROPOSAL to `/usr/local`. To change this, specify the install directory when calling CMake, for example `cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_INSTALL_PREFIX=/path/to/dir`.
 
-*Note:* As an alternative, you may create a local conan package and use it in your project. See the [conan documentation](https://docs.conan.io/en/latest/) for more information.
+*Note:* As an alternative, you may create a local conan package and use it in your project. See the [conan documentation](https://docs.conan.io/2/) for more information.
 
 ## Building using pip (recommended for Python users)
 
