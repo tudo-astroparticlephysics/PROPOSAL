@@ -6,8 +6,7 @@
 
 namespace PROPOSAL {
     namespace secondaries {
-        class PhotoPairProductionKochMotzForwardPeaked : public PhotoPairProductionInterpolant<crosssection::PhotoPairKochMotz>,
-                public DefaultSecondaries<PhotoPairProductionKochMotzForwardPeaked> {
+        class PhotoPairProductionKochMotzForwardPeaked : public PhotoPairProductionInterpolant<crosssection::PhotoPairKochMotz> {
 
         public:
             PhotoPairProductionKochMotzForwardPeaked() = default;
@@ -17,7 +16,8 @@ namespace PROPOSAL {
 
         };
 
-        class PhotoPairProductionKochMotzSauter : public PhotoPairProductionKochMotzForwardPeaked, public SauterSampling {
+        class PhotoPairProductionKochMotzSauter : public PhotoPairProductionKochMotzForwardPeaked, public SauterSampling,
+                                                  public DefaultSecondaries<PhotoPairProductionKochMotzSauter> {
         public:
             PhotoPairProductionKochMotzSauter() = default;
             PhotoPairProductionKochMotzSauter(ParticleDef p, Medium m)
