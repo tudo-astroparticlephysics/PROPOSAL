@@ -20,6 +20,10 @@ namespace PROPOSAL {
             return multiplier_ * cross_->CalculatedNdx(energy, comp_hash);
         };
 
+        double CalculatedNdx_unweighted(double energy, size_t comp_hash) override {
+            return multiplier_ * cross_->CalculatedNdx_unweighted(energy, comp_hash);
+        };
+
         double CalculateCumulativeCrosssection(double energy, size_t comp_hash, double v) override {
             return multiplier_ * cross_->CalculateCumulativeCrosssection(energy, comp_hash, v);
         }

@@ -33,16 +33,22 @@ crosssection::AnnihilationHeitler::AnnihilationHeitler() {
 
 double crosssection::AnnihilationHeitler::CalculatedNdx(double energy, size_t comp_hash, const ParticleDef& p_def,
                                                               const Medium& medium, cut_ptr cut) {
+    auto comp = Component::GetComponentForHash(comp_hash);
+    auto weight = detail::weight_component(medium, comp);
+    return CalculatedNdx_unweighted(energy, comp_hash, p_def, medium, cut) / weight;
+}
+
+double crosssection::AnnihilationHeitler::CalculatedNdx_unweighted(double energy, size_t comp_hash, const ParticleDef& p_def,
+                                                        const Medium& medium, cut_ptr cut) {
     // integrated form of Heitler Annihilation, cf. Geant4 PhysicsReferenceManual
     if (energy <= Annihilation::GetLowerEnergyLim(p_def, medium, cut))
         return 0.;
 
     auto comp = Component::GetComponentForHash(comp_hash);
     auto gamma = energy / p_def.mass;
-    auto weight = detail::weight_component(medium, comp);
     auto aux = (gamma * gamma + 4 * gamma + 1) / (gamma * gamma - 1)
-            * std::log(gamma + std::sqrt(gamma * gamma - 1)) - (gamma + 3) / std::sqrt(gamma * gamma - 1);
-    aux *= NA * comp.GetNucCharge() / comp.GetAtomicNum() * PI * RE * RE / (gamma + 1.) / weight;
+               * std::log(gamma + std::sqrt(gamma * gamma - 1)) - (gamma + 3) / std::sqrt(gamma * gamma - 1);
+    aux *= NA * comp.GetNucCharge() / comp.GetAtomicNum() * PI * RE * RE / (gamma + 1.);
 
     return aux;
 }

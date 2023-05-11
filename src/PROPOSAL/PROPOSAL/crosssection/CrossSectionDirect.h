@@ -26,6 +26,9 @@ namespace PROPOSAL {
         double CalculatedNdx(double energy, size_t hash) override {
             return param->CalculatedNdx(energy, hash, p, m, cut);
         };
+        double CalculatedNdx_unweighted(double energy, size_t hash) override {
+            return param->CalculatedNdx_unweighted(energy, hash, p, m, cut);
+        };
         double CalculateCumulativeCrosssection(
                 double energy, size_t hash, double v) override {
             return param->CalculateCumulativeCrosssection(energy, hash, v, p, m, cut);

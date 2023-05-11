@@ -43,10 +43,16 @@ double crosssection::Photoeffect::PhotonAtomCrossSection(double energy, const Co
 }
 
 double crosssection::Photoeffect::CalculatedNdx(
+        double energy, size_t comp_hash, const ParticleDef& p_def, const Medium& m, cut_ptr cut) {
+    auto comp = Component::GetComponentForHash(comp_hash);
+    auto weight = detail::weight_component(m, comp);
+    return CalculatedNdx_unweighted(energy, comp_hash, p_def, m, cut) / weight;
+}
+
+double crosssection::Photoeffect::CalculatedNdx_unweighted(
         double energy, size_t comp_hash, const ParticleDef&, const Medium& m, cut_ptr) {
-        auto comp = Component::GetComponentForHash(comp_hash);
-        auto weight = detail::weight_component(m, comp);
-        return NA / comp.GetAtomicNum() * PhotonAtomCrossSection(energy, comp) / weight;
+    auto comp = Component::GetComponentForHash(comp_hash);
+    return NA / comp.GetAtomicNum() * PhotonAtomCrossSection(energy, comp);
 }
 
 double crosssection::Photoeffect::CalculatedNdx(double energy, const ParticleDef& p, const Medium& m, cut_ptr cut) {

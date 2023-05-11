@@ -140,6 +140,29 @@ void init_crosssection(py::module& m)
             energy (float): energy in MeV
 
             )pbdoc")
+        .def("calculate_dNdx_unweighted",
+                 py::vectorize(py::overload_cast<double, size_t>(&CrossSectionBase::CalculatedNdx_unweighted)),
+                 py::arg("energy"), py::arg("target_hash"),
+                 R"pbdoc(
+
+        Calculates the total (unweighted) cross section
+
+            .. math:: \frac{N_A}{A} \cdot \int_{v_{cut}}^{v_{max}} \frac{d\sigma}{dv} dv
+
+        with the particle energy E, the relative energy loss v and the
+        crosssection :math:`\sigma`. The value v_{cut} is the energy cut to
+        differentiate between continous and stochastic losses in PROPOSAL,
+        see :meth:`~proposal.EnergyCutSettings` for more information on the
+        energy cuts.
+
+        Note that this integral only includes the v values about our cut,
+        therefore this values represents only the total crosssection for the
+        stochastic energy losses.
+
+        Args:
+            energy (float): energy in MeV
+
+            )pbdoc")
         .def("calculate_cumulative_crosssection", py::vectorize(&CrossSectionBase::CalculateCumulativeCrosssection),
              py::arg("energy"), py::arg("target_hash"), py::arg("v"), R"pbdoc(
                 Integrate differential cross section from v_cut to v (e.g. for

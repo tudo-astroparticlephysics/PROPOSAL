@@ -51,6 +51,7 @@ struct CrossSectionBase {
     virtual double CalculatedE2dx(double) = 0;
     virtual double CalculatedNdx(double) = 0;
     virtual double CalculatedNdx(double, size_t) = 0;
+    virtual double CalculatedNdx_unweighted(double, size_t) = 0;
     virtual double CalculateCumulativeCrosssection(double, size_t, double) = 0;
     virtual std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(
         double)
@@ -302,6 +303,13 @@ public:
         if (dndx)
             return std::get<1>((*dndx)[target_hash])->Calculate(E)
                 / std::get<0>((*dndx)[target_hash]);
+        return 0.;
+    };
+
+    double CalculatedNdx_unweighted(double E, size_t target_hash) override
+    {
+        if (dndx)
+            return std::get<1>((*dndx)[target_hash])->Calculate(E);
         return 0.;
     };
 

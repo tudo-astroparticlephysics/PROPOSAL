@@ -63,6 +63,7 @@ namespace crosssection {
 
         double CalculatedNdx(double, const ParticleDef&, const Medium&, cut_ptr) override;
         double CalculatedNdx(double, size_t, const ParticleDef&, const Medium&, cut_ptr) override;
+        double CalculatedNdx_unweighted(double, size_t, const ParticleDef&, const Medium&, cut_ptr) override;
         std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(
                 double, const ParticleDef&, const Medium&, cut_ptr) override;
 

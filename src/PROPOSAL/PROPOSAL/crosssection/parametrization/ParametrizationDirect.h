@@ -28,6 +28,8 @@ namespace PROPOSAL {
                     double, const ParticleDef&, const Medium&, cut_ptr) = 0;
             virtual double CalculatedNdx(
                     double, size_t, const ParticleDef&, const Medium&, cut_ptr) = 0;
+            virtual double CalculatedNdx_unweighted(
+                    double, size_t, const ParticleDef&, const Medium&, cut_ptr) = 0;
             virtual double CalculateCumulativeCrosssection(
                     double, size_t, double, const ParticleDef&, const Medium&, cut_ptr) = 0;
             virtual std::vector<std::pair<size_t, double>> CalculatedNdx_PerTarget(
