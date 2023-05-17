@@ -46,6 +46,8 @@ public:
     };
     Loss SampleLoss(double energy, std::vector<Rate> const& rates, double rnd);
 
+    Loss SampleLoss(double energy, double rnd);
+
     virtual double MeanFreePath(double) = 0;
 
     auto GetHash() const noexcept { return hash; }

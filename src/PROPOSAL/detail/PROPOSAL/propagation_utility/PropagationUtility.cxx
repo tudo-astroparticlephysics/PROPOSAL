@@ -89,13 +89,11 @@ PropagationUtility::PropagationUtility(
     }
 }
 
+
 Interaction::Loss PropagationUtility::EnergyStochasticloss(double energy,
                                                            double rnd)
 {
-    auto rates = collection.interaction_calc->Rates(energy);
-    auto loss = collection.interaction_calc->SampleLoss(energy, rates, rnd);
-
-    return loss;
+    return collection.interaction_calc->SampleLoss(energy, rnd);
 }
 
 double PropagationUtility::EnergyDecay(
