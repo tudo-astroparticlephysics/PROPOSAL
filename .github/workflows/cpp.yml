@@ -97,7 +97,7 @@ jobs:
           if: ${{ matrix.os != 'windows-latest' }}
           run: cmake --build . -j2
         - name: Build PROPOSAL (Windows)
-          if: ${{ matrix.os != 'windows-latest' }}
+          if: ${{ matrix.os == 'windows-latest' }}
           run: cmake --build . -j2 --config Release
     test:
       runs-on: ${{ matrix.os }}
