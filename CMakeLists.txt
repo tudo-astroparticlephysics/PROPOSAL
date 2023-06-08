@@ -11,10 +11,6 @@ project(PROPOSAL
     DESCRIPTION "The very best photon and lepton propagator."
     )
 
-if (EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
-    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-endif()
-
 if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "No build type has been specified. Using default system build type. You may want to change this to"
   	"'Release' if you are using PROPOSAL for production purposes.")

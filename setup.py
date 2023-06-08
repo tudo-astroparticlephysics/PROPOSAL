@@ -32,8 +32,7 @@ def get_cmake():
 
         if ret.returncode == 0:
             return exe
-    raise OSError("You need cmake >= 3.16")
-
+    raise OSError("You need cmake >= 3.23")
 
 def exists_conan_default_file():
     profiles = sp.check_output(["conan", "profile", "list"], encoding="UTF-8").split()
@@ -41,34 +40,13 @@ def exists_conan_default_file():
         return True
     return False
 
-
-def create_conan_profile(name):
-    cmd = ["conan", "profile", "new", f"{name}", "--detect"]
+def create_conan_profile():
+    cmd = ["conan", "profile", "detect"]
     r = sp.run(cmd)
     if r.returncode != 0:
         raise RuntimeError(
-            "conan was not able to create a new profile named {name}."
+            "conan was not able to create a new default profile."
         )
-
-
-def is_old_libcxx():
-    """ if we are on gcc, we might be using an old library ABI """
-
-    cmd = ["conan", "profile", "get", "settings.compiler", "default"]
-    r = sp.check_output(cmd, encoding="UTF-8")
-    compiler = r.split()[0]
-
-    if compiler != "gcc":
-        return False
-
-    cmd = ["conan", "profile", "get", "settings.compiler.libcxx", "default"]
-    r = sp.check_output(cmd, encoding="UTF-8")
-    libcxx = r.split()[0]
-
-    if libcxx == "libstdc++11":
-        return False
-
-    return True
 
 
 class CMakeExtension(Extension):
@@ -99,14 +77,13 @@ class build_ext_cmake(build_ext):
         cmake = get_cmake()
 
         rpath = '@loader_path' if sys.platform == 'darwin' else '$ORIGIN'
-        CMAKE_CXX_FLAGS = ""
         if not os.getenv("NO_CONAN", False):
             print(
                 "Using conan to install dependencies. Set environment variable NO_CONAN to skip conan."
             )
 
             if not exists_conan_default_file():
-                create_conan_profile("default")
+                create_conan_profile()
 
             conan_call = [
                 'conan',
@@ -117,24 +94,18 @@ class build_ext_cmake(build_ext):
                 '--build=missing'
                ]
             sp.run(conan_call, cwd=self.build_temp, check=True)
-            if is_old_libcxx():
-                CMAKE_CXX_FLAGS = '-DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=OFF"'
         cmake_call = [
             cmake,
+
             ext.source_dir,
+            '-DCMAKE_TOOLCHAIN_FILE={}/build/conan_toolchain.cmake'.format(ext.source_dir),
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
             '-DCMAKE_BUILD_TYPE=' + cfg,
-            '-DBUILD_TESTING=OFF',
-            '-DBUILD_PYTHON=ON',
-            '-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE',
-            '-DBUILD_EXAMPLE=OFF',
             '-DPython_EXECUTABLE=' + sys.executable,
             '-DCMAKE_INSTALL_RPATH={}'.format(rpath),
             '-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON',
             '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF',
         ]
-        if CMAKE_CXX_FLAGS:
-            cmake_call.append(CMAKE_CXX_FLAGS)
         sp.run(cmake_call, cwd=self.build_temp, check=True)
         build_call = [
             cmake,
