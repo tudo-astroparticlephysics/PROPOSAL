@@ -4,7 +4,12 @@ on: [push]
 
 jobs:
     build:
-      runs-on: "ubuntu-latest"
+      runs-on: ${{ matrix.os }}
+      strategy:
+        matrix:
+          include:
+            - os : "ubuntu-latest"
+            - os : "macos-latest"
       steps:
         - uses: actions/checkout@v2
         - name: Cache conan
@@ -12,17 +17,12 @@ jobs:
           uses: actions/cache@v2
           with:
             path: ~/.conan
-            key: ${{ runner.os }}-cache-conan-gcc-${{ hashFiles('conanfile.py') }}-key
+            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-${{ hashFiles('conanfile.py') }}-key
         - name: Install conan
-          run: python -m pip install conan
-        - name: Initialize conan
-          if : steps.cache-conan.outputs.cache-hit != 'true'
-          run: conan profile new default --detect
-        - name: Update conan profile
-          run: conan profile update settings.compiler.libcxx=libstdc++11 default
+          run: python3 -m pip install conan
         - name: Install Python 🐍 distributions 📦
-          run: python -m pip install .
+          run: python3 -m pip install .
         - name: Install pytest
-          run: python -m pip install pytest
+          run: python3 -m pip install pytest
         - name: run pytest
-          run: python -m pytest tests/python -v
+          run: python3 -m pytest tests/python -v

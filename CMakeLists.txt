@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 
 set(PROPOSAL_VERSION_MAJOR 7)
 set(PROPOSAL_VERSION_MINOR 5)
-set(PROPOSAL_VERSION_PATCH 0)
+set(PROPOSAL_VERSION_PATCH 1)
 set(PROPOSAL_VERSION ${PROPOSAL_VERSION_MAJOR}.${PROPOSAL_VERSION_MINOR}.${PROPOSAL_VERSION_PATCH})
 
 project(PROPOSAL
@@ -10,10 +10,6 @@ project(PROPOSAL
     LANGUAGES CXX
     DESCRIPTION "The very best photon and lepton propagator."
     )
-
-if (EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
-    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-endif()
 
 if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "No build type has been specified. Using default system build type. You may want to change this to"

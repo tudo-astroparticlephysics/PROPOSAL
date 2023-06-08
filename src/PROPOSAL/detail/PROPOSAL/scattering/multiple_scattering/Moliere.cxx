@@ -7,6 +7,8 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/scattering/multiple_scattering/Coefficients.h"
 #include "PROPOSAL/scattering/multiple_scattering/Moliere.h"
+#include <CubicInterpolation/Axis.h>
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL::multiple_scattering;
 
@@ -362,11 +364,71 @@ double Moliere::GetRandom(double pre_factor, double rnd)
     rnd = rnd - 0.5;
 
     // iterating until the number of correct digits is greater than 4
+    unsigned int i = 0;
     do {
+        i++;
         theta_n = theta_np1;
         theta_np1 = theta_n - (F(theta_n) - rnd) / f(theta_n);
-
+        if (i == 100) {
+            Logging::Get("proposal.scattering")->warn(
+                    "Iteration in Moliere::GetRandom did not converge after 100 iterations. "
+                    "Return current value theta = {} (previous iteration: theta = {}", theta_np1, theta_n);
+            return theta_np1;
+        }
     } while (std::abs((theta_n - theta_np1) / theta_np1) > 1e-4);
 
     return theta_np1;
+}
+
+MoliereInterpol::MoliereInterpol(const ParticleDef& p_def, const Medium& medium) : Moliere(p_def, medium) {
+    // initialize interpolation tables
+    Logging::Get("proposal.scattering")->debug("Initialize interpooation tables for MoliereInterpol.");
+
+    auto def_f1M = cubic_splines::CubicSplines<double>::Definition();
+    def_f1M.f = [&](double x) {return Moliere::f1M(x);};
+    def_f1M.axis = std::make_unique<cubic_splines::LinAxis<double>>(0.f, 20, size_t(100));
+    f1M_interpolant_ = std::make_shared<interpolant_t>(std::move(def_f1M));
+
+    auto def_f2M = cubic_splines::CubicSplines<double>::Definition();
+    def_f2M.f = [&](double x) {return Moliere::f2M(x);};
+    def_f2M.axis = std::make_unique<cubic_splines::LinAxis<double>>(0.f, 20, size_t(100));
+    f2M_interpolant_ = std::make_shared<interpolant_t>(std::move(def_f2M));
+
+    auto def_F1M = cubic_splines::CubicSplines<double>::Definition();
+    def_F1M.f = [&](double x) {return Moliere::F1M(x);};
+    def_F1M.axis = std::make_unique<cubic_splines::LinAxis<double>>(0.f, 20, size_t(100));
+    F1M_interpolant_ = std::make_shared<interpolant_t>(std::move(def_F1M));
+
+    auto def_F2M = cubic_splines::CubicSplines<double>::Definition();
+    def_F2M.f = [&](double x) {return Moliere::F2M(x);};
+    def_F2M.axis = std::make_unique<cubic_splines::LinAxis<double>>(0.f, 20, size_t(100));
+    F2M_interpolant_ = std::make_shared<interpolant_t>(std::move(def_F2M));
+}
+
+double MoliereInterpol::f1M(double x)
+{
+    if (x > 20.)
+        return Moliere::f1M(x); // use analytical evaluation outside range of interpolation tables
+    return f1M_interpolant_->evaluate(x);
+}
+
+double MoliereInterpol::f2M(double x)
+{
+    if (x > 20)
+        return Moliere::f2M(x);  // use analytical evaluation outside range of interpolation tables
+    return f2M_interpolant_->evaluate(x);
+}
+
+double MoliereInterpol::F1M(double x)
+{
+    if (x > 20.)
+        return Moliere::F1M(x); // use analytical evaluation outside range of interpolation tables
+    return F1M_interpolant_->evaluate(x);
+}
+
+double MoliereInterpol::F2M(double x)
+{
+    if (x > 20)
+        return Moliere::F2M(x); // use analytical evaluation outside range of interpolation tables
+    return F2M_interpolant_->evaluate(x);
 }

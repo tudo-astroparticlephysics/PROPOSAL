@@ -123,6 +123,9 @@ void init_secondaries(py::module& m)
     SecondariesBuilder<secondaries::KelnerKokoulinPetrukhinEpairProduction,
         secondaries::EpairProduction> {}
         .decl_rho_param(m_sub, "KelnerKokoulinPetrukhinEpairProduction");
+    SecondariesBuilder<secondaries::ForElectronPositronEpairProduction,
+        secondaries::EpairProduction> {}
+        .decl_rho_param(m_sub, "ForElectronPositronEpairProduction");
     SecondariesBuilder<secondaries::NaivEpairProduction,
         secondaries::EpairProduction> {}
         .decl_param(m_sub, "NaivEpairProduction");
@@ -148,9 +151,15 @@ void init_secondaries(py::module& m)
     SecondariesBuilder<secondaries::PhotoPairProductionTsaiForwardPeaked,
         secondaries::PhotoPairProduction> {}
         .decl_rho_param(m_sub, "PhotoTsaiForwardPeaked");
+    SecondariesBuilder<secondaries::PhotoPairProductionTsaiSauter,
+        secondaries::PhotoPairProduction> {}
+        .decl_rho_param(m_sub, "PhotoTsaiSauter");
     SecondariesBuilder<secondaries::PhotoPairProductionKochMotzForwardPeaked,
         secondaries::PhotoPairProduction> {}
         .decl_rho_param(m_sub, "PhotoKochMotzForwardPeaked");
+    SecondariesBuilder<secondaries::PhotoPairProductionKochMotzSauter,
+        secondaries::PhotoPairProduction> {}
+        .decl_rho_param(m_sub, "PhotoKochMotzSauter");
 
     SecondariesBuilder<secondaries::PhotoeffectNoDeflection, secondaries::Photoeffect> {}
         .decl_param(m_sub, "PhotoeffectNoDeflection");

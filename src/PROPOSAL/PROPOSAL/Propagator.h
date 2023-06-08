@@ -72,8 +72,8 @@ private:
 
     ParticleDef p_def;
     enum Type : int {
-        MinimalE = 0,
-        Decay = 1,
+        Decay = 0,
+        MinimalE = 1,
         Stochastic = 2,
     };
     enum AdvancementType : int {

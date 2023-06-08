@@ -8,7 +8,7 @@ All different installation approaches are going to be explained in the following
 
 For more detailed information about the specific building tools, see the listed documentations: 
 
-- [conan documentation](https://docs.conan.io/en/latest/)
+- [conan documentation](https://docs.conan.io/2/)
 - [CMake documentation](https://cmake.org/cmake/help/latest/)
 - [pip documentation](https://pip.pypa.io/en/stable/)
 
@@ -18,23 +18,23 @@ For more detailed information about the specific building tools, see the listed 
 For this installation approach, all dependencies will be fetched by conan, meaning that you don't have to install them by yourself. If you have not installed conan yet, you can do so, for example:
 
 ```sh
-$ pip install conan
+$ pip install "conan~=2.0"
 ```
 
 Clone the repository and create a build directory
 
 ```sh
 $ git clone https://github.com/tudo-astroparticlephysics/PROPOSAL.git
-$ cd PROPOSAL && mkdir build && cd build      
+$ cd PROPOSAL      
 ```
 
-Use conan to prepare all dependencies. You can pass additional options to conan.
+To prepare all dependencies, build PROPOSAL, and install PROPOSAL, simply use the command
 
 ```sh             
-$ conan install .. -o with_python=True	# other optional dependencies
+$ conan install . --build=missing -o with_python=True	# other options
 ```
 
-The following options can be passed to `conan install`:
+The following options can be passed to `conan build`:
 
 | Option.              | default | Description                                   |
 | -------------------- | ------- | --------------------------------------------- |
@@ -42,23 +42,24 @@ The following options can be passed to `conan install`:
 | `with_testing`       | False   | Build TestFiles for Python.                   |
 | `with_documentation` | False   | Build doxygen documentation of C++ code (WIP) |
 
-Build and install PROPOSAL. You may require root privileges when installing, depending on the installation location:
 
-```sh
-$ conan build ..
+Next, call CMake, using the toolchain file created by conan:
+
+```sh             
+$ cd build
+$ cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
 ```
 
-To set the install location, use `-pf / --package-folder` option.
-The default is `build/package`.
-E.g. to install proposal into `$HOME/.local/proposal`:
+Now make and install PROPOSAL
+
+```sh             
+$ cmake --build . -j4
+$ cmake --install .
 ```
-$ conan build .. -pf $HOME/.local/proposal
-```
 
-This will also run the tests if `with_testing` is true.
+Per default, CMake installs PROPOSAL to `/usr/local`. To change this, specify the install directory when calling CMake, for example `cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_INSTALL_PREFIX=/path/to/dir`.
 
-
-*Note:* As an alternative, you may create a local conan package and use it in your project. See the [conan documentation](https://docs.conan.io/en/latest/) for more information.
+*Note:* As an alternative, you may create a local conan package and use it in your project. See the [conan documentation](https://docs.conan.io/2/) for more information.
 
 ## Building using pip (recommended for Python users)
 

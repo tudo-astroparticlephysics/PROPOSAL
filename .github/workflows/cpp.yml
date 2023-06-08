@@ -55,7 +55,7 @@ jobs:
           with:
             version: 7
             platform: x64
-        - name: Cache conan
+        - name: Cache Conan
           if: ${{ matrix.os != 'windows-latest' }}
           id: cache-conan
           uses: actions/cache@v2
@@ -66,7 +66,7 @@ jobs:
           id: cache-build
           uses: actions/cache@v2
           with:
-            path: PROPOSAL_BUILD
+            path: build
             key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-${{ github.sha }}-key
         - uses: actions/setup-python@v2
           with:
@@ -74,27 +74,25 @@ jobs:
         - name: Install python dependencies
           run: python -m pip install conan
         - name: Initialize conan
-          if : steps.cache-conan.outputs.cache-hit != 'true'
-          run: conan profile new default --detect
-        - name: Update conan profile
-          if : ${{ matrix.os == 'ubuntu-20.04' || matrix.os == 'ubuntu-latest' }}
-          run: conan profile update settings.compiler.libcxx=libstdc++11 default
-        - name: Update conan profile
-          run: conan profile update settings.compiler.cppstd=14 default
-        - name: create build directory
-          if : steps.cache-build.outputs.cache-hit != 'true'
-          run: mkdir PROPOSAL_BUILD
-        - name: Install PROPOSAL dependencies
-          run: cd PROPOSAL_BUILD && conan install .. -o with_testing=True --build=missing
-        - name: Run build automatisation tool
-          run: cmake . -B PROPOSAL_BUILD -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=TRUE
-        - name: Build lib
+          run: conan profile detect
+        - name: Prepare dependencies using conan
+          if : ${{ matrix.compiler != 'gcc-5' }}
+          run: conan install . --build=missing -o with_testing=True
+        - name: Prepare dependencies using conan (gcc5)
+          if : ${{ matrix.compiler == 'gcc-5' }}
+          run: conan install . --build=missing -o with_testing=True -s:b compiler.cppstd=gnu14 -s compiler.cppstd=gnu14
+        - name: Call CMake
           if: ${{ matrix.os != 'windows-latest' }}
-          run: cmake --build PROPOSAL_BUILD
-        - name: Build lib
+          run: cmake . -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
+        - name: Call CMake (Windows)
           if: ${{ matrix.os == 'windows-latest' }}
-          run: cmake --build PROPOSAL_BUILD --target ALL_BUILD --config Release
-
+          run: cmake . -DCMAKE_TOOLCHAIN_FILE="build/conan_toolchain.cmake" -DCMAKE_POLICY_DEFAULT_CMP0091=NEW         
+        - name: Build PROPOSAL
+          if: ${{ matrix.os != 'windows-latest' }}
+          run: cmake --build . -j2
+        - name: Build PROPOSAL (Windows)
+          if: ${{ matrix.os != 'windows-latest' }}
+          run: cmake --build . -j2 --config Release
     test:
       runs-on: ${{ matrix.os }}
       needs: build
@@ -115,7 +113,7 @@ jobs:
               compilerpp : "g++-5"
             - os : "windows-latest"
       env:
-        PROPOSAL_TEST_FILES: ${{ github.workspace }}/PROPOSAL_BUILD/tests/TestFiles
+        PROPOSAL_TEST_FILES: ${{ github.workspace }}/tests/TestFiles
       steps:
         - uses: actions/checkout@v2
         - name: Cache conan
@@ -129,7 +127,7 @@ jobs:
           id: cache-build
           uses: actions/cache@v2
           with:
-            path: PROPOSAL_BUILD
+            path: build
             key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-${{ github.sha }}-key
         - name: Run tests
-          run: ctest --test-dir PROPOSAL_BUILD -j2 --verbose -E "(Brems.*Interpolant|Photo.*Interpolant|Epair.*Interpolant|Mupair.*Interpolant)"
+          run: ctest --test-dir tests -j2 --verbose -E "(Brems.*Interpolant|Photo.*Interpolant|Epair.*Interpolant|Mupair.*Interpolant)"

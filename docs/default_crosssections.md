@@ -23,14 +23,14 @@ More information about each parametrization are given [here](https://github.com/
 
 - Bremsstrahlung: `ElectronScreening` (LPM effect disabled)
 - Electron-Positron pair production: `ForElectronPositron` (LPM effect disabled)
-- Ionization: `BergerSeltzerBhabha`
+- Ionization: `BergerSeltzerMoller`
 - Nuclear interactions: `AbramowiczLevinLevyMaor97` (with the shadowing parametrization `ButkevichMikheyev`)
 
 ### Positrons:
 
 - Bremsstrahlung: `ElectronScreening` (LPM effect disabled)
 - Electron-Positron pair production: `ForElectronPositron` (LPM effect disabled)
-- Ionization: `BergerSeltzerMoller`
+- Ionization: `BergerSeltzerBhabha`
 - Nuclear interactions: `AbramowiczLevinLevyMaor97` (with the shadowing parametrization `ButkevichMikheyev`)
 - Annihilation: `Heitler`
 

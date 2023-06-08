@@ -697,22 +697,22 @@ void init_parametrization(py::module& m)
 
     py::class_<crosssection::PhotoproductionBezrukovBugaev,
     std::shared_ptr<crosssection::PhotoproductionBezrukovBugaev>,
-    crosssection::Photoproduction>(m_sub_photoproduction, "BezrukovBugaev")
+    crosssection::Photoproduction>(m_sub_photoproduction, "BezrukovBugaev", py::multiple_inheritance())
         .def(py::init<>());
 
     py::class_<crosssection::PhotoproductionCaldwell,
     std::shared_ptr<crosssection::PhotoproductionCaldwell>,
-    crosssection::Photoproduction>(m_sub_photoproduction, "Caldwell")
+    crosssection::Photoproduction>(m_sub_photoproduction, "Caldwell", py::multiple_inheritance())
         .def(py::init<>());
 
     py::class_<crosssection::PhotoproductionKokoulin,
     std::shared_ptr<crosssection::PhotoproductionKokoulin>,
-    crosssection::Photoproduction>(m_sub_photoproduction, "Kokoulin")
+    crosssection::Photoproduction>(m_sub_photoproduction, "Kokoulin", py::multiple_inheritance())
         .def(py::init<>());
 
     py::class_<crosssection::PhotoproductionRhode,
     std::shared_ptr<crosssection::PhotoproductionRhode>,
-    crosssection::Photoproduction>(m_sub_photoproduction, "Rhode")
+    crosssection::Photoproduction>(m_sub_photoproduction, "Rhode", py::multiple_inheritance())
         .def(py::init<>())
         .def("PhotonNucleonCrossSection",
          &crosssection::PhotoproductionRhode::PhotonNucleonCrossSection,
@@ -720,12 +720,12 @@ void init_parametrization(py::module& m)
 
     py::class_<crosssection::PhotoproductionHeck,
     std::shared_ptr<crosssection::PhotoproductionHeck>,
-    crosssection::Photoproduction>(m_sub_photoproduction, "Heck")
+    crosssection::Photoproduction>(m_sub_photoproduction, "Heck", py::multiple_inheritance())
         .def(py::init<>());
 
     py::class_<crosssection::PhotoproductionHeckC7Shadowing,
         std::shared_ptr<crosssection::PhotoproductionHeckC7Shadowing>,
-        crosssection::Photoproduction>(m_sub_photoproduction, "HeckC7Shadowing")
+        crosssection::Photoproduction>(m_sub_photoproduction, "HeckC7Shadowing", py::multiple_inheritance())
         .def(py::init<>());
 
     // --------------------------------------------------------------------- //
