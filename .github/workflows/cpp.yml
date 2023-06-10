@@ -68,6 +68,12 @@ jobs:
           with:
             path: build
             key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-${{ github.sha }}-key
+        - name: Cache tests
+          id: cache-tests
+          uses: actions/cache@v2
+          with:
+            path: tests
+            key: ${{ runner.os }}-cache-tests-${{ matrix.compiler }}-${{ github.sha }}-key            
         - uses: actions/setup-python@v2
           with:
             python-version: '3.8'
@@ -91,7 +97,7 @@ jobs:
           if: ${{ matrix.os != 'windows-latest' }}
           run: cmake --build . -j2
         - name: Build PROPOSAL (Windows)
-          if: ${{ matrix.os != 'windows-latest' }}
+          if: ${{ matrix.os == 'windows-latest' }}
           run: cmake --build . -j2 --config Release
     test:
       runs-on: ${{ matrix.os }}
@@ -123,11 +129,11 @@ jobs:
           with:
             path: ~/.conan
             key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-${{ hashFiles('conanfile.py') }}-key
-        - name: Cache build
-          id: cache-build
+        - name: Cache tests
+          id: cache-tests
           uses: actions/cache@v2
           with:
-            path: build
-            key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-${{ github.sha }}-key
+            path: tests
+            key: ${{ runner.os }}-cache-tests-${{ matrix.compiler }}-${{ github.sha }}-key
         - name: Run tests
           run: ctest --test-dir tests -j2 --verbose -E "(Brems.*Interpolant|Photo.*Interpolant|Epair.*Interpolant|Mupair.*Interpolant)"
