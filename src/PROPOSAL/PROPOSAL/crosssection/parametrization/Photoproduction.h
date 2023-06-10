@@ -99,6 +99,36 @@ namespace PROPOSAL {
         template <> struct ParametrizationName<PhotoproductionRhode> {
             static constexpr auto value = "Rhode";
         };
+
+        class PhotoproductionHeck : virtual public Photoproduction {
+            double sigma_bw(double s, double E, double M, double Gamma, double Sigma0);
+            double Q(double E, double E_th, double w);
+            const std::array<double, 3> resonances_M;
+            const std::array<double, 3> resonances_Gamma;
+            const std::array<double, 3> resonances_Sigma0;
+            const std::array<double, 3> resonances_w;
+
+        public:
+            PhotoproductionHeck();
+            std::unique_ptr<ParametrizationDirect> clone() const override;
+            double PhotonNucleonCrossSection(double, const Component&) override;
+        };
+
+        template <> struct ParametrizationName<PhotoproductionHeck> {
+            static constexpr auto value = "Heck";
+        };
+
+        class PhotoproductionHeckC7Shadowing : virtual public PhotoproductionHeck {
+        public:
+            PhotoproductionHeckC7Shadowing();
+            double PhotonAtomCrossSection(double energy, const Component& comp) override;
+            std::unique_ptr<ParametrizationDirect> clone() const override;
+        };
+
+        template <> struct ParametrizationName<PhotoproductionHeckC7Shadowing> {
+            static constexpr auto value = "HeckC7Shadowing";
+        };
+
     }
 }
 

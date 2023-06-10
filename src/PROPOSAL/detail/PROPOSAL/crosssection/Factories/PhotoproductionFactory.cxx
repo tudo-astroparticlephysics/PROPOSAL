@@ -22,7 +22,9 @@ std::map<std::string, photo_func_ptr, Helper::case_insensitive_comp> photoproduc
         init_param<crosssection::PhotoproductionBezrukovBugaev>,
         init_param<crosssection::PhotoproductionCaldwell>,
         init_param<crosssection::PhotoproductionKokoulin>,
-        init_param<crosssection::PhotoproductionRhode>
+        init_param<crosssection::PhotoproductionRhode>,
+        init_param<crosssection::PhotoproductionHeck>,
+        init_param<crosssection::PhotoproductionHeckC7Shadowing>
 };
 
 namespace PROPOSAL {

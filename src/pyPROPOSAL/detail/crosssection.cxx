@@ -285,6 +285,8 @@ void init_crosssection(py::module& m)
     build_crosssection<crosssection::PhotoproductionCaldwell>(m_sub);
     build_crosssection<crosssection::PhotoproductionKokoulin>(m_sub);
     build_crosssection<crosssection::PhotoproductionRhode>(m_sub);
+    build_crosssection<crosssection::PhotoproductionHeck>(m_sub);
+    build_crosssection<crosssection::PhotoproductionHeckC7Shadowing>(m_sub);
 
     build_crosssection<crosssection::PhotoeffectSauter>(m_sub);
 
