@@ -284,7 +284,7 @@ double Moliere::F1M(double x)
     for (int p = 68; p >= 0; p--)
         sum = sum * x + c1[p] / (2. * p + 1.);
 
-    return sum * std::sqrt(x);
+    return sum * std::sqrt(std::max(x, 0.));
 }
 
 //----------------------------------------------------------------------------//
@@ -321,7 +321,7 @@ double Moliere::F2M(double x)
     for (int p = 68; p >= 0; p--)
         sum = sum * x + c2[p] / (2. * p + 1.);
 
-    return sum * std::sqrt(x);
+    return sum * std::sqrt(std::max(x, 0.));
 }
 
 //----------------------------------------------------------------------------//
@@ -334,7 +334,7 @@ double Moliere::F(double theta)
         double x = theta * theta / (chiCSq_ * B_[i]);
 
         y1 += weight_ZZ_[i]
-            * (0.5 * std::erf(std::sqrt(x))
+            * (0.5 * std::erf(std::sqrt(std::max(x, 0.)))
                 + std::sqrt(1. / PI)
                     * (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
     }
