@@ -84,6 +84,7 @@ namespace multiple_scattering {
         }
 
         double GetMoliereAngle(double grammage, double ei, double rnd);
+        double GetMoliereAngle2D(double grammage, double ei, double rnd1, double rnd2);
     };
 
     class MoliereInterpol : public Moliere {
