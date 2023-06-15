@@ -54,9 +54,11 @@ void init_scattering(py::module& m)
     py::class_<multiple_scattering::Moliere, multiple_scattering::Parametrization,
             std::shared_ptr<multiple_scattering::Moliere>>(m_sub, "Moliere")
             .def(py::init<const ParticleDef&, const Medium&>(),
-                 py::arg("particle_def"), py::arg("medium"));
+                 py::arg("particle_def"), py::arg("medium"))
+            .def("moliere_angle", &multiple_scattering::Moliere::GetMoliereAngle,
+                 py::arg("grammage"), py::arg("E_i"), py::arg("rnd"));
 
-    py::class_<multiple_scattering::MoliereInterpol, multiple_scattering::Parametrization,
+    py::class_<multiple_scattering::MoliereInterpol, multiple_scattering::Moliere,
             std::shared_ptr<multiple_scattering::MoliereInterpol>>(m_sub, "MoliereInterpol")
             .def(py::init<const ParticleDef&, const Medium&>(),
                  py::arg("particle_def"), py::arg("medium"));

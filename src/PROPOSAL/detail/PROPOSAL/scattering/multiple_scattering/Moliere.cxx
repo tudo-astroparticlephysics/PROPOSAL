@@ -12,12 +12,7 @@
 
 using namespace PROPOSAL::multiple_scattering;
 
-ScatteringOffset Moliere::CalculateRandomAngle(
-    double grammage, double ei, double ef, const std::array<double, 4>& rnd)
-{
-    (void)ef;
-    ScatteringOffset offsets;
-
+double Moliere::GetPrefactor(double ei, double grammage) {
     double momentum_Sq = (ei - mass) * (ei + mass);
     double beta_Sq = 1. / (1. + mass * mass / momentum_Sq); // beta^2 = (v/c)^2
 
@@ -35,13 +30,13 @@ ScatteringOffset Moliere::CalculateRandomAngle(
         chi_0 = ME * ALPHA * std::pow(Zi_[i] * 128. / (9. * PI * PI), 1. / 3.);
         // Calculate Chi_a^2
         chi_A_Sq[i] = chi_0 * chi_0 / momentum_Sq
-            * (1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq);
+                      * (1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq);
     }
 
     // Calculate Chi_c^2
     chiCSq_ = ((4. * PI * NA * ALPHA * ALPHA * HBAR * HBAR * SPEED * SPEED)
-                  * (grammage) / beta_p_Sq)
-        * ZSq_A_average_;
+               * (grammage) / beta_p_Sq)
+              * ZSq_A_average_;
 
     // Calculate B
 
@@ -52,23 +47,36 @@ ScatteringOffset Moliere::CalculateRandomAngle(
 
         for (int n = 0; n < 6; n++) {
             if (xn < 0)
-                return offsets; // xn would become nan for further iterations
+                return 0; // xn would become nan for further iterations
             xn = xn
-                * ((1. - std::log(xn) - std::log(chiCSq_ / chi_A_Sq[i]) - 1.
-                       + 2. * EULER_MASCHERONI)
+                 * ((1. - std::log(xn) - std::log(chiCSq_ / chi_A_Sq[i]) - 1.
+                     + 2. * EULER_MASCHERONI)
                     / (1. - xn));
         }
 
         //  Check for inappropriate values of B. If B < 4.5 it is practical to
         //  assume no deviation.
         if ((xn < 4.5) || xn != xn) {
-            return offsets;
+            return 0;
         }
 
         B_[i] = xn;
     }
 
     double pre_factor = std::sqrt(chiCSq_ * B_[max_weight_index_]);
+    return pre_factor;
+}
+
+ScatteringOffset Moliere::CalculateRandomAngle(
+    double grammage, double ei, double ef, const std::array<double, 4>& rnd)
+{
+    (void)ef;
+    ScatteringOffset offsets;
+
+    auto pre_factor = GetPrefactor(ei, grammage);
+
+    if (pre_factor == 0)
+        return offsets;
 
     auto rnd1 = GetRandom(pre_factor, rnd[0]);
     auto rnd2 = GetRandom(pre_factor, rnd[1]);
@@ -84,6 +92,15 @@ ScatteringOffset Moliere::CalculateRandomAngle(
 
     return offsets;
 }
+
+double Moliere::GetMoliereAngle(double grammage, double ei, double rnd) {
+    auto pre_factor = GetPrefactor(ei, grammage);
+
+    if (pre_factor == 0)
+        return 0;
+
+    return GetRandom(pre_factor, rnd);
+};
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
