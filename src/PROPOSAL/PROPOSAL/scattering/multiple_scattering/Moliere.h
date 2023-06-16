@@ -83,8 +83,8 @@ namespace multiple_scattering {
             return std::make_unique<Moliere>(*this);
         }
 
-        double GetMoliereAngle(double grammage, double ei, double rnd);
-        double GetMoliereAngle2D(double grammage, double ei, double rnd1, double rnd2);
+        double CalculateScatteringAngle(double grammage, double ei, double ef, double rnd) override;
+        double CalculateScatteringAngle2D(double grammage, double ei, double ef, double rnd1, double rnd2) override;
     };
 
     class MoliereInterpol : public Moliere {

@@ -93,8 +93,8 @@ ScatteringOffset Moliere::CalculateRandomAngle(
     return offsets;
 }
 
-double Moliere::GetMoliereAngle(double grammage, double ei, double rnd) {
-    //  Generates random angle according to moliere distribution
+double Moliere::CalculateScatteringAngle(double grammage, double ei, double ef, double rnd) {
+    (void)ef;
 
     auto pre_factor = GetPrefactor(ei, grammage);
 
@@ -104,9 +104,8 @@ double Moliere::GetMoliereAngle(double grammage, double ei, double rnd) {
     return GetRandom(pre_factor, rnd);
 };
 
-double Moliere::GetMoliereAngle2D(double grammage, double ei, double rnd1, double rnd2) {
-    //  Generates two random angles angle1 and angle2 according to moliere distribution, and combines
-    //  them to return sqrt(angle1**2 + angle2**2)
+double Moliere::CalculateScatteringAngle2D(double grammage, double ei, double ef, double rnd1, double rnd2) {
+    (void)ef;
 
     auto pre_factor = GetPrefactor(ei, grammage);
 
