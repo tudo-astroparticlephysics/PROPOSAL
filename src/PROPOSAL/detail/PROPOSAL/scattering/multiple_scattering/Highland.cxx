@@ -86,3 +86,15 @@ ScatteringOffset Highland::CalculateRandomAngle(
 
     return offsets;
 }
+
+double Highland::CalculateScatteringAngle(double grammage, double ei, double ef, double rnd) {
+    auto Theta0 = CalculateTheta0(grammage, ei, ef);
+    return Theta0 * normalppf(rnd);
+}
+
+double Highland::CalculateScatteringAngle2D(double grammage, double ei, double ef, double rnd1, double rnd2) {
+    auto Theta0 = CalculateTheta0(grammage, ei, ef);
+    auto theta_x = Theta0 * normalppf(rnd1);
+    auto theta_y = Theta0 * normalppf(rnd2);
+    return std::sqrt(theta_x * theta_x + theta_y * theta_y);
+}

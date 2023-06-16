@@ -30,6 +30,36 @@ void init_scattering(py::module& m)
                     grammage(double): displacement of particle
                     e_i(double): initial energy
                     e_f(double): final energy
+            )pbdoc")
+        .def("scattering_angle",
+             &multiple_scattering::Parametrization::CalculateScatteringAngle,
+             py::arg("grammage"), py::arg("e_i"), py::arg("e_f"), py::arg("rnd"),
+             R"pbdoc(
+                Calculate a single scattering angle from multiple scattering distribution
+
+                Args:
+                    grammage(double): displacement of particle
+                    e_i(double): initial energy
+                    e_f(double): final energy
+                    rnd(double): random number
+            )pbdoc")
+        .def("scattering_angle_2d",
+             &multiple_scattering::Parametrization::CalculateScatteringAngle2D,
+             py::arg("grammage"), py::arg("e_i"), py::arg("e_f"), py::arg("rnd1"), py::arg("rnd2"),
+             R"pbdoc(
+                Calculate a scattering angle in space from multiple scattering parametrization, i.e.
+
+                    .. math:: \sqrt{\theta_x^2 + \theta_y^2}
+
+                where :math:`\theta_x` and :math:`\theta_y` are scattering angles individually sampled from the
+                multiple scattering distribution
+
+                Args:
+                    grammage(double): displacement of particle
+                    e_i(double): initial energy
+                    e_f(double): final energy
+                    rnd1(double): random number 1
+                    rnd2(double): random number 2
             )pbdoc");
 
     py::class_<multiple_scattering::Highland, multiple_scattering::Parametrization,
@@ -56,7 +86,7 @@ void init_scattering(py::module& m)
             .def(py::init<const ParticleDef&, const Medium&>(),
                  py::arg("particle_def"), py::arg("medium"));
 
-    py::class_<multiple_scattering::MoliereInterpol, multiple_scattering::Parametrization,
+    py::class_<multiple_scattering::MoliereInterpol, multiple_scattering::Moliere,
             std::shared_ptr<multiple_scattering::MoliereInterpol>>(m_sub, "MoliereInterpol")
             .def(py::init<const ParticleDef&, const Medium&>(),
                  py::arg("particle_def"), py::arg("medium"));

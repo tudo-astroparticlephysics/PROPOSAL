@@ -59,6 +59,10 @@ namespace multiple_scattering {
         ScatteringOffset CalculateRandomAngle(double grammage, double ei,
             double ef, const std::array<double, 4>& rnd) override;
         virtual double CalculateTheta0(double grammage, double ei, double ef);
+
+        double CalculateScatteringAngle(double grammage, double ei, double ef, double rnd) override;
+        double CalculateScatteringAngle2D(double grammage, double ei, double ef, double rnd1, double rnd2) override;
+
     };
 } // namespace multiple_scattering
 

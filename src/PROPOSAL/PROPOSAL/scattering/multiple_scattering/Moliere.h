@@ -62,6 +62,7 @@ namespace multiple_scattering {
         double f(double theta);
         double F(double theta);
         double GetRandom(double pre_factor, double rnd);
+        double GetPrefactor(double ei, double grammage);
 
     protected:
         virtual double f1M(double x);
@@ -81,6 +82,9 @@ namespace multiple_scattering {
         {
             return std::make_unique<Moliere>(*this);
         }
+
+        double CalculateScatteringAngle(double grammage, double ei, double ef, double rnd) override;
+        double CalculateScatteringAngle2D(double grammage, double ei, double ef, double rnd1, double rnd2) override;
     };
 
     class MoliereInterpol : public Moliere {
