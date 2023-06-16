@@ -131,6 +131,15 @@ public:
         return random_angles;
     };
 
+    double CalculateScatteringAngle(double, double, double, double) final {
+        return theta_scatter_;
+    };
+
+    double CalculateScatteringAngle2D(double, double, double, double, double) final {
+        return std::sqrt(2 * theta_scatter_ * theta_scatter_);
+    };
+
+
     bool compare(const Parametrization&) const override {return false;};
     void print(std::ostream&) const override {};
 
