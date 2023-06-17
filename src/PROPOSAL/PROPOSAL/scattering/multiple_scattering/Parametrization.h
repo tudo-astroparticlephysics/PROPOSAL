@@ -72,6 +72,7 @@ namespace multiple_scattering {
         // Calculate a scattering angle in space, i.e. sqrt(theta_1**2 + theta_2**), where theta_1 and theta_2 are
         // independent scattering angles
         virtual double CalculateScatteringAngle2D(double grammage, double ei, double ef, double rnd1, double rnd2) = 0;
+        virtual std::vector<double> CalculateScatteringAngle2DVec(double grammage, double ei, double ef, const std::vector<double>& rng1, const std::vector<double>& rng2){return std::vector<double>();};
 
         virtual bool operator==(const Parametrization& scattering) const;
         friend std::ostream& operator<<(std::ostream&, Parametrization const&);

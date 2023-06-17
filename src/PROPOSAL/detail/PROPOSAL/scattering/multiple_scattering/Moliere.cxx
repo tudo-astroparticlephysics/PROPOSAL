@@ -12,7 +12,8 @@
 
 using namespace PROPOSAL::multiple_scattering;
 
-double Moliere::GetPrefactor(double ei, double grammage) {
+double Moliere::GetPrefactor(double ei, double grammage)
+{
     double momentum_Sq = (ei - mass) * (ei + mass);
     double beta_Sq = 1. / (1. + mass * mass / momentum_Sq); // beta^2 = (v/c)^2
 
@@ -25,38 +26,36 @@ double Moliere::GetPrefactor(double ei, double grammage) {
     std::vector<double> chi_A_Sq; // screening angle^2 in rad^2
     chi_A_Sq.resize(numComp_);
 
-    for (int i = 0; i < numComp_; i++) {
+    for (int i = 0; i < numComp_; i++)
+    {
         // Calculate Chi_0 * p
         chi_0 = ME * ALPHA * std::pow(Zi_[i] * 128. / (9. * PI * PI), 1. / 3.);
         // Calculate Chi_a^2
-        chi_A_Sq[i] = chi_0 * chi_0 / momentum_Sq
-                      * (1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq);
+        chi_A_Sq[i] = chi_0 * chi_0 / momentum_Sq * (1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq);
     }
 
     // Calculate Chi_c^2
-    chiCSq_ = ((4. * PI * NA * ALPHA * ALPHA * HBAR * HBAR * SPEED * SPEED)
-               * (grammage) / beta_p_Sq)
-              * ZSq_A_average_;
+    chiCSq_ = ((4. * PI * NA * ALPHA * ALPHA * HBAR * HBAR * SPEED * SPEED) * (grammage) / beta_p_Sq) * ZSq_A_average_;
 
     // Calculate B
 
-    for (int i = 0; i < numComp_; i++) {
+    for (int i = 0; i < numComp_; i++)
+    {
         // calculate B-ln(B) = ln(chi_c^2/chi_a^2)+1-2*EULER_MASCHERONI via
         // Newton-Raphson method
         double xn = 15.;
 
-        for (int n = 0; n < 6; n++) {
+        for (int n = 0; n < 6; n++)
+        {
             if (xn < 0)
                 return 0; // xn would become nan for further iterations
-            xn = xn
-                 * ((1. - std::log(xn) - std::log(chiCSq_ / chi_A_Sq[i]) - 1.
-                     + 2. * EULER_MASCHERONI)
-                    / (1. - xn));
+            xn = xn * ((1. - std::log(xn) - std::log(chiCSq_ / chi_A_Sq[i]) - 1. + 2. * EULER_MASCHERONI) / (1. - xn));
         }
 
         //  Check for inappropriate values of B. If B < 4.5 it is practical to
         //  assume no deviation.
-        if ((xn < 4.5) || xn != xn) {
+        if ((xn < 4.5) || xn != xn)
+        {
             return 0;
         }
 
@@ -68,7 +67,7 @@ double Moliere::GetPrefactor(double ei, double grammage) {
 }
 
 ScatteringOffset Moliere::CalculateRandomAngle(
-    double grammage, double ei, double ef, const std::array<double, 4>& rnd)
+    double grammage, double ei, double ef, const std::array<double, 4> &rnd)
 {
     (void)ef;
     ScatteringOffset offsets;
@@ -93,7 +92,8 @@ ScatteringOffset Moliere::CalculateRandomAngle(
     return offsets;
 }
 
-double Moliere::CalculateScatteringAngle(double grammage, double ei, double ef, double rnd) {
+double Moliere::CalculateScatteringAngle(double grammage, double ei, double ef, double rnd)
+{
     (void)ef;
 
     auto pre_factor = GetPrefactor(ei, grammage);
@@ -104,7 +104,8 @@ double Moliere::CalculateScatteringAngle(double grammage, double ei, double ef, 
     return GetRandom(pre_factor, rnd);
 };
 
-double Moliere::CalculateScatteringAngle2D(double grammage, double ei, double ef, double rnd1, double rnd2) {
+double Moliere::CalculateScatteringAngle2D(double grammage, double ei, double ef, double rnd1, double rnd2)
+{
     (void)ef;
 
     auto pre_factor = GetPrefactor(ei, grammage);
@@ -118,32 +119,53 @@ double Moliere::CalculateScatteringAngle2D(double grammage, double ei, double ef
     return std::sqrt(angle1 * angle1 + angle2 * angle2);
 };
 
+std::vector<double> Moliere::CalculateScatteringAngle2DVec(double grammage, double ei, double ef, const std::vector<double> &rng1, const std::vector<double> &rng2)
+{
+    (void)ef;
+
+    auto pre_factor = GetPrefactor(ei, grammage);
+
+    if (pre_factor == 0)
+        return std::vector<double>();
+
+    if(rng1.size() != rng2.size())
+    {
+        std::cerr << "rng1.size() = " << rng1.size() << std::endl;
+        std::cerr << "rng2.size() = " << rng2.size() << std::endl;
+        throw std::invalid_argument("rng1 and rng2 must have the same size");
+    }
+    std::vector<double> result(rng1.size());
+
+    for (size_t i = 0; i < rng1.size(); ++i)
+    {
+        auto angle1 = GetRandom(pre_factor, rng1[i]);
+        auto angle2 = GetRandom(pre_factor, rng2[i]);
+
+        result[i] = std::sqrt(angle1 * angle1 + angle2 * angle2);
+    }
+
+    return result;
+}
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //--------------------------------constructors--------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Moliere::Moliere(const ParticleDef& particle_def, Medium const& medium)
-    : Parametrization(particle_def.mass)
-    , numComp_(medium.GetNumComponents())
-    , ZSq_A_average_(0.0)
-    , Zi_(numComp_)
-    , weight_ZZ_(numComp_)
-    , weight_ZZ_sum_(0.)
-    , max_weight_index_(0)
-    , chiCSq_(0.0)
-    , B_(numComp_)
+Moliere::Moliere(const ParticleDef &particle_def, Medium const &medium)
+    : Parametrization(particle_def.mass), numComp_(medium.GetNumComponents()), ZSq_A_average_(0.0), Zi_(numComp_), weight_ZZ_(numComp_), weight_ZZ_sum_(0.), max_weight_index_(0), chiCSq_(0.0), B_(numComp_)
 {
     std::vector<double> Ai(numComp_,
-        0); // atomic number of different components
+                           0); // atomic number of different components
     std::vector<double> ki(
         numComp_, 0); // number of atoms in molecule of different components
     std::vector<double> weight(
         numComp_, 0); // number of atoms in molecule of different components
     double A_sum = 0.;
 
-    for (int i = 0; i < numComp_; i++) {
+    for (int i = 0; i < numComp_; i++)
+    {
         Component component = medium.GetComponents().at(i);
         Zi_[i] = component.GetNucCharge();
         ki[i] = component.GetAtomInMolecule();
@@ -155,7 +177,8 @@ Moliere::Moliere(const ParticleDef& particle_def, Medium const& medium)
     double A_average = 0.;
     double ZSq_average = 0.;
 
-    for (int i = 0; i < numComp_; i++) {
+    for (int i = 0; i < numComp_; i++)
+    {
         weight[i] = ki[i] * Ai[i] / A_sum;
         A_average += weight[i] * Ai[i];
         weight_ZZ_[i] = weight[i] * Zi_[i] * Zi_[i];
@@ -175,7 +198,8 @@ Moliere::Moliere(const ParticleDef& particle_def, Medium const& medium)
     // guessing an initial value by assuming a gaussian distribution
     // only regarding the component with maximum weight
     // needed in the method GetRandom()
-    for (int i = 0; i + 1 < numComp_; i++) {
+    for (int i = 0; i + 1 < numComp_; i++)
+    {
         if (weight[i + 1] > weight[i])
             max_weight_index_ = i + 1;
     }
@@ -184,9 +208,9 @@ Moliere::Moliere(const ParticleDef& particle_def, Medium const& medium)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-bool Moliere::compare(const Parametrization& scattering) const
+bool Moliere::compare(const Parametrization &scattering) const
 {
-    auto sc = dynamic_cast<const Moliere*>(&scattering);
+    auto sc = dynamic_cast<const Moliere *>(&scattering);
 
     if (!sc)
         return false;
@@ -210,7 +234,7 @@ bool Moliere::compare(const Parametrization& scattering) const
         return true;
 }
 
-void Moliere::print(std::ostream& os) const { os << "work in progress\n"; }
+void Moliere::print(std::ostream &os) const { os << "work in progress\n"; }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -226,8 +250,7 @@ double Moliere::f1M(double x)
 {
     // approximation for large numbers to avoid numerical errors
     if (x > 12.)
-        return 0.5 * std::sqrt(PI)
-            / (std::pow(x, 1.5) * std::pow(1. - 4.5 / x, 2. / 3.));
+        return 0.5 * std::sqrt(PI) / (std::pow(x, 1.5) * std::pow(1. - 4.5 / x, 2. / 3.));
 
     double sum = c1[69];
 
@@ -253,9 +276,9 @@ double f2Mlarge(double x)
 
     double sum = 0;
 
-    for (int p = 2; p < 13; p++) {
-        sum += PROPOSAL::c2large[p] * (0.5 * std::log(x) + PROPOSAL::s2large[p])
-            * std::pow(x, -(p + 0.5));
+    for (int p = 2; p < 13; p++)
+    {
+        sum += PROPOSAL::c2large[p] * (0.5 * std::log(x) + PROPOSAL::s2large[p]) * std::pow(x, -(p + 0.5));
     }
 
     return sum;
@@ -281,11 +304,11 @@ double Moliere::f(double theta)
 {
     double y1 = 0;
 
-    for (int i = 0; i < numComp_; i++) {
+    for (int i = 0; i < numComp_; i++)
+    {
         double x = theta * theta / (chiCSq_ * B_[i]);
 
-        y1 += weight_ZZ_[i] / std::sqrt(chiCSq_ * B_[i] * PI)
-            * (std::exp(-x) + f1M(x) / B_[i] + f2M(x) / (B_[i] * B_[i]));
+        y1 += weight_ZZ_[i] / std::sqrt(chiCSq_ * B_[i] * PI) * (std::exp(-x) + f1M(x) / B_[i] + f2M(x) / (B_[i] * B_[i]));
     }
 
     return y1 * weight_ZZ_sum_;
@@ -335,10 +358,9 @@ double F2Mlarge(double x)
 
     double sum = 0;
 
-    for (int p = 2; p < 13; p++) {
-        sum += -0.5 * PROPOSAL::c2large[p] / p
-            * (0.5 / p + 0.5 * std::log(x) + PROPOSAL::s2large[p])
-            * std::pow(x, -p);
+    for (int p = 2; p < 13; p++)
+    {
+        sum += -0.5 * PROPOSAL::c2large[p] / p * (0.5 / p + 0.5 * std::log(x) + PROPOSAL::s2large[p]) * std::pow(x, -p);
     }
 
     return sum;
@@ -363,13 +385,11 @@ double Moliere::F(double theta)
 {
     double y1 = 0;
 
-    for (int i = 0; i < numComp_; i++) {
+    for (int i = 0; i < numComp_; i++)
+    {
         double x = theta * theta / (chiCSq_ * B_[i]);
 
-        y1 += weight_ZZ_[i]
-            * (0.5 * std::erf(std::sqrt(std::max(x, 0.)))
-                + std::sqrt(1. / PI)
-                    * (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
+        y1 += weight_ZZ_[i] * (0.5 * std::erf(std::sqrt(std::max(x, 0.))) + std::sqrt(1. / PI) * (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
     }
 
     return (theta < 0.) ? (-1.) * y1 * weight_ZZ_sum_ : y1 * weight_ZZ_sum_;
@@ -398,14 +418,16 @@ double Moliere::GetRandom(double pre_factor, double rnd)
 
     // iterating until the number of correct digits is greater than 4
     unsigned int i = 0;
-    do {
+    do
+    {
         i++;
         theta_n = theta_np1;
         theta_np1 = theta_n - (F(theta_n) - rnd) / f(theta_n);
-        if (i == 100) {
-            Logging::Get("proposal.scattering")->warn(
-                    "Iteration in Moliere::GetRandom did not converge after 100 iterations. "
-                    "Return current value theta = {} (previous iteration: theta = {}", theta_np1, theta_n);
+        if (i == 100)
+        {
+            Logging::Get("proposal.scattering")->warn("Iteration in Moliere::GetRandom did not converge after 100 iterations. "
+                                                      "Return current value theta = {} (previous iteration: theta = {}",
+                                                      theta_np1, theta_n);
             return theta_np1;
         }
     } while (std::abs((theta_n - theta_np1) / theta_np1) > 1e-4);
@@ -413,27 +435,32 @@ double Moliere::GetRandom(double pre_factor, double rnd)
     return theta_np1;
 }
 
-MoliereInterpol::MoliereInterpol(const ParticleDef& p_def, const Medium& medium) : Moliere(p_def, medium) {
+MoliereInterpol::MoliereInterpol(const ParticleDef &p_def, const Medium &medium) : Moliere(p_def, medium)
+{
     // initialize interpolation tables
     Logging::Get("proposal.scattering")->debug("Initialize interpooation tables for MoliereInterpol.");
 
     auto def_f1M = cubic_splines::CubicSplines<double>::Definition();
-    def_f1M.f = [&](double x) {return Moliere::f1M(x);};
+    def_f1M.f = [&](double x)
+    { return Moliere::f1M(x); };
     def_f1M.axis = std::make_unique<cubic_splines::LinAxis<double>>(0.f, 20, size_t(100));
     f1M_interpolant_ = std::make_shared<interpolant_t>(std::move(def_f1M));
 
     auto def_f2M = cubic_splines::CubicSplines<double>::Definition();
-    def_f2M.f = [&](double x) {return Moliere::f2M(x);};
+    def_f2M.f = [&](double x)
+    { return Moliere::f2M(x); };
     def_f2M.axis = std::make_unique<cubic_splines::LinAxis<double>>(0.f, 20, size_t(100));
     f2M_interpolant_ = std::make_shared<interpolant_t>(std::move(def_f2M));
 
     auto def_F1M = cubic_splines::CubicSplines<double>::Definition();
-    def_F1M.f = [&](double x) {return Moliere::F1M(x);};
+    def_F1M.f = [&](double x)
+    { return Moliere::F1M(x); };
     def_F1M.axis = std::make_unique<cubic_splines::LinAxis<double>>(0.f, 20, size_t(100));
     F1M_interpolant_ = std::make_shared<interpolant_t>(std::move(def_F1M));
 
     auto def_F2M = cubic_splines::CubicSplines<double>::Definition();
-    def_F2M.f = [&](double x) {return Moliere::F2M(x);};
+    def_F2M.f = [&](double x)
+    { return Moliere::F2M(x); };
     def_F2M.axis = std::make_unique<cubic_splines::LinAxis<double>>(0.f, 20, size_t(100));
     F2M_interpolant_ = std::make_shared<interpolant_t>(std::move(def_F2M));
 }
@@ -448,7 +475,7 @@ double MoliereInterpol::f1M(double x)
 double MoliereInterpol::f2M(double x)
 {
     if (x > 20)
-        return Moliere::f2M(x);  // use analytical evaluation outside range of interpolation tables
+        return Moliere::f2M(x); // use analytical evaluation outside range of interpolation tables
     return f2M_interpolant_->evaluate(x);
 }
 

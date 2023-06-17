@@ -85,6 +85,7 @@ namespace multiple_scattering {
 
         double CalculateScatteringAngle(double grammage, double ei, double ef, double rnd) override;
         double CalculateScatteringAngle2D(double grammage, double ei, double ef, double rnd1, double rnd2) override;
+        std::vector<double> CalculateScatteringAngle2DVec(double grammage, double ei, double ef, const std::vector<double>& rng1, const std::vector<double>& rng2) override;
     };
 
     class MoliereInterpol : public Moliere {

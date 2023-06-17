@@ -30,7 +30,7 @@ void init_scattering(py::module& m)
                     grammage(double): displacement of particle
                     e_i(double): initial energy
                     e_f(double): final energy
-            )pbdoc")
+            )pbdoc")        
         .def("scattering_angle",
              &multiple_scattering::Parametrization::CalculateScatteringAngle,
              py::arg("grammage"), py::arg("e_i"), py::arg("e_f"), py::arg("rnd"),
@@ -42,7 +42,7 @@ void init_scattering(py::module& m)
                     e_i(double): initial energy
                     e_f(double): final energy
                     rnd(double): random number
-            )pbdoc")
+            )pbdoc")       
         .def("scattering_angle_2d",
              &multiple_scattering::Parametrization::CalculateScatteringAngle2D,
              py::arg("grammage"), py::arg("e_i"), py::arg("e_f"), py::arg("rnd1"), py::arg("rnd2"),
@@ -60,6 +60,24 @@ void init_scattering(py::module& m)
                     e_f(double): final energy
                     rnd1(double): random number 1
                     rnd2(double): random number 2
+            )pbdoc")
+        .def("scattering_angle_2d_vec",
+             &multiple_scattering::Parametrization::CalculateScatteringAngle2DVec,
+             py::arg("grammage"), py::arg("e_i"), py::arg("e_f"), py::arg("rnd1"), py::arg("rnd2"),
+             R"pbdoc(
+                Calculate a scattering angle in space from multiple scattering parametrization, i.e.
+
+                    .. math:: \sqrt{\theta_x^2 + \theta_y^2}
+
+                where :math:`\theta_x` and :math:`\theta_y` are scattering angles individually sampled from the
+                multiple scattering distribution
+
+                Args:
+                    grammage(double): displacement of particle
+                    e_i(double): initial energy
+                    e_f(double): final energy
+                    rnd1(double): vector of random numbers 1
+                    rnd2(double): vector of random numbers 2
             )pbdoc");
 
     py::class_<multiple_scattering::Highland, multiple_scattering::Parametrization,
