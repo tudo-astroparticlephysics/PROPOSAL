@@ -110,8 +110,7 @@ class build_ext_cmake(build_ext):
         build_call = [
             cmake,
             '--build', '.',
-            '--config', cfg,
-            '--', '-j{}'.format(os.getenv('BUILD_CORES', 2))
+            '--config', cfg
         ]
         if ext.target is not None:
             build_call.extend(['--target', ext.target])
