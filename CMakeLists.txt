@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.9)
 
+# necessary to set for MSVC when using CMakeToolchain
+if(POLICY CMP0091)
+  cmake_policy(SET CMP0091 NEW)  # Enable MSVC runtime library setting
+endif()
+
 set(PROPOSAL_VERSION_MAJOR 7)
 set(PROPOSAL_VERSION_MINOR 6)
 set(PROPOSAL_VERSION_PATCH 2)
