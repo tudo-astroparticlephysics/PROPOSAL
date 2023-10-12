@@ -58,6 +58,8 @@ struct InterpolationSettings {
     static unsigned int NODES_DNDX_V;
     static unsigned int NODES_UTILITY;
     static unsigned int NODES_RATE_INTERPOLANT;
+    static bool ALLOW_TABLE_CREATION;
+    static bool ALLOW_TABLE_IN_MEMORY;
 };
 
 // propagation settings

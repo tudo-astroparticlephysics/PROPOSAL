@@ -32,6 +32,8 @@ unsigned int InterpolationSettings::NODES_DNDX_E = 100;
 unsigned int InterpolationSettings::NODES_DNDX_V = 100;
 unsigned int InterpolationSettings::NODES_UTILITY = 500;
 unsigned int InterpolationSettings::NODES_RATE_INTERPOLANT = 10000;
+bool InterpolationSettings::ALLOW_TABLE_CREATION = true;
+bool InterpolationSettings::ALLOW_TABLE_IN_MEMORY = true;
 
 // propagation settings
 

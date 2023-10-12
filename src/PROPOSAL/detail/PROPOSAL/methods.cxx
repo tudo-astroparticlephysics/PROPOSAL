@@ -11,6 +11,7 @@
 
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Logging.h"
+#include "PROPOSAL/Constants.h"
 #include <algorithm>
 #include <string>
 
@@ -23,14 +24,31 @@ LogTableCreation::LogTableCreation(const std::string &path, const std::string &f
     auto combined = path + "/" + filename;
     if (!Helper::file_exists(combined)) {
         if (warn_for_path != path) {
+            warn_for_path = path;
             // we haven't logged a warning for this specific path yet
-            Logging::Get("TableCreation")->warn("Tables are not available and need to be created. "
-                                                "They will be written to '{}'. "
-                                                "This can take some minutes.", path);
-            if (!Helper::is_folder_writable(path))
+            if (InterpolationSettings::ALLOW_TABLE_CREATION) {
+                if (!Helper::is_folder_writable(path)) {
+                    Logging::Get("TableCreation")->warn("PROPOSAL is unable to write to the requested path '{}'", path);
+                } else {
+                    Logging::Get("TableCreation")->warn("Tables are not available and need to be created. "
+                                                        "They will be written to '{}'. "
+                                                        "This can take some minutes.", path);
+                    return;
+                }
+            } else {
+                Logging::Get("TableCreation")->warn("Creation of new tables not allowed due to "
+                                                    "PROPOSAL::InterpolationSettings::ALLOW_TABLE_CREATION=False");
+            }
+
+            if (InterpolationSettings::ALLOW_TABLE_IN_MEMORY) {
                 Logging::Get("TableCreation")->warn("PROPOSAL is unable to write to the requested path '{}'. "
                                                     "Therefore, tables will only be stored in memory.", path);
-            warn_for_path = path;
+            } else {
+                throw std::logic_error("Tables are not available, are not allowed to be created, and are "
+                                       "note allows to be stored in memory due to "
+                                       "PROPOSAL::InterpolationSettings::ALLOW_TABLE_IN_MEMORY=False. "
+                                       "Unable to continue!");
+            }
         }
     } else {
         Logging::Get("TableCreation")->debug("Tables are available and are read from file '{}'.", combined);

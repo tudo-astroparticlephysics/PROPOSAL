@@ -235,7 +235,11 @@ PYBIND11_MODULE(proposal, m)
         .def_readwrite_static(
             "nodes_utility", &InterpolationSettings::NODES_UTILITY)
         .def_readwrite_static(
-            "nodes_rate_interpolant", &InterpolationSettings::NODES_RATE_INTERPOLANT);
+            "nodes_rate_interpolant", &InterpolationSettings::NODES_RATE_INTERPOLANT)
+        .def_readwrite_static(
+            "allow_table_creation", &InterpolationSettings::ALLOW_TABLE_CREATION)
+        .def_readwrite_static(
+            "allow_table_in_memory", &InterpolationSettings::ALLOW_TABLE_IN_MEMORY);
 
     py::class_<PropagationSettings, std::shared_ptr<PropagationSettings>>(
             m, "PropagationSettings")
