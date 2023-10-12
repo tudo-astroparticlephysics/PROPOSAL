@@ -34,6 +34,7 @@
 #include <memory>
 #include <vector>
 #include <sys/stat.h>
+#include "absl/hash/hash.h"
 // use unistd.h for access on POSIX os, use io.h for windows systems
 // todo: use filesystem instead when switching to c++17
 #ifdef _WIN32
@@ -77,7 +78,7 @@ inline void hash_combine(std::size_t& seed) { (void)seed; }
 template <typename T, typename... Rest>
 inline void hash_combine(std::size_t& seed, const T& v, Rest... rest)
 {
-    std::hash<T> hasher;
+    absl::Hash<T> hasher;
     seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     hash_combine(seed, rest...);
 }

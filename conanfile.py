@@ -69,6 +69,7 @@ class PROPOSALConan(ConanFile):
         self.requires("spdlog/1.11.0", transitive_headers=True, transitive_libs=True)
         # nlohmann_json: public headers include json.hpp and json_fwd.hpp
         self.requires("nlohmann_json/3.11.2", transitive_headers=True)
+        self.requires("20230125.3")
         if self.options.with_python:
             self.requires("pybind11/2.10.1")
         if self.options.with_testing:
