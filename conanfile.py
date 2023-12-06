@@ -35,6 +35,8 @@ class PROPOSALConan(ConanFile):
         "with_documentation": False,
     }
 
+    exports_sources = "*"
+
     @property
     def _min_cppstd(self):
         return "14"
@@ -93,9 +95,6 @@ class PROPOSALConan(ConanFile):
             raise ConanInvalidConfiguration(
                 f"{self.ref} requires C++{self._min_cppstd}, which your compiler does not support"
             )
-
-    def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def build(self):
         cmake = CMake(self)
