@@ -28,9 +28,9 @@ namespace secondaries {
         static constexpr int n_rnd = 4;
 
         PhotoPairProductionInterpolant() = default;
-        PhotoPairProductionInterpolant(ParticleDef p, Medium m)
+        PhotoPairProductionInterpolant(ParticleDef p, Medium m, bool interpol = true)
             : medium(m)
-            , dndx(detail::build_dndx(std::true_type {}, true,
+            , dndx(detail::build_dndx(std::true_type {}, interpol,
                                       Param(), p, medium, nullptr))
         {}
 
