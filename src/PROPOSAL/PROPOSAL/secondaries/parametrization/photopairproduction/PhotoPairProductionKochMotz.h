@@ -10,8 +10,8 @@ namespace PROPOSAL {
 
         public:
             PhotoPairProductionKochMotzForwardPeaked() = default;
-            PhotoPairProductionKochMotzForwardPeaked(ParticleDef p, Medium m)
-                : PhotoPairProductionInterpolant<crosssection::PhotoPairKochMotz>(p, m)
+            PhotoPairProductionKochMotzForwardPeaked(ParticleDef p, Medium m, bool interpol = true)
+                : PhotoPairProductionInterpolant<crosssection::PhotoPairKochMotz>(p, m, interpol)
             {}
 
         };
@@ -20,8 +20,8 @@ namespace PROPOSAL {
                                                   public DefaultSecondaries<PhotoPairProductionKochMotzSauter> {
         public:
             PhotoPairProductionKochMotzSauter() = default;
-            PhotoPairProductionKochMotzSauter(ParticleDef p, Medium m)
-                : PhotoPairProductionKochMotzForwardPeaked(p, m)
+            PhotoPairProductionKochMotzSauter(ParticleDef p, Medium m, bool interpol = true)
+                : PhotoPairProductionKochMotzForwardPeaked(p, m, interpol)
             {}
 
             std::tuple<Cartesian3D, Cartesian3D> CalculateDirections(

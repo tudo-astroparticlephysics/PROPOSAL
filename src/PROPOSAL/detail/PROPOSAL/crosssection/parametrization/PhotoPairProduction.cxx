@@ -126,7 +126,7 @@ double crosssection::PhotoPairKochMotz::DifferentialCrossSection(
     };
     auto dNdx_nocorrection = i.Integrate(limits.v_min, limits.v_max, integrand, 3);
     auto A = interpolant_->InterpolateArray(comp.GetNucCharge(), energy) / dNdx_nocorrection;
-    return A * DifferentialCrossSectionWithoutA(p, comp, energy, v);
+    return std::max(A * DifferentialCrossSectionWithoutA(p, comp, energy, v), 0.);
 }
 
 double crosssection::PhotoPairKochMotz::DifferentialCrossSectionWithoutA(

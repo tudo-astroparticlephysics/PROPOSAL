@@ -250,6 +250,49 @@ TEST(Compton, EnergyMomentumConservation)
         EXPECT_NEAR(p_init[i], p_photon[i] + p_electron[i], COMPUTER_PRECISION);
 }
 
+TEST(PhotoPairProduction, CompareIntegralInterpol)
+{
+    auto particle = GammaDef();
+    auto medium = Air();
+    auto target = medium.GetComponents().front();
+
+    auto sec_calculator_integral1 = secondaries::PhotoPairProductionKochMotzForwardPeaked(particle, medium, false);
+    auto sec_calculator_interpol1 = secondaries::PhotoPairProductionKochMotzForwardPeaked(particle, medium, true);
+
+    std::vector<double> energies = {5, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11, 1e12, 1e13, 1e14};
+    std::vector<double> rnd_list = {0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95};
+
+    double rho_integral, rho_interpol, accuracy;
+    for (auto E : energies) {
+        for (auto rnd : rnd_list) {
+            rho_integral = sec_calculator_integral1.CalculateRho(E, rnd, target);
+            rho_interpol = sec_calculator_interpol1.CalculateRho(E, rnd, target);
+            if (E <= 100) {
+                accuracy = 0.05; // numerical problems at low energies
+            } else {
+                accuracy = 0.001;
+            }
+            EXPECT_NEAR(rho_integral, rho_interpol, accuracy);
+        }
+    }
+
+    auto sec_calculator_integral2 = secondaries::PhotoPairProductionTsai(particle, medium, false);
+    auto sec_calculator_interpol2 = secondaries::PhotoPairProductionTsai(particle, medium, true);
+
+    for (auto E : energies) {
+        for (auto rnd : rnd_list) {
+            rho_integral = sec_calculator_integral2.CalculateRho(E, rnd, target);
+            rho_interpol = sec_calculator_interpol2.CalculateRho(E, rnd, target);
+            if (E <= 100) {
+                accuracy = 0.05; // numerical problems at low energies
+            } else {
+                accuracy = 0.005;
+            }
+            EXPECT_NEAR(rho_integral, rho_interpol, accuracy);
+        }
+    }
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

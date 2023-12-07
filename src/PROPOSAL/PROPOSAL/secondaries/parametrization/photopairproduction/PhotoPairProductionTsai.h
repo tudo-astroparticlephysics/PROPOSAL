@@ -11,8 +11,8 @@ namespace secondaries {
 
     public:
         PhotoPairProductionTsaiForwardPeaked() = default;
-        PhotoPairProductionTsaiForwardPeaked(ParticleDef p, Medium m)
-            : PhotoPairProductionInterpolant<crosssection::PhotoPairTsai>(p, m)
+        PhotoPairProductionTsaiForwardPeaked(ParticleDef p, Medium m, bool interpol = true)
+            : PhotoPairProductionInterpolant<crosssection::PhotoPairTsai>(p, m, interpol)
             {}
 
     };
@@ -24,8 +24,8 @@ namespace secondaries {
 
     public:
         PhotoPairProductionTsai() = default;
-        PhotoPairProductionTsai(ParticleDef p, Medium m)
-            : PhotoPairProductionTsaiForwardPeaked(p, m) {}
+        PhotoPairProductionTsai(ParticleDef p, Medium m, bool interpol = true)
+            : PhotoPairProductionTsaiForwardPeaked(p, m, interpol) {}
 
         std::tuple<Cartesian3D, Cartesian3D> CalculateDirections(
                 const Vector3D&, double, double, const Component&,
@@ -35,8 +35,8 @@ namespace secondaries {
     class PhotoPairProductionTsaiSauter : public PhotoPairProductionTsaiForwardPeaked, public SauterSampling {
     public:
         PhotoPairProductionTsaiSauter() = default;
-        PhotoPairProductionTsaiSauter(ParticleDef p, Medium m)
-            : PhotoPairProductionTsaiForwardPeaked(p, m)
+        PhotoPairProductionTsaiSauter(ParticleDef p, Medium m, bool interpol = true)
+            : PhotoPairProductionTsaiForwardPeaked(p, m, interpol)
         {}
 
         std::tuple<Cartesian3D, Cartesian3D> CalculateDirections(

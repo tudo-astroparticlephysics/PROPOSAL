@@ -39,6 +39,24 @@ namespace PROPOSAL {
         auto xi = std::log((1. - v_cut)/(1 - v_max));
         return 1. - std::log((1. - v)/(1. - v_max)) / xi;
     }
+
+    double transform_loss_linear(double v_cut, double v_max, double v)
+    {
+        if (v < 0 || v_max == 0)
+            return v_cut;
+        if (v >= 1)
+            return v_max;
+        return v_cut + (v_max - v_cut) * v;
+    }
+
+    double retransform_loss_linear(double v_cut, double v_max, double v)
+    {
+        if (v <= v_cut)
+            return 0;
+        if (v >= v_max)
+            return 1;
+        return (v - v_cut) / (v_max - v_cut);
+    }
 }
 
 std::string CrossSectionDNDXInterpolant::gen_path() const
