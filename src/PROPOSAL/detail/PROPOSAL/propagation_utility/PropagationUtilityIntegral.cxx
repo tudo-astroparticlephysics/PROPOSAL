@@ -2,7 +2,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/Constants.h"
 
-#include <cassert>
+#include <stdexcept>
 
 using namespace PROPOSAL;
 
