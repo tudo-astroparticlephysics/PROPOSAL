@@ -2,7 +2,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/Constants.h"
 
-#include <cassert>
+#include <stdexcept>
 
 using namespace PROPOSAL;
 
@@ -26,7 +26,11 @@ double UtilityIntegral::GetUpperLimit(double energy_initial, double rnd)
     auto sum = integral.IntegrateWithRandomRatio(
         energy_initial, lower_lim, FunctionToIntegral, 4, -rnd);
 
-    assert(sum > rnd); // searched energy is below lower_lim
+    if (rnd > sum) {
+        throw std::logic_error("Unable to calculate GetUpperLimit since result"
+                               "is below lower_lim. rnd was " + std::to_string(rnd)
+                               + " with rnd_max " + std::to_string(sum));
+    }
     (void)sum;
 
     return integral.GetUpperLimit();
