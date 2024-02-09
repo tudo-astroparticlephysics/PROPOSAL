@@ -1,5 +1,3 @@
-include(GNUInstallDirs)
-
 add_library(PROPOSAL)
 add_library(PROPOSAL::PROPOSAL ALIAS PROPOSAL)
 
