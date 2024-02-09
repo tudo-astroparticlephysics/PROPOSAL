@@ -1,8 +1,35 @@
 [build-system]
-requires = [
-    "setuptools>=45",
-    "wheel",
-    "cmake>=3.16",
-    "conan>=2.0.0",
+requires = ["scikit-build-core[pyproject]", "pybind11", "setuptools_scm[toml]"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "proposal"
+version = "7.6.3"
+description = "Python bindings for PROPOSAL"
+readme = "README.md"
+requires-pyton = ">= 3.9"
+license = {text = "BSD-3-Clause"}
+maintainers = [
+    {name = "Jean-Marco Alamedine", email = "jean-marco.alameddine@tu-dortmund.de"},
 ]
-build-backend = "setuptools.build_meta"
+
+[project.urls]
+repository = "https://github.com/tudo-astroparticlephysics/PROPOSAL"
+
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+]
+
+all = ["proposal[tests]"]
+
+
+[tool.scikit-build]
+sdist.cmake = true
+cmake.targets = ["pyPROPOSAL"]
+cmake.args = [
+    "-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON",
+    "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=ON",
+    "-DBUILD_PYTHON=ON",
+]
