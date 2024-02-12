@@ -1,6 +1,15 @@
 name: Check 🐍 pkg PROPOSAL.
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "**"
+  pull_request:
+
+env:
+  CMAKE_TOOLCHAIN_FILE: build/conan_toolchain.cmake
 
 jobs:
     build:
@@ -10,6 +19,7 @@ jobs:
           include:
             - os : "ubuntu-latest"
             - os : "macos-latest"
+
       steps:
         - uses: actions/checkout@v2
         - name: Cache conan
@@ -18,11 +28,17 @@ jobs:
           with:
             path: ~/.conan
             key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-${{ hashFiles('conanfile.py') }}-key
-        - name: Install conan
-          run: python3 -m pip install conan
+
+        - name: Setup conan
+          run: |
+            python3 -m pip install conan
+            conan profile detect
+
+        - name: Install C++ dependencies using conan
+          run: conan install . -o with_python=True -o with_testing=False --build=missing
+
         - name: Install Python 🐍 distributions 📦
-          run: python3 -m pip install .
-        - name: Install pytest
-          run: python3 -m pip install pytest
+          run: python3 -m pip install .[tests]
+
         - name: run pytest
           run: python3 -m pytest tests/python -v
