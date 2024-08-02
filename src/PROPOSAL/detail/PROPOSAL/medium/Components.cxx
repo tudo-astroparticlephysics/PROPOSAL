@@ -21,9 +21,10 @@ using namespace PROPOSAL::Components;
 
 std::unique_ptr<std::map<size_t, Component>> Component::component_map = nullptr;
 
-#define COMPONENT_IMPL(cls, SYMBOL, NUCCHARGE, ATOMICNUM)                      \
+#define COMPONENT_IMPL(cls, SYMBOL, NUCCHARGE, ATOMICNUM, IONIZENERGY)         \
     cls::cls(double atomInMolecule)                                            \
-        : Component(#SYMBOL, NUCCHARGE, ATOMICNUM, atomInMolecule)             \
+        : Component(                                                           \
+            #SYMBOL, NUCCHARGE, ATOMICNUM, atomInMolecule, IONIZENERGY)        \
     {                                                                          \
     }
 
@@ -31,12 +32,13 @@ std::unique_ptr<std::map<size_t, Component>> Component::component_map = nullptr;
  *                                  Component                                  *
  ******************************************************************************/
 
-Component::Component(
-    std::string name, double nucCharge, double atomicNum, double atomInMolecule)
+Component::Component(std::string name, double nucCharge, double atomicNum,
+    double atomInMolecule, double ionizationEnergy)
     : name_(name)
     , nucCharge_(nucCharge)
     , atomicNum_(atomicNum)
     , atomInMolecule_(atomInMolecule)
+    , ionizationEnergy_(ionizationEnergy)
 {
     SetLogConstant();
     SetBPrime();
@@ -54,15 +56,14 @@ Component::Component(
     }
 
     hash = 0;
-    hash_combine(hash, nucCharge_, atomicNum_, atomInMolecule_,
-                 logConstant_, bPrime_, averageNucleonWeight_, wood_saxon_);
+    hash_combine(hash, nucCharge_, atomicNum_, atomInMolecule_, logConstant_,
+        bPrime_, averageNucleonWeight_, wood_saxon_);
 
     if (!component_map)
         component_map = std::make_unique<std::map<size_t, Component>>();
 
     if (component_map->find(hash) == component_map->end())
-        component_map->insert({hash, Component(*this)});
-
+        component_map->insert({ hash, Component(*this) });
 }
 
 namespace PROPOSAL {
@@ -110,10 +111,7 @@ std::ostream& operator<<(std::ostream& os, Component const& comp) noexcept
 }
 }
 
-size_t Component::GetHash() const noexcept
-{
-    return hash;
-}
+size_t Component::GetHash() const noexcept { return hash; }
 
 // ------------------------------------------------------------------------- //
 // Methods
@@ -260,7 +258,8 @@ double Component::WoodSaxonPotential(double r0)
         * (r0 * r0 * std::log(2) + a * r0 * PI * PI / 6 + a * a * 1.5 * ZETA3);
 }
 
-Component Component::GetComponentForHash(size_t hash) {
+Component Component::GetComponentForHash(size_t hash)
+{
     auto it = Component::component_map->find(hash);
     if (it != Component::component_map->end())
         return it->second;
@@ -285,20 +284,25 @@ double calculate_proton_massnumber_fraction(
  *                            Different Components                             *
  ******************************************************************************/
 
-COMPONENT_IMPL(Hydrogen, H, 1, 1.00794)
-COMPONENT_IMPL(Carbon, C, 6, 12.0011)
-COMPONENT_IMPL(Nitrogen, N, 7, 14.0067)
-COMPONENT_IMPL(Oxygen, O, 8, 15.9994)
-COMPONENT_IMPL(Sodium, Na, 11, 22.989770)
-COMPONENT_IMPL(Magnesium, Mg, 12, 24.31)
-COMPONENT_IMPL(Sulfur, S, 16, 32.07)
-COMPONENT_IMPL(Chlorine, Cl, 17, 35.4527)
-COMPONENT_IMPL(Argon, Ar, 18, 39.948)
-COMPONENT_IMPL(Potassium, K, 19, 39.10)
-COMPONENT_IMPL(Calcium, Ca, 20, 40.08)
-COMPONENT_IMPL(Iron, Fe, 26, 55.845)
-COMPONENT_IMPL(Copper, Cu, 29, 63.546)
-COMPONENT_IMPL(Lead, Pb, 82, 207.2)
-COMPONENT_IMPL(Uranium, U, 92, 238.0289)
-COMPONENT_IMPL(StandardRock, StandardRock, 11, 22.0)
-COMPONENT_IMPL(FrejusRock, FrejusRock, 10.12, 20.34)
+COMPONENT_IMPL(Hydrogen, H, 1, 1.00794, 19.2)
+COMPONENT_IMPL(Carbon, C, 6, 12.0011, 78.0)
+COMPONENT_IMPL(Nitrogen, N, 7, 14.0067, 82.0)
+COMPONENT_IMPL(Oxygen, O, 8, 15.9994, 95.0)
+COMPONENT_IMPL(Sodium, Na, 11, 22.989770, 149.0)
+COMPONENT_IMPL(Magnesium, Mg, 12, 24.31, 156.0)
+COMPONENT_IMPL(Aluminium, AL, 13, 26.981, 166.0)
+COMPONENT_IMPL(Silicon, Si, 14, 28.085, 173.0)
+COMPONENT_IMPL(Sulfur, S, 16, 32.07, 180.0)
+COMPONENT_IMPL(Chlorine, Cl, 17, 35.4527, 174.0)
+COMPONENT_IMPL(Argon, Ar, 18, 39.948, 188.0)
+COMPONENT_IMPL(Potassium, K, 19, 39.10, 190.0)
+COMPONENT_IMPL(Calcium, Ca, 20, 40.08, 191.0)
+COMPONENT_IMPL(Iron, Fe, 26, 55.845, 286.0)
+COMPONENT_IMPL(Cobalt, Co, 27, 58.933, 297.0)
+COMPONENT_IMPL(Nickel, Ni, 28, 58.693, 311.0)
+COMPONENT_IMPL(Copper, Cu, 29, 63.546, 322.0)
+COMPONENT_IMPL(Arsenic, As, 33, 74.922, 347.0)
+COMPONENT_IMPL(Lead, Pb, 82, 207.2, 823.0)
+COMPONENT_IMPL(Uranium, U, 92, 238.0289, 890.0)
+COMPONENT_IMPL(StandardRock, StandardRock, 11, 22.0, 136.4) // I
+COMPONENT_IMPL(FrejusRock, FrejusRock, 10.12, 20.34, 149.0) // I

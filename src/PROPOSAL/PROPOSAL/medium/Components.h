@@ -28,10 +28,10 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
 
 #define COMPONENT_DEC(cls, ATOMS)                                              \
     class cls : public PROPOSAL::Component {                                   \
@@ -45,7 +45,7 @@ class Component {
 public:
     Component() = default;
     Component(std::string name, double charge, double atomicNum,
-        double atomInMolecule);
+        double atomInMolecule, double ionizationEnergy);
     virtual ~Component() = default;
 
     friend bool operator==(Component const&, Component const&) noexcept;
@@ -60,6 +60,7 @@ public:
     double GetBPrime() const { return bPrime_; }
     double GetAverageNucleonWeight() const { return averageNucleonWeight_; }
     double GetWoodSaxon() const { return wood_saxon_; }
+    double GetIonizationEnergy() const { return ionizationEnergy_; }
 
     size_t GetHash() const noexcept;
     static Component GetComponentForHash(size_t);
@@ -103,9 +104,10 @@ protected:
 
     // Passed to constructor
     std::string name_;
-    double nucCharge_;      ///< nucleus charge
-    double atomicNum_;      ///< molar mass [g/mol]
-    double atomInMolecule_; ///< number of atoms in a molecule
+    double nucCharge_;        ///< nucleus charge
+    double atomicNum_;        ///< molar mass [g/mol]
+    double atomInMolecule_;   ///< number of atoms in a molecule
+    double ionizationEnergy_; ///< ionization energy in eV
 
     // Calculated in constructor
     double logConstant_ = 0;          ///< radiation logarithm constant B
@@ -132,21 +134,26 @@ inline bool operator==(std::shared_ptr<Component> const& lhs,
 
 namespace Components {
 
-    COMPONENT_DEC(Hydrogen, 2.0)
-    COMPONENT_DEC(Carbon, 1.0)
-    COMPONENT_DEC(Nitrogen, 1.0)
-    COMPONENT_DEC(Oxygen, 1.0)
-    COMPONENT_DEC(Sodium, 1.0)
-    COMPONENT_DEC(Magnesium, 1.0)
-    COMPONENT_DEC(Sulfur, 1.0)
-    COMPONENT_DEC(Chlorine, 1.0)
-    COMPONENT_DEC(Argon, 1.0)
-    COMPONENT_DEC(Potassium, 1.0)
-    COMPONENT_DEC(Calcium, 1.0)
-    COMPONENT_DEC(Iron, 1.0)
-    COMPONENT_DEC(Copper, 1.0)
-    COMPONENT_DEC(Lead, 1.0)
-    COMPONENT_DEC(Uranium, 1.0)
+    COMPONENT_DEC(Hydrogen, 2.0)  // 1
+    COMPONENT_DEC(Carbon, 1.0)    // 6
+    COMPONENT_DEC(Nitrogen, 1.0)  // 7
+    COMPONENT_DEC(Oxygen, 1.0)    // 8
+    COMPONENT_DEC(Sodium, 1.0)    // 11
+    COMPONENT_DEC(Magnesium, 1.0) // 12
+    COMPONENT_DEC(Aluminium, 1.0) // 13
+    COMPONENT_DEC(Silicon, 1.0)   // 14
+    COMPONENT_DEC(Sulfur, 1.0)    // 16
+    COMPONENT_DEC(Chlorine, 1.0)  // 17
+    COMPONENT_DEC(Argon, 1.0)     // 18
+    COMPONENT_DEC(Potassium, 1.0) // 19
+    COMPONENT_DEC(Calcium, 1.0)   // 20
+    COMPONENT_DEC(Iron, 1.0)      // 26
+    COMPONENT_DEC(Cobalt, 1.0)    // 27
+    COMPONENT_DEC(Nickel, 1.0)    // 28
+    COMPONENT_DEC(Copper, 1.0)    // 29
+    COMPONENT_DEC(Arsenic, 1.0)   // 33
+    COMPONENT_DEC(Lead, 1.0)      // 82
+    COMPONENT_DEC(Uranium, 1.0)   // 92
     COMPONENT_DEC(StandardRock, 1.0)
     COMPONENT_DEC(FrejusRock, 1.0)
 
