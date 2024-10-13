@@ -46,7 +46,7 @@ option(BUILD_TESTING "build testing" OFF)
 add_subdirectory(src)
 
 if(BUILD_EXAMPLE)
-    add_subdirectory(example)
+    add_subdirectory(examples)
 endif()
 
 if(BUILD_DOCUMENTATION)

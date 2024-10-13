@@ -29,6 +29,7 @@
 #pragma once
 
 #include "PROPOSAL/medium/Components.h"
+#include <PROPOSAL/medium/Medium.h>
 #include <array>
 #include <cmath>
 #include <memory>
@@ -278,8 +279,12 @@ MEDIUM_DEF(Ferrosilit)
 MEDIUM_DEF(Anthophyllit)
 
 // Mica / Glimmer 5 %
-MEDIUM_DEF(Muscovite)
+// Mica - Biotit (solid solution)
 MEDIUM_DEF(Phlogopite)
+MEDIUM_DEF(Annite)
+// Mica - white glimmer (solid solution)
+MEDIUM_DEF(Muscovite)
+MEDIUM_DEF(Paragonit)
 
 // Olivine Group 3%
 MEDIUM_DEF(Liebenbergite)
@@ -403,6 +408,24 @@ static const std::array<std::string, 19> Medium_Name = {
     "antareswater",
     "cascadiabasinwater",
     "liquidargon",
+    "albit",
+    "anorthit",
+    "sanidine",
+    "anorthoclase",
+    "quartz",
+    "enstatite",
+    "ferrosilit",
+    "anthophyllit",
+    "muscovite",
+    "phlogopite",
+    "liebenbergite",
+    "kaolinite",
+    "calcit",
+    "dolomite",
+    "magnetit",
+    "gypsum",
+    "cobaltite",
+    "linneit",
 };
 } // namespace PROPOSAL
 

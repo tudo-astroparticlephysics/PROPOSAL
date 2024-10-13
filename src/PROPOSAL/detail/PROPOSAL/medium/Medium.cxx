@@ -709,6 +709,36 @@ Phlogopite::Phlogopite()
 {
 }
 
+Annite::Annite()
+    : Medium("annite",
+        3.36, // massDensity
+        {
+            Components::Potassium(),
+            Components::Iron(3.0), // Fe^{2+}
+            Components::Aluminium(),
+            Components::Silicon(3.0),
+            Components::Oxygen(10.0),
+            Components::Oxygen(2.0),
+            Components::Hydrogen(2.0),
+        })
+{
+}
+
+Paragonite::Paragonite()
+    : Medium("paragonite",
+        2.907, // massDensity
+        {
+            Components::Sodium(),
+            Components::Aluminium(2.0),
+            Components::Aluminium(),
+            Components::Silicon(3.0),
+            Components::Oxygen(10.0),
+            Components::Oxygen(2.0),
+            Components::Hydrogen(2.0),
+        })
+{
+}
+
 Liebenbergite::Liebenbergite()
     : Medium("liebenbergite",
         4.60, // massDensity
@@ -800,7 +830,6 @@ Linneit::Linneit()
         })
 {
 }
-
 
 /******************************************************************************
  *                        private Helper Funcitons                             *
