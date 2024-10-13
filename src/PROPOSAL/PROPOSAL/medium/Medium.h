@@ -284,7 +284,7 @@ MEDIUM_DEF(Phlogopite)
 MEDIUM_DEF(Annite)
 // Mica - white glimmer (solid solution)
 MEDIUM_DEF(Muscovite)
-MEDIUM_DEF(Paragonit)
+// MEDIUM_DEF(Paragonit)
 
 // Olivine Group 3%
 MEDIUM_DEF(Liebenbergite)

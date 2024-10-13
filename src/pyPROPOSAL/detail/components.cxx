@@ -114,21 +114,4 @@ void init_components(py::module& m) {
         .def_property_readonly("hash", &Component::GetHash, R"pbdoc(
                     Hash value of component.
                 )pbdoc");
-
-    COMPONENT_DEF(m_sub, Hydrogen)
-    COMPONENT_DEF(m_sub, Carbon)
-    COMPONENT_DEF(m_sub, Nitrogen)
-    COMPONENT_DEF(m_sub, Oxygen)
-    COMPONENT_DEF(m_sub, Sodium)
-    COMPONENT_DEF(m_sub, Magnesium)
-    COMPONENT_DEF(m_sub, Sulfur)
-    COMPONENT_DEF(m_sub, Argon)
-    COMPONENT_DEF(m_sub, Potassium)
-    COMPONENT_DEF(m_sub, Calcium)
-    COMPONENT_DEF(m_sub, Iron)
-    COMPONENT_DEF(m_sub, Copper)
-    COMPONENT_DEF(m_sub, Lead)
-    COMPONENT_DEF(m_sub, Uranium)
-    COMPONENT_DEF(m_sub, StandardRock)
-    COMPONENT_DEF(m_sub, FrejusRock)
 }
