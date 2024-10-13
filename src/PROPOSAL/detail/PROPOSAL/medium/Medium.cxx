@@ -724,20 +724,20 @@ Annite::Annite()
 {
 }
 
-Paragonite::Paragonite()
-    : Medium("paragonite",
-        2.907, // massDensity
-        {
-            Components::Sodium(),
-            Components::Aluminium(2.0),
-            Components::Aluminium(),
-            Components::Silicon(3.0),
-            Components::Oxygen(10.0),
-            Components::Oxygen(2.0),
-            Components::Hydrogen(2.0),
-        })
-{
-}
+// Paragonite::Paragonite()
+//     : Medium("paragonite",
+//         2.907, // massDensity
+//         {
+//             Components::Sodium(),
+//             Components::Aluminium(2.0),
+//             Components::Aluminium(),
+//             Components::Silicon(3.0),
+//             Components::Oxygen(10.0),
+//             Components::Oxygen(2.0),
+//             Components::Hydrogen(2.0),
+//         })
+// {
+// }
 
 Liebenbergite::Liebenbergite()
     : Medium("liebenbergite",

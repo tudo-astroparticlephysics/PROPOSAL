@@ -49,9 +49,9 @@ void init_components(py::module& m) {
 
     py::class_<Component, std::shared_ptr<Component>>(
         m_sub, "Component")
-        .def(py::init<std::string, double, double, double>(), py::arg("name"),
+        .def(py::init<std::string, double, double, double, double>(), py::arg("name"),
              py::arg("charge"), py::arg("atomic_num"),
-             py::arg("atom_in_molecule"), R"pbdoc(
+             py::arg("atom_in_molecule"), py::arg("ionization_energy"), R"pbdoc(
             Creating a new static component.
 
             Args:
@@ -59,6 +59,7 @@ void init_components(py::module& m) {
                charge (float):  Charge in units of Coulomb.
                atomic_num (float): Atom number in periodic table.
                atomic_in_molecule (float): Number of atoms in molecule.
+               ionization_energy (float): Ionization Energy of Atom.
         )pbdoc")
         .def("__str__", &py_print<Component>)
         .def_property_readonly("name", &Component::GetName,

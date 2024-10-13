@@ -388,7 +388,7 @@ enum Medium_Type {
 } // namespace PROPOSAL
 
 namespace PROPOSAL {
-static const std::array<std::string, 19> Medium_Name = {
+static const std::array<std::string, 37> Medium_Name = {
     "water",
     "waterpdg2001",
     "waterpdg2020",
@@ -425,7 +425,7 @@ static const std::array<std::string, 19> Medium_Name = {
     "magnetit",
     "gypsum",
     "cobaltite",
-    "linneit",
+    "linneit"
 };
 } // namespace PROPOSAL
 

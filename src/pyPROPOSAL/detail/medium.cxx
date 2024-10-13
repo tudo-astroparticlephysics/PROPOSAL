@@ -1,20 +1,21 @@
 
-#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/Components.h"
 #include "pyPROPOSAL/pyBindings.h"
 
-#define MEDIUM_DEF(module, cls)                                 \
-    py::class_<cls, Medium, std::shared_ptr<cls>>(module, #cls) \
+#define MEDIUM_DEF(module, cls)                                                \
+    py::class_<cls, Medium, std::shared_ptr<cls>>(module, #cls)                \
         .def(py::init<>());
 
-#define MEDIUM_DEF_namespace(module, cls, ns)                           \
-    py::class_<ns::cls, Medium, std::shared_ptr<ns::cls>>(module, #cls) \
+#define MEDIUM_DEF_namespace(module, cls, ns)                                  \
+    py::class_<ns::cls, Medium, std::shared_ptr<ns::cls>>(module, #cls)        \
         .def(py::init<>());
 
 namespace py = pybind11;
 using namespace PROPOSAL;
 
-void init_medium(py::module& m) {
+void init_medium(py::module& m)
+{
     py::module m_sub = m.def_submodule("medium");
 
     m_sub.def("get_medium_for_hash", &Medium::GetMediumForHash);
@@ -65,46 +66,37 @@ void init_medium(py::module& m) {
 				)pbdoc")
         .def("__str__", &py_print<Medium>)
         // .def(py::init<>())
-        .def(py::init<
-                 std::string,  double, double, double, double, double,
-                 double, double, double,
-                 const std::vector<Component>&>(),
-             py::arg("name"),  py::arg("I"), py::arg("C"),
-             py::arg("a"), py::arg("m"), py::arg("X0"), py::arg("X1"),
-             py::arg("d0"), py::arg("massDensity"), py::arg("components"))
+        .def(py::init<std::string, double, double, double, double, double,
+                 double, double, double, const std::vector<Component>&>(),
+            py::arg("name"), py::arg("I"), py::arg("C"), py::arg("a"),
+            py::arg("m"), py::arg("X0"), py::arg("X1"), py::arg("d0"),
+            py::arg("massDensity"), py::arg("components"))
         .def_property_readonly("sum_charge", &Medium::GetSumCharge,
-                               R"pbdoc(Sum of charges of all nuclei.)pbdoc")
+            R"pbdoc(Sum of charges of all nuclei.)pbdoc")
         .def_property_readonly("ratio_ZA", &Medium::GetZA,
-                               R"pbdoc(Ratio of atomic and mass number.)pbdoc")
+            R"pbdoc(Ratio of atomic and mass number.)pbdoc")
         .def_property_readonly("ionization_potential", &Medium::GetI,
-                               R"pbdoc(Ionization potential in [eV])pbdoc")
-        .def_property_readonly(
-            "radiation_length",
-            (double (Medium::*)() const) & Medium::GetRadiationLength,
+            R"pbdoc(Ionization potential in [eV])pbdoc")
+        .def_property_readonly("radiation_length",
+            (double(Medium::*)() const) & Medium::GetRadiationLength,
             R"pbdoc(Radiation length of the medium in [].)pbdoc")
-        .def_property_readonly(
-            "mass_density", &Medium::GetMassDensity,
+        .def_property_readonly("mass_density", &Medium::GetMassDensity,
             R"pbdoc(Mass density of the medium in [g/cm3].)pbdoc")
-        .def_property_readonly(
-            "mol_density", &Medium::GetMolDensity,
+        .def_property_readonly("mol_density", &Medium::GetMolDensity,
             R"pbdoc(Mol density of the medium in [#/cm3].)pbdoc")
-        .def_property_readonly(
-            "average_nucleon_weigth", &Medium::GetMM,
+        .def_property_readonly("average_nucleon_weigth", &Medium::GetMM,
             R"pbdoc(Averaged component nucleon weights in [MeV])pbdoc")
         .def_property_readonly("sum_nucleons", &Medium::GetSumNucleons,
-                               R"pbdoc(Sum of nucleons.)pbdoc")
-        .def_property_readonly(
-            "num_components", &Medium::GetNumComponents,
+            R"pbdoc(Sum of nucleons.)pbdoc")
+        .def_property_readonly("num_components", &Medium::GetNumComponents,
             R"pbdoc(Number of components preserved in the medium.)pbdoc")
-        .def_property_readonly(
-            "components", &Medium::GetComponents,
+        .def_property_readonly("components", &Medium::GetComponents,
             R"pbdoc(List of components preserved in the medium.)pbdoc")
-        .def_property_readonly(
-            "name", &Medium::GetName,
+        .def_property_readonly("name", &Medium::GetName,
             R"pbdoc(Internal name of the particle. Should be unique to prevent
 				undefined behaviour.)pbdoc")
-        .def_property_readonly("hash", &Medium::GetHash,
-            R"pbdoc(Get medium hash.)pbdoc");
+        .def_property_readonly(
+            "hash", &Medium::GetHash, R"pbdoc(Get medium hash.)pbdoc");
 
     // define modules corresponding to PDG2001 and PDG2020 namespaces
     py::module m_pdg01 = m_sub.def_submodule("PDG2001");
@@ -113,19 +105,21 @@ void init_medium(py::module& m) {
         Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
         )pbdoc";
     MEDIUM_DEF_namespace(m_pdg01, Water, PDG2001)
-    MEDIUM_DEF_namespace(m_pdg01, Ice, PDG2001)
+        MEDIUM_DEF_namespace(m_pdg01, Ice, PDG2001)
 
-    py::module m_pdg20 = m_sub.def_submodule("PDG2020");
+            py::module m_pdg20
+        = m_sub.def_submodule("PDG2020");
     m_pdg20.doc() = R"pbdoc(
         Medium implementations based on D.E. Groom et al. (Particle Data Group),
         The European Physical Journal C15 (2000) 1 and 2001 off-year partial
         update for the 2002 edition available on the PDG WWW pages (URL: http://pdg.lbl.gov/).
     )pbdoc";
     MEDIUM_DEF_namespace(m_pdg20, Water, PDG2020)
-    MEDIUM_DEF_namespace(m_pdg20, Ice, PDG2020)
+        MEDIUM_DEF_namespace(m_pdg20, Ice, PDG2020)
 
-    // define default media
-    m_sub.attr("Water") = m_pdg20.attr("Water");
+        // define default media
+        m_sub.attr("Water")
+        = m_pdg20.attr("Water");
     m_sub.attr("Ice") = m_pdg20.attr("Ice");
 
     MEDIUM_DEF(m_sub, Salt)
@@ -142,4 +136,24 @@ void init_medium(py::module& m) {
     MEDIUM_DEF(m_sub, AntaresWater)
     MEDIUM_DEF(m_sub, CascadiaBasinWater)
     MEDIUM_DEF(m_sub, LiquidArgon)
+    MEDIUM_DEF(m_sub, Albit)
+    MEDIUM_DEF(m_sub, Anorthit)
+    MEDIUM_DEF(m_sub, Sanidine)
+    MEDIUM_DEF(m_sub, Anorthoclase)
+    MEDIUM_DEF(m_sub, Quartz)
+    MEDIUM_DEF(m_sub, Enstatite)
+    MEDIUM_DEF(m_sub, Ferrosilit)
+    MEDIUM_DEF(m_sub, Anthophyllit)
+    MEDIUM_DEF(m_sub, Phlogopite)
+    MEDIUM_DEF(m_sub, Annite)
+    MEDIUM_DEF(m_sub, Muscovite)
+    MEDIUM_DEF(m_sub, Paragonit)
+    MEDIUM_DEF(m_sub, Liebenbergite)
+    MEDIUM_DEF(m_sub, Kaolinite)
+    MEDIUM_DEF(m_sub, Calcit)
+    MEDIUM_DEF(m_sub, Dolomite)
+    MEDIUM_DEF(m_sub, Magnetit)
+    MEDIUM_DEF(m_sub, Gypsum)
+    MEDIUM_DEF(m_sub, Cobaltite)
+    MEDIUM_DEF(m_sub, Linneit)
 }
