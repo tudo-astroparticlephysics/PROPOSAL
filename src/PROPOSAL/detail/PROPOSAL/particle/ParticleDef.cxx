@@ -277,7 +277,9 @@ std::unordered_map<int, ParticleDef> ParticleDef::create_particle_map() {
         { static_cast<int>(ParticleType::KMinus), KMinusDef() },
         { static_cast<int>(ParticleType::Monopole), MonopoleDef() },
         { static_cast<int>(ParticleType::SMPPlus), SMPPlusDef() },
-        { static_cast<int>(ParticleType::SMPMinus), SMPMinusDef() }};
+        { static_cast<int>(ParticleType::SMPMinus), SMPMinusDef() },
+        { static_cast<int>(ParticleType::RhoPlus), RhoPlusDef() },
+        { static_cast<int>(ParticleType::RhoMinus), RhoMinusDef() }};
 }
 
 /******************************************************************************
@@ -355,56 +357,13 @@ TauMinusDef::TauMinusDef()
                   LeptonicDecayChannelApprox(
                       EMinusDef(), NuTauDef(), NuEBarDef()))
               .addChannel(
-                  0.1153, TwoBodyPhaseSpace(PiMinusDef(), NuTauDef()))
-              .addChannel(0.2595,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(NuTauDef())
-                      .build())
-              .addChannel(0.0952,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(NuTauDef())
-                      .build())
-              .addChannel(0.098,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(NuTauDef())
-                      .build())
-              .addChannel(0.0457,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(NuTauDef())
-                      .build())
-              .addChannel(0.0119,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(NuTauDef())
-                      .build())
-              .addChannel(0.01,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(K0Def())
-                      .addDaughter(NuTauDef())
-                      .build())
-              .addChannel(0.00349,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(KMinusDef())
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(NuTauDef())
-                      .build()),
+                  0.1109, TwoBodyPhaseSpace(PiMinusDef(), NuTauDef()))
+              .addChannel(0.2540,
+                  TwoBodyPhaseSpace(RhoMinusDef(), NuTauDef()))
+              .addChannel(0.2540,
+                  TwoBodyPhaseSpace(A1MinusDef(), NuTauDef()))
+              .addChannel(0.2540,
+                  TwoBodyPhaseSpace(Rho1465MinusDef(), NuTauDef())),
           static_cast<int>(ParticleType::TauMinus),
           static_cast<int>(ParticleType::NuTau))
 {
@@ -421,57 +380,14 @@ TauPlusDef::TauPlusDef()
               .addChannel(0.1783,
                   LeptonicDecayChannelApprox(
                       EPlusDef(), NuTauBarDef(), NuEDef()))
-              .addChannel(0.1153,
-                  TwoBodyPhaseSpace(PiPlusDef(), NuTauBarDef()))
-              .addChannel(0.2595,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(NuTauBarDef())
-                      .build())
-              .addChannel(0.0952,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(NuTauBarDef())
-                      .build())
-              .addChannel(0.098,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(NuTauBarDef())
-                      .build())
-              .addChannel(0.0457,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(NuTauBarDef())
-                      .build())
-              .addChannel(0.0119,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(Pi0Def())
-                      .addDaughter(NuTauBarDef())
-                      .build())
-              .addChannel(0.01,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(K0Def())
-                      .addDaughter(NuTauBarDef())
-                      .build())
-              .addChannel(0.00349,
-                  ManyBodyPhaseSpace::Builder()
-                      .addDaughter(KPlusDef())
-                      .addDaughter(PiPlusDef())
-                      .addDaughter(PiMinusDef())
-                      .addDaughter(NuTauBarDef())
-                      .build()),
+              .addChannel(
+                  0.1109, TwoBodyPhaseSpace(PiPlusDef(), NuTauDef()))
+              .addChannel(0.2540,
+                  TwoBodyPhaseSpace(RhoPlusDef(), NuTauDef()))
+              .addChannel(0.2540,
+                  TwoBodyPhaseSpace(A1PlusDef(), NuTauDef()))
+              .addChannel(0.2540,
+                  TwoBodyPhaseSpace(Rho1465PlusDef(), NuTauDef())),
           static_cast<int>(ParticleType::TauPlus),
           static_cast<int>(ParticleType::NuTauBar))
 {
@@ -573,6 +489,15 @@ PARTICLE_IMP(PiPlus, MPI, LPI, 1.0, static_cast<int>(ParticleType::PiPlus))
 PARTICLE_IMP(K0, MKAON, -1.0, 0.0, static_cast<int>(ParticleType::K0))
 PARTICLE_IMP(KMinus, MKAON, LKAON, -1.0, static_cast<int>(ParticleType::KMinus))
 PARTICLE_IMP(KPlus, MKAON, LKAON, 1.0, static_cast<int>(ParticleType::KPlus))
+
+PARTICLE_IMP(RhoPlus, 769.3, -1.0, 1.0, static_cast<int>(ParticleType::RhoPlus))
+PARTICLE_IMP(RhoMinus, 769.3, -1.0, -1.0, static_cast<int>(ParticleType::RhoMinus))
+
+PARTICLE_IMP(A1Plus, 1230.0, -1.0, 1.0, static_cast<int>(ParticleType::A1Plus))
+PARTICLE_IMP(A1Minus, 1230.0, -1.0, -1.0, static_cast<int>(ParticleType::A1Minus))
+
+PARTICLE_IMP(Rho1465Plus, 1465.0, -1.0, 1.0, static_cast<int>(ParticleType::RhoPlus))
+PARTICLE_IMP(Rho1465Minus, 1465.0, -1.0, -1.0, static_cast<int>(ParticleType::RhoMinus))
 
 PARTICLE_IMP(Monopole, MMON, STABLE_PARTICLE, CMON,
     static_cast<int>(ParticleType::Monopole))

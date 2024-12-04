@@ -104,6 +104,12 @@ enum class ParticleType : int {
     SMPPlus = 9500,
     SMPMinus = -9500,
     Hadron = 81,
+    RhoPlus = 213,
+    RhoMinus = -213,
+    A1Plus = 20213,
+    A1Minus = -20213,
+    Rho1465Plus = 100213,
+    Rho1465Minus = -100213,
 };
 
 struct ParticleType_hash {
@@ -286,6 +292,15 @@ PARTICLE_DEF(StauPlus)
 PARTICLE_DEF(Pi0)
 PARTICLE_DEF(PiMinus)
 PARTICLE_DEF(PiPlus)
+
+PARTICLE_DEF(RhoPlus)
+PARTICLE_DEF(RhoMinus)
+
+PARTICLE_DEF(A1Plus)
+PARTICLE_DEF(A1Minus)
+
+PARTICLE_DEF(Rho1465Plus)
+PARTICLE_DEF(Rho1465Minus)
 
 // ----------------------------------------------------------------------------
 /// @brief Particle definition of K0
