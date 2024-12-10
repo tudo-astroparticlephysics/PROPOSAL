@@ -18,6 +18,7 @@
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/particle/TauDecayMatrixElement.h"
 
 #include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
