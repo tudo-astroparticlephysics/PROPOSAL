@@ -40,10 +40,21 @@ std::complex<double> F2_pion(double Q2)
     / (1.0 + beta + gamma) );
 }
 
-double matrix_element_two_pion(PROPOSAL::ParticleState, std::vector<PROPOSAL::ParticleState>)
+double matrix_element_two_pion(PROPOSAL::ParticleState parent, std::vector<PROPOSAL::ParticleState> daughters)
 {
   using namespace PROPOSAL;
 
-  double M2 = 1.0; // FIXME: dummy value
-  return M2;
+  // cf. Yung-Su Tsai, Phys. Rev. D 4, 2821 (1971)
+  // p1 = tau, p2 = tau neutrino, q1 = pion, q2 = pion, Q = q1 - q2
+  // NB: Q here is *not* the momentum for the formfactor, which corresponds to (q1 + q2) in this notation
+  double p1_Q, p2_Q, p1_p2, Q2;
+  p1_Q = parent.energy * (daughters[0].energy - daughters[1].energy)
+    - parent.direction * (daughters[0].direction - daughters[1].direction);
+  p2_Q = daughters[2].energy * (daughters[0].energy - daughters[1].energy)
+    - daughters[2].direction * (daughters[0].direction - daughters[1].direction);
+  p1_p2 = parent.energy * daughters[2].energy - parent.direction * daughters[2].direction;
+  Q2 = 2 * MPI * MPI - 2 * (daughters[0].energy * daughters[1].energy
+    - daughters[0].direction * daughters[1].direction);
+
+  return (2 * p1_Q * p2_Q - p1_p2 * Q2) * F2_pion(2 * MPI * MPI + 2 * p1_p2);
 }
