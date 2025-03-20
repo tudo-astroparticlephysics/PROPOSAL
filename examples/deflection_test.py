@@ -76,15 +76,15 @@ def propagate_deflected_muons(initial_energies, minimum_energies, inter_type, de
             collection.scattering = pp.scattering.ScatteringMultiplier(multiple_scatter, stochastic_deflect, 1.0, [(inter_type[0], 1.0)])
 
     utility = pp.PropagationUtility(collection = collection)
-    detector = pp.geometry.Sphere(pp.Vector3D(0,0,0), 1e20)
+    detector = pp.geometry.Sphere(pp.Cartesian3D(0,0,0), 1e20)
     density_distr = pp.density_distribution.density_homogeneous(args["target"].mass_density)
 
     
     prop = pp.Propagator(args["particle_def"], [(detector, utility, density_distr)])
 
     init_state = pp.particle.ParticleState()
-    init_state.position = pp.Vector3D(0, 0, 0)
-    init_state.direction = pp.Vector3D(initial_direction[0], initial_direction[1], initial_direction[2])
+    init_state.position = pp.Cartesian3D(0, 0, 0)
+    init_state.direction = pp.Cartesian3D(initial_direction[0], initial_direction[1], initial_direction[2])
 
     tracks = []
     for E_i, E_min in zip(tqdm(initial_energies), minimum_energies):
