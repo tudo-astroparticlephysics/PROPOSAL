@@ -25,7 +25,7 @@ jobs:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
       steps:
-        - uses: actions/checkout@v2
+        - uses: actions/checkout@v4
         - name: Set up gcc5
           if : ${{ matrix.compiler == 'gcc-5' }}
           run: |
@@ -58,19 +58,19 @@ jobs:
         - name: Cache Conan
           if: ${{ matrix.os != 'windows-latest' }}
           id: cache-conan
-          uses: actions/cache@v2
+          uses: actions/cache@v4
           with:
             path: ~/.conan
             key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-${{ hashFiles('conanfile.py') }}-key
         - name: Cache build
           id: cache-build
-          uses: actions/cache@v2
+          uses: actions/cache@v4
           with:
             path: build
             key: ${{ runner.os }}-cache-build-${{ matrix.compiler }}-${{ github.sha }}-key
         - name: Cache tests
           id: cache-tests
-          uses: actions/cache@v2
+          uses: actions/cache@v4
           with:
             path: tests
             key: ${{ runner.os }}-cache-tests-${{ matrix.compiler }}-${{ github.sha }}-key            
@@ -121,17 +121,17 @@ jobs:
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/tests/TestFiles
       steps:
-        - uses: actions/checkout@v2
+        - uses: actions/checkout@v4
         - name: Cache conan
           if: ${{ matrix.os != 'windows-latest' }}
           id: cache-conan
-          uses: actions/cache@v2
+          uses: actions/cache@v4
           with:
             path: ~/.conan
             key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-${{ hashFiles('conanfile.py') }}-key
         - name: Cache tests
           id: cache-tests
-          uses: actions/cache@v2
+          uses: actions/cache@v4
           with:
             path: tests
             key: ${{ runner.os }}-cache-tests-${{ matrix.compiler }}-${{ github.sha }}-key
