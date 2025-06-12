@@ -19,10 +19,10 @@ jobs:
             path: ~/.conan
             key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-${{ hashFiles('conanfile.py') }}-key
         - name: Install conan
-          run: pip install --user conan
+          run: python3 -m pip install --user conan
         - name: Install Python 🐍 distributions 📦
-          run: pip install --user .
+          run: python3 -m pip install --user .
         - name: Install pytest
-          run: pip install --user pytest
+          run: python3 -m pip install --user pytest
         - name: run pytest
           run: python3 -m pytest tests/python -v
