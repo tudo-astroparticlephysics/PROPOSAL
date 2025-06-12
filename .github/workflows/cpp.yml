@@ -14,47 +14,12 @@ jobs:
             - os : "macos-latest"
               compiler : "clang"
               compilerpp : "clang++"
-            - os : "ubuntu-20.04"
-              compiler : "gcc-7"
-              compilerpp : "g++-7"
-            - os : "ubuntu-20.04"
-              compiler : "gcc-5"
-              compilerpp : "g++-5"
             - os : "windows-latest"
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compilerpp }}
       steps:
         - uses: actions/checkout@v4
-        - name: Set up gcc5
-          if : ${{ matrix.compiler == 'gcc-5' }}
-          run: |
-            mkdir ~/Downloads
-            cd ~/Downloads
-            wget -c http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/gcc-5-base_5.5.0-12ubuntu1_amd64.deb
-            wget -c http://archive.ubuntu.com/ubuntu/pool/universe/i/isl-0.18/libisl15_0.18-4_amd64.deb
-            wget -c http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/cpp-5_5.5.0-12ubuntu1_amd64.deb
-            wget -c http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/libasan2_5.5.0-12ubuntu1_amd64.deb
-            wget -c http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/libmpx0_5.5.0-12ubuntu1_amd64.deb
-            wget -c http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/libgcc-5-dev_5.5.0-12ubuntu1_amd64.deb
-            wget -c http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/gcc-5_5.5.0-12ubuntu1_amd64.deb
-            wget -c http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/libstdc++-5-dev_5.5.0-12ubuntu1_amd64.deb
-            wget -c http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/g++-5_5.5.0-12ubuntu1_amd64.deb
-            sudo apt install ./g++-5_5.5.0-12ubuntu1_amd64.deb ./gcc-5_5.5.0-12ubuntu1_amd64.deb ./gcc-5-base_5.5.0-12ubuntu1_amd64.deb ./cpp-5_5.5.0-12ubuntu1_amd64.deb ./libisl15_0.18-4_amd64.deb ./libgcc-5-dev_5.5.0-12ubuntu1_amd64.deb ./libasan2_5.5.0-12ubuntu1_amd64.deb ./libmpx0_5.5.0-12ubuntu1_amd64.deb ./libstdc++-5-dev_5.5.0-12ubuntu1_amd64.deb
-            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 10
-            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 20
-            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 10
-            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 20
-            sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 30
-            sudo update-alternatives --set cc /usr/bin/gcc
-            sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30
-            sudo update-alternatives --set c++ /usr/bin/g++
-        - name: Set up gcc7
-          if : ${{ matrix.compiler == 'gcc-7' }}
-          uses: egor-tensin/setup-gcc@v1
-          with:
-            version: 7
-            platform: x64
         - name: Cache Conan
           if: ${{ matrix.os != 'windows-latest' }}
           id: cache-conan
@@ -82,11 +47,7 @@ jobs:
         - name: Initialize conan
           run: conan profile detect
         - name: Prepare dependencies using conan
-          if : ${{ matrix.compiler != 'gcc-5' }}
           run: conan install . --build=missing -o with_testing=True
-        - name: Prepare dependencies using conan (gcc5)
-          if : ${{ matrix.compiler == 'gcc-5' }}
-          run: conan install . --build=missing -o with_testing=True -s:b compiler.cppstd=gnu14 -s compiler.cppstd=gnu14
         - name: Call CMake
           if: ${{ matrix.os != 'windows-latest' }}
           run: cmake . -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
@@ -111,12 +72,6 @@ jobs:
             - os : "macos-latest"
               compiler : "clang"
               compilerpp : "clang++"
-            - os : "ubuntu-20.04"
-              compiler : "gcc-7"
-              compilerpp : "g++-7"
-            - os : "ubuntu-20.04"
-              compiler : "gcc-5"
-              compilerpp : "g++-5"
             - os : "windows-latest"
       env:
         PROPOSAL_TEST_FILES: ${{ github.workspace }}/tests/TestFiles
