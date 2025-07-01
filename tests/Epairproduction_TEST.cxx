@@ -11,6 +11,8 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSALTestUtilities/TestFilesHandling.h"
 
+#include <iomanip>
+
 using namespace PROPOSAL;
 
 ParticleDef getParticleDef(const std::string& name)
@@ -59,6 +61,9 @@ TEST(Epairproduction, Test_of_dEdx)
                                           false, config);
 
         dEdx_new = cross->CalculatedEdx(energy);
+
+        std::cout << particleName << ", " << mediumName << ", " << ecut << ", " << vcut << ", " << multiplier << ", " << lpm << ", " << energy << ", " << parametrization << ", " << dEdx_stored << ", " << dEdx_new << std::endl;
+
         EXPECT_NEAR(dEdx_new, dEdx_stored, 1e-5 * dEdx_stored);
     }
 }
@@ -96,7 +101,8 @@ TEST(Epairproduction, Test_of_dNdx)
 
         dNdx_new = cross->CalculatedNdx(energy);
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+        std::cout << particleName << ", " << mediumName << ", " << ecut << ", " << vcut << ", " << multiplier << ", " << lpm << ", " << energy << ", " << parametrization << ", " << dNdx_stored << ", " << dNdx_new << std::endl;
+        EXPECT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
     }
 }
 
