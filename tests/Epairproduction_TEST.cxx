@@ -329,6 +329,7 @@ TEST(Epairproduction, Test_of_e_Interpolant)
 
 int main(int argc, char** argv)
 {
+    std::cout << std::setprecision (16) << 3.14159265358979 << std::endl;
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
