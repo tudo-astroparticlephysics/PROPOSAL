@@ -91,4 +91,4 @@ jobs:
             path: tests
             key: ${{ runner.os }}-cache-tests-${{ matrix.compiler }}-${{ github.sha }}-key
         - name: Run tests
-          run: ctest --test-dir tests -j2 --verbose -E "(Brems.*Interpolant|Photo.*Interpolant|Epair.*Interpolant|Mupair.*Interpolant)"
+          run: ctest --test-dir tests -j1 --verbose -E "(Brems.*Interpolant|Photo.*Interpolant|Epair.*Interpolant|Mupair.*Interpolant)"
