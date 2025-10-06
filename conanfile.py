@@ -73,7 +73,7 @@ class PROPOSALConan(ConanFile):
             self.requires("pybind11/2.10.1")
         if self.options.with_testing:
             self.requires("boost/1.85.0")
-            self.requires("gtest/1.17.0")
+            self.requires("gtest/1.16.0")
         if self.options.with_documentation:
             self.requires("doxygen/1.8.20")
 
