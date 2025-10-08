@@ -68,33 +68,15 @@ double normalppf(double x);
 ///
 /// @param x real argument
 ///
-/// Originally translated by R.Brun from CERNLIB DILOG function C332
-///
-/// Implemented as a truncated series expansion in terms of Chebyshev
-/// polynomials, see [Yudell L. Luke: Mathematical functions and their
-/// approximations, Academic Press Inc., New York 1975, p.67].
+/// Implementation from Alexander Voigt (https://orcid.org/0000-0001-8963-6512)
+/// From the repository https://github.com/Expander/polylogarithm (version 7.0.0)
+/// Distributed under MIT license
+/// 
+/// See also https://arxiv.org/abs/2201.01678
 ///
 /// @return dilog(x)
 // ----------------------------------------------------------------------------
 double dilog(double x);
-
-// ----------------------------------------------------------------------------
-/// @brief Calculate the trilogarithm
-///
-/// @param x real argument
-///
-/// Algorithm created by Alexander Sandrock.
-///
-/// Using definitions of polylogarithm for 0, 1, -1
-/// and to reduce the calculation for values |x| > 1
-/// to a calculation of the trilogarithm between |x| < 1.
-///
-/// For values |x| < 1 an advanced method converging faster
-/// than the primitive power series is used.
-///
-/// @return trilog(x)
-// ----------------------------------------------------------------------------
-// double trilog(double x);
 
 
 /// @brief Netwon-Raphson method and bisection to find the root of the function f
