@@ -16,21 +16,24 @@ double transform_relative_loss(double v_cut, double v_max, double v, double c = 
 double retransform_relative_loss(double v_cut, double v_max, double v, double c = 1);
 double transform_loss_log(double v_cut, double v_max, double v);
 double retransform_loss_log(double v_cut, double v_max, double v);
+double transform_loss_linear(double v_cut, double v_max, double v);
+double retransform_loss_linear(double v_cut, double v_max, double v);
 
 namespace crosssection {
     struct Compton;
     struct Ionization;
+    struct PhotoPairProduction;
 }
 
 // general transformation rules for v nodes
 // TODO: in C++17, this section can be rewritten much cleaner using if constexpr
 
-template <typename Param, std::enable_if_t<!(std::is_base_of<crosssection::Ionization, Param>::value || std::is_base_of<crosssection::Compton, Param>::value), bool> = true>
+template <typename Param, std::enable_if_t<!(std::is_base_of<crosssection::Ionization, Param>::value || std::is_base_of<crosssection::Compton, Param>::value || std::is_base_of<crosssection::PhotoPairProduction, Param>::value), bool> = true>
 double transform_loss(double v_cut, double v_max, double v) {
     return transform_relative_loss(v_cut, v_max, v);
 }
 
-template <typename Param, std::enable_if_t<!(std::is_base_of<crosssection::Ionization, Param>::value || std::is_base_of<crosssection::Compton, Param>::value), bool> = true>
+template <typename Param, std::enable_if_t<!(std::is_base_of<crosssection::Ionization, Param>::value || std::is_base_of<crosssection::Compton, Param>::value || std::is_base_of<crosssection::PhotoPairProduction, Param>::value), bool> = true>
 double retransform_loss(double v_cut, double v_max, double v) {
     return retransform_relative_loss(v_cut, v_max, v);
 }
@@ -58,6 +61,18 @@ template <typename Param, std::enable_if_t<std::is_base_of<crosssection::Compton
 double retransform_loss(double v_cut, double v_max, double v) {
     return retransform_loss_log(v_cut, v_max, v);
 }
+
+// specifications for PhotoPairProduction
+
+    template <typename Param, std::enable_if_t<std::is_base_of<crosssection::PhotoPairProduction, Param>::value, bool> = true>
+    double transform_loss(double v_cut, double v_max, double v) {
+        return transform_loss_linear(v_cut, v_max, v);
+    }
+
+    template <typename Param, std::enable_if_t<std::is_base_of<crosssection::PhotoPairProduction, Param>::value, bool> = true>
+    double retransform_loss(double v_cut, double v_max, double v) {
+        return retransform_loss_linear(v_cut, v_max, v);
+    }
 
 template <typename T1, typename... Args>
 auto build_dndx_def(T1 const& param, ParticleDef const& p, Args... args)

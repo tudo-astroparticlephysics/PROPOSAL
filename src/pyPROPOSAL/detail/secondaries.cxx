@@ -54,6 +54,24 @@ template <typename T, typename BaseT> struct SecondariesBuilder {
                 :math:`\frac{E_-}{E_{\gamma}}`.
             )pbdoc");
     }
+
+    template <typename... Args> auto decl_rho_param_interpol(Args... args)
+    {
+        py::class_<T, BaseT, std::shared_ptr<T>>(args...)
+                .def(py::init<ParticleDef, Medium, bool>(), py::arg("particle_def"),
+                     py::arg("medium"), py::arg("interpolate") = true)
+                .def("calculate_rho", &T::CalculateRho,
+                     R"pbdoc(
+                Samples the asymmetry factor for interactions where two particles
+                are created. For EpairProduction and MupairProduction, this
+                factor is defined as :math:`\frac{E_+ - E_-}{E_+ + E_-}`, where
+                :math:`E_-` is the energy of the created particle and :math:`E_+`
+                the energy of the created antiparticle. For annihilation and
+                photopairproduction, this factor is defined as
+                :math:`\frac{E_{\gamma,1}}{E_+ + m_e}`, respectively
+                :math:`\frac{E_-}{E_{\gamma}}`.
+            )pbdoc");
+    }
 };
 
 void init_secondaries(py::module& m)
@@ -147,19 +165,19 @@ void init_secondaries(py::module& m)
 
     SecondariesBuilder<secondaries::PhotoPairProductionTsai,
         secondaries::PhotoPairProduction> {}
-        .decl_rho_param(m_sub, "PhotoTsai");
+        .decl_rho_param_interpol(m_sub, "PhotoTsai");
     SecondariesBuilder<secondaries::PhotoPairProductionTsaiForwardPeaked,
         secondaries::PhotoPairProduction> {}
-        .decl_rho_param(m_sub, "PhotoTsaiForwardPeaked");
+        .decl_rho_param_interpol(m_sub, "PhotoTsaiForwardPeaked");
     SecondariesBuilder<secondaries::PhotoPairProductionTsaiSauter,
         secondaries::PhotoPairProduction> {}
-        .decl_rho_param(m_sub, "PhotoTsaiSauter");
+        .decl_rho_param_interpol(m_sub, "PhotoTsaiSauter");
     SecondariesBuilder<secondaries::PhotoPairProductionKochMotzForwardPeaked,
         secondaries::PhotoPairProduction> {}
-        .decl_rho_param(m_sub, "PhotoKochMotzForwardPeaked");
+        .decl_rho_param_interpol(m_sub, "PhotoKochMotzForwardPeaked");
     SecondariesBuilder<secondaries::PhotoPairProductionKochMotzSauter,
         secondaries::PhotoPairProduction> {}
-        .decl_rho_param(m_sub, "PhotoKochMotzSauter");
+        .decl_rho_param_interpol(m_sub, "PhotoKochMotzSauter");
 
     SecondariesBuilder<secondaries::PhotoeffectNoDeflection, secondaries::Photoeffect> {}
         .decl_param(m_sub, "PhotoeffectNoDeflection");
