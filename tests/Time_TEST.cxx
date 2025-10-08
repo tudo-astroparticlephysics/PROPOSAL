@@ -116,7 +116,6 @@ TEST(TimeBuilder, HighEnergies)
     double elapsed_time_approx = time_approx.TimeElapsed(
         1e14, 1e10, prop_grammage, medium.GetMassDensity());
 
-    std::cout << std::setprecision(9);
     EXPECT_LT(elapsed_time_approx, elapsed_time_exact); // exact velocity must be smaller than c
     EXPECT_NE(elapsed_time_approx, elapsed_time_exact); // they should not be equal
     EXPECT_NEAR(elapsed_time_approx, elapsed_time_exact,

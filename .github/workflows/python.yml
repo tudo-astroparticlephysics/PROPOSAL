@@ -11,18 +11,18 @@ jobs:
             - os : "ubuntu-latest"
             - os : "macos-latest"
       steps:
-        - uses: actions/checkout@v2
+        - uses: actions/checkout@v4
         - name: Cache conan
           id: cache-conan
-          uses: actions/cache@v2
+          uses: actions/cache@v4
           with:
             path: ~/.conan
             key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-${{ hashFiles('conanfile.py') }}-key
         - name: Install conan
-          run: python3 -m pip install conan
+          run: python3 -m pip install --break-system-packages conan
         - name: Install Python 🐍 distributions 📦
-          run: python3 -m pip install .
+          run: python3 -m pip install --break-system-packages .
         - name: Install pytest
-          run: python3 -m pip install pytest
+          run: python3 -m pip install --break-system-packages pytest
         - name: run pytest
           run: python3 -m pytest tests/python -v

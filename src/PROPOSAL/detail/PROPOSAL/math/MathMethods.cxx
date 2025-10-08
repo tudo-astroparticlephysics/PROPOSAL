@@ -75,114 +75,79 @@ double normalppf(double p) {
     return x;
 }
 
-// ------------------------------------------------------------------------- //
-double dilog(double x) {
-    double C_arr[] = {
-        0.42996693560813697,  0.40975987533077105,  -0.01858843665014592,
-        0.00145751084062268,  -0.00014304184442340, 0.00001588415541880,
-        -0.00000190784959387, 0.00000024195180854,  -0.00000003193341274,
-        0.00000000434545063,  -0.00000000060578480, 0.00000000008612098,
-        -0.00000000001244332, 0.00000000000182256,  -0.00000000000027007,
-        0.00000000000004042,  -0.00000000000000610, 0.00000000000000093,
-        -0.00000000000000014, 0.00000000000000002};
+/// dilog implementation from Alexander Voigt (https://orcid.org/0000-0001-8963-6512)
+/// From the repository https://github.com/Expander/polylogarithm (version 7.0.0)
+/// Distributed under MIT license
 
-    double HF = 0.5;
+double dilog(double x)
+{
+    const double PI = 3.1415926535897932;
+    const double P[] = {
+            0.9999999999999999502e+0,
+            -2.6883926818565423430e+0,
+            2.6477222699473109692e+0,
+            -1.1538559607887416355e+0,
+            2.0886077795020607837e-1,
+            -1.0859777134152463084e-2
+    };
+    const double Q[] = {
+            1.0000000000000000000e+0,
+            -2.9383926818565635485e+0,
+            3.2712093293018635389e+0,
+            -1.7076702173954289421e+0,
+            4.1596017228400603836e-1,
+            -3.9801343754084482956e-2,
+            8.2743668974466659035e-4
+    };
 
-    if (x == 1)
-        return PI * PI / 6.0;
-    else if (x == -1)
-        return -PI * PI / 12.0;
-    else {
-        double _T = -x;
-        double Y, S, A, B0, B1, B2, _H, _ALFA;
+    double y = 0, r = 0, s = 1;
 
-        if (_T <= -2.0) {
-            Y = -1.0 / (1.0 + _T);
-            S = 1.0;
-            B1 = std::log(-_T);
-            B2 = std::log(1.0 + 1.0 / _T);
-            A = -PI * PI / 3.0 + HF * (B1 * B1 - B2 * B2);
-        } else if (_T < -1.0) {
-            Y = -1.0 - _T;
-            S = -1.0;
-            A = std::log(-_T);
-            A = -PI * PI / 6.0 + A * (A + std::log(1 + 1 / _T));
-        } else if (_T <= -0.5) {
-            Y = -(1 + _T) / _T;
-            S = 1.0;
-            A = std::log(-_T);
-            A = -PI * PI / 6.0 + A * (-HF * A + std::log(1.0 + _T));
-        } else if (_T < 0.0) {
-            Y = -_T / (1 + _T);
-            S = -1.0;
-            A = std::log(1 + _T);
-            A = HF * A * A;
-        } else if (_T <= 1.0) {
-            Y = _T;
-            S = 1.0;
-            A = 0.0;
-        } else {
-            Y = 1.0 / _T;
-            S = -1.0;
-            A = std::log(_T);
-            A = PI * PI / 6 + HF * A * A;
-        }
-
-        _H = Y + Y - 1;
-        _ALFA = _H + _H;
-        B1 = 0.0;
-        B2 = 0.0;
-
-        for (int i = 19; i >= 0.0; --i) {
-            B0 = C_arr[i] + _ALFA * B1 - B2;
-            B2 = B1;
-            B1 = B0;
-        }
-
-        return -(S * (B0 - _H * B2) + A);
+    // transform to [0, 1/2]
+    if (x < -1) {
+        const double l = std::log(1 - x);
+        y = 1/(1 - x);
+        r = -PI*PI/6 + l*(0.5*l - std::log(-x));
+        s = 1;
+    } else if (x == -1) {
+        return -PI*PI/12;
+    } else if (x < 0) {
+        const double l = std::log1p(-x);
+        y = x/(x - 1);
+        r = -0.5*l*l;
+        s = -1;
+    } else if (x == 0) {
+        return x;
+    } else if (x < 0.5) {
+        y = x;
+        r = 0;
+        s = 1;
+    } else if (x < 1) {
+        y = 1 - x;
+        r = PI*PI/6 - std::log(x)*std::log1p(-x);
+        s = -1;
+    } else if (x == 1) {
+        return PI*PI/6;
+    } else if (x < 2) {
+        const double l = std::log(x);
+        y = 1 - 1/x;
+        r = PI*PI/6 - l*(std::log(y) + 0.5*l);
+        s = 1;
+    } else {
+        const double l = std::log(x);
+        y = 1/x;
+        r = PI*PI/3 - 0.5*l*l;
+        s = -1;
     }
 
-    return x;
-}
+    const double y2 = y*y;
+    const double y4 = y2*y2;
+    const double p = P[0] + y * P[1] + y2 * (P[2] + y * P[3]) +
+                     y4 * (P[4] + y * P[5]);
+    const double q = Q[0] + y * Q[1] + y2 * (Q[2] + y * Q[3]) +
+                     y4 * (Q[4] + y * Q[5] + y2 * Q[6]);
 
-// double trilog(double x)
-// {
-//     if (x == 0.)
-//         return 0.;
-//     else if (x == 1.)
-//         return ZETA3;
-//     else if (x == -1.)
-//         return -0.75*ZETA3;
-//     else if (std::abs(x) < 1.)
-//     {
-//         int max_iter = 100;
-//         double uncertainty_limit = 1e-6;
-//         double power_series = 0.25*x;
-//         double x_k = x;
-//         double addend;
-//         for (int k=2; k <= max_iter; k++)
-//         {
-//             x_k = x_k*x;
-//             addend = x_k / (k*k*k * (k+1)*(k+1));
-//             if (k > 5 && std::abs(addend/power_series) < uncertainty_limit)
-//                 break;
-//             if (k == max_iter)
-//                 Logging::Get("proposal.math")->critical("reach max iterations in trilog");
-//             power_series += addend;
-//         }
-//         return -4 + (3 - 3./x)*std::log(1 - x) + (2 + 1./x)*dilog(x) + power_series;
-//     }
-//     else if (x < -1)
-//     {
-//         double ln_x = std::log(-x);
-//         return trilog(1./x) - ln_x*ln_x*ln_x/6 - PI*PI/6*ln_x;
-//     }
-//     else // (x > 1)
-//     {
-//         double ln_x = std::log(x);
-//         return -trilog(1./x) - trilog(1 - 1./x) + ZETA3 + ln_x*ln_x*ln_x/6 - 0.5*ln_x*ln_x*std::log(x - 1) + PI*PI/6*ln_x;
-//     }
-// }
+    return r + s*y*p/q;
+}
 
 double NewtonRaphson(std::function<double(double)> func,
                      std::function<double(double)> dfunc,
