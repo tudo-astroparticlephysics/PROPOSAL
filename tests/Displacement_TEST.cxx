@@ -75,11 +75,18 @@ TEST(UpperLimitTrackIntegral, ConsistencyCheck)
     DisplacementBuilder disp_calc(GetCrossSections(), std::false_type());
     double E_i = 1.e8;
     double E_f_old = E_i;
+
+    double max_disp = disp_calc.SolveTrackIntegral(E_i, disp_calc.GetLowerLim()); // highest possible displacement
+
     for (double logDisp = 1; logDisp < 5; logDisp+=1.e-2) {
         double disp = std::pow(logDisp, 10.);
-        double E_f = disp_calc.UpperLimitTrackIntegral(E_i, disp);
-        EXPECT_LE(E_f, E_f_old);
-        E_f_old = E_f;
+        if (disp > max_disp) {
+            EXPECT_THROW(disp_calc.UpperLimitTrackIntegral(E_i, disp), std::logic_error);
+        } else {
+            double E_f = disp_calc.UpperLimitTrackIntegral(E_i, disp);
+            EXPECT_LE(E_f, E_f_old);
+            E_f_old = E_f;
+        }
     }
 }
 
@@ -95,15 +102,26 @@ TEST(UpperLimitTrackIntegral, CompareIntegralInterpolant)
     DisplacementBuilder disp_calc_integral(GetCrossSections(), std::false_type());
     DisplacementBuilder disp_calc_interpol(GetCrossSections(), std::true_type());
     double E_i = 1e8;
+    bool exception_integral, exception_interpol;
     for (double logDisp = 1; logDisp < 5; logDisp+=1.e-2) {
+        exception_integral = false;
+        exception_interpol = false;
         double disp = std::pow(logDisp, 10.);
-        double E_f_integral = disp_calc_integral.UpperLimitTrackIntegral(E_i, disp);
-        double E_f_interpol;
+
+        double E_f_integral, E_f_interpol;
+        try {
+            E_f_integral = disp_calc_integral.UpperLimitTrackIntegral(E_i, disp);
+        } catch (std::logic_error& e) {
+            E_f_integral = disp_calc_integral.GetLowerLim();
+            exception_integral = true;
+        }
         try {
             E_f_interpol = disp_calc_interpol.UpperLimitTrackIntegral(E_i, disp);
         } catch (std::logic_error& e) {
             E_f_interpol = disp_calc_interpol.GetLowerLim();
+            exception_interpol = true;
         }
+        EXPECT_EQ(exception_interpol, exception_integral);
         EXPECT_NEAR(E_f_integral, E_f_interpol, E_f_integral*1e-3);
     }
 }
