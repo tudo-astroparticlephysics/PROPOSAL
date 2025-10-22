@@ -104,7 +104,7 @@ class build_ext_cmake(build_ext):
             '-DPython_EXECUTABLE=' + sys.executable,
             '-DCMAKE_INSTALL_RPATH={}'.format(rpath),
             '-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON',
-            '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF',
+            '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=ON',
         ]
         sp.run(cmake_call, cwd=self.build_temp, check=True)
         build_call = [
