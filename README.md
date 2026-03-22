@@ -1,6 +1,8 @@
 ```
 ###############################################################################
 #                                                                             #
+
+[![gitcgr](https://gitcgr.com/badge/tudo-astroparticlephysics/PROPOSAL.svg)](https://gitcgr.com/tudo-astroparticlephysics/PROPOSAL)
 #            _____  _____   ____  _____   ____   _____         _              #
 #           |  __ \|  __ \ / __ \|  __ \ / __ \ / ____|  /\   | |             #
 #           | |__) | |__) | |  | | |__) | |  | | (___   /  \  | |             #
