@@ -12,35 +12,57 @@ env:
   CMAKE_TOOLCHAIN_FILE: build/conan_toolchain.cmake
 
 jobs:
-    build:
-      runs-on: ${{ matrix.os }}
-      strategy:
-        matrix:
-          include:
-            - os : "ubuntu-latest"
-            - os : "macos-latest"
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: "ubuntu-latest"
+            install: pip
+          - os: "ubuntu-latest"
+            install: conda
+          - os: "macos-latest"
+            install: pip
+          - os: "macos-latest"
+            install: conda
 
-      steps:
-        - uses: actions/checkout@v6
-        - uses: actions/setup-python@v6
-          with:
-            python-version: "3.12"
-        - name: Cache conan
-          id: cache-conan
-          uses: actions/cache@v5
-          with:
-            path: ~/.conan
-            key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-${{ hashFiles('conanfile.py') }}-key
-        - name: Install conan
-          run: |
-            python -m pip install conan
-            conan profile detect
+    steps:
+      - uses: actions/checkout@v6
 
-        - name: Install C++ dependencies using conan
-          run: conan install . -o with_python=True -o with_testing=False --build=missing
+      - uses: actions/setup-python@v6
+        if: matrix.install == 'pip'
+        with:
+          python-version: "3.12"
 
-        - name: Install Python 🐍 distributions 📦
-          run: python -m pip install .[tests]
+      - name: mamba setup
+        if: matrix.install == 'conda'
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          init-shell: bash
+          environment-name: ci
+          create-args: >-
+            python=3.12
+            pip
+            pytest
+          cache-downloads: true
 
-        - name: run pytest
-          run: python -m pytest tests/python -v
+      - name: Cache conan
+        id: cache-conan
+        uses: actions/cache@v5
+        with:
+          path: ~/.conan
+          key: ${{ runner.os }}-cache-conan-${{ matrix.compiler }}-${{ hashFiles('conanfile.py') }}-key
+
+      - name: Install conan
+        run: |
+          python -m pip install conan
+          conan profile detect
+
+      - name: Install C++ dependencies using conan
+        run: conan install . -o with_python=True -o with_testing=False --build=missing
+
+      - name: Install Python 🐍 distributions 📦
+        run: python -m pip install -v ".[tests]"
+
+      - name: run pytest
+        run: python -m pytest tests/python -v
