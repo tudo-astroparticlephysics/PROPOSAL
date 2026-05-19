@@ -14,6 +14,12 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        # We need login shells (-l) for micromamba to work.
+        shell: bash -leo pipefail {0}
+
     strategy:
       matrix:
         include:
