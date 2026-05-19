@@ -2,13 +2,12 @@ cmake_minimum_required(VERSION 3.17...3.31)
 
 project(pyPROPOSAL LANGUAGES CXX)
 
-find_package(Python COMPONENTS Interpreter Development REQUIRED)
+find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 find_package(pybind11 REQUIRED)
 
 
 file(GLOB_RECURSE PYTHON_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cxx)
-pybind11_add_module(pyPROPOSAL SHARED
-    ${PYTHON_SRC_FILES})
+pybind11_add_module(pyPROPOSAL MODULE ${PYTHON_SRC_FILES})
 
 set_target_properties(pyPROPOSAL PROPERTIES
     OUTPUT_NAME proposal)
