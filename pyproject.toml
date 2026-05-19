@@ -27,7 +27,7 @@ all = ["proposal[tests]"]
 
 [tool.scikit-build]
 sdist.cmake = true
-cmake.targets = ["pyPROPOSAL"]
+build.targets = ["pyPROPOSAL"]
 cmake.args = [
     "-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON",
     "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=ON",
